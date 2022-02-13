@@ -1,10 +1,11 @@
 module box
     include("utils.jl")
 
-    export Box
+    export Box, fit
     export ASCII, ASCII2, ASCII_DOUBLE_HEAD, SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
     export MINIMAL_DOUBLE_HEAD, SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, HORIZONTALS, ROUNDED, HEAVY
     export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
+    export ALL_BOXES
 
     # ---------------------------------------------------------------------------- #
     #                                      BOX                                     #
@@ -102,7 +103,7 @@ module box
             get_row(box, widths, :foot),
             get_row(box, widths, :bottom),
         ]
-        return join(strings, "\n")
+        return merge_lines(strings)
     end
 
 
@@ -367,4 +368,45 @@ module box
     """
     )
     
+
+
+    ALL_BOXES = Dict(
+        :ASCII => ASCII,
+        :ASCII2 => ASCII2,
+        :ASCII_DOUBLE_HEAD => ASCII_DOUBLE_HEAD,
+        :SQUARE => SQUARE,
+        :SQUARE_DOUBLE_HEAD => SQUARE_DOUBLE_HEAD,
+        :MINIMAL => MINIMAL,
+        :MINIMAL_HEAVY_HEAD => MINIMAL_HEAVY_HEAD,
+        :MINIMAL_DOUBLE_HEAD => MINIMAL_DOUBLE_HEAD,
+        :SIMPLE => SIMPLE,
+        :SIMPLE_HEAD => SIMPLE_HEAD,
+        :SIMPLE_HEAVY => SIMPLE_HEAVY,
+        :HORIZONTALS => HORIZONTALS,
+        :ROUNDED => ROUNDED,
+        :HEAVY => HEAVY,
+        :HEAVY_EDGE => HEAVY_EDGE,
+        :HEAVY_HEAD => HEAVY_HEAD,
+        :DOUBLE => DOUBLE,
+        :DOUBLE_EDGE => DOUBLE_EDGE,
+    
+        "ASCII" => ASCII,
+        "ASCII2" => ASCII2,
+        "ASCII_DOUBLE_HEAD" => ASCII_DOUBLE_HEAD,
+        "SQUARE" => SQUARE,
+        "SQUARE_DOUBLE_HEAD" => SQUARE_DOUBLE_HEAD,
+        "MINIMAL" => MINIMAL,
+        "MINIMAL_HEAVY_HEAD" => MINIMAL_HEAVY_HEAD,
+        "MINIMAL_DOUBLE_HEAD" => MINIMAL_DOUBLE_HEAD,
+        "SIMPLE" => SIMPLE,
+        "SIMPLE_HEAD" => SIMPLE_HEAD,
+        "SIMPLE_HEAVY" => SIMPLE_HEAVY,
+        "HORIZONTALS" => HORIZONTALS,
+        "ROUNDED" => ROUNDED,
+        "HEAVY" => HEAVY,
+        "HEAVY_EDGE" => HEAVY_EDGE,
+        "HEAVY_HEAD" => HEAVY_HEAD,
+        "DOUBLE" => DOUBLE,
+        "DOUBLE_EDGE" => DOUBLE_EDGE,
+    )
 end

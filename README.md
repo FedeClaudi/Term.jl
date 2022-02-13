@@ -20,3 +20,7 @@
       - [ ] why bold not working?
       - [x] allow for nested tags
         - [ ] correct ANSI code reset for nested tags with > 1 levels
+      - [ ] multi-line markup strings
+
+  - PANEL
+    - add title

@@ -29,7 +29,7 @@ module text
     """
     Parses out markup tags from a string and creates a stylized `MarkupText` instance.
     """
-    function inject_style(text::String)::MarkupText
+    function inject_style(text::AbstractString)::MarkupText
         # get all tags from text
         tags = extract_tags(text)
         
@@ -58,10 +58,24 @@ module text
             end
         end
         
-
         return MarkupText(text, parsed, tags)
     end
 
+    """
+        apply_style(string)
+
+    Applies style to a markup string and returns a string with ASCII codes
+    """
+    apply_style(string::AbstractString)::AbstractString = inject_style(string).string
+
+    """
+        apply_style(strin, style)
+
+    Applies the selected style to a plain string
+    """
+    apply_style(string::AbstractString, style::Union{Nothing, String}) = isnothing(style) ? string : apply_style("[$style]"*string*"[/$style]")
+
+    apply_style_to_lines(string::AbstractString) = merge_lines([apply_style(ln) for ln in split_lines(string)])
 
     # ---------------------------------------------------------------------------- #
     #                                  Extraction                                  #
@@ -70,7 +84,7 @@ module text
         Extract information about where each Tag is and 
         what paramers it specifies
     """
-    function extract_tags(text::String; first_only=false)  # ::Union{Tag, Vector{Tag}}
+    function extract_tags(text::AbstractString; first_only=false)  # ::Union{Tag, Vector{Tag}}
         # get [ ] intervals
         starts, ends, nO, nC =  get_brackets_position(text)
 
@@ -87,20 +101,29 @@ module text
         # get open -> close for each tag
         tags = []
         for tag in openers
+            # get where the tag closes
             closer = [c for c in closers if nospaces(c.text) == nospaces(tag.text) && c.start_char_idx > tag.start_char_idx]
-            
             closer_idx = length(closer) > 0 ? closer[1].start_char_idx : -1
             if closer_idx <= tag.start_char_idx
                 @debug "Failed tag closing" tag closer tag.text text
                 throw("Did not find a closing tag for $(tag.text)")
             end
 
-            push!(tags, Tag(
-                        tag.start_char_idx, 
-                        closer[1].end_char_idx , 
-                        tag.text, 
-                        text[tag.end_char_idx+1:closer[1].start_char_idx-1]
-            ))
+            # make sure we get working indices
+            start = get_last_valid(text, tag.end_char_idx+1)
+            stop = get_last_valid(text, closer[1].start_char_idx-1)
+
+            try
+                push!(tags, Tag(
+                            tag.start_char_idx, 
+                            closer[1].end_char_idx , 
+                            tag.text, 
+                            text[start:stop]
+                ))
+            catch error
+                @debug "Failed to create Tag" tag closer text error
+                throw("Failed to create tag")
+            end
 
             if first_only
                 return tags[1]

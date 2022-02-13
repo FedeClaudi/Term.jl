@@ -1,23 +1,27 @@
 module Term
-
-    include("colors.jl")
-    include("modes.jl")
     include("utils.jl")
-    include("box.jl")
 
     include("renderable.jl")
+    include("colors.jl")
+    include("modes.jl")
+    include("box.jl")
+
     include("markup.jl")
     include("text.jl")
     include("info.jl")
     include("measure.jl")
+    inlcude("layout.jl")
+    include("panel.jl")
 
     import .renderable: AbstractRenderable
     import .markup: Tag
     import .text: MarkupText
     import .measure: Measure
     import .table
+    import .layout
+    import .panel: Panel
 
-    export Tag, MarkupText, Measure
+    export Tag, MarkupText, Measure, Panel
     export tprint, info
 
     """ 

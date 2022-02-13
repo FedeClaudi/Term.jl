@@ -26,7 +26,7 @@ module markup
     """
     Gets the postion of all [ ] and does quality checks.
     """
-    function get_brackets_position(text::String)
+    function get_brackets_position(text::AbstractString)
         stripped = escape_brackets(text)
         starts = find_in_str("[", stripped)
         ends = find_in_str("]", stripped)
@@ -57,7 +57,7 @@ module markup
     """
         Checks if a string has markup tags definitions in it.
     """
-    has_tags(text::String) = get_brackets_position(text)[3] > 0
+    has_tags(text::AbstractString) = get_brackets_position(text)[3] > 0
 
     # --------------------------------- text tag --------------------------------- #
     """
