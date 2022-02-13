@@ -1,6 +1,8 @@
 # Term
 
 Implementing some functionality of the awesome [Rich](https://github.com/Textualize/rich) python library in Julia.
+While I've been writing this library, most of the credit goes to Will McGugan who has done an incredible work developing `rich`.
+My contribution is a translation of some of `rich`'s base featurs in Julia.
 
 NODE: this project is in very early development. There will be frequent breaking changes. Use at your own peril
 
