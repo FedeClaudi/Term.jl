@@ -45,9 +45,20 @@ tprint(panel)
 ```
 
 gives
+
 ![](docs/images.jl/panel.png)
 
+### Info
+`Term` provides an `info` model to print out an overview of an object (docstring, types hierarchy, fields, values...)
+
+![](docs/images.jl/info.png)
+
+
 ## BUGS
+- [ ] @doc inside `info` cant retrieve docstring
+- [ ] info doesnt work with vectors
+- [ ] check if markup of string of vectors works
+  
 - COLORS
   - [ ] passing only `mode` or `background` to a markup tag causes all colors to change
   - [ ] most colors passed to `markup` tags are not rendered or incorrectly rendered
@@ -57,6 +68,7 @@ gives
 ## TODO
   - [ ] deal with nested structures more naturally
   - [ ] pad renderables and strings
+  - [ ] get source code with `info` (checkout `less`)
   
   - COLOR
     - [ ] hex/rgb -> color code, compatibility with MyterialColors.jl

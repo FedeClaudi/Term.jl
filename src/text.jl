@@ -113,7 +113,8 @@ module text
             closer_idx = length(closer) > 0 ? closer[1].start_char_idx : -1
             if closer_idx <= tag.start_char_idx
                 @debug "Failed tag closing" tag closer tag.text text
-                throw("Did not find a closing tag for ''$(tag.text)''")
+                @warn("Did not find a closing tag for ''$(tag.text)''")
+                continue
             end
 
             # make sure we get working indices

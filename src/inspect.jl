@@ -1,6 +1,11 @@
 using InteractiveUtils
 
 
+macro varname(arg)
+    string(arg)
+end
+
+
 """
     info(object::Any)
 
@@ -10,7 +15,7 @@ function info(obj)
     get(n) = escape_brackets(string(getproperty(obj, n)); replace_singles=true)
     values = [get(field) for field in fieldnames(typeof(obj))]
 
-    info(typeof(obj); values=values)
+    info(typeof(obj); values=values, obj_name=@varname(obj))
 end
 
 """
@@ -18,11 +23,16 @@ end
 
 Prints information (docstring, fields...) for a `Type`
 """
-function info(obj::DataType; values=nothing)
+function info(obj::DataType; values=nothing, obj_name=nothing)
+
+    @info "Obj" obj typeof(obj) @doc obj
+
     width = 88
 
+    obj_name = isnothing(obj_name) ? "" : " [cyan]──[/cyan] [white]variable name: '$obj_name'[/white]"
+
     # get metadata
-    super = supertypes(obj)
+    super = join(supertypes(obj)[2:end], " < ")
     sub = subtypes(obj)
     sub = length(sub)>0 ? sub : "None"
 
@@ -59,11 +69,12 @@ function info(obj::DataType; values=nothing)
     tprint(
         Panel(
             Empty,
-            "[bold green]Docstring[/bold green]:\n" * string(@doc obj),
-            Separator(width+2; style="yellow"),
+            "[green]Docstring[/green]:\n" * string(@doc obj),
+            Separator(width+2; style="cyan"),
             hierarchy, fields;
-            title="DataType: " * string(obj),
-            style="bold yellow"
+            title="DataType: [u green]" * string(obj) * "[/u green]" * obj_name,
+            title_style="bold white",
+            style="bold cyan"
         )
     )
 end
