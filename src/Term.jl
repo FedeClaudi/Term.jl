@@ -8,18 +8,19 @@ module Term
 
     include("markup.jl")
     include("text.jl")
-    include("info.jl")
+    include("inspect.jl")
     include("measure.jl")
-    inlcude("layout.jl")
+    include("layout.jl")
     include("panel.jl")
 
     import .renderable: AbstractRenderable
     import .markup: Tag
     import .text: MarkupText
     import .measure: Measure
-    import .table
+    import .box
     import .layout
     import .panel: Panel
+    import .inspect: info
 
     export Tag, MarkupText, Measure, Panel
     export tprint, info
@@ -38,6 +39,7 @@ module Term
     """
     tprint(text::AbstractRenderable) = println(text.string)
 
+    tprint(args...) = tprint.(args)
 
     function tag_info(t)
         tprint("""

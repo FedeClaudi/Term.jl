@@ -128,4 +128,8 @@ module markup
     """Creates a string with ANSI codes given a tag"""
     tag2ansi(tag::Tag) = "\033[$(tag.mode);$(tag.color);$(tag.background)m$(tag.text)\033[0m"
 
+
+    ANSI_TAG_OPEN = "\033["
+    ANSI_TAG_CLOSE = "\033[0m"
+
 end

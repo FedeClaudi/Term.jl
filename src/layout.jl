@@ -1,5 +1,5 @@
 module layout
-    import .measure: Measure
+    import ..measure: Measure
 
     export Padding
 
@@ -17,7 +17,7 @@ module layout
         @assert lw < target_width "Text is longer than the target width"
 
         # get total padding size
-        padding = lw < target_width ? " "^(target_width - lw) : ""
+        padding = lw < target_width ? " "^(target_width - lw -1) : ""
         lPad = Measure(padding).width
         
         # split left/right padding for left/right justify
@@ -30,11 +30,11 @@ module layout
 
         # craete padding
         if method == :center
-            return Padding(left, right)
+            return Padding(" "*left, right)
         elseif method == :left
-            return Padding("", padding)
+            return Padding(" ", padding)
         elseif method == :right
-            return Padding(padding, "")
+            return Padding(padding, " ")
         end
     end
 

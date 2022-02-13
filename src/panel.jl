@@ -1,10 +1,13 @@
 module panel
     include("utils.jl")
 
-    import ..renderable: AbstractPanel
+    import ..renderable: AbstractPanel, AbstractRenderable
     import ..box: get_row, ALL_BOXES
-    import ..text: apply_style, apply_style_to_lines
-    import ..measure: Measure
+    import ..text: apply_style, apply_style_to_lines, plain
+    import ..measure: Measure, count_codeunits
+    import ..layout: Padding
+    import ..inspect: info
+    import ..markup: ANSI_TAG_CLOSE
 
     """
     Renderable with a panel around another piece of content
@@ -21,6 +24,8 @@ module panel
     """
     function Panel(
                 content::Union{String, AbstractRenderable};
+                title::Union{Nothing, String}=nothing,
+                title_style::Union{String, Nothing}=nothing,
                 width::Union{Nothing, Int}=nothing,
                 style::Union{String, Nothing}=nothing,
                 box::Symbol=:ROUNDED,
@@ -42,7 +47,24 @@ module panel
 
         # create rows of strings
         lines = []
-        push!(lines, σ(get_row(box, [width], :top)))  # make top row
+
+        # create top and add title
+        top = get_row(box, [width], :top)
+
+        if !isnothing(title)
+            title=apply_style(title)
+            l = length(plain(title))
+            @assert l < width - 4 "Title too long for panel of width $width"
+            
+            # compose title line 
+            cut_start = get_last_valid(top, 4)
+            pre = top[1:cut_start] * " " * apply_style(title, title_style) * " "
+            
+            post = box.top.mid^(length(top)-length(plain(pre))-1) * box.top.right
+            top = pre * σ(post)
+        end
+
+        push!(lines, σ(top))
 
         # add a panel row for each content row
         left, right = σ(string(box.mid.left)), σ(string(box.mid.right))

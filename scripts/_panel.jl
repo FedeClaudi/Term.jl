@@ -1,4 +1,7 @@
-import Term
+import Revise
+Revise.revise()
+
+using Term
 
 # ---------------------------------------------------------------------------- #
 #                                   on string                                  #
@@ -28,3 +31,24 @@ tprint(panel)
 @info "From MarkupText"
 text = MarkupText(test)
 tprint(Panel(text; box=:HEAVY))
+
+
+
+# ---------------------------------------------------------------------------- #
+#                                     title                                    #
+# ---------------------------------------------------------------------------- #
+print("\n"^4)
+tprint(Panel("test tes wtagaegzdgdszfgg", title="m", box=:SQUARE))
+
+tprint(Panel("test tes wtagaegzdgdszfgg", title="━━", box=:SQUARE))
+
+
+tprint(Panel("test tes wtagaegzdgdszfgg", title="[red]Madasdasaseg56r6[/red]", box=:HEAVY))
+
+tprint(Panel("test tes"^4, title="test"^3, box=:ASCII))
+
+
+tprint(Panel("test tes"^12, title="Mega"^2, title_style="red", style="green"))
+
+
+tprint(Panel("test tes"^6, title="Mega"^10))

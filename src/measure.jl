@@ -43,6 +43,8 @@ module measure
     # ---------------------------------------------------------------------------- #
     #                                     utils                                    #
     # ---------------------------------------------------------------------------- #
+
+    # ------------------------------- string utils ------------------------------- #
     """
     Gets the 'width' of each character.
 
@@ -54,4 +56,7 @@ module measure
     """
     lengths(str::String) = [ncodeunits(c) for c in str]
 
+    count_codeunits(str::AbstractString) = sum(lengths(str))
+
+    n_valid_indices(str::String) = length([i for i in 1:ncodeunits(str) if isvalid(str, i)])
 end

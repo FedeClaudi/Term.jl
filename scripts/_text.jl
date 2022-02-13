@@ -16,6 +16,8 @@ strings = [
         multiple
         lines
     """,
+
+    # nested
 ]
 
 """
@@ -33,14 +35,19 @@ strings = [
             multiple
             lines
         [/red]
+
+        # nested
+        "[red] out [green]inside [blue] blue [/blue] now green [/green] test [/red]"
+
+        "[red] out [green]inside [blue]more inside [/blue] now green [/green] test[blue] then some blue [/blue] and red [/red]"
 """
 
 for string in strings
-    print("\n\n")
-    @info "Processing" string
+    # print("\n\n")
+    # @info "Processing" string
     print("\n")
     tprint(string)
 
-    text = MarkupText(string)
-    println(text)
+    # text = MarkupText(string)
+    # println(text)
 end
