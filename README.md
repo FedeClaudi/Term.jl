@@ -12,10 +12,11 @@
     - COLOR
       - [ ] hex/rgb -> color code, compatibility with Myterial
       - [ ] if bg is passed and front color is not, infer front color to make bg work
+      - [ ] check that colors actually work correctly
 
   - MARKUP
       - [ ] escaping [] from strings
       - [ ] autoclose tags with [/] or end of string
       - [ ] why bold not working?
       - [x] allow for nested tags
-        - [ ] correct ANSI code reset for nested tags
+        - [ ] correct ANSI code reset for nested tags with > 1 levels

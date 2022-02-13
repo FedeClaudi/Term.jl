@@ -38,6 +38,15 @@ module text
         while has_tags(parsed)
             # replace just the first tag
             tag = extract_tags(parsed; first_only=true)
+
+            # handle nested tags
+            if has_tags(tag.text)
+                nested = inject_style(tag.text).string
+                nested = replace(nested, "\e[0m" => "\e[0m[$(tag.definition)]") * "[/$(tag.definition)]"
+                tag.text = nested
+            end
+
+            # replace tag definition with ANSI escape codes + text
             _start, _end, _ansi = tag.start_idx - 1, tag.end_idx + 1, tag2ansi(tag)
 
             if tag.start_idx == 1
