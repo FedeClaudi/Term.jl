@@ -3,6 +3,9 @@ uuid = "22787eb5-b846-44ae-b979-8e399b8463ab"
 authors = ["FedeClaudi <federicoclaudi@protonmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+
 [compat]
 julia = "1.6"
 
