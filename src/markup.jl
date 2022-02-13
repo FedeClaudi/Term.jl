@@ -1,4 +1,4 @@
-module Tags
+module markup
     include("colors.jl")
     include("modes.jl")
     include("utils.jl")
@@ -27,12 +27,12 @@ module Tags
 
     # --------------------------------- text tag --------------------------------- #
     """
-    TextTag represents a portion of text specifying a tag. For instance in
+    RawSingleTag represents a portion of text specifying a tag. For instance in
         ``"text [this is tag] and [/this is end tag]"`
 
-    There are two `TextTag`: "[this is tag]" and "[/this is end tag]"
+    There are two `RawSingleTag`: "[this is tag]" and "[/this is end tag]"
     """
-    struct TextTag
+    struct RawSingleTag
         start_char_idx::Int  # position of [ in main text
         end_char_idx::Int # position of ] in main text
         text::AbstractString  # text between []
@@ -55,6 +55,7 @@ module Tags
         start_idx:: Int  # position of first [
         end_idx:: Int  # position of last ]
         text::AbstractString  # string XXX from [open]XXX[/closed]
+        definition::String   # text in first []
         color::String = "7"
         colorname::String="white"
         background::String = "49"
@@ -70,7 +71,7 @@ module Tags
     Constructor for `Tag` extacting style info from a string description (`tag`).
     """
     function Tag(start_idx::Int, end_idx::Int, tag::String, text::AbstractString)
-        tg = Tag(start_idx=start_idx, end_idx=end_idx, text=text)
+        tg = Tag(start_idx=start_idx, end_idx=end_idx, text=text, definition=tag)
 
         elements = split(tag)
         for elem in elements

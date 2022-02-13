@@ -3,17 +3,32 @@ module Term
     include("colors.jl")
     include("modes.jl")
     include("utils.jl")
-    include("tag.jl")
-    include("style.jl")
 
-    import .Tags: Tag
-    import .Styles: inject_style
+    include("renderable.jl")
+    include("markup.jl")
+    include("text.jl")
+    include("info.jl")
 
-    export inject_style, Tag
-    export tprint
+    import .renderable: AbstractRenderable
+    import .markup: Tag
+    import .text: MarkupText
 
-    """ Stylized printing"""
-    tprint(text::String) = (println ∘ inject_style)(text)
+    export Tag, MarkupText
+    export tprint, info
+
+    """ 
+        tprint(text::String)
+
+    Stylized printing of a string as MarkupText
+    """
+    tprint(text::String) = tprint(MarkupText(text))
+
+    """ 
+        tprint(text::AbstractRenderable)
+
+    Prints the string field of an AbstractRenderable
+    """
+    tprint(text::AbstractRenderable) = println(text.string)
 
 
     function tag_info(t)

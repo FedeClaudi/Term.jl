@@ -1,10 +1,59 @@
-module Styles
+module text
+
     include("colors.jl")
     include("modes.jl")
-    include("tag.jl")
     include("utils.jl")
 
-    import .Tags: is_tag_closer, TextTag, Tag, tag2ansi
+
+    import ..renderable
+    import ..markup: is_tag_closer, RawSingleTag, Tag, tag2ansi
+
+    export MarkupText
+
+    # ---------------------------------------------------------------------------- #
+    #                                     TEXT                                     #
+    # ---------------------------------------------------------------------------- #
+    struct MarkupText <: renderable.AbstractText
+        raw_string::String  # raw user-provided string
+        string::String      # formatted string
+        tags::Vector{Tag}   # used for debugging/testing
+    end
+
+    """
+        MarkupText(string)
+    Constructs a MarkupText object out of a markup string.
+    """
+    MarkupText(text::String) = inject_style(text)
+
+
+    """
+    Parses out markup tags from a string and creates a stylized `MarkupText` instance.
+    """
+    function inject_style(text::String)::MarkupText
+        # get tags from text
+        tags = extract_tags(text)
+        @debug "Parsing $text, got: " tags
+        
+        splits = []
+        idx = tags[1].start_idx
+        if idx > 1
+            push!(splits, text[1:idx])
+        end
+    
+        for (i, tag) in enumerate(tags)
+            push!(splits, tag2ansi(tag))
+            if i < length(tags)
+                push!(splits, text[tag.end_idx+1:tags[i+1].start_idx - 1])
+            elseif tag.end_idx < length(text)
+                push!(splits, text[tag.end_idx+1:end])
+            end
+        end
+
+        return MarkupText(text, join(splits), tags)
+    end
+
+
+
 
     # ----------------------------------- utils ---------------------------------- #
 
@@ -51,7 +100,7 @@ module Styles
             tag = remove_brackets(text[s:e])
             is_closer = is_tag_closer(tag)
             tag_text = is_closer ? replace(tag, "/"=>"") : tag
-            _tag = TextTag(s, e, tag_text, is_closer)
+            _tag = RawSingleTag(s, e, tag_text, is_closer)
             is_closer ? push!(closers, _tag) : push!(openers, _tag)
         end
 
@@ -73,31 +122,5 @@ module Styles
         return tags
     end
 
-    # ---------------------------------------------------------------------------- #
-    #                                   Insertion                                  #
-    # ---------------------------------------------------------------------------- #
-    """
-    Parses out tags from a string and adds style to it.
-    """
-    function inject_style(text::String)::String
-        # get tags from text
-        tags = extract_tags(text)
-        @debug "Parsing $text, got: " tags
-        
-        splits = []
-        idx = tags[1].start_idx
-        if idx > 1
-            push!(splits, text[1:idx])
-        end
-    
-        for (i, tag) in enumerate(tags)
-            push!(splits, tag2ansi(tag))
-            if i < length(tags)
-                push!(splits, text[tag.end_idx+1:tags[i+1].start_idx - 1])
-            elseif tag.end_idx < length(text)
-                push!(splits, text[tag.end_idx+1:end])
-            end
-        end
-        return join(splits)
-    end
+
 end

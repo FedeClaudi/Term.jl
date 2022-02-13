@@ -7,7 +7,8 @@
 
 ## TODO
 - [ ] test for string parsing
-- [ ] replace tprint
 - [ ] hex/rgb -> color code, compatibility with Myterial
 - [ ] if bg is passed and front color is not, infer front color to make bg work
 - [ ] why bold not working?
+- [ ] allow for nested tags
+- [ ] escaping [] from strings
