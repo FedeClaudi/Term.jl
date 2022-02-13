@@ -6,9 +6,16 @@
 [![Coverage](https://codecov.io/gh/FedeClaudi/Term.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/FedeClaudi/Term.jl)
 
 ## TODO
-- [ ] test for string parsing
-- [ ] hex/rgb -> color code, compatibility with Myterial
-- [ ] if bg is passed and front color is not, infer front color to make bg work
-- [ ] why bold not working?
-- [ ] allow for nested tags
-- [ ] escaping [] from strings
+    - TEST
+      - [ ] test for string parsing
+      - [ ] 
+    - COLOR
+      - [ ] hex/rgb -> color code, compatibility with Myterial
+      - [ ] if bg is passed and front color is not, infer front color to make bg work
+
+  - MARKUP
+      - [ ] escaping [] from strings
+      - [ ] autoclose tags with [/] or end of string
+      - [ ] why bold not working?
+      - [x] allow for nested tags
+        - [ ] correct ANSI code reset for nested tags

@@ -6,7 +6,7 @@ module text
 
 
     import ..renderable
-    import ..markup: is_tag_closer, RawSingleTag, Tag, tag2ansi
+    import ..markup: is_tag_closer, RawSingleTag, Tag, tag2ansi, get_brackets_position, has_tags
 
     export MarkupText
 
@@ -30,59 +30,30 @@ module text
     Parses out markup tags from a string and creates a stylized `MarkupText` instance.
     """
     function inject_style(text::String)::MarkupText
-        # get tags from text
+        # get all tags from text
         tags = extract_tags(text)
-        @debug "Parsing $text, got: " tags
         
-        splits = []
-        idx = tags[1].start_idx
-        if idx > 1
-            push!(splits, text[1:idx])
-        end
-    
-        for (i, tag) in enumerate(tags)
-            push!(splits, tag2ansi(tag))
-            if i < length(tags)
-                push!(splits, text[tag.end_idx+1:tags[i+1].start_idx - 1])
-            elseif tag.end_idx < length(text)
-                push!(splits, text[tag.end_idx+1:end])
+        # substitue each tag with ANSI codes
+        parsed = text
+        while has_tags(parsed)
+            # replace just the first tag
+            tag = extract_tags(parsed; first_only=true)
+            _start, _end, _ansi = tag.start_idx - 1, tag.end_idx + 1, tag2ansi(tag)
+
+            if tag.start_idx == 1
+                parsed = _ansi * parsed[_end:end]
+            elseif tag.end_idx == length(text)
+                parsed = parsed[1:_start] * _ansi
+            else
+                parsed = parsed[1:_start] * _ansi * parsed[_end:end]
             end
         end
+        
 
-        return MarkupText(text, join(splits), tags)
+        return MarkupText(text, parsed, tags)
     end
 
 
-
-
-    # ----------------------------------- utils ---------------------------------- #
-
-
-    """
-    Gets the postion of all [ ] and does quality checks.
-    """
-    function get_brackets_position(text::String)
-        starts = find_in_str("[", text)
-        ends = find_in_str("]", text)
-        nO, nC = length(starts), length(ends)
-        
-        @assert nO == nC "Unequal number of '[' and ']', case not handled."
-        if nO == 0
-            return []
-        end
-    
-        for (i, (open, close)) in enumerate(zip(starts, ends))
-            # check for nested []
-            if i < nO
-                if starts[i+1] < close || close < open
-                    @debug "Failed to parse text: '$text'" open close starts ends
-                    throw("There is a nested set of square brackets or error while parsing text, case not handled")
-                end
-            end
-        end
-        return starts, ends, nO, nC
-    end
-    
     # ---------------------------------------------------------------------------- #
     #                                  Extraction                                  #
     # ---------------------------------------------------------------------------- #
@@ -90,7 +61,7 @@ module text
         Extract information about where each Tag is and 
         what paramers it specifies
     """
-    function extract_tags(text::String)::Vector{Tag}
+    function extract_tags(text::String; first_only=false)  # ::Union{Tag, Vector{Tag}}
         # get [ ] intervals
         starts, ends, nO, nC =  get_brackets_position(text)
 
@@ -110,7 +81,10 @@ module text
             closer = [c for c in closers if nospaces(c.text) == nospaces(tag.text) && c.start_char_idx > tag.start_char_idx]
             
             closer_idx = length(closer) > 0 ? closer[1].start_char_idx : -1
-            @assert closer_idx > tag.start_char_idx "Did not find a closing tag for $(tag.text), closer: $closer, closers: $([c.text for c in closers])|Text:$text"
+            if closer_idx <= tag.start_char_idx
+                @debug "Failed tag closing" tag closer tag.text text
+                throw("Did not find a closing tag for $(tag.text)")
+            end
 
             push!(tags, Tag(
                         tag.start_char_idx, 
@@ -118,6 +92,10 @@ module text
                         tag.text, 
                         text[tag.end_char_idx+1:closer[1].start_char_idx-1]
             ))
+
+            if first_only
+                return tags[1]
+            end
         end
         return tags
     end

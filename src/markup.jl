@@ -23,7 +23,41 @@ module markup
     """If a tag starts with '/' it must be closing another tag"""
     is_tag_closer(text::String) = '/' == text[1]
 
+    """
+    Gets the postion of all [ ] and does quality checks.
+    """
+    function get_brackets_position(text::String)
+        stripped = escape_brackets(text)
+        starts = find_in_str("[", stripped)
+        ends = find_in_str("]", stripped)
+        nO, nC = length(starts), length(ends)
+        
+        # checks
+        if nO != nC 
+            @debug "Failed brackes finding" text stripped starts
+            throw("Unequal number of '[' and ']', in text:  $text")
+        end
 
+        if nO == 0
+            return [], [], 0, 0
+        end
+    
+        for (i, (open, close)) in enumerate(zip(starts, ends))
+            # check for nested []
+            if i < nO
+                if starts[i+1] < close || close < open
+                    @debug "Failed to parse text: '$text'" open close starts ends
+                    throw("There is a nested set of square brackets or error while parsing text, case not handled")
+                end
+            end
+        end
+        return starts, ends, nO, nC
+    end
+    
+    """
+        Checks if a string has markup tags definitions in it.
+    """
+    has_tags(text::String) = get_brackets_position(text)[3] > 0
 
     # --------------------------------- text tag --------------------------------- #
     """
@@ -64,7 +98,6 @@ module markup
         modename::String = "default"
     end
    
-
 
 
     """
