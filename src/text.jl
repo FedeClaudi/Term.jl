@@ -1,5 +1,4 @@
 module text
-
     include("colors.jl")
     include("modes.jl")
     include("utils.jl")
@@ -8,7 +7,7 @@ module text
     import ..renderable
     import ..markup: is_tag_closer, RawSingleTag, Tag, tag2ansi, get_brackets_position, has_tags
 
-    export MarkupText
+    export MarkupText, apply_style, plain
 
     # ---------------------------------------------------------------------------- #
     #                                     TEXT                                     #

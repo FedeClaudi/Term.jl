@@ -2,6 +2,7 @@
 #                                    STRINGS                                   #
 # ---------------------------------------------------------------------------- #
 
+# ---------------------------------- look up --------------------------------- #
 """
     find_in_str("test", "my test")  # [4]
 Returns the first index of when the string "search"
@@ -11,7 +12,13 @@ function find_in_str(search::String, text::String)
     indices = [f[1] for f in findall(search, text)]  # may contain invalid indices
 end
 
+# -------------------------------- conversion -------------------------------- #
+"""
+Converts a string to a vector of Char
+"""
+chars(str::AbstractString)::Vector{Char} = [c for c in str]
 
+# ---------------------------------- editing --------------------------------- #
 """Removes [()] from a string"""
 remove_brackets(text::AbstractString) = replace(replace(replace(replace(text, "[" => ""), "]" => ""), "(" => ""), ")" => "")
 
@@ -20,26 +27,26 @@ nospaces(text::String) = replace(text, " " => "")
 
 
 """
-Converts a string to a vector of Char
-"""
-chars(str::AbstractString)::Vector{Char} = [c for c in str]
-
-"""
 Replaces:
     [[ with {
     ]] with }
     \e[ with {{
     \\033[ with {{{
 """
-function escape_brackets(text::AbstractString)
+function escape_brackets(text::AbstractString; replace_singles=false)
     text = replace(text, "[[" => "{")
     text = replace(text, "}}" => "}")
     text = replace(text, "\e[" => "{{")
     text = replace(text, "\\033[" => "{{{")
+
+    if replace_singles
+        text = replace(text, "[" => "{")
+        text = replace(text, "]" => "}")
+    end
     return text
 end
 
-
+# ----------------------------------- lines ---------------------------------- #
 function split_lines(text::AbstractString; discard_empty=true)
     if !discard_empty
         return split(text, "\n")
@@ -48,10 +55,14 @@ function split_lines(text::AbstractString; discard_empty=true)
     end
 end
 
-split_lines(renderable) = split_lines(renderable.string)
+split_lines(renderable; discard_empty=true) = split_lines(renderable.string; discard_empty=discard_empty)
 
 merge_lines(lines::Vector) = join(lines, "\n")
 
+lines(r; discard_empty=true) = split_lines(r.string; discard_empty=discard_empty)  # AbstractRenderable
+lines(r::AbstractString; discard_empty=true) = split_lines(r; discard_empty=discard_empty)
+
+# --------------------------------- indexing --------------------------------- #
 """
 When indexing a string, the number of indices is given by the
 the sum of the `ncodeunits` of each `Char`, but some indices

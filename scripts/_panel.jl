@@ -52,3 +52,14 @@ tprint(Panel("test tes"^12, title="Mega"^2, title_style="red", style="green"))
 
 
 tprint(Panel("test tes"^6, title="Mega"^10))
+
+
+
+# ---------------------------------------------------------------------------- #
+#                                    NESTED                                    #
+# ---------------------------------------------------------------------------- #
+
+p1 = Panel("INSIDE\npanel")
+tprint(Panel(
+    p1; style="red", title="outer"
+))

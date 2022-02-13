@@ -59,7 +59,21 @@ module markup
     """
     has_tags(text::AbstractString) = get_brackets_position(text)[3] > 0
 
-    # --------------------------------- text tag --------------------------------- #
+
+    function tag_info(t)
+        tprint("""
+        [bold green]Tag[/bold green]:
+            [yellow]range[/yellow]: [cyan]$(t.start_idx):$(t.end_idx)[/cyan]
+            [yellow]text[/yellow]: [cyan]$(t.text)[/cyan]
+            [yellow]color[/yellow]: [$(t.colorname)]$(t.colorname) (code: $(t.color))[/$(t.colorname)]
+            [yellow]mode[/yellow]: [$(t.modename) white]$(t.modename) (code: $(t.mode))[/$(t.modename) white]
+            [yellow]background[/yellow]: [$(t.bg_colorname) white]$(t.bg_colorname) (code: $(t.background))[/$(t.bg_colorname) white]
+        """)
+    end
+
+    # ---------------------------------------------------------------------------- #
+    #                                   Text Tag                                   #
+    # ---------------------------------------------------------------------------- #
     """
     RawSingleTag represents a portion of text specifying a tag. For instance in
         ``"text [this is tag] and [/this is end tag]"`
@@ -72,6 +86,7 @@ module markup
         text::AbstractString  # text between []
         closer::Bool
     end
+
 
     # ---------------------------------------------------------------------------- #
     #                                      Tag                                     #

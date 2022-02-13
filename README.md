@@ -51,8 +51,13 @@ gives
 - COLORS
   - [ ] passing only `mode` or `background` to a markup tag causes all colors to change
   - [ ] most colors passed to `markup` tags are not rendered or incorrectly rendered
+  - [ ] deeply nested tags not working
+  - [ ] tags across multiple lines not working
 
 ## TODO
+  - [ ] deal with nested structures more naturally
+  - [ ] pad renderables and strings
+  
   - COLOR
     - [ ] hex/rgb -> color code, compatibility with MyterialColors.jl
     - [ ] if bg is passed and front color is not, infer front color to make bg work

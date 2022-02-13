@@ -1,7 +1,8 @@
 module measure
     include("utils.jl")
 
-    import ..renderable: AbstractRenderable
+    import ..renderable: AbstractRenderable, LINE
+    import ..text: apply_style
 
     export Measure
 
@@ -31,12 +32,18 @@ module measure
         Measure(string)
     """
     function Measure(text::AbstractString) 
-        lines = split_lines(text)
+        lines = split_lines(text; discard_empty=false)
+        if length(lines) == 0
+            return Measure(0, 1)
+        end
+
         Measure(
-            max([length(strip_ansi(l)) for l in lines]...),
+            max([length(strip_ansi(apply_style(l))) for l in lines]...),
             length(lines)
         )
     end
+
+    Merasure(line::LINE) = Measure(0, 1)
 
 
 

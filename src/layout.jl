@@ -1,7 +1,15 @@
 module layout
+    import ..renderable: AbstractRenderable
     import ..measure: Measure
+    import ..box: ALL_BOXES
+    import ..text: apply_style
 
-    export Padding
+    export Padding, Separator
+
+
+    # ---------------------------------------------------------------------------- #
+    #                                    PADDING                                   #
+    # ---------------------------------------------------------------------------- #
 
     """
         Stores string to pad a string to a given width
@@ -36,6 +44,25 @@ module layout
         elseif method == :right
             return Padding(padding, " ")
         end
+    end
+
+
+
+    # ---------------------------------------------------------------------------- #
+    #                                LINE SEPARATOR                                #
+    # ---------------------------------------------------------------------------- #
+    struct Separator <: AbstractRenderable
+        string::AbstractString
+    end
+
+    function Separator(n::Int; box::Symbol=:ROUNDED, style::Union{AbstractString, Nothing}=nothing)
+        box = ALL_BOXES[box]
+        return Separator(apply_style(box.row.mid^n, style))
+    end
+
+    function Separator(renderable::AbstractRenderable; box::Symbol=:ROUNDED, style::Union{AbstractString, Nothing}=nothing)
+        measure = Measure(renderable)
+        return Separator(measure.width; box=box)
     end
 
 end

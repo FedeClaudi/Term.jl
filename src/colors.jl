@@ -17,7 +17,6 @@ ANSI_COLOR_NAMES = Dict(
     "bright_cyan"=> 14,
     "bright_white"=> 15,
     "grey0"=> 16,
-    "gray0"=> 16,
     "navy_blue"=> 17,
     "dark_blue"=> 18,
     "blue3"=> 20,

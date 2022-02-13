@@ -1,30 +1,35 @@
 module Term
-    include("utils.jl")
+    include("all_modules.jl")
 
-    include("renderable.jl")
-    include("colors.jl")
-    include("modes.jl")
-    include("box.jl")
+    using .box: Box, fit, ALL_BOXES
 
-    include("markup.jl")
-    include("text.jl")
-    include("inspect.jl")
-    include("measure.jl")
-    include("layout.jl")
-    include("panel.jl")
+    using .markup: Tag
 
-    import .renderable: AbstractRenderable
-    import .markup: Tag
-    import .text: MarkupText
-    import .measure: Measure
-    import .box
-    import .layout
-    import .panel: Panel
-    import .inspect: info
+    using .measure: Measure
 
-    export Tag, MarkupText, Measure, Panel
+    using .renderable: AbstractRenderable, AbstractText, AbstractPanel, Line, Empty, Space
+    using .renderable: LINE
+
+    using .text: MarkupText, apply_style, plain
+
+    using .layout: Padding, Separator
+
+    using .panel: Panel
+
+
+    export MarkupText, Measure
+    export Panel
+    export Line, Space, Empty
+    export Separator
     export tprint, info
 
+    # -------------------------------- typed utils ------------------------------- #
+    lines(l::LINE; discard_empty=true) = ["\n"]
+    split_lines(l::LINE; discard_empty=true) = ["\n"]
+
+    # ---------------------------------------------------------------------------- #
+    #                                    tprint                                    #
+    # ---------------------------------------------------------------------------- #
     """ 
         tprint(text::String)
 
@@ -40,17 +45,6 @@ module Term
     tprint(text::AbstractRenderable) = println(text.string)
 
     tprint(args...) = tprint.(args)
-
-    function tag_info(t)
-        tprint("""
-        [bold green]Tag[/bold green]:
-            [yellow]range[/yellow]: [cyan]$(t.start_idx):$(t.end_idx)[/cyan]
-            [yellow]text[/yellow]: [cyan]$(t.text)[/cyan]
-            [yellow]color[/yellow]: [$(t.colorname)]$(t.colorname) (code: $(t.color))[/$(t.colorname)]
-            [yellow]mode[/yellow]: [$(t.modename) white]$(t.modename) (code: $(t.mode))[/$(t.modename) white]
-            [yellow]background[/yellow]: [$(t.bg_colorname) white]$(t.bg_colorname) (code: $(t.background))[/$(t.bg_colorname) white]
-        """)
-    end
 
 end
 
