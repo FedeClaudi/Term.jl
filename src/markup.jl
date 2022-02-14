@@ -2,7 +2,7 @@ module markup
 
     export extract_markup, MarkupTag
 
-    const OPEN_TAG_REGEX = r"\[[a-zA-Z _]+[^/\[]\]"
+    const OPEN_TAG_REGEX = r"\[[a-zA-Z _0-9.,()]+[^/\[]\]"
     const GENERIC_CLOSER_REGEX = r"\[\/\]"
 
     # -------------------------------- single tag -------------------------------- #

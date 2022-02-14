@@ -7,44 +7,6 @@ is_mode(string::AbstractString) = string ∈ NAMED_MODES
 
 import Parameters: @with_kw
 
-@with_kw mutable struct MarkupStyle
-    normal::Bool        = false
-    bold::Bool          = false
-    dim::Bool           = false
-    italic::Bool        = false
-    underline::Bool     = false
-    blinking::Bool      = false
-    inverse::Bool       = false
-    hidden::Bool        = false
-    striked::Bool       = false
-
-    color::AbstractColor       = NamedColor("default")
-    background::AbstractColor       = NamedColor("default")
-
-    tag::MarkupTag
-end
-
-function MarkupStyle(tag::MarkupTag)
-    codes = split(tag.markup)
-
-    style = MarkupStyle(tag=tag)
-    # setproperty!(style, color) = NamedColor("red")
-    setproperty!(style, :normal, true)
-
-    for code in codes
-        if is_mode(code)
-            setproperty!(style, Symbol(code), true)
-        elseif is_color(code)
-            setproperty!(style, :color, get_color(code))
-        elseif is_background(code)
-            setproperty!(style, :background, get_color(code[4:end]))
-        else
-            @warn "Code type not recognized: $code"
-        end
-    end
-    return style
-end
-
 
 
 for test in tests

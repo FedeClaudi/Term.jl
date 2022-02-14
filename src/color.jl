@@ -19,6 +19,18 @@ module color
 
     struct RGBColor <: AbstractColor
         color::String
+        r::Int
+        g::Int
+        b::Int
+    end
+    function RGBColor(s::AbstractString) 
+        r, g, b = _rgb(s)
+        if typeof(r) == Float64
+            r = (Int64 ∘ round)(r * 255)
+            g = (Int64 ∘ round)(b * 255)
+            b = (Int64 ∘ round)(b * 255)
+        end
+        return RGBColor(s, r, g, b)
     end
 
 
@@ -43,7 +55,8 @@ module color
     """
     function _rgb(txt)
         try
-            return _rgb(Float64, txt)
+            r,g,b =  _rgb(Float64, txt)
+
         catch
             return _rgb(Int64, txt)
         end
@@ -60,10 +73,9 @@ module color
     function is_rgb_color(string::AbstractString)::Bool
         try
             _rgb(string)
+            return true
         catch
             return false
-        finally
-            return true
         end
     end
     
@@ -79,6 +91,7 @@ module color
     
     
     function is_color(string::AbstractString)::Bool
+
         is_named = is_named_color(string)
         is_rgb = is_rgb_color(string)
         is_hex = is_hex_color(string)
@@ -94,22 +107,11 @@ module color
 
 
     # --------------------------------- get color -------------------------------- #
-    function string2rgb(string::AbstractString)::RGBColor
-        r,g,b = _rgb(string)
-        if typeof(r) == Float64
-            r = (Int64 ∘ round)(r * 255)
-            g = (Int64 ∘ round)(b * 255)
-            b = (Int64 ∘ round)(b * 255)
-        end
-    
-        return RGBColor("($r, $g, $b)")
-    end
-    
     
     function hex2rgb(string::AbstractString)::RGBColor
         throw("not implemented")
         r, g, b = "to", "do", "one day"
-        return RGBColor("($r, $g, $b)")
+        return RGBColor("($r, $g, $b)", r, g, b)
     end
     
     
@@ -127,7 +129,7 @@ module color
                 return NamedColor(NAMED_COLORS[idx])
             end
         elseif is_rgb_color(string)
-            return string2rgb(string)
+            return RGBColor(string)
         else
             return hex2rgb(string)
         end
