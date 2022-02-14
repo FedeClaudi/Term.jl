@@ -3,10 +3,10 @@ module style
     include("_ansi.jl")
     import Parameters: @with_kw
 
-    import ..markup: MarkupTag
+    import ..markup: MarkupTag, extract_markup
     import ..color: AbstractColor, NamedColor, is_color, is_background, get_color
 
-    export MarkupStyle
+    export MarkupStyle, extract_style
 
     is_mode(string::AbstractString) = string ∈ NAMED_MODES
 
@@ -59,5 +59,11 @@ module style
         return style
     end
 
+    # ------------------------------ extract style ------------------------------ #
+    function extract_style(text::AbstractString)
+        tags = extract_markup(text)
+        styles = [MarkupStyle(tag) for tag in tags]
+        return styles
+    end
 
 end
