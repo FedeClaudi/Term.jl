@@ -1,35 +1,5 @@
 
 
-"""Removes all spaces from a string"""
-nospaces(text::AbstractString) = replace(text, " " => "")
-remove_brackets(text::AbstractString) = replace(replace(text, "("=>""), ")"=>"")
-
-const NAMED_COLORS = [
-    "black",
-    "red",
-    "green",
-    "yellow",
-    "blue",
-    "magenta",
-    "cyan",
-    "white",
-    "default",
-]
-
-const NAMED_MODES = [
-    "normal",
-    "bold",
-    "dim",
-    "italic",
-    "underline",
-    "blinking",
-    "inverse",
-    "hidden",
-    "striked",
-]
-
-const COLORS_16b = [string(i) for i in 1:255]
-
 
 println("\n")
 
@@ -52,29 +22,7 @@ open_regex=r"\[[a-zA-Z _]+[^/]\]"
 tag_close_regex=r"\[\/+[a-zA-Z _]*\]"
 
 
-# ---------------------------------------------------------------------------- #
-#                                     tags                                     #
-# ---------------------------------------------------------------------------- #
-struct SingleTag
-    markup::String
-    start::Int
-    stop::Int
-    isclose::Bool
-end
-SingleTag(match::RegexMatch) = begin  SingleTag(
-        match.match[2:end-1],
-        match.offset,
-        match.offset + length(match.match),
-        match.match[2] == '/'
-    )
-end
 
-struct MarkupTag
-    markup::String
-    open::SingleTag
-    close::SingleTag
-end
-MarkupTag(open::SingleTag, close::SingleTag) = MarkupTag(open.markup, open, close)
 
 # ---------------------------------------------------------------------------- #
 #                                     color                                    #
