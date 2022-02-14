@@ -7,7 +7,7 @@ module color
     # ----------------------------- types definition ----------------------------- #
     abstract type AbstractColor end
 
-    Base.show(io::IO, color::AbstractColor) = print(io, color.color)
+    Base.show(io::IO, color::AbstractColor) = print(io, "$(typeof(color))('$(color.color)')")
 
     struct NamedColor <: AbstractColor
         color::String

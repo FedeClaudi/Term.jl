@@ -59,6 +59,8 @@ module style
         return style
     end
 
+    toDict(style::MarkupStyle) = Dict(fieldnames(typeof(style)) .=> getfield.(Ref(style), fieldnames(typeof(style))))
+
     # ------------------------------ extract style ------------------------------ #
     function extract_style(text::AbstractString)
         tags = extract_markup(text)

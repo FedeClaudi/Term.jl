@@ -1,3 +1,44 @@
+struct ANSICode
+    open::String
+    close::String
+end
+
+
+function ANSICode(named_color::String; bg::Bool=false, named=false)
+    Δ = bg ? 40 : 30
+    v = CODES[named_color]
+
+    if named
+        return ANSICode("\e[$(Δ + v)m", "\e[$(Δ+9)m")
+    end
+end
+
+
+
+CODES = Dict(
+    :bold =>  ANSICode("\e[1m", "\e[22m"),
+    :dim => ANSICode("\e[2m", "\e[22m"),
+    :italic => ANSICode("\e[3m", "\e[23m"),
+    :underline => ANSICode("\e[4m", "\e[24m"),
+    :blink => ANSICode("\e[5m", "\e[25m"),
+    :inverse => ANSICode("\e[7m", "\e[27m"),
+    :hidden => ANSICode("\e[8m", "\e[28m"),
+    :striked => ANSICode("\e[9m", "\e[29m"),
+
+    "black"=> 0,
+    "red"=> 1,
+    "green"=> 2,
+    "yellow"=> 3,
+    "blue"=> 4,
+    "magenta"=> 5,
+    "cyan"=> 6,
+    "white"=> 7,
+    "default"=>9,
+   
+)
+
+
+
 # ---------------------------------------------------------------------------- #
 #                                    COLORS                                    #
 # ---------------------------------------------------------------------------- #
