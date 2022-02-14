@@ -102,22 +102,26 @@ module color
             b = (Int64 ∘ round)(b * 255)
         end
     
-        return RGB("($r, $g, $b)")
+        return RGBColor("($r, $g, $b)")
     end
     
     
     function hex2rgb(string::AbstractString)::RGBColor
         throw("not implemented")
         r, g, b = "to", "do", "one day"
-        return RGB("($r, $g, $b)")
+        return RGBColor("($r, $g, $b)")
     end
     
     
-    function get_color(string::AbstractString)::AbstractColor
+    function get_color(string::AbstractString; bg=false)::AbstractColor
+        if bg
+            string = nospaces(string)[4:end]
+        end
+
         if is_named_color(string)
             if string ∈ COLORS_16b
                 idx = findfirst((c) -> c==string, COLORS_16b)[1]
-                return NamedColor(COLORS_16b[idx])
+                return BitColor(COLORS_16b[idx])
             else
                 idx = findfirst((c) -> c==string, NAMED_COLORS)[1]
                 return NamedColor(NAMED_COLORS[idx])

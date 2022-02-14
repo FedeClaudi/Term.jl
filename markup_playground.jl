@@ -1,49 +1,4 @@
 
-
-
-println("\n")
-
-
-tests = [
-    "[red]color[/red]white",
-    "[red on_green]color[/red on_green]white",
-    "[blue bold on_red] test // [/blue bold on_red]",
-    "[bold] [ test [/bold]",
-    "[bold] ] test [/bold]",
-    "[bold on_white] [] test [/bold on_white]",
-    "[bold italic] / test [/bold italic]",
-    "[red] outer [blue] inner [/blue] and close [/red]",
-    "[ red  on_blue] test with spaces [/ red  on_blue]",
-]
-test = "[red]color[/red]white"
-
-open_regex=r"\[[a-zA-Z _]+[^/]\]"
-
-tag_close_regex=r"\[\/+[a-zA-Z _]*\]"
-
-
-
-
-# ---------------------------------------------------------------------------- #
-#                                     color                                    #
-# ---------------------------------------------------------------------------- #
-abstract type AbstractColor end
-Base.show(io::IO, color::AbstractColor) = print(color.color)
-
-struct NamedColor <: AbstractColor
-    color::String
-end
-
-struct BitColor <: AbstractColor
-    color::String
-end
-
-struct RGBColor <: AbstractColor
-    color::String
-end
-
-
-
 # ---------------------------------------------------------------------------- #
 #                                     style                                    #
 # ---------------------------------------------------------------------------- #
