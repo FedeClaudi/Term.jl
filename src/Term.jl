@@ -3,8 +3,8 @@ module Term
 
     include("__text_utils.jl")
 
-    include("ansi.jl")
+    include("markup.jl")
 
-    using .ansi: extract_markup, MarkupTag
+    using .markup: extract_markup, MarkupTag
 end
 

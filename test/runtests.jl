@@ -1,4 +1,4 @@
 using Term
 using Test
 
-include("test_ansi.jl")
+include("test_markup_extraction.jl")
