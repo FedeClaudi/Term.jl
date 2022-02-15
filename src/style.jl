@@ -88,20 +88,25 @@ module style
         # start applying styles
         style_init, style_finish = "", ""
         for (attr, value) in toDict(style)
+            # BACKGROUND
             if attr == :background
-                if !isnothing(value)
-                    code = ANSICode(value.color; bg=true, named=(typeof(value) == NamedColor))
-                else
-                    code = nothing
-                end
-    
+                # if !isnothing(value)
+                #     @info value
+                #     code = ANSICode(value.color; bg=true, named=(typeof(value) == NamedColor))
+                # else
+                code = nothing
+                # end
+            
+            # COLOR
             elseif attr == :color
                 if !isnothing(value)
-                    code = ANSICode(value.color; bg=false, named=(typeof(value) == NamedColor))
+                    # @info value string(typeof(value))
+                    code = ANSICode(value; bg=false)
                 else
                     code = nothing
                 end
-    
+            
+            # MODES
             elseif attr != :tag && value == true
                 code = CODES[attr]
             elseif attr != :tag && value == false

@@ -1,4 +1,4 @@
-import Term.markup: extract_markup, MarkupTag
+import Term.markup: extract_markup, MarkupTag, remove_markup
 
 
 function test_extremes(tags, text)
@@ -105,4 +105,17 @@ end
     tags = extract_markup(txt)
     test_extremes(tags, txt)
     @test length(tags) == 3
+end
+
+
+@testset "MARKUP removal" begin
+    @test "abc" == remove_markup("[red]abc[/]")
+
+    @test "abc" == remove_markup("[red on_blue]abc[/red on_blue]")
+
+    @test "abc" == remove_markup("[pink bold on_red]abc")
+
+    @test "abc" == remove_markup("abc")
+
+    @test "abc" == remove_markup("[red on_blue]a[blue]b[/]c[/red on_blue]")
 end

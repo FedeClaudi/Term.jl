@@ -7,3 +7,7 @@ remove_brackets(text::AbstractString) = replace(replace(text, "("=>""), ")"=>"")
 
 """Removes spaces after commas """
 unspace_commas(text::AbstractString) = replace(replace(text, ", "=>","), ". "=>".")
+
+
+"""Splits a string into a vector of Chars"""
+chars(text::AbstractString)::Vector{Char} = [x for x in text]

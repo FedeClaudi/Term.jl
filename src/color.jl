@@ -107,10 +107,14 @@ module color
 
 
     # --------------------------------- get color -------------------------------- #
-    
-    function hex2rgb(string::AbstractString)::RGBColor
-        throw("not implemented")
-        r, g, b = "to", "do", "one day"
+    """
+        hex2rgb(hex::AbstractString)
+
+    Converts a string hex color code to a RGB color
+    """
+    function hex2rgb(hex::AbstractString)::RGBColor
+        to_int(h::AbstractString) = parse(Int, h, base=16)
+        r, g, b = [to_int(hex[i:i+1]) for i in (2, 4, 6)]
         return RGBColor("($r, $g, $b)", r, g, b)
     end
     
@@ -131,6 +135,7 @@ module color
         elseif is_rgb_color(string)
             return RGBColor(string)
         else
+            # convert hex to rgb
             return hex2rgb(string)
         end
     end

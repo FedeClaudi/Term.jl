@@ -74,17 +74,15 @@ end
     end
 
 
-    # hexes = [
-    #     "#ffffff",
-    #     "#000000",
-    #     "#dadasa",
-    #     "#123123",
-    # ]
-    # for hex in hexes
-    #     @test typeof(get_color(hex)) == RGBColor
-    # end
-
-
+    hexes = [
+        "#ffffff",
+        "#000000",
+        "#dada1a",
+        "#123123",
+    ]
+    for hex in hexes
+        @test typeof(get_color(hex)) == RGBColor
+    end
 end
 
 

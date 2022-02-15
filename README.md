@@ -1,5 +1,7 @@
 # TODO
-- [ ] get plain text for Measure
+- [x] get plain text for Measure
+  - [x] remove markup
+  - [ ] remove ansi | only if needed
   
 - [x] regex markup extraction
   - [x] deal with no or minmal closings
@@ -8,19 +10,28 @@
 - [x] color: test detection
   - [x] print all named colors
   - [x] test
-  - [ ] hex -> rgb
+  - [x] hex -> rgb
 
 - [x] markup -> ansi substitution, modular
   - [x] detect style
   - [x] inject style
+    - [x] all colors
+  - [ ] fix bug with nested tags
   
-- [ ] macros for styling a string
+- [x] segment
+  - [x] base
+  - [x] from string + style
+  - [x] from string + markup
 
+## Roadmap
+- [ ] macros for styling a string
 - [ ] box
 - [ ] panel
   - [ ] panel subtitle
-
 - [ ] inspect
+- [ ] latex->unicode parsing (https://github.com/phfaist/pylatexenc)
+- [ ] markdown parsing
+- [ ] Line divider thingy
 
 ## BUGS
 - [ ] nested tags, outer's color/bg not correctly restored

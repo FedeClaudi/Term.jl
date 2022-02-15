@@ -76,4 +76,31 @@ module markup
         end
         return tags
     end
+
+
+    # ---------------------------- remove markup tags ---------------------------- #
+    """
+        remove_markup
+
+    Removes all markup tags from a string of text.
+    """
+    function remove_markup(input_text::AbstractString)::AbstractString
+        text = input_text
+        for regex in [OPEN_TAG_REGEX, GENERIC_CLOSER_REGEX]
+            while occursin(regex, text)
+                # get opening regex match
+                rmatch = match(regex, text)
+
+                # get closing regex with same markup
+                markup = rmatch.match[2:end-1]
+                close_regex = r"\[\/+" * markup * r"\]"
+
+                # remove them
+                text = replace(text, regex=>"")
+                text = replace(text, close_regex=>"")
+            end
+        end
+
+        return text
+    end
 end

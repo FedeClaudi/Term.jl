@@ -17,7 +17,7 @@ import Term.color: NamedColor, RGBColor, BitColor
     @test style.hidden == false
     @test style.striked == false
     @test style.color == NamedColor("red")
-    @test style.background == NamedColor("default")
+    @test style.background == nothing
     @test style.tag == tag
 
 

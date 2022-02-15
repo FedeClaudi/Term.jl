@@ -1,7 +1,6 @@
 module box
-    include("utils.jl")
-
-    export Box, fit
+    include("__text_utils.jl")
+    
     export ASCII, ASCII2, ASCII_DOUBLE_HEAD, SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
     export MINIMAL_DOUBLE_HEAD, SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, HORIZONTALS, ROUNDED, HEAVY
     export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
@@ -366,47 +365,5 @@ module box
     ║ │║
     ╚═╧╝
     """
-    )
-    
-
-
-    ALL_BOXES = Dict(
-        :ASCII => ASCII,
-        :ASCII2 => ASCII2,
-        :ASCII_DOUBLE_HEAD => ASCII_DOUBLE_HEAD,
-        :SQUARE => SQUARE,
-        :SQUARE_DOUBLE_HEAD => SQUARE_DOUBLE_HEAD,
-        :MINIMAL => MINIMAL,
-        :MINIMAL_HEAVY_HEAD => MINIMAL_HEAVY_HEAD,
-        :MINIMAL_DOUBLE_HEAD => MINIMAL_DOUBLE_HEAD,
-        :SIMPLE => SIMPLE,
-        :SIMPLE_HEAD => SIMPLE_HEAD,
-        :SIMPLE_HEAVY => SIMPLE_HEAVY,
-        :HORIZONTALS => HORIZONTALS,
-        :ROUNDED => ROUNDED,
-        :HEAVY => HEAVY,
-        :HEAVY_EDGE => HEAVY_EDGE,
-        :HEAVY_HEAD => HEAVY_HEAD,
-        :DOUBLE => DOUBLE,
-        :DOUBLE_EDGE => DOUBLE_EDGE,
-    
-        "ASCII" => ASCII,
-        "ASCII2" => ASCII2,
-        "ASCII_DOUBLE_HEAD" => ASCII_DOUBLE_HEAD,
-        "SQUARE" => SQUARE,
-        "SQUARE_DOUBLE_HEAD" => SQUARE_DOUBLE_HEAD,
-        "MINIMAL" => MINIMAL,
-        "MINIMAL_HEAVY_HEAD" => MINIMAL_HEAVY_HEAD,
-        "MINIMAL_DOUBLE_HEAD" => MINIMAL_DOUBLE_HEAD,
-        "SIMPLE" => SIMPLE,
-        "SIMPLE_HEAD" => SIMPLE_HEAD,
-        "SIMPLE_HEAVY" => SIMPLE_HEAVY,
-        "HORIZONTALS" => HORIZONTALS,
-        "ROUNDED" => ROUNDED,
-        "HEAVY" => HEAVY,
-        "HEAVY_EDGE" => HEAVY_EDGE,
-        "HEAVY_HEAD" => HEAVY_HEAD,
-        "DOUBLE" => DOUBLE,
-        "DOUBLE_EDGE" => DOUBLE_EDGE,
     )
 end
