@@ -12,8 +12,6 @@ for both foreground and background colors.
 function ANSICode(color; bg::Bool=false)
     ctype = split(string(typeof(color)), ".")[end]
 
-    @info ctype
-
     if ctype == "NamedColor"
         Δ = bg ? 40 : 30
         v = CODES[color.color]

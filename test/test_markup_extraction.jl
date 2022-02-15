@@ -1,4 +1,5 @@
-import Term.markup: extract_markup, MarkupTag, remove_markup
+import Term.markup: extract_markup, MarkupTag
+import Term: remove_markup
 
 
 function test_extremes(tags, text)

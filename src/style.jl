@@ -90,12 +90,12 @@ module style
         for (attr, value) in toDict(style)
             # BACKGROUND
             if attr == :background
-                # if !isnothing(value)
-                #     @info value
-                #     code = ANSICode(value.color; bg=true, named=(typeof(value) == NamedColor))
-                # else
-                code = nothing
-                # end
+                if !isnothing(value)
+                    # @info value string(typeof(value))
+                    code = ANSICode(value; bg=true)
+                else
+                    code = nothing
+                end
             
             # COLOR
             elseif attr == :color
@@ -131,7 +131,7 @@ module style
 
     Extracts and applies all markup style in a string.
     """
-    function apply_style(text::AbstractString; outer::Union{Nothing, MarkupTag}=nothing)::AbstractString
+    function apply_style(text::AbstractString;)::AbstractString
         # @info "Styling" text
         while has_markup(text)
             # get tag

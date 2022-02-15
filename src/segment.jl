@@ -1,10 +1,14 @@
 module segment
+    include("__text_utils.jl")
     include("measure.jl")
 
     import ..style: apply_style, MarkupStyle
-    import ..markup: remove_markup
 
-    export Segment
+    export Segment, Segments, push!
+
+    # ---------------------------------------------------------------------------- #
+    #                                    SEGMENT                                   #
+    # ---------------------------------------------------------------------------- #
 
     """
         Segment
@@ -17,6 +21,7 @@ module segment
         measure::Measure       # measure of plain text
     end
 
+    # ------------------------------- constructors ------------------------------- #
     """
         Segment(text::AbstractString)
     
@@ -39,20 +44,70 @@ module segment
     
     Constructs a Segment out of a plain string and a MarkupStyle object.
     """
-    Segment(text::AbstractString, style::MarkupStyle) = Segment(apply_style(text, style), text, Measure(text))
+    function Segment(text::AbstractString, style::Union{Nothing, MarkupStyle}) 
+        if isnothing(style)
+            Segment(text, text, Measure(text))
+        else
+            Segment(apply_style(text, style), text, Measure(text))
+        end
+    end
 
+
+    # ---------------------------------- measure --------------------------------- #
+    Measure(seg::Segment) = seg.measure
+
+    # --------------------------------- printing --------------------------------- #
     """print styled in stdout, info otherwise"""
     function Base.show(io::IO, seg::Segment)
         if io == stdout 
             print(io, seg.text)
-        elseif io == stderr
-            print(io, "err")
+
         else    
             print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
         end
     end
 
-    
+    """
+    concatenate strings and segments
+    """
+    Base.:*(seg::Segment, str::AbstractString) = Segment(seg.text*str)
+    Base.:*(str::AbstractString, seg::Segment) = Segment(str*seg.text)
+    Base.:*(seg1::Segment, seg2::Segment) = Segment(seg1.text * seg2.text)
 
-    Base.show(io::IO, m::MIME"text/plain", seg::Segment) = print(io, seg.plain)
+
+    # ---------------------------------------------------------------------------- #
+    #                                SEGMENTS VECTOR                               #
+    # ---------------------------------------------------------------------------- #
+    """
+        Segments
+
+    Stores a vector of segments
+    """
+    mutable struct Segments
+        segments::Vector{Segment}
+        measure::Measure
+    end
+
+    Segments() = Segments([], Measure(0, 0))
+
+    """
+        Segments(text::String)
+
+    Constructs a Segments object from a string
+    """
+    function Segments(text::String)
+        seg = Segment(text)
+        return Segments([seg], seg.measure)
+    end
+
+    # ---------------------------------- methods --------------------------------- #
+
+    function Base.push!(segments::Segments, seg::Segment)
+        segments.segments = vcat(segments.segments, seg)
+        segments.measure = Measure(max(segments.measure.w, seg.measure.w), length(segments.segments))
+    end
+
+
+    Base.show(io::IO, segments::Segments) = print(io, "Segments \e[2m($(segments.measure), $(length(segments.segments)) segments)\e[0m")
+
 end

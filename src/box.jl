@@ -1,10 +1,19 @@
 module box
     include("__text_utils.jl")
     
+    export get_row
     export ASCII, ASCII2, ASCII_DOUBLE_HEAD, SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
     export MINIMAL_DOUBLE_HEAD, SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, HORIZONTALS, ROUNDED, HEAVY
     export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
-    export ALL_BOXES
+
+    """
+    Returns an iterable yielding tuples (is_last, value)
+    where is_last == true only if value is the lest item in v.
+    """
+    function loop_last(v::Vector)
+        is_last = [i==length(v) for i in 1:length(v)]
+        return zip(is_last, v)
+    end
 
     # ---------------------------------------------------------------------------- #
     #                                      BOX                                     #
@@ -66,7 +75,13 @@ module box
 
 
     function Base.show(io::IO, box::Box)
-        print(io, "Box ($(box.name))\n$(fit(box, [1, 3, 1]))")
+      if io == stdout 
+          print(io, "Box ($(box.name))\n$(fit(box, [1, 3, 1]))")
+      elseif io == stderr
+          print(io, "err")
+      else    
+          print(io, "Box\e[2m($(box.name))\e[0m")
+      end
     end
 
     """

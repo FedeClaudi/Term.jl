@@ -1,9 +1,8 @@
 module markup
-
+    include("__text_utils.jl")
     export extract_markup, MarkupTag
 
-    const OPEN_TAG_REGEX = r"\[[a-zA-Z _0-9.,()]+[^/\[]\]"
-    const GENERIC_CLOSER_REGEX = r"\[\/\]"
+
 
     # -------------------------------- single tag -------------------------------- #
     """
@@ -43,7 +42,7 @@ module markup
 
 
     # ---------------------------- extract markup tags --------------------------- #
-    has_markup(text::String) = occursin(OPEN_TAG_REGEX, text)
+    has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, text)
 
     function extract_markup(input_text::AbstractString; firstonly=false)
         text = input_text  # copy so that we can edit it
@@ -79,28 +78,5 @@ module markup
 
 
     # ---------------------------- remove markup tags ---------------------------- #
-    """
-        remove_markup
 
-    Removes all markup tags from a string of text.
-    """
-    function remove_markup(input_text::AbstractString)::AbstractString
-        text = input_text
-        for regex in [OPEN_TAG_REGEX, GENERIC_CLOSER_REGEX]
-            while occursin(regex, text)
-                # get opening regex match
-                rmatch = match(regex, text)
-
-                # get closing regex with same markup
-                markup = rmatch.match[2:end-1]
-                close_regex = r"\[\/+" * markup * r"\]"
-
-                # remove them
-                text = replace(text, regex=>"")
-                text = replace(text, close_regex=>"")
-            end
-        end
-
-        return text
-    end
 end
