@@ -13,9 +13,10 @@ function ANSICode(named_color::String; bg::Bool=false, named=false)
     end
 end
 
+reset_code(code::ANSICode) = ANSICode(code.close, code.close)
 
 
-CODES = Dict(
+const CODES = Dict(
     :bold =>  ANSICode("\e[1m", "\e[22m"),
     :dim => ANSICode("\e[2m", "\e[22m"),
     :italic => ANSICode("\e[3m", "\e[23m"),
@@ -34,7 +35,6 @@ CODES = Dict(
     "cyan"=> 6,
     "white"=> 7,
     "default"=>9,
-   
 )
 
 

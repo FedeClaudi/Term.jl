@@ -32,18 +32,20 @@ module markup
     
     Represents a complete markup tag.
     """
-    struct MarkupTag
+    mutable struct MarkupTag
         markup::String
         open::SingleTag
         close::SingleTag
+        text::String
     end
-    MarkupTag(open::SingleTag, close::SingleTag) = MarkupTag(open.markup, open, close)
+    MarkupTag(text::AbstractString, open::SingleTag, close::SingleTag) = MarkupTag(open.markup, open, close, text)
 
 
 
     # ---------------------------- extract markup tags --------------------------- #
+    has_markup(text::String) = occursin(OPEN_TAG_REGEX, text)
 
-    function extract_markup(input_text::AbstractString)
+    function extract_markup(input_text::AbstractString; firstonly=false)
         text = input_text  # copy so that we can edit it
         tags = []
         for open_match in eachmatch(OPEN_TAG_REGEX, text)
@@ -66,7 +68,11 @@ module markup
             end
 
             # crate tag and keep
-            push!(tags, MarkupTag(tag_open, tag_close))
+            contained = text[tag_open.stop+1:tag_close.start-1]  # text between tags
+            push!(tags, MarkupTag(contained, tag_open, tag_close))
+            if firstonly
+                return tags[1]
+            end
         end
         return tags
     end

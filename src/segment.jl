@@ -1,7 +1,7 @@
 module segment
     include("measure.jl")
 
-    import ..style: MarkupStyle, extract_style
+    import ..style: apply_style
 
     export Segment
 
@@ -11,19 +11,23 @@ module segment
     stores one piece of text with all the styles applied to it.
     """
     struct Segment
-        text::AbstractString
-        styles::Vector{MarkupStyle}
-        measure::Measure
+        text::AbstractString   # text with ANSI codes injected
+        plain::AbstractString  # plain text with no style
+        measure::Measure       # measure of plain text
     end
 
     """
         Segment(text::AbstractString)
     
-    Constructs a Segment out of a string.
+    Constructs a Segment out of a string with markup.
     """
-    Segment(text::AbstractString) = Segment(text, extract_style(text), Measure(text))
+    function Segment(text::AbstractString)
+        # plain = remove_markup(text)
+        Segment(apply_style(text), text, Measure(text))
+    end
 
-
-    Base.show(io::IO, seg::Segment) = print(io, "Segment \e[2m($(length(seg.styles)) styles; size: $(seg.measure))\e[0m")
+    """print styled in stdout, info otherwise"""
+    Base.show(io::IO, seg::Segment) = io == stdout ? print(io, seg.text) : print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
+    # Base.show(io::Base.TTY, seg::Segment) = print(io, seg.text)
 
 end
