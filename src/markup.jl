@@ -17,10 +17,12 @@ module markup
         isclose::Bool
     end
 
-    SingleTag(match::RegexMatch) = begin  SingleTag(
+    SingleTag(text::AbstractString, match::RegexMatch) = begin  SingleTag(
             match.match[2:end-1],
-            match.offset,
-            match.offset + length(match.match) - 1,
+            get_last_valid_str_idx(text, match.offset),
+            get_next_valid_str_idx(text, match.offset + length(match.match) - 1),
+            # match.offset,
+            # match.offset + length(match.match) - 1,
             match.match[2] == '/'
         )
     end
@@ -49,25 +51,29 @@ module markup
         tags = []
         for open_match in eachmatch(OPEN_TAG_REGEX, text)
             # get tag declaration
-            tag_open = SingleTag(open_match)
+            tag_open = SingleTag(text, open_match)
 
             # get tag closing
             close_regex = r"\[\/+" * tag_open.markup * r"\]"
             if !occursin(close_regex, text[tag_open.stop:end])
                 # check if a generig closer [/] is present
                 if occursin(GENERIC_CLOSER_REGEX, text[tag_open.stop:end])
-                    tag_close = SingleTag(match(GENERIC_CLOSER_REGEX, text))
+                    tag_close = SingleTag(text, match(GENERIC_CLOSER_REGEX, text))
                 else
                     # otherwise inject a closer tag at the end
                     text = text * "[/$(tag_open.markup)]"
-                    tag_close = SingleTag(match(close_regex, text, tag_open.start))
+                    tag_close = SingleTag(text, match(close_regex, text, tag_open.start))
                 end
             else
-                tag_close = SingleTag(match(close_regex, text, tag_open.start))
+                tag_close = SingleTag(text, match(close_regex, text, tag_open.start))
             end
 
             # crate tag and keep
-            contained = text[tag_open.stop+1:tag_close.start-1]  # text between tags
+            _start = get_last_valid_str_idx(text, tag_open.stop+1)
+            _stop = get_next_valid_str_idx(text, tag_close.start-1)
+            # _start = tag_open.stop+1
+            # _stop = tag_close.start-1
+            contained = text[_start:_stop]  # text between tags
             push!(tags, MarkupTag(contained, tag_open, tag_close))
             if firstonly
                 return tags[1]
@@ -76,7 +82,5 @@ module markup
         return tags
     end
 
-
-    # ---------------------------- remove markup tags ---------------------------- #
 
 end

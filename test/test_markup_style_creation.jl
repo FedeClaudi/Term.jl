@@ -34,7 +34,7 @@ import Term.color: NamedColor, RGBColor, BitColor
     @test style.inverse == false
     @test style.hidden == false
     @test style.striked == false
-    @test style.color == NamedColor("medium_spring_green")
+    @test style.color == BitColor("medium_spring_green")
     # @test style.background == NamedColor("blue")
     @test style.tag == tag
 
@@ -54,6 +54,8 @@ import Term.color: NamedColor, RGBColor, BitColor
     text = "tsers[(.1,.4,.1) on_(255, 12, 2) blink] rsers[/]"
     tag = extract_markup(text)[1]
     style = MarkupStyle(tag)
+    @test style.color == RGBColor("(.1,.4,.1)")
+    @test style.background == RGBColor("(255,12,2)")
 
     @test style.blink == true
     @test style.color == RGBColor("(.1,.4,.1)")
@@ -65,6 +67,6 @@ import Term.color: NamedColor, RGBColor, BitColor
     style = MarkupStyle(tag)
 
     @test style.blink == true
-    @test style.color == NamedColor("turquoise2")
-    @test style.background == NamedColor("pale_green3")
+    @test style.color == BitColor("turquoise2")
+    @test style.background == BitColor("pale_green3")
 end

@@ -69,7 +69,7 @@ the sum of the `ncodeunits` of each `Char`, but some indices
 will not be valid. This function ensures that given a (potentially)
 not valid index, the last valid one is elected.
 """
-function get_last_valid(str::AbstractString, idx::Int)
+function get_last_valid_str_idx(str::AbstractString, idx::Int)
     while !isvalid(str, idx)
         idx -= 1
 
@@ -86,7 +86,7 @@ the sum of the `ncodeunits` of each `Char`, but some indices
 will not be valid. This function ensures that given a (potentially)
 not valid index, the next valid one is elected.
 """
-function get_next_valid(str::AbstractString, idx::Int)
+function get_next_valid_str_idx(str::AbstractString, idx::Int)
     while !isvalid(str, idx)
         idx += 1
 

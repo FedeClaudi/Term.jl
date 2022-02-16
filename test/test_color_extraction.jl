@@ -52,12 +52,12 @@ end
 
 
 @testset "Get color" begin
-    for name in ["red", "blue", "black",  "grey42", "deep_sky_blue3", "dark_blue"]
+    for name in ["red", "blue", "black"]
         @test typeof(get_color(name)) == NamedColor
     end
 
 
-    for name in ["255", "1", "21", "6", "128"]
+    for name in ["255", "1", "21", "6", "128", "grey42", "deep_sky_blue3", "dark_blue"]
         @test typeof(get_color(name)) == BitColor
     end
 

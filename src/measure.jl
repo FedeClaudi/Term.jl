@@ -17,7 +17,7 @@ Base.show(io::IO, M::Measure) = print(io, "Measure (w: $(M.w), h: $(M.h))")
 Constructs a measure object from a string
 """
 function Measure(str::AbstractString)
-    str = remove_markup(str)
+    str = remove_ansi(remove_markup(str))
     lines = split(str, "\n")
     w = max([length(ln) for ln in lines]...)
     return Measure(w, length(lines))

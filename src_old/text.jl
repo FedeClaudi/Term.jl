@@ -118,8 +118,8 @@ module text
             end
 
             # make sure we get working indices
-            start = get_last_valid(text, tag.end_char_idx+1)
-            stop = get_last_valid(text, closer[1].start_char_idx-1)
+            start = get_last_valid_str_idx(text, tag.end_char_idx+1)
+            stop = get_last_valid_str_idx(text, closer[1].start_char_idx-1)
 
             try
                 push!(tags, Tag(

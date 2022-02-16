@@ -19,7 +19,6 @@ module Term
     include("panel.jl")
 
 
-
     using .box
 
     using .layout: Padding

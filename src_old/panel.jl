@@ -70,7 +70,7 @@ module panel
             @assert l < width - 4 "Title too long for panel of width $width"
             
             # compose title line 
-            cut_start = get_last_valid(top, 4)
+            cut_start = get_last_valid_str_idx(top, 4)
             pre = top[1:cut_start] * " " * apply_style(title, title_style) * " "
             
             post = box.top.mid^(length(top)-length(plain(pre))-1) * box.top.right

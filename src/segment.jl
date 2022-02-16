@@ -27,30 +27,35 @@ module segment
     
     Constructs a Segment out of a string with markup.
     """
-    function Segment(text::AbstractString)
-        plain = remove_markup(text)
+    function Segment(text::Union{Segment, AbstractString})
+        if typeof(text) == Segment
+            return text
+        end
+        plain = remove_ansi(remove_markup(text))
         Segment(apply_style(text), plain, Measure(plain))
     end
 
     """
-        Segment(text::AbstractString, markup::AbstractString)
+        Segment(text::Union{Segment, AbstractString}, markup::AbstractString)
     
     Constructs a Segment out of a plain string and a markup string with style info
     """
-    Segment(text::AbstractString, markup::AbstractString) = Segment("[$markup]"*text)
+    Segment(text::Union{Segment, AbstractString}, markup::Union{Nothing, AbstractString}) = isnothing(markup) ? Segment(text) : Segment("[$markup]"*text)
 
     """
-        Segment(text::AbstractString, style::MarkupStyle)
+        Segment(text::Union{Segment, AbstractString}, style::MarkupStyle)
     
     Constructs a Segment out of a plain string and a MarkupStyle object.
     """
-    function Segment(text::AbstractString, style::Union{Nothing, MarkupStyle}) 
+    function Segment(text::Union{Segment, AbstractString}, style::Union{Nothing, MarkupStyle}) 
         if isnothing(style)
             Segment(text, text, Measure(text))
         else
             Segment(apply_style(text, style), text, Measure(text))
         end
     end
+
+    Segment(text::Union{AbstractString, Segment}, null::Nothing) = Segment(text)
 
 
     # ---------------------------------- measure --------------------------------- #

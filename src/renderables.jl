@@ -10,7 +10,7 @@ module renderables
                 println(io, seg)
             end
         else
-            print(io, "$(typeof(renderable))<:AbstractRenderable \e[2m(size: $(renderable.measure))\e[0m")
+            print(io, "$(typeof(renderable)) <: AbstractRenderable \e[2m(size: $(renderable.measure))\e[0m")
         end
     end
 

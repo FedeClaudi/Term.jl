@@ -72,17 +72,21 @@ module panel
         segments = Segments()
 
         # create top and add title
-        top = get_row(box, [width], :top)
+        top = Segment(get_row(box, [width], :top)).plain
 
         if !isnothing(title)
             title=Segment(title)
             @assert title.measure.w < width - 4 "Title too long for panel of width $width"
+
+
+            @warn title title_style Segment(title, title_style)
             
             # compose title line 
-            cut_start = get_last_valid(top, 4)
-            pre = Segment(top[1:cut_start] * " " * Segment(title, title_style) * " ")
-            
+            cut_start = get_last_valid_str_idx(top, 4)
+            pre = Segment(top[1:cut_start] * " " * Segment(title, title_style).text * " ")            
             post = box.top.mid^(length(top) - pre.measure.w - 1) * box.top.right
+
+            @warn "prepost" pre post Segment(post)
             top = pre * σ(post)
         end
         push!(segments, σ(top))
@@ -105,7 +109,7 @@ module panel
         return Panel(
             content,
             segments, 
-            title,
+            title.plain,
             title_style,
             panel_measure,
             style,
@@ -113,16 +117,16 @@ module panel
 
     end
 
-    """
-        Panel(renderables; kwargs...)
+    # """
+    #     Panel(renderables; kwargs...)
 
-    `Panel` constructor for creating a panel out of multiple renderables at once.
-    """
-    function Panel(renderables...; kwargs...)
-        renderable = +(renderables...)
+    # `Panel` constructor for creating a panel out of multiple renderables at once.
+    # """
+    # function Panel(renderables...; kwargs...)
+    #     renderable = +(renderables...)
 
-        return Panel(renderable; kwargs...)
-    end
+    #     return Panel(renderable; kwargs...)
+    # end
 
 
 end
