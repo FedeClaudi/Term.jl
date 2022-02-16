@@ -71,6 +71,8 @@ function split_lines(text::AbstractString)
     return [l for l in split(text, "\n") if length(l)>0]
 end
 
+split_lines(renderable) = [s.text for s in renderable.segments.segments]
+
 """
 When indexing a string, the number of indices is given by the
 the sum of the `ncodeunits` of each `Char`, but some indices

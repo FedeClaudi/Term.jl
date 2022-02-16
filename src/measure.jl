@@ -27,8 +27,10 @@ module measure
         return Measure(w, length(lines))
     end
 
+    Measure(renderable) = renderable.measure
+
     """
     The sum of measures returns a measure with the highest value along each dimension
     """
-    Base.:+(m1::Measure, m2::Measure)::Measure = Measure(max(m1.w, m2.w), max(m1.h, m2.h))
+    Base.:+(m1::Measure, m2::Measure)::Measure = Measure(max(m1.w, m2.w), m1.h+m2.h)
 end

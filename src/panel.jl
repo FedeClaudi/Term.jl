@@ -98,22 +98,22 @@ module panel
             segments, 
             isnothing(title) ? title : title.plain,
             title_style,
-            panel_measure,
+            segments.measure,
             style,
         )
 
     end
 
-    # """
-    #     Panel(renderables; kwargs...)
+    """
+        Panel(renderables; kwargs...)
 
-    # `Panel` constructor for creating a panel out of multiple renderables at once.
-    # """
-    # function Panel(renderables...; kwargs...)
-    #     renderable = +(renderables...)
+    `Panel` constructor for creating a panel out of multiple renderables at once.
+    """
+    function Panel(renderables...; kwargs...)
+        renderable = +(renderables...)
 
-    #     return Panel(renderable; kwargs...)
-    # end
+        return Panel(renderable; kwargs...)
+    end
 
 
 end

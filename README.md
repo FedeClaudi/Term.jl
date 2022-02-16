@@ -23,6 +23,10 @@
   - [x] from string + style
   - [x] from string + markup
 
+- [ ] tests
+  - [ ] check that Measure is correct for all types of segment, segments, renderable...
+  - [ ] also check results make sense when concatenating them
+
 ## Roadmap
 - [ ] macros for styling a string
 - [ ] box

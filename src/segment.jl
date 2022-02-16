@@ -106,7 +106,14 @@ module segment
     end
 
     # ---------------------------------- methods --------------------------------- #
-
+    """
+    Concatenates two Segments
+    """
+    Base.:+(s1::Segments, s2::Segments)= Segments(
+        vcat(s1.segments, s2.segments),
+        s1.measure + s2.measure
+    )
+    
     function Base.push!(segments::Segments, seg::Segment)
         segments.segments = vcat(segments.segments, seg)
         segments.measure = Measure(max(segments.measure.w, seg.measure.w), length(segments.segments))

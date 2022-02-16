@@ -9,23 +9,24 @@ module Term
     include("box.jl")
     include("color.jl")
 
-    include("renderables.jl")
 
     # rely on other modules
+    include("layout.jl")
     include("markup.jl")
     include("style.jl")
     include("segment.jl")
-    include("layout.jl")
+
+    include("renderables.jl")
     include("panel.jl")
 
+    # ----------------------------------- base ----------------------------------- #
     using .measure: Measure
 
     using .box
 
     using .layout: Padding
 
-    using .renderables: AbstractRenderable
-    
+    # ----------------------------------- style ---------------------------------- #
     using .markup: extract_markup, MarkupTag
 
     using .color: NamedColor, BitColor, RGBColor, get_color
@@ -33,6 +34,9 @@ module Term
     using .style: MarkupStyle, extract_style
 
     using .segment: Segment, Segments, push!
+
+    # -------------------------------- renderables ------------------------------- #
+    using .renderables: AbstractRenderable
 
     using .panel: Panel
 end
