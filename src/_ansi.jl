@@ -22,7 +22,7 @@ function ANSICode(color; bg::Bool=false)
         return ANSICode("\e[$Δ;5;$(v)m", "\e[$(Δ+1)m")
     elseif ctype == "RGBColor"
         Δ = bg ? 48 : 38
-        rgb = "$(color.r);$(color.b);$(color.g)"
+        rgb = "$(color.r);$(color.g);$(color.b)"
         return ANSICode("\e[$Δ;2;$(rgb)m", "\e[$(Δ+1)m")
     end
 end

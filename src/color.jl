@@ -23,11 +23,11 @@ module color
         g::Int
         b::Int
     end
-    function RGBColor(s::AbstractString) 
+    function RGBColor(s::AbstractString)         
         r, g, b = _rgb(s)
-        if typeof(r) == Float64
+        if r < 1
             r = (Int64 ∘ round)(r * 255)
-            g = (Int64 ∘ round)(b * 255)
+            g = (Int64 ∘ round)(g * 255)
             b = (Int64 ∘ round)(b * 255)
         end
         return RGBColor(s, r, g, b)
