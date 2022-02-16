@@ -40,3 +40,4 @@
 ## BUGS
 - [ ] nested tags, outer's color/bg not correctly restored
 - [ ] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
+- [ ] panel: style's mode applies to title too.
