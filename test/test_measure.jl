@@ -1,8 +1,17 @@
 import Term: Measure
 
 
+≡(m1, m2) = m1.w == m2.w && m1.h == m2.h
 
 @testset "MEASURE string" begin
+
+    a = "[red]measure[/]"
+    m = Measure(a)
+    @test m.w == 7
+
+    a = "[red]\e[2m measure[/]"
+    m = Measure(a)
+    @test m.w == 8
 
     a = "1234567"
     m = Measure(a)
@@ -25,7 +34,7 @@ import Term: Measure
     a = """
 
 
-    test
+        test
     """
     m = Measure(a)
     @test m.w == 8
@@ -56,10 +65,11 @@ end
     a = """
 
 
-    test
+        test
     """
     m3 = Measure(a) # 8, 4
-
-    @test m1 + m2 == Measure(7, 2)
-    @test m1 + m2 + m3 == Measure(8, 4)
+    @test m3.w == 8
+    @test m3.h == 4
+    @test m1 + m2 ≡ Measure(7, 3)
+    @test m2 + m3 ≡ Measure(8, 6)
 end

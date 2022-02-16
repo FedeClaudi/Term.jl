@@ -36,7 +36,7 @@ module Term
     using .segment: Segment, Segments, push!
 
     # -------------------------------- renderables ------------------------------- #
-    using .renderables: AbstractRenderable
+    using .renderables: AbstractRenderable, Renderable
 
     using .panel: Panel
 end

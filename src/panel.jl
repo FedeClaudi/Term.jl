@@ -2,7 +2,7 @@ module panel
     include("__text_utils.jl")
 
     import ..measure: Measure
-    import ..renderables: AbstractRenderable
+    import ..renderables: AbstractRenderable, RenderablesUnion, Renderable
     import ..segment: Segments, Segment
     using ..box
     import ..style: apply_style
@@ -14,11 +14,10 @@ module panel
     Renderable with a panel around another piece of content (text or AbstractRenderable)
     """
     mutable struct Panel <: AbstractRenderable
-        content::Union{AbstractString, AbstractRenderable}  # panel content
         segments::Segments
+        measure::Measure
         title::Union{Nothing, String}
         title_style::Union{String, Nothing}
-        measure::Measure
         style::Union{String, Nothing}
     end
 
@@ -38,7 +37,7 @@ module panel
     `Panel` constructor to fit a panel to a piece of (renderable) content.
     """
     function Panel(
-                content::Union{AbstractString, AbstractRenderable};
+                content::RenderablesUnion;
                 title::Union{Nothing, String}=nothing,
                 title_style::Union{String, Nothing}=nothing,
                 width::Union{Nothing, Int}=nothing,
@@ -92,13 +91,11 @@ module panel
         end
         push!(segments, σ(get_row(box, [width], :bottom)))  # make bottom row
 
-
         return Panel(
-            content,
             segments, 
+            segments.measure,
             isnothing(title) ? title : title.plain,
             title_style,
-            segments.measure,
             style,
         )
 

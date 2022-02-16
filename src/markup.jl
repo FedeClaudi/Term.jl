@@ -74,8 +74,8 @@ module markup
             _start = tag_open.stop+1
             _stop = tag_close.start-1
 
-            _start =  !isvalid(text, _start) ? get_next_valid_str_idx(text, _start) : _start
-            _stop =  !isvalid(text, _stop) ? get_last_valid_str_idx(text, _stop) : _stop
+            _start = !isvalid(text, _start) ? get_next_valid_str_idx(text, _start) : _start
+            _stop = !isvalid(text, _stop) ? get_last_valid_str_idx(text, _stop) : _stop
             contained = text[_start:_stop]
             
             tag_open.stop = _start - 1

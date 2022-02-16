@@ -68,10 +68,19 @@ merge_lines(lines::Vector) = join(lines, "\n")
 
 
 function split_lines(text::AbstractString)
-    return [l for l in split(text, "\n") if length(l)>0]
+    # return [l for l in split(text, "\n") if length(l)>0]
+    split(text, "\n")
 end
 
-split_lines(renderable) = [s.text for s in renderable.segments.segments]
+function split_lines(renderable)
+    if string(typeof(renderable)) == "Segment"
+        return [renderable.text]
+    elseif string(typeof(renderable)) == "Segments"
+        [s.text for s in renderable.segments]
+    else
+        [s.text for s in renderable.segments.segments]
+    end
+end
 
 """
 When indexing a string, the number of indices is given by the

@@ -105,6 +105,9 @@ module segment
         return Segments([seg], seg.measure)
     end
 
+    Segments(segment::Segment) = Segments([segment], segment.measure)
+    Segments(segments...) = Segments(segments, sum([s.measure for s in segments]))
+
     # ---------------------------------- methods --------------------------------- #
     """
     Concatenates two Segments

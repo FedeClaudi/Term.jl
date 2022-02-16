@@ -1,12 +1,15 @@
 module renderables
 
-    import ..segment: Segments
+    import ..segment: Segments, Segment
     import ..measure: Measure
 
     export AbstractRenderable
 
     # ------------------------------- abstract type ------------------------------ #
     abstract type AbstractRenderable end
+
+
+   RenderablesUnion = Union{Segment, Segments, AbstractString, AbstractRenderable}
 
     # ------------------------- generic renderable object ------------------------ #
     struct Renderable <: AbstractRenderable
@@ -16,6 +19,8 @@ module renderables
 
     Renderable(str::AbstractString) = Renderable(Segments(str), Measure(str))
     Renderable(ren::AbstractRenderable) = ren  # returns the renderable
+    Renderable(segment::Segment) = Renderable(Segments(segment), segment.measure)
+    Renderable(segments::Segments) = Renderable(segments, segments.measure)
 
     """
         Base.:+(r1::Union{AbstractString, AstractRenderable}, r2::Union{AbstractString, AstractRenderable})
