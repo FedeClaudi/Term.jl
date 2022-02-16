@@ -1,30 +1,55 @@
 import IterTools: product as ×
 
-import Term: Segment
+import Term: Panel
 
-function make_circle(style, r=24)
-    mag(x) = sqrt((x[1] * .72)^2 + (x[2]*.95)^2)
 
-    p = collect(1:r)
-    points = collect(p × p)
-    
-    line = " "^(r*2)
-    circle = [line for i in 1:r]
+logo = """ 
+            GGGGG                                                                
+           GGGGGGG                                                               
+          GGGGGGGGG                                                              
+          GGGGGGGGG                                                              
+          GGGGGGGGG                 TTTTTTTTTTTTT                              
+          GGGGGGGGG                 TTTTTTTTTTTTT eeee                
+          GGGGGGGGG                      TTT    eeeeeeeee rrr   rrrmmm      mmm
+           GGGGGGG                       TTT   eee    eee rrr rrr  mmmmm  mmmmm
+            GGGGG                        TTT   eeeeeeee   rrrr     mmm  mm  mmm
+                                         TTT   eee        rrr      mmm      mmm
+                                         TTT   eee        rrr      mmm      mmm
+   RRRRR              PPPPP              TTT     eeeee    rrr      mmm      mmm
+  RRRRRRR            PPPPPPP                                                    
+ RRRRRRRRR          PPPPPPPPP                                                    
+ RRRRRRRRR          PPPPPPPPP                                                   
+ RRRRRRRRR          PPPPPPPPP                                                   
+ RRRRRRRRR          PPPPPPPPP                                                   
+ RRRRRRRRR          PPPPPPPPP                                                   
+  RRRRRRR            PPPPPPP                                                    
+   RRRRR              PPPPP                                                      
+"""
 
-    for point in points
-        shifted = [point[1]-r/2, point[2]-r/2]
-        if mag(shifted) < (r/2)-4
-            x, y = point
-            line = circle[y]
-            ln = line[1:x-1] * "X" * line[x+1:end]
-            circle[y] = ln
-        end
-    end
-    # return join(circle, "\n")
-    return Segment(join(circle, "\n"), style)
-end
+logo = """
+            gggg                      
+         gggggggggg                 
+        gggggggggggg                 
+        gggggggggggg                    
+         gggggggggg   
+            gggg                           
 
-print("\n\n\n")
-circle = make_circle("bold red")
-print(circle)
+    rrrr             pppp                      
+ rrrrrrrrrr       pppppppppp                 
+rrrrrrrrrrrr     pppppppppppp                 
+rrrrrrrrrrrr     pppppppppppp                    
+ rrrrrrrrrr       pppppppppp
+    rrrr             pppp                           
+"""
+                              
+
+
+logo = replace(logo, "g"=>"[green bold]X[/]")
+logo = replace(logo, "p"=>"[purple bold]X[/]")
+logo = replace(logo, "r"=>"[red bold]X[/]")
+
+
+
+print("\n\n")
+print(Panel(logo, style="green"), )
 

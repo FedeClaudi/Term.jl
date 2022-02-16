@@ -1,7 +1,7 @@
 # TODO
 - [x] get plain text for Measure
   - [x] remove markup
-  - [ ] remove ansi | only if needed
+  - [x] remove ansi
   
 - [x] regex markup extraction
   - [x] deal with no or minmal closings
@@ -23,14 +23,14 @@
   - [x] from string + style
   - [x] from string + markup
 
-- [ ] tests
-  - [ ] check that Measure is correct for all types of segment, segments, renderable...
-  - [ ] also check results make sense when concatenating them
+- [x] tests
+  - [x] check that Measure is correct for all types of segment, segments, renderable...
+  - [x] also check results make sense when concatenating them
 
 ## Roadmap
 - [ ] macros for styling a string
-- [ ] box
-- [ ] panel
+- [x] box
+- [x] panel
   - [ ] panel subtitle
 - [ ] inspect
 - [ ] latex->unicode parsing (https://github.com/phfaist/pylatexenc)
@@ -39,3 +39,4 @@
 
 ## BUGS
 - [ ] nested tags, outer's color/bg not correctly restored
+- [ ] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?

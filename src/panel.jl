@@ -80,7 +80,7 @@ module panel
         # add a panel row for each content row
         left, right = σ(string(box.mid.left)), σ(string(box.mid.right))
         content_lines = split_lines(content)
-
+        
         for n in 1:content_measure.h
             # get padding
             line = content_lines[n] 

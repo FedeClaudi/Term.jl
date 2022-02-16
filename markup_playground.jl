@@ -32,7 +32,6 @@ for test in tests
 
         # create style from tag
         style = MarkupStyle(markup_tag)
-        @info "Style" style
 
         println(style.color)
         println(style.background)
@@ -41,18 +40,6 @@ for test in tests
         break
     end
 
-    # has_match = occursin(open_regex, test)
-    # if has_match
-    #     println(match(open_regex, test))
-    # else
-    #     println("!!!! TAG OPEN no match for '$test'")
-    # end
 
-    # has_match = occursin(tag_close_regex, test)
-    # if has_match
-    #     println(match(tag_close_regex, test))
-    # else
-    #     println("!!!! TAG CLOSE no match for '$test'")
-    # end
     print("\n")
 end
