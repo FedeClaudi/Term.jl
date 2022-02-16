@@ -4,7 +4,7 @@ module style
     import Parameters: @with_kw
 
     import ..markup: MarkupTag, extract_markup, has_markup
-    import ..color: AbstractColor, NamedColor, is_color, is_background, get_color
+    import ..color: AbstractColor, NamedColor, is_color, is_background, get_color, is_hex_color, hex2rgb
 
     export MarkupStyle, extract_style
 
@@ -75,11 +75,11 @@ module style
     Applies a 'MarkupStyle' to a piece of text.
     """
     function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
-        s₁ = get_last_valid_str_idx(text,  style.tag.open.start)
-        e₁ = get_next_valid_str_idx(text, style.tag.open.stop)
-        s₂ = get_last_valid_str_idx(text, style.tag.close.start)
-        e₂ = get_next_valid_str_idx(text, style.tag.close.stop)
-    
+        s₁ =  style.tag.open.start
+        e₁ = style.tag.open.stop
+        s₂ = style.tag.close.start
+        e₂ = style.tag.close.stop
+
         # get text around the style's tag
         pre = s₁ > 1 ? text[1:s₁ - 1] : ""
         post = e₂ < length(text) ? text[e₂ + 1:end] : ""
@@ -91,7 +91,6 @@ module style
             # BACKGROUND
             if attr == :background
                 if !isnothing(value)
-                    # @info value string(typeof(value))
                     code = ANSICode(value; bg=true)
                 else
                     code = nothing
@@ -100,7 +99,6 @@ module style
             # COLOR
             elseif attr == :color
                 if !isnothing(value)
-                    # @info value string(typeof(value))
                     code = ANSICode(value; bg=false)
                 else
                     code = nothing
@@ -112,6 +110,9 @@ module style
             # elseif attr != :tag && value == false
             #     code = reset_code(CODES[attr])
             else
+                if value != false && attr != :tag
+                    @debug "Attr/value not recognized or not set" attr value
+                end
                 continue
             end
             
@@ -132,7 +133,6 @@ module style
     Extracts and applies all markup style in a string.
     """
     function apply_style(text::AbstractString;)::AbstractString
-        # @info "Styling" text
         while has_markup(text)
             # get tag
             tag = extract_markup(text; firstonly=true)

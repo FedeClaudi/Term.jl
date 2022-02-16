@@ -1,5 +1,6 @@
 module layout
-    import ..segment: Segment
+    import ..measure: Measure
+    # import ..segment: Segment
 
     export Padding
 
@@ -13,12 +14,12 @@ module layout
 
     """Creates a Padding for a string to match a given width according to a justify method"""
     function Padding(text, target_width, method)
-        lw = Segment(text).measure.w
+        lw = Measure(text).w
         @assert lw < target_width "Text is longer than the target width: $lw instead of $target_width"
 
         # get total padding size
         padding = lw < target_width ? " "^(target_width - lw -1) : ""
-        lPad = Segment(padding).measure.w
+        lPad = Measure(padding).w
 
         # split left/right padding for left/right justify
         if lPad > 0

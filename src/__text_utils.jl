@@ -3,7 +3,7 @@
 #                                     REGEX                                    #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- markup ---------------------------------- #
-const OPEN_TAG_REGEX = r"\[[a-zA-Z _0-9.,()]+[^/\[]\]"
+const OPEN_TAG_REGEX = r"\[[a-zA-Z _0-9.,()#]+[^/\[]\]"
 const GENERIC_CLOSER_REGEX = r"\[\/\]"
 
 """
@@ -81,7 +81,7 @@ function get_last_valid_str_idx(str::AbstractString, idx::Int)
     while !isvalid(str, idx)
         idx -= 1
 
-        if idx == 0
+        if idx <= 0
             throw("Failed to find a valid index for $str starting at $idx")
         end
     end
@@ -98,7 +98,7 @@ function get_next_valid_str_idx(str::AbstractString, idx::Int)
     while !isvalid(str, idx)
         idx += 1
 
-        if idx == length(str)
+        if idx >= length(str)
             throw("Failed to find a valid index for $str starting at $idx")
         end
     end

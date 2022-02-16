@@ -18,6 +18,7 @@ module Term
     include("layout.jl")
     include("panel.jl")
 
+    using .measure: Measure
 
     using .box
 

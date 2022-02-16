@@ -1,7 +1,7 @@
 module segment
     include("__text_utils.jl")
-    include("measure.jl")
-
+    
+    import ..measure: Measure
     import ..style: apply_style, MarkupStyle
 
     export Segment, Segments, push!

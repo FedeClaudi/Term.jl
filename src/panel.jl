@@ -1,7 +1,7 @@
 module panel
-    include("measure.jl")
     include("__text_utils.jl")
 
+    import ..measure: Measure
     import ..renderables: AbstractRenderable
     import ..segment: Segments, Segment
     using ..box
@@ -52,15 +52,6 @@ module panel
         title_style = isnothing(title_style) ? style : title_style
         σ(s) = Segment(s, style)  # applies the main style markup to a string to make a segment
 
-        # # get size of content and measure
-        # if typeof(content) <: AbstractString
-        #     seg = Segment(content)
-        #     content = seg.text
-        #     content_measure = seg.measure
-        # else
-        #     content_measure = content.measure
-        # end
-
         # get size of panel to fit the content
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
@@ -77,16 +68,12 @@ module panel
         if !isnothing(title)
             title=Segment(title)
             @assert title.measure.w < width - 4 "Title too long for panel of width $width"
-
-
-            @warn title title_style Segment(title, title_style)
             
             # compose title line 
             cut_start = get_last_valid_str_idx(top, 4)
             pre = Segment(top[1:cut_start] * " " * Segment(title, title_style).text * " ")            
             post = box.top.mid^(length(top) - pre.measure.w - 1) * box.top.right
 
-            @warn "prepost" pre post Segment(post)
             top = pre * σ(post)
         end
         push!(segments, σ(top))
@@ -101,7 +88,7 @@ module panel
             padding = Padding(line, width, justify)
 
             # make line
-            push!(segments, left * Segment(padding.left * line * padding.right) * right)
+            push!(segments, left * padding.left * line * padding.right * right)
         end
         push!(segments, σ(get_row(box, [width], :bottom)))  # make bottom row
 
@@ -109,7 +96,7 @@ module panel
         return Panel(
             content,
             segments, 
-            title.plain,
+            isnothing(title) ? title : title.plain,
             title_style,
             panel_measure,
             style,

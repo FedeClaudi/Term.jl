@@ -10,19 +10,21 @@ module markup
 
     Represents a single tag `[style]` or `[/style]`
     """
-    struct SingleTag
+    mutable struct SingleTag
         markup::String
         start::Int
         stop::Int
         isclose::Bool
     end
 
-    SingleTag(text::AbstractString, match::RegexMatch) = begin  SingleTag(
+    function SingleTag(text::AbstractString, match::RegexMatch) 
+        _start = match.offset
+        _stop = match.offset + length(match.match) - 1
+
+        SingleTag(
             match.match[2:end-1],
-            get_last_valid_str_idx(text, match.offset),
-            get_next_valid_str_idx(text, match.offset + length(match.match) - 1),
-            # match.offset,
-            # match.offset + length(match.match) - 1,
+            _start,
+            _stop,
             match.match[2] == '/'
         )
     end
@@ -69,11 +71,16 @@ module markup
             end
 
             # crate tag and keep
-            _start = get_last_valid_str_idx(text, tag_open.stop+1)
-            _stop = get_next_valid_str_idx(text, tag_close.start-1)
-            # _start = tag_open.stop+1
-            # _stop = tag_close.start-1
-            contained = text[_start:_stop]  # text between tags
+            _start = tag_open.stop+1
+            _stop = tag_close.start-1
+
+            _start =  !isvalid(text, _start) ? get_next_valid_str_idx(text, _start) : _start
+            _stop =  !isvalid(text, _stop) ? get_last_valid_str_idx(text, _stop) : _stop
+            contained = text[_start:_stop]
+            
+            tag_open.stop = _start - 1
+            tag_close.start = _stop + 1
+
             push!(tags, MarkupTag(contained, tag_open, tag_close))
             if firstonly
                 return tags[1]
