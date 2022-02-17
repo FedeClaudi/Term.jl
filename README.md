@@ -43,15 +43,14 @@
 - [ ] macros for styling a string
 - [x] box
 - [x] panel
-  - [ ] panel subtitle (new make line method)
+  - [x] panel subtitle (new make line method)
 - [ ] inspect
 - [ ] latex->unicode parsing (https://github.com/phfaist/pylatexenc)
 - [ ] markdown parsing
-- [ ] Line divider thingy
+- [ ] Line divider
 - [ ] error's traceback
 
 ## BUGS
 - [ ] nested tags, outer's color/bg not correctly restored
 - [ ] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
 - [x] panel: style's mode applies to title too.
-- [ ] not bug but bad, remove `vremove_markup` from measure.jl

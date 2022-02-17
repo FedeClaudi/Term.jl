@@ -55,9 +55,6 @@ Or create [italic bold light_sky_blue1]Panels[/] and [italic bold light_sky_blue
 
    [dim]https://github.com/FedeClaudi/Term.jl""",
 style="hidden",
-subtitle="vX.X", 
-subtitle_justify=:right, 
-subtitle_style="dim"
 )
 
 # create "spacers"
@@ -73,7 +70,10 @@ vspacer = RenderableText(join([" "^3 for i in 1:circles.measure.h], "\n"))
 
 logo = Panel(hstack(
    circles, vspacer, main
-), title="Term.jl", title_style="bold $indigo", style="dim $indigo"
+), title="Term.jl", title_style="bold $indigo", style="dim $indigo",
+subtitle="vX.X", 
+subtitle_justify=:right, 
+subtitle_style="dim"
 )
 print(logo)
 
