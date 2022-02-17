@@ -1,4 +1,4 @@
-import Term: Renderable, Segment, Segments, Measure
+import Term: Renderable, Segment, Measure
 
 ≡(m1, m2) = m1.w == m2.w && m1.h == m2.h
 

@@ -1,9 +1,9 @@
 module panel
-    include("__text_utils.jl")
+    import Term: split_lines, Measure, get_last_valid_str_idx
 
-    import ..measure: Measure
-    import ..renderables: AbstractRenderable, RenderablesUnion, Renderable
-    import ..segment: Segments, Segment
+    # import ..measure: Measure
+    import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
+    import ..segment: Segment
     using ..box
     import ..style: apply_style
     import ..layout: Padding
@@ -14,7 +14,7 @@ module panel
     Renderable with a panel around another piece of content (text or AbstractRenderable)
     """
     mutable struct Panel <: AbstractRenderable
-        segments::Segments
+        segments::Vector
         measure::Measure
         title::Union{Nothing, String}
         title_style::Union{String, Nothing}
@@ -59,7 +59,7 @@ module panel
         @assert width >= panel_measure.w "With too small, not yet supported"
 
         # create segments
-        segments = Segments()
+        segments::Vector{Segment} = []
 
         # create top and add title
         top = Segment(get_row(box, [width], :top)).plain
@@ -87,13 +87,13 @@ module panel
             padding = Padding(line, width, justify)
 
             # make line
-            push!(segments, left * padding.left * line * padding.right * right)
+            push!(segments, Segment(left * padding.left * line * padding.right * right))
         end
         push!(segments, σ(get_row(box, [width], :bottom)))  # make bottom row
 
         return Panel(
             segments, 
-            segments.measure,
+            Measure(segments),
             isnothing(title) ? title : title.plain,
             title_style,
             style,
@@ -107,7 +107,7 @@ module panel
     `Panel` constructor for creating a panel out of multiple renderables at once.
     """
     function Panel(renderables...; kwargs...)
-        renderable = +(renderables...)
+        renderable = +(Renderable.(renderables)...)
 
         return Panel(renderable; kwargs...)
     end

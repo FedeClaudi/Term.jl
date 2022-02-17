@@ -75,10 +75,8 @@ end
 function split_lines(renderable)
     if string(typeof(renderable)) == "Segment"
         return split_lines(renderable.text)
-    elseif string(typeof(renderable)) == "Segments"
-        [s.text for s in renderable.segments]
     else
-        [s.text for s in renderable.segments.segments]
+        [s.text for s in renderable.segments]
     end
 end
 

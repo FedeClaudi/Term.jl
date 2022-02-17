@@ -1,10 +1,9 @@
 module segment
-    include("__text_utils.jl")
-    
-    import ..measure: Measure
+    import Term: remove_markup, remove_ansi
     import ..style: apply_style, MarkupStyle
-
-    export Segment, Segments, push!
+    import ..measure: Measure
+    
+    export Segment
 
     # ---------------------------------------------------------------------------- #
     #                                    SEGMENT                                   #
@@ -57,9 +56,7 @@ module segment
 
     Segment(text::Union{AbstractString, Segment}, null::Nothing) = Segment(text)
 
-
-    # ---------------------------------- measure --------------------------------- #
-    Measure(seg::Segment) = seg.measure
+    
 
     # --------------------------------- printing --------------------------------- #
     """print styled in stdout, info otherwise"""
@@ -80,49 +77,5 @@ module segment
     Base.:*(seg1::Segment, seg2::Segment) = Segment(seg1.text * seg2.text)
 
 
-    # ---------------------------------------------------------------------------- #
-    #                                SEGMENTS VECTOR                               #
-    # ---------------------------------------------------------------------------- #
-    """
-        Segments
-
-    Stores a vector of segments
-    """
-    mutable struct Segments
-        segments::Vector{Segment}
-        measure::Measure
-    end
-
-    Segments() = Segments([], Measure(0, 0))
-
-    """
-        Segments(text::String)
-
-    Constructs a Segments object from a string
-    """
-    function Segments(text::String)
-        seg = Segment(text)
-        return Segments([seg], seg.measure)
-    end
-
-    Segments(segment::Segment) = Segments([segment], segment.measure)
-    Segments(segments...) = Segments(segments, sum([s.measure for s in segments]))
-
-    # ---------------------------------- methods --------------------------------- #
-    """
-    Concatenates two Segments
-    """
-    Base.:+(s1::Segments, s2::Segments)= Segments(
-        vcat(s1.segments, s2.segments),
-        s1.measure + s2.measure
-    )
-    
-    function Base.push!(segments::Segments, seg::Segment)
-        segments.segments = vcat(segments.segments, seg)
-        segments.measure = Measure(max(segments.measure.w, seg.measure.w), length(segments.segments))
-    end
-
-
-    Base.show(io::IO, segments::Segments) = print(io, "Segments \e[2m($(segments.measure), $(length(segments.segments)) segments)\e[0m")
 
 end

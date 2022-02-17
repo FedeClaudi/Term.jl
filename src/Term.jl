@@ -1,9 +1,9 @@
 module Term
 
     # general utils
-    include("_ansi.jl")
     include("__text_utils.jl")
-
+    include("_ansi.jl")
+    
     # don't import other modules
     include("measure.jl")
     include("box.jl")
@@ -20,11 +20,12 @@ module Term
     include("panel.jl")
 
     # ----------------------------------- base ----------------------------------- #
-    using .measure: Measure
-
     using .box
 
     using .layout: Padding
+
+    import .measure
+    using .measure: Measure
 
     # ----------------------------------- style ---------------------------------- #
     using .markup: extract_markup, MarkupTag
@@ -33,10 +34,29 @@ module Term
 
     using .style: MarkupStyle, extract_style
 
-    using .segment: Segment, Segments, push!
+    using .segment: Segment
+
+    """
+        Measure(seg::Segment) 
+
+    gives the measure of a segment
+    """
+    measure.Measure(seg::Segment) = seg.measure
+
+    """
+        Measure(segments::Vector{Segment})
+    
+    gives the measure of a vector of segments
+    """
+    function measure.Measure(segments::Vector{Segment})
+        return Measure(
+            max([seg.measure.w for seg in segments]...),
+            sum([seg.measure.h for seg in segments])
+        )
+    end
 
     # -------------------------------- renderables ------------------------------- #
-    using .renderables: AbstractRenderable, Renderable
+    using .renderables: AbstractRenderable, Renderable, RenderableText
 
     using .panel: Panel
 end

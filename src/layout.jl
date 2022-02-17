@@ -1,6 +1,5 @@
 module layout
     import ..measure: Measure
-    # import ..segment: Segment
 
     export Padding
 

@@ -1,6 +1,7 @@
 module measure
+
     include("__text_utils.jl")
-    
+
     export Measure
 
     """
@@ -27,7 +28,7 @@ module measure
         return Measure(w, length(lines))
     end
 
-    Measure(renderable) = renderable.measure
+
 
     """
     The sum of measures returns a measure with the highest value along each dimension
