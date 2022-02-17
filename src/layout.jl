@@ -1,8 +1,14 @@
 module layout
+    import ..renderables: RenderablesUnion, Renderable
     import ..measure: Measure
+    import ..segment: Segment
 
-    export Padding
+    export Padding, vstack
 
+
+    # ---------------------------------------------------------------------------- #
+    #                                    PADDING                                   #
+    # ---------------------------------------------------------------------------- #
     """
     Stores string to pad a string to a given width
     """
@@ -37,4 +43,43 @@ module layout
             return Padding(padding, " ")
         end
     end
+
+    # ---------------------------------------------------------------------------- #
+    #                                   STACKING                                   #
+    # ---------------------------------------------------------------------------- #
+    """
+        vstack(r1::RenderablesUnion, r2::RenderablesUnion)
+
+    Vertically stacks two renderables to give a new renderable.
+    """
+    function vstack(r1::RenderablesUnion, r2::RenderablesUnion)
+        r1 = Renderable(r1)
+        r2 = Renderable(r2)
+
+        # get dimensions of final renderable
+        w1, h1 = r1.measure.w, r1.measure.h
+        w2, h2 = r2.measure.w, r2.measure.h
+
+        width = max(w1, w2)
+        height = h1 + h2
+
+        # pad segments
+        Δw = abs(w2-w1)
+        if w1 > w2
+            r2.segments = [Segment(s.text * " "^Δw) for s in r2.segments]
+        elseif w1 < w2
+            r1.segments = [Segment(s.text * " "^Δw) for s in r1.segments]
+        end
+
+        # create segments stack
+        segments::Vector{Segment} = vcat(r1.segments, r2.segments)
+
+        return Renderable(
+            segments,
+            Measure(segments),
+        )
+    end
+
+    vstack(r1::RenderablesUnion) = r1
+
 end

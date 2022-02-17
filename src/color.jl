@@ -26,11 +26,11 @@ module color
     function RGBColor(s::AbstractString)         
         r, g, b = _rgb(s)
         if r < 1
-            r = (Int64 ∘ round)(r * 255)
-            g = (Int64 ∘ round)(g * 255)
-            b = (Int64 ∘ round)(b * 255)
+            r *= 255
+            g *= 255
+            b *= 255
         end
-        return RGBColor(s, r, g, b)
+        return RGBColor(s, (Int64 ∘ round)(r), (Int64 ∘ round)(g), (Int64 ∘ round)(b))
     end
 
 

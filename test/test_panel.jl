@@ -27,6 +27,4 @@ end
     p1 = Panel(t, style="(.1, .3, .5)")
     p2 = Panel("test string", title="ok")
     p3 = Panel(p1, p2)
-
-
 end

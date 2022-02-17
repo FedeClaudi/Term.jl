@@ -1,12 +1,12 @@
 module panel
     import Term: split_lines, Measure, get_last_valid_str_idx
 
-    # import ..measure: Measure
+    import ..measure: Measure
     import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
     import ..segment: Segment
     using ..box
     import ..style: apply_style
-    import ..layout: Padding
+    import ..layout: Padding, vstack
 
     export Panel
 
@@ -107,7 +107,7 @@ module panel
     `Panel` constructor for creating a panel out of multiple renderables at once.
     """
     function Panel(renderables...; kwargs...)
-        renderable = +(Renderable.(renderables)...)
+        renderable = vstack(Renderable.(renderables)...)
 
         return Panel(renderable; kwargs...)
     end

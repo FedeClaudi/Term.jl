@@ -11,18 +11,16 @@ module Term
 
 
     # rely on other modules
-    include("layout.jl")
     include("markup.jl")
     include("style.jl")
     include("segment.jl")
 
     include("renderables.jl")
+    include("layout.jl")
     include("panel.jl")
 
     # ----------------------------------- base ----------------------------------- #
     using .box
-
-    using .layout: Padding
 
     import .measure
     using .measure: Measure
@@ -57,6 +55,8 @@ module Term
 
     # -------------------------------- renderables ------------------------------- #
     using .renderables: AbstractRenderable, Renderable, RenderableText
+
+    using .layout: Padding, vstack
 
     using .panel: Panel
 end

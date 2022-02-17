@@ -1,4 +1,4 @@
-import Term: Panel
+import Term: Panel, RenderableText
 
 println(
     Panel(
@@ -13,7 +13,7 @@ println(
 
 println(
     Panel(
-        Segment("""
+        RenderableText("""
         [green]This is a multiline text[/]
         [on_black]This line is [bold]different!"""),
         style="blue dim",
@@ -29,16 +29,15 @@ println(
 println(
     Panel(
         Panel("[bold white]Title panel!!", style="dim"),
-        Panel(
-        Segment("""
+        Panel(RenderableText("""
         [green]This is a multiline text[/]
-        [on_black]This line is [bold]different!"""),
+        [on_black]This line is [bold]different!
+        """),
         style="blue dim",
         title="From Segment",
         width=50,
         justify=:center,
         title_style="red bold"
-
     ),
     justify=:center, title="created with Term", title_style="gray62"
     )
