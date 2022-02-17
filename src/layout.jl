@@ -3,7 +3,7 @@ module layout
     import ..measure: Measure
     import ..segment: Segment
 
-    export Padding, vstack
+    export Padding, vstack, hstack
 
 
     # ---------------------------------------------------------------------------- #
@@ -57,11 +57,8 @@ module layout
         r2 = Renderable(r2)
 
         # get dimensions of final renderable
-        w1, h1 = r1.measure.w, r1.measure.h
-        w2, h2 = r2.measure.w, r2.measure.h
-
-        width = max(w1, w2)
-        height = h1 + h2
+        w1 = r1.measure.w
+        w2 = r2.measure.w
 
         # pad segments
         Δw = abs(w2-w1)
@@ -80,6 +77,63 @@ module layout
         )
     end
 
-    vstack(r1::RenderablesUnion) = r1
+    """ 
+        vstack(renderables...)
+
+    Vertically stacks a variable number of renderables
+    """
+    function vstack(renderables...)
+        renderable = Renderable()
+
+        for ren in renderables
+            renderable = vstack(renderable, ren)
+        end
+        return renderable
+    end
+
+
+    """
+        hstack(r1::RenderablesUnion, r2::RenderablesUnion)
+
+    Horizontally stacks two renderables to give a new renderable.
+    """
+    function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
+        r1 = Renderable(r1)
+        r2 = Renderable(r2)
+
+        # get dimensions of final renderable
+        h1 = r1.measure.h
+        h2 = r2.measure.h
+
+        # make sure both renderables have the same number of segments
+        Δh = abs(h2-h1)
+        if h1 > h2
+            r2.segments = vcat(r2.segments, [Segment(" "^r2.measure.w) for i in 1:Δh])
+        elseif h1 < h2
+            r1.segments = vcat(r1.segments, [Segment(" "^r1.measure.w) for i in 1:Δh])
+        end
+
+        # combine segments
+        segments = [Segment(s1.text * s2.text) for (s1, s2) in zip(r1.segments, r2.segments)]
+
+        return Renderable(
+            segments,
+            Measure(segments),
+        )
+    end
+
+    """ 
+        hstack(renderables...)
+
+    Horizonatlly stacks a variable number of renderables
+    """
+    function hstack(renderables...)
+        renderable = Renderable()
+
+        for ren in renderables
+            renderable = hstack(renderable, ren)
+        end
+        return renderable
+    end
 
 end

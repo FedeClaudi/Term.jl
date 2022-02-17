@@ -38,18 +38,19 @@ module renderables
     end
 
     # ------------------------- generic renderable object ------------------------ #
-    struct Renderable <: AbstractRenderable
+    mutable struct Renderable <: AbstractRenderable
         segments::Vector
         measure::Measure
     end
 
+    Renderable() = Renderable([], Measure(0, 0))
     Renderable(str::AbstractString) = RenderableText(str)
     Renderable(ren::AbstractRenderable) = ren  # returns the renderable
     Renderable(segment::Segment) = Renderable([segment], Measure([segment]))
 
 
     # ----------------------------- text rendererable ---------------------------- #
-    struct RenderableText <: AbstractRenderable
+    mutable struct RenderableText <: AbstractRenderable
         segments::Vector
         measure::Measure
         text::AbstractString
@@ -60,6 +61,12 @@ module renderables
         return RenderableText(segments, Measure(segments), text)
     end
 
+    RenderableText(text::Vector{AbstractString}) = RenderableText(join(text, "\n"))
+
+    function RenderableText(text::AbstractString, style::AbstractString)
+        segments = [Segment(line, style) for line in split(text, "\n")]
+        return RenderableText(segments, Measure(segments), text)
+    end   
 
     # -------------------------------- union type -------------------------------- #
     RenderablesUnion = Union{AbstractString, AbstractRenderable, RenderableText}

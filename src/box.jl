@@ -1,7 +1,10 @@
 module box
     include("__text_utils.jl")
-    
-    export get_row
+
+    import ..segment: Segment
+    import ..style: apply_style
+
+    export get_row, get_title_row
     export ASCII, ASCII2, ASCII_DOUBLE_HEAD, SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
     export MINIMAL_DOUBLE_HEAD, SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, HORIZONTALS, ROUNDED, HEAVY
     export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
@@ -102,6 +105,50 @@ module box
         join(parts)
     end
     
+    function get_title_row(
+        row::Symbol,
+        box::Box,
+        title::Union{Nothing, AbstractString}; 
+        width::Int,
+        style::Union{Nothing, String},
+        title_style::Union{Nothing, AbstractString},
+        justify::Symbol=:left,
+      )
+
+      initial_line = Segment(get_row(box, [width], row), style).plain
+
+      if isnothing(title)
+        return Segment(initial_line, style)
+      else
+
+        # get title
+        title=Segment(title)
+        @assert title.measure.w < width - 4 "Title too long for panel of width $width"
+        
+        # compose title line 
+        line = getfield(box, row)
+
+        # initial_line = initial_line.text
+        if justify == :left
+          cut_start = get_last_valid_str_idx(initial_line, 4)
+          pre = Segment(
+            Segment(initial_line[1:cut_start], style) * "\e[0m" * " " * Segment(title, title_style).text * " "
+          )            
+          post = line.mid^(length(initial_line) - pre.measure.w - 1) * line.right
+        else
+          cut_start = get_next_valid_str_idx(initial_line, ncodeunits(initial_line)-8)
+          post = Segment(
+            "\e[0m" * " " * Segment(title, title_style).text * " " * Segment(initial_line[cut_start:end], style)
+          )          
+
+          pre = Segment(line.left * line.mid^(length(initial_line) - post.measure.w - 1), style)
+        end
+        return pre * Segment(post, style)
+        # return Segment(post, style)
+      end
+  end
+
+
     """
     Creates a box with one of each level type with columns
     widths specified by a vector of widhts.

@@ -1,27 +1,24 @@
 module Term
-
     # general utils
     include("__text_utils.jl")
     include("_ansi.jl")
     
     # don't import other modules
     include("measure.jl")
-    include("box.jl")
     include("color.jl")
-
 
     # rely on other modules
     include("markup.jl")
     include("style.jl")
     include("segment.jl")
 
+    # renderables, rely heavily on other modules
+    include("box.jl")
     include("renderables.jl")
     include("layout.jl")
     include("panel.jl")
 
     # ----------------------------------- base ----------------------------------- #
-    using .box
-
     import .measure
     using .measure: Measure
 
@@ -54,9 +51,11 @@ module Term
     end
 
     # -------------------------------- renderables ------------------------------- #
+    using .box
+
     using .renderables: AbstractRenderable, Renderable, RenderableText
 
-    using .layout: Padding, vstack
+    using .layout: Padding, vstack, hstack
 
     using .panel: Panel
 end

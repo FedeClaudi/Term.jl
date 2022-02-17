@@ -40,6 +40,10 @@ module panel
                 content::RenderablesUnion;
                 title::Union{Nothing, String}=nothing,
                 title_style::Union{String, Nothing}=nothing,
+                title_justify::Symbol=:left,
+                subtitle::Union{String, Nothing}=nothing,
+                subtitle_style::Union{String, Nothing}=nothing,
+                subtitle_justify::Symbol=:left,
                 width::Union{Nothing, Int}=nothing,
                 style::Union{String, Nothing}=nothing,
                 box::Symbol=:ROUNDED,
@@ -61,23 +65,25 @@ module panel
         # create segments
         segments::Vector{Segment} = []
 
-        # create top and add title
-        top = Segment(get_row(box, [width], :top)).plain
+        # create top/bottom rows with titles
+        top = get_title_row(:top,
+                    box, 
+                    title; 
+                    width=width,
+                    style=style,
+                    title_style=title_style,
+                    justify=title_justify)
 
-        if !isnothing(title)
-            title=Segment(title)
-            @assert title.measure.w < width - 4 "Title too long for panel of width $width"
-            
-            # compose title line 
-            cut_start = get_last_valid_str_idx(top, 4)
-            pre = Segment(top[1:cut_start] * "\e[0m" * " " * Segment(title, title_style).text * " ")            
-            post = box.top.mid^(length(top) - pre.measure.w - 1) * box.top.right
-
-            top = pre * σ(post)
-        end
-        push!(segments, σ(top))
+        bottom = get_title_row(:bottom,
+                    box,
+                    subtitle; 
+                    width=width,
+                    style=style,
+                    title_style=subtitle_style,
+                    justify=subtitle_justify)
 
         # add a panel row for each content row
+        push!(segments, top)
         left, right = σ(string(box.mid.left)), σ(string(box.mid.right))
         content_lines = split_lines(content)
         
@@ -89,12 +95,12 @@ module panel
             # make line
             push!(segments, Segment(left * padding.left * line * padding.right * right))
         end
-        push!(segments, σ(get_row(box, [width], :bottom)))  # make bottom row
+        push!(segments, bottom)
 
         return Panel(
             segments, 
             Measure(segments),
-            isnothing(title) ? title : title.plain,
+            isnothing(title) ? title : title,
             title_style,
             style,
         )
