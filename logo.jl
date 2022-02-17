@@ -25,5 +25,5 @@ logo = replace(logo, "R"=>"[#CB3C33 bold]o[/]")
 
 
 print("\n\n")
-print(Panel(logo, style=" bold green", title="Term", title_style="bold red"), )
+print(Panel(logo, style="dim bold blue", title="Term", title_style="bold bright_red"), )
 

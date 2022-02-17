@@ -70,7 +70,7 @@ module panel
             
             # compose title line 
             cut_start = get_last_valid_str_idx(top, 4)
-            pre = Segment(top[1:cut_start] * " " * Segment(title, title_style).text * " ")            
+            pre = Segment(top[1:cut_start] * "\e[0m" * " " * Segment(title, title_style).text * " ")            
             post = box.top.mid^(length(top) - pre.measure.w - 1) * box.top.right
 
             top = pre * σ(post)
