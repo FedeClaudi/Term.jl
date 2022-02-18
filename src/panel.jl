@@ -1,5 +1,5 @@
 module panel
-    import Term: split_lines, get_last_valid_str_idx, split_text_by_length, do_by_line
+    import Term: split_lines, get_last_valid_str_idx, split_text_by_length, do_by_line, join_lines
 
     import ..measure: Measure
     import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
@@ -144,7 +144,7 @@ module panel
 
 
     function TextBox(
-        text::AbstractString;
+        text::Union{Vector, AbstractString};
         width::Union{Symbol, Int}=88,
         title::Union{Nothing, String}=nothing,
         title_style::Union{String, Nothing}="default",
@@ -154,6 +154,9 @@ module panel
         subtitle_justify::Symbol=:left,
         justify::Symbol=:left,
         )
+        if typeof(text) <: AbstractVector
+            text = join_lines(text)
+        end
 
         if width != :fit
             text = do_by_line((ln)->split_text_by_length(ln, width), text)
@@ -175,5 +178,7 @@ module panel
 
         return TextBox(panel.segments, panel.measure)
     end
+
+
 
 end

@@ -69,10 +69,14 @@ vspacer = Spacer(2, circles.measure.h; char=' ')
 
 top_row = hstack(
    circles, vspacer, vLine(circles.measure.h, indigo), main
-   )
+)
 
 
-msg = "Term is at an early stage of development, so expect frequent breaking changes.\n[orange_red1 bold]Use at your own peril![/] (but also have fun with it).\nFor any question/feature request get in touch on Github or @fede_claudi on [blue]Twitter"
+msg = [
+   "Term is at an early stage of development, so expect frequent breaking changes.",
+   "[orange_red1 bold]Use at your own peril![/] (but also have fun with it).",
+   "For any question/feature request get in touch on Github or @fede_claudi on [blue]Twitter",
+]
 
 logo = Panel(
    vstack(
