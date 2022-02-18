@@ -1,5 +1,5 @@
 module panel
-    import Term: split_lines, Measure, get_last_valid_str_idx
+    import Term: split_lines, Measure, get_last_valid_str_idx, split_text_by_length, do_by_line
 
     import ..measure: Measure
     import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
@@ -8,12 +8,18 @@ module panel
     import ..style: apply_style
     import ..layout: Padding, vstack
 
-    export Panel
+    export Panel, TextBox
 
+
+    abstract type AbstractPanel <: AbstractRenderable end
+
+    # ---------------------------------------------------------------------------- #
+    #                                     PANEL                                    #
+    # ---------------------------------------------------------------------------- #
     """
     Renderable with a panel around another piece of content (text or AbstractRenderable)
     """
-    mutable struct Panel <: AbstractRenderable
+    mutable struct Panel <: AbstractPanel
         segments::Vector
         measure::Measure
         title::Union{Nothing, String}
@@ -118,5 +124,56 @@ module panel
         return Panel(renderable; kwargs...)
     end
 
+
+
+
+    # ---------------------------------------------------------------------------- #
+    #                                    TextBox                                   #
+    # ---------------------------------------------------------------------------- #
+    
+    """
+        TextBox
+
+    Creates a panel and fits input text to it.
+    The pannel is hidden so that the result is just a text box.
+    """
+    mutable struct TextBox <: AbstractPanel
+        segments::Vector
+        measure::Measure
+    end
+
+
+    function TextBox(
+        text::AbstractString;
+        width::Union{Symbol, Int}=88,
+        title::Union{Nothing, String}=nothing,
+        title_style::Union{String, Nothing}="default",
+        title_justify::Symbol=:left,
+        subtitle::Union{String, Nothing}=nothing,
+        subtitle_style::Union{String, Nothing}="default",
+        subtitle_justify::Symbol=:left,
+        justify::Symbol=:left,
+        )
+
+        if width != :fit
+            text = do_by_line((ln)->split_text_by_length(ln, width), text)
+        end
+
+
+        panel = Panel(
+            text,
+            style="hidden",
+            title=title,
+            title_style=title_style,
+            title_justify=title_justify,
+            subtitle=subtitle,
+            subtitle_style=subtitle_style,
+            subtitle_justify=subtitle_justify,
+            justify=justify,
+        )
+        
+
+        return TextBox(panel.segments, panel.measure)
+    end
 
 end

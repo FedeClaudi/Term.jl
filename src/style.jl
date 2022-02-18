@@ -21,16 +21,17 @@ module style
     `MarkupTag`.
     """
     @with_kw mutable struct MarkupStyle
+        default::Bool       = false
         bold::Bool          = false
         dim::Bool           = false
         italic::Bool        = false
         underline::Bool     = false
-        blink::Bool      = false
+        blink::Bool         = false
         inverse::Bool       = false
         hidden::Bool        = false
         striked::Bool       = false
 
-        color::Union{Nothing, AbstractColor}       = nothing
+        color::Union{Nothing, AbstractColor}            = nothing
         background::Union{Nothing, AbstractColor}       = nothing
 
         tag::MarkupTag

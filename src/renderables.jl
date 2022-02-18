@@ -49,7 +49,9 @@ module renderables
     Renderable(segment::Segment) = Renderable([segment], Measure([segment]))
 
 
-    # ----------------------------- text rendererable ---------------------------- #
+    # ---------------------------------------------------------------------------- #
+    #                                TEXT RENDERABLE                               #
+    # ---------------------------------------------------------------------------- #
     mutable struct RenderableText <: AbstractRenderable
         segments::Vector
         measure::Measure

@@ -31,6 +31,7 @@ reset_code(code::ANSICode) = ANSICode(code.close, code.close)
 
 
 const CODES = Dict(
+    :default =>  ANSICode("\e[22m", "\e[22m"),    
     :bold =>  ANSICode("\e[1m", "\e[22m"),
     :dim => ANSICode("\e[2m", "\e[22m"),
     :italic => ANSICode("\e[3m", "\e[23m"),
@@ -531,7 +532,7 @@ const COLORS_16b = vcat([
 #                                     MODES                                    #
 # ---------------------------------------------------------------------------- #
 const NAMED_MODES = [
-    "normal",
+    "default",
     "bold",
     "dim",
     "italic",

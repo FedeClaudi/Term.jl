@@ -164,7 +164,7 @@ module box
             get_row(box, widths, :foot),
             get_row(box, widths, :bottom),
         ]
-        return merge_lines(strings)
+        return join_lines(strings)
     end
 
 

@@ -64,11 +64,10 @@ unspace_commas(text::AbstractString) = replace(replace(text, ", "=>","), ". "=>"
 chars(text::AbstractString)::Vector{Char} = [x for x in text]
 
 """Merges a vector of strings in a single string"""
-merge_lines(lines::Vector) = join(lines, "\n")
+join_lines(lines::Vector) = join(lines, "\n")
 
 
 function split_lines(text::AbstractString)
-    # return [l for l in split(text, "\n") if length(l)>0]
     split(text, "\n")
 end
 
@@ -78,6 +77,52 @@ function split_lines(renderable)
     else
         [s.text for s in renderable.segments]
     end
+end
+
+"""
+    split_text_by_length(text::AbstractString, width::Int)
+
+Splits a text such that each line has max length: width.
+"""
+function split_text_by_length(text::AbstractString, width::Int)
+    if length(text) < width
+        return text
+    end
+
+    n_cuts = (Int ∘ ceil)(length(text)/width)
+    lines::Vector{AbstractString} = []
+
+    for cut in 1:n_cuts
+        pre = cut==1 ? 1 : get_last_valid_str_idx(text, width * (cut-1))
+        
+        if width * cut ≥ length(text)
+            post = get_last_valid_str_idx(text, length(text))
+        else
+            post = get_last_valid_str_idx(text, width * cut - 1)
+        end
+
+        # ensure all lines have the same length
+        line = text[pre:post]
+        if length(line) < width
+            line = line * " "^(width-length(line))
+        end
+        @assert length(line) == width
+        
+        push!(lines, line)
+
+    end
+    return join_lines(lines)
+end
+
+"""
+Applies a given function to each line in the text
+"""
+function do_by_line(fn, text)
+    lines::Vector{AbstractString} = []
+    for line in split_lines(text)
+        push!(lines, fn(line))
+    end
+    return join_lines(lines)
 end
 
 """

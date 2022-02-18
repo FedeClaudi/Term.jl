@@ -1,6 +1,6 @@
 import IterTools: product as ×
 
-import Term: Panel, RenderableText
+import Term: Panel, RenderableText, TextBox
 import Term: vstack, hstack
 
 circle = """
@@ -39,13 +39,13 @@ purple = Panel(
 
 
 indigo = "#42A5F5"
-main = Panel(
-"""   [bold $indigo underline]Term.jl[/]
+main = TextBox(
+"""   
 
 Presenting [italic $indigo]Term[/], a fancy terminal library.
 
-Style your text: [bold]bold[/],[italic]italic[/],[underline]underlined[/].
-[magenta2]You[/] [pink3]can[/] [bright_blue]add[/] [spring_green2]some[/] [green_yellow]color[/] [sky_blue2]too[/][bold bright_red]![/]
+Style your text: [bold]bold[/], [italic]italic[/] and [underline]underlined[/].
+         [magenta2]You[/] [pink3]can[/] [bright_blue]add[/] [spring_green2]some[/] [green_yellow]color[/] [sky_blue2]too[/][bold bright_red]![/]
 
 Or create [italic bold light_sky_blue1]Panels[/] and [italic bold light_sky_blue1]RenderableTexts[/], and
 [italic bold]stack[/] them to create 
@@ -54,7 +54,7 @@ Or create [italic bold light_sky_blue1]Panels[/] and [italic bold light_sky_blue
 
 
    [dim]https://github.com/FedeClaudi/Term.jl""",
-style="hidden",
+title="Term.jl", title_style="bold $indigo underline", width=:fit
 )
 
 # create "spacers"

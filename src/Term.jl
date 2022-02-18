@@ -18,6 +18,9 @@ module Term
     include("layout.jl")
     include("panel.jl")
 
+
+    export RenderableText, Panel, TextBox
+
     # ----------------------------------- base ----------------------------------- #
     import .measure
     using .measure: Measure
@@ -57,6 +60,6 @@ module Term
 
     using .layout: Padding, vstack, hstack
 
-    using .panel: Panel
+    using .panel: Panel, TextBox
 end
 
