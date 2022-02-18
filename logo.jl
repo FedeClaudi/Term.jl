@@ -1,6 +1,6 @@
 import IterTools: product as ×
 
-import Term: Panel, RenderableText, TextBox
+import Term: Panel, RenderableText, TextBox, vLine, hLine, Spacer
 import Term: vstack, hstack
 
 circle = """
@@ -45,7 +45,7 @@ main = TextBox(
 Presenting [italic $indigo]Term[/], a fancy terminal library.
 
 Style your text: [bold]bold[/], [italic]italic[/] and [underline]underlined[/].
-         [magenta2]You[/] [pink3]can[/] [bright_blue]add[/] [spring_green2]some[/] [green_yellow]color[/] [sky_blue2]too[/][bold bright_red]![/]
+      [magenta2]You[/] [pink3]can[/] [bright_blue]add[/] [spring_green2]some[/] [green_yellow]color[/] [sky_blue2]too[/][bold bright_red]![/]
 
 Or create [italic bold light_sky_blue1]Panels[/] and [italic bold light_sky_blue1]RenderableTexts[/], and
 [italic bold]stack[/] them to create 
@@ -53,27 +53,39 @@ Or create [italic bold light_sky_blue1]Panels[/] and [italic bold light_sky_blue
 
 
 
-   [dim]https://github.com/FedeClaudi/Term.jl""",
+         [dim]https://github.com/FedeClaudi/Term.jl""",
 title="Term.jl", title_style="bold $indigo underline", width=:fit
 )
 
 # create "spacers"
-hspacer = RenderableText(join([" "^(Int(round(green.measure.w/2))) for i in 1:green.measure.h], "\n"))
-
+hspacer = Spacer(green.measure.w/2, green.measure.h; char=' ')
 
 
 circles = vstack(
    hstack(hspacer, green, hspacer),
    hstack(red,purple)
 )
-vspacer = RenderableText(join([" "^3 for i in 1:circles.measure.h], "\n"))
+vspacer = Spacer(2, circles.measure.h; char=' ')
 
-logo = Panel(hstack(
-   circles, vspacer, main
-), title="Term.jl", title_style="bold $indigo", style="dim $indigo",
-subtitle="vX.X", 
-subtitle_justify=:right, 
-subtitle_style="dim"
+top_row = hstack(
+   circles, vspacer, vLine(circles.measure.h, indigo), main
+   )
+
+
+msg = "Term is at an early stage of development, so expect frequent breaking changes.\n[orange_red1 bold]Use at your own peril![/] (but also have fun with it).\nFor any question/feature request get in touch on Github or @fede_claudi on [blue]Twitter"
+
+logo = Panel(
+   vstack(
+      top_row,
+      hLine(top_row.measure.w, "dim"; box=:HEAVY),
+      TextBox(msg)
+   ), 
+   title="Term.jl",
+   title_style="bold $indigo",
+   style="dim $indigo",
+   subtitle="vX.X", 
+   subtitle_justify=:right, 
+   subtitle_style="dim"
 )
 print(logo)
 

@@ -30,13 +30,14 @@
 - [x] panel
   - [x] base features
   - [x] subtitle
-  - [ ] set height + vertical alignment
+  
 
 
 
 ## Roadmap
-- [ ] textbox (panel of given size with hidden edges + text inside)
-- [ ] vLine/hLine and spacer
+- [x] textbox (panel of given size with hidden edges + text inside)
+  - [ ] have textbox accept multiple lines of inputs as variable number of strings
+- [x] vLine/hLine and spacer
 - [ ] pad function + option to pad objects like AbstractPanel
  
 - [x] hstack/vstack for variable number of inputs too
@@ -48,6 +49,7 @@
 - [x] box
 - [x] panel
   - [x] panel subtitle (new make line method)
+  - [ ] set height + vertical alignment
 - [ ] inspect
 - [ ] error's traceback
 
@@ -58,3 +60,4 @@
 - [ ] nested tags, outer's color/bg not correctly restored
 - [ ] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
 - [x] panel: style's mode applies to title too.
+- [ ] `textbox` a bit buggy, produces weird output occasionally

@@ -1,9 +1,11 @@
 module layout
-    import ..renderables: RenderablesUnion, Renderable
+    import ..renderables: RenderablesUnion, Renderable, AbstractRenderable
     import ..measure: Measure
     import ..segment: Segment
+    using ..box
 
     export Padding, vstack, hstack
+    export Spacer, vLine, hLine
 
 
     # ---------------------------------------------------------------------------- #
@@ -136,4 +138,51 @@ module layout
         return renderable
     end
 
+
+
+    # ---------------------------------------------------------------------------- #
+    #                                LINES & SPACER                                #
+    # ---------------------------------------------------------------------------- #
+    abstract type AbstractLayoutElement <: AbstractRenderable end
+    mutable struct Spacer <: AbstractLayoutElement
+        segments::Vector{Segment}
+        measure::Measure
+    end
+
+    function Spacer(width::Number, height::Number; char::Char=' ')
+        width = (Int ∘ round)(width)
+        height = (Int ∘ round)(height)
+
+        line = char^width
+        segments = [Segment(line) for i in 1:height]
+        return Spacer(segments, Measure(segments))
+    end
+
+
+
+    mutable struct vLine <: AbstractLayoutElement
+        segments::Vector{Segment}
+        measure::Measure
+        height::Int
+    end
+
+    function vLine(height::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
+        height = (Int ∘ round)(height)
+        char = string(eval(box).head.left)
+        segments = [Segment(char, style) for i in 1:height]
+        return vLine(segments, Measure(segments), height)
+    end
+
+
+    mutable struct hLine <: AbstractLayoutElement
+        segments::Vector{Segment}
+        measure::Measure
+        width::Int
+    end
+
+    function hLine(width::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
+        width = (Int ∘ round)(width)
+        segments = [Segment(eval(box).row.mid^width, style)]
+        return hLine(segments, Measure(segments), width)
+    end
 end

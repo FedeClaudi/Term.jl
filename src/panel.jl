@@ -1,5 +1,5 @@
 module panel
-    import Term: split_lines, Measure, get_last_valid_str_idx, split_text_by_length, do_by_line
+    import Term: split_lines, get_last_valid_str_idx, split_text_by_length, do_by_line
 
     import ..measure: Measure
     import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText

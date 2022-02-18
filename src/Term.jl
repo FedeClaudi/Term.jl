@@ -20,6 +20,7 @@ module Term
 
 
     export RenderableText, Panel, TextBox
+    export Spacer, vLine, hLine
 
     # ----------------------------------- base ----------------------------------- #
     import .measure
@@ -58,7 +59,7 @@ module Term
 
     using .renderables: AbstractRenderable, Renderable, RenderableText
 
-    using .layout: Padding, vstack, hstack
+    using .layout: Padding, vstack, hstack, Spacer, vLine, hLine
 
     using .panel: Panel, TextBox
 end
