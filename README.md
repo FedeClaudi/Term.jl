@@ -57,10 +57,11 @@
   - [ ] set height + vertical alignment
 
 #### features
+- [ ] titleline : hLine with title centered in the middle
 - [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
 - [ ] inspect
   - [ ] type/struct inspection
-  - [ ] type hierarchy tree
+  - [ ] type hierarchy tree (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
 - [ ] error's traceback
 - [ ] logging
 - [ ] pretty print common data structures

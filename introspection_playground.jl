@@ -2,7 +2,7 @@ using Revise
 Revise.revise()
 
 using Term
-import Term: Panel, TextBox, Spacer, hLine, hstack, split_lines, join_lines, do_by_line
+import Term: Panel, TextBox, Spacer, hLine, hstack, split_lines, join_lines, do_by_line, RenderableText
 
 
 abstract type AA end
@@ -22,6 +22,8 @@ end
 
 Test(x) = Test(x[1], x[2])
 
+my_test_method(x::Test) = print(x)
+my_other_test_method(x::Test) = x/2
 
 
 function extract_type_info(type::DataType)
@@ -45,13 +47,20 @@ function extract_type_info(type::DataType)
 
     type_methods = join_lines(split_lines(string(methods(type)))[2:end])
 
+    using_type_methods = methodswith(type)
+    if length(using_type_methods) > 0
+        using_type_methods = join_lines([string(x) for x in using_type_methods])
+    end
 
     doc = string(@doc type)
 
-   return name, super, subs, fields, type_methods, doc
+   return name, super, subs, fields, type_methods, doc, using_type_methods
 end
 
 function style_method_line(method::AbstractString)
+    if length(method) == 0
+        return method
+    end
     name = split(method[4:end], " in ")[1]
     rest = split(method, name)[end]
 
@@ -63,7 +72,7 @@ function style_method_line(method::AbstractString)
 end
 
 function inspect(type::DataType, width=88)
-    name, super, subs, fields, type_methods, doc = extract_type_info(type)
+    name, super, subs, fields, type_methods, doc, using_type_methods = extract_type_info(type)
 
     # make a string for supertypes/subtypes
     if !isnothing(super)
@@ -77,11 +86,11 @@ function inspect(type::DataType, width=88)
     end
 
     if !isnothing(subs)
-        subtypes = "[dim](subtypes): "
+        subtypes = "  [dim](subtypes):[/] "
         for sub in subs
-            subtypes *= "[bold]$sub[/][blue] >[/blue]"
+            subtypes *= "[bold]$sub[/]"
         end
-        subtypes = subtypes * " [blue] :> [/blue][bold blue]$name[/]"
+        subtypes = subtypes * " [blue]> [/blue][bold blue]$name[/]"
     else
         subtypes = "  [dim](subtypes): no subtypes[/]"
     end
@@ -118,7 +127,7 @@ function inspect(type::DataType, width=88)
     end
 
     fields_panel = Panel(
-        isnothing(fields) ? "[dim]type has not $fields[/]" : formatted_fields,
+        isnothing(fields) ? "[dim]No arguments[/]" : formatted_fields,
         title="Arguments", 
         title_style="bold yellow",
         style="dim yellow",
@@ -129,13 +138,43 @@ function inspect(type::DataType, width=88)
 
     # type's methods
     type_methods = do_by_line(style_method_line, type_methods)
-    methods_panel = TextBox(
-        type_methods,
-        title="Methods [dim]($(length(split_lines(type_methods))))",
-        title_style="bold underline",
-        width=width
-    )
+    nmethods = length(split_lines(type_methods)) > 1 ? Int(length(split_lines(type_methods))/2) : 1
+    if nmethods > 1
+        methods_panel = TextBox(
+            type_methods,
+            title="Constructors[dim]($nmethods)",
+            title_style="bold underline",
+            width=width
+        )
+    else
+        methods_panel = TextBox(
+            "[dim]No methods          [/]",
+            title="Constructors[dim](0)",
+            title_style="bold underline",
+            width=width
+        )
+    end
 
+    # methods using type
+    if length(using_type_methods) > 0
+        using_type_methods = do_by_line(style_method_line, using_type_methods)
+        nmethods = length(split_lines(using_type_methods)) > 1 ? Int(length(split_lines(using_type_methods))/2) : 1
+        using_methods_panel = TextBox(
+            using_type_methods,
+            title="Metohods[dim]($nmethods)",
+            title_style="bold underline",
+            width=width
+        )
+    else
+        using_methods_panel = TextBox(
+            "[dim]No methods          [/]",
+            title="Metohods[dim](0)",
+            title_style="bold underline",
+            width=width
+        )
+    end
+
+    _title = isabstracttype(type) ? " [dim](Abstract)[/]" : ""
     println(
         Panel(
             Spacer(width, 1),
@@ -144,7 +183,10 @@ function inspect(type::DataType, width=88)
             insights_panel,
             hLine(width, "blue dim"),
             methods_panel,
-            title="$(typeof(type)): [bold]$name", title_style="red",
+            hLine(width, "blue dim"),
+            using_methods_panel,
+            title="$(typeof(type)): [bold]$name" * _title, 
+            title_style="red",
             style="blue dim",
         )
     )
@@ -152,10 +194,9 @@ function inspect(type::DataType, width=88)
 end
 
 
-# TODO show methods
+# TODO show methods - add methods using abstract supertypes
 # TODO get docstring
 # TODO get source code with @less
-# TODO make it work with abstract types
 
 
 """
@@ -169,5 +210,8 @@ print(Base.@locals())
 
 """
 
+
+print(RenderableText("[bold bright_yellow]inspect([/]Test[bold bright_yellow])"))
+print("\n\n")
+inspect(AbstractTest)
 inspect(Test)
-# inspect(AbstractTest)
