@@ -44,7 +44,7 @@ module renderables
     end
 
     Renderable() = Renderable([], Measure(0, 0))
-    Renderable(str::AbstractString) = RenderableText(str)
+    Renderable(str::Union{Vector, AbstractString}) = RenderableText(str)
     Renderable(ren::AbstractRenderable) = ren  # returns the renderable
     Renderable(segment::Segment) = Renderable([segment], Measure([segment]))
 

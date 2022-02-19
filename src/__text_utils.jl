@@ -85,7 +85,7 @@ end
 Splits a text such that each line has max length: width.
 """
 function split_text_by_length(text::AbstractString, width::Int)
-    if length(text) < width
+    if length(remove_ansi(remove_markup(text))) < width
         return text
     end
 

@@ -55,3 +55,7 @@ print(TextBox(
 print(TextBox(
     join("X"^26, "y"^8), title="test box!", title_style="bold red", width=44
 ))
+
+print(TextBox(
+    "[bold]test [/]"^25
+))

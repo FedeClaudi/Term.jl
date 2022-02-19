@@ -51,6 +51,7 @@ module panel
                 subtitle_style::Union{String, Nothing}=nothing,
                 subtitle_justify::Symbol=:left,
                 width::Union{Nothing, Int}=nothing,
+                height::Union{Nothing, Int}=nothing,
                 style::Union{String, Nothing}=nothing,
                 box::Symbol=:ROUNDED,
                 justify=:left
@@ -101,6 +102,14 @@ module panel
             # make line
             push!(segments, Segment(left * padding.left * line * padding.right * right))
         end
+
+        if !isnothing(height) && content_measure.h < height
+            for i in 1:(height - content_measure.h)
+                line = " "^(width)
+                push!(segments, Segment(left * line * right))
+            end
+        end
+
         push!(segments, bottom)
 
         return Panel(
@@ -179,6 +188,7 @@ module panel
         return TextBox(panel.segments, panel.measure)
     end
 
+    TextBox(texts...;kwargs...) = TextBox([s for s in texts]; kwargs...)
 
 
 end

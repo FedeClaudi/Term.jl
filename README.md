@@ -1,4 +1,4 @@
-# TODO
+### DOne
 - [x] get plain text for Measure
   - [x] remove markup
   - [x] remove ansi
@@ -55,16 +55,25 @@
 - [x] panel
   - [x] panel subtitle (new make line method)
   - [ ] set height + vertical alignment
+
 #### features
+- [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
 - [ ] inspect
+  - [ ] type/struct inspection
+  - [ ] type hierarchy tree
 - [ ] error's traceback
 - [ ] logging
+- [ ] pretty print common data structures
+  - [ ] highlight type info ::Type or <:Type
 
 - [ ] latex->unicode parsing (https://github.com/phfaist/pylatexenc)
 - [ ] markdown parsing
+- [ ] code syntax highlighting
 
 ## BUGS
 - [ ] nested tags, outer's color/bg not correctly restored
 - [ ] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
 - [x] panel: style's mode applies to title too.
 - [ ] `textbox` a bit buggy, produces weird output occasionally
+  - [ ] `textbox` should "clean" the text, lay it out, and then inject the style back in
+  - [ ] when splitting a line the style should be carried over
