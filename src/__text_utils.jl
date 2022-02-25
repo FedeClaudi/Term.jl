@@ -158,13 +158,15 @@ end
 """
 Applies a given function to each line in the text
 """
-function do_by_line(fn, text)
+function do_by_line(fn, text::AbstractString)
     lines::Vector{AbstractString} = []
     for line in split_lines(text)
         push!(lines, fn(line))
     end
     return join_lines(lines)
 end
+
+do_by_line(fn, text::Vector) = do_by_line(fn, join_lines(text))
 
 """
 When indexing a string, the number of indices is given by the

@@ -1,7 +1,7 @@
 import Term: Panel, RenderableText, TextBox
 import Term: split_lines
 
-println(
+@time println(
     Panel(
         """
         [green]This is a multiline text[/]
@@ -10,9 +10,10 @@ println(
         title="From text"
     )
 )
+print("\n\n")
 
 
-println(
+@time println(
     Panel(
         RenderableText("""
         [green]This is a multiline text[/]
@@ -25,9 +26,9 @@ println(
 
     )
 )
+print("\n\n")
 
-
-println(
+@time println(
     Panel(
         Panel("[bold white]Title panel!!", style="dim"),
         Panel(RenderableText("""
@@ -45,15 +46,15 @@ println(
     justify=:center, title="created with Term", title_style="gray62"
     )
 )
+print("\n\n")
 
 
-
-print(TextBox(
+@time println(TextBox(
     join("TEST"^4, "sdfs"^8, "\n"), title="test box!"
 ))
+print("\n\n")
 
-
-print(TextBox(
+@time println(TextBox(
     join("X"^26, "y"^8), title="test box!", title_style="bold red", width=44
 ))
-
+print("\n\n")

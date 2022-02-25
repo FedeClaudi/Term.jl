@@ -188,7 +188,6 @@ module layout
     end
 
 
-
     mutable struct vLine <: AbstractLayoutElement
         segments::Vector{Segment}
         measure::Measure
@@ -210,7 +209,7 @@ module layout
     end
 
     function hLine(width::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
-        width = (Int ∘ round)(width)
+        width = (Int ∘ round)(width) + 1
         segments = [Segment(eval(box).row.mid^width, style)]
         return hLine(segments, Measure(segments), width)
     end

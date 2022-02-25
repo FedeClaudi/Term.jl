@@ -76,6 +76,8 @@ function TypeInfo(type::DataType)
         _methods = join_lines([string(x) for x in _methods])
     end
 
+    @info "Building type info"
+
     return TypeInfo(string(type), super, sub, fields, constructors, _methods, doc)
 end
 
@@ -128,8 +130,9 @@ end
 
 
 
-function inspect(type::DataType, width=200)
+function inspect(type::DataType, width=150)
     info = TypeInfo(type)
+
 
     # make textbox showing types hierarchy
     hierarchy = TextBox(
@@ -174,72 +177,58 @@ function inspect(type::DataType, width=200)
     )
     insights_panel = fields_panel * Spacer(4, fields_panel.measure.h) * docs
 
-    print(hierarchy / insights_panel)
+    # type's constructors
+    constructors = do_by_line(style_method_line, info.constructors)
+    nmethods = length(split_lines(constructors)) > 1 ? Int(length(split_lines(constructors))/2) : 1
+    constructors = nmethods > 1 ? constructors : "[dim]No constructors          [/]"
+    cosntructors_panel = TextBox(
+        constructors,
+        title="Constructors[dim](0)",
+        title_style="bold underline",
+        width=width
+    )
 
-    # TODO debug + clean up and reformat code
+    # methods using type
+    if length(info.methods) > 0
+        methods = do_by_line(style_method_line, info.methods)
+        nmethods = length(split_lines(methods)) > 1 ? Int(length(split_lines(methods))/2) : 1
+    else
+        methods = "[dim]No methods          [/]"
+        nmethods = 0
+    end
 
-    # # type's methods
-    # type_methods = do_by_line(style_method_line, type_methods)
-    # nmethods = length(split_lines(type_methods)) > 1 ? Int(length(split_lines(type_methods))/2) : 1
-    # if nmethods > 1
-    #     methods_panel = TextBox(
-    #         type_methods,
-    #         title="Constructors[dim]($nmethods)",
-    #         title_style="bold underline",
-    #         width=width
-    #     )
-    # else
-    #     methods_panel = TextBox(
-    #         "[dim]No methods          [/]",
-    #         title="Constructors[dim](0)",
-    #         title_style="bold underline",
-    #         width=width
-    #     )
-    # end
+    methods_panel = TextBox(
+        methods,
+        title="Metohods[dim]($nmethods)",
+        title_style="bold underline",
+        width=width
+    )
 
-    # # methods using type
-    # if length(using_type_methods) > 0
-    #     using_type_methods = do_by_line(style_method_line, using_type_methods)
-    #     nmethods = length(split_lines(using_type_methods)) > 1 ? Int(length(split_lines(using_type_methods))/2) : 1
-    #     using_methods_panel = TextBox(
-    #         using_type_methods,
-    #         title="Metohods[dim]($nmethods)",
-    #         title_style="bold underline",
-    #         width=width
-    #     )
-    # else
-    #     using_methods_panel = TextBox(
-    #         "[dim]No methods          [/]",
-    #         title="Metohods[dim](0)",
-    #         title_style="bold underline",
-    #         width=width
-    #     )
-    # end
 
-    # _title = isabstracttype(type) ? " [dim](Abstract)[/]" : ""
-    # println(
-    #     Panel(
-    #         Spacer(width, 1),
-    #         hierarchy,
-    #         hLine(width, "blue dim"),
-    #         insights_panel,
-    #         hLine(width, "blue dim"),
-    #         methods_panel,
-    #         hLine(width, "blue dim"),
-    #         using_methods_panel,
-    #         title="$(typeof(type)): [bold]$name" * _title, 
-    #         title_style="red",
-    #         style="blue dim",
-    #     )
-    # )
+    _title = isabstracttype(type) ? " [dim](Abstract)[/]" : ""
+    println(
+        Panel(
+            Spacer(width, 1),
+            hierarchy,
+            hLine(width, "blue dim"),
+            insights_panel,
+            hLine(width, "blue dim"),
+            cosntructors_panel,
+            hLine(width, "blue dim"),
+            methods_panel,
+            title="$(typeof(type)): [bold]$(info.name)" * _title, 
+            title_style="red",
+            style="blue dim",
+        )
+    )
 
 end
 
+# TODO style docstring
+# TODO style argument names
+# TODO style constructors methods (first word colored, then highlight types in definition)
 
-# TODO show methods - add methods using abstract supertypes
-# TODO get docstring
-# TODO get source code with @less
-
+#! BUG: panel should rehsape things that are too wide
 
 """
 useful:
@@ -252,7 +241,12 @@ print(Base.@locals())
 
 """
 
-
+@info "STARTING"
 print(RenderableText("[bold bright_yellow]inspect([/]Test[bold bright_yellow])"))
 print("\n\n")
 inspect(Panel)
+
+
+# @time TypeInfo(Panel);
+# @time inspect(Panel)
+# @time inspect(Panel)
