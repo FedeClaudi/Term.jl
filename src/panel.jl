@@ -1,5 +1,5 @@
 module panel
-    import Term: split_lines, get_last_valid_str_idx, split_text_by_length, do_by_line, join_lines
+    import Term: split_lines, get_last_valid_str_idx, rehsape_text, do_by_line, join_lines
 
     import ..measure: Measure
     import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
@@ -163,14 +163,10 @@ module panel
         subtitle_justify::Symbol=:left,
         justify::Symbol=:left,
         )
-        if typeof(text) <: AbstractVector
-            text = join_lines(text)
-        end
 
         if width != :fit
-            text = do_by_line((ln)->split_text_by_length(ln, width), text)
+            text = do_by_line((ln)->rehsape_text(ln, width), text)
         end
-
 
         panel = Panel(
             text,
@@ -188,7 +184,6 @@ module panel
         return TextBox(panel.segments, panel.measure)
     end
 
-    TextBox(texts...;kwargs...) = TextBox([s for s in texts]; kwargs...)
-
+    TextBox(texts...;kwargs...) = TextBox(join_lines(texts); kwargs...)
 
 end

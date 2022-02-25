@@ -1,6 +1,6 @@
 using Revise
 Revise.revise()
-
+import Documenter.DocSystem: getdocs
 using Term
 import Term: Panel, TextBox, Spacer, hLine, hstack, split_lines, join_lines, do_by_line, RenderableText
 
@@ -13,6 +13,10 @@ abstract type AbstractTest <: AA end
     Test
 
 A test `struct` for inspection
+
+More info
+
+And more
 """
 mutable struct Test <: AbstractTest
     x::Int
@@ -25,17 +29,36 @@ Test(x) = Test(x[1], x[2])
 my_test_method(x::Test) = print(x)
 my_other_test_method(x::Test) = x/2
 
+"""
+    TypeInfo
 
-function extract_type_info(type::DataType)
-    name = string(type)
-    super = supertypes(type)
-    super = length(super) > 0 ? super : nothing
+Stores metadata about a DataType
+"""
+struct TypeInfo
+    name::String
+    supertypes::Union{Nothing, Tuple}
+    subtypes::Union{Nothing, Tuple}
+    fields::Union{Dict, Nothing}
+    constructors::Vector
+    methods::Vector  # functions using the target type
+    docs::Union{Nothing, Docs.DocStr}
+end
 
+"""
+    TypeInfo(type::DataType)
 
-    subs = subtypes(type)
+Extracts information from a DataType and stores it as a `TypeInfo` object.
+"""
+function TypeInfo(type::DataType)
+    # get super/sub types
+    super = length(supertypes(type)) > 0 ? (supertypes(type)) : nothing
+    sub = length(subtypes(type)) > 0 ? subtypes(type) : nothing
 
-    subs = length(subs) > 0 ? subs : nothing
+    # get docstring
+    doc = getdocs(Symbol(type))
+    doc = length(doc) > 0 ? doc[1] : nothing
 
+    # get fields
     if !isabstracttype(type)
         fields = Dict(
             "names" => fieldnames(type),
@@ -45,17 +68,49 @@ function extract_type_info(type::DataType)
         fields = nothing
     end
 
-    type_methods = join_lines(split_lines(string(methods(type)))[2:end])
+    # get constructors and methods
+    constructors = split_lines(string(methods(type)))[2:end]
 
-    using_type_methods = methodswith(type)
-    if length(using_type_methods) > 0
-        using_type_methods = join_lines([string(x) for x in using_type_methods])
+    _methods = methodswith(type)
+    if length(_methods) > 0
+        _methods = join_lines([string(x) for x in _methods])
     end
 
-    doc = string(@doc type)
-
-   return name, super, subs, fields, type_methods, doc, using_type_methods
+    return TypeInfo(string(type), super, sub, fields, constructors, _methods, doc)
 end
+
+
+
+
+function style_super_types(info::TypeInfo)::String
+    if !isnothing(info.supertypes)
+        stypes = "[dim](supertypes):[/] [bold blue]$(info.name)[/]"
+        for sup in info.supertypes[2:end]
+            abstract = isabstracttype(sup) ? "underline" : ""
+            name = split(string(sup), ".")[end]
+            stypes = stypes * "[blue] <[/blue] [bold $abstract]$name[/]"
+        end
+    else
+        stypes = "[dim](supertypes): no super types[/]"
+    end
+    return stypes
+end
+
+
+function style_sub_types(info::TypeInfo)::String
+    if !isnothing(info.subtypes)
+        subtypes = "  [dim](subtypes):[/] "
+        for sub in info.subtypes
+            name = split(string(sub), ".")[end]
+            subtypes *= "[bold]$name[/]"
+        end
+        subtypes = subtypes * " [blue]> [/blue][bold blue]$(info.name)[/]"
+    else
+        subtypes = "  [dim](subtypes): no subtypes[/]"
+    end
+    return subtypes
+end
+
 
 function style_method_line(method::AbstractString)
     if length(method) == 0
@@ -71,43 +126,25 @@ function style_method_line(method::AbstractString)
     return method
 end
 
+
+
 function inspect(type::DataType, width=88)
-    name, super, subs, fields, type_methods, doc, using_type_methods = extract_type_info(type)
+    info = TypeInfo(type)
 
-    # make a string for supertypes/subtypes
-    if !isnothing(super)
-        stypes = "[dim](supertypes):[/] [bold blue]$name[/]"
-        for sup in super[2:end]
-            abstract = isabstracttype(sup) ? "underline" : ""
-            stypes = stypes * "[blue] <[/blue] [bold $abstract]$sup[/]"
-        end
-    else
-        stypes = "[dim](supertypes): no super types[/]"
-    end
-
-    if !isnothing(subs)
-        subtypes = "  [dim](subtypes):[/] "
-        for sub in subs
-            subtypes *= "[bold]$sub[/]"
-        end
-        subtypes = subtypes * " [blue]> [/blue][bold blue]$name[/]"
-    else
-        subtypes = "  [dim](subtypes): no subtypes[/]"
-    end
-
-    # textbox showing types hierarchy
+    # make textbox showing types hierarchy
     hierarchy = TextBox(
         "",
-        stypes,
+        style_super_types(info),
         "",
-        subtypes,
-        width=120, title="Types hierarchy", title_style="bold blue underline"
+        style_sub_types(info),
+        width=width, 
+        title="Types hierarchy", 
+        title_style="bold blue underline"
     )
+    print(hierarchy)
 
-    # docstring
     docs = TextBox(
-        " ",
-        startswith(doc, "No documentation found.") ? "[bold salmon1]No documentation found." : doc,
+        info.docs.text[1],
         title="Docstring",
         title_style="bold underline",
         width = (Int ∘ round)(width/4*3 - 4)
@@ -117,8 +154,8 @@ function inspect(type::DataType, width=88)
 
     # panel showing type's field
     formatted_fields::Vector{AbstractString} = []
-    if !isnothing(fields)
-        for (name, type) in zip(fields["names"], fields["types"])
+    if !isnothing(info.fields)
+        for (name, type) in zip(info.fields["names"], info.fields["types"])
             push!(
                 formatted_fields,
                 "[bold yellow]$(string(name))[/][blue]::$(type)"
@@ -126,8 +163,9 @@ function inspect(type::DataType, width=88)
         end
     end
 
+
     fields_panel = Panel(
-        isnothing(fields) ? "[dim]No arguments[/]" : formatted_fields,
+        isnothing(formatted_fields) ? "[dim]No arguments[/]" : formatted_fields,
         title="Arguments", 
         title_style="bold yellow",
         style="dim yellow",
@@ -135,61 +173,64 @@ function inspect(type::DataType, width=88)
         width = (Int ∘ round)(width/4),
     )
     insights_panel = hstack(fields_panel, Spacer(4, fields_panel.measure.h), docs)
+    print(insights_panel)
 
-    # type's methods
-    type_methods = do_by_line(style_method_line, type_methods)
-    nmethods = length(split_lines(type_methods)) > 1 ? Int(length(split_lines(type_methods))/2) : 1
-    if nmethods > 1
-        methods_panel = TextBox(
-            type_methods,
-            title="Constructors[dim]($nmethods)",
-            title_style="bold underline",
-            width=width
-        )
-    else
-        methods_panel = TextBox(
-            "[dim]No methods          [/]",
-            title="Constructors[dim](0)",
-            title_style="bold underline",
-            width=width
-        )
-    end
+    # TODO debug + clean up and reformat code
 
-    # methods using type
-    if length(using_type_methods) > 0
-        using_type_methods = do_by_line(style_method_line, using_type_methods)
-        nmethods = length(split_lines(using_type_methods)) > 1 ? Int(length(split_lines(using_type_methods))/2) : 1
-        using_methods_panel = TextBox(
-            using_type_methods,
-            title="Metohods[dim]($nmethods)",
-            title_style="bold underline",
-            width=width
-        )
-    else
-        using_methods_panel = TextBox(
-            "[dim]No methods          [/]",
-            title="Metohods[dim](0)",
-            title_style="bold underline",
-            width=width
-        )
-    end
+    # # type's methods
+    # type_methods = do_by_line(style_method_line, type_methods)
+    # nmethods = length(split_lines(type_methods)) > 1 ? Int(length(split_lines(type_methods))/2) : 1
+    # if nmethods > 1
+    #     methods_panel = TextBox(
+    #         type_methods,
+    #         title="Constructors[dim]($nmethods)",
+    #         title_style="bold underline",
+    #         width=width
+    #     )
+    # else
+    #     methods_panel = TextBox(
+    #         "[dim]No methods          [/]",
+    #         title="Constructors[dim](0)",
+    #         title_style="bold underline",
+    #         width=width
+    #     )
+    # end
 
-    _title = isabstracttype(type) ? " [dim](Abstract)[/]" : ""
-    println(
-        Panel(
-            Spacer(width, 1),
-            hierarchy,
-            hLine(width, "blue dim"),
-            insights_panel,
-            hLine(width, "blue dim"),
-            methods_panel,
-            hLine(width, "blue dim"),
-            using_methods_panel,
-            title="$(typeof(type)): [bold]$name" * _title, 
-            title_style="red",
-            style="blue dim",
-        )
-    )
+    # # methods using type
+    # if length(using_type_methods) > 0
+    #     using_type_methods = do_by_line(style_method_line, using_type_methods)
+    #     nmethods = length(split_lines(using_type_methods)) > 1 ? Int(length(split_lines(using_type_methods))/2) : 1
+    #     using_methods_panel = TextBox(
+    #         using_type_methods,
+    #         title="Metohods[dim]($nmethods)",
+    #         title_style="bold underline",
+    #         width=width
+    #     )
+    # else
+    #     using_methods_panel = TextBox(
+    #         "[dim]No methods          [/]",
+    #         title="Metohods[dim](0)",
+    #         title_style="bold underline",
+    #         width=width
+    #     )
+    # end
+
+    # _title = isabstracttype(type) ? " [dim](Abstract)[/]" : ""
+    # println(
+    #     Panel(
+    #         Spacer(width, 1),
+    #         hierarchy,
+    #         hLine(width, "blue dim"),
+    #         insights_panel,
+    #         hLine(width, "blue dim"),
+    #         methods_panel,
+    #         hLine(width, "blue dim"),
+    #         using_methods_panel,
+    #         title="$(typeof(type)): [bold]$name" * _title, 
+    #         title_style="red",
+    #         style="blue dim",
+    #     )
+    # )
 
 end
 
@@ -213,5 +254,4 @@ print(Base.@locals())
 
 print(RenderableText("[bold bright_yellow]inspect([/]Test[bold bright_yellow])"))
 print("\n\n")
-inspect(AbstractTest)
-inspect(Test)
+inspect(Panel)

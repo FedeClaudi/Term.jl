@@ -23,8 +23,9 @@ function remove_markup(input_text::AbstractString)::AbstractString
             close_regex = r"\[\/+" * markup * r"\]"
 
             # remove them
-            text = replace(text, regex=>"")
+            text = replace(text, "[$markup]"=>"")
             text = replace(text, close_regex=>"")
+
         end
     end
 
@@ -66,6 +67,7 @@ chars(text::AbstractString)::Vector{Char} = [x for x in text]
 """Merges a vector of strings in a single string"""
 join_lines(lines::Vector) = join(lines, "\n")
 
+join_lines(lines) = join(lines, "\n")
 
 function split_lines(text::AbstractString)
     split(text, "\n")
@@ -80,37 +82,73 @@ function split_lines(renderable)
 end
 
 """
-    split_text_by_length(text::AbstractString, width::Int)
+    rehsape_text(text::AbstractString, width::Int)
 
-Splits a text such that each line has max length: width.
+Given a long string of text, it reshapes it into N lines
+of fixed width
 """
-function split_text_by_length(text::AbstractString, width::Int)
-    if length(remove_ansi(remove_markup(text))) < width
-        return text
+function rehsape_text(text::AbstractString, width::Int)
+    tags = extract_markup(text)
+
+    in_tags = zeros(Int, length(text))
+    valid_chars = ones(Int, length(text))
+    for tag in tags
+
+        in_tags[tag.open.stop + 1 : tag.close.start-1] .= -1
+
+        valid_chars[tag.open.start:tag.open.stop] .= 0
+        valid_chars[tag.close.start : tag.close.stop] .= 0
     end
+    tag_start = [t.open.start for t in tags]
 
-    n_cuts = (Int ∘ ceil)(length(text)/width)
-    lines::Vector{AbstractString} = []
 
-    for cut in 1:n_cuts
-        pre = cut==1 ? 1 : get_last_valid_str_idx(text, width * (cut-1))
+    lines = []
+    j = 1
+    next_ln_start = ""
+    while length(remove_markup(text))>width
+        # get a cutting index not in a tag's markup
+        line = ""
+        cut = findlast(cumsum(valid_chars[j : end]) .<= width)
+        cut = isnothing(cut) ? length(text) : cut
         
-        if width * cut ≥ length(text)
-            post = get_last_valid_str_idx(text, length(text))
+        # when splitting a tag, replicated start/end for new lines
+        if in_tags[cut+j] == -1
+            pre = findlast(tag_start .<= j)
+            pre = isnothing(pre) ? 1 : pre
+
+            next_ln_start = "[$(tags[pre].open.markup)]"
+            ln_end = "[$(tags[pre].close.markup)]"
         else
-            post = get_last_valid_str_idx(text, width * cut - 1)
+            next_ln_start, ln_end = "", ""
         end
 
-        # ensure all lines have the same length
-        line = text[pre:post]
-        if length(line) < width
-            line = line * " "^(width-length(line))
-        end
-        @assert length(line) == width
-        
+        # prep line
+        line =  next_ln_start * text[1:cut] * ln_end
+
+
         push!(lines, line)
+        text = text[cut+1:end]
+        j += cut
 
     end
+
+    # add what's left of the text
+    if length(text) > 0
+        push!(lines, next_ln_start * text)
+    end
+
+    # do checs and pad line
+    for (n, line) in enumerate(lines)
+        h = remove_markup(line)
+        # @assert length(remove_markup(line)) <= width
+
+        ll = length(remove_markup(line))
+        if ll < width
+            lines[n] = line * " "^(width-ll)
+        end
+
+    end
+
     return join_lines(lines)
 end
 
@@ -142,6 +180,18 @@ function get_last_valid_str_idx(str::AbstractString, idx::Int)
     return idx
 end
 
+function get_last_valid_str_idx(str::AbstractString, idx::Int, valid_places::Vector{Int64})
+    while !isvalid(str, idx) || valid_places[idx]==0
+        idx -= 1
+
+        if idx == 0
+            break
+        end
+    end
+    return idx
+end
+
+
 """
 When indexing a string, the number of indices is given by the
 the sum of the `ncodeunits` of each `Char`, but some indices
@@ -154,6 +204,17 @@ function get_next_valid_str_idx(str::AbstractString, idx::Int)
 
         if idx >= length(str)
             throw("Failed to find a valid index for $str starting at $idx")
+        end
+    end
+    return idx
+end
+
+function get_next_valid_str_idx(str::AbstractString, idx::Int, valid_places::Vector{Int64})
+    while !isvalid(str, idx) || valid_places[idx] == 0
+        idx += 1
+
+        if idx == length(str)
+            break
         end
     end
     return idx

@@ -60,7 +60,7 @@ module markup
             if !occursin(close_regex, text[tag_open.stop:end])
                 # check if a generig closer [/] is present
                 if occursin(GENERIC_CLOSER_REGEX, text[tag_open.stop:end])
-                    tag_close = SingleTag(text, match(GENERIC_CLOSER_REGEX, text))
+                    tag_close = SingleTag(text, match(GENERIC_CLOSER_REGEX, text, tag_open.start))
                 else
                     # otherwise inject a closer tag at the end
                     text = text * "[/$(tag_open.markup)]"

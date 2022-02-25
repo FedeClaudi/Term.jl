@@ -1,4 +1,7 @@
 module layout
+    include("__text_utils.jl")
+
+
     import ..renderables: RenderablesUnion, Renderable, AbstractRenderable
     import ..measure: Measure
     import ..segment: Segment
@@ -21,8 +24,9 @@ module layout
 
     """Creates a Padding for a string to match a given width according to a justify method"""
     function Padding(text, target_width, method)
+        # text = remove_ansi(remove_markup(text))
         lw = Measure(text).w
-        @assert lw < target_width "Text is longer than the target width: $lw instead of $target_width"
+        @assert lw < target_width "Text is longer than the target width: $lw instead of $target_width '($text)'"
 
         # get total padding size
         padding = lw < target_width ? " "^(target_width - lw -1) : ""
@@ -45,6 +49,18 @@ module layout
             return Padding(padding, " ")
         end
     end
+
+    function Base.show(io::IO, padding::Padding)
+        print(io, "$(typeof(padding))  \e[2m(left: $(length(padding.left)), right: $(length(padding.right)))\e[0m")
+    end    
+
+
+    # ---------------------------------------------------------------------------- #
+    #                                  Text layout                                 #
+    # ---------------------------------------------------------------------------- #
+
+
+    
 
     # ---------------------------------------------------------------------------- #
     #                                   STACKING                                   #

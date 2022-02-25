@@ -119,4 +119,6 @@ end
     @test "abc" == remove_markup("abc")
 
     @test "abc" == remove_markup("[red on_blue]a[blue]b[/]c[/red on_blue]")
+
+    @test "abs" == remove_markup("[blue]edssasda[/blue]")
 end

@@ -101,7 +101,11 @@ module color
     
     function is_background(string::AbstractString)::Bool
         stripped = nospaces(string)
-        return stripped[1:3] == "on_" && is_color(stripped[4:end])
+        if length(stripped) < 3
+            return false
+        else
+            return stripped[1:3] == "on_" && is_color(stripped[4:end])
+        end
     end
 
 
