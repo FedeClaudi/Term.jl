@@ -63,11 +63,17 @@ module panel
         σ(s) = Segment(s, style)  # applies the main style markup to a string to make a segment
 
         # get size of panel to fit the content
+        content = Renderable(content; width=width)
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
+        # @warn content content.segments
+
         width = isnothing(width) ? panel_measure.w : width
+        @assert width > content_measure.w
+
         panel_measure.w = width
         @assert width >= panel_measure.w "With too small, not yet supported"
+        # @info "Panel" content_measure panel_measure
 
         # create segments
         segments::Vector{Segment} = []
@@ -127,10 +133,10 @@ module panel
 
     `Panel` constructor for creating a panel out of multiple renderables at once.
     """
-    function Panel(renderables...; kwargs...)
-        renderable = vstack(Renderable.(renderables)...)
+    function Panel(renderables...; width::Union{Nothing, Int}=nothing, kwargs...)
+        renderable = vstack(Renderable.(renderables, width=width)...)
 
-        return Panel(renderable; kwargs...)
+        return Panel(renderable; width=width, kwargs...)
     end
 
 

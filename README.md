@@ -78,3 +78,4 @@
 - [ ] `textbox` a bit buggy, produces weird output occasionally
   - [ ] `textbox` should "clean" the text, lay it out, and then inject the style back in
   - [ ] when splitting a line the style should be carried over
+- `Panel` can't handle renderables larger than given width

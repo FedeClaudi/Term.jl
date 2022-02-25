@@ -128,7 +128,7 @@ end
 
 
 
-function inspect(type::DataType, width=88)
+function inspect(type::DataType, width=200)
     info = TypeInfo(type)
 
     # make textbox showing types hierarchy
@@ -141,7 +141,6 @@ function inspect(type::DataType, width=88)
         title="Types hierarchy", 
         title_style="bold blue underline"
     )
-    print(hierarchy)
 
     docs = TextBox(
         info.docs.text[1],
@@ -164,6 +163,7 @@ function inspect(type::DataType, width=88)
     end
 
 
+
     fields_panel = Panel(
         isnothing(formatted_fields) ? "[dim]No arguments[/]" : formatted_fields,
         title="Arguments", 
@@ -172,8 +172,9 @@ function inspect(type::DataType, width=88)
         height = max(docs.measure.h, length(formatted_fields)),
         width = (Int ∘ round)(width/4),
     )
-    insights_panel = hstack(fields_panel, Spacer(4, fields_panel.measure.h), docs)
-    print(insights_panel)
+    insights_panel = fields_panel * Spacer(4, fields_panel.measure.h) * docs
+
+    print(hierarchy / insights_panel)
 
     # TODO debug + clean up and reformat code
 

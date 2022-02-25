@@ -2,7 +2,8 @@ module renderables
 
     import ..measure: Measure    
     import ..segment: Segment
-    
+    import Term: split_lines, rehsape_text, do_by_line
+
 
     export AbstractRenderable, Renderable, RenderableText
 
@@ -45,9 +46,9 @@ module renderables
     end
 
     Renderable() = Renderable([], Measure(0, 0))
-    Renderable(str::Union{Vector, AbstractString}) = RenderableText(str)
-    Renderable(ren::AbstractRenderable) = ren  # returns the renderable
-    Renderable(segment::Segment) = Renderable([segment], Measure([segment]))
+    Renderable(str::Union{Vector, AbstractString}; width::Union{Nothing, Int}=nothing) =  RenderableText(str; width=width)
+    Renderable(ren::AbstractRenderable; width::Union{Nothing, Int}=nothing) = ren  # returns the renderable
+    Renderable(segment::Segment; width::Union{Nothing, Int}=nothing) = Renderable([segment], Measure([segment]))
 
 
     # ---------------------------------------------------------------------------- #
@@ -59,15 +60,21 @@ module renderables
         text::AbstractString
     end
 
-    function RenderableText(text::AbstractString)
-        segments = [Segment(line) for line in split(text, "\n")]
+    function RenderableText(text::AbstractString; width::Union{Nothing, Int}=nothing)
+        if !isnothing(width)
+            text = do_by_line((ln)->rehsape_text(ln, width), text)
+        end
+        segments = [Segment(line) for line in split_lines(text)]
         return RenderableText(segments, Measure(segments), text)
     end
 
-    RenderableText(text::Vector{AbstractString}) = RenderableText(join(text, "\n"))
+    RenderableText(text::Vector{AbstractString}; width::Union{Nothing, Int}=nothing) = RenderableText(join(text, "\n"); width=width)
 
-    function RenderableText(text::AbstractString, style::AbstractString)
-        segments = [Segment(line, style) for line in split(text, "\n")]
+    function RenderableText(text::AbstractString, style::AbstractString; width::Union{Nothing, Int}=nothing)
+        if !isnothing(width)
+            text = do_by_line((ln)->rehsape_text(ln, width), text)
+        end
+        segments = [Segment(line, style) for line in split_lines(text)]
         return RenderableText(segments, Measure(segments), text)
     end   
 

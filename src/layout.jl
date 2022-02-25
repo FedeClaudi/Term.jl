@@ -26,6 +26,8 @@ module layout
     function Padding(text, target_width, method)
         # text = remove_ansi(remove_markup(text))
         lw = Measure(text).w
+
+        # @info "Layout" text target_width method remove_ansi(remove_markup(text))
         @assert lw < target_width "Text is longer than the target width: $lw instead of $target_width '($text)'"
 
         # get total padding size
@@ -155,6 +157,17 @@ module layout
     end
 
 
+    # --------------------------------- operators -------------------------------- #
+
+    """
+        Operators for more coincise layout of renderables
+    """
+
+    Base.:/(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(r1, r2)
+
+    Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
+    Base.:*(r1::AbstractString,     r2::AbstractRenderable) = hstack(r1, r2)
+    Base.:*(r1::AbstractRenderable, r2::AbstractString)     = hstack(r1, r2)
 
     # ---------------------------------------------------------------------------- #
     #                                LINES & SPACER                                #

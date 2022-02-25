@@ -87,7 +87,10 @@ end
 Given a long string of text, it reshapes it into N lines
 of fixed width
 """
-function rehsape_text(text::AbstractString, width::Int)
+function rehsape_text(text::AbstractString, width::Int)::AbstractString
+    if length(remove_markup(text)) <= width
+        return text
+    end
     tags = extract_markup(text)
 
     in_tags = zeros(Int, length(text))
