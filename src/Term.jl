@@ -20,11 +20,13 @@ module Term
     include("renderables.jl")
     include("layout.jl")
     include("panel.jl")
+    include("inspect.jl")
 
 
     export RenderableText, Panel, TextBox
     export Spacer, vLine, hLine
     export theme, highlight
+    export inspect
 
     # ----------------------------------- base ----------------------------------- #
     import .measure
