@@ -5,30 +5,6 @@ using Term
 import Term: Panel, TextBox, Spacer, hLine, hstack, split_lines, join_lines, do_by_line, RenderableText
 
 
-abstract type AA end
-
-abstract type AbstractTest <: AA end
-
-"""
-    Test
-
-A test `struct` for inspection
-
-More info
-
-And more
-"""
-mutable struct Test <: AbstractTest
-    x::Int
-    y::String
-end
-
-
-Test(x) = Test(x[1], x[2])
-
-my_test_method(x::Test) = print(x)
-my_other_test_method(x::Test) = x/2
-
 """
     TypeInfo
 
@@ -76,12 +52,8 @@ function TypeInfo(type::DataType)
         _methods = join_lines([string(x) for x in _methods])
     end
 
-    @info "Building type info"
-
     return TypeInfo(string(type), super, sub, fields, constructors, _methods, doc)
 end
-
-
 
 
 function style_super_types(info::TypeInfo)::String
@@ -119,11 +91,15 @@ function style_method_line(method::AbstractString)
         return method
     end
     name = split(method[4:end], " in ")[1]
+    name, arguments = split(name, "(")
+    arguments = "("*arguments
     rest = split(method, name)[end]
 
     text, file = split(rest, "at")
     _in, _module = split(text)
-    method = "[bold blue]$name[/] in [bold italic]$_module[/]\n[dim]    $file"
+    method = "[$(theme.emphasis)]$(name)[/][$(theme.emphasis_light)]$(highlight(arguments, theme))[/$(theme.emphasis_light)]\n[dim]    $file"
+
+    @info method
 
     return method
 end
@@ -142,17 +118,16 @@ function inspect(type::DataType, width=150)
         style_sub_types(info),
         width=width, 
         title="Types hierarchy", 
-        title_style="bold blue underline"
+        title_style="bold underline"
     )
 
     docs = TextBox(
-        info.docs.text[1],
+        highlight(info.docs.text[1], theme, :docstring),
         title="Docstring",
         title_style="bold underline",
         width = (Int ∘ round)(width/4*3 - 4)
 
     )
-
 
     # panel showing type's field
     formatted_fields::Vector{AbstractString} = []
@@ -160,11 +135,10 @@ function inspect(type::DataType, width=150)
         for (name, type) in zip(info.fields["names"], info.fields["types"])
             push!(
                 formatted_fields,
-                "[bold yellow]$(string(name))[/][blue]::$(type)"
+                "[bold white]$(string(name))[/]"*highlight("::$(type)", theme, :type)
             )
         end
     end
-
 
 
     fields_panel = Panel(
@@ -183,7 +157,7 @@ function inspect(type::DataType, width=150)
     constructors = nmethods > 1 ? constructors : "[dim]No constructors          [/]"
     cosntructors_panel = TextBox(
         constructors,
-        title="Constructors[dim](0)",
+        title="Constructors[dim]($nmethods)",
         title_style="bold underline",
         width=width
     )
@@ -199,7 +173,7 @@ function inspect(type::DataType, width=150)
 
     methods_panel = TextBox(
         methods,
-        title="Metohods[dim]($nmethods)",
+        title="Methoods[dim]($nmethods)",
         title_style="bold underline",
         width=width
     )

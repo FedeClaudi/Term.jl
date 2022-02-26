@@ -3,7 +3,8 @@
 #                                     REGEX                                    #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- markup ---------------------------------- #
-const OPEN_TAG_REGEX = r"\[[a-zA-Z _0-9.,()#]+[^/\[]\]"
+const OPEN_TAG_REGEX = r"\[[a-zA-Z _0-9. ,()#]+[^/\[]\]"
+const CLOSE_TAG_REGEX = r"\[\/[a-zA-Z _0-9. ,()#]+[^/\[]\]"
 const GENERIC_CLOSER_REGEX = r"\[\/\]"
 
 """
@@ -52,6 +53,32 @@ end
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
+
+"""
+    replace_text(text::AbstractString, start::Int, stop::Int, replace::AbstractString)
+
+Replaces a section of a string with another string
+"""
+function replace_text(text::AbstractString, start::Int, stop::Int, replace::AbstractString)
+    if start == 1
+        return replace * text[stop:end]
+    elseif stop == length(text)
+        return text[1:start] * replace
+    else
+        return text[1:start] * replace * text[stop:end]
+    end
+end
+
+"""
+    replace_text(text::AbstractString, start::Int, stop::Int, char::Char='_')
+
+Replaces a section of a string with another string composed of repeats of a given character
+"""
+function replace_text(text::AbstractString, start::Int, stop::Int, char::Char='_')
+    replacement = char^(stop-start-1)
+    return replace_text(text, start, stop, replacement)
+end
+
 """Removes all spaces from a string"""
 nospaces(text::AbstractString) = replace(text, " " => "")
 
@@ -81,6 +108,28 @@ function split_lines(renderable)
     end
 end
 
+# ------------------------------- reshape text ------------------------------- #
+"""
+recursively extracts character tags from tags
+"""
+function get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
+    # get correct start/stop positions
+    s1, e1 = δ+tag.open.start, δ+tag.open.stop
+    s2, e2 = δ+tag.close.start, δ+tag.close.stop
+    
+    # do nested tags
+    for inner in tag.inner_tags
+        get_valid_chars!(valid_chars, inner, e1)
+    end
+
+    valid_chars[s1 : e1] .= 0
+    valid_chars[s2 : e2] .= 0
+
+    return valid_chars
+end
+
+
+
 """
     rehsape_text(text::AbstractString, width::Int)
 
@@ -88,56 +137,45 @@ Given a long string of text, it reshapes it into N lines
 of fixed width
 """
 function rehsape_text(text::AbstractString, width::Int)::AbstractString
+    # check if no work is required
     if length(remove_markup(text)) <= width
         return text
     end
-    tags = extract_markup(text)
 
-    in_tags = zeros(Int, length(text))
+    # extract tag and mark valid characters and "cutting" places
+    tags = extract_markup(text)
     valid_chars = ones(Int, length(text))
     for tag in tags
-
-        in_tags[tag.open.stop + 1 : tag.close.start-1] .= -1
-
-        valid_chars[tag.open.start:tag.open.stop] .= 0
-        valid_chars[tag.close.start : tag.close.stop] .= 0
+        get_valid_chars!(valid_chars, tag, 0)
     end
-    tag_start = [t.open.start for t in tags]
 
+    # ? debug: print label for each char
+    # for (n, (ch, vl, intag)) in enumerate(zip(text[1:49], valid_chars[1:49], in_tags[1:49]))
+    #     color = vl == 1 ? "\e[32m" : "\e[31m"
+    #     println("($n)  \e[34m$ch\e[0m - valid: $color$vl\e[0m - in tag: $intag")
+    # end
 
-    lines = []
+    # create lines with splitted tex
+    lines::Vector{AbstractString} = []
     j = 1
-    next_ln_start = ""
     while length(remove_markup(text))>width
-        # get a cutting index not in a tag's markup
-        line = ""
-        cut = findlast(cumsum(valid_chars[j : end]) .<= width)
-        cut = isnothing(cut) ? length(text) : cut
-        
-        # when splitting a tag, replicated start/end for new lines
-        if in_tags[cut+j] == -1
-            pre = findlast(tag_start .<= j)
-            pre = isnothing(pre) ? 1 : pre
 
-            next_ln_start = "[$(tags[pre].open.markup)]"
-            ln_end = "[$(tags[pre].close.markup)]"
-        else
-            next_ln_start, ln_end = "", ""
+        # get a cutting index not in a tag's markup
+        condition = (cumsum(valid_chars[j : end]) .<= width) .& valid_chars[j : end] .==1
+        cut = findlast(condition)
+        if cut+j > length(valid_chars)
+            cut = length(valid_chars) - j
         end
 
         # prep line
-        line =  next_ln_start * text[1:cut] * ln_end
-
-
-        push!(lines, line)
+        push!(lines, text[1:cut])
         text = text[cut+1:end]
         j += cut
-
     end
 
     # add what's left of the text
     if length(text) > 0
-        push!(lines, next_ln_start * text)
+        push!(lines, text)
     end
 
     # do checs and pad line
@@ -152,8 +190,10 @@ function rehsape_text(text::AbstractString, width::Int)::AbstractString
 
     end
 
-    return join_lines(lines)
+    return join_lines(pairup_tags(lines))
 end
+
+# ------------------------------------ end ----------------------------------- #
 
 """
 Applies a given function to each line in the text

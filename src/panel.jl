@@ -17,7 +17,7 @@ module panel
     #                                     PANEL                                    #
     # ---------------------------------------------------------------------------- #
     """
-    Renderable with a panel around another piece of content (text or AbstractRenderable)
+    Renderable with a panel around another piece of content (text or AbstractRenderable).
     """
     mutable struct Panel <: AbstractPanel
         segments::Vector
@@ -173,6 +173,7 @@ module panel
         if width != :fit
             text = do_by_line((ln)->rehsape_text(ln, width), text)
         end
+        text = "\n" * text
 
         panel = Panel(
             text,

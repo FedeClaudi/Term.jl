@@ -6,6 +6,8 @@ module Term
     # don't import other modules
     include("measure.jl")
     include("color.jl")
+    include("theme.jl")
+    include("highlight.jl")
 
     # rely on other modules
     include("markup.jl")
@@ -21,13 +23,14 @@ module Term
 
     export RenderableText, Panel, TextBox
     export Spacer, vLine, hLine
+    export theme, highlight
 
     # ----------------------------------- base ----------------------------------- #
     import .measure
     using .measure: Measure
 
     # ----------------------------------- style ---------------------------------- #
-    using .markup: extract_markup, MarkupTag
+    using .markup: extract_markup, MarkupTag, pairup_tags
 
     using .color: NamedColor, BitColor, RGBColor, get_color
 

@@ -75,17 +75,59 @@ module style
 
     Applies a 'MarkupStyle' to a piece of text.
     """
-    function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
-        s₁ =  style.tag.open.start
-        e₁ = style.tag.open.stop
-        s₂ = style.tag.close.start
-        e₂ = style.tag.close.stop
+    # function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
+    #     s₁ = style.tag.open.start
+    #     e₁ = style.tag.open.stop
+    #     s₂ = style.tag.close.start
+    #     e₂ = style.tag.close.stop
 
-        # get text around the style's tag
-        pre = s₁ > 1 ? text[1:s₁ - 1] : ""
-        post = e₂ < length(text) ? text[e₂ + 1:end] : ""
-        inside = text[e₁+1 : s₂-1]
+    #     # get text around the style's tag
+    #     pre = s₁ > 1 ? text[1:s₁ - 1] : ""
+    #     post = e₂ < length(text) ? text[e₂ + 1:end] : ""
+    #     inside = text[e₁+1 : s₂-1]
     
+    #     # start applying styles
+    #     style_init, style_finish = "", ""
+    #     for (attr, value) in toDict(style)
+    #         # BACKGROUND
+    #         if attr == :background
+    #             if !isnothing(value)
+    #                 code = ANSICode(value; bg=true)
+    #             else
+    #                 code = nothing
+    #             end
+            
+    #         # COLOR
+    #         elseif attr == :color
+    #             if !isnothing(value)
+    #                 code = ANSICode(value; bg=false)
+    #             else
+    #                 code = nothing
+    #             end
+            
+    #         # MODES
+    #         elseif attr != :tag && value == true
+    #             code = CODES[attr]
+    #         # elseif attr != :tag && value == false
+    #         #     code = reset_code(CODES[attr])
+    #         else
+    #             if value != false && attr != :tag
+    #                 @debug "Attr/value not recognized or not set" attr value
+    #             end
+    #             continue
+    #         end
+            
+    #         if !isnothing(code)
+    #             style_init *= code.open
+    #             style_finish *= code.close
+    #         end
+    #     end
+        
+    #     text = pre * style_init * style.tag.text * style_finish * post
+    # end
+
+
+    function get_style_codes(style::MarkupStyle)
         # start applying styles
         style_init, style_finish = "", ""
         for (attr, value) in toDict(style)
@@ -108,8 +150,8 @@ module style
             # MODES
             elseif attr != :tag && value == true
                 code = CODES[attr]
-            # elseif attr != :tag && value == false
-            #     code = reset_code(CODES[attr])
+
+                
             else
                 if value != false && attr != :tag
                     @debug "Attr/value not recognized or not set" attr value
@@ -122,11 +164,47 @@ module style
                 style_finish *= code.close
             end
         end
-        
-        text = pre * style_init * style.tag.text * style_finish * post
+
+        return style_init, style_finish
+    end
+
+    function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
+        style_init, style_finish = get_style_codes(style)
+
+        text = style_init * text * style_finish
     end
 
 
+    """
+        apply_style(text::AbstractString, tag::MarkupTag)::AbstractString
+
+    Applies the style of a markup tag and it's nested tags
+    """
+    function apply_style(text::AbstractString, tag::MarkupTag)::AbstractString
+        style = MarkupStyle(tag)
+        style_init, style_finish = get_style_codes(style)
+
+        # if no inner tags, just style the text
+        if length(tag.inner_tags) == 0
+            return apply_style(tag.text, style)
+        end
+
+        # apply inner tags
+        for inner in tag.inner_tags
+            inner_text = apply_style(inner.text, inner)
+
+            text = replace(
+                        tag.text, 
+                        "[$(inner.open.markup)]$(inner.text)[$(inner.close.markup)]" => 
+                        "$(inner_text)$(style_init)"
+                    )
+        end
+
+        # apply outer tag
+        text = apply_style(text, style)
+
+        return text
+    end
 
     """
         apply_style(text::AbstractString)
@@ -134,16 +212,16 @@ module style
     Extracts and applies all markup style in a string.
     """
     function apply_style(text::AbstractString;)::AbstractString
+        ntags = length(extract_markup(text))
+
         while has_markup(text)
-            # get tag
+        # for tag in extract_markup(text)
             tag = extract_markup(text; firstonly=true)
 
-            apply_style(tag.text)  # recursivly apply to nested tags
-            
+            pre = text[1:tag.open.start - 1]
+            post = text[tag.close.stop+1:end]
 
-            # get style
-            style = MarkupStyle(tag)
-            text = apply_style(text, style)
+            text = pre * apply_style(text, tag) * post
         end
         return text
     end

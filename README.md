@@ -67,7 +67,7 @@
 - [ ] error's traceback
 - [ ] logging
 - [ ] pretty print common data structures
-  - [ ] highlight type info ::Type or <:Type
+  - [x] highlight type info ::Type or <:Type
 
 
 #### possible future features
@@ -83,3 +83,4 @@
   - [ ] `textbox` should "clean" the text, lay it out, and then inject the style back in
   - [ ] when splitting a line the style should be carried over
 - `Panel` can't handle renderables larger than given width
+- When splitting markup text over multiple lines,  the wrong tag is carried over
