@@ -4,7 +4,16 @@ Revise.revise()
 using Term
 import Term: AbstractRenderable
 
+# ------------------------------- inspect types ------------------------------ #
+# inspect(Panel; max_n_methods=2) 
+# inspect(AbstractRenderable)
+# println("inspect(Number)")
+# inspect(String)
 
-inspect(Panel; max_n_methods=5) 
+# ----------------------------- inspect variables ---------------------------- #
+# inspect("test")
+# inspect(1)
 
-inspect(AbstractRenderable)
+
+# ------------------------------ inspect methods ----------------------------- #
+inspect(print)

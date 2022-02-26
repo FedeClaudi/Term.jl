@@ -1,9 +1,10 @@
-import Documenter.DocSystem: getdocs
 using InteractiveUtils
 
 include("_inspect.jl")
 
-
+# ---------------------------------------------------------------------------- #
+#                                   TYPEINFO                                   #
+# ---------------------------------------------------------------------------- #
 
 """
     TypeInfo
@@ -14,7 +15,7 @@ struct TypeInfo
     name::String
     supertypes::Union{Nothing, Tuple}
     subtypes::Union{Nothing, Vector}
-    fields::Union{Dict, Nothing}
+    fields::Union{Nothing, Dict}
     constructors::Vector
     methods::Vector  # functions using the target type
     docs::Union{Nothing, Docs.DocStr}
@@ -32,13 +33,10 @@ function TypeInfo(type::DataType)
     sub = length(subtypes(type)) > 0 ? subtypes(type) : nothing
 
     # get docstring
-    doc = getdocs(Symbol(type))
-    doc = length(doc) > 0 ? doc[1] : nothing
-    docstring = isnothing(doc) ? "no docstring" : join_lines(doc.text)
-    docstring = highlight(docstring, theme, :docstring)
+    doc, docstring = get_docstring(Symbol(type))
 
     # get fields
-    if !isabstracttype(type)
+    if !isabstracttype(type) && length(fieldnames(type)) > 0
         fields = Dict(
             "names" => fieldnames(type),
             "types"=> fieldtypes(type),
@@ -52,16 +50,30 @@ function TypeInfo(type::DataType)
     constructors = length(_constructors) > 1 ? _constructors[2:end] : []
 
     _methods = methodswith(type)
-    # if length(_methods) > 0
-    #     _methods = [string(x) for x in _methods])
-    # end
 
-    # @info "GOT INFO" super sub fields constructors _methods doc docstring
     return TypeInfo(string(type), super, sub, fields, constructors, _methods, doc, docstring)
 end
 
+"""
+    TypeInfo(fun::Function)
+
+Exctracts information from a function object
+"""
+function TypeInfo(fun::Function)
+    # get docstring
+    doc, docstring = get_docstring(fun)
+
+    # get methods with same name
+    _methods = split_lines(string(methods(fun)))
+    _methods = length(_methods) > 1 ? _methods[2:end] : []
+
+    return TypeInfo(string(fun), nothing, nothing, nothing, [], _methods, doc, docstring)
+end
 
 
+# ---------------------------------------------------------------------------- #
+#                                    INSPECT                                   #
+# ---------------------------------------------------------------------------- #
 
 """
     inspect(type::DataType; width::Int=120)
@@ -89,7 +101,7 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
         info.docstring,
         title="Docstring",
         title_style="bold underline yellow",
-        width = width
+        width = width,
     )
 
     # ---------------------------------- fields ---------------------------------- #
@@ -109,7 +121,6 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
             title="Arguments", 
             title_style="bold yellow",
             style="dim yellow",
-            height = max(docs.measure.h, length(formatted_fields)),
             width = width-2,
         )
         insights_panel = (docs / Spacer(width-2, 2) / fields_panel)
@@ -121,7 +132,7 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
     constructors = do_by_line((x)->style_method_line(x; trim=true), info.constructors)
     n_constructors = length(split_lines(constructors)) > 1 ? Int(length(split_lines(constructors))/2) : 0
     if n_constructors > max_n_methods
-        constructors = join_lines(split_lines(constructors)[1:max_n_methods*2])
+        constructors = join_lines(split_lines(constructors)[1:max_n_methods*2]) * "\n\n[grey53]( additional constructors not shown... )[/grey53]"
     end
     constructors = n_constructors > 1 ? constructors : "[dim]No constructors          [/dim]"
 
@@ -138,7 +149,7 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
         n_methods = length(split_lines(methods)) > 1 ? Int(length(split_lines(methods))/2) : 1
 
         if n_methods > max_n_methods
-            methods = join_lines(split_lines(methods)[1:max_n_methods*2])
+            methods = join_lines(split_lines(methods)[1:max_n_methods*2]) * "\n\n[grey53]( additional methods not shown... )[/grey53]"
         end
     else
         methods = "[dim]No methods          [/dim]"
@@ -172,4 +183,43 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
         panel
     )
 
+end
+
+
+function inspect(fun::Function; width::Int=88)
+    info = TypeInfo(fun)
+
+    # ----------------------------- prepare contents ----------------------------- #
+    println(RenderableText(info.docstring))
+    # docs = TextBox(
+    #     info.docstring,
+    #     title="Docstring",
+    #     title_style="bold underline yellow",
+    #     width = width-2,
+    # )
+
+    # -------------------------------- print panel ------------------------------- #
+    # println(
+    #     docs,
+    #     # Panel(
+    #     #     docs,
+    #     #     title=info.name,
+    #     #     tytle_style="bold red",
+    #     #     style="blue",
+    #     # )
+    # )
+end
+
+"""
+generic inspect method, dispatches to type-specific methods
+when they can be found
+"""
+function inspect(obj) 
+    if typeof(obj) <: Function
+        inspect(obj)
+    elseif typeof(typeof(obj)) == DataType
+        inspect(typeof(obj))
+    else
+        throw("Cannot inspect $obj ($(typeof(obj)))")
+    end
 end

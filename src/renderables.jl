@@ -64,6 +64,7 @@ module renderables
         if !isnothing(width)
             text = do_by_line((ln)->rehsape_text(ln, width), text)
         end
+
         segments = [Segment(line) for line in split_lines(text)]
         return RenderableText(segments, Measure(segments), text)
     end

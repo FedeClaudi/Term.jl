@@ -14,26 +14,12 @@ Removes all markup tags from a string of text.
 """
 function remove_markup(input_text::AbstractString)::AbstractString
     text = input_text
-    # for regex in [OPEN_TAG_REGEX, GENERIC_CLOSER_REGEX]
-    #     while occursin(regex, text)
-    #         # get opening regex match
-    #         rmatch = match(regex, text)
 
-    #         # get closing regex with same markup
-    #         markup = rmatch.match[2:end-1]
-    #         close_regex = r"\[\/+" * markup * r"\]"
-
-    #         # remove them
-    #         text = replace(text, "[$markup]"=>"")
-    #         text = replace(text, close_regex=>"")
-
-    #     end
-    # end
 
     # remove extra closing tags
-    text = replace(text, OPEN_TAG_REGEX=>"")
-    text = replace(text, GENERIC_CLOSER_REGEX=>"")
-    text = replace(text, CLOSE_TAG_REGEX=>"")
+    # text = replace(text, OPEN_TAG_REGEX=>"REM")
+    text = replace(text, GENERIC_CLOSER_REGEX=>"REM")
+    text = replace(text, CLOSE_TAG_REGEX=>"REM")
 
     return text
 end
@@ -55,6 +41,34 @@ function remove_ansi(str::AbstractString)
 end
 
 
+# ----------------------------------- misc ----------------------------------- #
+const brackets_regexes = [
+    (r"\[", "[["), (r"\]", "]]")
+]
+
+"""
+Replaces each squared brackets with a double copy of itself
+"""
+function escape_brackets(text::AbstractString)::AbstractString
+    for (regex, replacement) in brackets_regexes
+        text = replace(text, regex=>replacement)
+    end
+    return text
+end
+
+const remove_brackets_regexes = [
+    (r"\[\[", "["), (r"\]\]", "]")
+]
+
+"""
+Repleces every double squared parenthesis with a double copy of itself
+"""
+function unescape_brackets(text::AbstractString)::AbstractString
+    for (regex, replacement) in remove_brackets_regexes
+        text = replace(text, regex=>replacement)
+    end
+    return text
+end
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
@@ -141,7 +155,7 @@ end
 Given a long string of text, it reshapes it into N lines
 of fixed width
 """
-function rehsape_text(text::AbstractString, width::Int)::AbstractString
+function rehsape_text(text::AbstractString, width::Int)::AbstractString    
     # check if no work is required
     if length(remove_markup(text)) <= width
         return text

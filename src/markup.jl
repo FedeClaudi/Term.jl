@@ -48,7 +48,7 @@ module markup
 
 
     # ---------------------------- extract markup tags --------------------------- #
-    has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, text)
+    has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, remove_ansi(text))
 
     
     function extract_markup(input_text::AbstractString; firstonly=false)
@@ -84,6 +84,7 @@ module markup
             _start = !isvalid(text, _start) ? get_next_valid_str_idx(text, _start) : _start
             _stop = !isvalid(text, _stop) ? get_last_valid_str_idx(text, _stop) : _stop
             contained = text[_start:_stop]
+
             
             tag_open.stop = _start - 1
             tag_close.start = _stop + 1
@@ -94,6 +95,7 @@ module markup
             # remove tag's inside text
             input_text = replace_text(input_text, tag_open.start-1, tag_close.stop+1)
 
+            # @info "TAG" input_text  text contained length(contained)
             push!(tags, MarkupTag(contained, tag_open, tag_close, inner_tags))
             if firstonly
                 return tags[1]
@@ -134,8 +136,6 @@ module markup
                     text[end] = text[end] * "[/$(tag_open.markup)]"
                     j = length(text)
                 end
-
-                # @info "Got tag start end" tag_open.markup i j 
 
                 # add correct close/open markups
                 for idx in i:(j-1)

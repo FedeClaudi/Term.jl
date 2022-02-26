@@ -1,3 +1,20 @@
+import Documenter.DocSystem: getdocs
+
+"""
+Extracts and styles a docstring object
+"""
+function get_docstring(obj)
+    # get doc and docstring
+    doc = getdocs(obj)
+    doc = length(doc) > 0 ? doc[1] : nothing
+    docstring = isnothing(doc) ? "no docstring" :  escape_brackets(join_lines(doc.text))
+
+    # style
+    docstring = highlight(docstring, theme)
+    docstring = highlight(docstring,  theme, :docstring)
+    return doc, unescape_brackets(docstring)
+end
+
 
 """
 Styles a vector of super types 
@@ -45,10 +62,10 @@ function style_method_line(method::AbstractString; trim::Bool=false)::String
     
     method = trim ? method[4:end] : method
 
-    def, file = split(method, ") in ")
+    def, file = split(method, " in ")
     name, args = split(def, "(")
-    args = "(" * args * ")"
+    args = "(" * args
     file = split(file, " at ")[end]
 
-    return highlight(name, theme, :emphasis) *  highlight(highlight(args, theme), theme, :emphasis_light) * "\n         [dim]$file"
+    return highlight(name, theme, :emphasis) *  highlight(highlight(args, theme), theme, :emphasis_light) * "\n         [dim]$file[/dim]"
 end

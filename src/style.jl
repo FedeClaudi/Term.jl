@@ -54,7 +54,7 @@ module style
             elseif is_background(code)
                 setproperty!(style, :background, get_color(code; bg=true))
             else
-                @warn "Code type not recognized: $code"
+                @warn "Code type not recognized: $code" tag tag.markup
             end
         end
         return style
@@ -135,6 +135,7 @@ module style
 
         # apply inner tags
         for inner in tag.inner_tags
+            # @info "style inner" inner inner.markup tag.text text
             inner_text = apply_style(inner.text, inner)
 
             text = replace(
@@ -156,16 +157,16 @@ module style
     Extracts and applies all markup style in a string.
     """
     function apply_style(text::AbstractString;)::AbstractString
-        ntags = length(extract_markup(text))
-
+        @info "APPLYING STYLE" text
         while has_markup(text)
-        # for tag in extract_markup(text)
             tag = extract_markup(text; firstonly=true)
+            @info "tag" tag tag.markup
 
             pre = text[1:tag.open.start - 1]
             post = text[tag.close.stop+1:end]
 
             text = pre * apply_style(text, tag) * post
+            @info "     styled: " text
         end
         return text
     end
