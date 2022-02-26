@@ -14,21 +14,26 @@ Removes all markup tags from a string of text.
 """
 function remove_markup(input_text::AbstractString)::AbstractString
     text = input_text
-    for regex in [OPEN_TAG_REGEX, GENERIC_CLOSER_REGEX]
-        while occursin(regex, text)
-            # get opening regex match
-            rmatch = match(regex, text)
+    # for regex in [OPEN_TAG_REGEX, GENERIC_CLOSER_REGEX]
+    #     while occursin(regex, text)
+    #         # get opening regex match
+    #         rmatch = match(regex, text)
 
-            # get closing regex with same markup
-            markup = rmatch.match[2:end-1]
-            close_regex = r"\[\/+" * markup * r"\]"
+    #         # get closing regex with same markup
+    #         markup = rmatch.match[2:end-1]
+    #         close_regex = r"\[\/+" * markup * r"\]"
 
-            # remove them
-            text = replace(text, "[$markup]"=>"")
-            text = replace(text, close_regex=>"")
+    #         # remove them
+    #         text = replace(text, "[$markup]"=>"")
+    #         text = replace(text, close_regex=>"")
 
-        end
-    end
+    #     end
+    # end
+
+    # remove extra closing tags
+    text = replace(text, OPEN_TAG_REGEX=>"")
+    text = replace(text, GENERIC_CLOSER_REGEX=>"")
+    text = replace(text, CLOSE_TAG_REGEX=>"")
 
     return text
 end

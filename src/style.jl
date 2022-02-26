@@ -70,62 +70,6 @@ module style
     end
 
     # -------------------------------- apply style ------------------------------- #
-    """
-        apply_style(text::AbstractString, style::MarkupStyle)
-
-    Applies a 'MarkupStyle' to a piece of text.
-    """
-    # function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
-    #     s₁ = style.tag.open.start
-    #     e₁ = style.tag.open.stop
-    #     s₂ = style.tag.close.start
-    #     e₂ = style.tag.close.stop
-
-    #     # get text around the style's tag
-    #     pre = s₁ > 1 ? text[1:s₁ - 1] : ""
-    #     post = e₂ < length(text) ? text[e₂ + 1:end] : ""
-    #     inside = text[e₁+1 : s₂-1]
-    
-    #     # start applying styles
-    #     style_init, style_finish = "", ""
-    #     for (attr, value) in toDict(style)
-    #         # BACKGROUND
-    #         if attr == :background
-    #             if !isnothing(value)
-    #                 code = ANSICode(value; bg=true)
-    #             else
-    #                 code = nothing
-    #             end
-            
-    #         # COLOR
-    #         elseif attr == :color
-    #             if !isnothing(value)
-    #                 code = ANSICode(value; bg=false)
-    #             else
-    #                 code = nothing
-    #             end
-            
-    #         # MODES
-    #         elseif attr != :tag && value == true
-    #             code = CODES[attr]
-    #         # elseif attr != :tag && value == false
-    #         #     code = reset_code(CODES[attr])
-    #         else
-    #             if value != false && attr != :tag
-    #                 @debug "Attr/value not recognized or not set" attr value
-    #             end
-    #             continue
-    #         end
-            
-    #         if !isnothing(code)
-    #             style_init *= code.open
-    #             style_finish *= code.close
-    #         end
-    #     end
-        
-    #     text = pre * style_init * style.tag.text * style_finish * post
-    # end
-
 
     function get_style_codes(style::MarkupStyle)
         # start applying styles

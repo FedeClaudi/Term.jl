@@ -12,7 +12,7 @@ relevant segments, colors specified by a theme object
 function highlight(text::AbstractString, theme::Theme)
     for regex in type_def_regex
         for match in eachmatch(regex, text)
-            text = replace(text, match.match => "[$(theme.type)]$(match.match)[/]") 
+            text = replace(text, match.match => "[$(theme.type)]$(match.match)[/$(theme.type)]") 
         end
     end
     return text
@@ -26,5 +26,5 @@ relevant text of type :like.
 """
 function highlight(text::AbstractString, theme::Theme, like::Symbol)
     markup = getfield(theme, like)
-    return "[$markup]$(chomp(text))[/]"
+    return "[$markup]$(chomp(text))[/$markup]"
 end

@@ -120,13 +120,21 @@ module markup
                 # get line where it closes
                 j = i
                 close_regex = r"\[\/+" * tag_open.markup * r"\]"
-                for closing_line  in text[i:end]
+                for closing_line in text[i:end]
                     occursin(close_regex, closing_line) ? break : j += 1
                 end
-                
+        
+                # if they are in the same line, continue                
                 if j == i
                     continue
                 end
+
+                # if no close tag was found, add it at the end
+                if j > length(text)
+                    text[end] = text[end] * "[/$(tag_open.markup)]"
+                    j = length(text)
+                end
+
                 # @info "Got tag start end" tag_open.markup i j 
 
                 # add correct close/open markups

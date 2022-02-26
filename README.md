@@ -42,7 +42,6 @@
   - [ ] pad string
   - [ ] pad renderable
   - [ ] vpad/hpad
-- [ ] Improve performance
  
 #### docs/examples
 - [x] hstack/vstack for variable number of inputs too
@@ -76,11 +75,11 @@
 - [ ] code syntax highlighting
 
 ## BUGS
-- [ ] nested tags, outer's color/bg not correctly restored
-- [ ] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
+- [x] nested tags, outer's color/bg not correctly restored
+  - [ ] mostly fixed though mode tags don't carry over correctly all the time
+- [x] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
 - [x] panel: style's mode applies to title too.
-- [ ] `textbox` a bit buggy, produces weird output occasionally
-  - [ ] `textbox` should "clean" the text, lay it out, and then inject the style back in
-  - [ ] when splitting a line the style should be carried over
+- [x] `textbox` a bit buggy, produces weird output occasionally
 - `Panel` can't handle renderables larger than given width
-- When splitting markup text over multiple lines,  the wrong tag is carried over
+- [x] When splitting markup text over multiple lines,  the wrong tag is carried over
+- [ ] `highlight`, nested highlighting with hex code colors doesn't restore outer colors

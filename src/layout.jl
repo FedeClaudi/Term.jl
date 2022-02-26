@@ -6,6 +6,7 @@ module layout
     import ..measure: Measure
     import ..segment: Segment
     using ..box
+    import Term: int
 
     export Padding, vstack, hstack
     export Spacer, vLine, hLine
@@ -23,46 +24,46 @@ module layout
     end
 
     """Creates a Padding for a string to match a given width according to a justify method"""
-    function Padding(text, target_width, method)
-        # text = remove_ansi(remove_markup(text))
-        lw = Measure(text).w
-
-        # @info "Layout" text target_width method remove_ansi(remove_markup(text))
-        @assert lw < target_width "Text is longer than the target width: $lw instead of $target_width '($text)'"
-
+    function Padding(text::AbstractString, target_width::Int, method::Symbol)::Padding
         # get total padding size
-        padding = lw < target_width ? " "^(target_width - lw -1) : ""
-        lPad = Measure(padding).w
+        lw = Measure(text).w
+        if lw == target_width
+            return Padding("", "")
+        else
+            @assert lw < target_width "\e[31mTarget width is $target_width but the text has width $lw: \e[0m\n   $text\n     Cleaned: '$(remove_ansi(remove_markup(text)))'"
+        end
+        padding = " "^(target_width - lw -1)
+        pad_width = Measure(padding).w
 
         # split left/right padding for left/right justify
-        if lPad > 0
-            cut = lPad%2 == 0 ? Int(lPad/2) : (Int ∘ floor)(lPad/2)
+        if pad_width > 0
+            cut = pad_width%2 == 0 ? Int(pad_width/2) : (Int ∘ floor)(pad_width/2)
             left, right = padding[1:cut], padding[cut+1:end]
+            @assert length(left * right) == length(padding) "\e[31m$(length(left * right)) instead of $(length(padding))"
         else
             left, right = "", ""
         end
 
         # craete padding
         if method == :center
-            return Padding(" "*left, right)
+            padding = Padding(" "*left, right)
         elseif method == :left
-            return Padding(" ", padding)
+            padding = Padding(" ", padding)
         elseif method == :right
-            return Padding(padding, " ")
+            padding = Padding(padding, " ")
         end
+
+        # @info "made padding" text target_width method padding lw pad_width left right
+        @assert Measure(padding.left * text * padding.right).w == target_width "\e[31mPadded width $(Measure(padding.left * text * padding.right).w), target: $target_width $padding"
+        
+        return padding
     end
 
     function Base.show(io::IO, padding::Padding)
         print(io, "$(typeof(padding))  \e[2m(left: $(length(padding.left)), right: $(length(padding.right)))\e[0m")
     end    
 
-
-    # ---------------------------------------------------------------------------- #
-    #                                  Text layout                                 #
-    # ---------------------------------------------------------------------------- #
-
-
-    
+  
 
     # ---------------------------------------------------------------------------- #
     #                                   STACKING                                   #
@@ -81,19 +82,20 @@ module layout
         w2 = r2.measure.w
 
         # pad segments
-        Δw = abs(w2-w1)
-        if w1 > w2
-            r2.segments = [Segment(s.text * " "^Δw) for s in r2.segments]
-        elseif w1 < w2
-            r1.segments = [Segment(s.text * " "^Δw) for s in r1.segments]
-        end
+        # Δw = abs(w2-w1)
+        # if w1 > w2
+        #     r2.segments = [Segment(s.text * " "^Δw) for s in r2.segments]
+        # elseif w1 < w2
+        #     r1.segments = [Segment(s.text * " "^Δw) for s in r1.segments]
+        # end
 
         # create segments stack
         segments::Vector{Segment} = vcat(r1.segments, r2.segments)
+        measure = Measure(max(w1, w2), length(segments))
 
         return Renderable(
             segments,
-            Measure(segments),
+            measure,
         )
     end
 
@@ -179,38 +181,59 @@ module layout
     end
 
     function Spacer(width::Number, height::Number; char::Char=' ')
-        width = (Int ∘ round)(width)
-        height = (Int ∘ round)(height)
+        width = int(width)
+        height = int(height)
 
         line = char^width
         segments = [Segment(line) for i in 1:height]
         return Spacer(segments, Measure(segments))
     end
 
-
+    """
+        vLine
+    
+    A multi-line renderable with each line made of a | 
+    to create a vertical line
+    """
     mutable struct vLine <: AbstractLayoutElement
         segments::Vector{Segment}
         measure::Measure
         height::Int
     end
 
+    """
+        vLine(height::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
+
+    Constructor to create a styled vertical line of viven height.
+
+    """
     function vLine(height::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
-        height = (Int ∘ round)(height)
+        height = int(height)
         char = string(eval(box).head.left)
         segments = [Segment(char, style) for i in 1:height]
         return vLine(segments, Measure(segments), height)
     end
 
+    """
+        hLine
 
+    A 1-line renderable made of repeated character from a Box.
+    """
     mutable struct hLine <: AbstractLayoutElement
         segments::Vector{Segment}
         measure::Measure
         width::Int
     end
 
+    """
+        hLine(width::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
+    
+    constructor to create a styled hLine of given width
+    """
     function hLine(width::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
-        width = (Int ∘ round)(width) + 1
-        segments = [Segment(eval(box).row.mid^width, style)]
+        width = int(width)
+        char = eval(box).row.mid
+        segments = [Segment(char^width, style)]
         return hLine(segments, Measure(segments), width)
     end
 end

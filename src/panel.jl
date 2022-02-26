@@ -5,7 +5,6 @@ module panel
     import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
     import ..segment: Segment
     using ..box
-    import ..style: apply_style
     import ..layout: Padding, vstack
 
     export Panel, TextBox
@@ -56,6 +55,8 @@ module panel
                 box::Symbol=:ROUNDED,
                 justify=:left
         )
+
+
         box = eval(box)  # get box object from symbol
 
         # pre styles
@@ -66,14 +67,10 @@ module panel
         content = Renderable(content; width=width)
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
-        # @warn content content.segments
 
         width = isnothing(width) ? panel_measure.w : width
-        @assert width > content_measure.w
-
+        @assert width > content_measure.w "Width too small for content '$content' with $content_measure"
         panel_measure.w = width
-        @assert width >= panel_measure.w "With too small, not yet supported"
-        # @info "Panel" content_measure panel_measure
 
         # create segments
         segments::Vector{Segment} = []
@@ -106,9 +103,13 @@ module panel
             padding = Padding(line, width, justify)
 
             # make line
-            push!(segments, Segment(left * padding.left * line * padding.right * right))
+            segment = Segment(left * padding.left * line * padding.right * right)
+            push!(segments, segment)
+
+            # @assert segment.measure.w <= panel_measure.w "\e[31mTarget measure: $panel_measure, segment has $(segment.measure), pading: $padding, line length: $(length(line))"
         end
 
+        # add empty lines to ensure target height is reached
         if !isnothing(height) && content_measure.h < height
             for i in 1:(height - content_measure.h)
                 line = " "^(width)
@@ -118,9 +119,11 @@ module panel
 
         push!(segments, bottom)
 
+        # @assert max([Measure(s).w for s in segments]...) <= panel_measure.w "\e[31mSegments too large"
+
         return Panel(
             segments, 
-            Measure(segments),
+            panel_measure,
             isnothing(title) ? title : title,
             title_style,
             style,
@@ -134,7 +137,8 @@ module panel
     `Panel` constructor for creating a panel out of multiple renderables at once.
     """
     function Panel(renderables...; width::Union{Nothing, Int}=nothing, kwargs...)
-        renderable = vstack(Renderable.(renderables, width=width)...)
+        rend_width = isnothing(width) ? width : width-1
+        renderable = vstack(Renderable.(renderables, width=rend_width)...)
 
         return Panel(renderable; width=width, kwargs...)
     end
@@ -170,8 +174,10 @@ module panel
         justify::Symbol=:left,
         )
 
+
         if width != :fit
-            text = do_by_line((ln)->rehsape_text(ln, width), text)
+            text = do_by_line((ln)->rehsape_text(ln, width-4), text)
+            width -= 2
         end
         text = "\n" * text
 
@@ -185,6 +191,7 @@ module panel
             subtitle_style=subtitle_style,
             subtitle_justify=subtitle_justify,
             justify=justify,
+            width=width
         )
         
 

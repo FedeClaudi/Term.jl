@@ -31,7 +31,7 @@ module segment
             return text
         end
         plain = remove_ansi(remove_markup(text))
-        Segment(apply_style(text), plain, Measure(plain))
+        Segment(remove_markup(apply_style(text)), plain, Measure(plain))
     end
 
     """

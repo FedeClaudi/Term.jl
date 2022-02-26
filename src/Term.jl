@@ -2,6 +2,7 @@ module Term
     # general utils
     include("__text_utils.jl")
     include("_ansi.jl")
+    include("_utils.jl")
     
     # don't import other modules
     include("measure.jl")
