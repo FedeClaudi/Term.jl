@@ -185,7 +185,7 @@ module panel
 
         panel = Panel(
             text,
-            style="blue",
+            style="hidden",
             title=title,
             title_style=title_style,
             title_justify=title_justify,
@@ -193,7 +193,7 @@ module panel
             subtitle_style=subtitle_style,
             subtitle_justify=subtitle_justify,
             justify=justify,
-            # width=width
+            width=width
         )
         
 

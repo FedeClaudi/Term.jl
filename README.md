@@ -20,9 +20,9 @@
 #### features
 - [ ] titleline : hLine with title centered in the middle
 - [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
-- [ ] inspect
+- [x] inspect
   - [x] type/struct inspection
-  - [ ] method inspection
+  - [x] method inspection
   - [ ] type hierarchy tree (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
 - [ ] error's traceback
 - [ ] logging
@@ -37,12 +37,8 @@
 - [ ] code syntax highlighting
 
 ## known bugs (and currently brocken stuff)
-- [ ] multiple styles on same line, text in between not rendered correctly
-
-- [x] `clean_nested_tags` breaks Panel
-- [ ] `inspect` cannot print panels due to BonudsError
-  - [ ] error in `reshape` text with style
-- [x] `Panel`: not sure that it has correct width
+- [ ] when highlighting with multiple styles something is still brocken
+- [ ] when applying markup occasionally out of bounds error
 
 #### fixed bugs
 - [x] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
@@ -53,6 +49,12 @@
 - [x] nested tags, outer's color/bg not correctly restored
   - [x] mostly fixed though mode tags don't carry over correctly all the time
 - [x] `highlight`, nested highlighting with hex code colors doesn't restore outer colors
+- [x] multiple styles on same line, text in between not rendered correctly
+- [x] `clean_nested_tags` breaks Panel
+- [x] `inspect` cannot print panels due to BonudsError
+  - [x] error in `reshape` text with style
+- [x] `Panel`: not sure that it has correct width
+
 --------------
 
 ### Done

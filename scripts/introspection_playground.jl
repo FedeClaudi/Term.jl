@@ -6,13 +6,12 @@ import Term: AbstractRenderable
 
 # ------------------------------- inspect types ------------------------------ #
 # inspect(Panel) 
-# inspect(AbstractRenderable)
+# inspect(AbstractRenderable;)
 # inspect(String; width=300)
 
 # ----------------------------- inspect variables ---------------------------- #
 # inspect("test")
 # inspect(1)
 
-
 # ------------------------------ inspect methods ----------------------------- #
-# inspect(print)
+inspect(print)

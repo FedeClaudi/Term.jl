@@ -97,6 +97,7 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
     )
 
     # ----------------------------------- docs ----------------------------------- #
+    # @info "making docstirng box" info.docstring width
     docs = TextBox(
         info.docstring,
         title="Docstring",
@@ -186,28 +187,49 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
 end
 
 
-function inspect(fun::Function; width::Int=88)
+function inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
     info = TypeInfo(fun)
 
     # ----------------------------- prepare contents ----------------------------- #
-    println(RenderableText(info.docstring))
-    # docs = TextBox(
-    #     info.docstring,
-    #     title="Docstring",
-    #     title_style="bold underline yellow",
-    #     width = width-2,
-    # )
+    docs = TextBox(
+        info.docstring,
+        title="Docstring",
+        title_style="bold underline yellow",
+        width = width-2,
+    )
+
+    if length(info.methods) > 0
+        methods = do_by_line(style_method_line, info.methods)
+        n_methods = length(split_lines(methods)) > 1 ? Int(length(split_lines(methods))/2) : 1
+
+        if n_methods > max_n_methods
+            methods = join_lines(split_lines(methods)[1:max_n_methods*2]) * "\n\n[grey53]( additional methods not shown... )[/grey53]"
+        end
+    else
+        methods = "[dim]No methods          [/dim]"
+        n_methods = 0
+    end
+
+    methods_panel = TextBox(
+        methods,
+        title="Methods[dim]($n_methods)",
+        title_style="bold underline yellow",
+        width=width-2
+    )
 
     # -------------------------------- print panel ------------------------------- #
-    # println(
-    #     docs,
-    #     # Panel(
-    #     #     docs,
-    #     #     title=info.name,
-    #     #     tytle_style="bold red",
-    #     #     style="blue",
-    #     # )
-    # )
+    println(
+        Panel(
+            Spacer(width-2, 1),
+            docs,
+            hLine(width-2, "blue"),
+            methods_panel,
+            title=info.name,
+            title_style="bold red",
+            style="blue",
+            width=width,
+        )
+    )
 end
 
 """

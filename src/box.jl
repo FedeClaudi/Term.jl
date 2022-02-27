@@ -124,8 +124,8 @@ module box
       else
 
         # get title
-        title = apply_style("[$style]"*title, )
-        @assert  Segment(title).measure.w < width - 4 "Title too long for panel of width $width"
+        title = apply_style("[$title_style]"*title)
+        @assert  Segment(title).measure.w < width - 4 "Title too long for panel of width $width: $title, ($(Segment(title).measure.w))"
         
         # compose title line 
         line = getfield(box, row)
