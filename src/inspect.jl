@@ -18,7 +18,7 @@ struct TypeInfo
     fields::Union{Nothing, Dict}
     constructors::Vector
     methods::Vector  # functions using the target type
-    docs::Union{Nothing, Docs.DocStr}
+    docs::Union{Nothing, Vector{Docs.DocStr}}
     docstring::String
 end
 
@@ -81,7 +81,7 @@ end
 Inspects a type definition to extract info like docstring, fields, types etc.
 Also shows constructors for the type and methods making use of the type.
 """
-function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
+function inspect(type::DataType; width::Int=88, max_n_methods::Int=3)
     # extract type info
     info = TypeInfo(type)
 
@@ -169,11 +169,11 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
     panel = Panel(
         Spacer(width-2, 1),
         hierarchy,
-        hLine(width-2, "blue"),
+        hLine(width-6, "blue"),
         insights_panel,
-        hLine(width-2, "blue"),
+        hLine(width-6, "blue"),
         constructors_panel,
-        hLine(width-2, "blue"),
+        hLine(width-6, "blue"),
         methods_panel,
         title="$(typeof(type)): [bold]$(info.name)" * _title, 
         title_style="red",
@@ -186,7 +186,11 @@ function inspect(type::DataType; width::Int=120, max_n_methods::Int=3)
 
 end
 
+"""
+    inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
 
+Inspects `Function` objects providing docstrings, and methods signatures.
+"""
 function inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
     info = TypeInfo(fun)
 
@@ -199,7 +203,7 @@ function inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
     )
 
     if length(info.methods) > 0
-        methods = do_by_line(style_method_line, info.methods)
+        methods = do_by_line(m -> style_method_line(m; trim=true), info.methods)
         n_methods = length(split_lines(methods)) > 1 ? Int(length(split_lines(methods))/2) : 1
 
         if n_methods > max_n_methods
@@ -222,10 +226,10 @@ function inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
         Panel(
             Spacer(width-2, 1),
             docs,
-            hLine(width-2, "blue"),
+            hLine(width-6, "blue"),
             methods_panel,
-            title=info.name,
-            title_style="bold red",
+            title="Function: [bold red]$(info.name)[/bold red]",
+            title_style="red",
             style="blue",
             width=width,
         )

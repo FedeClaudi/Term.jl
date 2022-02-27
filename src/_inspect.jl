@@ -6,12 +6,23 @@ Extracts and styles a docstring object
 function get_docstring(obj)
     # get doc and docstring
     doc = getdocs(obj)
-    doc = length(doc) > 0 ? doc[1] : nothing
-    docstring = isnothing(doc) ? "no docstring" :  escape_brackets(join_lines(doc.text))
 
-    # style
-    docstring = highlight(docstring, theme)
-    docstring = highlight(docstring,  theme, :docstring)
+    doc = length(doc) > 0 ? doc : nothing
+    if isnothing(doc)
+        docstring = "no docstring"
+    else
+        docstrings::Vector{String} = []
+        for dc in doc
+            dstring = escape_brackets(dc.text[1])
+            file = "[dim]$(dc.data[:binding]): $(dc.data[:path]) at line $(dc.data[:linenumber])[/dim]"
+            push!(docstrings, dstring *  file * "\n")
+        end
+        # docstring = join_lines([escape_brackets(d.text[1])*"\n[dim bold]----------[/dim bold]" for d in doc])
+
+        # style
+        docstring = highlight(join_lines(docstrings), theme)
+        docstring = highlight(docstring,  theme, :docstring)
+    end
     return doc, unescape_brackets(docstring)
 end
 
