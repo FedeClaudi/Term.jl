@@ -3,7 +3,7 @@ module style
     include("_ansi.jl")
     import Parameters: @with_kw
 
-    import ..markup: MarkupTag, extract_markup, has_markup
+    import ..markup: MarkupTag, extract_markup, has_markup, clean_nested_tags
     import ..color: AbstractColor, NamedColor, is_color, is_background, get_color, is_hex_color, hex2rgb
 
     export MarkupStyle, extract_style
@@ -53,8 +53,8 @@ module style
                 setproperty!(style, :color, get_color(code))
             elseif is_background(code)
                 setproperty!(style, :background, get_color(code; bg=true))
-            else
-                @warn "Code type not recognized: $code" tag tag.markup
+            elseif code != "nothing"
+                @warn "Code type not recognized: $code" tag tag.markup typeof(code)
             end
         end
         return style
@@ -124,9 +124,9 @@ module style
 
     Applies the style of a markup tag and it's nested tags
     """
-    function apply_style(text::AbstractString, tag::MarkupTag)::AbstractString
+    function apply_style(text::AbstractString, tag::MarkupTag; isinner::Bool = false)::AbstractString
         style = MarkupStyle(tag)
-        style_init, style_finish = get_style_codes(style)
+        style_init, _ = get_style_codes(style)
 
         # if no inner tags, just style the text
         if length(tag.inner_tags) == 0
@@ -135,39 +135,47 @@ module style
 
         # apply inner tags
         for inner in tag.inner_tags
-            # @info "style inner" inner inner.markup tag.text text
-            inner_text = apply_style(inner.text, inner)
+            
+            inner_text = apply_style(inner.text, inner; isinner=true)
 
             text = replace(
-                        tag.text, 
+                        isinner ? text : tag.text, 
                         "[$(inner.open.markup)]$(inner.text)[$(inner.close.markup)]" => 
                         "$(inner_text)$(style_init)"
                     )
+            # @info "\e[34minner style" inner.open.markup style_init text
         end
 
         # apply outer tag
         text = apply_style(text, style)
+        # @info "\e[33mdone a style" tag.open.markup style_init text
 
         return text
     end
 
+
+    
     """
         apply_style(text::AbstractString)
 
     Extracts and applies all markup style in a string.
     """
     function apply_style(text::AbstractString;)::AbstractString
-        @info "APPLYING STYLE" text
+        # @info "Applying style to " text
+        text = clean_nested_tags(text)
+
         while has_markup(text)
             tag = extract_markup(text; firstonly=true)
-            @info "tag" tag tag.markup
+            # @info "tag" tag tag.markup tag.open.start tag.close.stop
 
             pre = text[1:tag.open.start - 1]
             post = text[tag.close.stop+1:end]
 
             text = pre * apply_style(text, tag) * post
-            @info "     styled: " text
+            # @info "     \e[31mdoing a style: " tag.markup pre post tag.open.start tag.close.stop
+
         end
+        # @info "  \e[32mAfter styling" text has_markup(text)
         return text
     end
 

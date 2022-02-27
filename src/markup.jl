@@ -1,6 +1,6 @@
 module markup
     include("__text_utils.jl")
-    export extract_markup, MarkupTag, pairup_tags
+    export extract_markup, MarkupTag, pairup_tags, clean_nested_tags
 
 
 
@@ -84,7 +84,6 @@ module markup
             _start = !isvalid(text, _start) ? get_next_valid_str_idx(text, _start) : _start
             _stop = !isvalid(text, _stop) ? get_last_valid_str_idx(text, _stop) : _stop
             contained = text[_start:_stop]
-
             
             tag_open.stop = _start - 1
             tag_close.start = _stop + 1
@@ -106,6 +105,55 @@ module markup
     end
 
     # ----------------------------- helper functions ----------------------------- #
+
+   
+    """
+        clean_nested_tags(text::AbstractString)::AbstractString
+
+    Given a text with nested string like:
+    `[red]aaaa [green]asdasdasd[/green] sasdas [blue] adasdas [/blue]asdadsa[/red]`
+
+    it adds extra tags to ensure that text within inner tags is handled properly, giving:
+    `[red]aaaa [green]asdasdasd[/green][red] sasdas [/red][blue] adasdas [/blue][red]asdadsa[/red]`
+    """
+    function clean_nested_tags(text::AbstractString)
+        if !has_markup(text)
+            return text
+        end
+
+        # @info "cleaning nested tags" text
+        tags = extract_markup(text)
+        for tag in tags
+            if length(tag.inner_tags) > 0
+                text = clean_nested_tags(tag, text)
+            end
+        end
+        # text = join_lines(clean_nested_tags.(, text))
+        # @info "after cleaning" text
+        return text
+    end
+
+    """
+        clean_nested_tags(tag, text::AbstractString)
+
+    recursively applies to inner tags
+    """
+    function clean_nested_tags(tag::MarkupTag, text::AbstractString)
+        # @info "     inner cleaning nested tags" text
+        for inner in tag.inner_tags
+            text = clean_nested_tags(inner, text)
+    
+            _tag = "[$(inner.open.markup)]$(inner.text)[$(inner.close.markup)]"
+            replacement = "[$(tag.close.markup)]" * _tag * "[$(tag.open.markup)]"
+            text = replace(text, _tag=>replacement)
+
+            # @info "\e[31minner" text inner
+        end
+        
+        return text
+    end
+
+
     """
         pairup_tags(text::Vector{AbstractString})
 

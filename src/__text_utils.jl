@@ -15,14 +15,15 @@ Removes all markup tags from a string of text.
 function remove_markup(input_text::AbstractString)::AbstractString
     text = input_text
 
-
     # remove extra closing tags
-    # text = replace(text, OPEN_TAG_REGEX=>"REM")
-    text = replace(text, GENERIC_CLOSER_REGEX=>"REM")
-    text = replace(text, CLOSE_TAG_REGEX=>"REM")
+    text = replace(text, GENERIC_CLOSER_REGEX=>"")
+    text = replace(text, CLOSE_TAG_REGEX=>"")
 
     return text
 end
+
+remove_markup_open(text::AbstractString)::AbstractString = replace(text, OPEN_TAG_REGEX=>"")
+
 
 # ----------------------------------- ansi ----------------------------------- #
 const ANSI_REGEXEs = [
@@ -156,10 +157,12 @@ Given a long string of text, it reshapes it into N lines
 of fixed width
 """
 function rehsape_text(text::AbstractString, width::Int)::AbstractString    
+    len(x) = (length ∘ remove_markup ∘ remove_markup_open)(x)
     # check if no work is required
-    if length(remove_markup(text)) <= width
+    if len(text) <= width
         return text
     end
+
 
     # extract tag and mark valid characters and "cutting" places
     tags = extract_markup(text)
@@ -169,20 +172,22 @@ function rehsape_text(text::AbstractString, width::Int)::AbstractString
     end
 
     # ? debug: print label for each char
-    # for (n, (ch, vl, intag)) in enumerate(zip(text[1:49], valid_chars[1:49], in_tags[1:49]))
+    # @info "Reshaping" text len(text) width tags length(valid_chars)
+    # for (n, (ch, vl)) in enumerate(zip(text[1:49], valid_chars[1:49]))
     #     color = vl == 1 ? "\e[32m" : "\e[31m"
-    #     println("($n)  \e[34m$ch\e[0m - valid: $color$vl\e[0m - in tag: $intag")
+    #     println("($n)  \e[34m$ch\e[0m - valid: $color$vl\e[0m)")
     # end
 
     # create lines with splitted tex
     lines::Vector{AbstractString} = []
     j = 1
-    while length(remove_markup(text))>width
+    while len(text)>width
 
         # get a cutting index not in a tag's markup
         condition = (cumsum(valid_chars[j : end]) .<= width) .& valid_chars[j : end] .==1
         cut = findlast(condition)
         if cut+j > length(valid_chars)
+            @warn "ops not valid" j cut length(valid_chars)
             cut = length(valid_chars) - j
         end
 
@@ -190,6 +195,8 @@ function rehsape_text(text::AbstractString, width::Int)::AbstractString
         push!(lines, text[1:cut])
         text = text[cut+1:end]
         j += cut
+
+        # @info "\e[32mmade line" lines[end] cut j width length(text) len(text) text Measure(lines[end])
     end
 
     # add what's left of the text
@@ -206,9 +213,11 @@ function rehsape_text(text::AbstractString, width::Int)::AbstractString
         if ll < width
             lines[n] = line * " "^(width-ll)
         end
-
     end
-
+    # @info "lines" lines length(lines) lines[1] lines[2]
+    # println("1 -----    ", lines[1])
+    # println("2 -----    ", lines[2])
+    # println("join   ", join_lines(pairup_tags(lines)))
     return join_lines(pairup_tags(lines))
 end
 

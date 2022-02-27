@@ -39,7 +39,7 @@ module layout
         if pad_width > 0
             cut = pad_width%2 == 0 ? Int(pad_width/2) : (Int ∘ floor)(pad_width/2)
             left, right = padding[1:cut], padding[cut+1:end]
-            @assert length(left * right) == length(padding) "\e[31m$(length(left * right)) instead of $(length(padding))"
+            @assert length(left * right) <= length(padding) "\e[31m$(length(left * right)) instead of $(length(padding))"
         else
             left, right = "", ""
         end
@@ -54,7 +54,7 @@ module layout
         end
 
         # @info "made padding" text target_width method padding lw pad_width left right
-        @assert Measure(padding.left * text * padding.right).w == target_width "\e[31mPadded width $(Measure(padding.left * text * padding.right).w), target: $target_width $padding"
+        @assert Measure(padding.left * text * padding.right).w <= target_width "\e[31mPadded width $(Measure(padding.left * text * padding.right).w), target: $target_width $padding"
         
         return padding
     end

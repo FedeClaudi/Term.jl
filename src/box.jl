@@ -3,6 +3,7 @@ module box
 
     import ..segment: Segment
     import ..style: apply_style
+    import Term: Measure
 
     export get_row, get_title_row
     export ASCII, ASCII2, ASCII_DOUBLE_HEAD, SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
@@ -115,30 +116,32 @@ module box
         justify::Symbol=:left,
       )
 
-      initial_line = Segment(get_row(box, [width], row), style).plain
+      initial_line = remove_markup_open(Segment(get_row(box, [width], row), style).plain)
+      # @info "Getting title row" initial_line
 
       if isnothing(title)
         return Segment(initial_line, style)
       else
 
         # get title
-        title=Segment(title)
-        @assert title.measure.w < width - 4 "Title too long for panel of width $width"
+        title = apply_style("[$style]"*title, )
+        @assert  Segment(title).measure.w < width - 4 "Title too long for panel of width $width"
         
         # compose title line 
         line = getfield(box, row)
 
-        # initial_line = initial_line.text
         if justify == :left
           cut_start = get_last_valid_str_idx(initial_line, 4)
           pre = Segment(
-            Segment(initial_line[1:cut_start], style) * "\e[0m" * " " * Segment(title, title_style).text * " "
+            Segment(initial_line[1:cut_start], style) * "\e[0m" * " " * title * " "
           )            
+
           post = line.mid^(length(initial_line) - pre.measure.w - 1) * line.right
+        
         else
           cut_start = get_next_valid_str_idx(initial_line, ncodeunits(initial_line)-8)
           post = Segment(
-            "\e[0m" * " " * Segment(title, title_style).text * " " * Segment(initial_line[cut_start:end], style)
+            "\e[0m" * " " * title * " " * Segment(initial_line[cut_start:end], style)
           )          
 
           pre = Segment(line.left * line.mid^(length(initial_line) - post.measure.w - 1), style)

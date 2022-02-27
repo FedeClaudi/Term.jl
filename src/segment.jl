@@ -31,6 +31,9 @@ module segment
             return text
         end
         plain = remove_ansi(remove_markup(text))
+
+        # len(x) = (length ∘ remove_ansi ∘ remove_markup)(x)
+        # @info "Creating segment" len(text) len(apply_style(text)) len(remove_markup(apply_style(text)))
         Segment(remove_markup(apply_style(text)), plain, Measure(plain))
     end
 

@@ -55,22 +55,23 @@ module panel
                 box::Symbol=:ROUNDED,
                 justify=:left
         )
-
-
         box = eval(box)  # get box object from symbol
 
-        # pre styles
+        # style stuff
         title_style = isnothing(title_style) ? style : title_style
-        σ(s) = Segment(s, style)  # applies the main style markup to a string to make a segment
+        # σ(s) = Segment(s, style)  # applies the main style markup to a string to make a segment
+        σ(s) = "[$style]$s[/$style]"  # applies the main style markup to a string to make a segment
 
         # get size of panel to fit the content
-        content = Renderable(content; width=width)
+        # content = Renderable(content; width=width)
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
 
         width = isnothing(width) ? panel_measure.w : width
         @assert width > content_measure.w "Width too small for content '$content' with $content_measure"
         panel_measure.w = width
+
+        # @info "Creating panel" content_measure panel_measure typeof(content)
 
         # create segments
         segments::Vector{Segment} = []
@@ -79,7 +80,7 @@ module panel
         top = get_title_row(:top,
                     box, 
                     title; 
-                    width=width,
+                    width=width-2,
                     style=style,
                     title_style=title_style,
                     justify=title_justify)
@@ -87,7 +88,7 @@ module panel
         bottom = get_title_row(:bottom,
                     box,
                     subtitle; 
-                    width=width,
+                    width=width-2,
                     style=style,
                     title_style=subtitle_style,
                     justify=subtitle_justify)
@@ -100,10 +101,13 @@ module panel
         for n in 1:content_measure.h
             # get padding
             line = content_lines[n] 
-            padding = Padding(line, width, justify)
+            padding = Padding(line, width-2, justify)
 
             # make line
             segment = Segment(left * padding.left * line * padding.right * right)
+            # @info "pl" left.plain padding.left padding.right right.plain
+            # @info "panel line" line padding segment segment.plain Measure(segment.plain)
+
             push!(segments, segment)
 
             # @assert segment.measure.w <= panel_measure.w "\e[31mTarget measure: $panel_measure, segment has $(segment.measure), pading: $padding, line length: $(length(line))"
@@ -174,16 +178,14 @@ module panel
         justify::Symbol=:left,
         )
 
-
         if width != :fit
             text = do_by_line((ln)->rehsape_text(ln, width-4), text)
-            width -= 2
         end
-        text = "\n" * text
+        # @info "\e[31mReshaped text" text Measure(text) width
 
         panel = Panel(
             text,
-            style="hidden",
+            style="blue",
             title=title,
             title_style=title_style,
             title_justify=title_justify,
@@ -191,7 +193,7 @@ module panel
             subtitle_style=subtitle_style,
             subtitle_justify=subtitle_justify,
             justify=justify,
-            width=width
+            # width=width
         )
         
 

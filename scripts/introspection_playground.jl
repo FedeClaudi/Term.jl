@@ -5,10 +5,9 @@ using Term
 import Term: AbstractRenderable
 
 # ------------------------------- inspect types ------------------------------ #
-# inspect(Panel; max_n_methods=2) 
+# inspect(Panel) 
 # inspect(AbstractRenderable)
-# println("inspect(Number)")
-# inspect(String)
+# inspect(String; width=300)
 
 # ----------------------------- inspect variables ---------------------------- #
 # inspect("test")
@@ -16,4 +15,4 @@ import Term: AbstractRenderable
 
 
 # ------------------------------ inspect methods ----------------------------- #
-inspect(print)
+# inspect(print)

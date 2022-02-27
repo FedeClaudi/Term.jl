@@ -61,11 +61,17 @@ module renderables
     end
 
     function RenderableText(text::AbstractString; width::Union{Nothing, Int}=nothing)
+        # @info "creating RenderableText"  text width
         if !isnothing(width)
             text = do_by_line((ln)->rehsape_text(ln, width), text)
         end
 
+        
         segments = [Segment(line) for line in split_lines(text)]
+
+        # @info "a" split_lines(text) segments length(segments)
+        # println(segments[1].plain)
+        # println(segments[2].plain)
         return RenderableText(segments, Measure(segments), text)
     end
 

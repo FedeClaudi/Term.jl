@@ -36,9 +36,13 @@
 - [ ] markdown parsing
 - [ ] code syntax highlighting
 
-## known bugs
+## known bugs (and currently brocken stuff)
 - [ ] multiple styles on same line, text in between not rendered correctly
 
+- [x] `clean_nested_tags` breaks Panel
+- [ ] `inspect` cannot print panels due to BonudsError
+  - [ ] error in `reshape` text with style
+- [x] `Panel`: not sure that it has correct width
 
 #### fixed bugs
 - [x] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
