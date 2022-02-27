@@ -14,6 +14,7 @@ module Term
     include("markup.jl")
     include("style.jl")
     include("segment.jl")
+    include("macros.jl")
 
     # renderables, rely heavily on other modules
     include("box.jl")
@@ -27,6 +28,8 @@ module Term
     export Spacer, vLine, hLine
     export theme, highlight
     export inspect
+    export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
+    export @bold, @dim, @italic, @underline, @style
 
     # ----------------------------------- base ----------------------------------- #
     import .measure
@@ -37,7 +40,7 @@ module Term
 
     using .color: NamedColor, BitColor, RGBColor, get_color
 
-    using .style: MarkupStyle, extract_style
+    using .style: MarkupStyle, extract_style, apply_style
 
     using .segment: Segment
 

@@ -24,6 +24,8 @@ function ANSICode(color; bg::Bool=false)
         Δ = bg ? 48 : 38
         rgb = "$(color.r);$(color.g);$(color.b)"
         return ANSICode("\e[$Δ;2;$(rgb)m", "\e[$(Δ+1)m")
+    else
+        @warn "Could not figure out color type for $color, can't produce ansi code"
     end
 end
 

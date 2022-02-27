@@ -94,7 +94,6 @@ module style
             # MODES
             elseif attr != :tag && value == true
                 code = CODES[attr]
-
                 
             else
                 if value != false && attr != :tag

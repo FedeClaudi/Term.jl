@@ -3,7 +3,6 @@ module box
 
     import ..segment: Segment
     import ..style: apply_style
-    import Term: Measure
 
     export get_row, get_title_row
     export ASCII, ASCII2, ASCII_DOUBLE_HEAD, SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
