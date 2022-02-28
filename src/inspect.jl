@@ -1,251 +1,261 @@
 using InteractiveUtils
 
-include("_inspect.jl")
+module INSPECT
+    include("__text_utils.jl")
 
-# ---------------------------------------------------------------------------- #
-#                                   TYPEINFO                                   #
-# ---------------------------------------------------------------------------- #
+    import Term: highlight, theme, TextBox, hLine, Panel, Spacer
+    include("_inspect.jl")
 
-"""
-    TypeInfo
+    export inspect
 
-Stores metadata about a DataType
-"""
-struct TypeInfo
-    name::String
-    supertypes::Union{Nothing, Tuple}
-    subtypes::Union{Nothing, Vector}
-    fields::Union{Nothing, Dict}
-    constructors::Vector
-    methods::Vector  # functions using the target type
-    docs::Union{Nothing, Vector{Docs.DocStr}}
-    docstring::String
-end
+    # ---------------------------------------------------------------------------- #
+    #                                   TYPEINFO                                   #
+    # ---------------------------------------------------------------------------- #
 
-"""
-    TypeInfo(type::DataType)
+    """
+        TypeInfo
 
-Extracts information from a DataType and stores it as a `TypeInfo` object.
-"""
-function TypeInfo(type::DataType)
-    # get super/sub types
-    super = length(supertypes(type)) > 0 ? (supertypes(type)) : nothing
-    sub = length(subtypes(type)) > 0 ? subtypes(type) : nothing
-
-    # get docstring
-    doc, docstring = get_docstring(Symbol(type))
-
-    # get fields
-    if !isabstracttype(type) && length(fieldnames(type)) > 0
-        fields = Dict(
-            "names" => fieldnames(type),
-            "types"=> fieldtypes(type),
-        )
-    else
-        fields = nothing
+    Stores metadata about a DataType
+    """
+    struct TypeInfo
+        name::String
+        supertypes::Union{Nothing, Tuple}
+        subtypes::Union{Nothing, Vector}
+        fields::Union{Nothing, Dict}
+        constructors::Vector
+        methods::Vector  # functions using the target type
+        docs::Union{Nothing, Vector{Docs.DocStr}}
+        docstring::String
     end
 
-    # get constructors and methods
-    _constructors = split_lines(string(methods(type)))
-    constructors = length(_constructors) > 1 ? _constructors[2:end] : []
+    """
+        TypeInfo(type::DataType)
 
-    _methods = methodswith(type)
+    Extracts information from a DataType and stores it as a `TypeInfo` object.
+    """
+    function TypeInfo(type::DataType)
+        # get super/sub types
+        super = length(supertypes(type)) > 0 ? (supertypes(type)) : nothing
+        sub = length(subtypes(type)) > 0 ? subtypes(type) : nothing
 
-    return TypeInfo(string(type), super, sub, fields, constructors, _methods, doc, docstring)
-end
+        # get docstring
+        doc, docstring = get_docstring(Symbol(type))
 
-"""
-    TypeInfo(fun::Function)
+        # get fields
+        if !isabstracttype(type) && length(fieldnames(type)) > 0
+            fields = Dict(
+                "names" => fieldnames(type),
+                "types"=> fieldtypes(type),
+            )
+        else
+            fields = nothing
+        end
 
-Exctracts information from a function object
-"""
-function TypeInfo(fun::Function)
-    # get docstring
-    doc, docstring = get_docstring(fun)
+        # get constructors and methods
+        _constructors = split_lines(string(methods(type)))
+        constructors = length(_constructors) > 1 ? _constructors[2:end] : []
 
-    # get methods with same name
-    _methods = split_lines(string(methods(fun)))
-    _methods = length(_methods) > 1 ? _methods[2:end] : []
+        _methods = methodswith(type)
 
-    return TypeInfo(string(fun), nothing, nothing, nothing, [], _methods, doc, docstring)
-end
+        return TypeInfo(string(type), super, sub, fields, constructors, _methods, doc, docstring)
+    end
+
+    """
+        TypeInfo(fun::Function)
+
+    Exctracts information from a function object
+    """
+    function TypeInfo(fun::Function)
+        # get docstring
+        doc, docstring = get_docstring(fun)
+
+        # get methods with same name
+        _methods = split_lines(string(methods(fun)))
+        _methods = length(_methods) > 1 ? _methods[2:end] : []
+
+        return TypeInfo(string(fun), nothing, nothing, nothing, [], _methods, doc, docstring)
+    end
 
 
-# ---------------------------------------------------------------------------- #
-#                                    INSPECT                                   #
-# ---------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------------- #
+    #                                    INSPECT                                   #
+    # ---------------------------------------------------------------------------- #
 
-"""
-    inspect(type::DataType; width::Int=120)
+    """
+        inspect(type::DataType; width::Int=120)
 
-Inspects a type definition to extract info like docstring, fields, types etc.
-Also shows constructors for the type and methods making use of the type.
-"""
-function inspect(type::DataType; width::Int=88, max_n_methods::Int=3)
-    # extract type info
-    info = TypeInfo(type)
+    Inspects a type definition to extract info like docstring, fields, types etc.
+    Also shows constructors for the type and methods making use of the type.
+    """
+    function inspect(type::DataType; width::Union{Nothing, Int}=nothing, max_n_methods::Int=3)
+        width = isnothing(width) ? displaysize(stdout)[2] : width
+        # extract type info
+        info = TypeInfo(type)
 
-    # ------------------------------ types hierarchy ----------------------------- #
-    hierarchy = TextBox(
-        "",
-        style_super_types(info),
-        "",
-        style_sub_types(info),
-        width=width, 
-        title="Types hierarchy", 
-        title_style="bold underline yellow"
-    )
+        # ------------------------------ types hierarchy ----------------------------- #
+        hierarchy = TextBox(
+            "",
+            style_super_types(info),
+            "",
+            style_sub_types(info),
+            width=width, 
+            title="Types hierarchy", 
+            title_style="bold underline yellow"
+        )
 
-    # ----------------------------------- docs ----------------------------------- #
-    # @info "making docstirng box" info.docstring width
-    docs = TextBox(
-        info.docstring,
-        title="Docstring",
-        title_style="bold underline yellow",
-        width = width,
-    )
+        # ----------------------------------- docs ----------------------------------- #
+        # @info "making docstirng box" info.docstring width
+        docs = TextBox(
+            info.docstring,
+            title="Docstring",
+            title_style="bold underline yellow",
+            width = width,
+        )
 
-    # ---------------------------------- fields ---------------------------------- #
-    if !isnothing(info.fields)
-        formatted_fields::Vector{AbstractString} = []
+        # ---------------------------------- fields ---------------------------------- #
         if !isnothing(info.fields)
-            for (name, type) in zip(info.fields["names"], info.fields["types"])
-                push!(
-                    formatted_fields,
-                    "[bold white]$(string(name))[/bold white]"*highlight("::$(type)", theme, :type)
-                )
+            formatted_fields::Vector{AbstractString} = []
+            if !isnothing(info.fields)
+                for (name, type) in zip(info.fields["names"], info.fields["types"])
+                    push!(
+                        formatted_fields,
+                        "[bold white]$(string(name))[/bold white]"*highlight("::$(type)", theme, :type)
+                    )
+                end
             end
+
+            fields_panel = Panel(
+                isnothing(formatted_fields) ? "[dim]No arguments[/dim]" : formatted_fields,
+                title="Arguments", 
+                title_style="bold yellow",
+                style="dim yellow",
+                width = width-2,
+            )
+            insights_panel = (docs / Spacer(width-2, 2) / fields_panel)
+        else
+            insights_panel = docs
         end
 
-        fields_panel = Panel(
-            isnothing(formatted_fields) ? "[dim]No arguments[/dim]" : formatted_fields,
-            title="Arguments", 
-            title_style="bold yellow",
-            style="dim yellow",
-            width = width-2,
+        # ------------------------------- constructors ------------------------------- #
+        constructors = do_by_line((x)->style_method_line(x; trim=true), info.constructors)
+        n_constructors = length(split_lines(constructors)) > 1 ? Int(length(split_lines(constructors))/2) : 0
+        if n_constructors > max_n_methods
+            constructors = join_lines(split_lines(constructors)[1:max_n_methods*2]) * "\n\n[grey53]( additional constructors not shown... )[/grey53]"
+        end
+        constructors = n_constructors > 1 ? constructors : "[dim]No constructors          [/dim]"
+
+        constructors_panel = TextBox(
+            constructors,
+            title="Constructors[dim]($n_constructors)",
+            title_style="bold underline yellow",
+            width=width
         )
-        insights_panel = (docs / Spacer(width-2, 2) / fields_panel)
-    else
-        insights_panel = docs
-    end
 
-    # ------------------------------- constructors ------------------------------- #
-    constructors = do_by_line((x)->style_method_line(x; trim=true), info.constructors)
-    n_constructors = length(split_lines(constructors)) > 1 ? Int(length(split_lines(constructors))/2) : 0
-    if n_constructors > max_n_methods
-        constructors = join_lines(split_lines(constructors)[1:max_n_methods*2]) * "\n\n[grey53]( additional constructors not shown... )[/grey53]"
-    end
-    constructors = n_constructors > 1 ? constructors : "[dim]No constructors          [/dim]"
+        # ---------------------------------- methods --------------------------------- #
+        if length(info.methods) > 0
+            methods = do_by_line(style_method_line, info.methods)
+            n_methods = length(split_lines(methods)) > 1 ? Int(length(split_lines(methods))/2) : 1
 
-    constructors_panel = TextBox(
-        constructors,
-        title="Constructors[dim]($n_constructors)",
-        title_style="bold underline yellow",
-        width=width
-    )
-
-    # ---------------------------------- methods --------------------------------- #
-    if length(info.methods) > 0
-        methods = do_by_line(style_method_line, info.methods)
-        n_methods = length(split_lines(methods)) > 1 ? Int(length(split_lines(methods))/2) : 1
-
-        if n_methods > max_n_methods
-            methods = join_lines(split_lines(methods)[1:max_n_methods*2]) * "\n\n[grey53]( additional methods not shown... )[/grey53]"
+            if n_methods > max_n_methods
+                methods = join_lines(split_lines(methods)[1:max_n_methods*2]) * "\n\n[grey53]( additional methods not shown... )[/grey53]"
+            end
+        else
+            methods = "[dim]No methods          [/dim]"
+            n_methods = 0
         end
-    else
-        methods = "[dim]No methods          [/dim]"
-        n_methods = 0
-    end
 
-    methods_panel = TextBox(
-        methods,
-        title="Methods[dim]($n_methods)",
-        title_style="bold underline yellow",
-        width=width
-    )
+        methods_panel = TextBox(
+            methods,
+            title="Methods[dim]($n_methods)",
+            title_style="bold underline yellow",
+            width=width
+        )
 
-    # ------------------------------- CREATE PANEL ------------------------------- #
-    _title = isabstracttype(type) ? " [dim](Abstract)[/dim]" : ""
-    panel = Panel(
-        Spacer(width-2, 1),
-        hierarchy,
-        hLine(width-6, "blue"),
-        insights_panel,
-        hLine(width-6, "blue"),
-        constructors_panel,
-        hLine(width-6, "blue"),
-        methods_panel,
-        title="$(typeof(type)): [bold]$(info.name)" * _title, 
-        title_style="red",
-        style="blue",
-    )
-
-    println(
-        panel
-    )
-
-end
-
-"""
-    inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
-
-Inspects `Function` objects providing docstrings, and methods signatures.
-"""
-function inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
-    info = TypeInfo(fun)
-
-    # ----------------------------- prepare contents ----------------------------- #
-    docs = TextBox(
-        info.docstring,
-        title="Docstring",
-        title_style="bold underline yellow",
-        width = width-2,
-    )
-
-    if length(info.methods) > 0
-        methods = do_by_line(m -> style_method_line(m; trim=true), info.methods)
-        n_methods = length(split_lines(methods)) > 1 ? Int(length(split_lines(methods))/2) : 1
-
-        if n_methods > max_n_methods
-            methods = join_lines(split_lines(methods)[1:max_n_methods*2]) * "\n\n[grey53]( additional methods not shown... )[/grey53]"
-        end
-    else
-        methods = "[dim]No methods          [/dim]"
-        n_methods = 0
-    end
-
-    methods_panel = TextBox(
-        methods,
-        title="Methods[dim]($n_methods)",
-        title_style="bold underline yellow",
-        width=width-2
-    )
-
-    # -------------------------------- print panel ------------------------------- #
-    println(
-        Panel(
+        # ------------------------------- CREATE PANEL ------------------------------- #
+        _title = isabstracttype(type) ? " [dim](Abstract)[/dim]" : ""
+        panel = Panel(
             Spacer(width-2, 1),
-            docs,
+            hierarchy,
+            hLine(width-6, "blue"),
+            insights_panel,
+            hLine(width-6, "blue"),
+            constructors_panel,
             hLine(width-6, "blue"),
             methods_panel,
-            title="Function: [bold red]$(info.name)[/bold red]",
+            title="$(typeof(type)): [bold]$(info.name)" * _title, 
             title_style="red",
             style="blue",
-            width=width,
         )
-    )
-end
 
-"""
-generic inspect method, dispatches to type-specific methods
-when they can be found
-"""
-function inspect(obj) 
-    if typeof(obj) <: Function
-        inspect(obj)
-    elseif typeof(typeof(obj)) == DataType
-        inspect(typeof(obj))
-    else
-        throw("Cannot inspect $obj ($(typeof(obj)))")
+        println(
+            panel
+        )
+
+    end
+
+    """
+        inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
+
+    Inspects `Function` objects providing docstrings, and methods signatures.
+    """
+    function inspect(fun::Function; width::Union{Nothing, Int}=nothing, max_n_methods::Int = 7)
+        width = isnothing(width) ? displaysize(stdout)[2] : width
+
+        info = TypeInfo(fun)
+
+        # ----------------------------- prepare contents ----------------------------- #
+        docs = TextBox(
+            info.docstring,
+            title="Docstring",
+            title_style="bold underline yellow",
+            width = width-2,
+        )
+
+        if length(info.methods) > 0
+            methods = do_by_line(m -> style_method_line(m; trim=true), info.methods)
+            n_methods = length(split_lines(methods)) > 1 ? Int(length(split_lines(methods))/2) : 1
+
+            if n_methods > max_n_methods
+                methods = join_lines(split_lines(methods)[1:max_n_methods*2]) * "\n\n[grey53]( additional methods not shown... )[/grey53]"
+            end
+        else
+            methods = "[dim]No methods          [/dim]"
+            n_methods = 0
+        end
+
+        methods_panel = TextBox(
+            methods,
+            title="Methods[dim]($n_methods)",
+            title_style="bold underline yellow",
+            width=width-2
+        )
+
+        # -------------------------------- print panel ------------------------------- #
+        println(
+            Panel(
+                Spacer(width-2, 1),
+                docs,
+                hLine(width-6, "blue"),
+                methods_panel,
+                title="Function: [bold red]$(info.name)[/bold red]",
+                title_style="red",
+                style="blue",
+                width=width,
+            )
+        )
+    end
+
+    """
+    generic inspect method, dispatches to type-specific methods
+    when they can be found
+    """
+    function inspect(obj; kwargs...) 
+        if typeof(obj) <: Function
+            inspect(obj; kwargs...)
+        elseif typeof(typeof(obj)) == DataType
+            inspect(typeof(obj); kwargs...)
+        else
+            throw("Cannot inspect $obj ($(typeof(obj)))")
+        end
     end
 end

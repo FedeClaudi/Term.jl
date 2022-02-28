@@ -67,7 +67,7 @@ module panel
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
 
-        width = isnothing(width) ? panel_measure.w : width
+        width = isnothing(width) ? displaysize()[2] : width
         @assert width > content_measure.w "Width too small for content '$content' with $content_measure"
         panel_measure.w = width
 

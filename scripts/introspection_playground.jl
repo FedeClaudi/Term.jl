@@ -15,4 +15,4 @@ import Term: AbstractRenderable
 
 # ------------------------------ inspect methods ----------------------------- #
 # inspect(print)
-inspect(inspect; width=100)
+inspect(inspect)

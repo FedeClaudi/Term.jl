@@ -230,7 +230,7 @@ module layout
     
     constructor to create a styled hLine of given width
     """
-    function hLine(width::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
+    function hLine(width::Number; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
         width = int(width)
         char = eval(box).row.mid
         segments = [Segment(char^width, style)]

@@ -12,26 +12,24 @@
   - [ ] macros
   - [ ] textbox/panels + nesting
   - [ ] layout: stacking + layout objects
+  - [ ] inspect
 
-#### small features
-- [ ] `tprint`
-- [ ] macros for styling a string
 
 #### features
 - [ ] titleline : hLine with title centered in the middle
-- [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
-- [x] inspect
-  - [x] type/struct inspection
-  - [x] method inspection
-  - [ ] type hierarchy tree (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
+
 - [ ] error's traceback
 - [ ] logging
 - [ ] pretty print common data structures
   - [x] highlight type info ::Type or <:Type
 - [ ] tree visualization
+    - [ ] type hierarchy tree for `inspect` (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
   
 
-#### possible future features
+#### possible future features/improvements
+- [ ] `Console` like object using `displaysize()` to get width
+- [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
+
 - [ ] latex->unicode parsing (https://github.com/phfaist/pylatexenc)
 - [ ] markdown parsing
 - [ ] code syntax highlighting
@@ -40,24 +38,18 @@
 - [ ] when highlighting with multiple styles something is still brocken
 - [ ] when applying markup occasionally out of bounds error
 
-#### fixed bugs
-- [x] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
-- [x] panel: style's mode applies to title too.
-- [x] `textbox` a bit buggy, produces weird output occasionally
-- `Panel` can't handle renderables larger than given width
-- [x] When splitting markup text over multiple lines,  the wrong tag is carried over
-- [x] nested tags, outer's color/bg not correctly restored
-  - [x] mostly fixed though mode tags don't carry over correctly all the time
-- [x] `highlight`, nested highlighting with hex code colors doesn't restore outer colors
-- [x] multiple styles on same line, text in between not rendered correctly
-- [x] `clean_nested_tags` breaks Panel
-- [x] `inspect` cannot print panels due to BonudsError
-  - [x] error in `reshape` text with style
-- [x] `Panel`: not sure that it has correct width
+
 
 --------------
 
 ### Done
+- [x] inspect
+  - [x] type/struct inspection
+  - [x] method inspection
+
+- [x] `tprint`
+- [x] macros for styling a string
+
 - [x] box
 - [x] panel
   - [x] panel subtitle (new make line method)
@@ -97,3 +89,18 @@
 - [x] textbox (panel of given size with hidden edges + text inside)
   - [x] have textbox accept multiple lines of inputs as variable number of strings
 - [x] vLine/hLine and spacer
+
+#### fixed bugs(for now)
+- [x] style: if a tag is at the beginning of a multiline string, it should be repeated on each line?
+- [x] panel: style's mode applies to title too.
+- [x] `textbox` a bit buggy, produces weird output occasionally
+- `Panel` can't handle renderables larger than given width
+- [x] When splitting markup text over multiple lines,  the wrong tag is carried over
+- [x] nested tags, outer's color/bg not correctly restored
+  - [x] mostly fixed though mode tags don't carry over correctly all the time
+- [x] `highlight`, nested highlighting with hex code colors doesn't restore outer colors
+- [x] multiple styles on same line, text in between not rendered correctly
+- [x] `clean_nested_tags` breaks Panel
+- [x] `inspect` cannot print panels due to BonudsError
+  - [x] error in `reshape` text with style
+- [x] `Panel`: not sure that it has correct width

@@ -30,6 +30,7 @@ module Term
     export inspect
     export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
     export @bold, @dim, @italic, @underline, @style
+    export tprint
 
     # ----------------------------------- base ----------------------------------- #
     import .measure
@@ -71,5 +72,12 @@ module Term
     using .layout: Padding, vstack, hstack, Spacer, vLine, hLine
 
     using .panel: Panel, TextBox
+
+    # ---------------------------------- others ---------------------------------- #
+    using .INSPECT: inspect
+
+
+    tprint(x::AbstractString) = (println ∘ apply_style)(x)
+    tprint(x::AbstractRenderable) = println(x)
 end
 
