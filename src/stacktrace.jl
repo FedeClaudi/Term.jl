@@ -68,7 +68,7 @@ module stacktrace
             "\n" * join(candidates, "\n"),
             width=76,
             title="closest candidates",
-            title_style="blue",
+            title_style="yellow",
             style="blue dim",
             )
     end
@@ -127,7 +127,7 @@ module stacktrace
                 style = "dim red",
                 width=width,
                 title_justify=:center,
-            ) / RenderableText("\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message")
+            ),  RenderableText("\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message")
     end
 
     function style_backtrace(io::IO, t::Vector)
@@ -149,7 +149,7 @@ module stacktrace
         # highlight offending line
         if length(stack_lines) > 0
             error_line = Panel(
-                stack_lines[1][35:end],
+                stack_lines[1],
                 title="error in",
                 width=90-8,
                 style="dim blue",
@@ -202,9 +202,15 @@ module stacktrace
                 println("\n")
 
                 stack = style_backtrace(io, bt)
-                err = style_error(io, ex.error)
-
-                println(stack / err)
+                err, err_msg = style_error(io, ex.error)
+            
+                # print or stack based on terminal size
+                # @info displaysize(io)[2] displaysize(io)
+                if displaysize(io)[2] >= 180
+                    println((stack * err) / err_msg) 
+                else
+                    println(stack / err / err_msg)
+                end
 
             end
 

@@ -16,15 +16,15 @@
 
 
 #### features
-- [ ] titleline : hLine with title centered in the middle
+- [x] titleline : hLine with title centered in the middle
 
 - [ ] error's traceback
   - [ ] keep adding more error types
-  - [ ] captures errors during error genereation
+  - [x] captures errors during error genereation
+  - [x] panel width/stacking by console size
 - [ ] logging
 - [ ] pretty print common data structures
   - [x] highlight type info ::Type or <:Type
-- [ ]  style by regex by applying style to each match
 - [ ] tree visualization
     - [ ] type hierarchy tree for `inspect` (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
   
