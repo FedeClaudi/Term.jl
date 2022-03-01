@@ -3,7 +3,7 @@ module stacktrace
     import Base: InterpreterIP, show_method_candidates, ExceptionStack
 
     import Term: theme, highlight, rehsape_text
-    import ..panel: Panel
+    import ..panel: Panel, TextBox
     import ..renderables: RenderableText
     import ..layout: hLine
 
@@ -15,6 +15,7 @@ module stacktrace
         BoundsError => "comes up when trying to acces a container at invalid position (e.g. a string a='abcd' with 4 characters cannot be accessed as a[5]).",
     )
     
+    IS_LOAD_ERROR = false
 
     _highlight(x::Union{Symbol, AbstractString}) = "[bold salmon1 underline]$x[/bold salmon1 underline]"
     _highlight(x::Number) = "[bold blue]$x[/bold blue]"
@@ -46,6 +47,7 @@ module stacktrace
         for can in _candidates[3:end-1]
             fun, file = split(can, " at ")
             name, args = split(fun, "(", limit=2)
+            name = "[red]$name[/red]"
 
             for regex in _method_regexes
                 for match in collect(eachmatch(regex, args))
@@ -55,11 +57,12 @@ module stacktrace
 
             file, lineno = split(file, ":")
 
-            # line = name * "("*args * "\n[dim]$file [bold dim](line: $lineno)[/bold dim][/dim]"
-            push!(candidates, "   " * _highlight(strip(name)) * "("*args)
+            println(RenderableText(name, "red"))
+            push!(candidates, "   " * name * "("*args)
             push!(candidates, "[dim]$file [bold dim](line: $lineno)[/bold dim][/dim]\n")
 
         end
+        candidates = length(candidates) == 0 ?  ["[dim]no candidate method found[/dim]"] : candidates
 
         return main_line * "\n",  Panel(
             "\n" * join(candidates, "\n"),
@@ -102,82 +105,137 @@ module stacktrace
         return "no message for error of type $(typeof(er)), sorry.", ""
     end
 
+
+    # ----------------------------- styling functions ---------------------------- #
+    function style_error(io::IO, er)
+        width = 90
+            
+        if haskey(ErrorsExplanations, typeof(er))
+            info_msg = ErrorsExplanations[typeof(er)]
+        else
+            info_msg = "no additional info available."
+        end
+        
+        main_message, message = error_message(io, er)
+        return Panel(
+                main_message,
+                message,
+                hLine(width-4; style="red dim"),
+                RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=width-4),
+                title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
+                title_style="red",
+                style = "dim red",
+                width=width,
+                title_justify=:center,
+            ) / RenderableText("\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message")
+    end
+
+    function style_backtrace(io::IO, t::Vector)
+        width = 90
+
+        # create text
+        stack_lines::Vector{String} = []
+        for (n, frame) in enumerate(t)
+            if typeof(frame) ∉ (Ptr{Nothing}, InterpreterIP)
+
+                func_line = "[light_yellow3]($n)[/light_yellow3] [sky_blue3]$(frame.func)[/sky_blue3]"
+                file_line = "       [dim]$(frame.file):$(frame.line) [bold dim](line: $(frame.line))[/bold dim][/dim]"
+                push!(stack_lines, func_line * "\n" * file_line * "\n" )
+            # else
+            #     @info "skipped frame" frame
+            end
+        end
+    
+        # highlight offending line
+        if length(stack_lines) > 0
+            error_line = Panel(
+                stack_lines[1][35:end],
+                title="error in",
+                width=90-8,
+                style="dim blue",
+                title_style="yellow",
+                )
+
+
+            above = TextBox(
+                stack_lines[2:end-1],
+                width=width-8
+            )
+            
+            offending = Panel(
+                stack_lines[end][35:end],
+                title="caused by",
+                width=90-8,
+                style="dim blue",
+                title_style="yellow",
+                )
+
+            stack = error_line / above / offending
+        else
+            stack = "[dim]No stack trace[/dim]"
+        end
+
+        # create output
+        return Panel(
+                stack,
+                title="StackTrace",
+                style="yellow dim",
+                title_style="yellow",
+                title_justify=:center,
+                width=width
+            )
+        
+    end
+
+
+
     # ---------------------------------------------------------------------------- #
     #                              INSTALL TRACESTACK                              #
     # ---------------------------------------------------------------------------- #
     function install_stacktrace()
         @eval begin
-            Base.display_error(er, bt=nothing) = "adadasdas"
-            function display_error(io::IO, er, bt)
-                # printstyled(io, "ERROR: "; bold=true, color=Base.error_color())
-                # show_exception_stack(IOContext(io, :limit => true), stack)
-                println(io, "cacca")
-            end
-            # function Base.showerror(io::IO, ex::LoadError, bt; backtrace=true)
-            #     println("aa")
-            #     @info "SHOW ERROR" ex ex.error bt
-            #     # !isa(ex.error, LoadError) && print(io, "LoadError: ")
-            #     # showerror(io, ex.error, bt, backtrace=backtrace)
-            #     print(io, "\nin expression starting at $(ex.file):$(ex.line)")
-            # end
-            # showerror(io::IO, ex::LoadError) = showerror(io, ex, [])
 
+
+            # ---------------------------- handle load errors ---------------------------- #
+            function Base.showerror(io::IO, ex::LoadError, bt; backtrace=true)
+                IS_LOAD_ERROR = true
+                println("\n")
+
+                stack = style_backtrace(io, bt)
+                err = style_error(io, ex.error)
+
+                println(stack / err)
+
+            end
+
+            # ------------------ handle all other errors (no backtrace) ------------------ #
+            """
+            Re-define Base module function. Prints a nicely formatted error message, but only
+            if the error wasn't nested in a LoadError. In that case `Base.showerror(io::IO, ex::LoadError, bt; backtrace=true)`
+            handles all the printing and printing the message here would cause a duplicate.
+            """
 
             function Base.display_error(io::IO, er, bt)
-                # @info "DISPLAY ERROR" er typeof(er) fieldnames(typeof(er)) 
-                width = 90
-            
-                if haskey(ErrorsExplanations, typeof(er))
-                    info_msg = ErrorsExplanations[typeof(er)]
-                else
-                    info_msg = "no additional info available."
-                end
-                
-                main_message, message = error_message(io, er)
-                println(
-                    Panel(
-                        main_message,
-                        message,
-                        hLine(width-4; style="red dim"),
-                        RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=width-4),
-                        title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
-                        title_style="red",
-                        style = "dim red",
-                        width=width,
-                        title_justify=:center,
-                    ),
-                    RenderableText("\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message")
-                )
+                @warn "in: display_error" IS_LOAD_ERROR er bt
+            #     if !IS_LOAD_ERROR
+                    
+            # #         stack = style_backtrace(io, bt)
+            # #         err = style_error(io, ex.error)
+            #         println(style_error(io, er))
+            # #         # println(style_error(io, er))
+            # #         println(stack / err)
+            #     end
             end
             
             
-            # -------------------------------- STACKTRACE -------------------------------- #
-            function Base.show_backtrace(io::IO, t::Vector)                
-                # create text
-                stack_lines::Vector{String} = []
-                for (n, frame) in enumerate(t)
-                    if typeof(frame) ∉ (Ptr{Nothing}, InterpreterIP)
+            # --------------------------- handle backtrace only -------------------------- #
+            """
+            Re-define the Base module function to print a nicely formatted stack trace.
+            """
 
-                        func_line = "[light_yellow3]($n))[/light_yellow3] [sky_blue3]$(frame.func)[/sky_blue3]"
-                        file_line = "       [dim]$(frame.file):$(frame.line) [bold dim](line: $(frame.line))[/bold dim][/dim]"
-                        push!(stack_lines, func_line * "\n" * file_line * "\n" )
-                    # else
-                    #     @info "skipped frame" frame
-                    end
-                end
-            
-                # create output
-                println(
-                    "\n\n",
-                    Panel(
-                        length(stack_lines) > 0 ? join(stack_lines, "\n") : "[dim]No stack trace[/dim]",
-                        title="StackTrace",
-                        style="yellow dim",
-                        title_style="yellow",
-                        title_justify=:center,
-                        width=90
-                    )
-                )
+            function Base.show_backtrace(io::IO, t::Vector) 
+                @warn "in: show_backtrace" io t
+                # println(style_backtrace(io, t))              
             end
         end
     end
