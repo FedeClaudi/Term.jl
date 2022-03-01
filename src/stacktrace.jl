@@ -205,7 +205,6 @@ module stacktrace
                 err, err_msg = style_error(io, ex.error)
             
                 # print or stack based on terminal size
-                # @info displaysize(io)[2] displaysize(io)
                 if displaysize(io)[2] >= 180
                     println((stack * err) / err_msg) 
                 else

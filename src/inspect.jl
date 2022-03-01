@@ -5,6 +5,8 @@ module INSPECT
     include("__text_utils.jl")
 
     import Term: highlight, theme
+
+    import ..consoles: console
     import ..panel: Panel, TextBox
     import ..layout: Spacer, hLine
     include("_inspect.jl")
@@ -91,7 +93,7 @@ module INSPECT
     Also shows constructors for the type and methods making use of the type.
     """
     function inspect(type::DataType; width::Union{Nothing, Int}=nothing, max_n_methods::Int=3)
-        width = isnothing(width) ? displaysize(stdout)[2] : width
+        width = isnothing(width) ? console.width : width
         # extract type info
         info = TypeInfo(type)
 
@@ -202,7 +204,7 @@ module INSPECT
     Inspects `Function` objects providing docstrings, and methods signatures.
     """
     function inspect(fun::Function; width::Union{Nothing, Int}=nothing, max_n_methods::Int = 7)
-        width = isnothing(width) ? displaysize(stdout)[2] : width
+        width = isnothing(width) ? console.width : width
 
         info = TypeInfo(fun)
 

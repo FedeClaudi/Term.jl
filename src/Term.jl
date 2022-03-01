@@ -9,6 +9,7 @@ module Term
     include("color.jl")
     include("theme.jl")
     include("highlight.jl")
+    include("console.jl")
 
     # rely on other modules
     include("markup.jl")
@@ -36,6 +37,7 @@ module Term
     # ----------------------------------- base ----------------------------------- #
     import .measure
     using .measure: Measure
+    using .consoles: Console, console, err_console
 
     # ----------------------------------- style ---------------------------------- #
     using .markup: extract_markup, MarkupTag, pairup_tags

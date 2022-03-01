@@ -1,6 +1,7 @@
 module panel
     import Term: split_lines, get_last_valid_str_idx, rehsape_text, do_by_line, join_lines
 
+    import ..consoles: console
     import ..measure: Measure
     import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
     import ..segment: Segment
@@ -70,7 +71,7 @@ module panel
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
 
-        width = isnothing(width) ? displaysize()[2] : width
+        width = isnothing(width) ? console.width : width
         @assert width > content_measure.w "Width too small for content '$content' with $content_measure"
         panel_measure.w = width
 

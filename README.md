@@ -22,6 +22,7 @@
   - [ ] keep adding more error types
   - [x] captures errors during error genereation
   - [x] panel width/stacking by console size
+  - [ ] show code in stack trace
 - [ ] logging
 - [ ] pretty print common data structures
   - [x] highlight type info ::Type or <:Type
@@ -30,7 +31,7 @@
   
 
 #### possible future features/improvements
-- [ ] `Console` like object using `displaysize()` to get width
+- [x] `Console` like object using `displaysize()` to get width
 - [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
 
 - [ ] latex->unicode parsing (https://github.com/phfaist/pylatexenc)
