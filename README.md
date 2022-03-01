@@ -23,6 +23,7 @@
   - [x] captures errors during error genereation
   - [x] panel width/stacking by console size
   - [ ] show code in stack trace
+  - [ ] perhaps escape strings in error messages to avoi injecting styles
 - [ ] logging
 - [ ] pretty print common data structures
   - [x] highlight type info ::Type or <:Type

@@ -2,7 +2,9 @@ using Revise
 Revise.revise()
 
 using Term
+import Term: install_stacktrace
 
+install_stacktrace()
 # -------------------------------- nested tags ------------------------------- #
 println(RenderableText(
     "You [green]can nest [blue underline] one [on_gold3 black bold]style[/on_gold3 black bold] inside  [/blue underline] another [/green]too!"

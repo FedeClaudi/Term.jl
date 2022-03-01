@@ -3,15 +3,18 @@ Revise.revise()
 
 using Term
 import Term: AbstractRenderable
+import Term: install_stacktrace
+
+install_stacktrace()
 
 # ------------------------------- inspect types ------------------------------ #
-# inspect(Panel) 
-# inspect(AbstractRenderable;)
-# inspect(String;)
+inspect(Panel) 
+inspect(AbstractRenderable;)
+inspect(String;)
 
 # ----------------------------- inspect variables ---------------------------- #
-# inspect("test")
-# inspect(1)
+inspect("test")
+inspect(1)
 
 # ------------------------------ inspect methods ----------------------------- #
 # inspect(print)

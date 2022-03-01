@@ -1,5 +1,5 @@
 
-module INSPECT
+module introspection
     using InteractiveUtils
 
     include("__text_utils.jl")
@@ -93,7 +93,7 @@ module INSPECT
     Also shows constructors for the type and methods making use of the type.
     """
     function inspect(type::DataType; width::Union{Nothing, Int}=nothing, max_n_methods::Int=3)
-        width = isnothing(width) ? console.width : width
+        width = isnothing(width) ? min(console.width, 120)-4 : width-4
         # extract type info
         info = TypeInfo(type)
 
@@ -181,15 +181,16 @@ module INSPECT
         panel = Panel(
             Spacer(width-2, 1),
             hierarchy,
-            hLine(width-6, "blue"),
+            hLine(width-6; style="blue dim"),
             insights_panel,
-            hLine(width-6, "blue"),
+            hLine(width-6; style="blue dim"),
             constructors_panel,
-            hLine(width-6, "blue"),
+            hLine(width-6; style="blue dim"),
             methods_panel,
             title="$(typeof(type)): [bold]$(info.name)" * _title, 
             title_style="red",
             style="blue",
+            width=width+4,
         )
 
         println(
@@ -204,7 +205,7 @@ module INSPECT
     Inspects `Function` objects providing docstrings, and methods signatures.
     """
     function inspect(fun::Function; width::Union{Nothing, Int}=nothing, max_n_methods::Int = 7)
-        width = isnothing(width) ? console.width : width
+        width = isnothing(width) ? min(console.width, 120) : width
 
         info = TypeInfo(fun)
 
@@ -240,7 +241,7 @@ module INSPECT
             Panel(
                 Spacer(width-2, 1),
                 docs,
-                hLine(width-6, "blue"),
+                hLine(width-6; style="blue dim"),
                 methods_panel,
                 title="Function: [bold red]$(info.name)[/bold red]",
                 title_style="red",

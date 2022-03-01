@@ -1,4 +1,7 @@
 import Term: hLine, vLine, Spacer, vstack, hstack
+import Term: install_stacktrace
+
+install_stacktrace()
 
 
 mid = vstack(

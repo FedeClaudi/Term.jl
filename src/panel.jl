@@ -71,7 +71,7 @@ module panel
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
 
-        width = isnothing(width) ? console.width : width
+        width = isnothing(width) ? console.width-4 : width
         @assert width > content_measure.w "Width too small for content '$content' with $content_measure"
         panel_measure.w = width
 
@@ -172,7 +172,7 @@ module panel
 
     function TextBox(
         text::Union{Vector, AbstractString};
-        width::Union{Symbol, Int}=88,
+        width::Union{Nothing, Symbol, Int}=88,
         title::Union{Nothing, String}=nothing,
         title_style::Union{String, Nothing}="default",
         title_justify::Symbol=:left,
@@ -183,6 +183,7 @@ module panel
         )
 
         if width != :fit
+            width = isnothing(width) ? console.width-4 : width
             text = do_by_line((ln)->rehsape_text(ln, width-4), text)
         end
         # @info "\e[31mReshaped text" text Measure(text) width

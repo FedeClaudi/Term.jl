@@ -77,7 +77,7 @@ module Term
     using .panel: Panel, TextBox
 
     # ---------------------------------- others ---------------------------------- #
-    using .INSPECT: inspect
+    using .introspection: inspect
 
     using .stacktrace: install_stacktrace
 

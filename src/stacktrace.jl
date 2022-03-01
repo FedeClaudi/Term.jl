@@ -6,22 +6,28 @@ module stacktrace
     import ..panel: Panel, TextBox
     import ..renderables: RenderableText
     import ..layout: hLine
+    import ..consoles: err_console
 
     export install_stacktrace
 
     const ErrorsExplanations = Dict(
-        UndefVarError => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
-        MethodError => "comes up when to method can be found with a given name and for a given set of argument types.",
+        AssertionError => "comes up when an assertion's check fails. For example `@assert 1==2` will throw an AssertionError",
         BoundsError => "comes up when trying to acces a container at invalid position (e.g. a string a='abcd' with 4 characters cannot be accessed as a[5]).",
+        MethodError => "comes up when to method can be found with a given name and for a given set of argument types.",
+        UndefVarError => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
     )
     
     IS_LOAD_ERROR = false
 
     _highlight(x::Union{Symbol, AbstractString}) = "[bold salmon1 underline]$x[/bold salmon1 underline]"
     _highlight(x::Number) = "[bold blue]$x[/bold blue]"
-    _highlight(x::DataType)= "[$(theme.type) dim]::$(x)[/$(theme.type) dim]"
+    _highlight(x::DataType) = "[$(theme.type) dim]::$(x)[/$(theme.type) dim]"
+    _highlight(x::UnitRange) = _highlight(string(x))
 
-    _highlight(x) = @info "highlighting misterious object" x typeof(x)
+    function _highlight(x)
+        @info "highlighting misterious object" x typeof(x)
+        return _highlight(string(x))
+    end
 
 
     # --------------------------------- messages --------------------------------- #
@@ -66,7 +72,7 @@ module stacktrace
 
         return main_line * "\n",  Panel(
             "\n" * join(candidates, "\n"),
-            width=76,
+            width=min(err_console, 120) - 10,
             title="closest candidates",
             title_style="yellow",
             style="blue dim",
@@ -74,8 +80,10 @@ module stacktrace
     end
 
     # ! BOUNDS ERROR
-    function error_message(io::IO, er::BoundsError)::String
+    function error_message(io::IO, er::BoundsError)
+        # @info "bounds error" er fieldnames(typeof(er))
         main_msg = "Attempted to access $(_highlight(er.a))$(_highlight(typeof(er.a))) at index $(_highlight(er.i))$(_highlight(typeof(er.i)))\n\n"
+
         additional_msg = "[dim]no additional message found[/dim]"
 
         if isdefined(er, :a)
@@ -94,9 +102,12 @@ module stacktrace
     function error_message(io::IO, er::StringIndexError)
         # @info er typeof(er) fieldnames(typeof(er)) 
         m1 = "attempted to access a String at index $(er.index)\n"
-        # m2 = "String: [light_green]$(er.string)[/light_green]"
-        # println(m1 * m2)
         return m1, ""
+    end
+
+    # ! ASSERTION ERROR
+    function error_message(io::IO, er::AssertionError)
+        return er.msg, ""
     end
 
     # ! catch all other errors
@@ -108,7 +119,7 @@ module stacktrace
 
     # ----------------------------- styling functions ---------------------------- #
     function style_error(io::IO, er)
-        width = 90
+        width = min(err_console.width, 120)
             
         if haskey(ErrorsExplanations, typeof(er))
             info_msg = ErrorsExplanations[typeof(er)]
@@ -131,7 +142,8 @@ module stacktrace
     end
 
     function style_backtrace(io::IO, t::Vector)
-        width = 90
+        # @info "styling backtrace"
+        width = min(err_console.width, 120)
 
         # create text
         stack_lines::Vector{String} = []
@@ -145,32 +157,34 @@ module stacktrace
             #     @info "skipped frame" frame
             end
         end
-    
+
         # highlight offending line
         if length(stack_lines) > 0
             error_line = Panel(
                 stack_lines[1],
                 title="error in",
-                width=90-8,
+                width=width-12,
                 style="dim blue",
                 title_style="yellow",
                 )
 
-
+            # @info 1
             above = TextBox(
                 stack_lines[2:end-1],
                 width=width-8
             )
-            
+            # @info 2 stack_lines[end] stack_lines[end][37:end]
             offending = Panel(
-                stack_lines[end][35:end],
+                stack_lines[end][37:end],
                 title="caused by",
-                width=90-8,
+                width=width-12,
                 style="dim blue",
                 title_style="yellow",
                 )
+            # @info 3
 
             stack = error_line / above / offending
+    
         else
             stack = "[dim]No stack trace[/dim]"
         end
@@ -195,21 +209,22 @@ module stacktrace
     function install_stacktrace()
         @eval begin
 
-
             # ---------------------------- handle load errors ---------------------------- #
             function Base.showerror(io::IO, ex::LoadError, bt; backtrace=true)
-                IS_LOAD_ERROR = true
                 println("\n")
+                # @info "loaderror" ex.error 
+                IS_LOAD_ERROR = true
 
                 stack = style_backtrace(io, bt)
+                # @info "error stack ready"
+
+
                 err, err_msg = style_error(io, ex.error)
+
+                # @info "error message ready"
             
                 # print or stack based on terminal size
-                if displaysize(io)[2] >= 180
-                    println((stack * err) / err_msg) 
-                else
-                    println(stack / err / err_msg)
-                end
+                println(stack / err / err_msg)
 
             end
 

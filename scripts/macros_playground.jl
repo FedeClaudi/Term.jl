@@ -3,6 +3,9 @@ using Revise
 Revise.revise()
 
 using Term
+import Term: install_stacktrace
+
+install_stacktrace()
 
 println(@green "Metaprogramming is great!")
 println(@underline "Made with [green]Term.jl[/green]")
