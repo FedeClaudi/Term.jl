@@ -1,9 +1,12 @@
-using InteractiveUtils
 
 module INSPECT
+    using InteractiveUtils
+
     include("__text_utils.jl")
 
-    import Term: highlight, theme, TextBox, hLine, Panel, Spacer
+    import Term: highlight, theme
+    import ..panel: Panel, TextBox
+    import ..layout: Spacer, hLine
     include("_inspect.jl")
 
     export inspect

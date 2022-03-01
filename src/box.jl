@@ -3,6 +3,7 @@ module box
 
     import ..segment: Segment
     import ..style: apply_style
+    import Term: int
 
     export get_row, get_title_row
     export ASCII, ASCII2, ASCII_DOUBLE_HEAD, SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
@@ -137,14 +138,30 @@ module box
 
           post = line.mid^(length(initial_line) - pre.measure.w - 1) * line.right
         
-        else
+        elseif justify == :right
           cut_start = get_next_valid_str_idx(initial_line, ncodeunits(initial_line)-8)
           post = Segment(
             "\e[0m" * " " * title * " " * Segment(initial_line[cut_start:end], style)
           )          
 
           pre = Segment(line.left * line.mid^(length(initial_line) - post.measure.w - 1), style)
-        end
+
+
+          else  # justify :center
+            cutval = int(ncodeunits(initial_line)/2 - ncodeunits(title)/2 - 15)
+            
+
+            cut_start = get_last_valid_str_idx(initial_line, cutval)
+            # @info width cutval cut_start length(initial_line) length(initial_line) ncodeunits(initial_line)
+
+            pre = Segment(
+              Segment(initial_line[1:cut_start], style) * "\e[0m" * " " * title * " "
+            )            
+  
+            post = line.mid^(length(initial_line) - pre.measure.w - 1) * line.right
+
+          end
+
         return pre * Segment(post, style)
         # return Segment(post, style)
       end

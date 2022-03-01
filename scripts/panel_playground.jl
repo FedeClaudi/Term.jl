@@ -17,6 +17,14 @@ import Term: split_lines
 # println("."^44)
 # print("\n\n")
 
+w = 32
+println(Panel(
+    "."^w,
+    title="TITLE",
+    title_justify=:center,
+    style="green",
+    width=2w
+))
 
 # print(
 #     Panel(
@@ -75,8 +83,8 @@ import Term: split_lines
 # println("."^44)
 # print("\n\n")
 
-print(TextBox(
-    "[red]red [blue]blue[/blue][green]green[/green]red[/red]"^50, title="test box!", title_style="bold red", width=44
-))
-println("."^44)
-print("\n\n")
+# print(TextBox(
+#     "[red]red [blue]blue[/blue][green]green[/green]red[/red]"^50, title="test box!", title_style="bold red", width=44
+# ))
+# println("."^44)
+# print("\n\n")

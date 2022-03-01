@@ -22,6 +22,7 @@ module Term
     include("layout.jl")
     include("panel.jl")
     include("inspect.jl")
+    include("stacktrace.jl")
 
 
     export RenderableText, Panel, TextBox
@@ -30,7 +31,7 @@ module Term
     export inspect
     export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
     export @bold, @dim, @italic, @underline, @style
-    export tprint
+    export tprint, install_stacktrace
 
     # ----------------------------------- base ----------------------------------- #
     import .measure
@@ -75,6 +76,8 @@ module Term
 
     # ---------------------------------- others ---------------------------------- #
     using .INSPECT: inspect
+
+    using .stacktrace: install_stacktrace
 
 
     tprint(x::AbstractString) = (println ∘ apply_style)(x)

@@ -30,7 +30,9 @@ module layout
         if lw == target_width
             return Padding("", "")
         else
-            @assert lw < target_width "\e[31mTarget width is $target_width but the text has width $lw: \e[0m\n   $text\n     Cleaned: '$(remove_ansi(remove_markup(text)))'"
+            if lw < target_width 
+                @debug "\e[31mTarget width is $target_width but the text has width $lw: \e[0m\n   $text\n     Cleaned: '$(remove_ansi(remove_markup(text)))'"
+            end
         end
         padding = " "^(target_width - lw -1)
         pad_width = Measure(padding).w
@@ -80,14 +82,6 @@ module layout
         # get dimensions of final renderable
         w1 = r1.measure.w
         w2 = r2.measure.w
-
-        # pad segments
-        # Δw = abs(w2-w1)
-        # if w1 > w2
-        #     r2.segments = [Segment(s.text * " "^Δw) for s in r2.segments]
-        # elseif w1 < w2
-        #     r1.segments = [Segment(s.text * " "^Δw) for s in r1.segments]
-        # end
 
         # create segments stack
         segments::Vector{Segment} = vcat(r1.segments, r2.segments)
@@ -207,7 +201,7 @@ module layout
     Constructor to create a styled vertical line of viven height.
 
     """
-    function vLine(height::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
+    function vLine(height::Number; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
         height = int(height)
         char = string(eval(box).head.left)
         segments = [Segment(char, style) for i in 1:height]
@@ -234,6 +228,29 @@ module layout
         width = int(width)
         char = eval(box).row.mid
         segments = [Segment(char^width, style)]
+        return hLine(segments, Measure(segments), width)
+    end
+
+    """
+        hLine(width::Number, text::String; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
+
+    Creates an hLine object with texte centered horizontally
+    """
+    function hLine(width::Number, text::String; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
+        box = eval(box)
+
+        initial_line = box.top.mid^width
+
+        cutval = int(ncodeunits(initial_line)/2 - ncodeunits(text) - 5)
+        cut_start = get_last_valid_str_idx(initial_line, cutval)
+
+        pre = Segment(
+          Segment(initial_line[1:cut_start], style) * "\e[0m" * " " * Segment(text, style) * " "
+        )            
+
+        post =  Segment(box.top.mid^(length(initial_line) - pre.measure.w - 1), style)
+
+        segments = [Segment(pre * (post), style)]
         return hLine(segments, Measure(segments), width)
     end
 end

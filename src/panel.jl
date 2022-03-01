@@ -63,7 +63,10 @@ module panel
         σ(s) = "[$style]$s[/$style]"  # applies the main style markup to a string to make a segment
 
         # get size of panel to fit the content
-        # content = Renderable(content; width=width)
+        if content isa AbstractString && !isnothing(width)
+            # content = rehsape_text(content, width-2)
+            content = do_by_line((ln)->rehsape_text(ln, width-4), content)
+        end
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
 
