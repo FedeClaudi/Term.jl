@@ -22,6 +22,11 @@ function remove_markup(input_text::AbstractString)::AbstractString
     return text
 end
 
+"""
+    remove_markup_open(text::AbstractString)
+
+Removes all opening markup tags from a piece of text
+"""
 remove_markup_open(text::AbstractString)::AbstractString = replace(text, OPEN_TAG_REGEX=>"")
 
 
@@ -42,7 +47,7 @@ function remove_ansi(str::AbstractString)
 end
 
 
-# ----------------------------------- misc ----------------------------------- #
+# --------------------------------- brackets --------------------------------- #
 const brackets_regexes = [
     (r"\[", "[["), (r"\]", "]]")
 ]
@@ -71,6 +76,10 @@ function unescape_brackets(text::AbstractString)::AbstractString
     return text
 end
 
+
+# ---------------------------------------------------------------------------- #
+#                                      I/O                                     #
+# ---------------------------------------------------------------------------- #
 """
     read_file_lines(path::String, start::Int, stop::Int)
 
@@ -174,8 +183,6 @@ function get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
         valid_chars[s2 : e2] .= 0
     end
     
-
-
     return valid_chars
 end
 
@@ -188,8 +195,6 @@ Given a long string of text, it reshapes it into N lines
 of fixed width
 """
 function rehsape_text(text::AbstractString, width::Int; indent::Bool=true)::AbstractString    
-    
-
     # get indentation spaces
     n_spaces = length(text) - length(strip(text))
     _indent = indent ? " "^n_spaces : ""

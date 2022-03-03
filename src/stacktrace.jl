@@ -11,10 +11,11 @@ module stacktrace
     export install_stacktrace
 
     const ErrorsExplanations = Dict(
-        AssertionError => "comes up when an assertion's check fails. For example `@assert 1==2` will throw an AssertionError",
-        BoundsError => "comes up when trying to acces a container at invalid position (e.g. a string a='abcd' with 4 characters cannot be accessed as a[5]).",
-        MethodError => "comes up when to method can be found with a given name and for a given set of argument types.",
-        UndefVarError => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
+        AssertionError  => "comes up when an assertion's check fails. For example `@assert 1==2` will throw an AssertionError",
+        BoundsError     => "comes up when trying to acces a container at invalid position (e.g. a string a='abcd' with 4 characters cannot be accessed as a[5]).",
+        ErrorException  => "is a generic error type",
+        MethodError     => "comes up when to method can be found with a given name and for a given set of argument types.",
+        UndefVarError   => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
     )
     
     IS_LOAD_ERROR = false
@@ -32,8 +33,38 @@ module stacktrace
 
 
     # --------------------------------- messages --------------------------------- #
-    # ! UNDEFVAR ERROR
-    error_message(io::IO, er::UndefVarError) =  "Undefined variable '$(_highlight(er.var))'.", ""
+
+    # ! ASSERTION ERROR
+    function error_message(io::IO, er::AssertionError)
+        return er.msg, ""
+    end
+
+    # ! BOUNDS ERROR
+    function error_message(io::IO, er::BoundsError)
+        # @info "bounds error" er fieldnames(typeof(er))
+        main_msg = "Attempted to access $(_highlight(er.a))$(_highlight(typeof(er.a))) at index $(_highlight(er.i))$(_highlight(typeof(er.i)))\n\n"
+
+        additional_msg = "[dim]no additional message found[/dim]"
+
+        if isdefined(er, :a)
+            if er.a isa AbstractString
+                nunits = ncodeunits(er.a)
+                additional_msg = "String has $nunits codeunits, $(length(er.a)) characters."
+            end
+        else
+            additional_msg ="[red]Variable is not defined!.[/red]" 
+        end
+        return main_msg, additional_msg
+    end
+
+    # ! EXCEPTION ERROR
+    function error_message(io::IO, er::ErrorException)
+        # @info "err exceprion" er fieldnames(ErrorException) er.msg
+        msg = split(er.msg, " around ")[1]
+        return msg, ""
+    end
+
+
 
     # ! METHOD ERROR
     _method_regexes = [
@@ -80,41 +111,25 @@ module stacktrace
             )
     end
 
-    # ! BOUNDS ERROR
-    function error_message(io::IO, er::BoundsError)
-        # @info "bounds error" er fieldnames(typeof(er))
-        main_msg = "Attempted to access $(_highlight(er.a))$(_highlight(typeof(er.a))) at index $(_highlight(er.i))$(_highlight(typeof(er.i)))\n\n"
+    # ! UNDEFVAR ERROR
+    error_message(io::IO, er::UndefVarError) =  "Undefined variable '$(_highlight(er.var))'.", ""
 
-        additional_msg = "[dim]no additional message found[/dim]"
+    
 
-        if isdefined(er, :a)
-            if er.a isa AbstractString
-                nunits = ncodeunits(er.a)
-                additional_msg = "String has $nunits codeunits, $(length(er.a)) characters."
-            end
-        else
-            additional_msg ="[red]Variable is not defined!.[/red]" 
-        end
-        return main_msg, additional_msg
-    end
-
-
-    # ! string index error
+    # ! STRING INDEX ERROR
     function error_message(io::IO, er::StringIndexError)
         # @info er typeof(er) fieldnames(typeof(er)) 
         m1 = "attempted to access a String at index $(er.index)\n"
         return m1, ""
     end
 
-    # ! ASSERTION ERROR
-    function error_message(io::IO, er::AssertionError)
-        return er.msg, ""
-    end
+
 
     # ! catch all other errors
     function error_message(io::IO, er) 
         @info er typeof(er) fieldnames(typeof(er)) 
-        return "no message for error of type $(typeof(er)), sorry.", ""
+        msg = hasfield(typeof(er), :msg) ? er.msg : "no message for error of type $(typeof(er)), sorry."
+        return msg, ""
     end
 
 
@@ -129,7 +144,7 @@ module stacktrace
         WIDTH = _width()
         main_message, message = error_message(io, er)
         return Panel(
-                main_message,
+            "[#FFCC80]" * main_message * "[/#FFCC80]",
                 message,
                 hLine(WIDTH-4; style="red dim"),
                 RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=WIDTH-4),
@@ -160,12 +175,12 @@ module stacktrace
             title=title,
             width=WIDTH-4,
             style="dim blue",
-            title_style="yellow",
+            title_style="bold bright_yellow",
         )
     end
 
     function style_backtrace(io::IO, t::Vector)
-        @info "styling backtrace"
+        # @info "styling backtrace"
         WIDTH = _width()
         
         # create text

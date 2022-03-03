@@ -4,6 +4,7 @@ Related:
 - https://github.com/Aerlinger/AnsiColor.jl
 
 
+
 ## Roadmap
 
 #### docs/examples
@@ -26,31 +27,30 @@ Related:
 - [ ] error's traceback
   - [ ] keep adding more error types
     - [ ]  type error
-    - [ ]  exception error
+    - [x]  exception error
     - [ ] LoadError
     - [ ] ArgumentError
   - [x] captures errors during error genereation
   - [x] panel width/stacking by console size
-  - [ ] show code in stack trace
-  - [ ] perhaps escape strings in error messages to avoi injecting styles
+  - [x] show code in stack trace
+  - [x] perhaps escape strings in error messages to avoi injecting styles
 - [ ] logging
 - [ ] pretty print common data structures
   - [x] highlight type info ::Type or <:Type
-- [ ] tree visualization
-    - [ ] type hierarchy tree for `inspect` (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
-  
+
 
 #### future features/improvements
 - [ ] progress bar
 - [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
-
+- [ ] tree visualization
+    - [ ] type hierarchy tree for `inspect` (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
+  
 - [ ] latex->unicode parsing (https://github.com/phfaist/pylatexenc)
 - [ ] markdown parsing
 - [ ] code syntax highlighting
-
 ## known bugs (and currently brocken stuff)
 - [ ] when highlighting with multiple styles something is still brocken
-- [ ] when applying markup occasionally out of bounds error
+- [x] when applying markup occasionally out of bounds error
 
 
 

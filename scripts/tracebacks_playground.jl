@@ -25,7 +25,10 @@ yet_another_function(z) = b(z)
 outer(y) = yet_another_function(y)
 
 # println(z)
-outer(2)
+1 = "a"
+
+# outer(2)
+
 
 # TODO load code and highlight https://juliadocs.github.io/Highlights.jl/stable/
 # TODO try getting error hints again

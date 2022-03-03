@@ -9,12 +9,17 @@ Stores colors for different semantically relevant items, used to
 style outputs to terminal.
 """
 @with_kw struct Theme
-    docstring::String = "#c8ffc8"
-    type::String = "#d880e7"
-    emphasis::String = "blue  bold"
-    emphasis_light::String = " #bfe0fd "
-    code::String = "#ffd77a"
-    multiline_code::String = "#ffd77a"
+    docstring::String       = "#D4E157"  # green
+    string::String          = "#A5D6A7"  # green
+    type::String            = "#d880e7"  # purple
+    emphasis::String        = "blue  bold"  
+    emphasis_light::String  = "#bfe0fd"  # pale green
+    code::String            = "#ffd77a"  # light blue
+    multiline_code::String  = "#ffd77a"  # light blue
+    symbol::String          = "#FFA726"  # orange
+    expression::String      = "#F48FB1"  # pink light
+    number::String          = "#90CAF9"  # blue
+    operator::String        = "#fc6262 bold" # operator
 end
 
 theme = Theme()  # default theme
@@ -47,6 +52,6 @@ abstract type CodeTheme <: AbstractTheme end
         STRING_DOC => S"fg: D4E157",
 
         # blue
-        NUMBER => S"fg: 5dc7fc"
+        NUMBER => S"fg: 90CAF9"
     ),
 )
