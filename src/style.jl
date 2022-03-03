@@ -54,7 +54,7 @@ module style
             elseif is_background(code)
                 setproperty!(style, :background, get_color(code; bg=true))
             elseif code != "nothing"
-                @warn "Code type not recognized: $code" tag tag.markup typeof(code)
+                @debug "Code type not recognized: $code" tag tag.markup typeof(code)
             end
         end
         return style

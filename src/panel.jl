@@ -1,5 +1,5 @@
 module panel
-    import Term: split_lines, get_last_valid_str_idx, rehsape_text, do_by_line, join_lines
+    import Term: split_lines, get_last_valid_str_idx, rehsape_text, do_by_line, join_lines, truncate
 
     import ..consoles: console
     import ..measure: Measure
@@ -172,7 +172,7 @@ module panel
 
     function TextBox(
         text::Union{Vector, AbstractString};
-        width::Union{Nothing, Symbol, Int}=88,
+        width::Union{Nothing, Int}=88,
         title::Union{Nothing, String}=nothing,
         title_style::Union{String, Nothing}="default",
         title_justify::Symbol=:left,
@@ -180,10 +180,14 @@ module panel
         subtitle_style::Union{String, Nothing}="default",
         subtitle_justify::Symbol=:left,
         justify::Symbol=:left,
+        fit::Symbol=:fit,
         )
 
-        if width != :fit
-            width = isnothing(width) ? console.width-4 : width
+        # fit text
+        width = isnothing(width) ? console.width-4 : width
+        if fit == :truncate
+            text = do_by_line(ln->truncate(ln, width-4), text)
+        elseif fit != :fit
             text = do_by_line((ln)->rehsape_text(ln, width-4), text)
         end
         # @info "\e[31mReshaped text" text Measure(text) width

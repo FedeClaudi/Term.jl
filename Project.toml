@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Highlights = "eafb193a-b7ab-5a9e-9068-77385905fa72"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 IterTools = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"

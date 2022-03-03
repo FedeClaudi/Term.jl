@@ -1,4 +1,8 @@
 
+Related:
+- https://github.com/KristofferC/Crayons.jl
+- https://github.com/Aerlinger/AnsiColor.jl
+
 
 ## Roadmap
 
@@ -13,6 +17,7 @@
   - [ ] textbox/panels + nesting
   - [ ] layout: stacking + layout objects
   - [ ] inspect
+  - [ ] errors
 
 
 #### features
@@ -20,6 +25,10 @@
 
 - [ ] error's traceback
   - [ ] keep adding more error types
+    - [ ]  type error
+    - [ ]  exception error
+    - [ ] LoadError
+    - [ ] ArgumentError
   - [x] captures errors during error genereation
   - [x] panel width/stacking by console size
   - [ ] show code in stack trace
@@ -31,8 +40,8 @@
     - [ ] type hierarchy tree for `inspect` (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
   
 
-#### possible future features/improvements
-- [x] `Console` like object using `displaysize()` to get width
+#### future features/improvements
+- [ ] progress bar
 - [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
 
 - [ ] latex->unicode parsing (https://github.com/phfaist/pylatexenc)
@@ -51,6 +60,7 @@
 - [x] inspect
   - [x] type/struct inspection
   - [x] method inspection
+- [x] `Console` like object using `displaysize()` to get width
 
 - [x] `tprint`
 - [x] macros for styling a string

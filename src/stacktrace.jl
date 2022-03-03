@@ -1,12 +1,12 @@
 module stacktrace
-
     import Base: InterpreterIP, show_method_candidates, ExceptionStack
 
-    import Term: theme, highlight, rehsape_text
+    import Term: theme, highlight, rehsape_text, read_file_lines, load_code_and_highlight, split_lines
+    import Term.style: apply_style
     import ..panel: Panel, TextBox
     import ..renderables: RenderableText
     import ..layout: hLine
-    import ..consoles: err_console
+    import ..consoles: Console
 
     export install_stacktrace
 
@@ -18,6 +18,7 @@ module stacktrace
     )
     
     IS_LOAD_ERROR = false
+    _width() = min(Console(stderr).width, 120)
 
     _highlight(x::Union{Symbol, AbstractString}) = "[bold salmon1 underline]$x[/bold salmon1 underline]"
     _highlight(x::Number) = "[bold blue]$x[/bold blue]"
@@ -72,7 +73,7 @@ module stacktrace
 
         return main_line * "\n",  Panel(
             "\n" * join(candidates, "\n"),
-            width=min(err_console, 120) - 10,
+            width=_width() - 10,
             title="closest candidates",
             title_style="yellow",
             style="blue dim",
@@ -119,69 +120,101 @@ module stacktrace
 
     # ----------------------------- styling functions ---------------------------- #
     function style_error(io::IO, er)
-        width = min(err_console.width, 120)
-            
         if haskey(ErrorsExplanations, typeof(er))
             info_msg = ErrorsExplanations[typeof(er)]
         else
             info_msg = "no additional info available."
         end
         
+        WIDTH = _width()
         main_message, message = error_message(io, er)
         return Panel(
                 main_message,
                 message,
-                hLine(width-4; style="red dim"),
-                RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=width-4),
+                hLine(WIDTH-4; style="red dim"),
+                RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=WIDTH-4),
                 title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
                 title_style="red",
                 style = "dim red",
-                width=width,
+                width=WIDTH,
                 title_justify=:center,
             ),  RenderableText("\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message")
     end
 
-    function style_backtrace(io::IO, t::Vector)
-        # @info "styling backtrace"
-        width = min(err_console.width, 120)
 
+
+    function backtrace_subpanel(line::String, WIDTH::Int, title::String)
+
+        # get path to file and line number
+        file = split(split_lines(line)[2], " [bold dim]")[1][13:end]
+        file, lineno = split(file, ":")
+        lineno = parse(Int, lineno)
+        
+        # read and highlight text
+        code = load_code_and_highlight(file, lineno; δ=3)
+
+        return Panel(
+            "\n",
+            line,
+            TextBox(code, width=WIDTH-6),
+            title=title,
+            width=WIDTH-4,
+            style="dim blue",
+            title_style="yellow",
+        )
+    end
+
+    function style_backtrace(io::IO, t::Vector)
+        @info "styling backtrace"
+        WIDTH = _width()
+        
         # create text
         stack_lines::Vector{String} = []
         for (n, frame) in enumerate(t)
             if typeof(frame) ∉ (Ptr{Nothing}, InterpreterIP)
-
                 func_line = "[light_yellow3]($n)[/light_yellow3] [sky_blue3]$(frame.func)[/sky_blue3]"
                 file_line = "       [dim]$(frame.file):$(frame.line) [bold dim](line: $(frame.line))[/bold dim][/dim]"
                 push!(stack_lines, func_line * "\n" * file_line * "\n" )
-            # else
-            #     @info "skipped frame" frame
+
             end
         end
 
-        # highlight offending line
+        # create layout
+        # @info "creating stack panels" length(stack_lines)
         if length(stack_lines) > 0
-            error_line = Panel(
-                stack_lines[1],
-                title="error in",
-                width=width-12,
-                style="dim blue",
-                title_style="yellow",
-                )
+            if length(stack_lines) > 1
+                error_line = backtrace_subpanel(stack_lines[1], WIDTH, "error in")
+            else
+                error_line = ""
+            end
 
-            # @info 1
-            above = TextBox(
-                stack_lines[2:end-1],
-                width=width-8
-            )
-            # @info 2 stack_lines[end] stack_lines[end][37:end]
-            offending = Panel(
-                stack_lines[end][37:end],
+            # @info 1 error_line
+            if length(stack_lines) > 3
+                above = TextBox(
+                    stack_lines[2:end-1],
+                    width=WIDTH-8
+                )
+            elseif length(stack_lines) > 2
+                above = TextBox(
+                    stack_lines[2],
+                    width=WIDTH-8
+                )
+            else
+                above = ""
+            end
+
+            # @info 2 above
+            offending = backtrace_subpanel(stack_lines[end], WIDTH, "caused by")
+
+            
+            Panel(
+                stack_lines[end],
                 title="caused by",
-                width=width-12,
+                width=WIDTH-12,
                 style="dim blue",
                 title_style="yellow",
                 )
-            # @info 3
+            # @info 3 offending
 
             stack = error_line / above / offending
     
@@ -196,12 +229,10 @@ module stacktrace
                 style="yellow dim",
                 title_style="yellow",
                 title_justify=:center,
-                width=width
+                width=WIDTH
             )
         
     end
-
-
 
     # ---------------------------------------------------------------------------- #
     #                              INSTALL TRACESTACK                              #
@@ -211,20 +242,23 @@ module stacktrace
 
             # ---------------------------- handle load errors ---------------------------- #
             function Base.showerror(io::IO, ex::LoadError, bt; backtrace=true)
-                println("\n")
-                # @info "loaderror" ex.error 
-                IS_LOAD_ERROR = true
+                try
+                    println("\n")
+                    # @info "loaderror" ex.error 
+                    IS_LOAD_ERROR = true
 
-                stack = style_backtrace(io, bt)
-                # @info "error stack ready"
+                    stack = style_backtrace(io, bt)
+                    # @info "error stack ready"
 
 
-                err, err_msg = style_error(io, ex.error)
-
-                # @info "error message ready"
-            
-                # print or stack based on terminal size
-                println(stack / err / err_msg)
+                    err, err_msg = style_error(io, ex.error)
+                    # @info "error message ready" stack err err_msg
+                
+                    # print or stack based on terminal size
+                    println(stack / err / err_msg)
+                catch err
+                    @warn "Failed to render error $ex" ex bt err
+                end
 
             end
 
@@ -236,15 +270,7 @@ module stacktrace
             """
 
             function Base.display_error(io::IO, er, bt)
-                @warn "in: display_error" IS_LOAD_ERROR er bt
-            #     if !IS_LOAD_ERROR
-                    
-            # #         stack = style_backtrace(io, bt)
-            # #         err = style_error(io, ex.error)
-            #         println(style_error(io, er))
-            # #         # println(style_error(io, er))
-            # #         println(stack / err)
-            #     end
+                @debug "in: display_error" IS_LOAD_ERROR er bt
             end
             
             
@@ -254,8 +280,7 @@ module stacktrace
             """
 
             function Base.show_backtrace(io::IO, t::Vector) 
-                @warn "in: show_backtrace" io t
-                # println(style_backtrace(io, t))              
+                @debug "in: show_backtrace" io t
             end
         end
     end

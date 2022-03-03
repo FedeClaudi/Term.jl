@@ -70,6 +70,21 @@ function unescape_brackets(text::AbstractString)::AbstractString
     end
     return text
 end
+
+"""
+    read_file_lines(path::String, start::Int, stop::Int)
+
+Reads a file and selects only lines in range start -> stop
+"""
+function read_file_lines(path::AbstractString, start::Int, stop::Int) 
+    start = start < 1 ? 1 : start
+    stop = stop >= countlines(path) ? countlines(path) : stop
+    lines = readlines(path; keep=true)
+    return [(n, ln) for (n, ln) in enumerate(lines)][start:stop]
+
+end
+
+
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
@@ -129,6 +144,15 @@ function split_lines(renderable)
 end
 
 # ------------------------------- reshape text ------------------------------- #
+function truncate(text::AbstractString, width::Int)
+    if textlen(text) <= width
+        return text
+    end
+
+    cut = get_last_valid_str_idx(text, width)
+    return text[1:cut] * "..."
+end
+
 """
 recursively extracts character tags from tags
 """
@@ -136,19 +160,26 @@ function get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
     # get correct start/stop positions
     s1, e1 = δ+tag.open.start, δ+tag.open.stop
     s2, e2 = δ+tag.close.start, δ+tag.close.stop
-    
+
+
     # do nested tags
     for inner in tag.inner_tags
         get_valid_chars!(valid_chars, inner, e1)
     end
 
-    valid_chars[s1 : e1] .= 0
-    valid_chars[s2 : e2] .= 0
+    if s2 > length(valid_chars)
+        @warn "How can tag close after valid chars?" tag tag.open tag.close length(valid_chars) tag.text
+    else
+        valid_chars[s1 : e1] .= 0
+        valid_chars[s2 : e2] .= 0
+    end
+    
+
 
     return valid_chars
 end
 
-
+textlen(x) = (length ∘ remove_markup ∘ remove_markup_open ∘ remove_ansi)(x)
 
 """
     rehsape_text(text::AbstractString, width::Int)
@@ -156,10 +187,15 @@ end
 Given a long string of text, it reshapes it into N lines
 of fixed width
 """
-function rehsape_text(text::AbstractString, width::Int)::AbstractString    
-    len(x) = (length ∘ remove_markup ∘ remove_markup_open)(x)
+function rehsape_text(text::AbstractString, width::Int; indent::Bool=true)::AbstractString    
+    
+
+    # get indentation spaces
+    n_spaces = length(text) - length(strip(text))
+    _indent = indent ? " "^n_spaces : ""
+
     # check if no work is required
-    if len(text) <= width
+    if textlen(text) <= width
         return text
     end
 
@@ -181,7 +217,7 @@ function rehsape_text(text::AbstractString, width::Int)::AbstractString
     # create lines with splitted tex
     lines::Vector{AbstractString} = []
     j = 1
-    while len(text)>width
+    while textlen(text)>width
 
         # get a cutting index not in a tag's markup
         condition = (cumsum(valid_chars[j : end]) .<= width) .& valid_chars[j : end] .==1
@@ -192,8 +228,9 @@ function rehsape_text(text::AbstractString, width::Int)::AbstractString
         end
 
         # prep line
+
         push!(lines, text[1:cut])
-        text = text[cut+1:end]
+        text = _indent * text[cut+1:end]
         j += cut
 
         # @info "\e[32mmade line" lines[end] cut j width length(text) len(text) text Measure(lines[end])
@@ -220,6 +257,10 @@ function rehsape_text(text::AbstractString, width::Int)::AbstractString
     # println("join   ", join_lines(pairup_tags(lines)))
     return join_lines(pairup_tags(lines))
 end
+
+
+
+
 
 # ------------------------------------ end ----------------------------------- #
 

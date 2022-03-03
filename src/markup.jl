@@ -48,7 +48,8 @@ module markup
 
 
     # ---------------------------- extract markup tags --------------------------- #
-    has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, remove_ansi(text))
+    # has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, remove_ansi(text))
+    has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, text)
 
     
     function extract_markup(input_text::AbstractString; firstonly=false)
@@ -71,6 +72,7 @@ module markup
                 else
                     # otherwise inject a closer tag at the end
                     text = text * "[/$(tag_open.markup)]"
+                    input_text = input_text * "[/$(tag_open.markup)]"
                     tag_close = SingleTag(text, match(close_regex, text, tag_open.start))
                 end
             else
@@ -80,6 +82,7 @@ module markup
             # crate tag and keep
             _start = tag_open.stop+1
             _stop = tag_close.start-1
+
 
             _start = !isvalid(text, _start) ? get_next_valid_str_idx(text, _start) : _start
             _stop = !isvalid(text, _stop) ? get_last_valid_str_idx(text, _stop) : _stop

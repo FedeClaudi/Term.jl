@@ -93,7 +93,7 @@ module introspection
     Also shows constructors for the type and methods making use of the type.
     """
     function inspect(type::DataType; width::Union{Nothing, Int}=nothing, max_n_methods::Int=3)
-        width = isnothing(width) ? min(console.width, 120)-4 : width-4
+        width = isnothing(width) ? min(console.width, 92)-4 : width-4
         # extract type info
         info = TypeInfo(type)
 
@@ -205,7 +205,7 @@ module introspection
     Inspects `Function` objects providing docstrings, and methods signatures.
     """
     function inspect(fun::Function; width::Union{Nothing, Int}=nothing, max_n_methods::Int = 7)
-        width = isnothing(width) ? min(console.width, 120) : width
+        width = isnothing(width) ? min(console.width, 92) : width
 
         info = TypeInfo(fun)
 

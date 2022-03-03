@@ -1,3 +1,8 @@
+using Highlights.Format
+import Highlights: Lexers
+import Highlights: highlight as _highlight
+
+# ------------------------------- highlighting ------------------------------- #
 const highlight_regexes = Dict(
     :multiline_code => [ r"\`\`\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \# \s \? \{ \}  \_ \- \: \!\ \" \> \'\s]*\`\`\`"],
     :code =>[r"\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \#\s \_ \- \: \!\ \? \{ \} \" \> \'\s]*\`"], 
@@ -49,4 +54,98 @@ relevant text of type :like.
 function highlight(text::AbstractString, theme::Theme, like::Symbol)
     markup = getfield(theme, like)
     return do_by_line(x->"[$markup]$x[/$markup]", chomp(text))
+end
+
+
+# ------------------------------ Highlighters.jl ----------------------------- #
+
+
+"""
+custom ANSI lexer https://juliadocs.github.io/Highlights.jl/stable/man/formatting/
+for Highlighters.jl
+"""
+function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
+    for (str, id, style) in tokens
+        fg = style.fg.active ? map(Int, (style.fg.r, style.fg.g, style.fg.b)) : ""
+        bg = style.bg.active ? map(Int, (style.bg.r, style.bg.g, style.bg.b)) : nothing
+        
+
+        bold = style.bold ? "bold" : ""
+        italic = style.italic ? "italic" : ""
+        underline = style.underline ? "underline" : ""        
+        bg = isnothing(bg) ? "" : "on_$(bg)"
+        markup = "$fg $(bg) $(bold) $(italic) $(underline)"
+        if length(strip(markup)) > 0
+            print(io, "[$markup]$str[/$markup]")
+        else
+            print(io, str)
+        end
+    end
+end
+
+
+function highlight_syntax(code::AbstractString; style::Bool=true) 
+    txt = sprint(_highlight, MIME("text/ansi"), escape_brackets(code), Lexers.JuliaLexer, CodeTheme; context=stdout)
+
+    if style
+        # txt = escape_brackets(txt)
+        # txt = apply_style("[$markup]$(txt)[/$markup]")
+        # txt = unescape_brackets(txt)
+        txt = apply_style(txt)
+    end
+
+    return txt
+end
+
+
+"""
+    load_code_and_highlighy(path::AbstractString, lineno::Int; δ::Int=3, width::INt=120)
+
+Loads a file, gets the code and formats it. Returns styled text
+"""
+function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int=3)
+    η = countlines(path)
+    @assert lineno > 0 "lineno must be ≥1"
+    @assert lineno ≤ η "lineno $lineno too high for file with $(η) lines"
+
+    lines = read_file_lines(path, lineno-9, lineno+10)
+    linenos = [ln[1] for ln in lines]
+    lines = [ln[2] for ln in lines]
+    code =  split(highlight_syntax(join(lines); style=false), "\n")
+
+    # clean
+    clean(line) =replace(line, "    [/    ]"=>"")
+    codelines = clean.(code)  # [10-δ:10+δ]
+    linenos = linenos  # [10-δ:10+δ]
+
+    # make n lines match
+    if lineno ≤  δ
+        codelines = clean.(code)[1:lineno+δ]
+        linenos = linenos[1:lineno+δ]
+    elseif η - lineno ≤ δ
+        codelines = clean.(code)[end-δ:end]
+        linenos = linenos[end-δ:end]
+    else
+        codelines = clean.(code)[10-δ:10+δ]
+        linenos = linenos[10-δ:10+δ]
+    end
+
+    # format
+    cleaned_lines = []
+    for (n, line) in zip(linenos, codelines)        
+        # style
+        if n == lineno
+            symb = "[red bold]▶[/red bold]"
+            color = "white"
+        else
+            symb = " "
+            color = "grey39"
+        end
+
+        # end
+        line = symb * " [$color]$n[/$color] " * line
+        push!(cleaned_lines, line)
+    end
+
+    return join(cleaned_lines, "\n")
 end
