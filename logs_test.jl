@@ -5,6 +5,9 @@ import Term: install_stacktrace
 
 install_stacktrace()
 
+# TODO use: https://julialogging.github.io/tutorials/working-with-loggers/
+# TODO add loglevel colors to theme
+
 struct CodeNode
     mod::String
     fn::Union{Nothing, String}
@@ -63,21 +66,25 @@ macro tinfo(args...)
 
             elseif arg isa Symbol
                 val = nothing
-                try
-                    # val = eval(arg)
-                    val = $(arg)
-                catch
-                    val = "[bold red]not a valid symbol![/bold red]"   
-                end
+                # try
+                #     # val = eval(arg)
+                #     val = $(arg)
+                # catch
+                #     val = "[bold red]not a valid symbol![/bold red]"   
+                # end
                 _line *= "[$(theme.symbol)]:$arg[/$(theme.symbol)] $val"
 
-            elseif arg isa Expr
-                # e = Expr(:kw, Symbol(arg), esc(arg))
-                # println(e)
+            # elseif arg isa Expr
+            #     throw("not implemented")
+            #     # e = Expr(:kw, Symbol(arg), esc(arg))
+            #     # println(e)
             
-                # _line *= "[$(theme.expression)]$arg[/$(theme.expression)] [$(theme.operator)]=[/$(theme.operator)] [italic]$(eval(arg))[/italic]"
-                _line *= "[$(theme.expression)]$arg[/$(theme.expression)]"
-
+            #     # _line *= "[$(theme.expression)]$arg[/$(theme.expression)] [$(theme.operator)]=[/$(theme.operator)] [italic]$(eval(arg))[/italic]"
+            #     # _line *= "[$(theme.expression)]$arg[/$(theme.expression)]"
+            # elseif arg isa Function
+            #     throw("not implemented")
+            # elseif arg isa DataType
+            #     throw("not implemented")
             else
                 _line *= "$arg"
             end
@@ -97,13 +104,10 @@ end
 
 function foo()
     x = 1
-    @info "this sis sodifsdfnso" 1+1 x 2x
-    @tinfo "this sis sodifsdfnso" 1+1 x 2x
+    @info "this is a string" 1+1 x 2x
+    @tinfo "this is a string" 1+1 x 2x
 end
 
 foo()
 
-# TODO fix error in errors.jl line 203
-# TODO eval expressions
-# TODO get variable value
-# see: https://github.com/JuliaLang/julia/blob/2f67b51c70280cf7f0f2da5de2e7769da0d49869/base/logging.jl#L323
+# TODO: use https://julialogging.github.io/tutorials/implement-a-new-logger/

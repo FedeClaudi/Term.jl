@@ -20,7 +20,6 @@ module errors
         UndefVarError   => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
     )
     
-    IS_LOAD_ERROR = false
     _width() = min(Console(stderr).width, 120)
 
     _highlight(x::Union{Symbol, AbstractString}) = "[bold salmon1 underline]$x[/bold salmon1 underline]"
@@ -74,8 +73,10 @@ module errors
     # ! LoadError
     function error_message(io::IO, er::LoadError)
         # @warn "load err" er fieldnames(ErrorException)
-        msg =  hasfield(typeof(er), :msg) ? er.msg : "load error - no message."
-        return msg, ""
+        # msg =  hasfield(typeof(er), :msg) ? er.msg : string(er)
+        msg = "at [dim]$(er.file) line $(er.line)[/dim]"
+        subm = "Original error: [red]$(er.error)[/red]"
+        return msg, subm
     end
 
     # ! METHOD ERROR
@@ -292,16 +293,20 @@ module errors
 
             # ---------------------------- handle load errors ---------------------------- #
             function Base.showerror(io::IO, ex::LoadError, bt; backtrace=true)
+                Base.showerror(io, ex.error, bt; backtrace=true)
+            end
+
+
+            function Base.showerror(io::IO, ex, bt; backtrace=true)
                 try
                     println("\n")
                     # @info "loaderror" typeof(ex.error) ex.error 
-                    IS_LOAD_ERROR = true
 
                     stack = style_backtrace(io, bt)
                     # @info "error stack ready"
 
 
-                    err, err_msg = style_error(io, ex.error)
+                    err, err_msg = style_error(io, ex)
                     # @info "error message ready" stack err err_msg
                 
                     # print or stack based on terminal size
@@ -346,7 +351,10 @@ module errors
             """
 
             function Base.display_error(io::IO, er, bt)
-                @debug "in: display_error"
+                @debug "in: display_error" er typeof(er) fieldnames(typeof(er)) bt
+                # if er isa LoadError
+                #     Base.showerror(io, er.error, bt)
+                # end
             end
             
             
@@ -356,7 +364,7 @@ module errors
             """
 
             function Base.show_backtrace(io::IO, t::Vector) 
-                @debug "in: show_backtrace"
+                @warn "in: show_backtrace" t
             end
         end
     end

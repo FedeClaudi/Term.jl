@@ -131,7 +131,16 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int=3)
     end
 
     # format
-    dedent = textlen(codelines[1]) - textlen(lstrip(remove_markup(remove_markup_open(codelines[1]))))
+    _len = textlen ∘ lstrip ∘ remove_markup ∘ remove_markup_open
+    dedent = 100
+    for ln in codelines
+        if _len(ln) > 1
+            dedent = min(dedent, textlen(ln) - _len(ln))
+        end
+    end
+    dedent = dedent < 1 ? 1 : dedent
+
+
     cleaned_lines = []
     for (n, line) in zip(linenos, codelines)      
         # style
@@ -144,7 +153,8 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int=3)
         end
 
         # end
-        line = symb * " [$color]$n[/$color] " * line[dedent:end]
+        line = textlen(line) > 1 ? line[dedent:end] : line
+        line = symb * " [$color]$n[/$color] " * line
         push!(cleaned_lines, line)
     end
 

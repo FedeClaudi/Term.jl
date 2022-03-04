@@ -22,6 +22,9 @@ Related:
 
 
 #### features
+
+- [ ] collect code extracting, styling file info. Highlight file name
+
 - [x] titleline : hLine with title centered in the middle
 
 - [ ] error's traceback
