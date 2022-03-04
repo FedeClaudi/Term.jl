@@ -23,7 +23,7 @@ module Term
     include("layout.jl")
     include("panel.jl")
     include("inspect.jl")
-    include("stacktrace.jl")
+    include("errors.jl")
 
 
     export RenderableText, Panel, TextBox
@@ -79,7 +79,7 @@ module Term
     # ---------------------------------- others ---------------------------------- #
     using .introspection: inspect
 
-    using .stacktrace: install_stacktrace
+    using .errors: install_stacktrace
 
 
     tprint(x::AbstractString) = (println ∘ apply_style)(x)

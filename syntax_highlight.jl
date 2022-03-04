@@ -1,5 +1,5 @@
 import Term: highlight_syntax, read_file_lines
-import Term.style: apply_style, rehsape_text
+import Term.style: apply_style, reshape_text
 
 import Term: hLine, TextBox
 

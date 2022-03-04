@@ -1,5 +1,5 @@
 module panel
-    import Term: split_lines, get_last_valid_str_idx, rehsape_text, do_by_line, join_lines, truncate
+    import Term: split_lines, get_last_valid_str_idx, reshape_text, do_by_line, join_lines, truncate
 
     import ..consoles: console
     import ..measure: Measure
@@ -65,8 +65,8 @@ module panel
 
         # get size of panel to fit the content
         if content isa AbstractString && !isnothing(width)
-            # content = rehsape_text(content, width-2)
-            content = do_by_line((ln)->rehsape_text(ln, width-4), content)
+            # content = reshape_text(content, width-2)
+            content = do_by_line((ln)->reshape_text(ln, width-4), content)
         end
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
@@ -188,9 +188,9 @@ module panel
         if fit == :truncate
             text = do_by_line(ln->truncate(ln, width-4), text)
         elseif fit != :fit
-            text = do_by_line((ln)->rehsape_text(ln, width-4), text)
+            text = do_by_line((ln)->reshape_text(ln, width-4), text)
         end
-        # @info "\e[31mReshaped text" text Measure(text) width
+        # @info "\e[31mReshaped text" Measure(text) width
 
         panel = Panel(
             text,
@@ -204,9 +204,9 @@ module panel
             justify=justify,
             width=width
         )
-        
 
         return TextBox(panel.segments, panel.measure)
+
     end
 
     TextBox(texts...;kwargs...) = TextBox(join_lines(texts); kwargs...)

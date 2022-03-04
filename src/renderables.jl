@@ -2,7 +2,7 @@ module renderables
 
     import ..measure: Measure    
     import ..segment: Segment
-    import Term: split_lines, rehsape_text, do_by_line
+    import Term: split_lines, reshape_text, do_by_line
 
 
     export AbstractRenderable, Renderable, RenderableText
@@ -50,7 +50,6 @@ module renderables
     Renderable(ren::AbstractRenderable; width::Union{Nothing, Int}=nothing) = ren  # returns the renderable
     Renderable(segment::Segment; width::Union{Nothing, Int}=nothing) = Renderable([segment], Measure([segment]))
 
-
     # ---------------------------------------------------------------------------- #
     #                                TEXT RENDERABLE                               #
     # ---------------------------------------------------------------------------- #
@@ -63,7 +62,7 @@ module renderables
     function RenderableText(text::AbstractString; width::Union{Nothing, Int}=nothing)
         # @info "creating RenderableText"  text width
         if !isnothing(width)
-            text = do_by_line((ln)->rehsape_text(ln, width), text)
+            text = do_by_line((ln)->reshape_text(ln, width), text)
         end
 
         
@@ -76,10 +75,11 @@ module renderables
     end
 
     RenderableText(text::Vector{AbstractString}; width::Union{Nothing, Int}=nothing) = RenderableText(join(text, "\n"); width=width)
+    RenderableText(text::Vector; width::Union{Nothing, Int}=nothing) = RenderableText(join(text, "\n"); width=width)
 
     function RenderableText(text::AbstractString, style::AbstractString; width::Union{Nothing, Int}=nothing)
         if !isnothing(width)
-            text = do_by_line((ln)->rehsape_text(ln, width), text)
+            text = do_by_line((ln)->reshape_text(ln, width), text)
         end
         segments = [Segment(line, style) for line in split_lines(text)]
         return RenderableText(segments, Measure(segments), text)

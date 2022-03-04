@@ -189,15 +189,18 @@ end
 textlen(x) = (length ∘ remove_markup ∘ remove_markup_open ∘ remove_ansi)(x)
 
 """
-    rehsape_text(text::AbstractString, width::Int)
+    reshape_text(text::AbstractString, width::Int)
 
 Given a long string of text, it reshapes it into N lines
 of fixed width
 """
-function rehsape_text(text::AbstractString, width::Int; indent::Bool=true)::AbstractString    
+function reshape_text(text::AbstractString, width::Int; indent::Bool=false)::AbstractString    
     # get indentation spaces
-    n_spaces = length(text) - length(strip(text))
-    _indent = indent ? " "^n_spaces : ""
+    # TODO indentation buggy, fix in the future
+    # n_spaces = length(text) - length(strip(text))
+    # n_spaces = n_spaces < 1 ? 1 : n_spaces
+    # _indent = indent ? " "^n_spaces : ""
+    _indent = ""
 
     # check if no work is required
     if textlen(text) <= width
@@ -233,10 +236,13 @@ function rehsape_text(text::AbstractString, width::Int; indent::Bool=true)::Abst
         end
 
         # prep line
-
-        push!(lines, text[1:cut])
-        text = _indent * text[cut+1:end]
-        j += cut
+        try
+            push!(lines, text[1:cut])
+            text = _indent * text[cut+1:end]
+            j += cut
+        catch err
+            throw("Failed to reshape text: $err - target width: $width")
+        end
 
         # @info "\e[32mmade line" lines[end] cut j width length(text) len(text) text Measure(lines[end])
     end
@@ -256,10 +262,7 @@ function rehsape_text(text::AbstractString, width::Int; indent::Bool=true)::Abst
             lines[n] = line * " "^(width-ll)
         end
     end
-    # @info "lines" lines length(lines) lines[1] lines[2]
-    # println("1 -----    ", lines[1])
-    # println("2 -----    ", lines[2])
-    # println("join   ", join_lines(pairup_tags(lines)))
+    
     return join_lines(pairup_tags(lines))
 end
 

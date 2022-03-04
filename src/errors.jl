@@ -1,7 +1,7 @@
-module stacktrace
+module errors
     import Base: InterpreterIP, show_method_candidates, ExceptionStack
 
-    import Term: theme, highlight, rehsape_text, read_file_lines, load_code_and_highlight, split_lines
+    import Term: theme, highlight, reshape_text, read_file_lines, load_code_and_highlight, split_lines, tprint
     import Term.style: apply_style
     import ..panel: Panel, TextBox
     import ..renderables: RenderableText
@@ -11,9 +11,11 @@ module stacktrace
     export install_stacktrace
 
     const ErrorsExplanations = Dict(
+        ArgumentError   => "The parameters to a function call do not match a valid signature.",
         AssertionError  => "comes up when an assertion's check fails. For example `@assert 1==2` will throw an AssertionError",
         BoundsError     => "comes up when trying to acces a container at invalid position (e.g. a string a='abcd' with 4 characters cannot be accessed as a[5]).",
         ErrorException  => "is a generic error type",
+        LoadError       => "occurs while using 'include', 'require' or 'using'",
         MethodError     => "comes up when to method can be found with a given name and for a given set of argument types.",
         UndefVarError   => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
     )
@@ -33,6 +35,11 @@ module stacktrace
 
 
     # --------------------------------- messages --------------------------------- #
+
+    # ! ARGUMENT ERROR
+    function error_message(io::IO, er::ArgumentError)
+        return er.msg, ""
+    end
 
     # ! ASSERTION ERROR
     function error_message(io::IO, er::AssertionError)
@@ -64,7 +71,12 @@ module stacktrace
         return msg, ""
     end
 
-
+    # ! LoadError
+    # function error_message(io::IO, er::LoadError)
+    #     # @warn "load err" er fieldnames(ErrorException)
+    #     msg =  er.msg
+    #     return msg, ""
+    # end
 
     # ! METHOD ERROR
     _method_regexes = [
@@ -76,7 +88,8 @@ module stacktrace
 
         # get main error message
         _args = join([string(ar)*_highlight(typeof(ar)) for ar in er.args], ", ")
-        main_line = "No method matching $(_highlight(string(er.f)))(" * _args * ")"
+        fn_name = "$(_highlight(string(er.f)))"
+        main_line = "No method matching $fn_name(" * _args * ")"
 
         # get recomended candidates
         _candidates = split(sprint(show_method_candidates, er; context=io), "\n")
@@ -85,7 +98,7 @@ module stacktrace
         for can in _candidates[3:end-1]
             fun, file = split(can, " at ")
             name, args = split(fun, "(", limit=2)
-            name = "[red]$name[/red]"
+            # name = "[red]$name[/red]"
 
             for regex in _method_regexes
                 for match in collect(eachmatch(regex, args))
@@ -95,8 +108,8 @@ module stacktrace
 
             file, lineno = split(file, ":")
 
-            println(RenderableText(name, "red"))
-            push!(candidates, "   " * name * "("*args)
+            # println(RenderableText(name, "red"))
+            push!(candidates, "   " * fn_name * "("*args)
             push!(candidates, "[dim]$file [bold dim](line: $lineno)[/bold dim][/dim]\n")
 
         end
@@ -112,9 +125,12 @@ module stacktrace
     end
 
     # ! UNDEFVAR ERROR
-    error_message(io::IO, er::UndefVarError) =  "Undefined variable '$(_highlight(er.var))'.", ""
+    function error_message(io::IO, er::UndefVarError) 
+        # @info "undef var error" er er.var typeof(er.var)
+        var = string(er.var)
+        "Undefined variable '$(_highlight(er.var))'.", ""
+    end
 
-    
 
     # ! STRING INDEX ERROR
     function error_message(io::IO, er::StringIndexError)
@@ -128,8 +144,15 @@ module stacktrace
     # ! catch all other errors
     function error_message(io::IO, er) 
         @info er typeof(er) fieldnames(typeof(er)) 
-        msg = hasfield(typeof(er), :msg) ? er.msg : "no message for error of type $(typeof(er)), sorry."
-        return msg, ""
+        if hasfield(typeof(er), :error)
+            # @info "nested error" typeof(er.error)
+            m1, m2 = error_message(io, er.error)
+            msg = "[bold red]LoadError:[/bold red]\n" * m1
+        else
+            msg = hasfield(typeof(er), :msg) ? er.msg : "no message for error of type $(typeof(er)), sorry."
+            m2 = ""
+        end
+        return msg, m2
     end
 
 
@@ -144,7 +167,7 @@ module stacktrace
         WIDTH = _width()
         main_message, message = error_message(io, er)
         return Panel(
-            "[#FFCC80]" * main_message * "[/#FFCC80]",
+                main_message,
                 message,
                 hLine(WIDTH-4; style="red dim"),
                 RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=WIDTH-4),
@@ -157,17 +180,27 @@ module stacktrace
     end
 
 
-
+    """
+    creates a sub-panel within a backtrace panel showing code where the error happened
+    """
     function backtrace_subpanel(line::String, WIDTH::Int, title::String)
-
         # get path to file and line number
         file = split(split_lines(line)[2], " [bold dim]")[1][13:end]
         file, lineno = split(file, ":")
         lineno = parse(Int, lineno)
+        @info "got file and lines" file lineno
         
         # read and highlight text
-        code = load_code_and_highlight(file, lineno; δ=3)
+        code = ""
+        try
+            code = load_code_and_highlight(file, lineno; δ=3)
+        catch SystemError  # file not found
+            code = ""
+        end
+        # println(TextBox(code, width=WIDTH-6))
+        @info "got rendered code"
 
+        # TODO fix error with panel construction here
         return Panel(
             "\n",
             line,
@@ -202,8 +235,9 @@ module stacktrace
             else
                 error_line = ""
             end
+            # @info "error line ready"
 
-            # @info 1 error_line
+            # @info 1 error_line length(stack_lines)
             if length(stack_lines) > 3
                 above = TextBox(
                     stack_lines[2:end-1],
@@ -217,21 +251,13 @@ module stacktrace
             else
                 above = ""
             end
+            # @info "above ready"
 
-            # @info 2 above
             offending = backtrace_subpanel(stack_lines[end], WIDTH, "caused by")
-
-            
-            Panel(
-                stack_lines[end],
-                title="caused by",
-                width=WIDTH-12,
-                style="dim blue",
-                title_style="yellow",
-                )
-            # @info 3 offending
+            # @info "offending line ready"
 
             stack = error_line / above / offending
+            # @info "stack ready" stack
     
         else
             stack = "[dim]No stack trace[/dim]"
@@ -246,7 +272,18 @@ module stacktrace
                 title_justify=:center,
                 width=WIDTH
             )
-        
+    end
+
+    """
+    Styles a symple `stcktrace()`
+    """
+    function style_stacktrace(stack::Vector)
+        lines::Vector{String} = []
+        for line in stack
+            push!(lines, apply_style("[#EF9A9A]$(line.func)[/#EF9A9A] - [dim]$(line.file):$(line.line)[/dim]"))
+        end
+
+        return join(lines, "\n")
     end
 
     # ---------------------------------------------------------------------------- #
@@ -259,7 +296,7 @@ module stacktrace
             function Base.showerror(io::IO, ex::LoadError, bt; backtrace=true)
                 try
                     println("\n")
-                    # @info "loaderror" ex.error 
+                    # @info "loaderror" typeof(ex.error) ex.error 
                     IS_LOAD_ERROR = true
 
                     stack = style_backtrace(io, bt)
@@ -271,10 +308,36 @@ module stacktrace
                 
                     # print or stack based on terminal size
                     println(stack / err / err_msg)
+                    # @info "error message printed" print(stack) print(err) print(err_msg)
                 catch err
-                    @warn "Failed to render error $ex" ex bt err
-                end
+                    @warn "Error in error rendering!!" err typeof(err)
+                    println(apply_style("[bold red]Error[/bold red][red bold dim] (during error message geneneration):[/red bold dim]"))
 
+                    
+                    # attemp to render individual parts
+                    try
+                        println(style_backtrace(io, stacktrace()))
+                    catch newerr
+                        @warn "failed to produce error stack" newerr
+                        println(apply_style("[bold yellow]Error stack trace:"))
+                        
+                        println(style_stacktrace(stacktrace()))
+
+                        println(apply_style("\n\n[bold yellow]Error back trace"))
+                        println(style_stacktrace(bt))
+                        print("\n")
+                    end
+
+                    try
+                        fmterr, err_msg = style_error(io, err)
+                        println(fmterr / err_msg)
+                    catch newerr
+                        @warn "failed to produce error message" newerr
+                        println("\e[31m" * err * "\e[0m")
+                    end
+
+                    println(apply_style("[red bold dim]End of error during error message generation[/red bold dim]\n\n"))
+                end
             end
 
             # ------------------ handle all other errors (no backtrace) ------------------ #
@@ -284,9 +347,9 @@ module stacktrace
             handles all the printing and printing the message here would cause a duplicate.
             """
 
-            function Base.display_error(io::IO, er, bt)
-                @debug "in: display_error" IS_LOAD_ERROR er bt
-            end
+            # function Base.display_error(io::IO, er, bt)
+            #     @debug "in: display_error"
+            # end
             
             
             # --------------------------- handle backtrace only -------------------------- #
@@ -295,7 +358,7 @@ module stacktrace
             """
 
             function Base.show_backtrace(io::IO, t::Vector) 
-                @debug "in: show_backtrace" io t
+                @debug "in: show_backtrace"
             end
         end
     end

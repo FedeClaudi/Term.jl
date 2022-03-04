@@ -51,7 +51,7 @@ Related:
 ## known bugs (and currently brocken stuff)
 - [ ] when highlighting with multiple styles something is still brocken
 - [x] when applying markup occasionally out of bounds error
-
+- [ ] indentation buggy in `rehsape_text`
 
 
 --------------
