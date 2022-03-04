@@ -4,6 +4,14 @@ import Term: install_stacktrace
 
 install_stacktrace()
 
+
+println(Panel(
+    "\n",
+    width=120,
+    style="dim blue",
+    title_style="bold bright_yellow",
+))
+
 # ----------------------------- basic and nested ----------------------------- #
 print(
     Panel(

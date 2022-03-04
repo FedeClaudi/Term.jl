@@ -1,7 +1,7 @@
 module errors
     import Base: InterpreterIP, show_method_candidates, ExceptionStack
 
-    import Term: theme, highlight, reshape_text, read_file_lines, load_code_and_highlight, split_lines, tprint
+    import Term: theme, highlight, reshape_text, read_file_lines, load_code_and_highlight, split_lines
     import Term.style: apply_style
     import ..panel: Panel, TextBox
     import ..renderables: RenderableText
@@ -72,11 +72,11 @@ module errors
     end
 
     # ! LoadError
-    # function error_message(io::IO, er::LoadError)
-    #     # @warn "load err" er fieldnames(ErrorException)
-    #     msg =  er.msg
-    #     return msg, ""
-    # end
+    function error_message(io::IO, er::LoadError)
+        # @warn "load err" er fieldnames(ErrorException)
+        msg =  hasfield(typeof(er), :msg) ? er.msg : "load error - no message."
+        return msg, ""
+    end
 
     # ! METHOD ERROR
     _method_regexes = [
@@ -184,11 +184,12 @@ module errors
     creates a sub-panel within a backtrace panel showing code where the error happened
     """
     function backtrace_subpanel(line::String, WIDTH::Int, title::String)
+        # @info "getting subpanel"
         # get path to file and line number
         file = split(split_lines(line)[2], " [bold dim]")[1][13:end]
         file, lineno = split(file, ":")
         lineno = parse(Int, lineno)
-        @info "got file and lines" file lineno
+        # @info "got file and lines" file lineno
         
         # read and highlight text
         code = ""
@@ -197,14 +198,13 @@ module errors
         catch SystemError  # file not found
             code = ""
         end
-        # println(TextBox(code, width=WIDTH-6))
-        @info "got rendered code"
 
-        # TODO fix error with panel construction here
+        code = length(code) > 0 ? TextBox(code, width=WIDTH-6) : ""
+
         return Panel(
             "\n",
             line,
-            TextBox(code, width=WIDTH-6),
+            code,
             title=title,
             width=WIDTH-4,
             style="dim blue",
@@ -235,12 +235,11 @@ module errors
             else
                 error_line = ""
             end
-            # @info "error line ready"
 
-            # @info 1 error_line length(stack_lines)
+            # @info "error line ready" error_line length(stack_lines)
             if length(stack_lines) > 3
                 above = TextBox(
-                    stack_lines[2:end-1],
+                    join(stack_lines[2:end-1], "\n"),
                     width=WIDTH-8
                 )
             elseif length(stack_lines) > 2
@@ -254,10 +253,9 @@ module errors
             # @info "above ready"
 
             offending = backtrace_subpanel(stack_lines[end], WIDTH, "caused by")
-            # @info "offending line ready"
+            # @info "offending line ready" offending
 
             stack = error_line / above / offending
-            # @info "stack ready" stack
     
         else
             stack = "[dim]No stack trace[/dim]"
@@ -347,9 +345,9 @@ module errors
             handles all the printing and printing the message here would cause a duplicate.
             """
 
-            # function Base.display_error(io::IO, er, bt)
-            #     @debug "in: display_error"
-            # end
+            function Base.display_error(io::IO, er, bt)
+                @debug "in: display_error"
+            end
             
             
             # --------------------------- handle backtrace only -------------------------- #
