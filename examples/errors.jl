@@ -39,14 +39,13 @@ corresponding error message
 
 
 # DomainError
-# sqrt(-1)
+sqrt(-1)
 
 # AssertionError
 
 
 import Term: Panel
-# Panel("mytext", title="this title is waaaay too long!!!")
-Panel(-6)
+Panel("mytext", title="this title is waaaay too long!!!")
 
 
 

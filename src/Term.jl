@@ -39,7 +39,7 @@ module Term
     # ----------------------------------- base ----------------------------------- #
     import .measure
     using .measure: Measure
-    using .consoles: Console, console, err_console
+    using .consoles: Console, console, err_console, console_height, console_width
 
     # ----------------------------------- style ---------------------------------- #
     using .markup: extract_markup, MarkupTag, pairup_tags

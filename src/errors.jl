@@ -17,6 +17,7 @@ module errors
         ErrorException  => "is a generic error type",
         LoadError       => "occurs while using 'include', 'require' or 'using'",
         MethodError     => "comes up when to method can be found with a given name and for a given set of argument types.",
+        TypeError       => "is a type assertion failure, or calling an intrinsic function with an incorrect argument type.",
         UndefVarError   => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
     )
     
@@ -126,6 +127,16 @@ module errors
             )
     end
 
+    # ! TYPE ERROR
+    function error_message(io::IO, er::TypeError) 
+        @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
+        # var = string(er.var)
+        msg = "In `[$(theme.emphasis_light) italic]$(er.func)` > `$(er.context)[/$(theme.emphasis_light) italic]` got"
+        msg *= " [orange1 bold]$(er.got)[/orange1 bold][$(theme.type)](::$(typeof(er.got)))[/$(theme.type)] but expected argument of type"
+        msg *= " [$(theme.type)]::$(er.expected)[/$(theme.type)]"
+        msg, ""
+    end
+
     # ! UNDEFVAR ERROR
     function error_message(io::IO, er::UndefVarError) 
         # @info "undef var error" er er.var typeof(er.var)
@@ -173,7 +184,7 @@ module errors
 
         # create panel and text
         panel = Panel(
-            # main_message,
+            main_message,
             message,
             hLine(WIDTH-4; style="red dim"),
             RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=WIDTH-4),
@@ -352,7 +363,7 @@ module errors
                         println(fmterr / err_msg)
                     catch newerr
                         @warn "failed to produce error message" newerr
-                        println("\e[31m" * err * "\e[0m")
+                        println("\e[31m" * string(err) * "\e[0m")
                     end
 
                     println(apply_style("[red bold dim]End of error during error message generation[/red bold dim]\n\n"))

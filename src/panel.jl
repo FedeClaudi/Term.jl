@@ -1,7 +1,7 @@
 module panel
-    import Term: split_lines, get_last_valid_str_idx, reshape_text, do_by_line, join_lines, truncate
+    import Term: split_lines, get_last_valid_str_idx, reshape_text, do_by_line, join_lines, truncate, textlen
 
-    import ..consoles: console
+    import ..consoles: console_width
     import ..measure: Measure
     import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
     import ..segment: Segment
@@ -75,7 +75,7 @@ module panel
         if width == :fit
             width = panel_measure.w + 2
         else
-            width = isnothing(width) ? console.width-4 : width
+            width = isnothing(width) ? console_width()-4 : width
         end
         @assert width > content_measure.w "Width too small for content '$content' with $content_measure"
         panel_measure.w = width
@@ -176,7 +176,7 @@ module panel
 
     function TextBox(
         text::Union{Vector, AbstractString};
-        width::Union{Nothing, Int}=88,
+        width::Union{Nothing, Int}=nothing,
         title::Union{Nothing, String}=nothing,
         title_style::Union{String, Nothing}="default",
         title_justify::Symbol=:left,
@@ -188,13 +188,15 @@ module panel
         )
 
         # fit text
-        width = isnothing(width) ? console.width-4 : width
-        if fit == :truncate
+        width = isnothing(width) ? console_width()-4 : width
+        if !isnothing(width)
+            text = do_by_line((ln)->reshape_text(ln, width-4), text)    
+        elseif fit == :truncate
             text = do_by_line(ln->truncate(ln, width-4), text)
-        elseif fit != :fit
-            text = do_by_line((ln)->reshape_text(ln, width-4), text)
+        elseif fit == :fit
+            width = Measure(text).w + 4
+            width = width < 4 ? 4 : width
         end
-        # @info "\e[31mReshaped text" Measure(text) width
 
         panel = Panel(
             text,

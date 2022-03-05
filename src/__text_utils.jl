@@ -240,7 +240,7 @@ function reshape_text(text::AbstractString, width::Int; indent::Bool=false)::Abs
 
         # prep line
         try
-            push!(lines, text[1:cut])
+            push!(lines, lstrip(text[1:cut]))
             text = _indent * text[cut+1:end]
             j += cut
         catch err

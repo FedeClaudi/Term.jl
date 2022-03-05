@@ -19,15 +19,6 @@ Related:
   - [ ] inspect
   - [ ] errors
 
-- examples
-  - [x] style string + macros
-  - [x] textbox
-  - [x] panels
-  - [x] errors
-  - [x] logging
-  - [x] layout
-  - [x] inspect
-
 #### Tests
 - [ ] text utils
 - [ ] ansi
@@ -51,6 +42,7 @@ Related:
 
 ### To do & bugs
 - [ ] errors should handle keyword objects: `Panel(-6)`
+- [ ] BUG: errors, occasionally fails to render error.
 - [ ] BUG: read code style from file sometimes gives the wrong line
 
 #### Future features

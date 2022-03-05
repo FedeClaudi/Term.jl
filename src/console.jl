@@ -1,6 +1,6 @@
 module consoles
 
-    export Console, console, err_console
+    export Console, console, err_console, console_height, console_width
     """
         Console
 
@@ -17,5 +17,11 @@ module consoles
 
     console = Console(stdout)
     err_console = Console(stderr)
+
+    console_height() = displaysize()[1]
+    console_height(io::IO) = displaysize(io)[1]
+
+    console_width() = displaysize()[2]
+    console_width(io::IO) = displaysize(io)[2]
 
 end
