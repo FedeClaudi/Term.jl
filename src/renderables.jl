@@ -46,9 +46,9 @@ module renderables
     end
 
     Renderable() = Renderable([], Measure(0, 0))
-    Renderable(str::Union{Vector, AbstractString}; width::Union{Nothing, Int}=nothing) =  RenderableText(str; width=width)
-    Renderable(ren::AbstractRenderable; width::Union{Nothing, Int}=nothing) = ren  # returns the renderable
-    Renderable(segment::Segment; width::Union{Nothing, Int}=nothing) = Renderable([segment], Measure([segment]))
+    Renderable(str::Union{Vector, AbstractString}; width::Union{Nothing, Int, Symbol}=nothing) =  RenderableText(str; width=width)
+    Renderable(ren::AbstractRenderable; width::Union{Nothing, Int, Symbol}=nothing) = ren  # returns the renderable
+    Renderable(segment::Segment; width::Union{Nothing, Int, Symbol}=nothing) = Renderable([segment], Measure([segment]))
 
     # ---------------------------------------------------------------------------- #
     #                                TEXT RENDERABLE                               #
@@ -59,9 +59,9 @@ module renderables
         text::AbstractString
     end
 
-    function RenderableText(text::AbstractString; width::Union{Nothing, Int}=nothing)
+    function RenderableText(text::AbstractString; width::Union{Nothing, Int, Symbol}=nothing)
         # @info "creating RenderableText"  text width
-        if !isnothing(width)
+        if width isa Number
             text = do_by_line((ln)->reshape_text(ln, width), text)
         end
 
@@ -74,11 +74,11 @@ module renderables
         return RenderableText(segments, Measure(segments), text)
     end
 
-    RenderableText(text::Vector{AbstractString}; width::Union{Nothing, Int}=nothing) = RenderableText(join(text, "\n"); width=width)
-    RenderableText(text::Vector; width::Union{Nothing, Int}=nothing) = RenderableText(join(text, "\n"); width=width)
+    RenderableText(text::Vector{AbstractString}; width::Union{Nothing, Int, Symbol}=nothing) = RenderableText(join(text, "\n"); width=width)
+    RenderableText(text::Vector; width::Union{Nothing, Int, Symbol}=nothing) = RenderableText(join(text, "\n"); width=width)
 
-    function RenderableText(text::AbstractString, style::AbstractString; width::Union{Nothing, Int}=nothing)
-        if !isnothing(width)
+    function RenderableText(text::AbstractString, style::AbstractString; width::Union{Nothing, Int, Symbol}=nothing)
+        if width isa Number
             text = do_by_line((ln)->reshape_text(ln, width), text)
         end
         segments = [Segment(line, style) for line in split_lines(text)]

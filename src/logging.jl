@@ -3,7 +3,7 @@ module logging
     import Dates
     using Logging
 
-    import Term: Theme, theme, textlen, square_to_round_brackets, escape_brackets, reshape_text, TextBox
+    import Term: Theme, theme, textlen, square_to_round_brackets, escape_brackets, reshape_text
     import ..markup: has_markup
     import ..box: ROUNDED
     import ..style: apply_style

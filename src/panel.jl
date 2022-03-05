@@ -7,6 +7,7 @@ module panel
     import ..segment: Segment
     using ..box
     import ..layout: Padding, vstack
+    import ..style: apply_style
 
     export Panel, TextBox
 
@@ -50,7 +51,7 @@ module panel
                 subtitle::Union{String, Nothing}=nothing,
                 subtitle_style::Union{String, Nothing}=nothing,
                 subtitle_justify::Symbol=:left,
-                width::Union{Nothing, Int}=nothing,
+                width::Union{Nothing, Symbol, Int}=:fit,
                 height::Union{Nothing, Int}=nothing,
                 style::Union{String, Nothing}=nothing,
                 box::Symbol=:ROUNDED,
@@ -64,18 +65,20 @@ module panel
         σ(s) = "[$style]$s[/$style]"  # applies the main style markup to a string to make a segment
 
         # get size of panel to fit the content
-        if content isa AbstractString && !isnothing(width)
-            # content = reshape_text(content, width-2)
+        if content isa AbstractString && width isa Number
             content = do_by_line((ln)->reshape_text(ln, width-4), content)
         end
+
         content_measure = Measure(content)
         panel_measure = Measure(content_measure.w+2, content_measure.h+2)
 
-        width = isnothing(width) ? console.width-4 : width
+        if width == :fit
+            width = panel_measure.w + 2
+        else
+            width = isnothing(width) ? console.width-4 : width
+        end
         @assert width > content_measure.w "Width too small for content '$content' with $content_measure"
         panel_measure.w = width
-
-        # @info "Creating panel" content_measure panel_measure typeof(content)
 
         # create segments
         segments::Vector{Segment} = []
@@ -101,6 +104,7 @@ module panel
         push!(segments, top)
         left, right = σ(string(box.mid.left)), σ(string(box.mid.right))
         content_lines = split_lines(content)
+
         
         for n in 1:content_measure.h
             # get padding
@@ -108,7 +112,7 @@ module panel
             padding = Padding(line, width-2, justify)
 
             # make line
-            segment = Segment(left * padding.left * line * padding.right * right)
+            segment = Segment(left * padding.left * apply_style(line) * padding.right * right)
             # @info "pl" left.plain padding.left padding.right right.plain
             # @info "panel line" line padding segment segment.plain Measure(segment.plain)
 
@@ -144,8 +148,8 @@ module panel
 
     `Panel` constructor for creating a panel out of multiple renderables at once.
     """
-    function Panel(renderables...; width::Union{Nothing, Int}=nothing, kwargs...)
-        rend_width = isnothing(width) ? width : width-1
+    function Panel(renderables...; width::Union{Nothing, Int, Symbol}=nothing, kwargs...)
+        rend_width = isnothing(width) || width isa Symbol ? width : width-1
         renderable = vstack(Renderable.(renderables, width=rend_width)...)
 
         return Panel(renderable; width=width, kwargs...)
