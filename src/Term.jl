@@ -24,6 +24,7 @@ module Term
     include("panel.jl")
     include("inspect.jl")
     include("errors.jl")
+    include("logging.jl")
 
 
     export RenderableText, Panel, TextBox
@@ -33,6 +34,7 @@ module Term
     export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
     export @bold, @dim, @italic, @underline, @style
     export tprint, install_stacktrace
+    export install_term_logger
 
     # ----------------------------------- base ----------------------------------- #
     import .measure
@@ -47,6 +49,7 @@ module Term
     using .style: MarkupStyle, extract_style, apply_style
 
     using .segment: Segment
+
 
     """
         Measure(seg::Segment) 
@@ -76,13 +79,18 @@ module Term
 
     using .panel: Panel, TextBox
 
+    tprint(x::AbstractString) = (println ∘ apply_style)(x)
+    tprint(x::AbstractRenderable) = println(x)
+    tpritn(x) = tprint(string(x))
+
     # ---------------------------------- others ---------------------------------- #
     using .introspection: inspect
 
     using .errors: install_stacktrace
 
+    using .logging: install_term_logger, TermLogger
 
-    tprint(x::AbstractString) = (println ∘ apply_style)(x)
-    tprint(x::AbstractRenderable) = println(x)
+
+
 end
 

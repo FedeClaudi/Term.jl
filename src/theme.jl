@@ -16,10 +16,17 @@ style outputs to terminal.
     emphasis_light::String  = "#bfe0fd"  # pale green
     code::String            = "#ffd77a"  # light blue
     multiline_code::String  = "#ffd77a"  # light blue
-    symbol::String          = "#FFA726"  # orange
+    symbol::String          = "#ffc94d"  # orange light
     expression::String      = "#F48FB1"  # pink light
     number::String          = "#90CAF9"  # blue
-    operator::String        = "#fc6262 bold" # operator
+    operator::String        = "#fc6262 bold" # red
+    func::String            = "#fff126" # yellow
+
+    # loggin levels
+    info::String            = "#90CAF9"  # blue
+    debug::String           = "#90CAF9"  # blue
+    warn::String            = "#ff681c"  # orange
+    error::String            = "bold red"  # orange
 end
 
 theme = Theme()  # default theme
