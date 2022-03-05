@@ -28,6 +28,27 @@ Related:
   - [x] layout
   - [x] inspect
 
+#### Tests
+- [ ] text utils
+- [ ] ansi
+- [ ] inspect
+- [ ] box
+- [ ] color
+- [ ] console
+- [ ] errors
+- [ ] highlight
+- [ ] inspect
+- [ ] layout
+- [ ] logging
+- [ ] macros
+- [ ] markup
+- [ ] measure
+- [ ] panel
+- [ ] renderables
+- [ ] segment
+- [ ] style
+- [ ] theme
+
 ### To do & bugs
 - [ ] errors should handle keyword objects: `Panel(-6)`
 - [ ] BUG: read code style from file sometimes gives the wrong line
@@ -41,3 +62,4 @@ Related:
 - [ ] type hierarchy tree (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
 - [ ] logging:
   - [ ] get "stack trace" of logging: where is the log message triggered from?
+- [ ] allow for user created `Theme`s
