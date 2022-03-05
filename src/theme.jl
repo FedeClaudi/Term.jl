@@ -9,7 +9,7 @@ Stores colors for different semantically relevant items, used to
 style outputs to terminal.
 """
 @with_kw struct Theme
-    docstring::String       = "#D4E157"  # green
+    docstring::String       = "#a7de97"  # green
     string::String          = "#A5D6A7"  # green
     type::String            = "#d880e7"  # purple
     emphasis::String        = "blue  bold"  

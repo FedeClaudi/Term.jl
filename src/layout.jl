@@ -7,6 +7,7 @@ module layout
     import ..segment: Segment
     using ..box
     import Term: int
+    import ..consoles: console
 
     export Padding, vstack, hstack
     export Spacer, vLine, hLine
@@ -208,6 +209,8 @@ module layout
         return vLine(segments, Measure(segments), height)
     end
 
+    vLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED) = vLine(console.height; style=style, box=box)
+
     """
         hLine
 
@@ -253,4 +256,8 @@ module layout
         segments = [Segment(pre * (post), style)]
         return hLine(segments, Measure(segments), width)
     end
+    
+    hLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED) = hLine(console.width; style=style, box=box)
+
+    hLine(text::AbstractString; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED) = hLine(console.width, text; style=style, box=box)
 end

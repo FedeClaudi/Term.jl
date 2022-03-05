@@ -55,9 +55,8 @@ print("\n\n\n")
 vline = vLine(p1.measure.h, style="blue")  # create a vertical line as high as the panel
 top = p1 * vline * space * vline * p1
 line = hLine(top.measure.w, "some space", style="red", box=:DOUBLE)
-dimline = hLine(top.measure.w, style="dim green", box=:ASCII_DOUBLE_HEAD)
 
 # vertically stack everything and print nested in a panel
-println(Panel(top / line / top / dimline, title="layout is great!", title_style="bold red", style="red dim"))
+println(Panel(top / line / top , title="layout is great!", title_style="bold red", style="red dim", title_justify=:left))
 
 

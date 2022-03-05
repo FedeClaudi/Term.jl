@@ -23,14 +23,21 @@ Related:
   - [x] style string + macros
   - [x] textbox
   - [x] panels
-  - [ ] errors
-  - [ ] logging
-  - [ ] layout
+  - [x] errors
+  - [x] logging
+  - [x] layout
+  - [x] inspect
+
+### To do & bugs
+- [ ] errors should handle keyword objects: `Panel(-6)`
+- [ ] BUG: read code style from file sometimes gives the wrong line
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles
 - [ ] pretty print commond data structure such as Dict
 - [ ] progress bar
-- [ ] allow things like Panel and TextBox to `fill` their parent and `fit` their content.
+- [ ] allow things like Panel and TextBox to `fill` their parent renderable
 - [ ] tree visualization
 - [ ] type hierarchy tree (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
+- [ ] logging:
+  - [ ] get "stack trace" of logging: where is the log message triggered from?

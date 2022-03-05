@@ -53,7 +53,10 @@ print(
 
 """
 And of course you can use Term.jl's layout syntax to compose TextBox objects, 
-see layout example
+see layout example.
+
+ps: this might not print correctly on smaller screens since you're asking for a 
+very wide piece of text
 """
 
 tb1 = TextBox(
@@ -70,7 +73,11 @@ tb2 = TextBox(another_long_one, width=60, title="second column", title_style="bl
 
 print(tb1 * tb2)
 
-""" or even """
+""" or even 
+
+ps: this might not print correctly on smaller screens since you're asking for a 
+very wide piece of text
+"""
 
 import Term: Panel
 print(Panel(tb1 * tb2, width=:fit, title="My Panel"))

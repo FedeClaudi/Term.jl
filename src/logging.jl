@@ -2,6 +2,7 @@
 module logging
     import Dates
     using Logging
+    using InteractiveUtils
 
     import Term: Theme, theme, textlen, square_to_round_brackets, escape_brackets, reshape_text
     import ..markup: has_markup
@@ -94,6 +95,13 @@ $vert   [dim]$(file):$(line) [/dim][bold dim](line: $(line))[/bold dim]"""
 
     # get padding width
     _types = string.(typeof.([v for v in values(kwargs)]))
+    for (i, _type) in enumerate(values(kwargs))
+        if typeof(_type) <: Function
+            _types[i] = string(Function)
+        end
+    end
+
+
     wpad = max(textlen.(_types)...) + 2
     namepad = max(textlen.(string.([v for v in keys(kwargs)]))...)
 
@@ -120,7 +128,13 @@ $vert   [dim]$(file):$(line) [/dim][bold dim](line: $(line))[/bold dim]"""
             _style = logger.theme.string
         elseif v isa AbstractVector
             _style = logger.theme.number
-            v = square_to_round_brackets(string(v)) * "\n [dim]size: $(size(v))[/dim]"
+            _size = size(v)
+            v = square_to_round_brackets(string(v)) 
+            v = textlen(v) > 33 ? v[1:30] * " ...)" : v
+            v *= "\n [dim]size: $(_size)[/dim]"
+        elseif v isa AbstractArray || v isa AbstractMatrix
+            _style = logger.theme.number
+            v = "$(typeof(v)) [dim]<: $(supertypes(typeof(v))[end-1])[/dim]" * "\n [dim]size: $(size(v))[/dim]"
         elseif v isa Function
             _style = logger.theme.func
         else

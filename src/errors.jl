@@ -22,13 +22,14 @@ module errors
     
     _width() = min(Console(stderr).width, 120)
 
-    _highlight(x::Union{Symbol, AbstractString}) = "[bold salmon1 underline]$x[/bold salmon1 underline]"
-    _highlight(x::Number) = "[bold blue]$x[/bold blue]"
+    _highlight(x::Union{Symbol, AbstractString}) = "[$(theme.symbol)]$x[/$(theme.symbol)]"
+    _highlight(x::Number) = "[$(theme.number)]$x[/$(theme.number)]"
     _highlight(x::DataType) = "[$(theme.type) dim]::$(x)[/$(theme.type) dim]"
     _highlight(x::UnitRange) = _highlight(string(x))
+    _highlight(x::Union{AbstractArray, AbstractVector, AbstractMatrix}) =  "[$(theme.number)]$x[/$(theme.number)]"
 
     function _highlight(x)
-        @info "highlighting misterious object" x typeof(x)
+        # @info "highlighting misterious object" x typeof(x)
         return _highlight(string(x))
     end
 
@@ -167,17 +168,24 @@ module errors
         
         WIDTH = _width()
         main_message, message = error_message(io, er)
-        return Panel(
-                main_message,
-                message,
-                hLine(WIDTH-4; style="red dim"),
-                RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=WIDTH-4),
-                title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
-                title_style="red",
-                style = "dim red",
-                width=WIDTH,
-                title_justify=:center,
-            ),  RenderableText("\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message")
+        # @info "Got styled error" er main_message info_msg
+
+
+        # create panel and text
+        panel = Panel(
+            # main_message,
+            message,
+            hLine(WIDTH-4; style="red dim"),
+            RenderableText("[grey89 dim][bold red dim]$(typeof(er)):[/bold red dim] " * info_msg * "[/grey89 dim]"; width=WIDTH-4),
+            title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
+            title_style="red",
+            style = "dim red",
+            width=WIDTH,
+            title_justify=:center,
+        )
+        text = RenderableText("\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message")
+
+        return panel,  text
     end
 
 
@@ -196,11 +204,11 @@ module errors
         code = ""
         try
             code = load_code_and_highlight(file, lineno; δ=3)
+            code = length(code) > 0 ? TextBox(code, width=WIDTH-6) : ""
         catch SystemError  # file not found
+            # @warn "Failed to get code"
             code = ""
         end
-
-        code = length(code) > 0 ? TextBox(code, width=WIDTH-6) : ""
 
         return Panel(
             "\n",
@@ -220,7 +228,7 @@ module errors
         # create text
         stack_lines::Vector{String} = []
         for (n, frame) in enumerate(t)
-            if typeof(frame) ∉ (Ptr{Nothing}, InterpreterIP)
+            if typeof(frame) ∉ (Ptr, InterpreterIP)
                 func_line = "[light_yellow3]($n)[/light_yellow3] [sky_blue3]$(frame.func)[/sky_blue3]"
                 file_line = "       [dim]$(frame.file):$(frame.line) [bold dim](line: $(frame.line))[/bold dim][/dim]"
                 push!(stack_lines, func_line * "\n" * file_line * "\n" )
@@ -254,23 +262,31 @@ module errors
             # @info "above ready"
 
             offending = backtrace_subpanel(stack_lines[end], WIDTH, "caused by")
-            # @info "offending line ready" offending
-
             stack = error_line / above / offending
-    
+            # @info "stacked"
         else
             stack = "[dim]No stack trace[/dim]"
         end
 
         # create output
-        return Panel(
-                stack,
-                title="StackTrace",
-                style="yellow dim",
-                title_style="yellow",
-                title_justify=:center,
-                width=WIDTH
-            )
+        # @info "creating panel"
+        try
+            panel = Panel(
+                    stack,
+                    title="StackTrace",
+                    style="yellow dim",
+                    title_style="yellow",
+                    title_justify=:left,
+                    width=WIDTH
+                )
+            # @info "panel ready"
+            return panel
+        catch err
+            @warn "failed to crate panel" err
+            println(stack)
+            return stack
+        end
+
     end
 
     """
@@ -278,8 +294,10 @@ module errors
     """
     function style_stacktrace(stack::Vector)
         lines::Vector{String} = []
-        for line in stack
-            push!(lines, apply_style("[#EF9A9A]$(line.func)[/#EF9A9A] - [dim]$(line.file):$(line.line)[/dim]"))
+        for (n, frame) in enumerate(stack)
+            if typeof(frame) ∉ (Ptr. Ptr{Nothing}, InterpreterIP)
+                push!(lines, apply_style("[bright_blue dim]($n)[/bright_blue dim] [yellow]$(frame.func)[/yellow] - [dim]$(line.file):$(line.line)[/dim]"))
+            end
         end
 
         return join(lines, "\n")
@@ -300,20 +318,18 @@ module errors
             function Base.showerror(io::IO, ex, bt; backtrace=true)
                 try
                     println("\n")
-                    # @info "loaderror" typeof(ex.error) ex.error 
+                    # @info "loaderror"
 
                     stack = style_backtrace(io, bt)
                     # @info "error stack ready"
 
-
                     err, err_msg = style_error(io, ex)
                     # @info "error message ready" stack err err_msg
                 
-                    # print or stack based on terminal size
                     println(stack / err / err_msg)
-                    # @info "error message printed" print(stack) print(err) print(err_msg)
+                    # @info "error message printed" 
                 catch err
-                    @warn "Error in error rendering!!" err typeof(err)
+                    @error "Error in error rendering!!" err typeof(err) ex
                     println(apply_style("[bold red]Error[/bold red][red bold dim] (during error message geneneration):[/red bold dim]"))
 
                     
@@ -326,7 +342,7 @@ module errors
                         
                         println(style_stacktrace(stacktrace()))
 
-                        println(apply_style("\n\n[bold yellow]Error back trace"))
+                        println(apply_style("\n\n[bold yellow]Error back trace[bold yellow]"))
                         println(style_stacktrace(bt))
                         print("\n")
                     end
@@ -340,6 +356,9 @@ module errors
                     end
 
                     println(apply_style("[red bold dim]End of error during error message generation[/red bold dim]\n\n"))
+                    println(apply_style("[orange1]Original error:[/orange1][indian_red] $ex [/indian_red]\n[orange1]Backtrace:[/orange1]"))
+                    println.(style_stacktrace(bt))
+
                 end
             end
 
@@ -364,7 +383,7 @@ module errors
             """
 
             function Base.show_backtrace(io::IO, t::Vector) 
-                @warn "in: show_backtrace" t
+                @debug "in: show_backtrace" t
             end
         end
     end
