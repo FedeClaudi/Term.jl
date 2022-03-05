@@ -33,4 +33,5 @@ y = x * x'
 name = "the name is [bold blue]Term[/bold blue]"
 p1 = Panel("text")
 
-@error "[italic purple bold]fancy logs![/italic purple bold]" x y name √9 install_term_logger p1
+print("\n"^3)
+@error "[italic green bold]fancy logs![/italic green bold]" x y name √9 install_term_logger p1

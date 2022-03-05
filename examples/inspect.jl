@@ -16,7 +16,7 @@ abstract type T1 end
 
 abstract type T2 <: T1 end
 
-"""
+"""§§
     MyType
 
 It's just a useless type we've defined to provide an example of

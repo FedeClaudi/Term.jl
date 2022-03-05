@@ -13,7 +13,8 @@ module errors
     const ErrorsExplanations = Dict(
         ArgumentError   => "The parameters to a function call do not match a valid signature.",
         AssertionError  => "comes up when an assertion's check fails. For example `@assert 1==2` will throw an AssertionError",
-        BoundsError     => "comes up when trying to acces a container at invalid position (e.g. a string a='abcd' with 4 characters cannot be accessed as a[5]).",
+        BoundsError     => "comes up when trying to acces a container at invalid position (e.g., a string a='abcd' with 4 characters cannot be accessed as a[5]).",
+        DomainError     => "comes up when the argument to a function is outside its domain (e.g., √(-1))",
         ErrorException  => "is a generic error type",
         LoadError       => "occurs while using 'include', 'require' or 'using'",
         MethodError     => "comes up when to method can be found with a given name and for a given set of argument types.",
@@ -63,6 +64,13 @@ module errors
             additional_msg ="[red]Variable is not defined!.[/red]" 
         end
         return main_msg, additional_msg
+    end
+
+    # ! Domain ERROR
+    function error_message(io::IO, er::DomainError)
+        # @info "err exceprion" er fieldnames(DomainError) er.val
+        # msg = split(er.msg, " around ")[1]
+        return er.msg, "\nThe invalid value is: $(_highlight(er.val))$(_highlight(typeof(er.val)))."
     end
 
     # ! EXCEPTION ERROR
@@ -129,7 +137,7 @@ module errors
 
     # ! TYPE ERROR
     function error_message(io::IO, er::TypeError) 
-        @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
+        # @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
         # var = string(er.var)
         msg = "In `[$(theme.emphasis_light) italic]$(er.func)` > `$(er.context)[/$(theme.emphasis_light) italic]` got"
         msg *= " [orange1 bold]$(er.got)[/orange1 bold][$(theme.type)](::$(typeof(er.got)))[/$(theme.type)] but expected argument of type"
@@ -156,7 +164,7 @@ module errors
 
     # ! catch all other errors
     function error_message(io::IO, er) 
-        @info er typeof(er) fieldnames(typeof(er)) 
+        @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(typeof(er)) 
         if hasfield(typeof(er), :error)
             # @info "nested error" typeof(er.error)
             m1, m2 = error_message(io, er.error)

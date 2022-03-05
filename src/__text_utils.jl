@@ -129,8 +129,8 @@ nospaces(text::AbstractString) = replace(text, " " => "")
 """Removes all () brackets from a string"""
 remove_brackets(text::AbstractString) = replace(replace(text, "("=>""), ")"=>"")
 
+"""Replaces square brackets with round ones"""
 square_to_round_brackets(text::AbstractString) = replace(replace(text, "["=>"("), "]"=>")")
-
 
 """Removes spaces after commas """
 unspace_commas(text::AbstractString) = replace(replace(text, ", "=>","), ". "=>".")
@@ -156,6 +156,7 @@ function split_lines(renderable)
 end
 
 # ------------------------------- reshape text ------------------------------- #
+"""Shortens a string of text to a target width"""
 function truncate(text::AbstractString, width::Int)
     if textlen(text) <= width
         return text
@@ -166,7 +167,8 @@ function truncate(text::AbstractString, width::Int)
 end
 
 """
-recursively extracts character tags from tags
+recursively extracts valid characters (i.e. not in markup tags)
+from a string
 """
 function get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
     # get correct start/stop positions
@@ -198,13 +200,6 @@ Given a long string of text, it reshapes it into N lines
 of fixed width
 """
 function reshape_text(text::AbstractString, width::Int; indent::Bool=false)::AbstractString    
-    # get indentation spaces
-    # TODO indentation buggy, fix in the future
-    # n_spaces = length(text) - length(strip(text))
-    # n_spaces = n_spaces < 1 ? 1 : n_spaces
-    # _indent = indent ? " "^n_spaces : ""
-    _indent = ""
-
     # check if no work is required
     if textlen(text) <= width
         return text
@@ -241,13 +236,11 @@ function reshape_text(text::AbstractString, width::Int; indent::Bool=false)::Abs
         # prep line
         try
             push!(lines, lstrip(text[1:cut]))
-            text = _indent * text[cut+1:end]
+            text = text[cut+1:end]
             j += cut
         catch err
             throw("Failed to reshape text: $err - target width: $width")
         end
-
-        # @info "\e[32mmade line" lines[end] cut j width length(text) len(text) text Measure(lines[end])
     end
 
     # add what's left of the text
@@ -255,7 +248,7 @@ function reshape_text(text::AbstractString, width::Int; indent::Bool=false)::Abs
         push!(lines, text)
     end
 
-    # do checs and pad line
+    # do checks and pad line
     for (n, line) in enumerate(lines)
         h = remove_markup(line)
         # @assert length(remove_markup(line)) <= width
