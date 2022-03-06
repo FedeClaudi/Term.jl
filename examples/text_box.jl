@@ -66,11 +66,11 @@ tb1 = TextBox(
     title_justify=:center,
     subtitle="styled by Term.jl",
     subtitle_justify=:right,
-    subtitle_style="dim"
+    subtitle_style="dim",
+    width=44
 )
 
-tb2 = TextBox(another_long_one, width=60, title="second column", title_style="blue bold", title_justify=:center)
-
+tb2 = TextBox(another_long_one, width=30, title="second column", title_style="blue bold", title_justify=:center, fit=:fit)
 print(tb1 * tb2)
 
 """ or even 

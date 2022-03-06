@@ -49,7 +49,7 @@ module markup
 
     # ---------------------------- extract markup tags --------------------------- #
     # has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, remove_ansi(text))
-    has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, text)
+    has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, replace_double_brackets(text))
 
     
     function extract_markup(input_text::AbstractString; firstonly=false)

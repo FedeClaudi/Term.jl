@@ -13,13 +13,14 @@ remove_markup
 Removes all markup tags from a string of text.
 """
 function remove_markup(input_text::AbstractString)::AbstractString
-    text = input_text
+    text = replace_double_brackets(input_text)
 
     # remove extra closing tags
+    text = remove_markup_open(text)
     text = replace(text, GENERIC_CLOSER_REGEX=>"")
     text = replace(text, CLOSE_TAG_REGEX=>"")
 
-    return text
+    return reinsert_double_brackets(text)
 end
 
 """
@@ -76,6 +77,21 @@ function unescape_brackets(text::AbstractString)::AbstractString
     return text
 end
 
+"""
+Replaces double brackets with %% and ±± to avoid them being picked up by markup extraction
+"""
+function replace_double_brackets(text::AbstractString)::AbstractString
+    text = replace(text, "[["=>"%%")
+    text = replace(text, "]]"=>"±±")
+    return text
+end
+
+"""re-inserts previously replaced double brackets"""
+function reinsert_double_brackets(text::AbstractString)::AbstractString
+    text = replace(text, "%%"=>"[[")
+    text = replace(text, "±±"=>"]]")
+    return text
+end
 
 # ---------------------------------------------------------------------------- #
 #                                      I/O                                     #
@@ -162,7 +178,7 @@ function truncate(text::AbstractString, width::Int)
         return text
     end
 
-    cut = get_last_valid_str_idx(text, width)
+    cut = get_last_valid_str_idx(text, width-3)
     return text[1:cut] * "..."
 end
 
@@ -199,7 +215,7 @@ textlen(x) = (length ∘ remove_markup ∘ remove_markup_open ∘ remove_ansi)(x
 Given a long string of text, it reshapes it into N lines
 of fixed width
 """
-function reshape_text(text::AbstractString, width::Int; indent::Bool=false)::AbstractString    
+function reshape_text(text::AbstractString, width::Int)::AbstractString    
     # check if no work is required
     if textlen(text) <= width
         return text

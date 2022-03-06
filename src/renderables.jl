@@ -27,6 +27,14 @@ module renderables
         )
     end
 
+    """
+    Creates a string representation of a renderable
+    """
+    function Base.string(r::AbstractRenderable)::String
+        lines = [seg.text for seg in r.segments]
+        return join(lines, "\n")
+    end
+
 
     function Base.show(io::IO, renderable::AbstractRenderable)
         if io == stdout 
@@ -65,12 +73,7 @@ module renderables
             text = do_by_line((ln)->reshape_text(ln, width), text)
         end
 
-        
         segments = [Segment(line) for line in split_lines(text)]
-
-        # @info "a" split_lines(text) segments length(segments)
-        # println(segments[1].plain)
-        # println(segments[2].plain)
         return RenderableText(segments, Measure(segments), text)
     end
 

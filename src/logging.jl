@@ -122,8 +122,6 @@ module logging
             
             epad = namepad - textlen(string(k))
             line *= " "^epad * " [bold red]=[/bold red] "
-
-
             lpad = textlen(line) - 4
 
             # get value style
