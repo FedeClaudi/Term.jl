@@ -1,7 +1,7 @@
 import Term: remove_markup, remove_ansi, truncate, reshape_text
 import Term.style: apply_style
 
-@testset "TU - remove" begin
+@testset "\e[31mTU - remove" begin
     # ------------------------------- remove markup ------------------------------ #
     @test remove_markup("[red]text[/red]")=="text"
     @test remove_markup("[red]sffsdf[green on_blue italic]") == "sffsdf"
@@ -36,7 +36,7 @@ import Term.style: apply_style
 end
 
 
-@testset "TU - reshape text" begin
+@testset "\e[31mTU - reshape text" begin
     nlines(x) = length(split(x, "\n"))
     lw(x) = length(split(x, "\n")[1])
 

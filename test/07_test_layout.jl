@@ -1,7 +1,7 @@
 import Term: RenderableText, Spacer, vLine, hLine
 
 
-@testset "layout - spacer" begin
+@testset "\e[31mlayout - spacer" begin
     sizes = [
         (22, 1), (44, 123), (21, 1), (4334, 232)
     ]
@@ -12,7 +12,7 @@ import Term: RenderableText, Spacer, vLine, hLine
     end
 end
 
-@testset "layout - vLine " begin
+@testset "\e[31mlayout - vLine " begin
     for h in [1, 22, 55, 11]
         line = vLine(h)
         @test length(line.segments) == h
@@ -36,7 +36,7 @@ end
 end
 
 
-@testset "layout - hLine " begin
+@testset "\e[31mlayout - hLine " begin
     for w in [1, 342, 433, 11, 22]
         line = hLine(w)
         @test line.width == w
@@ -59,7 +59,7 @@ end
 
 
 
-@testset "layout - vstack" begin
+@testset "\e[31mlayout - vstack" begin
     r1 = RenderableText("."^100; width=25)
     r2 = RenderableText("."^100; width=50)
 
@@ -85,7 +85,7 @@ end
 end
 
 
-@testset "layout - hstack" begin
+@testset "\e[31mlayout - hstack" begin
     r1 = RenderableText("."^100; width=25)
     r2 = RenderableText("."^100; width=50)
 

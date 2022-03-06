@@ -1,7 +1,7 @@
 import Term: Measure
 import Term: remove_markup
 
-@testset "Measure - str" begin
+@testset "\e[31mMeasure - str" begin
     @test Measure("a"^10).w == 10
 
     strings = (

@@ -1,6 +1,6 @@
 import Term.renderables: Renderable, RenderableText, AbstractRenderable
 
-@testset "Renderables - Renderable" begin
+@testset "\e[31mRenderables - Renderable" begin
     # simply test the creation and type of Renderables
     @test Renderable("text") isa RenderableText
 
@@ -11,7 +11,7 @@ import Term.renderables: Renderable, RenderableText, AbstractRenderable
 end
 
 
-@testset "Renderables - RenderableText" begin
+@testset "\e[31mRenderables - RenderableText" begin
     @test RenderableText("sadasdasdasdasdas") isa RenderableText
 
     r = RenderableText("a"^100; width=25)

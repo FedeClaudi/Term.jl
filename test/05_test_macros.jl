@@ -1,6 +1,6 @@
 import Term.style: apply_style
 
-@testset "MACROS" begin
+@testset "\e[31mMACROS" begin
     @test (@green "string") == apply_style("[green]string[/green]")
     @test (@blue "string") == apply_style("[blue]string[/blue]")
     @test (@red "string") == apply_style("[red]string[/red]")

@@ -1,7 +1,7 @@
 import Term.markup: has_markup, extract_markup
 
 
-@testset "Markup - detection" begin
+@testset "\e[31mMarkup - detection" begin
     # with no markup
     strings = [
         "asdasdasdsad",

@@ -1,6 +1,6 @@
 import Term: Panel, TextBox, cleantext
 
-@testset "Panel - panel creation" begin
+@testset "\e[31mPanel - panel creation" begin
     p1 = Panel("this panel has fixed width", width=44, justify=:right)
     @test string(
         p1
@@ -59,7 +59,7 @@ import Term: Panel, TextBox, cleantext
 end
 
 
-@testset "Panel - panel layout  " begin
+@testset "\e[31mPanel - panel layout  " begin
 
     pright = Panel("content [red]with style[/red] "^26, title="My Panel", title_style="bold red", width=44)
     pleft = Panel("content "^30, box=:DOUBLE, style="blue", width=66)
@@ -95,7 +95,7 @@ end
 end
 
 
-@testset "Panel - tbox creation " begin
+@testset "\e[31mPanel - tbox creation " begin
     my_long_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
     tb = TextBox(my_long_text; width=44)
 
@@ -118,7 +118,7 @@ end
 end
 
 
-@testset "Pannel - tbox markup  " begin
+@testset "\e[31mPannel - tbox markup  " begin
     another_long_one = "This is a [red bold]very[/red bold] piece of [green italic]content[/green italic]. But TextBox can handle [underline]anything[/underline]!! "^10
     tb = TextBox(another_long_one, width=44)
 
