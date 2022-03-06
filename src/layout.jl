@@ -17,14 +17,20 @@ module layout
     #                                    PADDING                                   #
     # ---------------------------------------------------------------------------- #
     """
-    Stores string to pad a string to a given width
+        Padding
+
+    Stores empty string to pad a string to the desired with.
     """
     struct Padding
         left::AbstractString
         right::AbstractString
     end
 
-    """Creates a Padding for a string to match a given width according to a justify method"""
+    """
+        Padding(text::AbstractString, target_width::Int, method::Symbol)::Padding
+
+    Create `Padding` for a string given a justification `method` ∈ (:left, :center, :right).
+    """
     function Padding(text::AbstractString, target_width::Int, method::Symbol)::Padding
         # get total padding size
         lw = Measure(text).w
@@ -74,7 +80,7 @@ module layout
     """
         vstack(r1::RenderablesUnion, r2::RenderablesUnion)
 
-    Vertically stacks two renderables to give a new renderable.
+    Vertically stack two renderables to give a new renderable.
     """
     function vstack(r1::RenderablesUnion, r2::RenderablesUnion)
         r1 = Renderable(r1)
@@ -97,7 +103,7 @@ module layout
     """ 
         vstack(renderables...)
 
-    Vertically stacks a variable number of renderables
+    Vertically stack a variable number of renderables
     """
     function vstack(renderables...)
         renderable = Renderable()
@@ -112,7 +118,7 @@ module layout
     """
         hstack(r1::RenderablesUnion, r2::RenderablesUnion)
 
-    Horizontally stacks two renderables to give a new renderable.
+    Horizontally stack two renderables to give a new renderable.
     """
     function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
         r1 = Renderable(r1)
@@ -142,7 +148,7 @@ module layout
     """ 
         hstack(renderables...)
 
-    Horizonatlly stacks a variable number of renderables
+    Horizonatlly stack a variable number of renderables
     """
     function hstack(renderables...)
         renderable = Renderable()
@@ -170,6 +176,13 @@ module layout
     #                                LINES & SPACER                                #
     # ---------------------------------------------------------------------------- #
     abstract type AbstractLayoutElement <: AbstractRenderable end
+
+    # ---------------------------------- spacer ---------------------------------- #
+    """
+            Spacer
+
+    A box of empty text with given width and height.
+    """
     mutable struct Spacer <: AbstractLayoutElement
         segments::Vector{Segment}
         measure::Measure
@@ -184,11 +197,12 @@ module layout
         return Spacer(segments, Measure(segments))
     end
 
+
+    # ----------------------------------- vline ---------------------------------- #
     """
         vLine
     
-    A multi-line renderable with each line made of a | 
-    to create a vertical line
+    A multi-line renderable with each line made of a | to create a vertical line
     """
     mutable struct vLine <: AbstractLayoutElement
         segments::Vector{Segment}
@@ -196,11 +210,11 @@ module layout
         height::Int
     end
 
+
     """
         vLine(height::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
 
-    Constructor to create a styled vertical line of viven height.
-
+    Create a `vLine` given a height and, optionally, style information.
     """
     function vLine(height::Number; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
         height = int(height)
@@ -209,6 +223,11 @@ module layout
         return vLine(segments, Measure(segments), height)
     end
 
+    """
+        vLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
+
+    Create a `vLine` as tall as the `stdout` console
+    """
     vLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED) = vLine(console_height(); style=style, box=box)
 
     """
@@ -225,7 +244,7 @@ module layout
     """
         hLine(width::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
     
-    constructor to create a styled hLine of given width
+    Create a styled `hLine` of given width.
     """
     function hLine(width::Number; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
         width = int(width)
@@ -237,7 +256,7 @@ module layout
     """
         hLine(width::Number, text::String; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
 
-    Creates an hLine object with texte centered horizontally
+    Creates an hLine object with texte centered horizontally.
     """
     function hLine(width::Number, text::String; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
         box = eval(box)
@@ -257,6 +276,17 @@ module layout
         return hLine(segments, Measure(segments), width)
     end
     
+    """
+        hLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
+
+    Construct an `hLine` as wide as the `stdout`
+    """
     hLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED) = hLine(console_width(); style=style, box=box)
+    
+    """
+        hLine(text::AbstractString; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
+    
+    Construct an `hLine` as wide as the `stdout` with centered text.
+    """
     hLine(text::AbstractString; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED) = hLine(console_width(), text; style=style, box=box)
 end

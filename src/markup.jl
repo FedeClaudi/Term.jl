@@ -17,7 +17,12 @@ module markup
         isclose::Bool
     end
 
-    function SingleTag(text::AbstractString, match::RegexMatch) 
+    """
+        SingleTag(match::RegexMatch) 
+
+    Construct a `SingleTag` out of a `RegexMatch`
+    """
+    function SingleTag(match::RegexMatch) 
         _start = match.offset
         _stop = match.offset + length(match.match) - 1
 
@@ -34,6 +39,9 @@ module markup
         MarkupTag
     
     Represents a complete markup tag.
+
+    It stores two `SingleTag`, the text inbetween and any other `MarkupTag`
+    that was detected in that text.
     """
     mutable struct MarkupTag
         markup::String
@@ -48,10 +56,19 @@ module markup
 
 
     # ---------------------------- extract markup tags --------------------------- #
-    # has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, remove_ansi(text))
+
+    """
+        has_markup(text::AbstractString)
+
+    Returns `true` if `text` includes a `MarkupTag`
+    """
     has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, replace_double_brackets(text))
 
-    
+    """
+        extract_markup(input_text::AbstractString; firstonly=false)
+
+    Extracts `MarkupTag`s from a piece of text.
+    """
     function extract_markup(input_text::AbstractString; firstonly=false)
         text = input_text  # copy so that we can edit it
         tags = []
@@ -61,22 +78,22 @@ module markup
             open_match = match(OPEN_TAG_REGEX, input_text)
 
             # get tag declaration
-            tag_open = SingleTag(text, open_match)
+            tag_open = SingleTag(open_match)
 
             # get tag closing
             close_regex = r"\[\/+" * tag_open.markup * r"\]"
             if !occursin(close_regex, text[tag_open.stop:end])
                 # check if a generig closer [/] is present
                 if occursin(GENERIC_CLOSER_REGEX, text[tag_open.stop:end])
-                    tag_close = SingleTag(text, collect(eachmatch(GENERIC_CLOSER_REGEX, text))[end])
+                    tag_close = SingleTag(collect(eachmatch(GENERIC_CLOSER_REGEX, text))[end])
                 else
                     # otherwise inject a closer tag at the end
                     text = text * "[/$(tag_open.markup)]"
                     input_text = input_text * "[/$(tag_open.markup)]"
-                    tag_close = SingleTag(text, match(close_regex, text, tag_open.start))
+                    tag_close = SingleTag(match(close_regex, text, tag_open.start))
                 end
             else
-                tag_close = SingleTag(text, match(close_regex, text, tag_open.start))
+                tag_close = SingleTag(match(close_regex, text, tag_open.start))
             end
 
             # crate tag and keep
@@ -114,10 +131,10 @@ module markup
         clean_nested_tags(text::AbstractString)::AbstractString
 
     Given a text with nested string like:
-    `[red]aaaa [green]asdasdasd[/green] sasdas [blue] adasdas [/blue]asdadsa[/red]`
+    `[red]aaaa [green]bbbb[/green] cccc [blue] ddddd [/blue]eeee[/red]`
 
     it adds extra tags to ensure that text within inner tags is handled properly, giving:
-    `[red]aaaa [green]asdasdasd[/green][red] sasdas [/red][blue] adasdas [/blue][red]asdadsa[/red]`
+    `[red]aaaa [green]bbbb[/green][red] cccc [/red][blue] ddddd [/blue][red]eeee[/red]`
     """
     function clean_nested_tags(text::AbstractString)
         if !has_markup(text)
@@ -149,8 +166,6 @@ module markup
             _tag = "[$(inner.open.markup)]$(inner.text)[$(inner.close.markup)]"
             replacement = "[$(tag.close.markup)]" * _tag * "[$(tag.open.markup)]"
             text = replace(text, _tag=>replacement)
-
-            # @info "\e[31minner" text inner
         end
         
         return text
@@ -168,7 +183,7 @@ module markup
         for i in length(text): -1 : 1
             # get all open tags
             for opener in reverse(collect(eachmatch(OPEN_TAG_REGEX, text[i])))
-                tag_open = SingleTag(text[i], opener)
+                tag_open = SingleTag(opener)
 
                 # get line where it closes
                 j = i

@@ -24,7 +24,7 @@ module segment
     """
         Segment(text::AbstractString)
     
-    Constructs a Segment out of a string with markup.
+    Construct a Segment out of a string with markup.
     """
     function Segment(text::Union{Segment, AbstractString})
         if typeof(text) == Segment
@@ -40,14 +40,14 @@ module segment
     """
         Segment(text::Union{Segment, AbstractString}, markup::AbstractString)
     
-    Constructs a Segment out of a plain string and a markup string with style info
+    Construct a Segment out of a plain string and a markup string with style info
     """
     Segment(text::Union{Segment, AbstractString}, markup::Union{Nothing, AbstractString}) = isnothing(markup) ? Segment(text) : Segment("[$markup]"*text)
 
     """
         Segment(text::Union{Segment, AbstractString}, style::MarkupStyle)
     
-    Constructs a Segment out of a plain string and a MarkupStyle object.
+    Construct a Segment out of a plain string and a MarkupStyle object.
     """
     function Segment(text::Union{Segment, AbstractString}, style::Union{Nothing, MarkupStyle}) 
         if isnothing(style)

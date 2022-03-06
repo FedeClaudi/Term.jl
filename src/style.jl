@@ -17,8 +17,7 @@ module style
     """
         MarkupStyle
 
-    Holds information about the style specification set out by a 
-    `MarkupTag`.
+    Holds information about the style specification set out by a `MarkupTag`.
     """
     @with_kw mutable struct MarkupStyle
         default::Bool       = false
@@ -63,6 +62,11 @@ module style
     toDict(style::MarkupStyle) = Dict(fieldnames(typeof(style)) .=> getfield.(Ref(style), fieldnames(typeof(style))))
 
     # ------------------------------ extract style ------------------------------ #
+    """
+        extract_style(text::AbstractString)
+
+    Extract style information from a `text`.
+    """
     function extract_style(text::AbstractString)
         tags = extract_markup(text)
         styles = [MarkupStyle(tag) for tag in tags]
@@ -71,6 +75,11 @@ module style
 
     # -------------------------------- apply style ------------------------------- #
 
+    """
+        get_style_codes(style::MarkupStyle)
+
+    Get `ANSICode`s corresponding to a `MarkupStyle`.
+    """
     function get_style_codes(style::MarkupStyle)
         # start applying styles
         style_init, style_finish = "", ""
@@ -111,6 +120,11 @@ module style
         return style_init, style_finish
     end
 
+    """
+        apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
+
+    Apply a `style` to a `text`.
+    """
     function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
         style_init, style_finish = get_style_codes(style)
 
@@ -121,7 +135,7 @@ module style
     """
         apply_style(text::AbstractString, tag::MarkupTag)::AbstractString
 
-    Applies the style of a markup tag and it's nested tags
+    Appliy the style of a markup tag and it's nested tags
     """
     function apply_style(text::AbstractString, tag::MarkupTag; isinner::Bool = false)::AbstractString
         style = MarkupStyle(tag)
@@ -157,7 +171,7 @@ module style
     """
         apply_style(text::AbstractString)
 
-    Extracts and applies all markup style in a string.
+    Extract and apply all markup style in a string.
     """
     function apply_style(text::AbstractString;)::AbstractString
         # @info "Applying style to " text

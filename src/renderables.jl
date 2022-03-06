@@ -8,6 +8,10 @@ module renderables
     export AbstractRenderable, Renderable, RenderableText
 
     # ------------------------------- abstract type ------------------------------ #
+
+    """
+        AbstractRenderable
+    """
     abstract type AbstractRenderable end
 
     Measure(renderable::AbstractRenderable) = renderable.measure
@@ -28,6 +32,8 @@ module renderables
     end
 
     """
+        Base.string(r::AbstractRenderable)::String
+
     Creates a string representation of a renderable
     """
     function Base.string(r::AbstractRenderable)::String
@@ -48,6 +54,12 @@ module renderables
 
     
     # ------------------------- generic renderable object ------------------------ #
+
+    """
+        Renderable
+
+    Generic `Renderable` object.
+    """
     mutable struct Renderable <: AbstractRenderable
         segments::Vector
         measure::Measure
@@ -61,12 +73,27 @@ module renderables
     # ---------------------------------------------------------------------------- #
     #                                TEXT RENDERABLE                               #
     # ---------------------------------------------------------------------------- #
+
+    """
+        RenderableText
+
+    `Renderable` represnting a text.
+
+    See also [`Renderable`](@ref), [`TextBox`](@ref)
+    """
     mutable struct RenderableText <: AbstractRenderable
         segments::Vector
         measure::Measure
         text::AbstractString
     end
 
+    """
+        RenderableText(text::AbstractString; width::Union{Nothing, Int, Symbol}=nothing)
+
+    Construct a `RenderableText` out of a string.
+
+    If a `width` is passed the text is resized to match the width.
+    """
     function RenderableText(text::AbstractString; width::Union{Nothing, Int, Symbol}=nothing)
         # @info "creating RenderableText"  text width
         if width isa Number

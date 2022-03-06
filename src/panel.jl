@@ -18,7 +18,12 @@ module panel
     #                                     PANEL                                    #
     # ---------------------------------------------------------------------------- #
     """
-    Renderable with a panel around another piece of content (text or AbstractRenderable).
+        Panel
+
+    `Renderable` with a panel surrounding some content:
+            ╭──────────╮
+            │ my panel │
+            ╰──────────╯
     """
     mutable struct Panel <: AbstractPanel
         segments::Vector
@@ -32,16 +37,27 @@ module panel
 
     """
         Panel(
-            content::Union{String, AbstractRenderable};
+            content::RenderablesUnion;
             title::Union{Nothing, String}=nothing,
             title_style::Union{String, Nothing}=nothing,
-            width::Union{Nothing, Int}=nothing,
+            title_justify::Symbol=:left,
+            subtitle::Union{String, Nothing}=nothing,
+            subtitle_style::Union{String, Nothing}=nothing,
+            subtitle_justify::Symbol=:left,
+            width::Union{Nothing, Symbol, Int}=:fit,
+            height::Union{Nothing, Int}=nothing,
             style::Union{String, Nothing}=nothing,
             box::Symbol=:ROUNDED,
             justify=:left
         )
 
     `Panel` constructor to fit a panel to a piece of (renderable) content.
+
+    `title` can be used to specify a title to be addded to the top row and 
+    `title_style` and `title_justify` set its appearance and position.
+    Same for `subtitle` but for the panel's bottom row.
+    `width` and `height` are used to set the `Panel`'s size. If not passed
+    they are computed to fit tot the `content`'s size.
     """
     function Panel(
                 content::RenderablesUnion;
@@ -113,12 +129,8 @@ module panel
 
             # make line
             segment = Segment(left * padding.left * apply_style(line) * padding.right * right)
-            # @info "pl" left.plain padding.left padding.right right.plain
-            # @info "panel line" line padding segment segment.plain Measure(segment.plain)
 
             push!(segments, segment)
-
-            # @assert segment.measure.w <= panel_measure.w "\e[31mTarget measure: $panel_measure, segment has $(segment.measure), pading: $padding, line length: $(length(line))"
         end
 
         # add empty lines to ensure target height is reached
@@ -128,10 +140,7 @@ module panel
                 push!(segments, Segment(left * line * right))
             end
         end
-
         push!(segments, bottom)
-
-        # @assert max([Measure(s).w for s in segments]...) <= panel_measure.w "\e[31mSegments too large"
 
         return Panel(
             segments, 
@@ -140,7 +149,6 @@ module panel
             title_style,
             style,
         )
-
     end
 
     """
@@ -165,7 +173,7 @@ module panel
     """
         TextBox
 
-    Creates a panel and fits input text to it.
+    Creates a `Panel` and fits input text to it.
     The pannel is hidden so that the result is just a text box.
     """
     mutable struct TextBox <: AbstractPanel
@@ -174,6 +182,30 @@ module panel
     end
 
 
+    """
+        TextBox(
+            text::Union{Vector, AbstractString};
+            width::Union{Nothing, Int}=nothing,
+            title::Union{Nothing, String}=nothing,
+            title_style::Union{String, Nothing}="default",
+            title_justify::Symbol=:left,
+            subtitle::Union{String, Nothing}=nothing,
+            subtitle_style::Union{String, Nothing}="default",
+            subtitle_justify::Symbol=:left,
+            justify::Symbol=:left,
+            fit::Symbol=:fit,
+            )
+
+    Creates an hidden `Panel` with `text` in it.
+
+    If a `width` is passed, the input `text` is reshaped to have
+    that size, unless `fit=:truncate` in which case it's cut to size.
+    If no `width` is passed and `fit=:fit` the `TextBox`'s size
+    matches the size of the input `text`.
+    Other arguments behave like `Panel`.
+
+    See also [`Panel`](@ref).
+    """
     function TextBox(
         text::Union{Vector, AbstractString};
         width::Union{Nothing, Int}=nothing,

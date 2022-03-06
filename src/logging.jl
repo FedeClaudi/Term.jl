@@ -14,7 +14,11 @@ module logging
     tprint = (println ∘ apply_style)
 
     # ---------------------------- create term logger ---------------------------- #
-    # create logger
+    """
+        TermLogger
+
+    Custom logger type.
+    """
     struct TermLogger <: Logging.AbstractLogger
         io::IO
         theme::Theme
@@ -34,7 +38,7 @@ module logging
     """
         print_closing_line(color::String, width::Int)
 
-    Prints the final line of a log message with style and date info
+    Print the final line of a log message with style and date info
     """
     function print_closing_line(color::String, width::Int)
         tprint("  [$color bold dim]$(ROUNDED.bottom.left)" * "$(ROUNDED.row.mid)"^(width) * "[/$color bold dim]")
@@ -47,9 +51,10 @@ module logging
 
 
     """
-    Logging.handle_message(logger::TermLogger,
+        Logging.handle_message(logger::TermLogger,
 
-    Handles printing of log messages, with style!.
+    Handle printing of log messages, with style!.
+
     In addition to the log message and info such as file/line and time of log, 
     it prints kwargs styled by their type.
     """
@@ -166,8 +171,17 @@ module logging
     end
 
     # ---------------------------- install term logger --------------------------- #
+
+    """
+        install_term_logger(theme::Theme=theme)
+
+    Install `TermLogger` as the global logging system.
+
+    `theme::Theme` can be passed to specify the theme to use for styling objects.
+    """
     function install_term_logger(theme::Theme=theme)
         _logger = TermLogger(theme)
         global_logger(_logger)
     end
+    
 end
