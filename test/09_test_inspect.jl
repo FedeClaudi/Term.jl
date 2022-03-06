@@ -1,6 +1,6 @@
 import Term: inspect
 oldstd = stdout
-redirect_stdout(open("/dev/null", "w"))
+# redirect_stdout(open("/dev/null", "w"))
 
 # define some types
 abstract type T1 end
@@ -71,4 +71,4 @@ as you can see inspect prints the docstrings of the methods it can find and list
 the methods available.
 """
 
-redirect_stdout(oldstd) # recover original stdout
+# redirect_stdout(oldstd) # recover original stdout

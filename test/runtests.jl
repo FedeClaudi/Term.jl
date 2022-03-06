@@ -2,7 +2,6 @@ using Term
 using Test
 
 
-
 nlines(x) = length(split(x, "\n"))
 lw(x) = max(length.(split(x, "\n"))...)
 
