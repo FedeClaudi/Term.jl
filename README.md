@@ -41,9 +41,9 @@ Related:
 - [ ] theme
 
 ### To do & bugs
-- [ ] errors should handle keyword objects: `Panel(-6)`
-- [ ] BUG: errors, occasionally fails to render error.
-- [ ] BUG: read code style from file sometimes gives the wrong line
+- [x] errors should handle keyword objects: `Panel(-6)`
+- [x] BUG: errors, occasionally fails to render error.
+- [ ] BUG: read code style from file sometimes gives the wrong line (towards end of file)
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles
@@ -55,3 +55,14 @@ Related:
 - [ ] logging:
   - [ ] get "stack trace" of logging: where is the log message triggered from?
 - [ ] allow for user created `Theme`s
+- [ ] add additional error types to errors.jl
+  - [ ] SystemError
+  - [x] DivideError
+  - [x] StackOverflowError
+  - [ ] UndefRefError 
+  - [ ] EOFError
+  - [x] KeyError
+  - [ ] InterruptException
+  - [ ] DimensionMismatch
+  - [ ] UndefKeywordError
+  - [x] InexactError

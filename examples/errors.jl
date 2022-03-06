@@ -29,24 +29,37 @@ To run this example uncomment one of the lines below to find the
 corresponding error message
 """
 
-# Method Errors
+# ------------  MethodError
 # 1 - "a"
 
-# nested errors
-# fn(x::Int) = 2x
-# other_fn(x) = fn(x) + fn(x)
-# other_fn("a")
+# ------------  DomainError
+# sqrt(-1)
 
+# ------------  AssertionError
+# import Term: Panel
+# Panel("mytext", title="this title is waaaay too long!!!")
 
-# DomainError
-sqrt(-1)
+# ------------  UndefVarError
+# println(x)
 
-# AssertionError
+# ------------  BoundsError
+# v = collect(1:10)
+# v[20]
 
+# ------------  DivideError
+# div(2, 0)
 
-import Term: Panel
-Panel("mytext", title="this title is waaaay too long!!!")
+# ------------  StackOverflowError
+# a() = b()
+# b() = a()
+# a()
 
+# ------------  KeyError
+# mydict = Dict(:a=>"a", :b=>"b")
+# mydict["a"]
+
+# ------------  InexactError
+Int(2.5)
 
 
 
