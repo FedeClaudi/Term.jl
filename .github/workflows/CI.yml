@@ -14,7 +14,7 @@ jobs:
         version:
           - '1.6'
           - '1.7'
-          - 'nightly'
+          # - 'nightly'
         os:
           - ubuntu-latest
           - windows-latest
@@ -43,23 +43,3 @@ jobs:
       - uses: codecov/codecov-action@v1
         with:
           file: lcov.info
-
-  # docs:
-  #   name: Documentation
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: julia-actions/setup-julia@v1
-  #       with:
-  #         version: '1'
-  #     - uses: julia-actions/julia-buildpkg@v1
-  #     - uses: julia-actions/julia-docdeploy@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-  #     - run: |
-  #         julia --project=docs -e '
-  #           using Documenter: DocMeta, doctest
-  #           using Term
-  #           DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive=true)
-  #           doctest(Term)'
