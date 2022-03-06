@@ -1,3 +1,10 @@
+"""
+    _highlight(x)
+
+Apply style to `x` based on its type.
+"""
+function _highlight end
+
 _highlight(x::Union{Symbol, AbstractString}) = "[$(theme.symbol)]$x[/$(theme.symbol)]"
 _highlight(x::Number) = "[$(theme.number)]$x[/$(theme.number)]"
 _highlight(x::DataType) = "[$(theme.type) dim]::$(x)[/$(theme.type) dim]"
@@ -5,8 +12,24 @@ _highlight(x::UnitRange) = _highlight(string(x))
 _highlight(x::Union{AbstractArray, AbstractVector, AbstractMatrix}) =  "[$(theme.number)]$x[/$(theme.number)]"
 _highlight(x::Function) = "[$(theme.function)]$x[/$(theme.function)]"
 
+function _highlight(x)
+    return _highlight(string(x))
+end
+
+
+"""
+    _highlight_with_type(x)
+
+Apply style to x and and mark its type.
+"""
 _highlight_with_type(x) = "$(_highlight(x))$(_highlight(typeof(x)))"
 
+
+"""
+    _highlight_numbers(x::AbstractString) 
+
+Add style to each number in a string
+"""
 function _highlight_numbers(x::AbstractString) 
     for match in collect(eachmatch(r"[0-9]", x))
         x = replace(x, match.match=>"[blue]$(match.match)[/blue]")
@@ -15,12 +38,13 @@ function _highlight_numbers(x::AbstractString)
 end
 
 
-function _highlight(x)
-    # @info "highlighting misterious object" x typeof(x)
-    return _highlight(string(x))
-end
+"""
+    style_error(io::IO, er)
 
+Create a style error panel.
 
+Creates a `Panel` with an error message and optional hints.
+"""
 function style_error(io::IO, er)
     if haskey(ErrorsExplanations, typeof(er))
         info_msg = ErrorsExplanations[typeof(er)]
@@ -61,7 +85,9 @@ end
 
 
 """
-creates a sub-panel within a backtrace panel showing code where the error happened
+    backtrace_subpanel(line::String, WIDTH::Int, title::String)
+
+Create a subpanel for stacktrace, showing source code.
 """
 function backtrace_subpanel(line::String, WIDTH::Int, title::String)
     # @info "getting subpanel"
@@ -95,6 +121,11 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
     )
 end
 
+"""
+    style_backtrace(io::IO, t::Vector)
+
+Create a Panel with styled error backtrace information.
+"""
 function style_backtrace(io::IO, t::Vector)
     # @info "styling backtrace"
     WIDTH = _width()
@@ -173,7 +204,9 @@ function style_backtrace(io::IO, t::Vector)
 end
 
 """
-Simple styling of stack traces. Just adding a miniumum of color.
+    style_stacktrace_simple(stack::Vector)
+
+Simply style a stacktrace. Just adding a miniumum of color.
 """
 function style_stacktrace_simple(stack::Vector)
     lines::Vector{String} = []

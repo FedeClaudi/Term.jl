@@ -5,6 +5,11 @@ module color
     export NamedColor, BitColor, RGBColor, get_color
 
     # ----------------------------- types definition ----------------------------- #
+    """
+        AbstractColor
+
+    Abstract color type.
+    """
     abstract type AbstractColor end
 
     Base.show(io::IO, color::AbstractColor) = print(io, "$(typeof(color))('$(color.color)')")
@@ -38,7 +43,7 @@ module color
     """
         _rgb(numbertype, txt)
 
-    Tries to parse r,g,b out of a string based on number type
+    Tries to parse r,g,b out of a string based on number type.
     """
     _rgb(number_type, txt) = begin
         rgb = split(remove_brackets(nospaces(txt)), ",")
@@ -51,7 +56,7 @@ module color
     """
         _rgb(numbertype, txt)
 
-    Tries to parse r,g,b out of a string
+    Tries to parse r,g,b out of a string.
     """
     function _rgb(txt)
         try
@@ -62,6 +67,12 @@ module color
         end
     end
 
+
+    """
+        is_named_color(string::AbstractString)::Bool
+
+    Check if a string represents a named color.
+    """
     function is_named_color(string::AbstractString)::Bool
         if string ∈ NAMED_COLORS || string ∈ COLORS_16b
             return true
@@ -70,6 +81,11 @@ module color
         end
     end
     
+    """
+        is_rgb_color(string::AbstractString)::Bool
+
+    Check if a string represents a RGB color.
+    """
     function is_rgb_color(string::AbstractString)::Bool
         try
             _rgb(string)
@@ -79,6 +95,11 @@ module color
         end
     end
     
+    """
+        is_hex_color(string::AbstractString)::Bool
+
+    Check if a string represents a hex color.
+    """
     function is_hex_color(string::AbstractString)::Bool
         stripped = nospaces(string)
         l = length(stripped)
@@ -89,7 +110,11 @@ module color
         end
     end
     
+    """
+        is_color(string::AbstractString)::Bool
     
+    Check if a string represents color information, of any type.
+    """
     function is_color(string::AbstractString)::Bool
 
         is_named = is_named_color(string)
@@ -99,6 +124,11 @@ module color
         return is_named || is_rgb || is_hex
     end
     
+    """
+        is_background(string::AbstractString)::Bool
+    
+    Check if a string represents background color information, of any type.
+    """
     function is_background(string::AbstractString)::Bool
         stripped = nospaces(string)
         if length(stripped) < 3
@@ -122,7 +152,11 @@ module color
         return RGBColor("($r, $g, $b)", r, g, b)
     end
     
-    
+    """
+        get_color(string::AbstractString; bg=false)::AbstractColor
+
+    Extract a color type from a string with color information.
+    """
     function get_color(string::AbstractString; bg=false)::AbstractColor
         if bg
             string = nospaces(string)[4:end]

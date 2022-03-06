@@ -6,8 +6,7 @@ end
 """
     ANSICode(color; bg::Bool=false)
 
-Given an AbstractColor, create the appropriate ANSI tag, 
-for both foreground and background colors.
+Create ANSI tags for colors.
 """
 function ANSICode(color; bg::Bool=false)
     ctype = split(string(typeof(color)), ".")[end]
@@ -28,6 +27,7 @@ function ANSICode(color; bg::Bool=false)
         @warn "Could not figure out color type for $color, can't produce ansi code"
     end
 end
+
 
 reset_code(code::ANSICode) = ANSICode(code.close, code.close)
 

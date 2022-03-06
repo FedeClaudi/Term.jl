@@ -11,8 +11,9 @@ module box
     export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
 
     """
-    Returns an iterable yielding tuples (is_last, value)
-    where is_last == true only if value is the lest item in v.
+      loop_last(v::Vector)
+    
+      Returns an iterable yielding tuples (is_last, value).
     """
     function loop_last(v::Vector)
         is_last = [i==length(v) for i in 1:length(v)]
@@ -23,7 +24,9 @@ module box
     #                                      BOX                                     #
     # ---------------------------------------------------------------------------- #
     """
-    Defines the characters in a single line of a `Box`
+      BoxLine
+    
+    Stores the characters for a line of a `Box` object.
     """
     struct BoxLine
         left::Char
@@ -33,7 +36,11 @@ module box
     end
 
     """
+      Box
+    
     Defines characters to render boxes.
+
+    Row names:
 
     ┌─┬┐ top
     │ ││ head
@@ -43,6 +50,8 @@ module box
     ├─┼┤ foot_row
     │ ││ foot
     └─┴┘ bottom
+
+    each row is an instance of `BoxLine`
     """
     struct Box
         name::String
@@ -59,9 +68,9 @@ module box
     """
         Box(string)
 
-    Constructs a `Box` objet out of a box string.
+    Construct a `Box` objet out of a box string.
     """
-    function Box(box_name, box::String)
+    function Box(box_name::String, box::String)
         top, head, head_row, mid, row, foot_row, foot, bottom = split(box, "\n")
 
         Box(
@@ -88,11 +97,13 @@ module box
       end
     end
 
+
     """
         get_row(box, [1, 2, 3], :row)
 
     Gets characters for a row of a Box object.
-    The level Symbold can be used to specify the box level (:top, :footer...)
+
+    The level Symbol can be used to specify the box level (:top, :footer...)
     """
     function get_row(box::Box, widths::Vector{Int}, level::Symbol)::String
         # get the correct level of the box
@@ -106,6 +117,23 @@ module box
         join(parts)
     end
     
+    """
+      get_title_row(row::Symbol, box::Box, title::Union{Nothing, AbstractString}; <keyword arguments>)
+
+    Create a box row with a title string.
+
+    Can create both titles in the top and bottom row to produce subtitles.
+
+    #Arguments:
+    - width::Int: width of line
+    - style::Union{Nothing:  String}: style of line
+    - title_style::Union{Nothing:  AbstractString}: style of title string
+    - justify::Symbol=:left: position of title string
+
+    See also [`get_row`](@ref).
+
+
+    """
     function get_title_row(
         row::Symbol,
         box::Box,
@@ -169,7 +197,11 @@ module box
 
 
     """
-    Creates a box with one of each level type with columns
+      fit(box::Box, widths::Vector{Int})::String
+
+    Creates a box.
+    
+    The box has one of each level type with columns
     widths specified by a vector of widhts.
     """
     function fit(box::Box, widths::Vector{Int})::String

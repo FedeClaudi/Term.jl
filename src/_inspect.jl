@@ -1,7 +1,9 @@
 import Documenter.DocSystem: getdocs
 
 """
-Extracts and styles a docstring object
+    get_docstring(obj)
+
+Extract and style an object's docstring.
 """
 function get_docstring(obj)
     # get doc and docstring
@@ -28,7 +30,9 @@ end
 
 
 """
-Styles a vector of super types 
+    style_super_types(info)::String
+
+Style a vector of super types 
 """
 function style_super_types(info)::String
     if !isnothing(info.supertypes)
@@ -46,7 +50,9 @@ end
 
 
 """
-Styles a vector of sub types 
+    style_sub_types(info)::String
+
+Style a vector of sub types.
 """
 function style_sub_types(info)::String
     if !isnothing(info.subtypes)
@@ -64,7 +70,9 @@ end
 
 
 """
-Styles a string with method info (name, args, path...)
+    style_method_line(method::AbstractString; trim::Bool=false)::String
+
+Style a string with method info (name, args, path...)
 """
 function style_method_line(method::AbstractString; trim::Bool=false)::String
     if length(method) == 0

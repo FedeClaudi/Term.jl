@@ -36,7 +36,7 @@ module introspection
     """
         TypeInfo(type::DataType)
 
-    Extracts information from a DataType and stores it as a `TypeInfo` object.
+    Extract information from a DataType and store it as a `TypeInfo` object.
     """
     function TypeInfo(type::DataType)
         # get super/sub types
@@ -68,7 +68,7 @@ module introspection
     """
         TypeInfo(fun::Function)
 
-    Exctracts information from a function object
+    Exctract information from a function object
     """
     function TypeInfo(fun::Function)
         # get docstring
@@ -89,8 +89,10 @@ module introspection
     """
         inspect(type::DataType; width::Int=120)
 
-    Inspects a type definition to extract info like docstring, fields, types etc.
-    Also shows constructors for the type and methods making use of the type.
+    Introspect a  type.
+    
+    Extract  info like docstring, fields, types etc. and show it in a structured
+    terminal output.
     """
     function inspect(type::DataType; width::Union{Nothing, Int}=nothing, max_n_methods::Int=3)
         width = isnothing(width) ? min(console.width, 92)-4 : width-4
@@ -199,6 +201,7 @@ module introspection
 
     end
 
+
     """
         inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
 
@@ -252,8 +255,7 @@ module introspection
     end
 
     """
-    generic inspect method, dispatches to type-specific methods
-    when they can be found
+    generic inspect method, dispatches to type-specific methods when they can be found
     """
     function inspect(obj; kwargs...) 
         if typeof(obj) <: Function

@@ -14,7 +14,7 @@ const code_regex = ""
 """
     highlight(text::AbstractString, theme::Theme)
 
-Highlights a text introducing markup to style semantically
+Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object
 """
 function highlight(text::AbstractString, theme::Theme)
@@ -61,8 +61,9 @@ end
 
 
 """
-custom ANSI lexer https://juliadocs.github.io/Highlights.jl/stable/man/formatting/
-for Highlighters.jl
+    Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
+
+custom ANSI lexer for Highlighters.jl
 """
 function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
     for (str, id, style) in tokens
@@ -83,14 +84,15 @@ function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
     end
 end
 
+"""
+    highlight_syntax(code::AbstractString; style::Bool=true) 
 
+Highlight Julia code syntax in a string.
+"""
 function highlight_syntax(code::AbstractString; style::Bool=true) 
     txt = sprint(_highlight, MIME("text/ansi"), escape_brackets(code), Lexers.JuliaLexer, CodeTheme; context=stdout)
 
     if style
-        # txt = escape_brackets(txt)
-        # txt = apply_style("[$markup]$(txt)[/$markup]")
-        # txt = unescape_brackets(txt)
         txt = apply_style(txt)
     end
 
@@ -99,9 +101,9 @@ end
 
 
 """
-    load_code_and_highlighy(path::AbstractString, lineno::Int; δ::Int=3, width::INt=120)
+    load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int=3, width::INt=120)
 
-Loads a file, gets the code and formats it. Returns styled text
+Load a file, get the code and format it. Return styled text
 """
 function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int=3)
     η = countlines(path)
