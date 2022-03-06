@@ -25,7 +25,7 @@ macro make_color_macro(color)
         macro $(esc(color))(text)
             color_str = $(string(color))
             quote
-                code = ANSICode(get_color($color_str); bg=false)
+                code = ANSICode(get_color($color_str); bg = false)
                 styled = apply_style($(string(text)))
                 string(code.open * styled * code.close)
             end

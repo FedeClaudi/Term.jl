@@ -8,7 +8,7 @@ import Term: install_stacktrace
 install_stacktrace()
 
 # ------------------------------- inspect types ------------------------------ #
-inspect(Panel) 
+inspect(Panel)
 inspect(AbstractRenderable;)
 inspect(String;)
 

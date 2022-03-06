@@ -1,6 +1,6 @@
 import Term: inspect
 oldstd = stdout
-redirect_stdout(open("/dev/null", "w")) 
+redirect_stdout(open("/dev/null", "w"))
 
 # define some types
 abstract type T1 end
@@ -16,7 +16,7 @@ Term's awesome `inspect` functionality!
 struct MyType <: T2
     x::Int
     y::String
-    fn
+    fn::Any
 end
 
 

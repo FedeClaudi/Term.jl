@@ -4,8 +4,12 @@ import Highlights: highlight as _highlight
 
 # ------------------------------- highlighting ------------------------------- #
 const highlight_regexes = Dict(
-    :multiline_code => [ r"\`\`\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \# \s \? \{ \}  \_ \- \: \!\ \" \> \'\s]*\`\`\`"],
-    :code =>[r"\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \#\s \_ \- \: \!\ \? \{ \} \" \> \'\s]*\`"], 
+    :multiline_code => [
+        r"\`\`\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \# \s \? \{ \}  \_ \- \: \!\ \" \> \'\s]*\`\`\`",
+    ],
+    :code => [
+        r"\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \#\s \_ \- \: \!\ \? \{ \} \" \> \'\s]*\`",
+    ],
     :type => [r"\:\:+[a-zA-Z0-9\.\,]*", r"\{+[a-zA-Z0-9 \,\.. ]*\}"],
 )
 
@@ -27,7 +31,7 @@ function highlight(text::AbstractString, theme::Theme)
                 # @info "L" length(match.match) match.match like
 
                 # TODO find better way to avoid repeats/mistakes with :code
-                if like ==  :code && length(match.match) == 2
+                if like == :code && length(match.match) == 2
                     continue
                 end
 
@@ -36,8 +40,8 @@ function highlight(text::AbstractString, theme::Theme)
                 end
                 prev_match = match.match
 
-                with_markup = do_by_line(x->"[$markup]$x[/$markup]", match.match)
-                text = replace(text, match.match => with_markup) 
+                with_markup = do_by_line(x -> "[$markup]$x[/$markup]", match.match)
+                text = replace(text, match.match => with_markup)
                 # text = replace(text, match.match => "[$markup]$(match.match)[/$markup]") 
             end
         end
@@ -53,7 +57,7 @@ relevant text of type :like.
 """
 function highlight(text::AbstractString, theme::Theme, like::Symbol)
     markup = getfield(theme, like)
-    return do_by_line(x->"[$markup]$x[/$markup]", chomp(text))
+    return do_by_line(x -> "[$markup]$x[/$markup]", chomp(text))
 end
 
 
@@ -69,11 +73,11 @@ function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
     for (str, id, style) in tokens
         fg = style.fg.active ? map(Int, (style.fg.r, style.fg.g, style.fg.b)) : ""
         bg = style.bg.active ? map(Int, (style.bg.r, style.bg.g, style.bg.b)) : nothing
-        
+
 
         bold = style.bold ? "bold" : ""
         italic = style.italic ? "italic" : ""
-        underline = style.underline ? "underline" : ""        
+        underline = style.underline ? "underline" : ""
         bg = isnothing(bg) ? "" : "on_$(bg)"
         markup = "$fg $(bg) $(bold) $(italic) $(underline)"
         if length(strip(markup)) > 0
@@ -89,8 +93,15 @@ end
 
 Highlight Julia code syntax in a string.
 """
-function highlight_syntax(code::AbstractString; style::Bool=true) 
-    txt = sprint(_highlight, MIME("text/ansi"), escape_brackets(code), Lexers.JuliaLexer, CodeTheme; context=stdout)
+function highlight_syntax(code::AbstractString; style::Bool = true)
+    txt = sprint(
+        _highlight,
+        MIME("text/ansi"),
+        escape_brackets(code),
+        Lexers.JuliaLexer,
+        CodeTheme;
+        context = stdout,
+    )
 
     if style
         txt = apply_style(txt)
@@ -105,23 +116,23 @@ end
 
 Load a file, get the code and format it. Return styled text
 """
-function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int=3)
+function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     η = countlines(path)
     @assert lineno > 0 "lineno must be ≥1"
     @assert lineno ≤ η "lineno $lineno too high for file with $(η) lines"
 
-    lines = read_file_lines(path, lineno-9, lineno+10)
+    lines = read_file_lines(path, lineno - 9, lineno + 10)
     linenos = [ln[1] for ln in lines]
     lines = [ln[2] for ln in lines]
-    code =  split(highlight_syntax(join(lines); style=false), "\n")
+    code = split(highlight_syntax(join(lines); style = false), "\n")
 
     # clean
-    clean(line) =replace(line, "    [/    ]"=>"")
+    clean(line) = replace(line, "    [/    ]" => "")
     codelines = clean.(code)  # [10-δ:10+δ]
     linenos = linenos  # [10-δ:10+δ]
 
     # make n lines match
-    if lineno ≤  δ
+    if lineno ≤ δ
         codelines = clean.(code)[1:lineno+δ]
         linenos = linenos[1:lineno+δ]
     elseif η - lineno ≤ δ
@@ -144,7 +155,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int=3)
 
 
     cleaned_lines = []
-    for (n, line) in zip(linenos, codelines)      
+    for (n, line) in zip(linenos, codelines)
         # style
         if n == lineno
             symb = "[red bold]▶[/red bold]"

@@ -14,12 +14,12 @@ end
 @testset "\e[31mRenderables - RenderableText" begin
     @test RenderableText("sadasdasdasdasdas") isa RenderableText
 
-    r = RenderableText("a"^100; width=25)
+    r = RenderableText("a"^100; width = 25)
     @test r.measure.w == 25
     @test r.measure.h == 4
 
 
-    r = RenderableText("a"^100, "red bold"; width=25)
+    r = RenderableText("a"^100, "red bold"; width = 25)
     @test r.measure.w == 25
     @test r.measure.h == 4
 

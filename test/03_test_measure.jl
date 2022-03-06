@@ -8,7 +8,7 @@ import Term: remove_markup
         "asadasda"^2,
         "~~±±||__ASdaSDvxcvxc\nasdfsiaudfhsdiufhndskjv",
         "dasdadsa\nsdfsd"^7,
-        "asdasdsa|dfvcxvashfusdn\nfidsuhfsdf"
+        "asdasdsa|dfvcxvashfusdn\nfidsuhfsdf",
     )
     for string in strings
         m = Measure(string)
@@ -20,7 +20,7 @@ import Term: remove_markup
         "[red]is my color"^2,
         "~~±±||__[red on_green]aasdas[bold]asdsad[/bold]asdas[/red on_green]xc\nasdfsiaudfhsdiufhndskjv",
         "dasda[#ffffff]dsa[#ffffff]\nsdfsd"^7,
-        "asdasdsa|dfvcxvashf[bold]usdn\nfid[/bold]suhfsdf"
+        "asdasdsa|dfvcxvashf[bold]usdn\nfid[/bold]suhfsdf",
     )
     for string in strings
         m = Measure(string)

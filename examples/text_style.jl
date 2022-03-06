@@ -41,10 +41,8 @@ Fortunately, Term provides a set of macros to easily print styled strings!!
 
 import Term: @red, @blue, @style
 
-println( @red "This is red")
-println( @blue "and this is blue")
+println(@red "This is red")
+println(@blue "and this is blue")
 
 # or, if you want some more control
-println(
-    @style "this is my beautifully styled text" green italic bold
-)
+println(@style "this is my beautifully styled text" green italic bold)

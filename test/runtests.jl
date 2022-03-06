@@ -9,7 +9,9 @@ lw(x) = max(length.(split(x, "\n"))...)
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
-macro timeit_include(path::AbstractString) :(@timeit TIMEROUTPUT $path include($path)) end
+macro timeit_include(path::AbstractString)
+    :(@timeit TIMEROUTPUT $path include($path))
+end
 
 
 print("\n\n")
@@ -40,5 +42,5 @@ print("\n\n")
 @timeit_include("09_test_inspect.jl")
 
 
-show(TIMEROUTPUT; compact=true, sortby=:firstexec)
+show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")

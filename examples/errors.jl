@@ -18,7 +18,7 @@ import Term: hLine
 
 install_stacktrace()
 
-print(hLine("Fancy Errors", style="bold blue"))
+print(hLine("Fancy Errors", style = "bold blue"))
 
 """
 Done!
@@ -71,7 +71,3 @@ corresponding error message
 a = zeros(20, 20)
 b = zeros(5, 4)
 a .+ b
-
-
-
-

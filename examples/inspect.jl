@@ -25,7 +25,7 @@ Term's awesome `inspect` functionality!
 struct MyType <: T2
     x::Int
     y::String
-    fn
+    fn::Any
 end
 
 

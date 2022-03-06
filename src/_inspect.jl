@@ -17,13 +17,13 @@ function get_docstring(obj)
         for dc in doc
             dstring = escape_brackets(dc.text[1])
             file = "[dim]$(dc.data[:binding]): $(dc.data[:path]) at line $(dc.data[:linenumber])[/dim]"
-            push!(docstrings, dstring *  file * "\n")
+            push!(docstrings, dstring * file * "\n")
         end
         # docstring = join_lines([escape_brackets(d.text[1])*"\n[dim bold]----------[/dim bold]" for d in doc])
 
         # style
         docstring = highlight(join_lines(docstrings), theme)
-        docstring = highlight(docstring,  theme, :docstring)
+        docstring = highlight(docstring, theme, :docstring)
     end
     return doc, unescape_brackets(docstring)
 end
@@ -74,11 +74,11 @@ end
 
 Style a string with method info (name, args, path...)
 """
-function style_method_line(method::AbstractString; trim::Bool=false)::String
+function style_method_line(method::AbstractString; trim::Bool = false)::String
     if length(method) == 0
         return method
     end
-    
+
     method = trim ? method[4:end] : method
 
     def, file = split(method, " in ")
@@ -86,5 +86,7 @@ function style_method_line(method::AbstractString; trim::Bool=false)::String
     args = "(" * args
     file = split(file, " at ")[end]
 
-    return highlight(name, theme, :emphasis) *  highlight(highlight(args, theme), theme, :emphasis_light) * "\n         [dim]$file[/dim]"
+    return highlight(name, theme, :emphasis) *
+           highlight(highlight(args, theme), theme, :emphasis_light) *
+           "\n         [dim]$file[/dim]"
 end

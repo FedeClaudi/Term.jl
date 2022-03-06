@@ -20,9 +20,7 @@ println(my_long_text)
 
 
 println(@green "\n\nAnd now in a textbox:")
-print(
-    TextBox(my_long_text)
-)
+print(TextBox(my_long_text))
 
 """
 note that textbox is really printing a `Term.Panel` object, so all the arguments
@@ -32,23 +30,22 @@ you'd use in a panel can be used here for more creating control (see panels exam
 print(
     TextBox(
         my_long_text,
-        title="This is my long text",
-        title_style="bold red",
-        title_justify=:center,
-        subtitle="styled by Term.jl",
-        subtitle_justify=:right,
-        subtitle_style="dim"
-    )
+        title = "This is my long text",
+        title_style = "bold red",
+        title_justify = :center,
+        subtitle = "styled by Term.jl",
+        subtitle_justify = :right,
+        subtitle_style = "dim",
+    ),
 )
 
 """
 And of course it works well with markup styles too
 """
-another_long_one = "This is a [red bold]very[/red bold] piece of [green italic]content[/green italic]. But TextBox can handle [underline]anything[/underline]!! "^10
+another_long_one =
+    "This is a [red bold]very[/red bold] piece of [green italic]content[/green italic]. But TextBox can handle [underline]anything[/underline]!! "^10
 
-print(
-    TextBox(another_long_one, width=44)
-)
+print(TextBox(another_long_one, width = 44))
 
 
 """
@@ -61,16 +58,23 @@ very wide piece of text
 
 tb1 = TextBox(
     my_long_text,
-    title="This is my long text",
-    title_style="bold red",
-    title_justify=:center,
-    subtitle="styled by Term.jl",
-    subtitle_justify=:right,
-    subtitle_style="dim",
-    width=44
+    title = "This is my long text",
+    title_style = "bold red",
+    title_justify = :center,
+    subtitle = "styled by Term.jl",
+    subtitle_justify = :right,
+    subtitle_style = "dim",
+    width = 44,
 )
 
-tb2 = TextBox(another_long_one, width=30, title="second column", title_style="blue bold", title_justify=:center, fit=:fit)
+tb2 = TextBox(
+    another_long_one,
+    width = 30,
+    title = "second column",
+    title_style = "blue bold",
+    title_justify = :center,
+    fit = :fit,
+)
 print(tb1 * tb2)
 
 """ or even 
@@ -80,4 +84,4 @@ very wide piece of text
 """
 
 import Term: Panel
-print(Panel(tb1 * tb2, width=:fit, title="My Panel"))
+print(Panel(tb1 * tb2, width = :fit, title = "My Panel"))

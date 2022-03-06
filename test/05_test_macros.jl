@@ -10,8 +10,10 @@ import Term.style: apply_style
     @test (@underline "string") == apply_style("[underline]string[/underline]")
 
 
-    @test (@style "string" bold underline) == apply_style("[bold underline]string[/bold underline]")
+    @test (@style "string" bold underline) ==
+          apply_style("[bold underline]string[/bold underline]")
     @test (@style "string" bold greeen) == apply_style("[bold greeen]string[/bold greeen]")
-    @test (@style "string" red on_blue underline) == apply_style("[red on_blue underline]string[/red on_blue underline]")
+    @test (@style "string" red on_blue underline) ==
+          apply_style("[red on_blue underline]string[/red on_blue underline]")
     @test (@style "string" bold italic) == apply_style("[bold italic]string[/bold italic]")
 end
