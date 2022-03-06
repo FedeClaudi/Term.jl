@@ -24,7 +24,7 @@ module measure
     function Measure(str::AbstractString)
         str = (remove_ansi ∘ remove_markup_open ∘ remove_markup)(str)
         lines = split(str, "\n")
-        w = max([length(ln) for ln in lines]...)
+        w = max([textwidth(ln) for ln in lines]...)
         return Measure(w, length(lines))
     end
 

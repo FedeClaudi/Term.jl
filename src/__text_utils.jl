@@ -49,6 +49,12 @@ function remove_ansi(str::AbstractString)::AbstractString
     str
 end
 
+"""
+    cleantext(str::AbstractString)
+
+Remove all style information from a string.
+"""
+cleantext(str::AbstractString) = (remove_ansi ∘ remove_markup_open ∘ remove_markup)(str)
 
 # --------------------------------- brackets --------------------------------- #
 const brackets_regexes = [

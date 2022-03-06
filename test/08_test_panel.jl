@@ -1,37 +1,60 @@
-import Term: Panel, TextBox
+import Term: Panel, TextBox, cleantext
 
 @testset "Panel - panel creation" begin
+    p1 = Panel("this panel has fixed width", width=44, justify=:right)
     @test string(
-        Panel("this panel has fixed width", width=44, justify=:right)
+        p1
     ) == "╭──────────────────────────────────────────╮\n│               this panel has fixed width │\n╰──────────────────────────────────────────╯"
 
-
+    p2 = Panel("this one too, but the text is at the center!", width=66, justify=:center)
     @test string(
-        Panel("this one too, but the text is at the center!", width=66, justify=:center)
+        p2
     ) == "╭────────────────────────────────────────────────────────────────╮\n│          this one too, but the text is at the center!          │\n╰────────────────────────────────────────────────────────────────╯"
 
-
+    p3 = Panel("this one fits its content", width=:fit)
     @test string(
-        Panel("this one fits its content", width=:fit)
+        p3
     ) == "╭───────────────────────────╮\n│ this one fits its content │\n╰───────────────────────────╯"
 
-
+    p4 = Panel(
+        "[red]This is the panel's first line.[/red]",
+        "[bold green]and this is another, panel just stacks all inputs into one piece of content[/bold green]",
+        width=:fit,
+    )
     @test string(
-        Panel(
-            "[red]This is the panel's first line.[/red]",
-            "[bold green]and this is another, panel just stacks all inputs into one piece of content[/bold green]",
-            width=:fit,
-        )
+        p4
     ) == "╭─────────────────────────────────────────────────────────────────────────────╮\n│ \e[31mThis is the panel's first line.\e[39m                                             │\n│ \e[1m\e[32mand this is another, panel just stacks all inputs into one piece of content\e[22m\e[39m │\n╰─────────────────────────────────────────────────────────────────────────────╯"
 
 
+    p5 = Panel("content "^10, subtitle="another panel", subtitle_style="dim underline", subtitle_justify=:right, width=44)
     @test string(
-        Panel("content "^10, subtitle="another panel", subtitle_style="dim underline", subtitle_justify=:right, width=44)
+        p5
     ) == "╭──────────────────────────────────────────╮\n│ content content content content content  │\n│ content content content content content  │\n╰─────────────────────────\e[0m \e[2m\e[4manother panel\e[22m\e[24m ──╯"
 
+    p6 = Panel("content "^10, box=:DOUBLE, style="blue", width=44)
     @test string(
-        Panel("content "^10, box=:DOUBLE, style="blue", width=44)
+        p6
     ) == "\e[34m╔══════════════════════════════════════════╗\e[39m\n\e[34m║\e[39m content content content content content  \e[34m║\e[39m\n\e[34m║\e[39m content content content content content  \e[34m║\e[39m\n\e[34m╚══════════════════════════════════════════╝\e[39m"
+
+    # test with wider chars
+    p7 = Panel("나랏말싸미 듕귁에 달아")
+    p8 = Panel("こんにちは(わ)")
+
+    @test p7.measure.w == 26
+    @test p8.measure.w == 18
+    @test p8.measure.h == 3
+
+    @test string(p7) == "╭────────────────────────╮\n│ 나랏말싸미 듕귁에 달아 │\n╰────────────────────────╯"
+    @test string(p8) == "╭────────────────╮\n│ こんにちは(わ) │\n╰────────────────╯"
+
+
+    # check all  lines in each panel have exactly the same size
+    for panel in (p1, p2, p3, p4, p5, p6, p7, p8)
+        _p = string(panel)
+        widths = textwidth.(cleantext.(split(_p, "\n")))
+        @test length(unique(widths)) == 1
+
+    end
 
 end
 
