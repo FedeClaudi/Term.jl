@@ -107,7 +107,7 @@ module errors
     function error_message(io::IO, er::LoadError)
         # @info "load error message"  fieldnames(LoadError)
         msg = "At [grey62 underline]$(er.file)[/grey62 underline] line [bold]$(er.line)"
-        subm = "\nThe cause is an error of type: [bright_red]$(string(typeof(er.error)))"
+        subm = "The cause is an error of type: [bright_red]$(string(typeof(er.error)))"
         return msg, subm
 
     end

@@ -35,7 +35,7 @@ function style_error(io::IO, er)
     # create panel and text
     if !isnothing(info_msg)
         panel = Panel(
-            main_message * message,
+            length(message) > 0 ? main_message / message : main_message,
             hLine(WIDTH-4; style="red dim"),
             RenderableText("[bold yellow italic underline]hint:[/bold yellow italic underline] [bright_red]$(typeof(er))[/bright_red] " * info_msg; width=WIDTH-4),
             title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
@@ -46,7 +46,7 @@ function style_error(io::IO, er)
         )
     else
         panel = Panel(
-            main_message * message,
+            length(message) > 0 ? main_message / message : main_message,
             title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
             title_style="red",
             style = "dim red",
