@@ -59,7 +59,18 @@ corresponding error message
 # mydict["a"]
 
 # ------------  InexactError
-Int(2.5)
+# Int(2.5)
+
+# ------------  UndefKeywordError
+# function my_func(;my_arg::Int)
+#     return my_arg + 1
+# end
+# my_func()
+
+# ------------  DimensionMismatch
+a = zeros(20, 20)
+b = zeros(5, 4)
+a .+ b
 
 
 

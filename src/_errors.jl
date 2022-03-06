@@ -7,6 +7,13 @@ _highlight(x::Function) = "[$(theme.function)]$x[/$(theme.function)]"
 
 _highlight_with_type(x) = "$(_highlight(x))$(_highlight(typeof(x)))"
 
+function _highlight_numbers(x::AbstractString) 
+    for match in collect(eachmatch(r"[0-9]", x))
+        x = replace(x, match.match=>"[blue]$(match.match)[/blue]")
+    end
+    return x
+end
+
 
 function _highlight(x)
     # @info "highlighting misterious object" x typeof(x)
@@ -28,8 +35,7 @@ function style_error(io::IO, er)
     # create panel and text
     if !isnothing(info_msg)
         panel = Panel(
-            main_message,
-            message,
+            main_message * message,
             hLine(WIDTH-4; style="red dim"),
             RenderableText("[bold yellow italic underline]hint:[/bold yellow italic underline] [bright_red]$(typeof(er))[/bright_red] " * info_msg; width=WIDTH-4),
             title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
@@ -40,8 +46,7 @@ function style_error(io::IO, er)
         )
     else
         panel = Panel(
-            main_message,
-            message,
+            main_message * message,
             title="ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
             title_style="red",
             style = "dim red",

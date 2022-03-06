@@ -47,14 +47,21 @@ Related:
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles
+
 - [ ] pretty print commond data structure such as Dict
+
 - [ ] progress bar
+
 - [ ] allow things like Panel and TextBox to `fill` their parent renderable
+
 - [ ] tree visualization
 - [ ] type hierarchy tree (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
+
 - [ ] logging:
   - [ ] get "stack trace" of logging: where is the log message triggered from?
+
 - [ ] allow for user created `Theme`s
+
 - [ ] add additional error types to errors.jl
   - [ ] SystemError
   - [x] DivideError
@@ -63,6 +70,6 @@ Related:
   - [ ] EOFError
   - [x] KeyError
   - [ ] InterruptException
-  - [ ] DimensionMismatch
-  - [ ] UndefKeywordError
+  - [x] DimensionMismatch
+  - [x] UndefKeywordError
   - [x] InexactError

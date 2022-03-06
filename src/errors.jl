@@ -16,6 +16,7 @@ module errors
         ArgumentError       => "The parameters to a function call do not match a valid signature.",
         AssertionError      => "comes up when an assertion's check fails (e.g., `@assert 1==2`)",
         BoundsError         => "comes up when trying to acces a container at invalid position (e.g., a string a='abcd' with 4 characters cannot be accessed as a[5]).",
+        DimensionMismatch   => "comes up when trying to perform an operation on objects which don't have matching dimensionality (e.g., summing matrixes of different size).",
         DivideError         => "comes up when attempting integer division with 0 as denominator. [blue]2/0=Inf[/blue] is okay, but [orange1]div(2, )[/orange1] will give an error",
         DomainError         => "comes up when the argument to a function is outside its domain (e.g., √(-1))",
         ErrorException      => "is a generic error type",
@@ -25,6 +26,7 @@ module errors
         MethodError         => "comes up when to method can be found with a given name and for a given set of argument types.",
         StackOverflowError  => "usually comes up when functions call each other recursively.",
         TypeError           => "is a type assertion failure, or calling an intrinsic function with an incorrect argument type.",
+        UndefKeywordError   => "comes up when a function has a keyword argument with no default value and no value is passed to a function call",
         UndefVarError       => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
     )
     
@@ -54,10 +56,10 @@ module errors
         if isdefined(er, :a)
             if er.a isa AbstractString
                 nunits = ncodeunits(er.a)
-                additional_msg = "String has $nunits codeunits, $(length(er.a)) characters."
+                additional_msg = "S\ntring has $nunits codeunits, $(length(er.a)) characters."
             end
         else
-            additional_msg ="[red]Variable is not defined!.[/red]" 
+            additional_msg ="\n[red]Variable is not defined!.[/red]" 
         end
         return main_msg, additional_msg
     end
@@ -67,6 +69,11 @@ module errors
         # @info "err exceprion" er fieldnames(DomainError) er.val
         # msg = split(er.msg, " around ")[1]
         return er.msg, "\nThe invalid value is: $(_highlight_with_type(er.val))."
+    end
+
+    # ! DimensionMismatch
+    function error_message(io::IO, er::DimensionMismatch)
+        return _highlight_numbers(er.msg), ""
     end
 
     # ! DivideError
@@ -92,7 +99,7 @@ module errors
     function error_message(io::IO, er::InexactError)
         # @info "load error message"  fieldnames(InexactError)
         msg = "Cannot convert $(_highlight_with_type(er.val)) to type [$(theme.type)]$(er.T)[/$(theme.type)]"
-        subm = "Conversion error in function: $(_highlight(er.func))"
+        subm = "\nConversion error in function: $(_highlight(er.func))"
         return msg, subm
     end
 
@@ -100,7 +107,7 @@ module errors
     function error_message(io::IO, er::LoadError)
         # @info "load error message"  fieldnames(LoadError)
         msg = "At [grey62 underline]$(er.file)[/grey62 underline] line [bold]$(er.line)"
-        subm = "The cause is an error of type: [bright_red]$(string(typeof(er.error)))"
+        subm = "\nThe cause is an error of type: [bright_red]$(string(typeof(er.error)))"
         return msg, subm
 
     end
@@ -164,6 +171,13 @@ module errors
         msg, ""
     end
 
+    # ! UndefKeywordError
+    function error_message(io::IO, er::UndefKeywordError) 
+        # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
+        var = string(er.var)
+        "Undefined function keyword argument: '$(_highlight(er.var))'.", ""
+    end
+
     # ! UNDEFVAR ERROR
     function error_message(io::IO, er::UndefVarError) 
         # @info "undef var error" er er.var typeof(er.var)
@@ -185,7 +199,7 @@ module errors
         if hasfield(typeof(er), :error)
             # @info "nested error" typeof(er.error)
             m1, m2 = error_message(io, er.error)
-            msg = "[bold red]LoadError:[/bold red]\n" * m1
+            msg = "\n[bold red]LoadError:[/bold red]\n" * m1
         else
             msg = hasfield(typeof(er), :msg) ? er.msg : "no message for error of type $(typeof(er)), sorry."
             m2 = ""
