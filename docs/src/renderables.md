@@ -139,20 +139,22 @@ import Term: Panel # hide
 print(
     Panel(width=8, box=:DOUBLE, style="green") *
     Panel(width=8, box=:HEAVY, style="white") *
-    Panel(width=8, box=:DOUBLE_EDGE, style="red"),
+    Panel(width=8, box=:ROUNDED, style="red"),
 )
 ```
 
-About `Panels`, they're not limited to having strings as content, they can have other renderables too (multiple ones in fact)!
+
+
+By the way, `Panels` are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!
 ```@example
 
 import Term: Panel # hide
 
 print(
     Panel(
-        Panel(width=18, box=:DOUBLE, style="green"),
-        Panel(width=18, box=:HEAVY, style="white"),
-        Panel(width=18, box=:DOUBLE_EDGE, style="red"),
+        Panel(width=18, style="green"),
+        Panel(width=18, style="white"),
+        Panel(width=18, style="red"),
         title="so many panels!",
         width=:fit,
         title_justify=:left,
@@ -164,8 +166,8 @@ print(
 
 ## TextBox
 `TextBox`es are a very simple but very useful renderable. They bring together `RenderableText` with `Panel`.
-In fact they're just a panel with a `RenderableText` inside an its box hidden. Why, you say? Well because now
-you can have a piece of text, with a nice title and sub title.
+In fact they're just a panel with a `RenderableText` inside and with its box hidden. 
+Why do we need them, you say? Well because now you can have a piece of text, with a nice title and sub title.
 
 ```@example
 import Term: TextBox
