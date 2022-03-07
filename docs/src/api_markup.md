@@ -4,5 +4,5 @@ CurrentModule = Term.markup
 ```
 
 ```@autodocs
-Modules = [Term.markup]
+Modules = [markup]
 ```

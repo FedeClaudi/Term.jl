@@ -5,6 +5,7 @@ The term `styled text` refers to text printed out to a terminal (or other `::IO`
 The easiest way to add style information to a `String` in `Term` is using the dedicated macros:
 
 ```@example
+using Term
 println(@green "this is green")
 println(@blue "and this is blue")
 print("\n")
@@ -48,7 +49,7 @@ str="Every other word has colors!"
 
 to have a color. You could do it with macros:
 
-```julia
+```@example
 e = @red "Every"
 o = "other"
 w = @green "word"
@@ -81,7 +82,7 @@ that's right, `Term.jl` can also color the background of your text (by adding `o
 
 If you just want to **use** `Term.jl`'s style functionality, just make sure to read the admonition below. If you're curious about what's happening under the hood, read on below!
 
-!!! warning A note on style tags
+!!! warning "A note on style tags"
     The style tags used by `Term.jl` have an opening `"[style]"` and closing `"[/style]"` syntax. The style is applied to everything inbetween. For `"[/style]"` to close `"[style]"` the text in the parentheses must match exactly (excuding `/`), up to the number and position of spaces and the words order. So:
     ```julia
     "[red] wohoo [/red]"  # works
@@ -90,7 +91,7 @@ If you just want to **use** `Term.jl`'s style functionality, just make sure to r
     "[bold blue] wohoo [/blue bold]" # doesn't
     ```
 
-!!! tip!
+!!! tip
     Occasionally you can do without the closing tag:
     
     ```@example
@@ -124,7 +125,4 @@ somehow.
 CurrentModule = Term.markup
 ```
 
-All of this is taken care of by:
-```@docs
-extract_markup
-```
+All of this is taken care of by [`makedocs`](@extract_markup)
