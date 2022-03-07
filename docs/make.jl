@@ -1,4 +1,5 @@
 using Term
+
 using Documenter
 
 DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
@@ -18,7 +19,7 @@ makedocs(;
         "page.md",
         "Page title" => "page2.md",
         "Subsection" => [
-            "pag123.md",
+            "p.md",
             "page12312.md",
         ]
         
