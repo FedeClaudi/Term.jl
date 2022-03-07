@@ -22,9 +22,8 @@ makedocs(;
         "Subsection" => [
             "p.md",
             "page12312.md",
-        ]
-        
+            ]
         ],
 )
 
-deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "docs")
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "gh-pages")
