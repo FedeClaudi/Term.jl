@@ -16,15 +16,26 @@ Related:
   - [x] basic usage
     - [x] markup
     - [x] apply style
-  - [x] macros
+    - [x] macros
+  - [ ] colors
+    - [ ] allowed colors
+    - [ ] how to use them and exmaples
   - [ ] renderabletext, textbox/panels + nesting
-    - [ ] segments
-    - [ ] measure
-  - [ ] layout: stacking + layout objects
+    - [x] segments
+    - [x] measure
+    - [ ] panels
+    - [ ] textbox
+  - [ ] layout
+    - [ ] the idea
+    - [ ] vstack vs hstack
+    - [ ] nesting
+    - [ ] hline
+    - [ ] vLine
+    - [ ] Spacer
   - [ ] inspect
   - [ ] errors
   - [ ] logging
-  - [ ] colors! (add ref in styled text)
+
   - API
     - [x] term
     - [x] markup
@@ -44,6 +55,8 @@ Related:
 - [ ] `highlight` sometimes doesnt apply styles correctly when >1 elements per line
 - [ ] BUG: read code style from file sometimes gives the wrong line (towards end of file)
 - [x] `logging` accept symbols and expressions in message
+- [ ] refactor `TextBox` and `RenderableText`
+- [ ] use project board
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles

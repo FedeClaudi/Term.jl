@@ -105,7 +105,7 @@ If you just want to **use** `Term.jl`'s style functionality, just make sure to r
     applied to the same string, it's better to be explicit in exactly where each style starts and ends.
 
 
-## Under the hood.
+## Under the hood
 
 If you're reading here you're curious about what exactly is happening under the hood. So let's get started.
 `Term.jl`, like `rich` in python, defines a simple markup language to specify the style of bits of strins.
