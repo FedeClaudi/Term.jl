@@ -101,8 +101,10 @@ function Logging.handle_message(
     vert = "[$outline_markup]" * ROUNDED.mid.left * "[/$outline_markup]"
 
     # style message
-    msg = has_markup(msg) ? msg : "[#8abeff]$msg[/#8abeff]"
-    msg = reshape_text(msg, 64)
+    if msg isa AbstractString
+        msg = has_markup(msg) ? msg : "[#8abeff]$msg[/#8abeff]"
+        msg = reshape_text(msg, 64)
+    end
 
 
     # print the first line of information

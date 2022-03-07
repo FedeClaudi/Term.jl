@@ -19,11 +19,13 @@ Related:
   - [ ] layout: stacking + layout objects
   - [ ] inspect
   - [ ] errors
+  - [ ] logging
 
 
 ### To do & bugs
 - [ ] `highlight` sometimes doesnt apply styles correctly when >1 elements per line
 - [ ] BUG: read code style from file sometimes gives the wrong line (towards end of file)
+- [x] `logging` accept symbols and expressions in message
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles
