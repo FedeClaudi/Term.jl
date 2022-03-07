@@ -138,7 +138,6 @@ After extracting style information, `apply_style` replaces the `MarkupTag` infor
 So in summary:
 
 ```julia
-import Term.style: apply_style  # hide
 apply_style("[red]text[/red]")
 ```
 will return a string with style information
