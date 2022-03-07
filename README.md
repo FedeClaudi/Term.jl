@@ -26,8 +26,8 @@ Related:
   - [ ] logging
   - [ ] colors! (add ref in styled text)
   - API
-    - [ ] term
-    - [ ] markup
+    - [x] term
+    - [x] markup
     - [ ] style
     - [ ] color
     - [ ] console
@@ -39,7 +39,6 @@ Related:
     - [ ] segment
     - [ ] measure
     - [ ] style
-    - [ ] theme
 
 
 ### To do & bugs
