@@ -24,4 +24,4 @@ makedocs(;
         ],
 )
 
-deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "main")
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "docs")
