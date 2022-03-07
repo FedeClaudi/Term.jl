@@ -19,7 +19,7 @@ While for styling you have: `@bold @dim @italic @underline`.
 Note that the styling macros return a string, so you can combine the resulting strings as you would normally:
 
 ```@example
-using Term # hidden
+using Term # hide
 println(
     @green("This is green") * " and " * @red("this is red")
 )
@@ -33,7 +33,7 @@ With these style macros you can do some simply styling, but it gets clunky when 
 Of course not, you can use the `@style` macro!
 
 ```@example
-using Term # hidden
+using Term # hide
 mytext = @style "this is my text" blue bold underline
 println(mytext)
 ```
@@ -52,7 +52,7 @@ str="Every other word has colors!"
 to have a color. You could do it with macros:
 
 ```@example
-using Term # hidden
+using Term # hide
 e = @red "Every"
 o = "other"
 w = @green "word"
@@ -77,7 +77,7 @@ Two things happened: 1) `Term` styling machinery detects strings segments like `
 
 Not bad huh? Even better, the style information inside a parentheses can be more than just color:
 ```@example
-using Term # hidden
+using Term # hide
 tprint(
     "[bold black underline on_red]So much [gold3 bold]STYLE[/gold3 bold] in this text[/bold black underline on_red]"
 )
@@ -114,7 +114,7 @@ As we saw, the syntax is very simple with an opening and closing tag specifying 
 So the first thing that needs to happen is the **detection** of these markup tags. This is surprisingly hard because there's so many possible combinations. You can have markup tags whose style information varies considerably, you can have nested tags, you can have tags spread across lines and you can have nested tags spread across lines:
 
 ```@example
-using Term # hidden
+using Term # hide
 tprint(
     """
 And [blue] somehow
@@ -130,27 +130,27 @@ somehow.
 CurrentModule = Term.markup
 ```
 
-All of this is taken care of by [`extract_markup`](@ref) which returns a vector of [`MarkupTag`](@ref) objects. Each of these stores the opening and close tags (as `SingleTag` objects), the text inbetween them as well as a reference to all `MarkupTag`s nested in it.
+All of this is taken care of by [`Term.markup.extract_markup`](@ref) which returns a vector of [`Term.markup.MarkupTag`](@ref) objects. Each of these stores the opening and close tags (as `SingleTag` objects), the text inbetween them as well as a reference to all `MarkupTag`s nested in it.
 
-Normally, you should never use `extract_markup` directly. Instead you can let [`apply_style`](@ref) handle it. When passed a `String`, `apply_style` will use `extract_markup` to extract style information before applying it to the string. This is done one `MarkupTag` at the time and recursively (i.e., dealing with nested tags before moving on to the next) until no markup information is found. 
+Normally, you should never use `extract_markup` directly. Instead you can let [`Term.style.apply_style`](@ref) handle it. When passed a `String`, `apply_style` will use `extract_markup` to extract style information before applying it to the string. This is done one `MarkupTag` at the time and recursively (i.e., dealing with nested tags before moving on to the next) until no markup information is found. 
 
-After extracting style information, `apply_style` replaces the `MarkupTag` information with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text bewteen `[...]`) into a [`MarkupStyle`](@ref) object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
+After extracting style information, `apply_style` replaces the `MarkupTag` information with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text bewteen `[...]`) into a [`Term.style.MarkupStyle`](@ref) object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
 So in summary:
 
 ```julia
-import Term.style: apply_style  # hidden
+import Term.style: apply_style  # hide
 apply_style("[red]text[/red]")
 ```
 will return a string with style information
 
 ```@example
-import Term.style: apply_style  # hidden
-apply_style("[red]text[/red]") # hidden
+import Term.style: apply_style  # hide
+apply_style("[red]text[/red]") # hide
 ```
 
 which printed to the console looks like:
 ```@example
-import Term.style: apply_style  # hidden
-print(apply_style("[red]text[/red]")) # hidden
+import Term.style: apply_style  # hide
+print(apply_style("[red]text[/red]")) # hide
 ```
 

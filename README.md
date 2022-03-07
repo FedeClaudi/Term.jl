@@ -13,9 +13,9 @@ Related:
 - [x] logo
 - [ ] docs
   - [x] installation
-  - [ ] basic usage
-    - [ ] markup
-    - [ ] apply style
+  - [x] basic usage
+    - [x] markup
+    - [x] apply style
   - [x] macros
   - [ ] renderabletext, textbox/panels + nesting
     - [ ] segments
@@ -28,17 +28,16 @@ Related:
   - API
     - [x] term
     - [x] markup
-    - [ ] style
-    - [ ] color
-    - [ ] console
-    - [ ] inspect
-    - [ ] layout
-    - [ ] logging
-    - [ ] panel
-    - [ ] renderables
-    - [ ] segment
-    - [ ] measure
-    - [ ] style
+    - [x] color
+    - [x] console
+    - [x] inspect
+    - [x] layout
+    - [x] logging
+    - [x] panel
+    - [x] renderables
+    - [x] segment
+    - [x] measure
+    - [x] style
 
 
 ### To do & bugs

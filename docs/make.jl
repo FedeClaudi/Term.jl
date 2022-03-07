@@ -20,7 +20,7 @@ makedocs(;
         "Manual" => [
             "Styled text"           => "styled_text.md",
             "Panels"                => "panels.md",
-            "Content layout"        => "content_layout.md",
+            "Layout"        => "content_layout.md",
             "Logging"               => "logging.md",
             "Errors tracebacks"     => "errors_tracebacks.md",
             "Code introspection"    => "introspection.md",
