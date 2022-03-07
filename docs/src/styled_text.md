@@ -130,4 +130,27 @@ somehow.
 CurrentModule = Term.markup
 ```
 
-All of this is taken care of by [`Term.markup.extract_markup`](@extract_markup)
+All of this is taken care of by [`extract_markup`](@Term.markup.extract_markup) which returns a vector of [`MarkupTag`](@Term.markup.MarkupTag) objects. Each of these stores the opening and close tags (as `SingleTag` objects), the text inbetween them as well as a reference to all `MarkupTag`s nested in it.
+
+Normally, you should never use `extract_markup` directly. Instead you can let [`apply_style](@Term.style.apply_style) handle it. When passed a `String`, `apply_style` will use `extract_markup` to extract style information before applying it to the string. This is done one `MarkupTag` at the time and recursively (i.e., dealing with nested tags before moving on to the next) until no markup information is found. 
+
+After extracting style information, `apply_style` replaces the `MarkupTag` information with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text bewteen `[...]`) into a [`MarkupStyle'](@Term.style.MarkupStyle) object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
+So in summary:
+
+```julia
+import Term.style: apply_style  # hidden
+apply_style("[red]text[/red]")
+```
+will return a string with style information
+
+```@example
+import Term.style: apply_style  # hidden
+apply_style("[red]text[/red]") # hidden
+```
+
+which printed to the console looks like:
+```@eval
+import Term.style: apply_style  # hidden
+print(apply_style("[red]text[/red]"))
+```end
+
