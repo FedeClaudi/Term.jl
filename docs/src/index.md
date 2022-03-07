@@ -2,13 +2,10 @@
 CurrentModule = Term
 ```
 
-# Term
 
-Documentation for [Term](https://github.com/FedeClaudi/Term.jl).
+```@example
+import Term: make_logo
+log0 = make_logo()
 
-```@index
-```
-
-```@autodocs
-Modules = [Term]
+print(logo)
 ```

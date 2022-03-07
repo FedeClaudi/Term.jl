@@ -13,7 +13,16 @@ makedocs(;
         canonical = "https://FedeClaudi.github.io/Term.jl",
         assets = String[],
     ),
-    pages = ["Home" => "index.md"],
+    pages = [
+        "Home" => "index.md",
+        "page.md",
+        "Page title" => "page2.md",
+        "Subsection" => [
+            "pag123.md",
+            "page12312.md",
+        ]
+        
+        ],
 )
 
 deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "main")
