@@ -26,6 +26,8 @@ include("inspect.jl")
 include("errors.jl")
 include("logging.jl")
 
+include("logo.jl")
+
 
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine
