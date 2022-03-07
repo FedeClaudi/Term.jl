@@ -28,7 +28,7 @@ When you venture beyond styling simple strings, virtually every object you'll en
 
     When creating a renderable. This will generally produce the content that will be ultimately be printed to te terminal by generating a list of `Segment`s. When the renderable is printed out, its `Segment.text`s are printed to the console in sequence. The `Measure` of a renderable is a combination of the `Measure` of the individual segments. It provides information about the renderable's width and number of lines, crucial when creating layouts!
 
-    
+
 ## Renderable
 The most generic renderable type is the creatively named `Renderable`. You'll very rarely create an instance of a `Renderable` from scratch. More generally `Term` will create one while performing another operation. For example: in the next page we'll see how to stack multiple renderables to crate a complex layout. Each renderable can be any `AbstractRenderable`-like object (including string). So if you're stacking a `Panel`, a `TextBox` an a `String`, what type should the resulting renderable object be? Well the generic but useful `Renderable` of course. 
 
