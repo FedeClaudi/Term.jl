@@ -23,6 +23,10 @@ makedocs(;
         "logging"               => "logging.md",
         "errors tracebacks"     => "errors_tracebacks.md",
         "code introspection"    => "introspection.md",
+        "Manul" => [
+            "Term" => "api_term.md",
+            "markup" => "api_markup.md",
+        ]
     ],
 )
 

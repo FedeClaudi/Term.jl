@@ -20,6 +20,7 @@ Related:
   - [ ] inspect
   - [ ] errors
   - [ ] logging
+  - [ ] colors! (add ref in styled text)
 
 
 ### To do & bugs
