@@ -16,14 +16,14 @@ makedocs(;
         assets = String[],
     ),
     pages = [
-        "Home" => "index.md",
-        "page.md",
-        "Page title" => "page2.md",
-        "Subsection" => [
-            "p.md",
-            "page12312.md",
-            ]
-        ],
+        "Home"                  => "index.md",
+        "styled text"           => "styled_text.md",
+        "panels"                => "panels.md",
+        "content layout"        => "content_layout.md",
+        "logging"               => "logging.md",
+        "errors tracebacks"     => "errors_tracebacks.md",
+        "code introspection"    => "introspection.md",
+    ],
 )
 
 deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "gh-pages")
