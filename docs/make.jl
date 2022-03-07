@@ -17,16 +17,18 @@ makedocs(;
     ),
     pages = [
         "Home"                  => "index.md",
-        "styled text"           => "styled_text.md",
-        "panels"                => "panels.md",
-        "content layout"        => "content_layout.md",
-        "logging"               => "logging.md",
-        "errors tracebacks"     => "errors_tracebacks.md",
-        "code introspection"    => "introspection.md",
-        "Manul" => [
+        "Manual" => [
+            "styled text"           => "styled_text.md",
+            "panels"                => "panels.md",
+            "content layout"        => "content_layout.md",
+            "logging"               => "logging.md",
+            "errors tracebacks"     => "errors_tracebacks.md",
+            "code introspection"    => "introspection.md",
+        ],
+        "API" => [
             "Term" => "api_term.md",
             "markup" => "api_markup.md",
-        ]
+        ],
     ],
 )
 

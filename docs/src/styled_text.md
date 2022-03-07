@@ -19,6 +19,7 @@ While for styling you have: `@bold @dim @italic @underline`.
 Note that the styling macros return a string, so you can combine the resulting strings as you would normally:
 
 ```@example
+using Term # hidden
 println(
     @green("This is green") * " and " * @red("this is red")
 )
@@ -32,6 +33,7 @@ With these style macros you can do some simply styling, but it gets clunky when 
 Of course not, you can use the `@style` macro!
 
 ```@example
+using Term # hidden
 mytext = @style "this is my text" blue bold underline
 println(mytext)
 ```
@@ -50,6 +52,7 @@ str="Every other word has colors!"
 to have a color. You could do it with macros:
 
 ```@example
+using Term # hidden
 e = @red "Every"
 o = "other"
 w = @green "word"
@@ -74,6 +77,7 @@ Two things happened: 1) `Term` styling machinery detects strings segments like `
 
 Not bad huh? Even better, the style information inside a parentheses can be more than just color:
 ```@example
+using Term # hidden
 tprint(
     "[bold black underline on_red]So much [gold3 bold]STYLE[/gold3 bold] in this text[/bold black underline on_red]"
 )
@@ -110,6 +114,7 @@ As we saw, the syntax is very simple with an opening and closing tag specifying 
 So the first thing that needs to happen is the **detection** of these markup tags. This is surprisingly hard because there's so many possible combinations. You can have markup tags whose style information varies considerably, you can have nested tags, you can have tags spread across lines and you can have nested tags spread across lines:
 
 ```@example
+using Term # hidden
 tprint(
     """
 And [blue] somehow
@@ -125,4 +130,4 @@ somehow.
 CurrentModule = Term.markup
 ```
 
-All of this is taken care of by [`makedocs`](@extract_markup)
+All of this is taken care of by [`Term.markup.extract_markup`](@extract_markup)
