@@ -1,5 +1,6 @@
 using Term
 
+import Pkg; Pkg.add("Documenter")
 using Documenter
 
 DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
