@@ -18,6 +18,7 @@ Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [compat]
+Coverage = "1"
 Documenter = "0.27"
 Highlights = "0.5"
 IterTools = "1"
