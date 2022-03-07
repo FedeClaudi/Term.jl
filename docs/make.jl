@@ -19,7 +19,7 @@ makedocs(;
         "Home"                  => "index.md",
         "Manual" => [
             "Styled text"           => "styled_text.md",
-            "Panels"                => "panels.md",
+            "Renderables"                => "panels.md",
             "Layout"        => "content_layout.md",
             "Logging"               => "logging.md",
             "Errors tracebacks"     => "errors_tracebacks.md",
