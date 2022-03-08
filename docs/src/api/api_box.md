@@ -1,3 +1,4 @@
+# Box
 
 ```@meta
 CurrentModule = Term.box

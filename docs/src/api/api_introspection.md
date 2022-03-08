@@ -1,4 +1,4 @@
-
+# Introspection
 ```@meta
 CurrentModule = Term.introspection
 ```

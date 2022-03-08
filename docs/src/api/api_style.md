@@ -1,4 +1,4 @@
-
+# Style
 ```@meta
 CurrentModule = Term.style
 ```

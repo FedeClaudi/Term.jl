@@ -1,4 +1,4 @@
-
+# Color
 ```@meta
 CurrentModule = Term.color
 ```

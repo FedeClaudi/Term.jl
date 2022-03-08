@@ -1,4 +1,4 @@
-
+# Renderables
 ```@meta
 CurrentModule = Term.renderables
 ```

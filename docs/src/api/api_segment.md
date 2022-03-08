@@ -1,4 +1,4 @@
-
+# Segment
 ```@meta
 CurrentModule = Term.segment
 ```

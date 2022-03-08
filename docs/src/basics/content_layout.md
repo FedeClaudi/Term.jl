@@ -137,7 +137,7 @@ print(top / mid / bottom)
 ```
 
 look at that layout! Actually don't, look at it without that clutter:
-```@spacer
+```@example
 import Term: Panel, Spacer # hide
 p = Panel(width=5, height=3) # hide
 
