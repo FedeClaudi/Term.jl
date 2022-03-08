@@ -40,7 +40,7 @@ Logging.catch_exceptions(logger::TermLogger) = true
 
 Print the final line of a log message with style and date info
 """
-function print_closing_line(color::String, width::Int)
+function print_closing_line(color::String, width::Int=48)
     tprint(
         "  [$color bold dim]$(ROUNDED.bottom.left)" *
         "$(ROUNDED.row.mid)"^(width) *
@@ -78,7 +78,7 @@ function Logging.handle_message(
     fname = ""
     for frame in stacktrace()
         if "$(frame.file)" == file && frame.line == line
-            fname = "[$(logger.theme.func) underline]$(frame.func)[/$(logger.theme.func) underline]"
+            fname = ".[$(logger.theme.func) underline]$(frame.func)[/$(logger.theme.func) underline]"
         end
     end
 
@@ -104,19 +104,26 @@ function Logging.handle_message(
     if msg isa AbstractString
         msg = has_markup(msg) ? msg : "[#8abeff]$msg[/#8abeff]"
         msg = reshape_text(msg, 64)
+    else
+        msg = string(msg)
     end
 
+    # get the first line of information
+    content = "[$color underline bold]@$(string(lvl))[/$color underline bold] [#edb46f ]($(_mod)$fname):[/#edb46f ]"
 
-    # print the first line of information
-    content = """
-[$color underline bold]@$(string(lvl))[/$color underline bold] [#edb46f ]($(_mod).$fname):[/#edb46f ] $msg
-  $vert   [dim]$(file):$(line) [/dim][bold dim](line: $(line))[/bold dim]"""
+
+    # for multi-lines message, print each line separately.
+    msg_lines::Vector{AbstractString} = split(msg, "\n")
+    for n in 2:length(msg_lines)
+        msg_lines[n] = "  $vert   " * " "^textlen(content) * "[#8abeff]" * msg_lines[n]
+    end
+    content *= "  " * msg_lines[1]
     tprint(content)
-    lw = min((Int ∘ round)(textlen(content) * 0.75), 48)
+    tprint.(msg_lines[2:end])
 
     # if no kwargs we can just quit
     if length(kwargs) == 0
-        print_closing_line(color, lw)
+        print_closing_line(color)
         return
     end
 
@@ -187,7 +194,7 @@ function Logging.handle_message(
             end
         end
     end
-    print_closing_line(color, lw)
+    print_closing_line(color)
 end
 
 # ---------------------------- install term logger --------------------------- #

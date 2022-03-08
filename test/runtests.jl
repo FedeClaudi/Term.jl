@@ -1,5 +1,9 @@
 using Term
 using Test
+using Suppressor
+
+# using Pkg
+# Pkg.test("Term",coverage=true)
 
 
 nlines(x) = length(split(x, "\n"))
@@ -42,6 +46,8 @@ print("\n\n")
 print("\n\n")
 @timeit_include("09_test_inspect.jl")
 
+print("\n\n")
+@timeit_include("10_test_logging.jl")
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")

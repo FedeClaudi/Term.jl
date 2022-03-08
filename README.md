@@ -1,3 +1,9 @@
+[![Build Status](https://github.com/FedeClaudi/Term.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/FedeClaudi/Term.jl/actions/workflows/CI.yml?query=branch%3Amain)
+
+[![Coverage](https://codecov.io/gh/FedeClaudi/Term.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/FedeClaudi/Term.jl)
+
+[![Dev docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://fedeclaudi.github.io/Term.jl/dev/)
+
 
 Related:
 - https://github.com/KristofferC/Crayons.jl
@@ -58,6 +64,8 @@ Related:
 - [x] `logging` accept symbols and expressions in message
 - [ ] refactor `TextBox` and `RenderableText`
 - [ ] use project board
+- [x] `logging` handle well multi-line messages
+- [ ] `tprint` should accept multiple arguments and non-string arguments
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles
