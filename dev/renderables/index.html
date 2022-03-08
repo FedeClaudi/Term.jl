@@ -90,26 +90,26 @@ DOUBLE,
 DOUBLE_EDGE</code></pre><p>And you can use any of these with your panels:</p><pre><code class="language-julia hljs">print(
     Panel(width=8, box=:DOUBLE, style=&quot;green&quot;) *
     Panel(width=8, box=:HEAVY, style=&quot;white&quot;) *
-    Panel(width=8, box=:DOUBLE_EDGE, style=&quot;red&quot;),
-)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32">╔══════╗</span><span class="sgr37">┏━━━━━━┓</span><span class="sgr31">╔══════╗</span>
-<span class="sgr32">╚══════╝</span><span class="sgr37">┗━━━━━━┛</span><span class="sgr31">╚══════╝</span></code></pre><p>About <code>Panels</code>, they&#39;re not limited to having strings as content, they can have other renderables too (multiple ones in fact)!</p><pre><code class="language-julia hljs">print(
+    Panel(width=8, box=:ROUNDED, style=&quot;red&quot;),
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32">╔══════╗</span><span class="sgr37">┏━━━━━━┓</span><span class="sgr31">╭──────╮</span>
+<span class="sgr32">╚══════╝</span><span class="sgr37">┗━━━━━━┛</span><span class="sgr31">╰──────╯</span></code></pre><p>By the way, <code>Panels</code> are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!</p><pre><code class="language-julia hljs">print(
     Panel(
-        Panel(width=18, box=:DOUBLE, style=&quot;green&quot;),
-        Panel(width=18, box=:HEAVY, style=&quot;white&quot;),
-        Panel(width=18, box=:DOUBLE_EDGE, style=&quot;red&quot;),
+        Panel(width=18, style=&quot;green&quot;),
+        Panel(width=18, style=&quot;white&quot;),
+        Panel(width=18, style=&quot;red&quot;),
         title=&quot;so many panels!&quot;,
         width=:fit,
         title_justify=:left,
         title_style=&quot;bold red&quot;
     )
 )</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭─ <span class="sgr31"><span class="sgr1">so many panels!</span></span> ──╮
-│ <span class="sgr32">╔════════════════╗</span> │
-│ <span class="sgr32">╚════════════════╝</span> │
-│ <span class="sgr37">┏━━━━━━━━━━━━━━━━┓</span> │
-│ <span class="sgr37">┗━━━━━━━━━━━━━━━━┛</span> │
-│ <span class="sgr31">╔════════════════╗</span> │
-│ <span class="sgr31">╚════════════════╝</span> │
-╰────────────────────╯</code></pre><h2 id="TextBox"><a class="docs-heading-anchor" href="#TextBox">TextBox</a><a id="TextBox-1"></a><a class="docs-heading-anchor-permalink" href="#TextBox" title="Permalink"></a></h2><p><code>TextBox</code>es are a very simple but very useful renderable. They bring together <code>RenderableText</code> with <code>Panel</code>. In fact they&#39;re just a panel with a <code>RenderableText</code> inside an its box hidden. Why, you say? Well because now you can have a piece of text, with a nice title and sub title.</p><pre><code class="language-julia hljs">import Term: TextBox
+│ <span class="sgr32">╭────────────────╮</span> │
+│ <span class="sgr32">╰────────────────╯</span> │
+│ <span class="sgr37">╭────────────────╮</span> │
+│ <span class="sgr37">╰────────────────╯</span> │
+│ <span class="sgr31">╭────────────────╮</span> │
+│ <span class="sgr31">╰────────────────╯</span> │
+╰────────────────────╯</code></pre><h2 id="TextBox"><a class="docs-heading-anchor" href="#TextBox">TextBox</a><a id="TextBox-1"></a><a class="docs-heading-anchor-permalink" href="#TextBox" title="Permalink"></a></h2><p><code>TextBox</code>es are a very simple but very useful renderable. They bring together <code>RenderableText</code> with <code>Panel</code>. In fact they&#39;re just a panel with a <code>RenderableText</code> inside and with its box hidden.  Why do we need them, you say? Well because now you can have a piece of text, with a nice title and sub title.</p><pre><code class="language-julia hljs">import Term: TextBox
 
 print(
     TextBox(
@@ -169,4 +169,4 @@ print(
 │ ,,,,,,,,,,,,,,,,,, │
 │ ,,,,,,,,,,,,,,,,,, │
 │ ,,,,,,,,,,         │
-╰────────────────────╯</code></pre><p>Now the two pieces of text look the same and the final layout is a lot more homogeneous, success!</p><p>Let&#39;s move on to talk about layout more!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../styled_text/">« Styled text</a><a class="docs-footer-nextpage" href="../content_layout/">Layout »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.14 on <span class="colophon-date" title="Monday 7 March 2022 23:30">Monday 7 March 2022</span>. Using Julia version 1.6.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+╰────────────────────╯</code></pre><p>Now the two pieces of text look the same and the final layout is a lot more homogeneous, success!</p><p>Let&#39;s move on to talk about layout more!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../styled_text/">« Styled text</a><a class="docs-footer-nextpage" href="../content_layout/">Layout »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.14 on <span class="colophon-date" title="Tuesday 8 March 2022 09:18">Tuesday 8 March 2022</span>. Using Julia version 1.6.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
