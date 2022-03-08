@@ -50,8 +50,14 @@ import Term: Panel, TextBox, cleantext
     @test string(p8) == "╭────────────────╮\n│ こんにちは(わ) │\n╰────────────────╯"
 
 
+    # create empty panels with varying size
+    p9 = Panel(height=20, width=4)
+    p10 = Panel("", height=5)
+    p11 = Panel(width=12, height=6)
+
+
     # check all  lines in each panel have exactly the same size
-    for panel in (p1, p2, p3, p4, p5, p6, p7, p8)
+    for panel in (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
         _p = string(panel)
         widths = textwidth.(cleantext.(split(_p, "\n")))
         @test length(unique(widths)) == 1
