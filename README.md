@@ -58,6 +58,8 @@ Related:
 - [x] `logging` accept symbols and expressions in message
 - [ ] refactor `TextBox` and `RenderableText`
 - [ ] use project board
+- [x] `logging` handle well multi-line messages
+- [ ] `tprint` should accept multiple arguments and non-string arguments
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles
