@@ -10,7 +10,6 @@ Related:
 - https://github.com/Aerlinger/AnsiColor.jl
 
 
-
 ## Roadmap
 
 #### docs/examples
@@ -65,7 +64,8 @@ Related:
 - [ ] refactor `TextBox` and `RenderableText`
 - [ ] use project board
 - [x] `logging` handle well multi-line messages
-- [ ] `tprint` should accept multiple arguments and non-string arguments
+- [x] `tprint` should accept multiple arguments and non-string arguments
+  - [x] print symbols, numbers... with style
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles

@@ -102,3 +102,4 @@ end
         @test typeof(get_color(hex; bg = true)) == RGBColor
     end
 end
+
