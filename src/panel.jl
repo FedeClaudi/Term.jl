@@ -147,7 +147,7 @@ function Panel(
     # add empty lines to ensure target height is reached
     if !isnothing(height) && content_measure.h < height
         for i = 1:(height-content_measure.h)
-            line = " "^(width)
+            line = " "^(width - 2)
             push!(segments, Segment(left * line * right))
         end
     end
