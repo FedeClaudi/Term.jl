@@ -1,7 +1,9 @@
 name: Documentation
 
 on:
-  push
+  push:
+    branches:
+      - gh-pages
 
 jobs:
   build:
