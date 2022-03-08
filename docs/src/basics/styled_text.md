@@ -13,6 +13,28 @@ println(@bold "this is bold")
 println(@underline "and this is underlined")
 ```
 
+
+pages = [
+    "Home" => "index.md",
+    "Manual" => Any[
+        "Guide" => "man/guide.md",
+        "man/examples.md",
+        "man/syntax.md",
+        "man/doctests.md",
+        "man/latex.md",
+        hide("man/hosting.md", [
+            "man/hosting/walkthrough.md"
+        ]),
+        "man/other-formats.md",
+    ],
+    "showcase.md",
+    "Library" => Any[
+        "Public" => "lib/public.md",
+        "Internals" => map(
+            s -> "lib/internals/$(s)",
+            sort(readdir(joinpath(@__DIR__, "src/lib/interna
+
+
 For color you can use these macros: `@black, @red, @green, @yellow, @blue, @magenta, @cyan, @white, @default`.
 While for styling you have: `@bold @dim @italic @underline`.
 

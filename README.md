@@ -25,11 +25,10 @@ Related:
     - [x] markup
     - [x] apply style
     - [x] macros
-  - [ ] highlighting
-  - [ ] colors
-    - [ ] allowed colors
-    - [ ] how to use them and exmaples
-  - [ ] renderabletext, textbox/panels + nesting
+  - [x] colors
+    - [x] allowed colors
+    - [x] how to use them and exmaples
+  - [x] renderabletext, textbox/panels + nesting
     - [x] segments
     - [x] measure
     - [x] panels

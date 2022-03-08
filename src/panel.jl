@@ -102,6 +102,7 @@ function Panel(
     end
     @assert width > content_measure.w "Width too small for content '$content' with $content_measure"
     panel_measure.w = width
+    panel_measure.h = isnothing(height) ? panel_measure.w : height
 
     # create segments
     segments::Vector{Segment} = []
@@ -145,8 +146,8 @@ function Panel(
     end
 
     # add empty lines to ensure target height is reached
-    if !isnothing(height) && content_measure.h < height
-        for i = 1:(height-content_measure.h)
+    if !isnothing(height) && content_measure.h < height-2
+        for i = 1:(height-content_measure.h-2)
             line = " "^(width - 2)
             push!(segments, Segment(left * line * right))
         end
@@ -155,7 +156,7 @@ function Panel(
 
     return Panel(
         segments,
-        panel_measure,
+        Measure(segments),
         isnothing(title) ? title : title,
         title_style,
         style,
