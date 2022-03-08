@@ -1,8 +1,6 @@
-[![Build Status](https://github.com/FedeClaudi/Term.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/FedeClaudi/Term.jl/actions/workflows/CI.yml?query=branch%3Amain)
-
-[![Coverage](https://codecov.io/gh/FedeClaudi/Term.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/FedeClaudi/Term.jl)
-
+[![CI](https://github.com/FedeClaudi/Term.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/FedeClaudi/Term.jl/actions/workflows/CI.yml)[![codecov](https://codecov.io/gh/FedeClaudi/Term.jl/branch/master/graph/badge.svg?token=SZM70KS8PK)](https://codecov.io/gh/FedeClaudi/Term.jl)
 [![Dev docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://fedeclaudi.github.io/Term.jl/dev/)
+
 
 
 Related:
@@ -26,11 +24,11 @@ Related:
   - [ ] colors
     - [ ] allowed colors
     - [ ] how to use them and exmaples
-  - [ ] renderabletext, textbox/panels + nesting
+  - [x] renderabletext, textbox/panels + nesting
     - [x] segments
     - [x] measure
-    - [ ] panels
-    - [ ] textbox
+    - [x] panels
+    - [x] textbox
   - [ ] layout
     - [ ] the idea
     - [ ] vstack vs hstack
@@ -42,30 +40,11 @@ Related:
   - [ ] errors
   - [ ] logging
 
-  - API
-    - [x] term
-    - [x] markup
-    - [x] color
-    - [x] console
-    - [x] inspect
-    - [x] layout
-    - [x] logging
-    - [x] panel
-    - [x] renderables
-    - [x] segment
-    - [x] measure
-    - [x] style
-
 
 ### To do & bugs
 - [ ] `highlight` sometimes doesnt apply styles correctly when >1 elements per line
 - [ ] BUG: read code style from file sometimes gives the wrong line (towards end of file)
-- [x] `logging` accept symbols and expressions in message
-- [ ] refactor `TextBox` and `RenderableText`
 - [ ] use project board
-- [x] `logging` handle well multi-line messages
-- [x] `tprint` should accept multiple arguments and non-string arguments
-  - [x] print symbols, numbers... with style
 
 #### Future features
 - [ ] add :time and :date options for panel's subtitles
@@ -78,9 +57,6 @@ Related:
 
 - [ ] tree visualization
 - [ ] type hierarchy tree (https://towardsdatascience.com/runtime-introspection-julias-most-powerful-best-kept-secret-bf845e282367)
-
-- [ ] logging:
-  - [ ] get "stack trace" of logging: where is the log message triggered from?
 
 - [ ] allow for user created `Theme`s
 

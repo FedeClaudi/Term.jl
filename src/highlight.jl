@@ -1,6 +1,6 @@
 using Highlights.Format
 import Highlights: Lexers
-import Highlights: highlight as _highlight
+import Highlights
 
 # ------------------------------- highlighting ------------------------------- #
 const highlight_regexes = Dict(
@@ -95,7 +95,7 @@ Highlight Julia code syntax in a string.
 """
 function highlight_syntax(code::AbstractString; style::Bool = true)
     txt = sprint(
-        _highlight,
+        Highlights.highlight,
         MIME("text/ansi"),
         escape_brackets(code),
         Lexers.JuliaLexer,

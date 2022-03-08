@@ -16,8 +16,6 @@ macro timeit_include(path::AbstractString)
     :(@timeit TIMEROUTPUT $path include($path))
 end
 
-@timeit_include("00_empty.jl")
-
 
 print("\n\n")
 @timeit_include("01_test_text_utils.jl")
