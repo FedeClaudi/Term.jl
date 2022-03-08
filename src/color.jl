@@ -1,6 +1,6 @@
 module color
-include("__text_utils.jl")
-include("_ansi.jl")
+
+import Term: NAMED_COLORS, nospaces, COLORS_16b, remove_brackets
 
 export NamedColor, BitColor, RGBColor, get_color
 

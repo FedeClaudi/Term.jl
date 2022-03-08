@@ -1,6 +1,6 @@
 module measure
 
-include("__text_utils.jl")
+import Term: remove_ansi, remove_markup_open, remove_markup
 
 export Measure
 

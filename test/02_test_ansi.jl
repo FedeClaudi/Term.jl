@@ -65,8 +65,6 @@ end
 
 
 
-
-
 @testset "\e[31mANSI background color" begin
     for name in ["on_red", "on_blue", "on_black"]
         @test is_background(name) == true

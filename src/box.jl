@@ -1,9 +1,8 @@
 module box
-include("__text_utils.jl")
 
 import ..segment: Segment
 import ..style: apply_style
-import Term: int
+import Term: int, chars, remove_markup_open, get_last_valid_str_idx, get_next_valid_str_idx
 
 export get_row, get_title_row
 export ASCII,

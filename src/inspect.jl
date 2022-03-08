@@ -2,9 +2,14 @@
 module introspection
 using InteractiveUtils
 
-include("__text_utils.jl")
 
-import Term: highlight, theme
+import Term: highlight,
+        theme,
+        escape_brackets,
+        join_lines,
+        unescape_brackets,
+        split_lines,
+        do_by_line
 
 import ..consoles: console
 import ..panel: Panel, TextBox

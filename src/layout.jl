@@ -1,12 +1,10 @@
 module layout
-include("__text_utils.jl")
 
-
+import Term: int, get_last_valid_str_idx
 import ..renderables: RenderablesUnion, Renderable, AbstractRenderable
 import ..measure: Measure
 import ..segment: Segment
 using ..box
-import Term: int
 import ..consoles: console_width, console_height
 
 export Padding, vstack, hstack
@@ -40,6 +38,11 @@ function Padding(text::AbstractString, target_width::Int, method::Symbol)::Paddi
         if lw < target_width
             @debug "\e[31mTarget width is $target_width but the text has width $lw: \e[0m\n   $text\n     Cleaned: '$(remove_ansi(remove_markup(text)))'"
         end
+    end
+
+    if target_width < lw
+        @debug "While creating padding, target width < lw" target_width lw method text
+        return Padding("", "")
     end
     padding = " "^(target_width - lw - 1)
     pad_width = Measure(padding).w

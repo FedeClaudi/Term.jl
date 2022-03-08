@@ -1,5 +1,8 @@
 module markup
-include("__text_utils.jl")
+
+import Term: replace_double_brackets, OPEN_TAG_REGEX, replace_text
+import Term: get_last_valid_str_idx, CLOSE_TAG_REGEX, GENERIC_CLOSER_REGEX
+
 export extract_markup, MarkupTag, pairup_tags, clean_nested_tags
 
 

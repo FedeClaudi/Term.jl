@@ -18,12 +18,13 @@ makedocs(;
     pages = [
         "Home"=> "index.md",
         "Manual" => [
-            "Styled text"           => "styled_text.md",
-            "Renderables"           => "renderables.md",
-            "Layout"                => "content_layout.md",
-            "Logging"               => "logging.md",
-            "Errors tracebacks"     => "errors_tracebacks.md",
-            "Code introspection"    => "introspection.md",
+            "Styled text"           => "01_styled_text.md",
+            "Colors"                => "02_colors.md",
+            "Renderables"           => "03_renderables.md",
+            "Layout"                => "04_content_layout.md",
+            "Logging"               => "05_logging.md",
+            "Errors tracebacks"     => "06_errors_tracebacks.md",
+            "Code introspection"    => "07_introspection.md",
         ],
         "API" => [
             "Term"          => "api_term.md",

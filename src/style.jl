@@ -1,7 +1,8 @@
 module style
-include("__text_utils.jl")
-include("_ansi.jl")
+
 import Parameters: @with_kw
+
+import Term: unspace_commas, NAMED_MODES, CODES, ANSICode
 
 import ..markup: MarkupTag, extract_markup, has_markup, clean_nested_tags
 import ..color:

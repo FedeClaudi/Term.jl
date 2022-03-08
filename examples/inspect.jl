@@ -59,7 +59,7 @@ Not bad huh !?
 It also works with instances of types
 """
 
-inspect(1)
+inspect(MyType(2))
 
 """
 And for abstract types of course1
