@@ -3,7 +3,7 @@ Related:
 - https://github.com/KristofferC/Crayons.jl
 - https://github.com/Aerlinger/AnsiColor.jl
 
-
+[![Dev docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://fedeclaudi.github.io/Term.jl/dev/)
 
 ## Roadmap
 
