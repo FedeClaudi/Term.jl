@@ -9,7 +9,6 @@ include("measure.jl")
 include("color.jl")
 include("theme.jl")
 include("highlight.jl")
-include("console.jl")
 
 # rely on other modules
 include("markup.jl")
@@ -20,6 +19,7 @@ include("macros.jl")
 # renderables, rely heavily on other modules
 include("box.jl")
 include("renderables.jl")
+include("console.jl")
 include("layout.jl")
 include("panel.jl")
 include("inspect.jl")
@@ -41,7 +41,6 @@ export install_term_logger
 # ----------------------------------- base ----------------------------------- #
 import .measure
 using .measure: Measure
-using .consoles: Console, console, err_console, console_height, console_width
 
 # ----------------------------------- style ---------------------------------- #
 using .markup: extract_markup, MarkupTag, pairup_tags
@@ -77,13 +76,12 @@ using .box
 
 using .renderables: AbstractRenderable, Renderable, RenderableText
 
+using .consoles: Console, console, err_console, console_height, console_width, tprint
+
 using .layout: Padding, vstack, hstack, Spacer, vLine, hLine
 
 using .panel: Panel, TextBox
 
-tprint(x::AbstractString) = (println ∘ apply_style)(x)
-tprint(x::AbstractRenderable) = println(x)
-tpritn(x) = tprint(string(x))
 
 # ---------------------------------- others ---------------------------------- #
 using .introspection: inspect

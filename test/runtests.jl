@@ -52,5 +52,8 @@ print("\n\n")
 print("\n\n")
 @timeit_include("11_test_errors.jl")
 
+print("\n\n")
+@timeit_include("12_test_console.jl")
+
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")
