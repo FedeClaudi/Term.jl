@@ -41,20 +41,21 @@ function make_logo()
     main = TextBox(
         """
 
-        Term.jl is a [#9558B2]Julia[/#9558B2] package for creating styled terminal outputs.
+        Term.jl is a [#9558B2]Julia[/#9558B2] package for creating  styled terminal outputs.
 
-        It can be used to [blue]inject[/blue] [bright_green]some[/bright_green] [indian_red]color[/indian_red] [italic]&[/italic] [bold underline italic]style[/bold underline italic] to your text.
-        It provides a collection of $(as_code("Renderable")) objects such as $(as_code("Panels")) and $(as_code("TextBoxes")) to create structured content.
-        $(as_code("Renderables")) can be [italic]stacked[/italic] to compose them into a larger piece of conent, as showcased here, using operators such as: [bold red underline]*[/bold red underline] & [bold red underline]/[/bold red underline].
-
-        Also, Term.jl provides functionality to create [underline]structured[/underline] $(as_code("logging")) and $(as_code("error")) messages. Check the examples and documentation for more information
-
-        Term.jl is under [bold]active[/bold] development! Get in touch on github or twitter ([italic blue]@Federico_claudi[/italic blue]) with questions or ideas on how to improve it!
-        """,
+        Term provides a simple [italic green4 bold]markup language[/italic green4 bold] toadd [bold bright_blue]color[/bold bright_blue] and [bold underline]styles[/bold underline] to your text.
+        
+        More complicated text layout can be 
+        created using $(as_code("Renderable")) objects such 
+        as $(as_code("Panel")) and $(as_code("TextBox")).
+        These can also be nested and stacked to 
+        create [italic pink3]fancy[/italic pink3] and [underline]informative[/underline] terminal
+        ouputs for your Julia code.""",
         title = "Term.jl",
-        title_style = indigo,
-        width = 75,
+        title_style = indigo * " bold",
+        width = 45,
     )
+
 
     # create "spacers" and stack renderables
     hspacer = Spacer(green.measure.w / 2 + 1, green.measure.h)
@@ -63,13 +64,23 @@ function make_logo()
         (red * Spacer(2, purple.measure.h) * purple)
 
     vspacer = Spacer(2, circles.measure.h)
-    content = circles * vspacer * vLine(main.measure.h; style = indigo * " dim") * main
+    content = circles * vspacer * vLine(circles.measure.h; style = indigo * " dim") * (Spacer(main.measure.w, 1) / main)
 
+    # add second message
+    second_message = TextBox(
+        """
+        Term.jl can also be used to create [underline]fancy[/underline] $(as_code("logging")) and $(as_code("error")) messages. 
+        
+        Check the examples and documentation for more information!
+        Term.jl is under [bold]active[/bold] development, get in touch for questions or ideas on   how to improve it!""",
+        width = content.measure.w,
+    )
+    hline = hLine(content.measure.w; style=indigo * " dim")
+    content = content / second_message
 
     # add a final message
     msg = """[#75b6e0]Term.jl is based on the [underline]Python[/underline] library [orange1 italic]Rich[/orange1 italic] by [/#75b6e0]Will McGugan. 
-                        [dim]https://github.com/Textualize/rich[/dim]
-    """
+                        [dim]https://github.com/Textualize/rich[/dim]"""
 
 
     logo =
@@ -82,7 +93,8 @@ function make_logo()
             subtitle_justify = :right,
             subtitle_style = "dim",
             width = :fit,
-        ) / "" / (Spacer(40, 2) * msg)
+        ) / "" / (Spacer(18, 2) * msg)
 
     return logo
 end
+

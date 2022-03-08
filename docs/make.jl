@@ -16,15 +16,31 @@ makedocs(;
         assets = String[],
     ),
     pages = [
-        "Home" => "index.md",
-        "page.md",
-        "Page title" => "page2.md",
-        "Subsection" => [
-            "p.md",
-            "page12312.md",
-        ]
-        
+        "Home"=> "index.md",
+        "Manual" => [
+            "Styled text"           => "styled_text.md",
+            "Renderables"           => "renderables.md",
+            "Layout"                => "content_layout.md",
+            "Logging"               => "logging.md",
+            "Errors tracebacks"     => "errors_tracebacks.md",
+            "Code introspection"    => "introspection.md",
         ],
+        "API" => [
+            "Term"          => "api_term.md",
+            "Box"           => "api_box.md",
+            "Color"         => "api_color.md",
+            "Console"       => "api_console.md",
+            "Inspect"       => "api_inspect.md",
+            "Layout"        => "api_layout.md",
+            "Logging"       => "api_logging.md",
+            "Markup"        => "api_markup.md",
+            "Measure"       => "api_measure.md",
+            "Panel"         => "api_panel.md",
+            "Renderables"   => "api_renderables.md",
+            "Segment"       => "api_segment.md",
+            "Style"         => "api_style.md",
+        ],
+    ],
 )
 
-deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "main")
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "gh-pages")
