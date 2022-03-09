@@ -17,10 +17,13 @@ Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [compat]
+Coverage = "1"
 Documenter = "0.27"
 Highlights = "0.5"
 Parameters = "0.12"
+PkgTemplates = "0.7"
 Revise = "3"
+Suppressor = "0.2"
 julia = "1.6"
 
 [extras]
