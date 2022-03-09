@@ -53,4 +53,4 @@ install_term_logger() # hide
 @error "uh oh, not good!"
 ```
 
-![](./assets/logs.png)
+![](assets/logs.png)

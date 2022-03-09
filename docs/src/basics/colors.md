@@ -41,7 +41,7 @@ If the style informaton represents a color, `Term` first represents it as a `Abs
 
 `NamedColor` objects represent simple colors like `red` and `blue`, `BitColor` represent 16-bit colors like `dark_goldenrod` and `RGBColor`, surprisingly, represents rgb-style colors. There's no method to represent hex colors as these are converted into rgb first. 
 
-The distinction between `NamedColor`, `BitColor` and `RGBColor` is necessary because three color styles are represented by a different syntax in the ANSI codes. Naturally, `Term` users won't normally worry about this and can use whichever color formulation is most convenient.
+The distinction between `NamedColor`, `BitColor` and `RGBColor` is necessary because the three color styles are represented by a different syntax in the ANSI codes. Naturally, `Term` users won't normally worry about this and can use whichever color formulation is most convenient.
 
 
 ## Colors

@@ -16,13 +16,13 @@ import Term: Panel # hide
 
 print(
     Panel(
-        Panel(width=18, style="green"),
-        Panel(width=18, style="white"),
-        Panel(width=18, style="red"),
-        title="so many panels!",
-        width=:fit,
-        title_justify=:left,
-        title_style="bold red"
+        Panel(
+            Panel(
+                "We need to go deeper...", height=3, width=28, style="green", box=:ASCII, title="ED", title_style="white"
+            ),
+            style="red", box=:HEAVY, title="ST", title_style="white"
+        ),
+        width=44, justify=:center, style="blue", box=:DOUBLE, title="NE", title_style="white"
     )
 )
 ```

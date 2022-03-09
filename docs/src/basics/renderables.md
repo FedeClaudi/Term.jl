@@ -12,7 +12,7 @@ In this section we will look at `Renderable` objects (subtypes of `AbstractRende
 ## AbsractRenderable
 This section focuses a bit on how renderables work under the hood. If you just want use `Term` and you don't care too much for how it works, skip ahead to the next section!
 
-When you venture beyond styling simple strings, virtually every object you'll encounter will be a subtype of the `AbstractRenderable`. We will call these objects renderables. Renderable types vary, but they all must have two fields: `:segments` and `:measure`.
+When you venture beyond styling simple strings, virtually every object you'll encounter will be a subtype of the `AbstractRenderable` type. We will call these objects renderables. Renderable types vary, but they all must have two fields: `:segments` and `:measure`.
 
 !!! note "Segment & Measure"
     A `Segment` is simply a line of text, kinda. The segment type:
@@ -24,13 +24,13 @@ When you venture beyond styling simple strings, virtually every object you'll en
         end
     ```
 
-    stores a bit of plain text (i.e. without any style information) but also the same text with style information (`text`). Text is created as described earlier, using `apply_style`. The other bit of information is the `Measure` object. `Measure` keeps track of the size of objects as they will be rendered in the terminal (i.e., wihtout style markup or ANSI codes). It sores a width (`w`) and height (`h`) attribute keeping track of text width and number of lines. The `Measure` of a segment is just that: the `textwidth` of `Segment.plain` and the number of lines in it. 
+    stores a bit of plain text (i.e. without any style information) but also the same text with style information (`text`). Text is created as described earlier, using `apply_style`. The other bit of information is the `Measure` object. `Measure` keeps track of the size of objects as they will be rendered in the terminal (i.e., wihtout style markup or ANSI codes). It stores a width (`w`) and height (`h`) attribute keeping track of text width and number of lines. The `Measure` of a segment is just that: the `textwidth` of `Segment.plain` and the number of lines in it. 
 
     When creating a renderable. This will generally produce the content that will be ultimately be printed to te terminal by generating a list of `Segment`s. When the renderable is printed out, its `Segment.text`s are printed to the console in sequence. The `Measure` of a renderable is a combination of the `Measure` of the individual segments. It provides information about the renderable's width and number of lines, crucial when creating layouts!
 
 
 ## Renderable
-The most generic renderable type is the creatively named `Renderable`. You'll very rarely create an instance of a `Renderable` from scratch. More generally `Term` will create one while performing another operation. For example: in the next page we'll see how to stack multiple renderables to crate a complex layout. Each renderable can be any `AbstractRenderable`-like object (including string). So if you're stacking a `Panel`, a `TextBox` an a `String`, what type should the resulting renderable object be? Well the generic but useful `Renderable` of course. 
+The most generic renderable type is the creatively named `Renderable`. You'll very rarely create an instance of a `Renderable` from scratch. More generally `Term` will create one while performing another operation. For example: in the next page we'll see how to stack multiple renderables to crate a complex layout. Each renderable can be any `AbstractRenderable`-like object (including string). So if you're stacking a `Panel`, a `TextBox` and a `String`, what type should the resulting renderable object be? Well the generic but useful `Renderable` of course. 
 
 
 ## RenderableText
@@ -74,23 +74,22 @@ print(rend)
 Okay, time to move beyond simple text. It's time for:
 ```@example
 import Term: Panel # hide
-
-print(
-    Panel(
-        "[red]awesome[/red]",
-        title="Term's",
-        title_style="bold green",
-        style="gold1 bold",
-        subtitle="Panels",
-        subtitle_style="bold blue",
-        subtitle_justify=:right,
-        width=18,
-        justify=:center
-    )
+print(# hide
+    Panel(# hide
+        "[red]awesome[/red]", # hide
+        title="Term's", # hide
+        title_style="bold green", # hide
+        style="gold1 bold", # hide
+        subtitle="Panels", # hide
+        subtitle_style="bold blue", # hide
+        subtitle_justify=:right, # hide
+        width=18, # hide
+        justify=:center # hide
+    ) # hide
 ) # hide
 ```
 
-Simpli put, a `Panel` showing a piece of content (generally a styled string, but it can be any `Renderable` really) surrounded by a box. Simple but effective.
+Simply put, a `Panel` showing a piece of content (generally a styled string, but it can be any `Renderable` really) surrounded by a box. Simple but effective.
 
 Well not that simple actually because `Panel` is the first renderable that allows you lots of options to personalize its appearance. For instance the panel printed above is given by:
 ```julia
