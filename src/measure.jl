@@ -1,6 +1,6 @@
 module measure
 
-include("__text_utils.jl")
+import Term: remove_ansi, remove_markup_open, remove_markup
 
 export Measure
 
@@ -27,8 +27,6 @@ function Measure(str::AbstractString)
     w = max([textwidth(ln) for ln in lines]...)
     return Measure(w, length(lines))
 end
-
-
 
 """
 The sum of measures returns a measure with the highest value along each dimension

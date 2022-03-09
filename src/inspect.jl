@@ -2,9 +2,14 @@
 module introspection
 using InteractiveUtils
 
-include("__text_utils.jl")
-
-import Term: highlight, theme
+import Term:
+    highlight,
+    theme,
+    escape_brackets,
+    join_lines,
+    unescape_brackets,
+    split_lines,
+    do_by_line
 
 import ..consoles: console
 import ..panel: Panel, TextBox
@@ -60,14 +65,7 @@ function TypeInfo(type::DataType)
     _methods = methodswith(type)
 
     return TypeInfo(
-        string(type),
-        super,
-        sub,
-        fields,
-        constructors,
-        _methods,
-        doc,
-        docstring,
+        string(type), super, sub, fields, constructors, _methods, doc, docstring
     )
 end
 
@@ -87,7 +85,6 @@ function TypeInfo(fun::Function)
     return TypeInfo(string(fun), nothing, nothing, nothing, [], _methods, doc, docstring)
 end
 
-
 # ---------------------------------------------------------------------------- #
 #                                    INSPECT                                   #
 # ---------------------------------------------------------------------------- #
@@ -101,9 +98,7 @@ Extract  info like docstring, fields, types etc. and show it in a structured
 terminal output.
 """
 function inspect(
-    type::DataType;
-    width::Union{Nothing,Int} = nothing,
-    max_n_methods::Int = 3,
+    type::DataType; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 3
 )
     width = isnothing(width) ? min(console.width, 92) - 4 : width - 4
     # extract type info
@@ -114,7 +109,7 @@ function inspect(
         "",
         style_super_types(info),
         "",
-        style_sub_types(info),
+        style_sub_types(info);
         width = width,
         title = "Types hierarchy",
         title_style = "bold underline yellow",
@@ -123,7 +118,7 @@ function inspect(
     # ----------------------------------- docs ----------------------------------- #
     # @info "making docstirng box" info.docstring width
     docs = TextBox(
-        info.docstring,
+        info.docstring;
         title = "Docstring",
         title_style = "bold underline yellow",
         width = width,
@@ -143,7 +138,7 @@ function inspect(
         end
 
         fields_panel = Panel(
-            isnothing(formatted_fields) ? "[dim]No arguments[/dim]" : formatted_fields,
+            isnothing(formatted_fields) ? "[dim]No arguments[/dim]" : formatted_fields;
             title = "Arguments",
             title_style = "bold yellow",
             style = "dim yellow",
@@ -156,19 +151,21 @@ function inspect(
 
     # ------------------------------- constructors ------------------------------- #
     constructors = do_by_line((x) -> style_method_line(x; trim = true), info.constructors)
-    n_constructors =
-        length(split_lines(constructors)) > 1 ? Int(length(split_lines(constructors)) / 2) :
+    n_constructors = if length(split_lines(constructors)) > 1
+        Int(length(split_lines(constructors)) / 2)
+    else
         0
+    end
     if n_constructors > max_n_methods
         constructors =
-            join_lines(split_lines(constructors)[1:max_n_methods*2]) *
+            join_lines(split_lines(constructors)[1:(max_n_methods * 2)]) *
             "\n\n[grey53]( additional constructors not shown... )[/grey53]"
     end
     constructors =
         n_constructors > 1 ? constructors : "[dim]No constructors          [/dim]"
 
     constructors_panel = TextBox(
-        constructors,
+        constructors;
         title = "Constructors[dim]($n_constructors)",
         title_style = "bold underline yellow",
         width = width,
@@ -182,7 +179,7 @@ function inspect(
 
         if n_methods > max_n_methods
             methods =
-                join_lines(split_lines(methods)[1:max_n_methods*2]) *
+                join_lines(split_lines(methods)[1:(max_n_methods * 2)]) *
                 "\n\n[grey53]( additional methods not shown... )[/grey53]"
         end
     else
@@ -191,7 +188,7 @@ function inspect(
     end
 
     methods_panel = TextBox(
-        methods,
+        methods;
         title = "Methods[dim]($n_methods)",
         title_style = "bold underline yellow",
         width = width,
@@ -207,17 +204,15 @@ function inspect(
         hLine(width - 6; style = "blue dim"),
         constructors_panel,
         hLine(width - 6; style = "blue dim"),
-        methods_panel,
+        methods_panel;
         title = "$(typeof(type)): [bold]$(info.name)" * _title,
         title_style = "red",
         style = "blue",
         width = width + 4,
     )
 
-    println(panel)
-
+    return println(panel)
 end
-
 
 """
     inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
@@ -231,7 +226,7 @@ function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_metho
 
     # ----------------------------- prepare contents ----------------------------- #
     docs = TextBox(
-        info.docstring,
+        info.docstring;
         title = "Docstring",
         title_style = "bold underline yellow",
         width = width - 2,
@@ -244,7 +239,7 @@ function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_metho
 
         if n_methods > max_n_methods
             methods =
-                join_lines(split_lines(methods)[1:max_n_methods*2]) *
+                join_lines(split_lines(methods)[1:(max_n_methods * 2)]) *
                 "\n\n[grey53]( additional methods not shown... )[/grey53]"
         end
     else
@@ -253,19 +248,19 @@ function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_metho
     end
 
     methods_panel = TextBox(
-        methods,
+        methods;
         title = "Methods[dim]($n_methods)",
         title_style = "bold underline yellow",
         width = width - 2,
     )
 
     # -------------------------------- print panel ------------------------------- #
-    println(
+    return println(
         Panel(
             Spacer(width - 2, 1),
             docs,
             hLine(width - 6; style = "blue dim"),
-            methods_panel,
+            methods_panel;
             title = "Function: [bold red]$(info.name)[/bold red]",
             title_style = "red",
             style = "blue",

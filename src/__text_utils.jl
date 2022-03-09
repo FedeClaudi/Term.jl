@@ -31,7 +31,6 @@ Remove all opening markup tags from a string of text
 remove_markup_open(text::AbstractString)::AbstractString =
     replace(text, OPEN_TAG_REGEX => "")
 
-
 # ----------------------------------- ansi ----------------------------------- #
 const ANSI_REGEXEs = [r"\e\[[0-9]*m", r"\e\[[0-9;]*m"]
 
@@ -44,7 +43,7 @@ function remove_ansi(str::AbstractString)::AbstractString
     for regex in ANSI_REGEXEs
         str = replace(str, regex => "")
     end
-    str
+    return str
 end
 
 """
@@ -122,7 +121,6 @@ function read_file_lines(path::AbstractString, start::Int, stop::Int)
     return collect(enumerate(lines))[start:stop]
 end
 
-
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
@@ -171,8 +169,9 @@ remove_brackets(text::AbstractString) = replace(replace(text, "(" => ""), ")" =>
 
 Replace square brackets with round ones.
 """
-square_to_round_brackets(text::AbstractString) =
-    replace(replace(text, "[" => "("), "]" => ")")
+function square_to_round_brackets(text::AbstractString)
+    return replace(replace(text, "[" => "("), "]" => ")")
+end
 
 """
     unspace_commas(text::AbstractString)
@@ -199,7 +198,7 @@ join_lines(lines) = join(lines, "\n")
 Split a string into its composing lines.
 """
 function split_lines(text::AbstractString)
-    split(text, "\n")
+    return split(text, "\n")
 end
 
 """
@@ -240,7 +239,6 @@ function get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
     s1, e1 = δ + tag.open.start, δ + tag.open.stop
     s2, e2 = δ + tag.close.start, δ + tag.close.stop
 
-
     # do nested tags
     for inner in tag.inner_tags
         get_valid_chars!(valid_chars, inner, e1)
@@ -248,7 +246,7 @@ function get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
 
     if s2 > length(valid_chars)
         @warn "How can tag close after valid chars?" tag tag.open tag.close length(
-            valid_chars,
+            valid_chars
         ) tag.text
     else
         valid_chars[s1:e1] .= 0
@@ -281,7 +279,6 @@ function reshape_text(text::AbstractString, width::Int)::AbstractString
         return text
     end
 
-
     # extract tag and mark valid characters and "cutting" places
     tags = extract_markup(text)
     valid_chars = ones(Int, length(text))
@@ -312,7 +309,7 @@ function reshape_text(text::AbstractString, width::Int)::AbstractString
         # prep line
         try
             push!(lines, lstrip(text[1:cut]))
-            text = text[cut+1:end]
+            text = text[(cut + 1):end]
             j += cut
         catch err
             throw("Failed to reshape text: $err - target width: $width")
@@ -337,10 +334,6 @@ function reshape_text(text::AbstractString, width::Int)::AbstractString
 
     return join_lines(pairup_tags(lines))
 end
-
-
-
-
 
 # ------------------------------------ end ----------------------------------- #
 
@@ -392,7 +385,6 @@ function get_last_valid_str_idx(str::AbstractString, idx::Int, valid_places::Vec
     end
     return idx
 end
-
 
 """
 get_next_valid_str_idx(str::AbstractString, idx::Int)

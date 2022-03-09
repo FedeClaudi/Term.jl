@@ -28,9 +28,7 @@ function ANSICode(color; bg::Bool = false)
     end
 end
 
-
 reset_code(code::ANSICode) = ANSICode(code.close, code.close)
-
 
 const CODES = Dict(
     :default => ANSICode("\e[22m", "\e[22m"),
@@ -285,12 +283,12 @@ const CODES_16BIT_COLORS = Dict(
     "gray93" => 255,
 )
 
-
 # ---------------------------------------------------------------------------- #
 #                                    COLORS                                    #
 # ---------------------------------------------------------------------------- #
-const NAMED_COLORS =
-    ["default", "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
+const NAMED_COLORS = [
+    "default", "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
+]
 
 const COLORS_16b = vcat(
     [
@@ -521,7 +519,7 @@ const COLORS_16b = vcat(
         "grey93",
         "gray93",
     ],
-    [string(i) for i = 1:255],
+    [string(i) for i in 1:255],
 )
 
 # ---------------------------------------------------------------------------- #

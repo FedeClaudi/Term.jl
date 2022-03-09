@@ -60,9 +60,7 @@ function highlight(text::AbstractString, theme::Theme, like::Symbol)
     return do_by_line(x -> "[$markup]$x[/$markup]", chomp(text))
 end
 
-
 # ------------------------------ Highlighters.jl ----------------------------- #
-
 
 """
     Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
@@ -73,7 +71,6 @@ function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
     for (str, id, style) in tokens
         fg = style.fg.active ? map(Int, (style.fg.r, style.fg.g, style.fg.b)) : ""
         bg = style.bg.active ? map(Int, (style.bg.r, style.bg.g, style.bg.b)) : nothing
-
 
         bold = style.bold ? "bold" : ""
         italic = style.italic ? "italic" : ""
@@ -110,7 +107,6 @@ function highlight_syntax(code::AbstractString; style::Bool = true)
     return txt
 end
 
-
 """
     load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int=3, width::INt=120)
 
@@ -133,14 +129,14 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
 
     # make n lines match
     if lineno ≤ δ
-        codelines = clean.(code)[1:lineno+δ]
-        linenos = linenos[1:lineno+δ]
+        codelines = clean.(code)[1:(lineno + δ)]
+        linenos = linenos[1:(lineno + δ)]
     elseif η - lineno ≤ δ
-        codelines = clean.(code)[end-δ:end]
-        linenos = linenos[end-δ:end]
+        codelines = clean.(code)[(end - δ):end]
+        linenos = linenos[(end - δ):end]
     else
-        codelines = clean.(code)[10-δ:10+δ]
-        linenos = linenos[10-δ:10+δ]
+        codelines = clean.(code)[(10 - δ):(10 + δ)]
+        linenos = linenos[(10 - δ):(10 + δ)]
     end
 
     # format
@@ -152,7 +148,6 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
         end
     end
     dedent = dedent < 1 ? 1 : dedent
-
 
     cleaned_lines = []
     for (n, line) in zip(linenos, codelines)

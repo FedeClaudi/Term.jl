@@ -18,7 +18,6 @@ my_long_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
 println(@green "This is what it looks like if you just print it out:")
 println(my_long_text)
 
-
 println(@green "\n\nAnd now in a textbox:")
 print(TextBox(my_long_text))
 
@@ -29,7 +28,7 @@ you'd use in a panel can be used here for more creating control (see panels exam
 
 print(
     TextBox(
-        my_long_text,
+        my_long_text;
         title = "This is my long text",
         title_style = "bold red",
         title_justify = :center,
@@ -45,8 +44,7 @@ And of course it works well with markup styles too
 another_long_one =
     "This is a [red bold]very[/red bold] piece of [green italic]content[/green italic]. But TextBox can handle [underline]anything[/underline]!! "^10
 
-print(TextBox(another_long_one, width = 44))
-
+print(TextBox(another_long_one; width = 44))
 
 """
 And of course you can use Term.jl's layout syntax to compose TextBox objects, 
@@ -57,7 +55,7 @@ very wide piece of text
 """
 
 tb1 = TextBox(
-    my_long_text,
+    my_long_text;
     title = "This is my long text",
     title_style = "bold red",
     title_justify = :center,
@@ -68,7 +66,7 @@ tb1 = TextBox(
 )
 
 tb2 = TextBox(
-    another_long_one,
+    another_long_one;
     width = 30,
     title = "second column",
     title_style = "blue bold",
@@ -84,4 +82,4 @@ very wide piece of text
 """
 
 import Term: Panel
-print(Panel(tb1 * tb2, width = :fit, title = "My Panel"))
+print(Panel(tb1 * tb2; width = :fit, title = "My Panel"))

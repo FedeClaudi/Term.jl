@@ -15,7 +15,6 @@ macro style(text, styles...)
     end
 end
 
-
 # ------------------------- macros generating macros ------------------------- #
 """
 Macro to create macros such as `@green` which colors text accordingly
@@ -32,7 +31,6 @@ macro make_color_macro(color)
         end
     end
 end
-
 
 """
 Macro to create macros such as `@underline` which styles text accordingly.
@@ -60,7 +58,6 @@ end
 @make_color_macro cyan
 @make_color_macro white
 @make_color_macro default
-
 
 # ----------------------------------- modes ---------------------------------- #
 @make_mode_macro bold
