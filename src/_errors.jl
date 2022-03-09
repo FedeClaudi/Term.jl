@@ -52,13 +52,13 @@ function style_error(io::IO, er)
     end
 
     WIDTH = _width()
-    main_message, message = error_message(io, er)
-    # @info "Got styled error" er main_message info_msg
+    main_message, message = error_message(io, er) 
+    # @info "Got styled error" main_message info_msg isnothing(info_msg) typeof(message)
 
     # create panel and text
-    if !isnothing(info_msg)
+    if !isnothing(info_msg) &&  Measure(message).w > 0
         panel = Panel(
-            length(message) > 0 ? main_message / message : main_message,
+            main_message / message,
             hLine(WIDTH - 4; style = "red dim"),
             RenderableText(
                 "[bold yellow italic underline]hint:[/bold yellow italic underline] [bright_red]$(typeof(er))[/bright_red] " *
@@ -73,7 +73,7 @@ function style_error(io::IO, er)
         )
     else
         panel = Panel(
-            length(message) > 0 ? main_message / message : main_message;
+            main_message;
             title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
             title_style = "red",
             style = "dim red",
@@ -106,7 +106,7 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
     try
         code = load_code_and_highlight(file, lineno; δ = 2)
         if length(code) > 0
-            code = TextBox(code; width = WIDTH - 18)
+            code = TextBox(code; width = WIDTH - 26)
             code = Spacer(8, code.measure.h) * code
         end
     catch SystemError  # file not found
@@ -114,15 +114,18 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
         code = ""
     end
 
-    return Panel(
+    # @info "line&code" line code
+    panel = Panel(
         "\n",
         chomp(line),
         code;
         title = title,
-        width = WIDTH - 4,
+        width = :fit,
         style = "dim blue",
         title_style = "bold bright_yellow",
     )
+    # @info "Created backtrace subpanel"
+    return panel
 end
 
 """
@@ -144,7 +147,7 @@ function style_backtrace(io::IO, t::Vector)
         end
     end
 
-    # trim exceedingly long stack traces
+    # trim excedingly long stack traces
     if length(stack_lines) > 10
         stack_lines = vcat(
             stack_lines[1:5],
@@ -157,7 +160,7 @@ function style_backtrace(io::IO, t::Vector)
     # @info "creating stack panels" length(stack_lines)
     if length(stack_lines) > 0
         if length(stack_lines) > 1
-            error_line = backtrace_subpanel(stack_lines[1], WIDTH, "error in")
+            error_line = backtrace_subpanel(stack_lines[1], WIDTH - 8, "error in")
         else
             error_line = ""
         end
@@ -172,9 +175,10 @@ function style_backtrace(io::IO, t::Vector)
         end
         # @info "above ready"
 
-        offending = backtrace_subpanel(stack_lines[end], WIDTH, "caused by")
+        offending = backtrace_subpanel(stack_lines[end], WIDTH - 8, "caused by")
+        # @info "offending ready" offending
         stack = error_line / above / offending
-        # @info "stacked"
+        # @info "stacked" stack
     else
         stack = "[dim]No stack trace[/dim]"
     end

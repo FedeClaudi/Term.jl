@@ -7,6 +7,7 @@ using Documenter
 DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
 
 makedocs(;
+    build="stable".
     modules = [Term],
     authors = "FedeClaudi <federicoclaudi@protonmail.com> and contributors",
     repo = "https://github.com/FedeClaudi/Term.jl/blob/{commit}{path}#{line}",
@@ -20,18 +21,20 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "Basics" => Any[
-            "Guide" => "basics/styled_text.md",
+            "basics/basics.md",    
+            "basics/styled_text.md",
             "basics/colors.md",
             "basics/renderables.md",
             "basics/content_layout.md",
         ],
         "Advanced" => Any[
-            "Advanced" => "adv/logging.md",
+            "adv/logging.md",    
+            "adv/logging.md",
             "adv/errors_tracebacks.md",
             "adv/introspection.md",
         ],
         "API" => Any[
-            "API" => "api/api_term.md",
+            "api/adv.md",
             "api/api_box.md",
             "api/api_color.md",
             "api/api_console.md",
@@ -49,4 +52,4 @@ makedocs(;
     ],
 )
 
-deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "gh-pages")
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "gh-pages", target="stable")

@@ -10,6 +10,7 @@ import ..panel: Panel, TextBox
 import ..renderables: RenderableText
 import ..layout: hLine, Spacer
 import ..consoles: Console
+import ..measure: Measure
 
 export install_stacktrace
 
@@ -251,7 +252,8 @@ function install_stacktrace()
                 err, err_msg = style_error(io, er)
                 println(err / err_msg)
             catch styling_error
-                @error "Failed to generate styled error emssage" styling_error
+                @error "Failed to generate styled error message" styling_error stacktrace()
+
                 println(apply_style("Original error: [bright_red]$(string(er))"))
             end
         end

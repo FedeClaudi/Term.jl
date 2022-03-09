@@ -30,7 +30,7 @@ corresponding error message
 """
 
 # ------------  MethodError
-# 1 - "a"
+1 - "a"
 
 # ------------  DomainError
 # sqrt(-1)
