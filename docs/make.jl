@@ -1,6 +1,7 @@
 using Term
 
-import Pkg; Pkg.add("Documenter")
+using Pkg: Pkg;
+Pkg.add("Documenter");
 using Documenter
 
 DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
@@ -17,33 +18,33 @@ makedocs(;
         collapselevel = 1,
     ),
     pages = [
-        "Home"=> "index.md",
+        "Home" => "index.md",
         "Basics" => Any[
             "Guide" => "basics/styled_text.md",
-                "basics/colors.md",
-                "basics/renderables.md",
-                "basics/content_layout.md",
+            "basics/colors.md",
+            "basics/renderables.md",
+            "basics/content_layout.md",
         ],
         "Advanced" => Any[
-            "Advanced" =>  "adv/logging.md",
-                "adv/errors_tracebacks.md",
-                "adv/introspection.md",
+            "Advanced" => "adv/logging.md",
+            "adv/errors_tracebacks.md",
+            "adv/introspection.md",
         ],
         "API" => Any[
             "API" => "api/api_term.md",
-                "api/api_box.md",
-                "api/api_color.md",
-                "api/api_console.md",
-                "api/api_errors.md",
-                "api/api_introspection.md",
-                "api/api_layout.md",
-                "api/api_logging.md",
-                "api/api_markup.md",
-                "api/api_measure.md",
-                "api/api_panel.md",
-                "api/api_renderables.md",
-                "api/api_segment.md",
-                "api/api_style.md",
+            "api/api_box.md",
+            "api/api_color.md",
+            "api/api_console.md",
+            "api/api_errors.md",
+            "api/api_introspection.md",
+            "api/api_layout.md",
+            "api/api_logging.md",
+            "api/api_markup.md",
+            "api/api_measure.md",
+            "api/api_panel.md",
+            "api/api_renderables.md",
+            "api/api_segment.md",
+            "api/api_style.md",
         ],
     ],
 )

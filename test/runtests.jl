@@ -5,7 +5,6 @@ using Suppressor
 # using Pkg
 # Pkg.test("Term",coverage=true)
 
-
 nlines(x) = length(split(x, "\n"))
 lw(x) = max(length.(split(x, "\n"))...)
 
@@ -13,11 +12,10 @@ using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
 macro timeit_include(path::AbstractString)
-    :(@timeit TIMEROUTPUT $path include($path))
+    return :(@timeit TIMEROUTPUT $path include($path))
 end
 
 @timeit_include("00_empty.jl")
-
 
 print("\n\n")
 @timeit_include("01_test_text_utils.jl")

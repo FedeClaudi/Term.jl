@@ -12,14 +12,12 @@ println(
     ),
 )
 
-
 # ----------------------------- >2 tags per line ----------------------------- #
 println(
     RenderableText(
-        "[red]reeed [blue]blueeee[/blue] reeeed [green] greeen [/green] red red red[/red]",
+        "[red]reeed [blue]blueeee[/blue] reeeed [green] greeen [/green] red red red[/red]"
     ),
 )
-
 
 # ------------------------------ text reshaping ------------------------------ #
 text =
@@ -32,7 +30,6 @@ for width in [9, 29, 37, 50]
 
     print(RenderableText(text; width = width))
 end
-
 
 text = "[red]TEST[/red]aaa"^20
 # text = "TESTaaa"^10

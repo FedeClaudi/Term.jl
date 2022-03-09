@@ -18,7 +18,6 @@ import ..style: apply_style
 
 export Panel, TextBox
 
-
 abstract type AbstractPanel <: AbstractRenderable end
 
 # ---------------------------------------------------------------------------- #
@@ -39,8 +38,6 @@ mutable struct Panel <: AbstractPanel
     title_style::Union{String,Nothing}
     style::Union{String,Nothing}
 end
-
-
 
 """
     Panel(
@@ -133,8 +130,7 @@ function Panel(
     left, right = σ(string(box.mid.left)), σ(string(box.mid.right))
     content_lines = split_lines(content)
 
-
-    for n = 1:content_measure.h
+    for n in 1:(content_measure.h)
         # get padding
         line = content_lines[n]
         padding = Padding(line, width - 2, justify)
@@ -146,8 +142,8 @@ function Panel(
     end
 
     # add empty lines to ensure target height is reached
-    if !isnothing(height) && content_measure.h < height-2
-        for i = 1:(height-content_measure.h-2)
+    if !isnothing(height) && content_measure.h < height - 2
+        for i in 1:(height - content_measure.h - 2)
             line = " "^(width - 2)
             push!(segments, Segment(left * line * right))
         end
@@ -155,11 +151,7 @@ function Panel(
     push!(segments, bottom)
 
     return Panel(
-        segments,
-        Measure(segments),
-        isnothing(title) ? title : title,
-        title_style,
-        style,
+        segments, Measure(segments), isnothing(title) ? title : title, title_style, style
     )
 end
 
@@ -175,9 +167,6 @@ function Panel(renderables...; width::Union{Nothing,Int,Symbol} = nothing, kwarg
     return Panel(renderable; width = width, kwargs...)
 end
 
-
-
-
 # ---------------------------------------------------------------------------- #
 #                                    TextBox                                   #
 # ---------------------------------------------------------------------------- #
@@ -192,7 +181,6 @@ mutable struct TextBox <: AbstractPanel
     segments::Vector
     measure::Measure
 end
-
 
 """
     TextBox(
@@ -243,7 +231,7 @@ function TextBox(
     end
 
     panel = Panel(
-        text,
+        text;
         style = "hidden",
         title = title,
         title_style = title_style,
@@ -256,7 +244,6 @@ function TextBox(
     )
 
     return TextBox(panel.segments, panel.measure)
-
 end
 
 TextBox(texts...; kwargs...) = TextBox(join_lines(texts); kwargs...)

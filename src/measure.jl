@@ -28,8 +28,6 @@ function Measure(str::AbstractString)
     return Measure(w, length(lines))
 end
 
-
-
 """
 The sum of measures returns a measure with the highest value along each dimension
 """

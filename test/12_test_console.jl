@@ -15,16 +15,13 @@ println("\nTesting tprint, stdout temporarily disabled")
         @test_nowarn tprint(1)
         @test_nowarn tprint(:x)
 
-        @test_nowarn tprint(1,Panel("test"), "test")
-
+        @test_nowarn tprint(1, Panel("test"), "test")
     end
 end
-
 
 @testset "\e[31mCONSOLE" begin
     @test console_height() == displaysize(stdout)[1]
     @test console_height(stdout) == displaysize(stdout)[1]
-
 
     @test console_width() == displaysize(stdout)[2]
     @test console_width(stdout) == displaysize(stdout)[2]

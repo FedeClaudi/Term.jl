@@ -18,7 +18,7 @@ import Term: hLine
 
 install_stacktrace()
 
-print(hLine("Fancy Errors", style = "bold blue"))
+print(hLine("Fancy Errors"; style = "bold blue"))
 
 """
 Done!

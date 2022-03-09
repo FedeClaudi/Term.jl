@@ -27,5 +27,4 @@ import Term: remove_markup
         @test m.w == lw(remove_markup(string))
         @test m.h == nlines(remove_markup(string))
     end
-
 end

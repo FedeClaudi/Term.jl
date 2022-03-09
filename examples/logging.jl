@@ -10,7 +10,6 @@ import Term: install_term_logger, Panel
 # insall term's logger as the global logger
 install_term_logger()
 
-
 # log
 @info "my log!"
 

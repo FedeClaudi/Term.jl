@@ -2,7 +2,6 @@ import Term: install_stacktrace
 
 install_stacktrace()
 
-
 """
 The logic behind these tests is that if something goes
 wrong during the error message generation, the 
@@ -11,13 +10,12 @@ will be different from the one you'd expect
 """
 
 @testset "ERRORS" begin
-    
     @test_throws MethodError 1 - "a"
 
     @test_throws DomainError √(-1)
 
     import Term: Panel
-    @test_throws AssertionError Panel("mytext", title="this title is waaaay too long!!!")
+    @test_throws AssertionError Panel("mytext", title = "this title is waaaay too long!!!")
 
     @test_throws UndefVarError println(x)
 
@@ -29,12 +27,12 @@ will be different from the one you'd expect
     b() = a()
     @test_throws StackOverflowError a()
 
-    mydict = Dict(:a=>"a", :b=>"b")
+    mydict = Dict(:a => "a", :b => "b")
     @test_throws KeyError mydict["a"]
 
     @test_throws InexactError Int(2.5)
 
-    function my_func(;my_arg::Int)
+    function my_func(; my_arg::Int)
         return my_arg + 1
     end
     @test_throws UndefKeywordError my_func()
@@ -42,7 +40,4 @@ will be different from the one you'd expect
     a = zeros(20, 20)
     b = zeros(5, 4)
     @test_throws DimensionMismatch a .+ b
-
-
-
 end

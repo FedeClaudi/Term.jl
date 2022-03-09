@@ -10,7 +10,6 @@ import ..consoles: console_width, console_height
 export Padding, vstack, hstack
 export Spacer, vLine, hLine
 
-
 # ---------------------------------------------------------------------------- #
 #                                    PADDING                                   #
 # ---------------------------------------------------------------------------- #
@@ -50,7 +49,7 @@ function Padding(text::AbstractString, target_width::Int, method::Symbol)::Paddi
     # split left/right padding for left/right justify
     if pad_width > 0
         cut = pad_width % 2 == 0 ? Int(pad_width / 2) : (Int ∘ floor)(pad_width / 2)
-        left, right = padding[1:cut], padding[cut+1:end]
+        left, right = padding[1:cut], padding[(cut + 1):end]
         @assert length(left * right) <= length(padding) "\e[31m$(length(left * right)) instead of $(length(padding))"
     else
         left, right = "", ""
@@ -72,13 +71,11 @@ function Padding(text::AbstractString, target_width::Int, method::Symbol)::Paddi
 end
 
 function Base.show(io::IO, padding::Padding)
-    print(
+    return print(
         io,
         "$(typeof(padding))  \e[2m(left: $(length(padding.left)), right: $(length(padding.right)))\e[0m",
     )
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                   STACKING                                   #
@@ -117,7 +114,6 @@ function vstack(renderables...)
     return renderable
 end
 
-
 """
     hstack(r1::RenderablesUnion, r2::RenderablesUnion)
 
@@ -134,9 +130,9 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
     # make sure both renderables have the same number of segments
     Δh = abs(h2 - h1)
     if h1 > h2
-        r2.segments = vcat(r2.segments, [Segment(" "^r2.measure.w) for i = 1:Δh])
+        r2.segments = vcat(r2.segments, [Segment(" "^r2.measure.w) for i in 1:Δh])
     elseif h1 < h2
-        r1.segments = vcat(r1.segments, [Segment(" "^r1.measure.w) for i = 1:Δh])
+        r1.segments = vcat(r1.segments, [Segment(" "^r1.measure.w) for i in 1:Δh])
     end
 
     # combine segments
@@ -158,7 +154,6 @@ function hstack(renderables...)
     end
     return renderable
 end
-
 
 # --------------------------------- operators -------------------------------- #
 
@@ -193,10 +188,9 @@ function Spacer(width::Number, height::Number; char::Char = ' ')
     height = int(height)
 
     line = char^width
-    segments = [Segment(line) for i = 1:height]
+    segments = [Segment(line) for i in 1:height]
     return Spacer(segments, Measure(segments))
 end
-
 
 # ----------------------------------- vline ---------------------------------- #
 """
@@ -210,20 +204,17 @@ mutable struct vLine <: AbstractLayoutElement
     height::Int
 end
 
-
 """
     vLine(height::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
 
 Create a `vLine` given a height and, optionally, style information.
 """
 function vLine(
-    height::Number;
-    style::Union{String,Nothing} = nothing,
-    box::Symbol = :ROUNDED,
+    height::Number; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED
 )
     height = int(height)
     char = string(eval(box).head.left)
-    segments = [Segment(char, style) for i = 1:height]
+    segments = [Segment(char, style) for i in 1:height]
     return vLine(segments, Measure(segments), height)
 end
 
@@ -232,8 +223,9 @@ end
 
 Create a `vLine` as tall as the `stdout` console
 """
-vLine(; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED) =
-    vLine(console_height(); style = style, box = box)
+function vLine(; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED)
+    return vLine(console_height(); style = style, box = box)
+end
 
 """
     hLine
@@ -252,9 +244,7 @@ end
 Create a styled `hLine` of given width.
 """
 function hLine(
-    width::Number;
-    style::Union{String,Nothing} = nothing,
-    box::Symbol = :ROUNDED,
+    width::Number; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED
 )
     width = int(width)
     char = eval(box).row.mid
@@ -299,17 +289,18 @@ end
 
 Construct an `hLine` as wide as the `stdout`
 """
-hLine(; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED) =
-    hLine(console_width(); style = style, box = box)
+function hLine(; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED)
+    return hLine(console_width(); style = style, box = box)
+end
 
 """
     hLine(text::AbstractString; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
 
 Construct an `hLine` as wide as the `stdout` with centered text.
 """
-hLine(
-    text::AbstractString;
-    style::Union{String,Nothing} = nothing,
-    box::Symbol = :ROUNDED,
-) = hLine(console_width(), text; style = style, box = box)
+function hLine(
+    text::AbstractString; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED
+)
+    return hLine(console_width(), text; style = style, box = box)
+end
 end

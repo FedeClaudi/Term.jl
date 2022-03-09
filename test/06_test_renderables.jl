@@ -7,9 +7,7 @@ import Term.renderables: Renderable, RenderableText, AbstractRenderable
     r1 = Renderable("asdasda")
     @test Renderable(r1) isa AbstractRenderable
     @test Renderable(r1.segments[1]) isa AbstractRenderable
-
 end
-
 
 @testset "\e[31mRenderables - RenderableText" begin
     @test RenderableText("sadasdasdasdasdas") isa RenderableText
@@ -18,9 +16,7 @@ end
     @test r.measure.w == 25
     @test r.measure.h == 4
 
-
     r = RenderableText("a"^100, "red bold"; width = 25)
     @test r.measure.w == 25
     @test r.measure.h == 4
-
 end

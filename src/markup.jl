@@ -5,8 +5,6 @@ import Term: get_last_valid_str_idx, CLOSE_TAG_REGEX, GENERIC_CLOSER_REGEX
 
 export extract_markup, MarkupTag, pairup_tags, clean_nested_tags
 
-
-
 # -------------------------------- single tag -------------------------------- #
 """
     SingleTag
@@ -29,7 +27,7 @@ function SingleTag(match::RegexMatch)
     _start = match.offset
     _stop = match.offset + length(match.match) - 1
 
-    SingleTag(match.match[2:end-1], _start, _stop, match.match[2] == '/')
+    return SingleTag(match.match[2:(end - 1)], _start, _stop, match.match[2] == '/')
 end
 
 # -------------------------------- markup tag -------------------------------- #
@@ -48,12 +46,13 @@ mutable struct MarkupTag
     text::String
     inner_tags::Vector
 end
-MarkupTag(text::AbstractString, open::SingleTag, close::SingleTag, inner::Vector) =
-    MarkupTag(open.markup, open, close, text, inner)
+function MarkupTag(text::AbstractString, open::SingleTag, close::SingleTag, inner::Vector)
+    return MarkupTag(open.markup, open, close, text, inner)
+end
 
-Base.show(io::IO, tag::MarkupTag) =
-    print(io, "Markup tag ($(length(tag.inner_tags)) inner tags)")
-
+function Base.show(io::IO, tag::MarkupTag)
+    return print(io, "Markup tag ($(length(tag.inner_tags)) inner tags)")
+end
 
 # ---------------------------- extract markup tags --------------------------- #
 
@@ -82,9 +81,9 @@ function extract_markup(input_text::AbstractString; firstonly = false)
 
         # get tag closing
         close_regex = r"\[\/+" * tag_open.markup * r"\]"
-        if !occursin(close_regex, text[tag_open.stop:end])
+        if !occursin(close_regex, text[(tag_open.stop):end])
             # check if a generig closer [/] is present
-            if occursin(GENERIC_CLOSER_REGEX, text[tag_open.stop:end])
+            if occursin(GENERIC_CLOSER_REGEX, text[(tag_open.stop):end])
                 tag_close = SingleTag(collect(eachmatch(GENERIC_CLOSER_REGEX, text))[end])
             else
                 # otherwise inject a closer tag at the end
@@ -100,7 +99,6 @@ function extract_markup(input_text::AbstractString; firstonly = false)
         _start = tag_open.stop + 1
         _stop = tag_close.start - 1
 
-
         _start = !isvalid(text, _start) ? get_next_valid_str_idx(text, _start) : _start
         _stop = !isvalid(text, _stop) ? get_last_valid_str_idx(text, _stop) : _stop
         contained = text[_start:_stop]
@@ -109,7 +107,7 @@ function extract_markup(input_text::AbstractString; firstonly = false)
         tag_close.start = _stop + 1
 
         # get nested tags
-        inner_tags = extract_markup(input_text[tag_open.stop+1:tag_close.start-1])
+        inner_tags = extract_markup(input_text[(tag_open.stop + 1):(tag_close.start - 1)])
 
         # remove tag's inside text
         input_text = replace_text(input_text, tag_open.start - 1, tag_close.stop + 1)
@@ -125,7 +123,6 @@ function extract_markup(input_text::AbstractString; firstonly = false)
 end
 
 # ----------------------------- helper functions ----------------------------- #
-
 
 """
     clean_nested_tags(text::AbstractString)::AbstractString
@@ -171,7 +168,6 @@ function clean_nested_tags(tag::MarkupTag, text::AbstractString)
     return text
 end
 
-
 """
     pairup_tags(text::Vector{AbstractString})
 
@@ -180,7 +176,7 @@ it fixes things up.
 """
 function pairup_tags(text::Vector{AbstractString})::Vector{AbstractString}
     # sweep lines to add tags starts/end
-    for i = length(text):-1:1
+    for i in length(text):-1:1
         # get all open tags
         for opener in reverse(collect(eachmatch(OPEN_TAG_REGEX, text[i])))
             tag_open = SingleTag(opener)
@@ -204,27 +200,23 @@ function pairup_tags(text::Vector{AbstractString})::Vector{AbstractString}
             end
 
             # add correct close/open markups
-            for idx = i:(j-1)
+            for idx in i:(j - 1)
                 text[idx] = text[idx] * "[/$(tag_open.markup)]"
-                text[1+idx] = "[$(tag_open.markup)]" * text[1+idx]
+                text[1 + idx] = "[$(tag_open.markup)]" * text[1 + idx]
             end
-
-
         end
     end
 
     # do another sweep to close up orphaned tags
     for (i, line) in enumerate(text)
         for match in eachmatch(CLOSE_TAG_REGEX, line)
-            markup = match.match[3:end-1]
+            markup = match.match[3:(end - 1)]
 
             open_regex = r"\[" * markup * r"\]"
-            if !occursin(open_regex, line[1:match.offset])
-
+            if !occursin(open_regex, line[1:(match.offset)])
                 line = "[$markup]" * line
                 # @info "injected" markup i line
             end
-
         end
         text[i] = line
     end

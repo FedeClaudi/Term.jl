@@ -7,7 +7,6 @@ using Term
 install_stacktrace()
 import Base: ExceptionStack
 
-
 import Term: highlight_syntax
 
 # TODO mostly working but error not rendering correctly
@@ -20,7 +19,6 @@ b(x::String) = x * "a"
 """
 yet_another_function(z) = b(z)
 
-
 # is this going to work?
 outer(y) = yet_another_function(y)
 
@@ -28,7 +26,6 @@ outer(y) = yet_another_function(y)
 1 = "a"
 
 # outer(2)
-
 
 # TODO load code and highlight https://juliadocs.github.io/Highlights.jl/stable/
 # TODO try getting error hints again

@@ -1,6 +1,6 @@
 
 module logging
-import Dates
+using Dates: Dates
 using Logging
 using InteractiveUtils
 
@@ -25,7 +25,6 @@ struct TermLogger <: Logging.AbstractLogger
 end
 TermLogger(theme::Theme) = TermLogger(stderr, theme)
 
-
 # set logger beavior
 Logging.min_enabled_level(logger::TermLogger) = Logging.Info
 function Logging.shouldlog(logger::TermLogger, level, _module, group, id)
@@ -40,7 +39,7 @@ Logging.catch_exceptions(logger::TermLogger) = true
 
 Print the final line of a log message with style and date info
 """
-function print_closing_line(color::String, width::Int=48)
+function print_closing_line(color::String, width::Int = 48)
     tprint(
         "  [$color bold dim]$(ROUNDED.bottom.left)" *
         "$(ROUNDED.row.mid)"^(width) *
@@ -49,10 +48,10 @@ function print_closing_line(color::String, width::Int=48)
     _date = Dates.format(Dates.now(), "e, dd u yyyy")
     _time = Dates.format(Dates.now(), "HH:MM:SS")
     pad = width - textlen(_date * _time) - 2
-    tprint(" "^pad * "[dim]$_date[/dim] [bold dim underline]$_time[/bold dim underline]")
+    return tprint(
+        " "^pad * "[dim]$_date[/dim] [bold dim underline]$_time[/bold dim underline]"
+    )
 end
-
-
 
 """
     Logging.handle_message(logger::TermLogger,
@@ -63,15 +62,7 @@ In addition to the log message and info such as file/line and time of log,
 it prints kwargs styled by their type.
 """
 function Logging.handle_message(
-    logger::TermLogger,
-    lvl,
-    msg,
-    _mod,
-    group,
-    id,
-    file,
-    line;
-    kwargs...,
+    logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...
 )
 
     # get name of function where logging message was called from
@@ -95,7 +86,6 @@ function Logging.handle_message(
         color = "#90CAF9"
     end
 
-
     outline_markup = "$color dim"
     hor = "[$outline_markup]▶[/$outline_markup]"
     vert = "[$outline_markup]" * ROUNDED.mid.left * "[/$outline_markup]"
@@ -111,7 +101,6 @@ function Logging.handle_message(
     # get the first line of information
     content = "[$color underline bold]@$(string(lvl))[/$color underline bold] [#edb46f ]($(_mod)$fname):[/#edb46f ]"
 
-
     # for multi-lines message, print each line separately.
     msg_lines::Vector{AbstractString} = split(msg, "\n")
     for n in 2:length(msg_lines)
@@ -124,7 +113,7 @@ function Logging.handle_message(
     # if no kwargs we can just quit
     if length(kwargs) == 0
         print_closing_line(color)
-        return
+        return nothing
     end
 
     # get padding width
@@ -137,7 +126,6 @@ function Logging.handle_message(
 
     wpad = max(textlen.(_types)...) + 2
     namepad = max(textlen.(string.([v for v in keys(kwargs)]))...)
-
 
     # print all kwargs
     tprint("  $vert")
@@ -194,7 +182,7 @@ function Logging.handle_message(
             end
         end
     end
-    print_closing_line(color)
+    return print_closing_line(color)
 end
 
 # ---------------------------- install term logger --------------------------- #
@@ -208,7 +196,7 @@ Install `TermLogger` as the global logging system.
 """
 function install_term_logger(theme::Theme = theme)
     _logger = TermLogger(theme)
-    global_logger(_logger)
+    return global_logger(_logger)
 end
 
 end

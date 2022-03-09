@@ -28,10 +28,8 @@ struct MyType <: T2
     fn::Any
 end
 
-
 #  Now, what is MyType like?
 inspect(MyType)
-
 
 # Let's define some constructors and methods using MyType
 
@@ -41,7 +39,6 @@ constructors!
 MyType(x::Int) = MyType(x, "no string", nothing)
 
 MyType(x::Int, y) = MyType(x, y, nothing)
-
 
 # methods
 useless_method(m::MyType) = m
@@ -66,7 +63,6 @@ And for abstract types of course1
 """
 
 inspect(T2)
-
 
 """
 finally, you can also use inspect to look at functions.

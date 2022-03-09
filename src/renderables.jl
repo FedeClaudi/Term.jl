@@ -4,7 +4,6 @@ import ..measure: Measure
 import ..segment: Segment
 import Term: split_lines, reshape_text, do_by_line
 
-
 export AbstractRenderable, Renderable, RenderableText
 
 # ------------------------------- abstract type ------------------------------ #
@@ -41,7 +40,6 @@ function Base.string(r::AbstractRenderable)::String
     return join(lines, "\n")
 end
 
-
 function Base.show(io::IO, renderable::AbstractRenderable)
     if io == stdout
         for seg in renderable.segments
@@ -54,7 +52,6 @@ function Base.show(io::IO, renderable::AbstractRenderable)
         )
     end
 end
-
 
 # ------------------------- generic renderable object ------------------------ #
 
@@ -69,11 +66,15 @@ mutable struct Renderable <: AbstractRenderable
 end
 
 Renderable() = Renderable([], Measure(0, 0))
-Renderable(str::Union{Vector,AbstractString}; width::Union{Nothing,Int,Symbol} = nothing) =
-    RenderableText(str; width = width)
+function Renderable(
+    str::Union{Vector,AbstractString}; width::Union{Nothing,Int,Symbol} = nothing
+)
+    return RenderableText(str; width = width)
+end
 Renderable(ren::AbstractRenderable; width::Union{Nothing,Int,Symbol} = nothing) = ren  # returns the renderable
-Renderable(segment::Segment; width::Union{Nothing,Int,Symbol} = nothing) =
-    Renderable([segment], Measure([segment]))
+function Renderable(segment::Segment; width::Union{Nothing,Int,Symbol} = nothing)
+    return Renderable([segment], Measure([segment]))
+end
 
 # ---------------------------------------------------------------------------- #
 #                                TEXT RENDERABLE                               #
@@ -109,15 +110,17 @@ function RenderableText(text::AbstractString; width::Union{Nothing,Int,Symbol} =
     return RenderableText(segments, Measure(segments), text)
 end
 
-RenderableText(text::Vector{AbstractString}; width::Union{Nothing,Int,Symbol} = nothing) =
-    RenderableText(join(text, "\n"); width = width)
-RenderableText(text::Vector; width::Union{Nothing,Int,Symbol} = nothing) =
-    RenderableText(join(text, "\n"); width = width)
+function RenderableText(
+    text::Vector{AbstractString}; width::Union{Nothing,Int,Symbol} = nothing
+)
+    return RenderableText(join(text, "\n"); width = width)
+end
+function RenderableText(text::Vector; width::Union{Nothing,Int,Symbol} = nothing)
+    return RenderableText(join(text, "\n"); width = width)
+end
 
 function RenderableText(
-    text::AbstractString,
-    style::AbstractString;
-    width::Union{Nothing,Int,Symbol} = nothing,
+    text::AbstractString, style::AbstractString; width::Union{Nothing,Int,Symbol} = nothing
 )
     if width isa Number
         text = do_by_line((ln) -> reshape_text(ln, width), text)
@@ -128,6 +131,5 @@ end
 
 # -------------------------------- union type -------------------------------- #
 RenderablesUnion = Union{AbstractString,AbstractRenderable,RenderableText}
-
 
 end
