@@ -9,7 +9,7 @@ print(Term.make_logo())
 The example above is composed of panels and textboxes, of course, but also additional lines and spacing elements that can help with the layout. These elements are combined using a very simple syntax to create the whole thing.
 
 ## Nesting
-The easiest way to create a layout is to nest things. We've already seen how to do this with `Panel`s and `TextBox`s:
+The easiest way to create a layout is to nest things. We've already seen how to do this with `Panel`s and `TextBox`es:
 ```@example
 
 import Term: Panel # hide
@@ -37,7 +37,7 @@ The idea is simple: horizontally stack two renderables and they will appear side
     `*` was chosen because it's already what Julia uses to concatenate strings, and you can think of that as "horizontally stacking them". `/` was chosen because it reminds me of fractions, and fractions have one number over another. 
 
     If you don't like to use these operators, you're in luck! They are really just a 
-    shorthand notation for the functions `hstack` * `vstack`. You'll find that this notation makes for some pretty nifty code though.
+    shorthand notation for the functions `hstack` & `vstack`. You'll find that this notation makes for some pretty nifty code though.
 
 Let's stack things:
 
@@ -68,12 +68,12 @@ println(
 ```
 
 
-what's that red text doing in there? We didn't use `tprint`, or `apply_style`, we didn't put it into a `RenderableText` or a `TextBox`... why didn't it print as ""[bold red]supripse![/bold red]"??
+what's that red text doing in there? We didn't use `tprint`, or `apply_style`, we didn't put it into a `RenderableText` or a `TextBox`... why didn't it print as `"[bold red]supripse![/bold red]"`??
 
 The answer is that stacking operators return the generic `Renderable` type object, and `Renderable`s apply their styles before printing out to console. Okay, not a huge surprise I guess, but I just wanted an excuse to say that regardless of what goes into `*` and `/` the output is a generic `Renderable` (well with the exception of `*` between two strings which returns a string; also `*` and `/` don't work with things like `::Number` & co., but you get the idea).
 
 Previously we briefly mentioned the idea of the `Measure` or a renderable object. `Measure` stores information about the width and height of a renderable as it will appear in the terminal. When we stack renderables, the `Measure` of the resulting `Renderable` will do the following:
-- if we are using `*` the width will be the sum of widths of the two renderables and the height will be the height of the height of the tallest renderable
+- if we are using `*` the width will be the sum of widths of the two renderables and the height will be the height  of the tallest renderable
 -  if we are using `/` the width will be that of the widest renderable and the height will be the sum of heights. 
 
 Let's see:
@@ -97,7 +97,7 @@ This is important, because often you want to know a `Renderable`'s size when cre
 
 
 ## Spacer
-Okay, we can stack two `Panel`s side by side and it looks like thisL
+Okay, we can stack two `Panel`s side by side. It looks like this:
 
 ```@example
 using Term # hide
@@ -148,9 +148,10 @@ bottom = p * Spacer(5, 3) * p
 print(top / mid / bottom)
 ```
 
-
 ## vLine
-Space is nice. You can separate distinct pieces of content so that the message you're trying to convey is more easily interpreted by the user. But space is not enough. Sometimes you want to add a line to mark out where one section ends and the other starts:
+Space is nice. You can separate distinct pieces of content so that the message you're trying to convey is more easily interpreted by the user. But space is not enough. Sometimes you want to add a line to mark out where one section ends and the other starts.
+Well, that's where `vLine` and `hLine` below come in. They're very simple to use, just say how tall/weide the line should be and, optionally, give some markup style information too:
+
 ```@example
 import Term: Panel, Spacer # hide
 import Term: vLine
@@ -163,7 +164,7 @@ print(p * l * s * l * p)
 ```
 
 !!! note
-    Like with `Panel`, `vLine` (and `hLine` below) accept a `box=` keyword argument with the `::Symbol` of any of the `Box` objects supported by `Term`.
+    Like with `Panel`, `vLine` and `hLine` accept a `box=` keyword argument with the `::Symbol` of any of the `Box` objects supported by `Term`.
 
 
 ## hLine
