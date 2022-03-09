@@ -33,12 +33,6 @@ makedocs(;
             "adv/errors_tracebacks.md",
             "adv/introspection.md",
         ],
-        "Examples" => Any[
-            "examples/text.md",
-            "examples/panel.md",
-            "examples/box.md",
-            "examples/layout.md",
-        ],
         "API" => Any[
             "api/api_term.md",    
             "api/api_box.md",
