@@ -13,29 +13,7 @@ println(@bold "this is bold")
 println(@underline "and this is underlined")
 ```
 
-
-pages = [
-    "Home" => "index.md",
-    "Manual" => Any[
-        "Guide" => "man/guide.md",
-        "man/examples.md",
-        "man/syntax.md",
-        "man/doctests.md",
-        "man/latex.md",
-        hide("man/hosting.md", [
-            "man/hosting/walkthrough.md"
-        ]),
-        "man/other-formats.md",
-    ],
-    "showcase.md",
-    "Library" => Any[
-        "Public" => "lib/public.md",
-        "Internals" => map(
-            s -> "lib/internals/$(s)",
-            sort(readdir(joinpath(@__DIR__, "src/lib/interna
-
-
-For color you can use these macros: `@black, @red, @green, @yellow, @blue, @magenta, @cyan, @white, @default`.
+To color you can use these macros: `@black, @red, @green, @yellow, @blue, @magenta, @cyan, @white, @default`.
 While for styling you have: `@bold @dim @italic @underline`.
 
 Note that the styling macros return a string, so you can combine the resulting strings as you would normally:
@@ -104,7 +82,7 @@ tprint(
     "[bold black underline on_red]So much [gold3 bold]STYLE[/gold3 bold] in this text[/bold black underline on_red]"
 )
 ```
-that's right, `Term.jl` can also color the background of your text (by adding `on_C` to your color `C` you set it as the background, see !!!! COLORS !!! page). Also, you might have noticed, `Term` can also handle nested style tags!
+that's right, `Term.jl` can also color the background of your text (by adding `on_C` to your color `C` you set it as the background, see `colors` page). As you can see you can pass multiple style information tags as space separated words within the `"[...]"`. Also, you might have noticed, `Term` can also handle nested style tags!
 
 If you just want to **use** `Term.jl`'s style functionality, just make sure to read the admonition below. If you're curious about what's happening under the hood, read on below!
 
@@ -130,7 +108,7 @@ If you just want to **use** `Term.jl`'s style functionality, just make sure to r
 ## Under the hood
 
 If you're reading here you're curious about what exactly is happening under the hood. So let's get started.
-`Term.jl`, like `rich` in python, defines a simple markup language to specify the style of bits of strins.
+`Term.jl`, like `rich` in python, defines a simple markup language to specify the style of bits of strings.
 As we saw, the syntax is very simple with an opening and closing tag specifying the style and marking the start and end of the styled text. 
 
 So the first thing that needs to happen is the **detection** of these markup tags. This is surprisingly hard because there's so many possible combinations. You can have markup tags whose style information varies considerably, you can have nested tags, you can have tags spread across lines and you can have nested tags spread across lines:

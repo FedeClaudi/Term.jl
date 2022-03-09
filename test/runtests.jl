@@ -85,26 +85,24 @@ end
  # ? 10 errors
  tprint("\n\n[bold green]Running: '10_test_errors.jl' ")
  @suppress begin
-     include("10_test_errors.jl")
+    include("10_test_errors.jl")
  end
  @time @timeit_include("10_test_errors.jl")
 
- # ? 11 logging
-tprint("\n\n[bold green]Running: '11_test_logging.jl' ")
+
+ # ? 11 console
+tprint("\n\n[bold green]Running: '11_test_console.jl' ")
 @suppress begin
-    include("11_test_logging.jl")
+include("11_test_console.jl")
 end
-@time @timeit_include("11_test_logging.jl")
+@time @timeit_include("11_test_console.jl")
 
-
- # ? 12 console
-tprint("\n\n[bold green]Running: '12_test_console.jl' ")
-@suppress begin
-    include("12_test_console.jl")
-end
-@time @timeit_include("12_test_console.jl")
-
-
+ # ? 12 logging
+ tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
+ @suppress begin
+    include("12_test_logging.jl")
+ end
+ @time @timeit_include("12_test_logging.jl")
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")

@@ -8,6 +8,7 @@ import Term: Theme, theme, textlen, square_to_round_brackets, escape_brackets, r
 import ..markup: has_markup
 import ..box: ROUNDED
 import ..style: apply_style
+import ..renderables: AbstractRenderable
 
 export TermLogger, install_term_logger
 
@@ -162,6 +163,9 @@ function Logging.handle_message(
                 "\n [dim]size: $(size(v))[/dim]"
         elseif v isa Function
             _style = logger.theme.func
+        elseif v isa AbstractRenderable
+            _style = "default"
+            v = "$(typeof(v)) \e[2m(size: $(v.measure))\e[0m"
         else
             _style = nothing
         end

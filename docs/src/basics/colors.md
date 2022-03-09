@@ -1,5 +1,5 @@
 # Colors
-Okay, so far so good. We can use macros like `@red` and the `tprint` function to print colored strings. But so far we've only been using few named colors (blue, red...) and 
+Okay, so far so good. We can use macros like `@red` and the `tprint` function to print colored strings. But so far we've only been using few named colors, but..
 
 ```@example
 function rainbow_maker() # hide
@@ -39,7 +39,7 @@ What `Term` is doing here is taking each bit of style information in the markup 
 
 If the style informaton represents a color, `Term` first represents it as a `AbstractColor` type: `NamedColor` or `BitColor` or `RGBColor`.  
 
-`NamedColor` objects represent simple colors like `red` and `blue`, `BitColor` represnet 16-bit colors like `dark_goldenrod` and `RGBColor`, surprisingly, represents rgb-style colors. There's no method to represent hex colors as these are converted into rgb first. 
+`NamedColor` objects represent simple colors like `red` and `blue`, `BitColor` represent 16-bit colors like `dark_goldenrod` and `RGBColor`, surprisingly, represents rgb-style colors. There's no method to represent hex colors as these are converted into rgb first. 
 
 The distinction between `NamedColor`, `BitColor` and `RGBColor` is necessary because three color styles are represented by a different syntax in the ANSI codes. Naturally, `Term` users won't normally worry about this and can use whichever color formulation is most convenient.
 
