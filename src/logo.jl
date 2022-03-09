@@ -67,7 +67,7 @@ function make_logo()
     content = circles * vspacer * vLine(circles.measure.h; style = indigo * " dim") * (Spacer(main.measure.w, 1) / main)
 
     # add second message
-    second_message = TextBox(
+    second_message = RenderableText(
         """
         Term.jl can also be used to create [underline]fancy[/underline] $(as_code("logging")) and $(as_code("error")) messages. 
         
@@ -76,7 +76,7 @@ function make_logo()
         width = content.measure.w,
     )
     hline = hLine(content.measure.w; style=indigo * " dim")
-    content = content / second_message
+    content = content /  hline / second_message
 
     # add a final message
     msg = """[#75b6e0]Term.jl is based on the [underline]Python[/underline] library [orange1 italic]Rich[/orange1 italic] by [/#75b6e0]Will McGugan. 
@@ -98,3 +98,4 @@ function make_logo()
     return logo
 end
 
+print(make_logo())
