@@ -9,7 +9,7 @@ exception returned by the test
 will be different from the one you'd expect
 """
 
-@testset "ERRORS" begin
+@testset "\e[34mERRORS" begin
     @test_throws MethodError 1 - "a"
 
     @test_throws DomainError √(-1)
@@ -37,7 +37,7 @@ will be different from the one you'd expect
     end
     @test_throws UndefKeywordError my_func()
 
-    a = zeros(20, 20)
-    b = zeros(5, 4)
-    @test_throws DimensionMismatch a .+ b
+    m = zeros(20, 20)
+    n = zeros(5, 4)
+    @test_throws DimensionMismatch m .+ n
 end

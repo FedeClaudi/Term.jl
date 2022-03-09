@@ -30,7 +30,7 @@ corresponding error message
 """
 
 # ------------  MethodError
-1 - "a"
+# 1 - "a"
 
 # ------------  DomainError
 # sqrt(-1)
@@ -50,9 +50,10 @@ corresponding error message
 # div(2, 0)
 
 # ------------  StackOverflowError
-# a() = b()
-# b() = a()
-# a()
+# ! not working
+a() = b()
+b() = a()
+a()
 
 # ------------  KeyError
 # mydict = Dict(:a=>"a", :b=>"b")
@@ -68,6 +69,6 @@ corresponding error message
 # my_func()
 
 # ------------  DimensionMismatch
-a = zeros(20, 20)
-b = zeros(5, 4)
-a .+ b
+# m = zeros(20, 20)
+# n = zeros(5, 4)
+# m .+ n

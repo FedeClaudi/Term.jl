@@ -3,7 +3,7 @@ import Term.consoles: console_height, console_width, console, err_console
 println("\nTesting tprint, stdout temporarily disabled")
 
 @suppress_out begin
-    @testset "\e[31mTPRINT" begin
+    @testset "\e[34mTPRINT" begin
         @test_nowarn tprint("string")
         @test_nowarn tprint("[red]adasd[/red]")
         @test_nowarn tprint("[blue on_green]adasda")
@@ -19,7 +19,7 @@ println("\nTesting tprint, stdout temporarily disabled")
     end
 end
 
-@testset "\e[31mCONSOLE" begin
+@testset "\e[34mCONSOLE" begin
     @test console_height() == displaysize(stdout)[1]
     @test console_height(stdout) == displaysize(stdout)[1]
 

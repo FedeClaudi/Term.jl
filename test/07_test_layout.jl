@@ -1,6 +1,6 @@
 import Term: RenderableText, Spacer, vLine, hLine
 
-@testset "\e[31mlayout - spacer" begin
+@testset "\e[34mlayout - spacer" begin
     sizes = [(22, 1), (44, 123), (21, 1), (4334, 232)]
     for (w, h) in sizes
         spacer = Spacer(w, h)
@@ -9,7 +9,7 @@ import Term: RenderableText, Spacer, vLine, hLine
     end
 end
 
-@testset "\e[31mlayout - vLine " begin
+@testset "\e[34mlayout - vLine " begin
     for h in [1, 22, 55, 11]
         line = vLine(h)
         @test length(line.segments) == h
@@ -29,7 +29,7 @@ end
     @test vLine().height == displaysize(stdout)[1]
 end
 
-@testset "\e[31mlayout - hLine " begin
+@testset "\e[34mlayout - hLine " begin
     for w in [1, 342, 433, 11, 22]
         line = hLine(w)
         @test line.width == w
@@ -50,7 +50,7 @@ end
     @test hLine().width == displaysize(stdout)[2]
 end
 
-@testset "\e[31mlayout - vstack" begin
+@testset "\e[34mlayout - vstack" begin
     r1 = RenderableText("."^100; width = 25)
     r2 = RenderableText("."^100; width = 50)
 
@@ -77,7 +77,7 @@ end
     @test (p1 / p2).measure.h == 9
 end
 
-@testset "\e[31mlayout - hstack" begin
+@testset "\e[34mlayout - hstack" begin
     r1 = RenderableText("."^100; width = 25)
     r2 = RenderableText("."^100; width = 50)
 

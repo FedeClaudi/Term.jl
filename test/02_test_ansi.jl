@@ -1,7 +1,7 @@
 import Term.color: is_named_color, is_rgb_color, is_hex_color, is_color, is_background
 import Term.color: get_color, NamedColor, RGBColor, BitColor
 
-@testset "\e[31mANSI detect color" begin
+@testset "\e[34mANSI detect color" begin
     for name in ["red", "blue", "black", "grey42", "deep_sky_blue3", "dark_blue"]
         @test is_named_color(name) == true
         @test is_color(name) == true
@@ -33,7 +33,7 @@ import Term.color: get_color, NamedColor, RGBColor, BitColor
     end
 end
 
-@testset "\e[31mANSI get color" begin
+@testset "\e[34mANSI get color" begin
     for name in ["red", "blue", "black"]
         @test typeof(get_color(name)) == NamedColor
     end
@@ -53,7 +53,7 @@ end
     end
 end
 
-@testset "\e[31mANSI background color" begin
+@testset "\e[34mANSI background color" begin
     for name in ["on_red", "on_blue", "on_black"]
         @test is_background(name) == true
         @test is_color(name) == false

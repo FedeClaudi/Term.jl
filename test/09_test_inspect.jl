@@ -2,7 +2,7 @@ import Term: inspect
 
 println("\nTesting logging, stdout temporarily disabled")
 @suppress_out begin
-    @testset "\e[31mINSPECT test" begin
+    @testset "\e[34mINSPECT test" begin
 
         # define some types
         abstract type T1 end
