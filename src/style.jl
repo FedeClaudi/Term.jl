@@ -1,7 +1,8 @@
 module style
-include("__text_utils.jl")
-include("_ansi.jl")
+
 import Parameters: @with_kw
+
+import Term: unspace_commas, NAMED_MODES, CODES, ANSICode
 
 import ..markup: MarkupTag, extract_markup, has_markup, clean_nested_tags
 import ..color:
@@ -10,7 +11,6 @@ import ..color:
 export MarkupStyle, extract_style
 
 is_mode(string::AbstractString) = string ∈ NAMED_MODES
-
 
 # ---------------------------------------------------------------------------- #
 #                                    STYLEX                                    #
@@ -45,7 +45,7 @@ Builds a MarkupStyle definition from a MarkupTag.
 function MarkupStyle(tag::MarkupTag)
     codes = split(unspace_commas(tag.markup))
 
-    style = MarkupStyle(tag = tag)
+    style = MarkupStyle(; tag = tag)
     for code in codes
         if is_mode(code)
             setproperty!(style, Symbol(code), true)
@@ -60,8 +60,11 @@ function MarkupStyle(tag::MarkupTag)
     return style
 end
 
-toDict(style::MarkupStyle) =
-    Dict(fieldnames(typeof(style)) .=> getfield.(Ref(style), fieldnames(typeof(style))))
+function toDict(style::MarkupStyle)
+    return Dict(
+        fieldnames(typeof(style)) .=> getfield.(Ref(style), fieldnames(typeof(style)))
+    )
+end
 
 # ------------------------------ extract style ------------------------------ #
 """
@@ -130,9 +133,8 @@ Apply a `style` to a `text`.
 function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
     style_init, style_finish = get_style_codes(style)
 
-    text = style_init * text * style_finish
+    return text = style_init * text * style_finish
 end
-
 
 """
     apply_style(text::AbstractString, tag::MarkupTag)::AbstractString
@@ -140,9 +142,7 @@ end
 Appliy the style of a markup tag and it's nested tags
 """
 function apply_style(
-    text::AbstractString,
-    tag::MarkupTag;
-    isinner::Bool = false,
+    text::AbstractString, tag::MarkupTag; isinner::Bool = false
 )::AbstractString
     style = MarkupStyle(tag)
     style_init, _ = get_style_codes(style)
@@ -154,7 +154,6 @@ function apply_style(
 
     # apply inner tags
     for inner in tag.inner_tags
-
         inner_text = apply_style(inner.text, inner; isinner = true)
 
         text = replace(
@@ -171,8 +170,6 @@ function apply_style(
     return text
 end
 
-
-
 """
     apply_style(text::AbstractString)
 
@@ -186,8 +183,8 @@ function apply_style(text::AbstractString;)::AbstractString
         tag = extract_markup(text; firstonly = true)
         # @info "tag" tag tag.markup tag.open.start tag.close.stop
 
-        pre = text[1:tag.open.start-1]
-        post = text[tag.close.stop+1:end]
+        pre = text[1:(tag.open.start - 1)]
+        post = text[(tag.close.stop + 1):end]
 
         text = pre * apply_style(text, tag) * post
         # @info "     \e[31mdoing a style: " tag.markup pre post tag.open.start tag.close.stop

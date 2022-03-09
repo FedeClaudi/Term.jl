@@ -1,7 +1,6 @@
 import Term.markup: has_markup, extract_markup
 
-
-@testset "\e[31mMarkup - detection" begin
+@testset "\e[34mMarkup - detection" begin
     # with no markup
     strings = [
         "asdasdasdsad",
@@ -15,11 +14,14 @@ import Term.markup: has_markup, extract_markup
         @test length(extract_markup(str)) == 0
     end
 
-
     # with markup
-    ntags(tag) =
-        length(tag.inner_tags) > 0 ? length(tag.inner_tags) + sum(ntags.(tag.inner_tags)) :
-        0
+    function ntags(tag)
+        return if length(tag.inner_tags) > 0
+            length(tag.inner_tags) + sum(ntags.(tag.inner_tags))
+        else
+            0
+        end
+    end
     tottags(tags) = length(tags) + sum(ntags.(tags))
 
     strings = [
@@ -32,5 +34,4 @@ import Term.markup: has_markup, extract_markup
         @test has_markup(str) == true
         @test tottags(extract_markup(str)) == n
     end
-
 end

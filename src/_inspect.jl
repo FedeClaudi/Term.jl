@@ -28,7 +28,6 @@ function get_docstring(obj)
     return doc, unescape_brackets(docstring)
 end
 
-
 """
     style_super_types(info)::String
 
@@ -48,7 +47,6 @@ function style_super_types(info)::String
     return stypes
 end
 
-
 """
     style_sub_types(info)::String
 
@@ -61,13 +59,12 @@ function style_sub_types(info)::String
             name = split(string(sub), ".")[end]
             subtypes *= "[bold]$name[/bold] ~ "
         end
-        subtypes = subtypes[1:end-3]
+        subtypes = subtypes[1:(end - 3)]
     else
         subtypes = "  [dim](subtypes): no subtypes[/dim]"
     end
     return subtypes
 end
-
 
 """
     style_method_line(method::AbstractString; trim::Bool=false)::String

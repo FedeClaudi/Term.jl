@@ -1,6 +1,6 @@
 module color
-include("__text_utils.jl")
-include("_ansi.jl")
+
+import Term: NAMED_COLORS, nospaces, COLORS_16b, remove_brackets
 
 export NamedColor, BitColor, RGBColor, get_color
 
@@ -38,7 +38,6 @@ function RGBColor(s::AbstractString)
     return RGBColor(s, (Int64 ∘ round)(r), (Int64 ∘ round)(g), (Int64 ∘ round)(b))
 end
 
-
 # --------------------------------- is color? -------------------------------- #
 """
     _rgb(numbertype, txt)
@@ -66,7 +65,6 @@ function _rgb(txt)
         return _rgb(Int64, txt)
     end
 end
-
 
 """
     is_named_color(string::AbstractString)::Bool
@@ -116,7 +114,6 @@ end
 Check if a string represents color information, of any type.
 """
 function is_color(string::AbstractString)::Bool
-
     is_named = is_named_color(string)
     is_rgb = is_rgb_color(string)
     is_hex = is_hex_color(string)
@@ -138,8 +135,6 @@ function is_background(string::AbstractString)::Bool
     end
 end
 
-
-
 # --------------------------------- get color -------------------------------- #
 """
     hex2rgb(hex::AbstractString)
@@ -147,8 +142,8 @@ end
 Converts a string hex color code to a RGB color
 """
 function hex2rgb(hex::AbstractString)::RGBColor
-    to_int(h::AbstractString) = parse(Int, h, base = 16)
-    r, g, b = [to_int(hex[i:i+1]) for i in (2, 4, 6)]
+    to_int(h::AbstractString) = parse(Int, h; base = 16)
+    r, g, b = [to_int(hex[i:(i + 1)]) for i in (2, 4, 6)]
     return RGBColor("($r, $g, $b)", r, g, b)
 end
 

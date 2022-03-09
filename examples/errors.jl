@@ -18,7 +18,7 @@ import Term: hLine
 
 install_stacktrace()
 
-print(hLine("Fancy Errors", style = "bold blue"))
+print(hLine("Fancy Errors"; style = "bold blue"))
 
 """
 Done!
@@ -50,9 +50,10 @@ corresponding error message
 # div(2, 0)
 
 # ------------  StackOverflowError
-# a() = b()
-# b() = a()
-# a()
+# ! not working
+a() = b()
+b() = a()
+a()
 
 # ------------  KeyError
 # mydict = Dict(:a=>"a", :b=>"b")
@@ -68,6 +69,6 @@ corresponding error message
 # my_func()
 
 # ------------  DimensionMismatch
-a = zeros(20, 20)
-b = zeros(5, 4)
-a .+ b
+# m = zeros(20, 20)
+# n = zeros(5, 4)
+# m .+ n

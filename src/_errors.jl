@@ -9,14 +9,14 @@ _highlight(x::Union{Symbol,AbstractString}) = "[$(theme.symbol)]$x[/$(theme.symb
 _highlight(x::Number) = "[$(theme.number)]$x[/$(theme.number)]"
 _highlight(x::DataType) = "[$(theme.type) dim]::$(x)[/$(theme.type) dim]"
 _highlight(x::UnitRange) = _highlight(string(x))
-_highlight(x::Union{AbstractArray,AbstractVector,AbstractMatrix}) =
-    "[$(theme.number)]$x[/$(theme.number)]"
+function _highlight(x::Union{AbstractArray,AbstractVector,AbstractMatrix})
+    return "[$(theme.number)]$x[/$(theme.number)]"
+end
 _highlight(x::Function) = "[$(theme.function)]$x[/$(theme.function)]"
 
 function _highlight(x)
     return _highlight(string(x))
 end
-
 
 """
     _highlight_with_type(x)
@@ -24,7 +24,6 @@ end
 Apply style to x and and mark its type.
 """
 _highlight_with_type(x) = "$(_highlight(x))$(_highlight(typeof(x)))"
-
 
 """
     _highlight_numbers(x::AbstractString) 
@@ -37,7 +36,6 @@ function _highlight_numbers(x::AbstractString)
     end
     return x
 end
-
 
 """
     style_error(io::IO, er)
@@ -54,19 +52,19 @@ function style_error(io::IO, er)
     end
 
     WIDTH = _width()
-    main_message, message = error_message(io, er)
-    # @info "Got styled error" er main_message info_msg
+    main_message, message = error_message(io, er) 
+    # @info "Got styled error" main_message info_msg isnothing(info_msg) typeof(message)
 
     # create panel and text
-    if !isnothing(info_msg)
+    if !isnothing(info_msg) &&  Measure(message).w > 0
         panel = Panel(
-            length(message) > 0 ? main_message / message : main_message,
+            main_message / message,
             hLine(WIDTH - 4; style = "red dim"),
             RenderableText(
                 "[bold yellow italic underline]hint:[/bold yellow italic underline] [bright_red]$(typeof(er))[/bright_red] " *
                 info_msg;
                 width = WIDTH - 4,
-            ),
+            );
             title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
             title_style = "red",
             style = "dim red",
@@ -75,7 +73,7 @@ function style_error(io::IO, er)
         )
     else
         panel = Panel(
-            length(message) > 0 ? main_message / message : main_message,
+            main_message;
             title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
             title_style = "red",
             style = "dim red",
@@ -83,12 +81,12 @@ function style_error(io::IO, er)
             title_justify = :left,
         )
     end
-    text =
-        RenderableText("\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message")
+    text = RenderableText(
+        "\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message"
+    )
 
     return panel, text
 end
-
 
 """
     backtrace_subpanel(line::String, WIDTH::Int, title::String)
@@ -108,7 +106,7 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
     try
         code = load_code_and_highlight(file, lineno; δ = 2)
         if length(code) > 0
-            code = TextBox(code, width = WIDTH - 18)
+            code = TextBox(code; width = WIDTH - 26)
             code = Spacer(8, code.measure.h) * code
         end
     catch SystemError  # file not found
@@ -116,15 +114,18 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
         code = ""
     end
 
-    return Panel(
+    # @info "line&code" line code
+    panel = Panel(
         "\n",
         chomp(line),
-        code,
+        code;
         title = title,
-        width = WIDTH - 4,
+        width = :fit,
         style = "dim blue",
         title_style = "bold bright_yellow",
     )
+    # @info "Created backtrace subpanel"
+    return panel
 end
 
 """
@@ -143,16 +144,15 @@ function style_backtrace(io::IO, t::Vector)
             func_line = "[light_yellow3]($n)[/light_yellow3] [sky_blue3]$(frame.func)[/sky_blue3]"
             file_line = "       [dim]$(frame.file):$(frame.line) [bold dim](line: $(frame.line))[/bold dim][/dim]"
             push!(stack_lines, func_line * "\n" * file_line)
-
         end
     end
 
-    # trim exceedingly long stack traces
+    # trim excedingly long stack traces
     if length(stack_lines) > 10
         stack_lines = vcat(
             stack_lines[1:5],
             "\n[dim bright_blue]        ... skipped $(length(stack_lines)-11) levels in stack trace ...\n",
-            stack_lines[end-5:end],
+            stack_lines[(end - 5):end],
         )
     end
 
@@ -160,24 +160,25 @@ function style_backtrace(io::IO, t::Vector)
     # @info "creating stack panels" length(stack_lines)
     if length(stack_lines) > 0
         if length(stack_lines) > 1
-            error_line = backtrace_subpanel(stack_lines[1], WIDTH, "error in")
+            error_line = backtrace_subpanel(stack_lines[1], WIDTH - 8, "error in")
         else
             error_line = ""
         end
 
         # @info "error line ready" error_line length(stack_lines)
         if length(stack_lines) > 3
-            above = TextBox(join(stack_lines[2:end-1], "\n"), width = WIDTH - 8)
+            above = TextBox(join(stack_lines[2:(end - 1)], "\n"); width = WIDTH - 8)
         elseif length(stack_lines) > 2
-            above = TextBox(stack_lines[2], width = WIDTH - 8)
+            above = TextBox(stack_lines[2]; width = WIDTH - 8)
         else
             above = ""
         end
         # @info "above ready"
 
-        offending = backtrace_subpanel(stack_lines[end], WIDTH, "caused by")
+        offending = backtrace_subpanel(stack_lines[end], WIDTH - 8, "caused by")
+        # @info "offending ready" offending
         stack = error_line / above / offending
-        # @info "stacked"
+        # @info "stacked" stack
     else
         stack = "[dim]No stack trace[/dim]"
     end
@@ -186,7 +187,7 @@ function style_backtrace(io::IO, t::Vector)
     # @info "creating panel"
     try
         panel = Panel(
-            stack,
+            stack;
             title = "StackTrace",
             style = "yellow dim",
             title_style = "yellow",
@@ -200,7 +201,6 @@ function style_backtrace(io::IO, t::Vector)
         println(stack)
         return stack
     end
-
 end
 
 """

@@ -31,7 +31,6 @@ end
 
 theme = Theme() # default theme
 
-
 # ------------------------------ Highlighters.jl ----------------------------- #
 
 """

@@ -1,11 +1,13 @@
 using Term
 
-import Pkg; Pkg.add("Documenter")
+using Pkg: Pkg;
+Pkg.add("Documenter");
 using Documenter
 
 DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
 
 makedocs(;
+    build="stable",
     modules = [Term],
     authors = "FedeClaudi <federicoclaudi@protonmail.com> and contributors",
     repo = "https://github.com/FedeClaudi/Term.jl/blob/{commit}{path}#{line}",
@@ -14,33 +16,40 @@ makedocs(;
         prettyurls = get(ENV, "CI", "false") == "true",
         canonical = "https://FedeClaudi.github.io/Term.jl",
         assets = String[],
+        collapselevel = 1,
     ),
     pages = [
-        "Home"=> "index.md",
-        "Manual" => [
-            "Styled text"           => "styled_text.md",
-            "Renderables"           => "renderables.md",
-            "Layout"                => "content_layout.md",
-            "Logging"               => "logging.md",
-            "Errors tracebacks"     => "errors_tracebacks.md",
-            "Code introspection"    => "introspection.md",
+        "Home" => "index.md",
+        "Basics" => Any[
+            "basics/basics.md",    
+            "basics/styled_text.md",
+            "basics/colors.md",
+            "basics/renderables.md",
+            "basics/content_layout.md",
         ],
-        "API" => [
-            "Term"          => "api_term.md",
-            "Box"           => "api_box.md",
-            "Color"         => "api_color.md",
-            "Console"       => "api_console.md",
-            "Inspect"       => "api_inspect.md",
-            "Layout"        => "api_layout.md",
-            "Logging"       => "api_logging.md",
-            "Markup"        => "api_markup.md",
-            "Measure"       => "api_measure.md",
-            "Panel"         => "api_panel.md",
-            "Renderables"   => "api_renderables.md",
-            "Segment"       => "api_segment.md",
-            "Style"         => "api_style.md",
+        "Advanced" => Any[
+            "adv/adv.md",    
+            "adv/logging.md",
+            "adv/errors_tracebacks.md",
+            "adv/introspection.md",
+        ],
+        "API" => Any[
+            "api/api_term.md",    
+            "api/api_box.md",
+            "api/api_color.md",
+            "api/api_console.md",
+            "api/api_errors.md",
+            "api/api_introspection.md",
+            "api/api_layout.md",
+            "api/api_logging.md",
+            "api/api_markup.md",
+            "api/api_measure.md",
+            "api/api_panel.md",
+            "api/api_renderables.md",
+            "api/api_segment.md",
+            "api/api_style.md",
         ],
     ],
 )
 
-deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "gh-pages")
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "gh-pages", target="stable")

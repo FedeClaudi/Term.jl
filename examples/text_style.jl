@@ -26,10 +26,8 @@ information 'xx' must be identical between the start/end parentheses.
 
 import Term: tprint
 
-
 my_string = "[bold underline]This[/bold underline] is [red italic]my[/red italic] [on_green black]string[/on_green black]"
 tprint(my_string)
-
 
 """
 Using markup tags is great when you want your styled text to be printed within other `Renderable` object

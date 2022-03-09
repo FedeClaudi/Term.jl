@@ -10,6 +10,7 @@ import ..panel: Panel, TextBox
 import ..renderables: RenderableText
 import ..layout: hLine, Spacer
 import ..consoles: Console
+import ..measure: Measure
 
 export install_stacktrace
 
@@ -32,8 +33,6 @@ const ErrorsExplanations = Dict(
 )
 
 _width() = min(Console(stderr).width, 120)
-
-
 
 # ----------------------- error type specific messages ----------------------- #
 
@@ -110,7 +109,6 @@ function error_message(io::IO, er::LoadError)
     msg = "At [grey62 underline]$(er.file)[/grey62 underline] line [bold]$(er.line)"
     subm = "The cause is an error of type: [bright_red]$(string(typeof(er.error)))"
     return msg, subm
-
 end
 
 # ! METHOD ERROR
@@ -121,20 +119,20 @@ function error_message(io::IO, er::MethodError; kwargs...)
     fn_name = "$(_highlight(string(er.f)))"
     main_line = "No method matching $fn_name with aguments:\n      " * _args
 
-
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er; context = io), "\n")
     candidates::Vector{String} = []
 
-    for can in _candidates[3:end-1]
+    for can in _candidates[3:(end - 1)]
         fun, file = split(can, " at ")
-        name, args = split(fun, "(", limit = 2)
+        name, args = split(fun, "("; limit = 2)
         # name = "[red]$name[/red]"
 
         for regex in _method_regexes
             for match in collect(eachmatch(regex, args))
-                args =
-                    replace(args, match.match => "[dim red]$(match.match[9:end])[/dim red]")
+                args = replace(
+                    args, match.match => "[dim red]$(match.match[9:end])[/dim red]"
+                )
             end
         end
 
@@ -149,7 +147,7 @@ function error_message(io::IO, er::MethodError; kwargs...)
 
     return main_line * "\n",
     Panel(
-        "\n" * join(candidates, "\n"),
+        "\n" * join(candidates, "\n");
         width = _width() - 10,
         title = "closest candidates",
         title_style = "yellow",
@@ -159,7 +157,7 @@ end
 
 # ! StackOverflowError
 function error_message(io::IO, er::StackOverflowError)
-    "Stack overflow error: too many function calls.", ""
+    return "Stack overflow error: too many function calls.", ""
 end
 
 # ! TYPE ERROR
@@ -169,23 +167,22 @@ function error_message(io::IO, er::TypeError)
     msg = "In `[$(theme.emphasis_light) italic]$(er.func)` > `$(er.context)[/$(theme.emphasis_light) italic]` got"
     msg *= " [orange1 bold]$(er.got)[/orange1 bold][$(theme.type)](::$(typeof(er.got)))[/$(theme.type)] but expected argument of type"
     msg *= " [$(theme.type)]::$(er.expected)[/$(theme.type)]"
-    msg, ""
+    return msg, ""
 end
 
 # ! UndefKeywordError
 function error_message(io::IO, er::UndefKeywordError)
     # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
     var = string(er.var)
-    "Undefined function keyword argument: '$(_highlight(er.var))'.", ""
+    return "Undefined function keyword argument: '$(_highlight(er.var))'.", ""
 end
 
 # ! UNDEFVAR ERROR
 function error_message(io::IO, er::UndefVarError)
     # @info "undef var error" er er.var typeof(er.var)
     var = string(er.var)
-    "Undefined variable '$(_highlight(er.var))'.", ""
+    return "Undefined variable '$(_highlight(er.var))'.", ""
 end
-
 
 # ! STRING INDEX ERROR
 function error_message(io::IO, er::StringIndexError)
@@ -197,22 +194,22 @@ end
 # ! catch all other errors
 function error_message(io::IO, er)
     @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(
-        typeof(er),
+        typeof(er)
     )
     if hasfield(typeof(er), :error)
         # @info "nested error" typeof(er.error)
         m1, m2 = error_message(io, er.error)
         msg = "\n[bold red]LoadError:[/bold red]\n" * m1
     else
-        msg =
-            hasfield(typeof(er), :msg) ? er.msg :
+        msg = if hasfield(typeof(er), :msg)
+            er.msg
+        else
             "no message for error of type $(typeof(er)), sorry."
+        end
         m2 = ""
     end
     return msg, m2
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                              INSTALL STACKTRACE                              #
@@ -226,7 +223,7 @@ function install_stacktrace()
             println(hLine(_width(), "[bold red]LoadError[/bold red]"; style = "dim red"))
             Base.display_error(io, er, bt)
 
-            Base.showerror(io, er.error, bt; backtrace = true)
+            return Base.showerror(io, er.error, bt; backtrace = true)
         end
 
         """
@@ -255,7 +252,8 @@ function install_stacktrace()
                 err, err_msg = style_error(io, er)
                 println(err / err_msg)
             catch styling_error
-                @error "Failed to generate styled error emssage" styling_error
+                @error "Failed to generate styled error message" styling_error stacktrace()
+
                 println(apply_style("Original error: [bright_red]$(string(er))"))
             end
         end

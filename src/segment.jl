@@ -34,7 +34,7 @@ function Segment(text::Union{Segment,AbstractString})
 
     # len(x) = (length ∘ remove_ansi ∘ remove_markup)(x)
     # @info "Creating segment" len(text) len(apply_style(text)) len(remove_markup(apply_style(text)))
-    Segment(remove_markup(apply_style(text)), plain, Measure(plain))
+    return Segment(remove_markup(apply_style(text)), plain, Measure(plain))
 end
 
 """
@@ -42,8 +42,9 @@ end
 
 Construct a Segment out of a plain string and a markup string with style info
 """
-Segment(text::Union{Segment,AbstractString}, markup::Union{Nothing,AbstractString}) =
-    isnothing(markup) ? Segment(text) : Segment("[$markup]" * text)
+function Segment(text::Union{Segment,AbstractString}, markup::Union{Nothing,AbstractString})
+    return isnothing(markup) ? Segment(text) : Segment("[$markup]" * text)
+end
 
 """
     Segment(text::Union{Segment, AbstractString}, style::MarkupStyle)
@@ -59,8 +60,6 @@ function Segment(text::Union{Segment,AbstractString}, style::Union{Nothing,Marku
 end
 
 Segment(text::Union{AbstractString,Segment}, null::Nothing) = Segment(text)
-
-
 
 # --------------------------------- printing --------------------------------- #
 """print styled in stdout, info otherwise"""
@@ -79,7 +78,5 @@ concatenate strings and segments
 Base.:*(seg::Segment, str::AbstractString) = Segment(seg.text * str)
 Base.:*(str::AbstractString, seg::Segment) = Segment(str * seg.text)
 Base.:*(seg1::Segment, seg2::Segment) = Segment(seg1.text * seg2.text)
-
-
 
 end

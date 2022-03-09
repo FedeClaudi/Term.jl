@@ -28,7 +28,6 @@ include("logging.jl")
 
 include("logo.jl")
 
-
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine
 export theme, highlight
@@ -39,7 +38,7 @@ export tprint, install_stacktrace
 export install_term_logger
 
 # ----------------------------------- base ----------------------------------- #
-import .measure
+using .measure: measure
 using .measure: Measure
 
 # ----------------------------------- style ---------------------------------- #
@@ -50,7 +49,6 @@ using .color: NamedColor, BitColor, RGBColor, get_color
 using .style: MarkupStyle, extract_style, apply_style
 
 using .segment: Segment
-
 
 """
     Measure(seg::Segment) 
@@ -82,14 +80,11 @@ using .layout: Padding, vstack, hstack, Spacer, vLine, hLine
 
 using .panel: Panel, TextBox
 
-
 # ---------------------------------- others ---------------------------------- #
 using .introspection: inspect
 
 using .errors: install_stacktrace
 
 using .logging: install_term_logger, TermLogger
-
-
 
 end
