@@ -1,4 +1,4 @@
-# Intro to Advanced
+# Intro
 
 In the `Basics` section we've learned how to style text, create renderables and stack them into more complex layouts. You can use all of that to produce great terminal output for your Julia code, but that doesn't exhaust the range of things `Term` can do. 
 

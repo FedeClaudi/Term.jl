@@ -53,7 +53,7 @@ The rest of the documentation is dedicated to explaining the basic concepts beha
 Head to the [GitHub](https://github.com/FedeClaudi/Term.jl) repository to find several detailed examples or jump in the [Discussions](https://github.com/FedeClaudi/Term.jl/discussions) to start chatting with us. 
 
 
-!!! note "A note on `Rich`
+!!! note "A note on `Rich`"
     Term.jl is based on a pre-existing package called `rich` (see [here](https://github.com/Textualize/rich)) developed by Will McGugan.
     While most of how `Term.jl` handles things under the hood is specific to `Term`, the basic concepts behind how to even begin creating fancy terminal
     outputs like the ones that `rich` and `Term` can produce are entirely Will's work. 

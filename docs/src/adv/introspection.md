@@ -79,6 +79,9 @@ do_a_thing(a::MyType, x::MyType) = println(a, x)
 inspect(MyType)
 ```
 
+!!! warning
+    Ooooops. It looks like the layout is a bit funky when rendered in the docs! It will look fine when you use `Term` in your REPL.
+
 As you can see, with a `DataType` argument, `inspect` shows you the type's hierarchy for `MyType`, its docstring and where is defined as well as constructors for our custom type and methods that make use of `MyType` in their arguments. That's pretty much it, enjoy using `inspect`!
 
 

@@ -4,7 +4,7 @@ Julia has a [great logging system](https://docs.julialang.org/en/v1/stdlib/Loggi
 
 AS you know, if you use logging macros like `@info` with a bunch of arguments after, Julia produces something like this:
 
-```@example
+```Julia
 @info "My log message" 1+1 n="a string!" :x
 ```
 
@@ -17,9 +17,12 @@ import Term: install_term_logger
 install_term_logger()
 ```
 
+!!! note
+    We could not get Documenter.jl to show the output of `Term`'s logger. So we've added a screenshot at the bottom of this page!
+
 Done. Not a lot of work. Now you can just use your logging macros as you would normally, you don't need to change anything. But magic will happen:
 
-```@example
+```Julia
 import Term: install_term_logger # hide
 install_term_logger() # hide
 @info "My log message" 1+1 n="a string!" :x
@@ -27,7 +30,7 @@ install_term_logger() # hide
 
 As you can see, it shows all the information that is normally there, an more! 
 If your log macro is called from within a function, it will also tell you that:
-```@example
+```Julia
 import Term: install_term_logger # hide
 install_term_logger()  # hide
 
@@ -39,7 +42,8 @@ my_useful_function()
 ```
 
 And of course it works nicely with all logging macros:
-```
+
+```Julia
 import Term: install_term_logger # hide
 install_term_logger() # hide
 
@@ -48,3 +52,5 @@ install_term_logger() # hide
 @warn "careful!"
 @error "uh oh, not good!"
 ```
+
+![](./assets/logs.png)
