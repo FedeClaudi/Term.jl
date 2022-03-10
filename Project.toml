@@ -25,6 +25,7 @@ Parameters = "0.12"
 PkgTemplates = "0.7"
 Revise = "3"
 Suppressor = "0.2"
+TimerOutputs = "0.5"
 julia = "1.6"
 
 [extras]
