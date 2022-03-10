@@ -37,7 +37,7 @@ corresponding error message
 
 # ------------  AssertionError
 # import Term: Panel
-# Panel("mytext", title="this title is waaaay too long!!!")
+# Panel("mytext", title="this title is waaaay too long!!!", fit=:fit)
 
 # ------------  UndefVarError
 # println(x)

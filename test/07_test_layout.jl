@@ -74,12 +74,12 @@ end
     p1 = Panel(; width = 5, height = 5, fit=:nofit)
     p2 = Panel(; width = 8, height = 4, fit=:nofit)
     @test (p1 / p2).measure.w == 8
-    @test (p1 / p2).measure.h == 9
+    @test (p1 / p2).measure.h == 13
 
     p1 = Panel(; width = 5, height = 5)
     p2 = Panel(; width = 8, height = 4)
-    @test (p1 / p2).measure.w == 2
-    @test (p1 / p2).measure.h == 6
+    @test (p1 / p2).measure.w == 8
+    @test (p1 / p2).measure.h == 13
 end
 
 @testset "\e[34mlayout - hstack" begin
@@ -99,10 +99,10 @@ end
     p1 = Panel(; width = 5, height = 5, fit=:nofit)
     p2 = Panel(; width = 8, height = 4, fit=:nofit)
     @test (p1 * p2).measure.w == 13
-    @test (p1 * p2).measure.h == 5
+    @test (p1 * p2).measure.h == 7
 
     p1 = Panel(; width = 5, height = 5)
     p2 = Panel(; width = 8, height = 4)
-    @test (p1 * p2).measure.w == 4
-    @test (p1 * p2).measure.h == 3
+    @test (p1 * p2).measure.w == 13
+    @test (p1 * p2).measure.h == 7
 end

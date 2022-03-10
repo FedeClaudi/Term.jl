@@ -10,6 +10,7 @@ function make_logo()
     # create circles
     green = Panel(
         RenderableText(circle, "#389826 bold");
+        fit=:fit,
         style = "dim #389826",
         justify = :center,
         title = "[italic]Made",
@@ -17,6 +18,7 @@ function make_logo()
     )
     red = Panel(
         RenderableText(circle, "#CB3C33 bold");
+        fit=:fit,
         style = "dim #CB3C33",
         justify = :center,
         subtitle = "[italic]with",
@@ -25,6 +27,7 @@ function make_logo()
     )
     purple = Panel(
         RenderableText(circle, "#9558B2 bold");
+        fit=:fit,
         style = "dim #9558B2",
         justify = :center,
         subtitle = "[italic]Term",
@@ -54,17 +57,17 @@ function make_logo()
     )
 
     # create "spacers" and stack renderables
-    hspacer = Spacer(green.measure.w / 2 + 1, green.measure.h)
-    circles =
-        Spacer(green.measure.w * 2 + 2, 1) / (hspacer * green * hspacer) /
-        (red * Spacer(2, purple.measure.h) * purple)
+    hspacer = Spacer(green.measure.w / 2 + 2, green.measure.h)
+    line = Spacer(green.measure.w * 2 + 6, 1)
+    circles =  line / (hspacer * green * hspacer) / (red * Spacer(2, purple.measure.h) * purple)
 
     vspacer = Spacer(2, circles.measure.h)
+
     content =
         circles *
         vspacer *
         vLine(circles.measure.h; style = indigo * " dim") *
-        (Spacer(main.measure.w, 1) / main)
+        main
 
     # add second message
     second_message = RenderableText(
@@ -72,7 +75,7 @@ function make_logo()
         Term.jl can also be used to create [underline]fancy[/underline] $(as_code("logging")) and $(as_code("error")) messages. 
 
         Check the examples and documentation for more information!
-        Term.jl is under [bold]active[/bold] development, get in touch for questions or ideas on   how to improve it!""";
+        Term.jl is under [bold]active[/bold] development, get in touch for questions or ideas on how to  improve it!""";
         width = content.measure.w,
     )
     hline = hLine(content.measure.w; style = indigo * " dim")
@@ -91,8 +94,9 @@ function make_logo()
             subtitle = "https://github.com/FedeClaudi/Term.jl",
             subtitle_justify = :right,
             subtitle_style = "dim",
-            width = :fit,
+            fit = :fit,
         ) / "" / (Spacer(18, 2) * msg)
 
     return logo
 end
+

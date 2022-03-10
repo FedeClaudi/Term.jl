@@ -155,7 +155,7 @@ print(
         Panel(width=18, style="white"),
         Panel(width=18, style="red"),
         title="so many panels!",
-        width=:fit,
+        fit=:fit,
         title_justify=:left,
         title_style="bold red"
     )

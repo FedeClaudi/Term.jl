@@ -75,7 +75,7 @@ function Panel(
     box::Symbol = :ROUNDED,
     width::Int = 88,
     height::Union{Nothing,Int} = nothing,
-    fit::Symbol=:fit,
+    fit::Symbol=:nofit,
     justify = :left,
 )
     box = eval(box)  # get box object from symbol
@@ -109,7 +109,7 @@ function Panel(
             content = do_by_line((ln) -> reshape_text(ln, width - 2), content)
             content_measure = Measure(content)
             
-            height = max(height, content_measure.h)
+            height = max(height, content_measure.h) + 2
         elseif content isa AbstractRenderable
             width = min(width, WIDTH)
             height = min(height, HEIGHT)
@@ -268,7 +268,7 @@ function TextBox(
     # create panel with text inside
     panel = Panel(
         text;
-        style = "hidden",
+        # style = "hid den",
         title = title,
         title_style = title_style,
         title_justify = title_justify,
@@ -280,7 +280,7 @@ function TextBox(
         fit=:nofit
     )
 
-    return TextBox(panel.segments, Measure(panel.measure.w, panel.measure.h+2))
+    return TextBox(panel.segments, Measure(panel.measure.w, panel.measure.h))
 end
 
 TextBox(texts...; kwargs...) = TextBox(join_lines(texts); kwargs...)
