@@ -18,9 +18,14 @@ print(
     Panel(
         Panel(
             Panel(
-                "We need to go deeper...", height=3, width=28, style="green", box=:ASCII, title="ED", title_style="white"
+                "We need to go deeper...",
+                height=3,
+                width=28,
+                style="green",
+                box=:ASCII,
+                title="ED",title_style="white"
             ),
-            style="red", box=:HEAVY, title="ST", title_style="white"
+            style="red", box=:HEAVY, title="ST", title_style="white", fit=:fit
         ),
         width=44, justify=:center, style="blue", box=:DOUBLE, title="NE", title_style="white"
     )
@@ -46,11 +51,11 @@ Let's stack things:
 import Term: Panel # hide
 
 println(
-    Panel("horizontally") * Panel("stacked")
+    Panel("horizontally"; fit=:fit) * Panel("stacked"; fit=:fit)
 )
 println("&\n")
 println(
-    Panel("vertically") / Panel("stacked")
+    Panel("vertically"; fit=:fit) / Panel("stacked"; fit=:fit)
 )
 
 ```
@@ -109,7 +114,7 @@ print(p * p)
 but what if we want some space between them? We can do something like
 ```@example
 using Term # hide
-p = Panel(width=5, height=3) # hide
+p = Panel("panny") # hide
 print(p * " "^5 * p)
 print(p / "\n"^2 / p)
 ```
@@ -120,7 +125,7 @@ import Term: Panel # hide
 import Term: Spacer
 p = Panel(width=5, height=3) # hide
 
-space = Spacer(5, 3; char=',')
+space = Spacer(5, 5; char=',')
 print(p * space * p)
 ```
 
@@ -129,9 +134,9 @@ here we're using the optional argument `char` to fill the spacer with a characte
 import Term: Panel, Spacer # hide
 p = Panel(width=5, height=3) # hide
 
-top = p * Spacer(5, 3; char='t') * p
+top = p * Spacer(9, 3; char='t') * p
 mid = Spacer(top.measure.w, 2; char='m') # use top's Measure info !
-bottom = p * Spacer(5, 3; char='b') * p
+bottom = p * Spacer(5, 5; char='b') * p
 
 print(top / mid / bottom)
 ```
@@ -141,9 +146,9 @@ look at that layout! Actually don't, look at it without that clutter:
 import Term: Panel, Spacer # hide
 p = Panel(width=5, height=3) # hide
 
-top = p * Spacer(5, 3) * p
+top = p * Spacer(5, 5) * p
 mid = Spacer(top.measure.w, 2) # use top's Measure info !
-bottom = p * Spacer(5, 3) * p
+bottom = p * Spacer(5, 5) * p
 
 print(top / mid / bottom)
 ```

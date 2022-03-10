@@ -91,7 +91,8 @@ function Panel(
             width = WIDTH-4
             fit = :nofit
         else
-            panel_measure = Measure(content_measure.w+2, content_measure.h+2)
+            _width = content isa AbstractString ? content_measure.w+2 : content_measure.w+4
+            panel_measure = Measure(_width, content_measure.h+2)
         end
     end
 
@@ -103,7 +104,7 @@ function Panel(
         # ensure that sizes are big enought for content
         if content isa AbstractString
             # reshape content to fit in width
-            width =  max(width, Measure(content).w+2)
+            # width =  max(width, Measure(content).w+2)
             width = width > WIDTH ? WIDTH : width
             
             content = do_by_line((ln) -> reshape_text(ln, width - 2), content)
@@ -268,7 +269,7 @@ function TextBox(
     # create panel with text inside
     panel = Panel(
         text;
-        # style = "hid den",
+        style = "hidden",
         title = title,
         title_style = title_style,
         title_justify = title_justify,

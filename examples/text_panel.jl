@@ -22,8 +22,8 @@ print("\n\n")
 print(
     Panel("this panel has fixed width"; width = 44, justify = :right),
     Panel("this one too, but the text is at the center!"; width = 66, justify = :center),
-    Panel("this one fits its content"; width = :fit),
-    Panel("this one fits the terminal window size!"; width = nothing),
+    Panel("this one fits its content"; fit = :fit),
+    Panel("this one fits the terminal window size!"; width = 30),
 )
 
 """
@@ -36,7 +36,7 @@ print(
     Panel(
         "[red]This is the panel's first line.[/red]",
         "[bold green]and this is another, panel just stacks all inputs into one piece of content[/bold green]";
-        width = :fit,
+        fit = :fit,
     ),
 )
 

@@ -61,5 +61,6 @@ println(
         title_style = "bold red",
         style = "red dim",
         title_justify = :left,
+        fit=:fit
     ),
 )

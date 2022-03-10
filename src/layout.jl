@@ -120,8 +120,11 @@ end
 Horizontally stack two renderables to give a new renderable.
 """
 function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
+    w1 = r1 isa AbstractString ? Measure(r1).w : r1.measure.w+2
+    w2 = r2 isa AbstractString ? Measure(r2).w : r2.measure.w+2
     r1 = Renderable(r1)
     r2 = Renderable(r2)
+
 
     # get dimensions of final renderable
     h1 = r1.measure.h
@@ -129,10 +132,11 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
 
     # make sure both renderables have the same number of segments
     Δh = abs(h2 - h1)
+
     if h1 > h2
-        r2.segments = vcat(r2.segments, [Segment(" "^(r2.measure.w + 2)) for i in 1:Δh])
+        r2.segments = vcat(r2.segments, [Segment(" "^(w2)) for i in 1:(Δh)])
     elseif h1 < h2
-        r1.segments = vcat(r1.segments, [Segment(" "^(r1.measure.w + 2)) for i in 1:Δh])
+        r1.segments = vcat(r1.segments, [Segment(" "^(w1)) for i in 1:(Δh)])
     end
 
     # combine segments
