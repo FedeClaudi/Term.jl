@@ -1,13 +1,8 @@
-using Term
-
-using Pkg: Pkg;
-Pkg.add("Documenter");
-using Documenter
+using Term, Documenter
 
 DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
 
 makedocs(;
-    build="stable",
     modules = [Term],
     authors = "FedeClaudi <federicoclaudi@protonmail.com> and contributors",
     repo = "https://github.com/FedeClaudi/Term.jl/blob/{commit}{path}#{line}",
@@ -52,4 +47,4 @@ makedocs(;
     ],
 )
 
-deploydocs(; repo = "github.com/FedeClaudi/Term.jl", devbranch = "gh-pages", target="stable")
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl")
