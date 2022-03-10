@@ -138,7 +138,7 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
     # combine segments
     segments = [Segment(s1.text * s2.text) for (s1, s2) in zip(r1.segments, r2.segments)]
 
-    return Renderable(segments, Measure(segments))
+    return Renderable(segments, Measure(r1.measure.w+r2.measure.w, max(r1.measure.h, r2.measure.h)))
 end
 
 """ 

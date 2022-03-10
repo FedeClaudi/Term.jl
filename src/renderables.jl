@@ -15,20 +15,6 @@ abstract type AbstractRenderable end
 
 Measure(renderable::AbstractRenderable) = renderable.measure
 
-"""
- Base.:+(r1::Union{AbstractString, AstractRenderable}, r2::Union{AbstractString, AstractRenderable})
-
- Concatenates two abstract rendereables
- """
-function Base.:+(
-    r1::Union{AbstractString,AbstractRenderable},
-    r2::Union{AbstractString,AbstractRenderable},
-)
-    r1 = Renderable(r1)
-    r2 = Renderable(r2)
-    segments = vcat(r1.segments, r2.segments)
-    return Renderable(segments, Measure(segments))
-end
 
 """
     Base.string(r::AbstractRenderable)::String
@@ -48,7 +34,7 @@ function Base.show(io::IO, renderable::AbstractRenderable)
     else
         print(
             io,
-            "$(typeof(renderable)) <: AbstractRenderable \e[2m(size: $(renderable.measure))\e[0m",
+            "$(typeof(renderable)) <: AbstractRenderable \e[2msize: $(renderable.measure)\e[0m",
         )
     end
 end

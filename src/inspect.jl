@@ -116,13 +116,13 @@ function inspect(
     )
 
     # ----------------------------------- docs ----------------------------------- #
-    # @info "making docstirng box" info.docstring width
     docs = TextBox(
         info.docstring;
         title = "Docstring",
         title_style = "bold underline yellow",
         width = width,
     )
+
 
     # ---------------------------------- fields ---------------------------------- #
     if !isnothing(info.fields)
@@ -143,7 +143,9 @@ function inspect(
             title_style = "bold yellow",
             style = "dim yellow",
             width = width - 2,
+            fit=:nofits
         )
+
         insights_panel = (docs / Spacer(width - 2, 2) / fields_panel)
     else
         insights_panel = docs
@@ -199,11 +201,11 @@ function inspect(
     panel = Panel(
         Spacer(width - 2, 1),
         hierarchy,
-        hLine(width - 6; style = "blue dim"),
+        hLine(width; style = "blue dim"),
         insights_panel,
-        hLine(width - 6; style = "blue dim"),
+        hLine(width; style = "blue dim"),
         constructors_panel,
-        hLine(width - 6; style = "blue dim"),
+        hLine(width; style = "blue dim"),
         methods_panel;
         title = "$(typeof(type)): [bold]$(info.name)" * _title,
         title_style = "red",
