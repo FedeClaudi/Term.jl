@@ -10,7 +10,7 @@ function make_logo()
     # create circles
     green = Panel(
         RenderableText(circle, "#389826 bold");
-        fit=:fit,
+        fit=true,
         style = "dim #389826",
         justify = :center,
         title = "[italic]Made",
@@ -18,7 +18,7 @@ function make_logo()
     )
     red = Panel(
         RenderableText(circle, "#CB3C33 bold");
-        fit=:fit,
+        fit=true,
         style = "dim #CB3C33",
         justify = :center,
         subtitle = "[italic]with",
@@ -27,7 +27,7 @@ function make_logo()
     )
     purple = Panel(
         RenderableText(circle, "#9558B2 bold");
-        fit=:fit,
+        fit=true,
         style = "dim #9558B2",
         justify = :center,
         subtitle = "[italic]Term",

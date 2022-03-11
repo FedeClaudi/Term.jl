@@ -15,7 +15,7 @@ will be different from the one you'd expect
     @test_throws DomainError √(-1)
 
     import Term: Panel
-    @test_throws AssertionError Panel("mytext", title = "this title is waaaay too long!!!", fit=:fit)
+    @test_throws AssertionError Panel("mytext", title = "this title is waaaay too long!!!", fit=true)
 
     @test_throws UndefVarError println(x)
 

@@ -25,5 +25,5 @@ prt(TextBox(
 
 prt(TextBox(
     "truncate"^25;
-    fit=:fit
+    fit=true
 ))

@@ -25,7 +25,7 @@ print(
                 box=:ASCII,
                 title="ED",title_style="white"
             ),
-            style="red", box=:HEAVY, title="ST", title_style="white", fit=:fit
+            style="red", box=:HEAVY, title="ST", title_style="white", fit=true
         ),
         width=44, justify=:center, style="blue", box=:DOUBLE, title="NE", title_style="white"
     )
@@ -51,11 +51,11 @@ Let's stack things:
 import Term: Panel # hide
 
 println(
-    Panel("horizontally"; fit=:fit) * Panel("stacked"; fit=:fit)
+    Panel("horizontally"; fit=true) * Panel("stacked"; fit=true)
 )
 println("&\n")
 println(
-    Panel("vertically"; fit=:fit) / Panel("stacked"; fit=:fit)
+    Panel("vertically"; fit=true) / Panel("stacked"; fit=true)
 )
 
 ```
@@ -114,7 +114,7 @@ print(p * p)
 but what if we want some space between them? We can do something like
 ```@example
 using Term # hide
-p = Panel(" "; fit=:fit) # hide
+p = Panel(" "; fit=true) # hide
 print(p * " "^5 * p)
 print(p / "\n"^2 / p)
 ```

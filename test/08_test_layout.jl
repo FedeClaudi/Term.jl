@@ -71,8 +71,8 @@ end
     @test (h1 / h2).measure.w == 33
     @test (h1 / h2).measure.h == 2
 
-    p1 = Panel(; width = 5, height = 5, fit=:nofit)
-    p2 = Panel(; width = 8, height = 4, fit=:nofit)
+    p1 = Panel(; width = 5, height = 5, fit=false)
+    p2 = Panel(; width = 8, height = 4, fit=false)
     @test (p1 / p2).measure.w == 8
     @test (p1 / p2).measure.h == 13
 
@@ -96,8 +96,8 @@ end
     @test (h1 * h2).measure.w == 2
     @test (h1 * h2).measure.h == 33
 
-    p1 = Panel(; width = 5, height = 5, fit=:nofit)
-    p2 = Panel(; width = 8, height = 4, fit=:nofit)
+    p1 = Panel(; width = 5, height = 5, fit=false)
+    p2 = Panel(; width = 8, height = 4, fit=false)
     @test (p1 * p2).measure.w == 13
     @test (p1 * p2).measure.h == 7
 

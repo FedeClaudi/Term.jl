@@ -66,7 +66,7 @@ Same for `subtitle` but for the panel's bottom row.
 they are computed to fit tot the `content`'s size.
 """
 function Panel(
-    content::RenderablesUnion;
+    content::Union{Nothing, RenderablesUnion};
     title::Union{Nothing,String} = nothing,
     title_style::Union{String,Nothing} = nothing,
     title_justify::Symbol = :left,
@@ -77,7 +77,7 @@ function Panel(
     box::Symbol = :ROUNDED,
     width::Int = 88,
     height::Union{Nothing,Int} = nothing,
-    fit::Symbol=:nofit,
+    fit::Bool=false,
     justify = :left,
 )
     box = eval(box)  # get box object from symbol
@@ -86,42 +86,53 @@ function Panel(
     # get measure
     WIDTH = console_width(stdout)
     HEIGHT = console_height(stdout)
-    content_measure = Measure(content)
-    if fit == :fit
-        # use content's measure if not too large
-        if content_measure.w > WIDTH - 4
-            width = WIDTH-4
-            fit = :nofit
+
+    if isnothing(content)
+        if fit
+            panel_measure = Measure(3, 2)
         else
-            _width = content isa AbstractString ? content_measure.w+2 : content_measure.w+4
-            panel_measure = Measure(_width, content_measure.h+2)
+            height = isnothing(height) ? 2 : height
+            panel_measure = Measure(width, height)
+        end
+        # panel_measure = Measure(2, 2)
+        content = ""
+        content_measure = Measure(0, 0)
+    else
+        content_measure = Measure(content)
+        if fit
+            # if content width too large, resize content if its text
+            if content_measure.w > WIDTH - 4
+                width = WIDTH-4
+                if content isa AbstractString
+                    content = do_by_line((ln) -> reshape_text(ln, width - 2), content)
+                    content_measure = Measure(content)
+                end
+                panel_measure = Measure(width+2, content_measure.h+2)
+            else
+                panel_measure = Measure(content_measure.w+4, content_measure.h+2)
+            end
+        end
+
+        if !fit
+            # check that the content fits within the given width
+            if content isa AbstractString
+                width = min(width, WIDTH)
+                if content_measure.w > width-2
+                    # reshape it
+                    content = do_by_line((ln) -> reshape_text(ln, width - 4), content)
+                    content_measure = Measure(content)
+                end
+            else
+                # if width too small for content, try to enlarge
+                width = width < content_measure.w+2 ?  min(content_measure.w+2, WIDTH-2) : width
+            end
+
+            # get target height
+            height = isnothing(height) ? content_measure.h + 2 : max(height, content_measure.h)
+            panel_measure = Measure(width, height)
         end
     end
 
-    if fit != :fit
-        # check that sizes are not bigger than console
-        width = width > WIDTH ? WIDTH : width
-        height = isnothing(height) ? content_measure.h : min(height, HEIGHT)
-
-        # ensure that sizes are big enought for content
-        if content isa AbstractString
-            # reshape content to fit in width
-            # width =  max(width, Measure(content).w+2)
-            width = width > WIDTH ? WIDTH : width
-            
-            content = do_by_line((ln) -> reshape_text(ln, width - 2), content)
-            content_measure = Measure(content)
-            
-            height = max(height, content_measure.h) + 2
-        elseif content isa AbstractRenderable
-            width = min(width, WIDTH)
-            height = min(height, HEIGHT)
-        end
-
-        width = min(width, WIDTH-2)
-        height = min(height, HEIGHT-2)
-        panel_measure = Measure(width, height)
-    end
     
     # style stuff
     title_style = isnothing(title_style) ? style : title_style
@@ -135,7 +146,7 @@ function Panel(
         :top,
         box,
         title;
-        width = panel_measure.w,
+        width = panel_measure.w-2,
         style = style,
         title_style = title_style,
         justify = title_justify,
@@ -145,7 +156,7 @@ function Panel(
         :bottom,
         box,
         subtitle;
-        width = panel_measure.w,
+        width = panel_measure.w-2,
         style = style,
         title_style = subtitle_style,
         justify = subtitle_justify,
@@ -159,7 +170,7 @@ function Panel(
     for n in 1:(content_measure.h)
         # get padding
         line = content_lines[n]
-        padding = Padding(line, panel_measure.w, justify)
+        padding = Padding(line, panel_measure.w-2, justify)
 
         # make line
         segment = Segment(left * padding.left * apply_style(line) * padding.right * right)
@@ -170,7 +181,7 @@ function Panel(
     # add empty lines to ensure target height is reached
     if content_measure.h < panel_measure.h-2
         for i in 1:(panel_measure.h-2 - content_measure.h)
-            line = " "^(panel_measure.w)
+            line = " "^(panel_measure.w-2)
             push!(segments, Segment(left * line * right))
         end
     end
@@ -192,7 +203,7 @@ function Panel(content, renderables...; kwargs...)
 end
 
 Panel(content::AbstractVector; kwargs...) = Panel(content...; kwargs...)
-Panel(; kwargs...) = Panel(""; kwargs...)
+Panel(; kwargs...) = Panel(nothing; kwargs...)
 
 # ---------------------------------------------------------------------------- #
 #                                    TextBox                                   #
@@ -227,7 +238,7 @@ Creates an hidden `Panel` with `text` in it.
 
 If a `width` is passed, the input `text` is reshaped to have
 that size, unless `fit=:truncate` in which case it's cut to size.
-If no `width` is passed and `fit=:fit` the `TextBox`'s size
+If no `width` is passed and `fit=true` the `TextBox`'s size
 matches the size of the input `text`.
 Other arguments behave like `Panel`.
 
@@ -247,7 +258,7 @@ function TextBox(
 )
 
     # fit text or get width
-    if fit == :fit
+    if fit
         # the box's size depends on the text's size
         width = Measure(text).w + 4
 

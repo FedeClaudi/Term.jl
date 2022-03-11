@@ -43,30 +43,31 @@ tprint("\n\n[bold green]Running: '05_test_macros.jl' ")
 tprint("\n\n[bold green]Running: '06_test_renderables.jl' ")
 @time @timeit_include("06_test_renderables.jl")
 
- # ? 7 layout
-tprint("\n\n[bold green]Running: '07_test_layout.jl' ")
-@time @timeit_include("07_test_layout.jl")
+# ? 7 panel
+tprint("\n\n[bold green]Running: '07_test_panel.jl' ")
+@time @timeit_include("07_test_panel.jl")
 
- # ? 8 panel
-tprint("\n\n[bold green]Running: '08_test_panel.jl' ")
-@time @timeit_include("08_test_panel.jl")
+# # ? 8 layout
+# tprint("\n\n[bold green]Running: '08_test_layout.jl' ")
+# @time @timeit_include("08_test_layout.jl")
 
-#  ? 9 inspect
-tprint("\n\n[bold green]Running: '09_test_inspect.jl' ")
-@time @timeit_include("09_test_inspect.jl")
+ 
+# #  ? 9 inspect
+# tprint("\n\n[bold green]Running: '09_test_inspect.jl' ")
+# @time @timeit_include("09_test_inspect.jl")
 
- # ? 10 errors
- tprint("\n\n[bold green]Running: '10_test_errors.jl' ")
- @time @timeit_include("10_test_errors.jl")
+#  # ? 10 errors
+#  tprint("\n\n[bold green]Running: '10_test_errors.jl' ")
+#  @time @timeit_include("10_test_errors.jl")
 
 
- # ? 11 console
-tprint("\n\n[bold green]Running: '11_test_console.jl' ")
-@time @timeit_include("11_test_console.jl")
+#  # ? 11 console
+# tprint("\n\n[bold green]Running: '11_test_console.jl' ")
+# @time @timeit_include("11_test_console.jl")
 
- # ? 12 logging
- tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
- @time @timeit_include("12_test_logging.jl")
+#  # ? 12 logging
+#  tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
+#  @time @timeit_include("12_test_logging.jl")
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")
