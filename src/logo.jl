@@ -90,7 +90,7 @@ function make_logo()
             subtitle = "https://github.com/FedeClaudi/Term.jl",
             subtitle_justify = :right,
             subtitle_style = "dim",
-            fit = :fit,
+            fit = true,
         ) / "" / (Spacer(18, 2) * msg)
 
     return logo

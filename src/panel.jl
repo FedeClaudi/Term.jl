@@ -287,7 +287,7 @@ function TextBox(
     # create panel with text inside
     panel = Panel(
         text;
-        # style = "hidden",
+        style = "hidden",
         title = title,
         title_style = title_style,
         title_justify = title_justify,

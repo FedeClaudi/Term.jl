@@ -125,7 +125,7 @@ import Term: Panel # hide
 import Term: Spacer
 p = Panel(width=5, height=3) # hide
 
-space = Spacer(5, 5; char=',')
+space = Spacer(5, 3; char=',')
 print(p * space * p)
 ```
 
@@ -134,9 +134,9 @@ here we're using the optional argument `char` to fill the spacer with a characte
 import Term: Panel, Spacer # hide
 p = Panel(width=5, height=3) # hide
 
-top = p * Spacer(5, 5; char='t') * p
+top = p * Spacer(5, 3; char='t') * p
 mid = Spacer(top.measure.w, 2; char='m') # use top's Measure info !
-bottom = p * Spacer(5, 5; char='b') * p
+bottom = p * Spacer(5, 3; char='b') * p
 
 print(top / mid / bottom)
 ```
