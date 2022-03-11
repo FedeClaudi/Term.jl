@@ -41,19 +41,15 @@ function make_logo()
     main = TextBox(
         """
 
-        Term.jl is a [#9558B2]Julia[/#9558B2] package for creating  styled terminal outputs.
+        Term.jl is a [#9558B2]Julia[/#9558B2] package for creating styled terminal outputs.
 
         Term provides a simple [italic green4 bold]markup language[/italic green4 bold] toadd [bold bright_blue]color[/bold bright_blue] and [bold underline]styles[/bold underline] to your text.
-
-        More complicated text layout can be 
-        created using $(as_code("Renderable")) objects such 
+        More complicated text layout can be created using $(as_code("Renderable")) objects such 
         as $(as_code("Panel")) and $(as_code("TextBox")).
-        These can also be nested and stacked to 
-        create [italic pink3]fancy[/italic pink3] and [underline]informative[/underline] terminal
-        ouputs for your Julia code.""";
+        These can also be nested and stacked to create[italic pink3]fancy[/italic pink3]and [underline]informative[/underline] terminal ouputs for your Julia code""";
         title = "Term.jl",
         title_style = indigo * " bold",
-        width = 45,
+        width = 33,
     )
 
     # create "spacers" and stack renderables

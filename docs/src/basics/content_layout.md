@@ -114,7 +114,7 @@ print(p * p)
 but what if we want some space between them? We can do something like
 ```@example
 using Term # hide
-p = Panel("panny") # hide
+p = Panel(" "; fit=:fit) # hide
 print(p * " "^5 * p)
 print(p / "\n"^2 / p)
 ```
@@ -134,7 +134,7 @@ here we're using the optional argument `char` to fill the spacer with a characte
 import Term: Panel, Spacer # hide
 p = Panel(width=5, height=3) # hide
 
-top = p * Spacer(9, 3; char='t') * p
+top = p * Spacer(5, 5; char='t') * p
 mid = Spacer(top.measure.w, 2; char='m') # use top's Measure info !
 bottom = p * Spacer(5, 5; char='b') * p
 

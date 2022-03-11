@@ -39,20 +39,22 @@ mutable struct Panel <: AbstractPanel
     style::Union{String,Nothing}
 end
 
+
 """
     Panel(
         content::RenderablesUnion;
-        title::Union{Nothing, String}=nothing,
-        title_style::Union{String, Nothing}=nothing,
-        title_justify::Symbol=:left,
-        subtitle::Union{String, Nothing}=nothing,
-        subtitle_style::Union{String, Nothing}=nothing,
-        subtitle_justify::Symbol=:left,
-        width::Union{Nothing, Symbol, Int}=:fit,
-        height::Union{Nothing, Int}=nothing,
-        style::Union{String, Nothing}=nothing,
-        box::Symbol=:ROUNDED,
-        justify=:left
+        title::Union{Nothing,String} = nothing,
+        title_style::Union{String,Nothing} = nothing,
+        title_justify::Symbol = :left,
+        subtitle::Union{String,Nothing} = nothing,
+        subtitle_style::Union{String,Nothing} = nothing,
+        subtitle_justify::Symbol = :left,
+        style::Union{String,Nothing} = "default",
+        box::Symbol = :ROUNDED,
+        width::Int = 88,
+        height::Union{Nothing,Int} = nothing,
+        fit::Symbol=:nofit,
+        justify = :left,
     )
 
 `Panel` constructor to fit a panel to a piece of (renderable) content.
