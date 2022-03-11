@@ -87,6 +87,16 @@ function Panel(
     WIDTH = console_width(stdout)
     HEIGHT = console_height(stdout)
 
+    resize_text(content, content_measure, wodth) = begin
+        if content isa AbstractString || content isa RenderableText
+            content = RenderableText(content; width=width-4)
+            content_measure = content.measure
+            return content, content.measure
+        else
+            return content, content_measure
+        end
+    end
+
     if isnothing(content)
         if fit
             panel_measure = Measure(3, 2)
@@ -103,10 +113,7 @@ function Panel(
             # if content width too large, resize content if its text
             if content_measure.w > WIDTH - 4
                 width = WIDTH-4
-                if content isa AbstractString
-                    content = do_by_line((ln) -> reshape_text(ln, width - 2), content)
-                    content_measure = Measure(content)
-                end
+                content, content_measure = resize_text(content, content_measure, width)
                 panel_measure = Measure(width+2, content_measure.h+2)
             else
                 panel_measure = Measure(content_measure.w+4, content_measure.h+2)
@@ -115,12 +122,10 @@ function Panel(
 
         if !fit
             # check that the content fits within the given width
-            if content isa AbstractString
+            if content isa AbstractString || content isa RenderableText
                 width = min(width, WIDTH)
                 if content_measure.w > width-2
-                    # reshape it
-                    content = do_by_line((ln) -> reshape_text(ln, width - 4), content)
-                    content_measure = Measure(content)
+                    content, content_measure = resize_text(content, content_measure, width)
                 end
             else
                 # if width too small for content, try to enlarge
@@ -128,7 +133,7 @@ function Panel(
             end
 
             # get target height
-            height = isnothing(height) ? content_measure.h + 2 : max(height, content_measure.h)
+            height = isnothing(height) ? content_measure.h + 2 : max(height, content_measure.h+2)
             panel_measure = Measure(width, height)
         end
     end

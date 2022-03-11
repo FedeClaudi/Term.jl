@@ -32,8 +32,8 @@ tprint("\n\n[bold green]Running: '03_test_measure.jl' ")
 @time @timeit_include("03_test_measure.jl")
 
  # ? 4 markup
-tprint("\n\n[bold green]Running: '04_test_markup.jl' ")
-@time @timeit_include("04_test_markup.jl")
+tprint("\n\n[bold green]Running: '04_test_markup_and_style.jl' ")
+@time @timeit_include("04_test_markup_and_style.jl")
 
  # ? 5 macros
 tprint("\n\n[bold green]Running: '05_test_macros.jl' ")

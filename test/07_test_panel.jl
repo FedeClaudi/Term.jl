@@ -4,13 +4,16 @@ function testpanel(p, w, h)
     # check all lines have the same length
     _p = string(p)
     widths = textwidth.(cleantext.(split(_p, "\n")))
+    
     # println(p, p.measure, widths)
     @test length(unique(widths)) == 1
 
     # check it has the right measure
-    @test p.measure.w == w
-    @test textlen(cleantext(p.segments[1].text)) == w
-    @test length(chars(cleantext(p.segments[1].text))) == w
+    if !isnothing(w)
+        @test p.measure.w == w
+        @test textlen(cleantext(p.segments[1].text)) == w
+        @test length(chars(cleantext(p.segments[1].text))) == w
+    end
 
     if !isnothing(h)
         @test p.measure.h == h
@@ -151,7 +154,95 @@ end
                     Panel("t2"; style=style),
                 ), 90, 8
             )
+
+
+            testpanel(
+                Panel(
+                    Panel("test", width=22);  width=30, height=8
+                ), 30, 8
+            )
+
+            testpanel(
+                Panel(
+                    Panel("test", width=42);  width=30, height=8
+                ), 44, 8
+            )
+
+            testpanel(
+                Panel(
+                    Panel("test", width=42,height=12);  width=30, height=8
+                ), 44, 14
+            )
         end
     end
+
+
 end
 
+
+@testset "\e[34mPanel + renderables" begin
+    testpanel(
+        Panel(
+            RenderableText("x".^5)
+        ), 88, 3
+    )
+
+
+    testpanel(
+        Panel(
+            RenderableText("x".^500)
+        ), 88, nothing
+    )
+
+
+    testpanel(
+        Panel(
+            RenderableText("x".^5); fit=true
+        ), 9, 3
+    )
+
+    testpanel(
+        Panel(
+            RenderableText("x".^500); fit=true
+        ), displaysize(stdout)[2]-2, nothing
+    )
+
+end
+
+
+@testset "\e[34mPANEL - titles" begin
+    for fit in (true, false)
+        for justify in (:left, :center, :right)
+            for style in ("red", "bold", "default", "on_green")
+
+                testpanel(
+                    Panel("."^50, title="test",
+                            title_style=style,
+                            title_justify=justify,
+                            subtitle="subtest",
+                            subtitle_style=style,
+                            subtitle_justify=justify,
+                            ),
+                    fit ? nothing : 88,
+                    nothing
+                )
+
+                testpanel(
+                    Panel(
+                        Panel("."^50, title="test",
+                                title_style=style,
+                                title_justify=justify,
+                                subtitle="subtest",
+                                subtitle_style=style,
+                                subtitle_justify=justify,
+                                )
+                    ),
+                    fit ? nothing : 90,
+                    nothing
+                )
+
+            end 
+        end
+    end
+
+end

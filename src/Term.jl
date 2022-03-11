@@ -18,14 +18,14 @@ include("macros.jl")
 
 # renderables, rely heavily on other modules
 include("box.jl")
-include("renderables.jl")
 include("console.jl")
+include("renderables.jl")
 include("layout.jl")
 include("panel.jl")
 include("inspect.jl")
 include("errors.jl")
 include("logging.jl")
-
+include("tprint.jl")
 include("logo.jl")
 
 export RenderableText, Panel, TextBox
@@ -72,9 +72,9 @@ end
 # -------------------------------- renderables ------------------------------- #
 using .box
 
-using .renderables: AbstractRenderable, Renderable, RenderableText
+using .consoles: Console, console, err_console, console_height, console_width
 
-using .consoles: Console, console, err_console, console_height, console_width, tprint
+using .renderables: AbstractRenderable, Renderable, RenderableText
 
 using .layout: Padding, vstack, hstack, Spacer, vLine, hLine
 
@@ -86,5 +86,7 @@ using .introspection: inspect
 using .errors: install_stacktrace
 
 using .logging: install_term_logger, TermLogger
+
+using .Tprint: tprint
 
 end

@@ -8,10 +8,7 @@ pprint(pan) = begin
     println(pan.measure, "   ", length(chars(pan.segments[1].plain)) )
 end
 
-# TODO with size info for nested panels
-# TODO test with title and subtitles
 # TODO test panels layout
-# TODO test with other Renderables and TB as content
 
 # ---------------------------------------------------------------------------- #
 #                                  no content                                  #
@@ -147,3 +144,63 @@ end
 #         Panel("t2"),
 #     )
 # )
+
+# pprint(
+#     Panel(
+#         Panel("test", width=42);  width=30, height=8
+#     )
+# )
+
+
+# pprint(
+#     Panel(
+#         Panel("test", width=42,height=12);  width=30, height=8
+#     )
+# )
+
+
+# pprint(
+#     Panel(
+#         Panel("test", width=42,height=12);  width=30, height=8
+#     )
+# )
+
+# -------------------------- with other renderables -------------------------- #
+# pprint(
+#     Panel(
+#         RenderableText("x".^5)
+#     )
+# )
+
+
+# pprint(
+#     Panel(
+#         RenderableText("x".^500)
+#     )
+# )
+
+# pprint(
+#     Panel(
+#         RenderableText("x".^5); fit=true
+#     )
+# )
+
+
+# pprint(
+#     Panel(
+#         RenderableText("x".^500); fit=false
+#     )
+# )
+
+
+
+# ---------------------------------------------------------------------------- #
+#                                    titles                                    #
+# ---------------------------------------------------------------------------- #
+
+# pprint(
+#     Panel(
+#         Panel("[red].[/red]"^50, title="test", subtitle="subtest")
+#     )
+# )
+
