@@ -34,7 +34,8 @@ export theme, highlight
 export inspect
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
-export tprint, install_stacktrace
+export tprint, tprintln
+export install_stacktrace
 export install_term_logger
 
 # ----------------------------------- base ----------------------------------- #
@@ -87,6 +88,6 @@ using .errors: install_stacktrace
 
 using .logging: install_term_logger, TermLogger
 
-using .Tprint: tprint
+using .Tprint: tprint, tprintln
 
 end

@@ -246,3 +246,64 @@ end
     end
 
 end
+
+
+
+
+
+@testset "\e[34mTBOX" begin
+    w = displaysize(stdout)[2]
+
+    for justify in (:left, :center, :right)
+
+
+        testpanel(
+            TextBox(
+                "nofit"^25;
+                width=1000,
+                justify=justify
+            ),w, nothing)
+
+        testpanel(
+            TextBox(
+                "truncate"^25;
+                width=100,
+                fit=:truncate,
+                justify=justify
+        ), 100, 3)
+
+        testpanel(
+            TextBox(
+                "truncate"^25;
+                width=100,
+                justify=justify
+            ), 100, 5)
+
+        testpanel(
+            TextBox(
+                "truncate"^8;
+                fit=:fit,
+                justify=justify
+            ), 68, 3)
+
+        testpanel(
+            TextBox(
+                "[red]truncate[/red]"^8;
+                fit=:fit,
+                justify=justify
+            ), 68, 3)
+
+        testpanel(
+            TextBox(
+                "[red]tru\nncate[/red]test"^8;
+                fit=:fit,
+                justify=justify
+            ), 16, 11)
+
+        testpanel(TextBox(
+                "[red]tru\nncate[/red]test"^1;
+                fit=:fit,
+                justify=justify
+            ), 13, 4)
+    end
+end

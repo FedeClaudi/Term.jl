@@ -1,4 +1,5 @@
 import Term.consoles: console_height, console_width, console, err_console
+import Term: tprint, tprintln
 
 println("\nTesting tprint, stdout temporarily disabled")
 
@@ -16,6 +17,12 @@ println("\nTesting tprint, stdout temporarily disabled")
         @test_nowarn tprint(:x)
 
         @test_nowarn tprint(1, Panel("test"), "test")
+
+        @test_nowarn tprintln("test")
+
+        @test_nowarn tprintln(Panel("test"))
+
+        @test_nowarn tprintln(1, Panel("test"), "test")
     end
 end
 

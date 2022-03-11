@@ -1,11 +1,11 @@
 module Tprint
 
-import ..renderables: AbstractRenderable
 import Term: highlight, theme
-
+import ..renderables: AbstractRenderable
 import ..style: apply_style
+import ..layout: hstack
 
-export tprint
+export tprint, tprintln
 """
 tprint
 
@@ -19,7 +19,7 @@ tprint(x::AbstractString)
 
 Apply style to a string and print it to a new line
 """
-tprint(io::IO, x::AbstractString) = println(io, apply_style(x))
+tprint(io::IO, x::AbstractString) = print(io, apply_style(x))
 tprint(x::AbstractString) = tprint(stdout, x)
 
 """
@@ -60,8 +60,17 @@ When no dedicated method is present, print the string representation
 tprint(x) = tprint(stdout, string(x))
 
 function tprint(args...)
-    map((x)->tprint(stdout, x), args)
+    for (n, arg) in enumerate(args)
+        tprint(arg)
+
+        if n < length(args)
+            args[n+1] isa AbstractRenderable || print(" ")
+        end
+    end
     return nothing
 end
+
+tprintln(x) = tprint(x, "\n")
+tprintln(args...) = tprint(args, "\n")
 
 end

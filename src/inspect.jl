@@ -143,7 +143,7 @@ function inspect(
             title_style = "bold yellow",
             style = "dim yellow",
             width = width - 2,
-            fit=:nofits
+            fit=false
         )
 
         insights_panel = (docs / Spacer(width - 2, 2) / fields_panel)

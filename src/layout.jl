@@ -92,11 +92,25 @@ function vstack(r1::RenderablesUnion, r2::RenderablesUnion)
     # get dimensions of final renderable
     w1 = r1.measure.w
     w2 = r2.measure.w
+    if w1 > w2
+        s1 = r1.segments
+        s2 = map(
+            (s)->Segment(s.text * " ".^(w1-s.measure.w)),
+            r2.segments
+        )
+    elseif w1 < w2
+        s1 = map(
+            (s)->Segment(s.text * " ".^(w2-s.measure.w)),
+            r1.segments
+        )
+        s2 = r2.segments
+    else
+        s1, s2 = r1.segments, r2.segments
+    end
 
     # create segments stack
-    segments::Vector{Segment} = vcat(r1.segments, r2.segments)
+    segments::Vector{Segment} = vcat(s1, s2)
     measure = Measure(max(w1, w2), length(segments))
-
     return Renderable(segments, measure)
 end
 
@@ -120,27 +134,27 @@ end
 Horizontally stack two renderables to give a new renderable.
 """
 function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
-    w1 = r1 isa AbstractString ? Measure(r1).w : r1.measure.w+2
-    w2 = r2 isa AbstractString ? Measure(r2).w : r2.measure.w+2
-    r1 = Renderable(r1)
-    r2 = Renderable(r2)
-
+    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
+    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
 
     # get dimensions of final renderable
     h1 = r1.measure.h
     h2 = r2.measure.h
-
-    # make sure both renderables have the same number of segments
     Δh = abs(h2 - h1)
 
+    # make sure both renderables have the same number of segments
     if h1 > h2
-        r2.segments = vcat(r2.segments, [Segment(" "^(w2)) for i in 1:(Δh)])
+        s1 = r1.segments
+        s2 = vcat(r2.segments, [Segment(" "^(r2.measure.w)) for i in 1:(Δh)])
     elseif h1 < h2
-        r1.segments = vcat(r1.segments, [Segment(" "^(w1)) for i in 1:(Δh)])
+        s1 = vcat(r1.segments, [Segment(" "^(r1.measure.w)) for i in 1:(Δh)])
+        s2 = r2.segments
+    else
+        s1, s2, = r1.segments, r2.segments
     end
 
     # combine segments
-    segments = [Segment(s1.text * s2.text) for (s1, s2) in zip(r1.segments, r2.segments)]
+    segments = [Segment(s1.text * s2.text) for (s1, s2) in zip(s1, s2)]
 
     return Renderable(segments, Measure(r1.measure.w+r2.measure.w, max(r1.measure.h, r2.measure.h)))
 end

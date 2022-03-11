@@ -263,14 +263,14 @@ function TextBox(
 )
 
     # fit text or get width
-    if fit
+    if fit==:fit
         # the box's size depends on the text's size
         width = Measure(text).w + 4
 
         # too large, fit to console
         if width > console_width(stdout)
             width=console_width(stdout)
-            fit = :fit
+            fit = true
         end
     else
         width = width > console_width(stdout) ? console_width(stdout) : width
@@ -287,7 +287,7 @@ function TextBox(
     # create panel with text inside
     panel = Panel(
         text;
-        style = "hidden",
+        # style = "hidden",
         title = title,
         title_style = title_style,
         title_justify = title_justify,
@@ -296,7 +296,7 @@ function TextBox(
         subtitle_justify = subtitle_justify,
         justify = justify,
         width = width,
-        fit=:nofit
+        fit=false
     )
 
     return TextBox(panel.segments, Measure(panel.measure.w, panel.measure.h))

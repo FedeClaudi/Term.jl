@@ -1,10 +1,12 @@
 using Term
 
-prt(tb) = print(tb, "\n", tb.measure, "\n")
+prt(tb) = print(tb, tb.measure, "\n")
 
 # prt(TextBox(
 #     "nofit"
 # ))
+
+print("\n"^20)
 
 # check that unreasonable widhts are ignored
 prt(TextBox(
@@ -21,9 +23,19 @@ prt(TextBox(
 prt(TextBox(
     "truncate"^25;
     width=100,
-))ork
+))
 
 prt(TextBox(
-    "truncate"^25;
-    fit=true
+    "truncate"^8;
+    fit=:fit
+))
+
+prt(TextBox(
+    "[red]truncate[/red]"^8;
+    fit=:fit
+))
+
+prt(TextBox(
+    "[red]tru\nncate[/red]test"^1;
+    fit=:fit
 ))

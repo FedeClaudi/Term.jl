@@ -7,6 +7,15 @@ import Term.renderables: Renderable, RenderableText, AbstractRenderable
     r1 = Renderable("asdasda")
     @test Renderable(r1) isa AbstractRenderable
     @test Renderable(r1.segments[1]) isa AbstractRenderable
+
+
+    r = Renderable("x".^10)
+    @test r.measure.w == 10
+    @test r.measure.h == 1
+
+    r = Renderable(".\n".^10)
+    @test r.measure.w == 1
+    @test r.measure.h == 10
 end
 
 
