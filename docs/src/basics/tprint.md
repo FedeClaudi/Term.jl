@@ -16,17 +16,16 @@ tprint("This is a: ", 1, "of type", typeof(1), "this is a function", print)
 
 you can see two differences. The first is that when passing multiple comma separated arguments `tprint` inserts a space between them, making the output easier to parse. The second is that it colors certain objects types (`Number`, `DataType` and `Function` in the example). Thus any number will be printed blue, function names will be yellow etc.
 
-!!! note "Highlighting strings"
-    First, note that this `tprint` behavior depends on the objects' types. If you print something like:
-    ```Julia
-    tprint("This is a: 1 of type Int64 this is a function print")
-    ```
-    `tprint` won't be able to color thinkgs like `Int64` because they're part of the string.
-    We are working on a `highlight` feature that will be able to parse strings and color their elements correctly though:
-    ```@example
-    import Term: tprint, highlight, theme
-    tprint(highlight("This is a: 1 of type ::Int64 this is a function print", theme))
-    ```
+Note that `tprint` can only highlight objects based on their type (e.g., `1` abose is of type `Int64`, not a string `"1"`.). So this won't work:
+```example
+using Term # hide
+tprint("This is a: 1 of type Int64 this is a function print")
+```
+But, we are working on a `highlight` feature that will be able to parse strings and color their elements correctly. Like this:
+```@example
+import Term: tprint, highlight, theme
+tprint(highlight("This is a: 1 of type ::Int64 this is a function print", theme))
+```
 
 
 `Tprint` can also print renderables, of course.
