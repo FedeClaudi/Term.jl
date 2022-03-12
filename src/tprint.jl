@@ -53,6 +53,13 @@ Print highlighted as a Function
 tprint(x::Function) = tprint(stdout, highlight(string(x), theme, :func))
 
 """
+tprint(x::DataType)
+
+Print highlighted as a DataType
+"""
+tprint(x::DataType) = tprint(stdout, highlight(string(x), theme, :type))
+
+"""
 tprint(x)
 
 When no dedicated method is present, print the string representation

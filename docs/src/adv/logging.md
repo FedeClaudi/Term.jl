@@ -53,5 +53,3 @@ with_logger(TermLogger(stderr, theme)) do # hide
 
 end # hide
 ```
-
-![](logs.png)

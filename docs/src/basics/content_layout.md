@@ -187,4 +187,3 @@ print(p / l / p)
 
 surprise! `hLine` is *not just like `vLine`*: it also accepts an optional text argument to create a little title line if you will. But yeah, otherwise it's just the same. 
 
-With this we conclude our overview of the content layout in `Term`. There's a lot more you can use `Term` for, but styled text, panels and layout operators will get you far! Enjoy!

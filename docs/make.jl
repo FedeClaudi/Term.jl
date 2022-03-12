@@ -21,6 +21,7 @@ makedocs(;
             "basics/colors.md",
             "basics/renderables.md",
             "basics/content_layout.md",
+            "basics/tprint.md"
         ],
         "Advanced" => Any[
             "adv/adv.md",    

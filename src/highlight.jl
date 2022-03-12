@@ -3,7 +3,7 @@ import Highlights: Lexers
 import Highlights
 
 # ------------------------------- highlighting ------------------------------- #
-const highlight_regexes = Dict(
+highlight_regexes = Dict(
     :multiline_code => [
         r"\`\`\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \# \s \? \{ \}  \_ \- \: \!\ \" \> \'\s]*\`\`\`",
     ],
@@ -11,9 +11,12 @@ const highlight_regexes = Dict(
         r"\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \#\s \_ \- \: \!\ \? \{ \} \" \> \'\s]*\`",
     ],
     :type => [r"\:\:+[a-zA-Z0-9\.\,]*", r"\{+[a-zA-Z0-9 \,\.. ]*\}"],
+    :number => [
+        r" +[0-9.]* "
+    ]
 )
 
-const code_regex = ""
+
 
 """
     highlight(text::AbstractString, theme::Theme)
