@@ -1,4 +1,4 @@
-# Tprint 
+# tprint 
 We've seen tprint before. When passed a string with markup information it will print it with the correct style.
 
 ```@example
