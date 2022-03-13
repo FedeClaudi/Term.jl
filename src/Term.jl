@@ -38,7 +38,7 @@ export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
 export install_stacktrace
 export install_term_logger, uninstall_term_logger
-export ProgressBar, update
+export ProgressBar, update, track
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -101,7 +101,7 @@ using .logging: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
 
-using .progress: ProgressBar, update
+using .progress: ProgressBar, update, track
 
 
 end

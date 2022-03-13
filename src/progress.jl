@@ -1,13 +1,112 @@
 module progress
-    import Term: int, textlen, truncate
-    import ..Tprint: tprint
-    import ..style: apply_style
-    import ..consoles: console_width, clear, hide_cursor, show_cursor, line, erase_line
 
-    export ProgressBar, update
+import Term: int, textlen, truncate
+import ..Tprint: tprint
+import ..style: apply_style
+import ..consoles: console_width, clear, hide_cursor, show_cursor, line, erase_line
+import ..renderables: AbstractRenderable
+import ..measure: Measure
+import ..segment: Segment
 
-    seg = '━'
-    dot = apply_style("[#D81B60] ● [/#D81B60]")
+export ProgressBar, update, track
+
+
+
+
+# ---------------------------------------------------------------------------- #
+#                                    columns                                   #
+# ---------------------------------------------------------------------------- #
+abstract type AbstractColumn <: AbstractRenderable end
+
+
+# ---------------------------- description column ---------------------------- #
+struct DescriptionColumn <: AbstractColumn
+    segments::Vector
+    measure::Measure
+    text::String
+end
+function DescriptionColumn(description::String)
+    seg = Segment(description)
+    return DescriptionColumn([seg], seg.measure, seg.text)
+end
+update(col::DescriptionColumn, args...)::String = col.text
+
+
+# ----------------------------- separator column ----------------------------- #
+struct SeparatorColumn <: AbstractColumn
+    segments::Vector
+    measure::Measure
+    text::String
+end
+function SeparatorColumn()
+    seg = Segment("●", "#D81B60")
+    return SeparatorColumn([seg], seg.measure, seg.text)
+end
+update(col::SeparatorColumn, args...)::String = col.text
+
+
+# ----------------------------- completed column ----------------------------- #
+struct CompletedColumn <: AbstractColumn
+    segments::Vector
+    measure::Measure
+end
+function CompletedColumn(N::Int)
+    width = length("$N")*2+1
+    seg = Segment(" "^width)
+    return CompletedColumn([seg], seg.measure)
+end
+function update(col::CompletedColumn, i::Int, N::Int, color::String)::String
+    _i = "$(i)"
+    _N = "$(N)"
+    _i = " "^(length(_N) - length(_i)) * _i
+
+    return apply_style("[$color bold]$_i[/$color bold]/[(.1, .8, .5) underline]$_N[/(.1, .8, .5) underline]")
+end
+
+
+# ----------------------------- percentage column ---------------------------- #
+struct PercentageColumn <: AbstractColumn
+    segments::Vector
+    measure::Measure
+end
+function PercentageColumn()
+    len = 8  # "xxx.xx %
+    seg = Segment(" "^len)
+    return PercentageColumn([seg], seg.measure)
+end
+function update(col::PercentageColumn, i::Int, N::Int, args...)::String
+    p = round(i / N * 100; digits=2)
+    return "\e[2m$p %\e[0m"
+end
+
+# -------------------------------- bar column -------------------------------- #
+mutable struct BarColumn <: AbstractColumn
+    segments::Vector
+    measure::Measure
+    nsegs::Int
+end
+BarColumn() = BarColumn([], Measure(0, 0), 0)
+
+function setwidth!(col::BarColumn, width::Int)
+    col.measure = Measure(width, 1)
+    col.nsegs = width
+end
+
+
+function update(col::BarColumn, i::Int, N::Int, color::String)::String
+    completed = int(col.nsegs * i/N)
+    remaining = col.nsegs - completed
+    return apply_style("[$color bold]" * seg^(completed) * "[/$color bold]"* " "^(remaining))
+end
+
+
+
+
+# ---------------------------------------------------------------------------- #
+#                                  PROGESS BAR                                 #
+# ---------------------------------------------------------------------------- #
+
+seg = '━'
 
 
 """
@@ -20,17 +119,16 @@ mutable struct ProgressBar
     i::Int
     N::Int
     width::Int
-    nsegs::Int
-    description::String
     started::Bool
     transient::Bool
+    columns::Vector{AbstractColumn}
 
     """
         ProgressBar(;
             N::Int=100,
             width::Int=50,
             description::String="[#F48FB1]Progress...[/#F48FB1]",
-            fill::Bool=false,
+            expand::Bool=false,
             transient=false
         )   
     
@@ -42,36 +140,41 @@ mutable struct ProgressBar
     """
     function ProgressBar(;
                 N::Int=100,
-                width::Int=50,
-                description::String="[#F48FB1]Progress...[/#F48FB1]",
-                fill::Bool=false,
+                width::Int=88,
+                description::String="[orange1 italic]Running...[/orange1 italic]",
+                expand::Bool=false,
                 transient=false
         )
 
+        columns = [
+            DescriptionColumn(description),
+            SeparatorColumn(),
+            BarColumn(),
+            SeparatorColumn(),
+            CompletedColumn(N),
+            PercentageColumn(),
+        ]
+
         # check that width is large enough
-        width = fill ? console_width() : max(width, 20)
-        
-        # check if the description is too long
-        description = textlen(description) > width - 10 ? truncate(description, width-10) : description
-        dlen = textlen(description) + 2 * textlen(dot)
+        width = expand ? console_width() : max(width, 20)
 
-        # get length of progress info
-        dinfo = length("$N")*2 + 1
-        dperc = 8
-        
-        # get the number of segments in the progress bar 
-        nsegs = width - dlen - dinfo - dperc
+        # get the width of the BarColumn
+        spaces = length(columns) -1
+        colwidths = sum(map((c)-> c isa BarColumn ? 0 : c.measure.w, columns))
 
+        bcol_width = width - colwidths - spaces
+        for col in columns
+            col isa BarColumn && setwidth!(col, bcol_width)
+        end
 
         # create progress bar
         new(
             1,
             N,
             width,
-            nsegs,
-            description,
             false,
-            transient
+            transient,
+            columns
         )
 
     end
@@ -89,7 +192,7 @@ function pbar_color(pbar::ProgressBar)
     i = .8 * pbar.i/pbar.N
     g = i
     r = .9 - i
-    return "($r, $g, .5)"
+    return "($r, $g, .4)"
 end
 
 
@@ -111,25 +214,12 @@ function update(pbar::ProgressBar)
 
     # get progress bar
     color = pbar_color(pbar)
-    completed = int(pbar.nsegs * pbar.i/pbar.N)
-    remaining = pbar.nsegs - completed
-    bar = "[$color bold]" * seg^(completed) * "[/$color bold]"* " "^(remaining)
 
-    # get completed info
-    _i = "$(pbar.i)"
-    _N = "$(pbar.N)"
-    _i = " "^(length(_N)-length(_i)) * _i
 
-    completed = "[$color bold]$_i[/$color bold]/[(.1, .8, .5) underline]$_N[/(.1, .8, .5) underline]"
-    
-    # get percentage
-    p = round(pbar.i / pbar.N * 100; digits=2)
-    perc = " \e[2m$p %\e[0m"
-
-    # reset line and print progress
-    _bar = apply_style(pbar.description * dot * bar * dot * completed * perc)
+    # get columns data
+    contents = map((c)->update(c, pbar.i, pbar.N, color), pbar.columns)
     erase_line()
-    tprint(_bar)
+    tprint(contents...)
 
     # update counter
     pbar.i += 1
@@ -142,5 +232,64 @@ function update(pbar::ProgressBar)
 
     return nothing
 end
+
+
+# ---------------------------------------------------------------------------- #
+#                                     track                                    #
+# ---------------------------------------------------------------------------- #
+
+"""
+    Track
+
+Convenience iterator to add a `ProgressBar` to `for` loops.
+
+```Julia
+for i in track(1:100)
+    # ... do something
+end
+```
+
+Adds a progress bar that updates for each iteration through the loop.
+"""
+struct Track
+    itr
+    pbar::ProgressBar
+
+    Track(itr; kwargs...) = new(itr, ProgressBar(; kwargs...))
+end
+
+"""
+Costructor for a `Track` object.
+"""
+function track(itr; kwargs...)
+    Track(
+        itr;
+        N = length(itr),
+        kwargs...
+    )
+end
+
+
+"""
+Start iteration. Crate `Progress Bar`
+"""
+function Base.iterate(e::Track)
+    it = iterate(e.itr)
+    isnothing(it) || update(e.pbar)
+    return it
+end
+
+"""
+Update progress bar and continue iteration.
+"""
+function Base.iterate(e::Track, state)
+    it = iterate(e.itr, state)
+    isnothing(it) || update(e.pbar)
+    return it
+end
+
+Base.length(e::Track) = length(e.itr)
+Base.size(e::Track) = size(e.itr)
+
 
 end
