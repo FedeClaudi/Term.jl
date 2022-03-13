@@ -26,6 +26,7 @@ include("inspect.jl")
 include("errors.jl")
 include("logging.jl")
 include("tprint.jl")
+include("progress.jl")
 include("logo.jl")
 
 export RenderableText, Panel, TextBox
@@ -37,6 +38,7 @@ export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
 export install_stacktrace
 export install_term_logger, uninstall_term_logger
+export ProgressBar, update
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -98,6 +100,8 @@ using .errors: install_stacktrace
 using .logging: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
+
+using .progress: ProgressBar, update
 
 
 end

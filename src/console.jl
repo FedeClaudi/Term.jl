@@ -2,6 +2,38 @@ module consoles
 
 export Console, console, err_console, console_height, console_width
 
+
+# --------------------------------- controls --------------------------------- #
+"""
+Clear terminal.
+"""
+clear() = print("\x1b[2J")
+
+"""
+Hide cursor
+"""
+hide_cursor() = print("\x1b[?25l")
+
+
+"""
+Show cursor
+"""
+show_cursor() = print("\x1b[?25h")
+
+"""
+Print a new line.
+"""
+line() = print("\n")
+
+"""
+Erase last line in console.
+"""
+erase_line() = print("\e[2K\r")
+
+
+# ---------------------------------------------------------------------------- #
+#                                    CONSOLE                                   #
+# ---------------------------------------------------------------------------- #
 """
     Console
 
