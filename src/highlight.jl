@@ -24,7 +24,7 @@ highlight_regexes = Dict(
 Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object
 """
-function highlight(text::AbstractString, theme::Theme)
+function highlight(text::AbstractString; theme::Theme=theme)
     for (like, regexes) in highlight_regexes
         markup = getfield(theme, like)
 
@@ -58,7 +58,7 @@ end
 Hilights an entire text as if it was a type of semantically
 relevant text of type :like.
 """
-function highlight(text::AbstractString, theme::Theme, like::Symbol)
+function highlight(text::AbstractString, like::Symbol; theme::Theme=theme)
     markup = getfield(theme, like)
     return do_by_line(x -> "[$markup]$x[/$markup]", chomp(text))
 end

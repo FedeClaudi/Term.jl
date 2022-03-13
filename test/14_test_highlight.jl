@@ -3,15 +3,15 @@ import Term: load_code_and_highlight, highlight_syntax, highlight, theme
 
 @testset "\e[34mHIGHLIGHT" begin
 
-    @test highlight("this is 1 12", theme) == "this is[#90CAF9] 1 [/#90CAF9]12"
+    @test highlight("this is 1 12") == "this is[#90CAF9] 1 [/#90CAF9]12"
 
-    @test highlight("this is ::Int64", theme) == "this is [#d880e7]::Int64[/#d880e7]"
+    @test highlight("this is ::Int64") == "this is [#d880e7]::Int64[/#d880e7]"
 
-    @test highlight("print", theme, :func) == "[#fff126]print[/#fff126]"
+    @test highlight("print", :func) == "[#fff126]print[/#fff126]"
 
-    @test highlight("1 + 2", theme, :code) == "[#ffd77a]1 + 2[/#ffd77a]"
+    @test highlight("1 + 2", :code) == "[#ffd77a]1 + 2[/#ffd77a]"
 
-    @test highlight("this 1 + `test`", theme) == "this[#90CAF9] 1 [/#90CAF9]+ [#ffd77a]`test`[/#ffd77a]"
+    @test highlight("this 1 + `test`") == "this[#90CAF9] 1 [/#90CAF9]+ [#ffd77a]`test`[/#ffd77a]"
 
     @test highlight_syntax("""
 This is ::Int64 my style

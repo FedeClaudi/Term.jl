@@ -132,7 +132,7 @@ function inspect(
                 push!(
                     formatted_fields,
                     "[bold white]$(string(name))[/bold white]" *
-                    highlight("::$(type)", theme, :type),
+                    highlight("::$(type)", :type),
                 )
             end
         end

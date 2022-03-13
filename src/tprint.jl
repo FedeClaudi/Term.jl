@@ -36,28 +36,28 @@ tprint(x::Symbol)
 
 Print highlighted as a Symbol
 """
-tprint(x::Symbol) = tprint(stdout, highlight(":" * string(x), theme, :symbol))
+tprint(x::Symbol) = tprint(stdout, highlight(":" * string(x), :symbol))
 
 """
 tprint(x::Number)
 
 Print highlighted as a Number
 """
-tprint(x::Number) = tprint(stdout, highlight(string(x), theme, :number))
+tprint(x::Number) = tprint(stdout, highlight(string(x), :number))
 
 """
 tprint(x::Function)
 
 Print highlighted as a Function
 """
-tprint(x::Function) = tprint(stdout, highlight(string(x), theme, :func))
+tprint(x::Function) = tprint(stdout, highlight(string(x), :func))
 
 """
 tprint(x::DataType)
 
 Print highlighted as a DataType
 """
-tprint(x::DataType) = tprint(stdout, highlight(string(x), theme, :type))
+tprint(x::DataType) = tprint(stdout, highlight(string(x), :type))
 
 """
 tprint(x)
