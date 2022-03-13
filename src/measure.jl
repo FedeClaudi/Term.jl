@@ -32,4 +32,23 @@ end
 The sum of measures returns a measure with the highest value along each dimension
 """
 Base.:+(m1::Measure, m2::Measure)::Measure = Measure(max(m1.w, m2.w), m1.h + m2.h)
+
+"""
+    width
+
+Measure the width of renderable objects (text, AbsstractRenderable)
+"""
+function width end
+
+
+"""
+    height
+
+Measure the height of renderable objects (text, AbsstractRenderable)
+"""
+function height end
+
+
+
+
 end

@@ -81,6 +81,15 @@ using .layout: Padding, vstack, hstack, Spacer, vLine, hLine
 
 using .panel: Panel, TextBox
 
+# define additional methods for measure functions
+measure.width(text::AbstractString) = Measure(text).w
+measure.width(seg::Segment) = seg.measure.w
+measure.width(ren::AbstractRenderable) = ren.measure.w
+
+measure.height(text::AbstractString) = Measure(text).h
+measure.height(seg::Segment) = seg.measure.h
+measure.height(ren::AbstractRenderable) = ren.measure.h
+
 # ---------------------------------- others ---------------------------------- #
 using .introspection: inspect
 
