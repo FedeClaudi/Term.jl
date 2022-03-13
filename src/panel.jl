@@ -1,7 +1,6 @@
 module panel
 import Term:
     split_lines,
-    get_last_valid_str_idx,
     reshape_text,
     do_by_line,
     join_lines,

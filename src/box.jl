@@ -2,7 +2,7 @@ module box
 
 import ..segment: Segment
 import ..style: apply_style
-import Term: int, chars, remove_markup_open, get_last_valid_str_idx, get_next_valid_str_idx
+import Term: int, chars, remove_markup_open, get_last_valid_str_idx, get_next_valid_str_idx, join_lines
 
 export get_row, get_title_row
 export ASCII,
@@ -89,8 +89,6 @@ end
 function Base.show(io::IO, box::Box)
     if io == stdout
         print(io, "Box ($(box.name))\n$(fit(box, [1, 3, 1]))")
-    elseif io == stderr
-        print(io, "err")
     else
         print(io, "Box\e[2m($(box.name))\e[0m")
     end

@@ -1,4 +1,4 @@
-import Term.consoles: console_height, console_width, console, err_console
+import Term.consoles: console_height, console_width, console, err_console, Console
 import Term: tprint, tprintln
 
 println("\nTesting tprint, stdout temporarily disabled")
@@ -32,4 +32,7 @@ end
 
     @test console_width() == displaysize(stdout)[2]
     @test console_width(stdout) == displaysize(stdout)[2]
+
+    @test Console(stdout) == Console()
+
 end

@@ -1,4 +1,18 @@
 import Term.renderables: Renderable, RenderableText, AbstractRenderable
+import Term.segment: Segment
+
+@testset "\e[34mSegment" begin
+    seg = Segment("test", nothing)
+    @test seg.text == "test"
+    @test seg.plain == "test"
+    @test seg.measure.w == 4
+
+    @test_nowarn println(seg)
+
+    seg = Segment("test", "red")
+    @test seg.text == "\e[31mtest\e[39m"
+    @test seg.plain == "test"
+end
 
 @testset "\e[34mRenderables - Renderable" begin
     # simply test the creation and type of Renderables

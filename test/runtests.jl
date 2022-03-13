@@ -44,6 +44,11 @@ end
 tprint("\n[bold blue]Runing all tests measuring timing and allocations\n")
 
 
+# ? 1  - misc
+tprint("[bold green]Running: '00_misc.jl' ")
+@time @timeit_include("00_misc.jl")
+
+
 # ? 1  - text utils
 tprint("[bold green]Running: '01_test_text_utils.jl' ")
 @time @timeit_include("01_test_text_utils.jl")
@@ -85,12 +90,20 @@ tprint("\n\n[bold green]Running: '11_test_console.jl' ")
 @time @timeit_include("11_test_console.jl")
 
 # ? 12 logging
- tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
- @time @timeit_include("12_test_logging.jl")
+tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
+@time @timeit_include("12_test_logging.jl")
+
+# ? 13 box
+tprint("\n\n[bold green]Running: '13_test_box.jl' ")
+@time @timeit_include("13_test_box.jl")
+
+# ? 14 highlight
+tprint("\n\n[bold green]Running: '14_test_highlight.jl' ")
+@time @timeit_include("14_test_highlight.jl")
 
 # ? 99 errors
- tprint("\n\n[bold green]Running: '99_test_errors.jl' ")
- @time @timeit_include("99_test_errors.jl")
+tprint("\n\n[bold green]Running: '99_test_errors.jl' ")
+@time @timeit_include("99_test_errors.jl")
 
 
 
