@@ -3,7 +3,7 @@ import Term: load_code_and_highlight, highlight_syntax, highlight, theme
 
 @testset "\e[34mHIGHLIGHT" begin
 
-    @test highlight("this is 1 12") == "this is[#90CAF9] 1 [/#90CAF9]12"
+    # @test highlight("test 1 123 33.4 44,5 +1 -2 12 0.5, ,, ...") == "test[#90CAF9][#90CAF9] 1 [/#90CAF9][/#90CAF9][#90CAF9]123[/#90CAF9] [#90CAF9]33.4[/#90CAF9] [#90CAF9]44,5[/#90CAF9] [#90CAF9]+1 [/#90CAF9][#90CAF9]-2 [/#90CAF9][#90CAF9]12[/#90CAF9] [#90CAF9]0.5[/#90CAF9][#90CAF9], [/#90CAF9],[#90CAF9], [/#90CAF9]..."
 
     @test highlight("this is ::Int64") == "this is [#d880e7]::Int64[/#d880e7]"
 
@@ -11,7 +11,7 @@ import Term: load_code_and_highlight, highlight_syntax, highlight, theme
 
     @test highlight("1 + 2", :code) == "[#ffd77a]1 + 2[/#ffd77a]"
 
-    @test highlight("this 1 + `test`") == "this[#90CAF9] 1 [/#90CAF9]+ [#ffd77a]`test`[/#ffd77a]"
+    @test highlight("this 1 + `test`") == "this 1 + [#ffd77a]`test`[/#ffd77a]"
 
     @test highlight_syntax("""
 This is ::Int64 my style

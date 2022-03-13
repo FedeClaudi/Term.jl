@@ -274,6 +274,7 @@ cutting inside style markup and copying markup tags over to new lines
 so that the style is correctly applied.
 """
 function reshape_text(text::AbstractString, width::Int)::AbstractString
+
     # check if no work is required
     if textlen(text) <= width
         return text
@@ -282,25 +283,25 @@ function reshape_text(text::AbstractString, width::Int)::AbstractString
     # extract tag and mark valid characters and "cutting" places
     tags = extract_markup(text)
     valid_chars = ones(Int, length(text))
+    spaces = isspace.(chars(text))
     for tag in tags
         get_valid_chars!(valid_chars, tag, 0)
     end
-
-    # ? debug: print label for each char
-    # @info "Reshaping" text len(text) width tags length(valid_chars)
-    # for (n, (ch, vl)) in enumerate(zip(text[1:49], valid_chars[1:49]))
-    #     color = vl == 1 ? "\e[32m" : "\e[31m"
-    #     println("($n)  \e[34m$ch\e[0m - valid: $color$vl\e[0m)")
-    # end
 
     # create lines with splitted tex
     lines::Vector{AbstractString} = []
     j = 1
     while textlen(text) > width
-
         # get a cutting index not in a tag's markup
-        condition = (cumsum(valid_chars[j:end]) .<= width) .& valid_chars[j:end] .== 1
+        condition = (cumsum(valid_chars[j:end]) .<= width) .& valid_chars[j:end] .== 1 .& spaces[j:end] .== 1
         cut = findlast(condition)
+
+        if isnothing(cut)
+            # couldnt find a cut in the spaces, try without
+            condition = (cumsum(valid_chars[j:end]) .<= width) .& valid_chars[j:end] .== 1
+            cut = findlast(condition)
+        end
+
         if cut + j > length(valid_chars)
             @warn "ops not valid" j cut length(valid_chars)
             cut = length(valid_chars) - j
@@ -308,8 +309,13 @@ function reshape_text(text::AbstractString, width::Int)::AbstractString
 
         # prep line
         try
-            push!(lines, lstrip(text[1:cut]))
-            text = text[(cut + 1):end]
+            newline = strip(text[1:cut])
+
+            # pad new line with spaces to ensure it has the right lengt
+            newline *= " ".^(width - textlen(newline))
+
+            push!(lines, newline)
+            text = lstrip(text[(cut + 1):end])
             j += cut
         catch err
             throw("Failed to reshape text: $err - target width: $width")
@@ -318,7 +324,7 @@ function reshape_text(text::AbstractString, width::Int)::AbstractString
 
     # add what's left of the text
     if length(text) > 0
-        push!(lines, text)
+        push!(lines, text * " "^(width - textlen(text)))
     end
 
     # do checks and pad line
