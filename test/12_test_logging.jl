@@ -1,4 +1,4 @@
-import Term: install_term_logger
+import Term: install_term_logger, uninstall_term_logger
 
 install_term_logger()
 
@@ -22,5 +22,10 @@ println("\nTesting logging, stdout temporarily disabled")
 
         sdfs
         s""" 1 + 2
+
+        uninstall_term_logger()
+
+        @info "removed"
+
     end
 end

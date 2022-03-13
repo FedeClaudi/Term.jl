@@ -36,7 +36,7 @@ export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
 export install_stacktrace
-export install_term_logger
+export install_term_logger, uninstall_term_logger
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -95,7 +95,7 @@ using .introspection: inspect
 
 using .errors: install_stacktrace
 
-using .logging: install_term_logger, TermLogger
+using .logging: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
 
