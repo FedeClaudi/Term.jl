@@ -89,9 +89,9 @@ tprint("\n\n[bold green]Running: '08_test_layout.jl' ")
 tprint("\n\n[bold green]Running: '11_test_console.jl' ")
 @time @timeit_include("11_test_console.jl")
 
-# ? 12 logging
-tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
-@time @timeit_include("12_test_logging.jl")
+# # ? 12 logging
+# tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
+# @time @timeit_include("12_test_logging.jl")
 
 # ? 13 box
 tprint("\n\n[bold green]Running: '13_test_box.jl' ")
