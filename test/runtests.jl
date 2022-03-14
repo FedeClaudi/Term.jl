@@ -81,9 +81,9 @@ tprint("\n\n[bold green]Running: '07_test_panel.jl' ")
 tprint("\n\n[bold green]Running: '08_test_layout.jl' ")
 @time @timeit_include("08_test_layout.jl")
 
-#  ? 9 inspect
-tprint("\n\n[bold green]Running: '09_test_inspect.jl' ")
-@time @timeit_include("09_test_inspect.jl")
+# #  ? 9 inspect
+# tprint("\n\n[bold green]Running: '09_test_inspect.jl' ")
+# @time @timeit_include("09_test_inspect.jl")
 
 # ? 11 console
 tprint("\n\n[bold green]Running: '11_test_console.jl' ")
