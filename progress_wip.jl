@@ -5,18 +5,24 @@ Revise.revise()
 using Term
 import Term.consoles: clear
 
-N = 250
-# pbar = ProgressBar(;
-#         N=N,
-#         fill=true,
-#         width=200,
-#         transient=false,
-#         description="Made with [bold blue underline]Term[/bold blue underline]"
-#     )
+
+"""
+# TODO
+Stdout doesn't get preserved, only the first line does.
+"""
 
 # clear()
-println("."^150)
+# print("\n\n\n")
+
+
+
+N = 100
+
+
 for i in track(1:N; expand=false, description="test", width=150)
     sleep(.01)
+    if i % 50 == 0
+        println("cacca")
+    end
 end
 

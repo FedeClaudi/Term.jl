@@ -1,9 +1,16 @@
 module progress
 
 import Term: int, textlen, truncate
-import ..Tprint: tprint
+import ..Tprint: tprint, tprintln
 import ..style: apply_style
-import ..consoles: console_width, clear, hide_cursor, show_cursor, line, erase_line
+import ..consoles: console_width,
+                clear,
+                hide_cursor,
+                show_cursor,
+                line,
+                erase_line,
+                beginning_previous_line
+
 import ..renderables: AbstractRenderable
 import ..measure: Measure
 import ..segment: Segment
@@ -25,10 +32,12 @@ struct DescriptionColumn <: AbstractColumn
     measure::Measure
     text::String
 end
+
 function DescriptionColumn(description::String)
     seg = Segment(description)
     return DescriptionColumn([seg], seg.measure, seg.text)
 end
+
 update(col::DescriptionColumn, args...)::String = col.text
 
 
@@ -38,10 +47,12 @@ struct SeparatorColumn <: AbstractColumn
     measure::Measure
     text::String
 end
+
 function SeparatorColumn()
     seg = Segment("●", "#D81B60")
     return SeparatorColumn([seg], seg.measure, seg.text)
 end
+
 update(col::SeparatorColumn, args...)::String = col.text
 
 
@@ -51,17 +62,18 @@ struct CompletedColumn <: AbstractColumn
     measure::Measure
     text::String
 end
+
 function CompletedColumn(N::Int)
     width = length("$N")*2+1
     seg = Segment(" "^width)
     text = apply_style("[white bold]/[/white bold][(.1, .8, .4) underline]$N[/(.1, .8, .4) underline]")
     return CompletedColumn([seg], seg.measure, text)
 end
+
 function update(col::CompletedColumn, i::Int, N::Int, color::String)::String
     _i = "$(i)"
     _N = "$(N)"
     _i = " "^(length(_N) - length(_i)) * _i
-
     return apply_style("[$color bold]$_i[/$color bold]") * col.text
 end
 
@@ -71,11 +83,13 @@ struct PercentageColumn <: AbstractColumn
     segments::Vector
     measure::Measure
 end
+
 function PercentageColumn()
     len = 8  # "xxx.xx %
     seg = Segment(" "^len)
     return PercentageColumn([seg], seg.measure)
 end
+
 function update(col::PercentageColumn, i::Int, N::Int, args...)::String
     p = round(i / N * 100; digits=2)
     return "\e[2m$p %\e[0m"
@@ -87,6 +101,7 @@ mutable struct BarColumn <: AbstractColumn
     measure::Measure
     nsegs::Int
 end
+
 BarColumn() = BarColumn([], Measure(0, 0), 0)
 
 function setwidth!(col::BarColumn, width::Int)
@@ -124,6 +139,8 @@ mutable struct ProgressBar
     started::Bool
     transient::Bool
     columns::Vector{AbstractColumn}
+    originalstdout  # stores a reference to the original stdout
+    out  # will be used to store temporarily re-directed stdout
 
     """
         ProgressBar(;
@@ -145,17 +162,21 @@ mutable struct ProgressBar
                 width::Int=88,
                 description::String="[orange1 italic]Running...[/orange1 italic]",
                 expand::Bool=false,
-                transient=false
+                transient=false,
+                columns::Union{Nothing, Vector{AbstractColumn}} = nothing
         )
 
-        columns = [
-            DescriptionColumn(description),
-            SeparatorColumn(),
-            BarColumn(),
-            SeparatorColumn(),
-            CompletedColumn(N),
-            PercentageColumn(),
-        ]
+        # use default columns layout
+        if isnothing(columns)
+            columns = [
+                DescriptionColumn(description),
+                SeparatorColumn(),
+                BarColumn(),
+                SeparatorColumn(),
+                CompletedColumn(N),
+                PercentageColumn(),
+            ]
+        end
 
         # check that width is large enough
         width = expand ? console_width() : max(width, 20)
@@ -163,8 +184,17 @@ mutable struct ProgressBar
         # get the width of the BarColumn
         spaces = length(columns) -1
         colwidths = sum(map((c)-> c isa BarColumn ? 0 : c.measure.w, columns))
-
         bcol_width = width - colwidths - spaces
+
+        # if it doesn't have a bar column, add one
+        bars = sum(map((c)-> c isa BarColumn ? 1 : 0, columns))
+        if bars == 0
+            push!(columns, BarColumn())
+        elseif bars > 1
+            bcol_width /= bars
+        end
+
+        # set width of bar columns
         for col in columns
             col isa BarColumn && setwidth!(col, bcol_width)
         end
@@ -176,13 +206,20 @@ mutable struct ProgressBar
             width,
             false,
             transient,
-            columns
+            columns,
+            nothing,
         )
 
     end
 
     Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar) = print(io, "Progress bar \e[2m($(pbar.i)/$(pbar.N))\e[0m")
 
+end
+
+struct TempSTDOUT
+    out_rd::Base.PipeEndpoint
+    out_wr::Base.PipeEndpoint
+    out_reader::Task
 end
 
 """
@@ -200,6 +237,29 @@ function pbar_color(pbar::ProgressBar)
     return "($r, $g, $b)"
 end
 
+function start(pbar::ProgressBar)
+    # re-direct STDOUT
+    pbar.originalstdout = stdout
+    out_rd, out_wr = redirect_stdout()
+    out_reader = @async read(out_rd, String)
+    pbar.out = TempSTDOUT(out_rd, out_wr, out_reader)
+
+    # start pbar
+    hide_cursor()
+    pbar.started = true
+end
+
+function stop(pbar::ProgressBar)
+    # restore STDOUT
+    redirect_stdout(pbar.originalstdout)
+    close(pbar.out.out_wr)
+
+    # print out captured content
+    out = fetch(pbar.out.out_reader)
+    tprint(out)
+    show_cursor()
+end
+
 
 """
     update(pbar::ProgressBar)
@@ -207,32 +267,36 @@ end
 Update progress bar info and display.
 """
 function update(pbar::ProgressBar)
-    # start pbar if not started
-    if !pbar.started
-        line()
-        hide_cursor()
-        pbar.started = true
-    end
-
     # check that index is in range
     pbar.i = pbar.i > pbar.N ? pbar.N : pbar.i
 
     # get progress bar
     color = pbar_color(pbar)
 
-
     # get columns data
     contents = map((c)->update(c, pbar.i, pbar.N, color), pbar.columns)
-    erase_line()
-    tprint(contents...)
+
+    # start & print progress bar
+    if !pbar.started
+        start(pbar)
+        tprint(pbar.originalstdout, contents...)
+        line(pbar.originalstdout)  # any stdout will happen on a new line
+    else
+        # erase_line()  # delete previous pbar
+        beginning_previous_line(pbar.originalstdout)
+        erase_line(pbar.originalstdout)
+        tprint(pbar.originalstdout, contents...)
+        line(pbar.originalstdout)
+    end
 
     # update counter
     pbar.i += 1
 
     # check if done
     if pbar.i > pbar.N
-        pbar.transient ? erase_line() : line()
-        show_cursor()
+        # pbar.transient ? erase_line() : line()
+        # show_cursor()
+        stop(pbar)
     end
 
     return nothing
