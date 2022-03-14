@@ -23,9 +23,9 @@ println("\nTesting logging, stdout temporarily disabled")
         sdfs
         s""" 1 + 2
 
-        uninstall_term_logger()
-
-        @info "removed"
+        # uninstall_term_logger()
+        # @info "removed"
+        
 
     end
 end
