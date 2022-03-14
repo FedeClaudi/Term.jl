@@ -53,8 +53,9 @@ show_cursor(io::IO) = print(io, "\x1b[?25h")
 """
 Print a new line.
 """
-line() = print("\n")
-line(io::IO) = print(io, "\n")
+line(; i=1) = print("\n"^i)
+line(io::IO; i=1) = print(io, "\n"^i)
+
 
 """
 Erase last line in console.

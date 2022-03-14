@@ -144,7 +144,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     for (n, line) in zip(linenos, codelines)
         # style
         if n == lineno
-            symb = "[red bold]▶[/red bold]"
+            symb = "[red bold]❯[/red bold]"
             color = "white"
         else
             symb = " "
