@@ -56,7 +56,7 @@ end
                 fit=true, style=style), 13, 7
             )
 
-            @test_nowarn Panel(
+            @test_nothrow Panel(
                     Panel("."^250; fit=true, style=style); fit=true, style=style
                 )
         end

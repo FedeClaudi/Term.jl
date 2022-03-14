@@ -2,44 +2,10 @@ using Term
 using Test
 using Suppressor
 
-function testpanel(p, w, h)
-    # check all lines have the same length
-    _p = string(p)
-
-    dw = displaysize(stdout)[2]
-    if isnothing(w) || w > dw
-        return
-    else
-        widths = textwidth.(cleantext.(split(_p, "\n")))
-    end
-    
-    # println(p, p.measure, widths)
-    @test length(unique(widths)) == 1
-
-    # check it has the right measure
-    if !isnothing(w)
-        @test p.measure.w == w
-        @test textlen(cleantext(p.segments[1].text)) == w
-        @test length(chars(cleantext(p.segments[1].text))) == w
-    end
-
-    if !isnothing(h)
-        @test p.measure.h == h
-        @test length(p.segments) == h
-    end
-end
-
-
-nlines(x) = length(split(x, "\n"))
-lw(x) = max(length.(split(x, "\n"))...)
+include("__test_utils.jl")
 
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
-
-macro timeit_include(path::AbstractString)
-    return :(@timeit TIMEROUTPUT $path include($path))
-end
-
 
 tprint("\n[bold blue]Runing all tests measuring timing and allocations\n")
 
@@ -101,10 +67,13 @@ tprint("\n\n[bold green]Running: '13_test_box.jl' ")
 tprint("\n\n[bold green]Running: '14_test_highlight.jl' ")
 @time @timeit_include("14_test_highlight.jl")
 
+# ? 15 progress
+tprint("\n\n[bold green]Running: '15_test_progress.jl' ")
+@time @timeit_include("15_test_progress.jl")
+
 # ? 99 errors
 tprint("\n\n[bold green]Running: '99_test_errors.jl' ")
 @time @timeit_include("99_test_errors.jl")
-
 
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)

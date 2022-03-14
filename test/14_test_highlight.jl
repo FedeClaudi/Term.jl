@@ -22,7 +22,7 @@ This is ::Int64 my style
 print(x + 2)
 """) == "This is \e[1m\e[38;2;252;98;98m::\e[22m\e[39mInt64 my style\n\e[1m\e[38;2;255;245;157mprint\e[22m\e[39m\e[38;2;252;116;116m(\e[39mx \e[1m\e[38;2;252;98;98m+\e[22m\e[39m \e[38;2;144;202;249m2\e[39m\e[38;2;252;116;116m)\e[39m\n"
 
-    @test_nowarn load_code_and_highlight("14_test_highlight.jl", 7)
+    @test_nothrow load_code_and_highlight("14_test_highlight.jl", 7)
 
 
 end

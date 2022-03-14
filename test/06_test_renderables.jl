@@ -7,7 +7,7 @@ import Term.segment: Segment
     @test seg.plain == "test"
     @test seg.measure.w == 4
 
-    @test_nowarn println(seg)
+    @test_nothrow println(seg)
 
     seg = Segment("test", "red")
     @test seg.text == "\e[31mtest\e[39m"

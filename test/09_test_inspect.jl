@@ -22,7 +22,7 @@ println("\nTesting logging, stdout temporarily disabled")
     end
 
     #  Now, what is MyType like?
-    @test_nowarn inspect(MyType)
+    @test_nothrow inspect(MyType)
 
     # Let's define some constructors and methods using MyType
 
@@ -42,27 +42,27 @@ println("\nTesting logging, stdout temporarily disabled")
     another_method(m1::MyType, m2::MyType) = print(m1, m2)
 
     # let's inspect MyType again!
-    @test_nowarn inspect(MyType)
+    @test_nothrow inspect(MyType)
 
     """
     Not bad huh !?
     It also works with instances of types
     """
 
-    @test_nowarn inspect(1)
+    @test_nothrow inspect(1)
 
     """
     And for abstract types of course1
     """
 
-    @test_nowarn inspect(T2)
+    @test_nothrow inspect(T2)
 
     """
     finally, you can also use inspect to look at functions.
     Let's get a bit meta
     """
 
-    @test_nowarn inspect(inspect)
+    @test_nothrow inspect(inspect)
 
     """
     as you can see inspect prints the docstrings of the methods it can find and lists some of 
