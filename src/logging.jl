@@ -14,6 +14,8 @@ export TermLogger, install_term_logger
 
 tprint = (println ∘ apply_style)
 
+DEFAULT_LOGGER = global_logger()
+
 # ---------------------------- create term logger ---------------------------- #
 """
     TermLogger
@@ -203,4 +205,9 @@ function install_term_logger(theme::Theme = theme)
     return global_logger(_logger)
 end
 
+function uninstall_term_logger()
+    _lg = global_logger(DEFAULT_LOGGER)
+    logger = global_logger(DEFAULT_LOGGER)
+    return logger
+end
 end

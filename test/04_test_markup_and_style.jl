@@ -76,6 +76,6 @@ end
     fdsf[/red] [bold] sfsdfp[green] sdfsdp[/green]sdsdfs
     pdfsdp[/bold]""") == "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[22m\e[32m sdfsdp\e[39m\e[1msdsdfs\npdfsdp\e[22m"
 
-    @test_nowarn tprint(Panel("test"; style="red"))
+    @test_nothrow tprint(Panel("test"; style="red"))
 
 end

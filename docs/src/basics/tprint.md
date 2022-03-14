@@ -23,8 +23,8 @@ tprint("This is a: 1 of type Int64 this is a function print")
 ```
 But, we are working on a `highlight` feature that will be able to parse strings and color their elements correctly. Like this:
 ```@example
-import Term: tprint, highlight, theme
-tprint(highlight("This is a: 1 of type ::Int64 this is a function print", theme))
+import Term: tprint, highlight
+tprint(highlight("This is a: 1 of type ::Int64 this is a function print"))
 ```
 
 

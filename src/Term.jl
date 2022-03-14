@@ -26,6 +26,7 @@ include("inspect.jl")
 include("errors.jl")
 include("logging.jl")
 include("tprint.jl")
+include("progress.jl")
 include("logo.jl")
 
 export RenderableText, Panel, TextBox
@@ -36,7 +37,8 @@ export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
 export install_stacktrace
-export install_term_logger
+export install_term_logger, uninstall_term_logger
+export track
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -81,14 +83,25 @@ using .layout: Padding, vstack, hstack, Spacer, vLine, hLine
 
 using .panel: Panel, TextBox
 
+# define additional methods for measure functions
+measure.width(text::AbstractString) = Measure(text).w
+measure.width(seg::Segment) = seg.measure.w
+measure.width(ren::AbstractRenderable) = ren.measure.w
+
+measure.height(text::AbstractString) = Measure(text).h
+measure.height(seg::Segment) = seg.measure.h
+measure.height(ren::AbstractRenderable) = ren.measure.h
+
 # ---------------------------------- others ---------------------------------- #
 using .introspection: inspect
 
 using .errors: install_stacktrace
 
-using .logging: install_term_logger, TermLogger
+using .logging: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
+
+using .progress: ProgressBar, update, track
 
 
 end

@@ -5,7 +5,7 @@ It's as simple as calling one function, Term takes care of the rest
 so you can use Julia's logging functionality as you would normally
 """
 
-import Term: install_term_logger, Panel
+import Term: install_term_logger, uninstall_term_logger, Panel
 
 # insall term's logger as the global logger
 install_term_logger()
@@ -33,4 +33,12 @@ name = "the name is [bold blue]Term[/bold blue]"
 p1 = Panel("text")
 
 print("\n"^3)
+@error "[italic green bold]fancy logs![/italic green bold]" x y name √9 install_term_logger p1
+
+
+"""
+You can reset Julia's default logger like this:
+"""
+
+uninstall_term_logger()
 @error "[italic green bold]fancy logs![/italic green bold]" x y name √9 install_term_logger p1
