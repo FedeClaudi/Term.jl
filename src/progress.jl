@@ -119,6 +119,10 @@ end
 function update(col::BarColumn, i::Int, N::Int, color::String, args...)::String
     completed = int(col.nsegs * i/N)
     remaining = col.nsegs - completed
+
+    completed = completed < 0 ? 0 : completed
+    remaining = remaining < 0 ? 0 : remaining
+
     return apply_style("[$color bold]" * seg^(completed) * "[/$color bold]"* " "^(remaining))
 end
 
@@ -131,7 +135,7 @@ struct ElapsedColumn <: AbstractColumn
     style::String
 end
 
-ElapsedColumn(; style=yellow_dark) = ElapsedColumn([], Measure(8+9, 1), style)
+ElapsedColumn(; style=yellow_dark) = ElapsedColumn([], Measure(7+9, 1), style)
 
 function update(col::ElapsedColumn, i::Int, N::Int, color::String, starttime::Union{Nothing, DateTime}, args...)::String
     isnothing(starttime) && return " "^(col.measure.w)
@@ -166,7 +170,7 @@ struct ETAColumn <: AbstractColumn
     style::String
 end
 
-ETAColumn(; style=teal) = ETAColumn([], Measure(8+11, 1), style)
+ETAColumn(; style=teal) = ETAColumn([], Measure(7+11, 1), style)
 
 
 function update(col::ETAColumn, i::Int, N::Int, color::String, starttime::Union{Nothing, DateTime}, args...)::String

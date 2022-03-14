@@ -136,13 +136,16 @@ import Term: tprint
 import Term.progress: track
 
 for i in 1:3
-    for j in track(1:250; description="[yellow bold]Transient pbars![/yellow bold]", transient=true)
+    for j in track(1:5; description="[yellow bold]Transient pbars![/yellow bold]", transient=true)
         sleep(0.001)
 
     end
 end
 tprint("[bright_blue bold]poof![/bright_blue bold] [underline bright_blue]They disappeared[/]")
 ```
+
+!!! note
+    Okay, they didn't really disappear. But they will in the terminal, promised.
 
 ## A note on STDOUT
 This is more advanced than most people will care about, but if you're confused about why the stuff you print in your for loops is not showing up perhaps have a look.
