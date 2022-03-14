@@ -49,18 +49,20 @@ update(col::SeparatorColumn, args...)::String = col.text
 struct CompletedColumn <: AbstractColumn
     segments::Vector
     measure::Measure
+    text::String
 end
 function CompletedColumn(N::Int)
     width = length("$N")*2+1
     seg = Segment(" "^width)
-    return CompletedColumn([seg], seg.measure)
+    text = apply_style("[white bold]/[/white bold][(.1, .8, .4) underline]$N[/(.1, .8, .4) underline]")
+    return CompletedColumn([seg], seg.measure, text)
 end
 function update(col::CompletedColumn, i::Int, N::Int, color::String)::String
     _i = "$(i)"
     _N = "$(N)"
     _i = " "^(length(_N) - length(_i)) * _i
 
-    return apply_style("[$color bold]$_i[/$color bold]/[(.1, .8, .5) underline]$_N[/(.1, .8, .5) underline]")
+    return apply_style("[$color bold]$_i[/$color bold]") * col.text
 end
 
 
@@ -189,10 +191,13 @@ pbar_color(pbar::ProgressBar)
 Get the RGB color of of a progress bar's bar based on progress.
 """
 function pbar_color(pbar::ProgressBar)
-    i = .8 * pbar.i/pbar.N
+    _r = pbar.i/pbar.N
+    i = .8 * _r
     g = i
     r = .9 - i
-    return "($r, $g, .4)"
+
+    b = max(sin(π * _r) * .7, .4)
+    return "($r, $g, $b)"
 end
 
 
