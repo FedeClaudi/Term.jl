@@ -18,6 +18,7 @@ import ..consoles: console_width,
 import ..renderables: AbstractRenderable
 import ..measure: Measure
 import ..segment: Segment
+import ..color: RGBColor
 
 export ProgressBar, update, track, start, stop
 
@@ -116,6 +117,7 @@ function setwidth!(col::BarColumn, width::Int)
 end
 
 
+
 function update(col::BarColumn, i::Int, N::Int, color::String, args...)::String
     completed = int(col.nsegs * i/N)
     remaining = col.nsegs - completed
@@ -123,7 +125,7 @@ function update(col::BarColumn, i::Int, N::Int, color::String, args...)::String
     completed = completed < 0 ? 0 : completed
     remaining = remaining < 0 ? 0 : remaining
 
-    return apply_style("[$color bold]" * seg^(completed) * "[/$color bold]"* " "^(remaining))
+    return apply_style("[$color bold]" * '━'^(completed) * "[/$color bold]"* " "^(remaining))
 end
 
 
@@ -207,7 +209,6 @@ end
 #                                  PROGESS BAR                                 #
 # ---------------------------------------------------------------------------- #
 
-seg = '━'
 
 
 function get_columns(columnsset::Symbol, description::String, N::Int)::Vector{AbstractColumn}
@@ -261,6 +262,7 @@ mutable struct ProgressBar
     redirectstdout::Bool
     originalstdout::Union{Nothing, IO}  # stores a reference to the original stdout
     out  # will be used to store temporarily re-directed stdout
+    colors::Vector{RGBColor}
 
 
     """
@@ -287,6 +289,11 @@ mutable struct ProgressBar
                 redirectstdout=true,
                 columns::Union{Symbol, Vector{AbstractColumn}} = :default,
                 update_every=1,
+                colors::Vector{RGBColor}=[
+                    RGBColor("(1, .05, .05)"),
+                    RGBColor("(.05, .05, 1)"),
+                    RGBColor("(.05, 1, .05)"),
+                ]
         )
 
         # get columns if not provided
@@ -295,7 +302,8 @@ mutable struct ProgressBar
         end
 
         # check that width is large enough
-        width = expand ? console_width()-1 : max(width, 20)
+        width = expand ? console_width()-5 : min(max(width, 20), console_width()-5)
+        
 
         # get the width of the BarColumn
         spaces = length(columns) -1
@@ -330,6 +338,7 @@ mutable struct ProgressBar
             redirectstdout,
             nothing, # originalstdout
             nothing, # out
+            colors,
         )
 
     end
@@ -344,16 +353,29 @@ pbar_color(pbar::ProgressBar)
 Get the RGB color of of a progress bar's bar based on progress.
 """
 function pbar_color(pbar::ProgressBar)
-    _r = pbar.i/pbar.N
-    i = .8 * _r
-    g = i
-    r = .9 - i
+    α = .8 * pbar.i/pbar.N
+    β = max(sin(π * pbar.i/pbar.N) * .7, .4)
 
-    b = max(sin(π * _r) * .7, .4)
+    c1, c2, c3 = pbar.colors
+    r = (.8 - α) * c1.r + β * c2.r + α * c3.r
+    g = (.8 - α) * c1.g + β * c2.g + α * c3.g
+    b = (.8 - α) * c1.b + β * c2.b + α * c3.b
+
+
+    # _r = pbar.i/pbar.N
+    # i = .8 * _r
+    # g = i
+    # r = .9 - i
+
+    # b = max(sin(π * _r) * .7, .4)
     return "($r, $g, $b)"
 end
 
+"""
+    TempSTDOUT
 
+Stores information about a temporarily re-directed STDOUT
+"""
 struct TempSTDOUT
     out_rd::Base.PipeEndpoint
     out_wr::Base.PipeEndpoint

@@ -1,6 +1,7 @@
 using Term
 import Term.progress: track, ProgressBar, update, start, stop
 import Term.consoles: clear, line
+import Term.color: RGBColor
 
 clear()
 
@@ -32,7 +33,7 @@ line()
 # loop da loop
 for i in 1:250
     # do stuff
-    sleep(.01)
+    sleep(.007)
 
     # manually update the progress bar
     update(pbar)
@@ -45,16 +46,22 @@ The same parameters can be used for both ProgressBar and track.
 Here's more:
 """
 
+print("\n")
 trk(x) = track(x;
-    description="[red bold]My tracker[/red bold]",
+    description="[red bold]Choose your colors![/red bold]",
     expand=true,  #  fill the screen
     update_every=5,  # don't update at every iteration
-    columns=:detailed  # print more info
+    columns=:detailed,  # print more info
+    colors = [
+        RGBColor("(.3, .3, 1)"),
+        RGBColor("(1, 1, 1)"),
+        RGBColor("(.9, .3, .3)"),
+    ]
 )
 
 print("\n")
 for i in trk(1:500)
-    sleep(0.005)
+    sleep(0.007)
 end
 
 """
@@ -66,8 +73,8 @@ Term provides three different presets to display different ammounts of informati
 """
 
 print("\n")
-for level in (:minimal, :default, :detailed)
-    for i in track(1:100; description=string(level), columns=level, width=150)
+for (level, color) in zip((:minimal, :default, :detailed), ("red", "green","blue"))
+    for i in track(1:100; description="[bold $color italic]$level[/bold $color italic]", columns=level, width=150)
         sleep(.005)
     end
 end
@@ -121,7 +128,7 @@ clutter the console space too much, make them transient!
 
 print("\n")
 for i in 1:3
-    for j in track(1:250; description="[yellow bold]Transient pbars![/yellow bold]", transient=true)
+    for j in track(1:250; description="[yellow bold]Transient pbars![/yellow bold]", transient=true, width=250)
         sleep(0.001)
 
     end
