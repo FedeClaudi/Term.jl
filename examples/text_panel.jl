@@ -60,7 +60,12 @@ print(
     ),
     Panel("content "^10; box = :ASCII_DOUBLE_HEAD, style = "red", width = 44),
     Panel("content "^10; box = :DOUBLE, style = "blue", width = 44),
+    Panel("content "^10; fit=true, padding=(0, 0, 0, 0)),
+    Panel("content "^10; fit=true, padding=(4, 4, 0, 0)),
+    Panel("content "^10; fit=true, padding=(2, 2, 2, 2)),
 )
+
+
 
 """
 Finally, you can layout panels to create structured content

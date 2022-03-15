@@ -85,14 +85,14 @@ function Panel(
     height::Union{Nothing,Int} = nothing,
     fit::Bool=false,
     justify::Symbol = :left,
-    padding::Union{Vector, Padding} = Padding(2, 2, 0, 0)
+    padding::Union{Vector, Padding, NTuple} = Padding(2, 2, 0, 0)
 
 )
     box = eval(box)  # get box object from symbol
 
     # get measure
     WIDTH = console_width(stdout)
-    padding = padding isa Vector ? Padding(padding...) : padding
+    padding = padding isa Padding ? padding : Padding(padding...)
     Δw = padding.left + padding.right + 2
     Δh = padding.top + padding.bottom
 

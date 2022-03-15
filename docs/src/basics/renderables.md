@@ -149,10 +149,17 @@ Let's look at some more examples:
 import Term: Panel # hide
 
 print(
-print(
     Panel("this panel has fixed width, text on the left"; width = 66, justify = :left),    
     Panel("this one too, but the text is at the center!"; width = 66, justify = :center),
     Panel("the text is here!"; width = 66, justify = :right),
+)
+print("\n")
+
+# padding!
+print(
+    Panel("content "^10; fit=true, padding=(0, 0, 0, 0)),
+    Panel("content "^10; fit=true, padding=(4, 4, 0, 0)),
+    Panel("content "^10; fit=true, padding=(2, 2, 2, 2)),
 )
 ```
 
