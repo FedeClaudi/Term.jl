@@ -53,16 +53,22 @@ You'll see that we've passed `description` to specify the text that goes before 
 
 ```@example
 import Term.progress: track
+import Term.color: RGBColor
 
 trk(x) = track(x;
-    description="[red bold]My tracker[/red bold]",
+    description="[red bold]Choose your colors![/red bold]",
     expand=true,  #  fill the screen
     update_every=5,  # don't update at every iteration
-    columns=:detailed  # print more info
+    columns=:detailed,  # print more info
+    colors = [
+        RGBColor("(.3, .3, 1)"),
+        RGBColor("(1, 1, 1)"),
+        RGBColor("(.9, .3, .3)"),
+    ]
 )
 
 print("\n")
-for i in trk(1:25)
+for i in trk(1:10)
     sleep(0.005)
 end
 ```
@@ -74,11 +80,12 @@ What's going on with `columns=:detailed` you ask? Well let me tell you. Each bit
 import Term.progress: track
 
 
-for level in (:minimal, :default, :detailed)
-    for i in track(1:5; description=string(level), columns=level, width=65)
+for (level, color) in zip((:minimal, :default, :detailed), ("red", "green","blue"))
+    for i in track(1:5; description="[bold $color italic]$level[/bold $color italic]", columns=level, width=150)
         sleep(.005)
     end
 end
+
 ```
 
 As you can see, regardless of how many columns there are the progress bar will have the right width. That's because each column is a `Term` renderable object and as such has a `Measure` object that tells us about it's width. The size of the bar in the progress bar is then adjusted to fit in all the columns. 
@@ -136,13 +143,16 @@ import Term: tprint
 import Term.progress: track
 
 for i in 1:3
-    for j in track(1:250; description="[yellow bold]Transient pbars![/yellow bold]", transient=true)
+    for j in track(1:5; description="[yellow bold]Transient pbars![/yellow bold]", transient=true)
         sleep(0.001)
 
     end
 end
 tprint("[bright_blue bold]poof![/bright_blue bold] [underline bright_blue]They disappeared[/]")
 ```
+
+!!! note
+    Okay, they didn't really disappear. But they will in the terminal, promised.
 
 ## A note on STDOUT
 This is more advanced than most people will care about, but if you're confused about why the stuff you print in your for loops is not showing up perhaps have a look.
