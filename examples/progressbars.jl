@@ -61,7 +61,7 @@ trk(x) = track(x;
 
 print("\n")
 for i in trk(1:500)
-    sleep(0.007)
+    sleep(0.005)
 end
 
 """
@@ -73,7 +73,7 @@ Term provides three different presets to display different ammounts of informati
 """
 
 print("\n")
-for (level, color) in zip((:minimal, :default, :detailed), ("red", "green","blue"))
+for (level, color) in zip((:minimal, :default, :detailed), ("yellow1", "green","blue"))
     for i in track(1:100; description="[bold $color italic]$level[/bold $color italic]", columns=level, width=150)
         sleep(.005)
     end
