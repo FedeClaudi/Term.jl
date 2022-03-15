@@ -91,14 +91,14 @@ struct PercentageColumn <: AbstractColumn
 end
 
 function PercentageColumn()
-    len = 8  # "xxx.xx %
+    len = 5  # "xxx %
     seg = Segment(" "^len)
     return PercentageColumn([seg], seg.measure)
 end
 
 function update(col::PercentageColumn, i::Int, N::Int, args...)::String
-    p = string(round(i / N * 100; digits=2))
-    p = lpad(p, 5)
+    p = string(int(i / N * 100))
+    p = lpad(p, col.measure.w-2)
     return "\e[2m$p %\e[0m"
 end
 
@@ -137,7 +137,7 @@ struct ElapsedColumn <: AbstractColumn
     style::String
 end
 
-ElapsedColumn(; style=yellow_dark) = ElapsedColumn([], Measure(7+9, 1), style)
+ElapsedColumn(; style=yellow_dark) = ElapsedColumn([], Measure(6+9, 1), style)
 
 function update(col::ElapsedColumn, i::Int, N::Int, color::String, starttime::Union{Nothing, DateTime}, args...)::String
     isnothing(starttime) && return " "^(col.measure.w)
@@ -361,13 +361,6 @@ function pbar_color(pbar::ProgressBar)
     g = (.8 - α) * c1.g + β * c2.g + α * c3.g
     b = (.8 - α) * c1.b + β * c2.b + α * c3.b
 
-
-    # _r = pbar.i/pbar.N
-    # i = .8 * _r
-    # g = i
-    # r = .9 - i
-
-    # b = max(sin(π * _r) * .7, .4)
     return "($r, $g, $b)"
 end
 

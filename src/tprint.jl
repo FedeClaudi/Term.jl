@@ -85,10 +85,10 @@ end
 
 function tprint(args...)
     for (n, arg) in enumerate(args)
-        tprint( arg)
+        tprint(arg)
 
         if n < length(args)
-            args[n+1] isa AbstractRenderable || print( " ")
+            args[n+1] isa AbstractRenderable || print(" ")
         end
     end
     return nothing
