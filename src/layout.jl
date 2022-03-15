@@ -1,5 +1,7 @@
 module layout
 
+import Parameters: @with_kw
+
 import Term: int, get_last_valid_str_idx
 import ..renderables: RenderablesUnion, Renderable, AbstractRenderable
 import ..measure: Measure
@@ -7,7 +9,7 @@ import ..segment: Segment
 using ..box
 import ..consoles: console_width, console_height
 
-export Padding, vstack, hstack
+export Padding, vstack, hstack, pad
 export Spacer, vLine, hLine
 
 # ---------------------------------------------------------------------------- #
@@ -16,66 +18,54 @@ export Spacer, vLine, hLine
 """
     Padding
 
-Stores empty string to pad a string to the desired with.
+Stores information about ammount of padding.
 """
-struct Padding
-    left::AbstractString
-    right::AbstractString
+@with_kw struct Padding
+    left::Int
+    right::Int
+    top::Int
+    bottom::Int
 end
 
 """
-    Padding(text::AbstractString, target_width::Int, method::Symbol)::Padding
+    pad(text::AbstractString, target_width::Int, method::Symbol)::String
 
-Create `Padding` for a string given a justification `method` ∈ (:left, :center, :right).
+Pad a string to width: `target_width` by adding empty spaces strings " ".
+Where the spaces are added depends on the justification `method` ∈ (:left, :center, :right).
 """
-function Padding(text::AbstractString, target_width::Int, method::Symbol)::Padding
+function pad(text::AbstractString, target_width::Int, method::Symbol)::String
     # get total padding size
     lw = Measure(text).w
-    if lw == target_width
-        return Padding("", "")
-    else
-        if lw < target_width
-            @debug "\e[31mTarget width is $target_width but the text has width $lw: \e[0m\n   $text\n     Cleaned: '$(remove_ansi(remove_markup(text)))'"
-        end
+    if lw >= target_width
+        return text
     end
 
-    if target_width < lw
-        @debug "While creating padding, target width < lw" target_width lw method text
-        return Padding("", "")
-    end
-    padding = " "^(target_width - lw - 1)
-    pad_width = Measure(padding).w
+    npads = target_width - lw
 
-    # split left/right padding for left/right justify
-    if pad_width > 0
-        cut = pad_width % 2 == 0 ? Int(pad_width / 2) : (Int ∘ floor)(pad_width / 2)
-        left, right = padding[1:cut], padding[(cut + 1):end]
-        @assert length(left * right) <= length(padding) "\e[31m$(length(left * right)) instead of $(length(padding))"
-    else
-        left, right = "", ""
-    end
-
-    # craete padding
-    if method == :center
-        padding = Padding(" " * left, right)
-    elseif method == :left
-        padding = Padding(" ", padding)
+    if method == :left
+        return text * " "^npads
     elseif method == :right
-        padding = Padding(padding, " ")
+        return " "^npads * text
+    else
+        if npads % 2 == 0
+            nl = nr = Int(npads/2)
+        else
+            nl = (Int ∘ floor)(npads/2)
+            nr = nl + 1
+        end
+        return " "^nl * text * " "^nr
     end
-
-    # @info "made padding" text target_width method padding lw pad_width left right
-    @assert Measure(padding.left * text * padding.right).w <= target_width "\e[31mPadded width $(Measure(padding.left * text * padding.right).w), target: $target_width $padding"
-
-    return padding
 end
 
-function Base.show(io::IO, padding::Padding)
-    return print(
-        io,
-        "$(typeof(padding))  \e[2m(left: $(length(padding.left)), right: $(length(padding.right)))\e[0m",
-    )
+"""
+    pad(text::AbstractString, left::Int=0, right::Int=0)::String
+
+Pad a string by a fixed ammount.
+"""
+function pad(text::AbstractString, left::Int=0, right::Int=0)::String
+    return " "^left * text * " "^right
 end
+
 
 # ---------------------------------------------------------------------------- #
 #                                   STACKING                                   #
@@ -90,10 +80,11 @@ function vstack(r1::RenderablesUnion, r2::RenderablesUnion)
     r2 = Renderable(r2)
 
     # get dimensions of final renderable
-    w1 = r1.measure.w
-    w2 = r2.measure.w
+    w1 = length(r1.segments) > 1 ? max([s.measure.w for s in r1.segments]...) : r1.measure.w
+    w2 = length(r2.segments) > 1 ? max([s.measure.w for s in r2.segments]...) : r2.measure.w
     if w1 > w2
         s1 = r1.segments
+
         s2 = map(
             (s)->Segment(s.text * " ".^(w1-s.measure.w)),
             r2.segments
@@ -140,6 +131,8 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
     # get dimensions of final renderable
     h1 = r1.measure.h
     h2 = r2.measure.h
+    # h1 = max([s.measure.w for s in r1.segments]...)
+    # h2 = max([s.measure.w for s in r2.segments]...)
     Δh = abs(h2 - h1)
 
     # make sure both renderables have the same number of segments

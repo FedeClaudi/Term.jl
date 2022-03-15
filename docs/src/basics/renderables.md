@@ -108,6 +108,7 @@ Well not that simple actually because `Panel` is the first renderable that allow
 
 The first argument is the content, the rest is styling options. As you can see you can specify the titles and subtitles (or leave them out if you prefer, do your thing!), their appearance (via `markup` style information) and their position (`:left, :center` or `:right`). The `style` argument sets the style of the box itself (and title/subtitle if they don't have dedicated style information).
 
+
 The box is created using `Term`'s own `Box` type! It's not worth going too much into exactly how it works, but it's worth pointing out that there's loads of types of boxes:
 ```
 ASCII,
@@ -142,6 +143,18 @@ print(
 )
 ```
 
+Let's look at some more examples:
+```@example
+
+import Term: Panel # hide
+
+print(
+print(
+    Panel("this panel has fixed width, text on the left"; width = 66, justify = :left),    
+    Panel("this one too, but the text is at the center!"; width = 66, justify = :center),
+    Panel("the text is here!"; width = 66, justify = :right),
+)
+```
 
 
 By the way, `Panels` are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!
