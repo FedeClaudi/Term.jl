@@ -14,7 +14,6 @@ tprint("\n[bold blue]Runing all tests measuring timing and allocations\n")
 tprint("[bold green]Running: '00_misc.jl' ")
 @time @timeit_include("00_misc.jl")
 
-
 # ? 1  - text utils
 tprint("[bold green]Running: '01_test_text_utils.jl' ")
 @time @timeit_include("01_test_text_utils.jl")
@@ -71,10 +70,17 @@ tprint("\n\n[bold green]Running: '14_test_highlight.jl' ")
 tprint("\n\n[bold green]Running: '15_test_progress.jl' ")
 @time @timeit_include("15_test_progress.jl")
 
-# ? 99 errors
+# ? 16 5433
+tprint("\n\n[bold green]Running: '16_test_tree.jl' ")
+@time @timeit_include("16_test_tree.jl")
+
+# ? ERRORS
 tprint("\n\n[bold green]Running: '99_test_errors.jl' ")
 @time @timeit_include("99_test_errors.jl")
 
+# ? EXAMPLES
+tprint("\n\n[bold green]Running: '999_test_examples.jl' ")
+@time @timeit_include("999_test_examples.jl")
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")

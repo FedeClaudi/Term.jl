@@ -1,6 +1,6 @@
 import Term: inspect
 
-println("\nTesting logging, stdout temporarily disabled")
+# println("\nTesting logging, stdout temporarily disabled")
 # @suppress_out begin
 @testset "\e[34mINSPECT test" begin
 

@@ -1,5 +1,20 @@
 using Highlights.Tokens, Highlights.Themes
 
+import MyterialColors: green,
+                green_light,
+                purple,
+                blue,
+                red,
+                green_light,
+                blue_light,
+                orange_light,
+                pink_light,
+                orange,
+                yellow,
+                yellow_light,
+                white,
+                green
+
 import Parameters: @with_kw
 
 """
@@ -9,24 +24,30 @@ Stores colors for different semantically relevant items, used to
 style outputs to terminal.
 """
 @with_kw struct Theme
-    docstring::String = "#a7de97"  # green
-    string::String = "#A5D6A7"  # green
-    type::String = "#d880e7"  # purple
-    emphasis::String = "blue  bold"
-    emphasis_light::String = "#bfe0fd"  # pale green
-    code::String = "#ffd77a"  # light blue
-    multiline_code::String = "#ffd77a"  # light blue
-    symbol::String = "#ffc94d"  # orange light
-    expression::String = "#F48FB1"  # pink light
-    number::String = "#90CAF9"  # blue
-    operator::String = "#fc6262 bold" # red
-    func::String = "#fff126" # yellow
+    docstring::String           = green
+    string::String              = green_light
+    type::String                = purple
+    emphasis::String            = "$blue  bold"
+    emphasis_light::String      = green_light
+    code::String                = blue_light
+    multiline_code::String      = blue_light
+    symbol::String              = orange_light
+    expression::String          = pink_light
+    number::String              = blue
+    operator::String            = "$red bold"
+    func::String                = yellow
 
     # loggin levels
-    info::String = "#90CAF9"  # blue
-    debug::String = "#90CAF9"  # blue
-    warn::String = "#ff681c"  # orange
-    error::String = "bold red"  # orange
+    info::String                = blue
+    debug::String               = blue
+    warn::String                = orange
+    error::String               = "bold $red"
+
+    # Tree objects
+    tree_title_style::String    = "$orange italic"
+    tree_node_style::String     = "$yellow italic"
+    tree_leaf_style::String     = yellow_light
+    tree_guide_style::String    = blue
 end
 
 theme = Theme() # default theme

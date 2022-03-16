@@ -1,13 +1,10 @@
 using Term
 import Term.progress: track, ProgressBar, update, start, stop
-import Term.consoles: clear, line
+import Term.consoles: clear
 import Term.color: RGBColor
-
-clear()
 
 
 tprint(hLine("progress bars"; style="blue"))
-line()  # print a new line
 
 """
 The easiest way to use Term's progress bars is through the 
@@ -29,7 +26,6 @@ But you can do it manually if you want more control over it
 """
 # create progress bar
 pbar = ProgressBar(;N=250, description="Manual pbar", width=120)
-line()
 # loop da loop
 for i in 1:250
     # do stuff
@@ -112,7 +108,6 @@ cols = [
     MyCol("bold red"),
 ]
 
-line()
 for i in track(1:100; columns=cols)
     sleep(.01)
 end
@@ -135,6 +130,4 @@ for i in 1:3
 end
 tprint("[bright_blue bold]poof![/bright_blue bold] [underline bright_blue]They disappeared[/]")
 
-
-line(;i=3)
 tprint(hLine("Done"; style="green"))

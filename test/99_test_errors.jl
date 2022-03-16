@@ -17,7 +17,7 @@ will be different from the one you'd expect
     import Term: Panel
     @test_throws AssertionError Panel("mytext", title = "this title is waaaay too long!!!", fit=true)
 
-    @test_throws UndefVarError println(x)
+    @test_throws UndefVarError println(sadfsadfasdsfsd)
 
     @test_throws BoundsError collect(1:10)[20]
 
