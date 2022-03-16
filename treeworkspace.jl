@@ -2,25 +2,11 @@ import Parameters: @with_kw
 import MyterialColors: yellow, orange, red, blue
 
 import Term.layout: vstack
-import Term: loop_last
+import Term: loop_last, replace_double_brackets, escape_brackets
 import Term.segment: Segment
 import Term.measure: Measure
 import Term.renderables: AbstractRenderable
 
-"""
-    iterable(x)
-
-Checks if x is an iterable (but not a string).
-"""
-function iterable(x)
-    x isa AbstractString && return false
-    try
-        iterate(x)
-        return true
-    catch
-        return false
-    end
-end
 
 """
     TreeGuides
@@ -92,6 +78,8 @@ function Base.show(io::IO, tree::Tree)
 end
 
 
+asleaf(x) = (replace_double_brackets ∘ escape_brackets ∘ string)(x)
+
 """
     Tree(data::Union{Dict, Pair}; level=0, title::String="tree", kwargs...)
 
@@ -101,20 +89,18 @@ function Tree(data::Union{Dict, Pair}; level=0, title::String="tree", kwargs...)
     # initialize
     nodes::Vector{Tree} = []
     leaves::Vector{Leaf} = []
-    data = data isa Pair ? Dict(data) : data
+    # data = data isa Pair ? Dict(data) : data
 
     # go over all entries
-    for (k, vv) in zip(keys(data), values(data))
-        # ensure we can loop over items
-        vv = iterable(vv) ? vv : [vv]
-        
-        # dict -> nodes, others -> leaves
-        for v in vv
-            if v isa Dict || v isa Pair
-                push!(nodes, Tree(v; level=level+1, title=string(k)))
-            else
-                push!(leaves, Leaf(k, string(v)))
-            end
+    for (k, v) in zip(keys(data), values(data))
+        if v isa Dict
+            push!(nodes, Tree(v; level=level+1, title=string(k)))
+        elseif v isa Pair
+            @info "v isa pair" v
+            push!(leaves, Leaf(v.first, asleaf(v.second)))
+        else
+            @info "v isa" v
+            push!(leaves, Leaf(k, asleaf(v)))
         end
     end
 
@@ -143,67 +129,109 @@ end
 
 Render a `Tree` into segments. Recursively handle nested trees.
 """
-function render(tree::Tree)::Vector{Segment}
+function render(tree::Tree; prevhasleaves=true, lasttree=false)::Vector{Segment}
     guides = getguides(tree.guide_stype, tree.guide_style)
+    hasleaves = length(tree.leaves) > 0
+    hasanodes = length(tree.nodes) > 0
+    haschildren = hasanodes || hasleaves
+
 
     segments::Vector{Segment}=[]
-    _add(x::String,) = push!(segments, Segment(x,))
-    _add(x::String, style) = push!(segments, Segment(x, style))
+    function _add(x::String, style)
+        push!(segments, Segment(x, style))
+    end
+    _add(x::String) = _add(x, "default")
 
     # get spacing based on what was before
-    pre = "[$(tree.guide_style)]$(guides.vline^tree.level)[/$(tree.guide_style)]"
-
+    if haschildren && !lasttree
+        pre = "[$(tree.guide_style)]$(guides.vline^tree.level)[/$(tree.guide_style)]"
+    else
+        pre = "[$(tree.guide_style)]$(guides.space^tree.level)[/$(tree.guide_style)]"
+    end
 
     # render initial part
     if tree.level == 0
         _add(tree.name, tree.title_style)
     else
-        _pre = guides.vline^(tree.level-1) * guides.branch
+        if prevhasleaves && !lasttree
+            _pre = guides.vline^(tree.level-1) * guides.branch
+        else
+            _pre = guides.vline^(tree.level-1) * guides.leaf
+        end
         _add(_pre * "[$(tree.node_style)]$(tree.name)[/$(tree.node_style)]")
     end
     tree.level == 0 && _add(pre * guides.vline)
 
     # render sub-trees
-    for node in tree.nodes
-        append!(segments, render(node))
-        _add(pre * guides.vline)
+    for (last, node) in loop_last(tree.nodes)
+        islast = last && !hasleaves
+        append!(segments, render(node; prevhasleaves=haschildren, lasttree=islast))
+        hasleaves && _add(pre * guides.vline)
     end
 
     # render leaves
-    for (last, leaf) in loop_last(tree.leaves)
-        seg = last ? guides.leaf : guides.branch
-        _add(pre * seg * "[$(tree.node_style) dim]$(leaf.name)[/$(tree.node_style) dim]: [$(tree.leaf_style)]$(leaf.text)[/$(tree.leaf_style)]")
+    if hasleaves
+        for (last, leaf) in loop_last(tree.leaves)
+            seg = last ? guides.leaf : guides.branch
+            k = "[$(tree.node_style) dim]$(leaf.name)[/$(tree.node_style) dim]"
+            v = "[$(tree.leaf_style)]$(leaf.text)[/$(tree.leaf_style)]"
+            _add(pre * seg * "$k: $v")
+        end
     end
 
     return segments
 end
 
 
+# ---------------------------------------------------------------------------- #
+#                                   EXAMPLES                                   #
+# ---------------------------------------------------------------------------- #
+
+# d = Dict(
+#     "nested" => Dict(
+#         "n1"=>1,
+#         "n2"=>2,
+#     ),  
+# )
+
+
+# d = Dict(
+#     "nested" => Dict(
+#         "n1"=>1,
+#         "n2"=>2,
+#     ),  
+#     "nested2" => Dict(
+#         "n1"=>[1, 2, 3],
+#         "n2"=>2,
+#     ),  
+# )
+
 
 d = Dict(
-    "deep" => Dict(
-        "deeper" => [
-                1, 
-                2, 
-                Dict(
-                    "aleaf"=>:x,
-                    "anotherleaf"=>1+1,
-                )
-        ],
-        "deep'sleaf"=>"unbeliefable",
-    ),
-    "name" => "test",
-    "aleaf" => 1,
-
+    "nested" => Dict(
+        "deeper"=>Dict(
+            "aleaf"=>"unbeliefable",
+            "leaflet"=>"level 3"
+        ),
+        "n2"=>Int,
+        "n3"=>1 + 2,
+    ),  
+    "nested2" => Dict(
+        "n1"=>[1, 2, 3],
+        "n2"=>2,
+    ),  
 )
 
-# TODO: fix bug with leaves not being assigned correctly...
-# TODO: fix widths
+# ----------------------------------- full ----------------------------------- #
+
+# TODO: allow for nested trees to print out correctly
+# TODO: fix misplaced guides
+# TODO: fill in widths function
 
 tree = Tree(d)
 
-import Term: Panel
-pan = Panel(tree; title="A tree", style="dim", fit=true, title_style="bold white", padding=(0, 0, 0, 0))
-print(pan)
+# import Term: Panel
+# pan = Panel(tree; title="A tree", style="dim", fit=true, title_style="bold white", padding=(0, 0, 0, 0))
+# print(pan)
 
-# print(tree * tree)
+print(tree)
