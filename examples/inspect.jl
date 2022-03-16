@@ -9,7 +9,7 @@ can go on the GitHub repository and look around, or yo can use Term!
 Term provides an `inspect` method that provides a lot of useful information!
 """
 
-import Term: inspect
+import Term: inspect, typestree
 
 # define some types
 abstract type T1 end
@@ -75,3 +75,9 @@ inspect(inspect)
 as you can see inspect prints the docstrings of the methods it can find and lists some of 
 the methods available.
 """
+
+"""
+If you just want to see the type's hierarchy for a type, you can use typestree
+"""
+
+typestree(AbstractFloat)

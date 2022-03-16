@@ -2,7 +2,7 @@ using Highlights.Tokens, Highlights.Themes
 
 import MyterialColors: green,
                 green_light,
-                purple,
+                purple_light,
                 blue,
                 red,
                 green_light,
@@ -26,7 +26,7 @@ style outputs to terminal.
 @with_kw struct Theme
     docstring::String           = green
     string::String              = green_light
-    type::String                = purple
+    type::String                = purple_light
     emphasis::String            = "$blue  bold"
     emphasis_light::String      = green_light
     code::String                = blue_light

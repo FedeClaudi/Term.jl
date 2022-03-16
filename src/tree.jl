@@ -1,6 +1,8 @@
 module tree
 import Base: @kwdef
 import MyterialColors: yellow, orange, red, blue
+using InteractiveUtils
+
 
 import Term: loop_last,
         replace_double_brackets,
@@ -70,6 +72,7 @@ Style an object to render it as a a string
 function asleaf end
 
 asleaf(x) = truncate(highlight(x), 22)
+asleaf(x::Nothing) = nothing
 asleaf(x::AbstractVector) = truncate((replace_double_brackets ∘ escape_brackets ∘ string)(x), 22)
 asleaf(x::AbstractString) = truncate(highlight(x, :string), 22)
 
@@ -79,8 +82,8 @@ asleaf(x::AbstractString) = truncate(highlight(x, :string), 22)
 End items in a `Tree`. No sub-trees.
 """
 struct Leaf
-    name::String
-    text::String
+    name::Union{Nothing, String}
+    text::Union{Nothing, String}
 end
 
 # ----------------------------------- tree ----------------------------------- #
@@ -102,7 +105,7 @@ It renders as a hierarchical structure with lines (guides) connecting the variou
     title_style::String = theme.tree_title_style
     node_style::String = theme.tree_node_style
     leaf_style::String = theme.tree_leaf_style
-    guide_style::String = theme.tree_guide_style
+    guides_style::String = theme.tree_guide_style
     guides_type::Symbol = :standardtree
 end
 
@@ -133,7 +136,6 @@ function Tree(
         kwargs...
     )
 
-
     # initialize
     nodes::Vector{Tree} = []
     leaves::Vector{Leaf} = []
@@ -143,16 +145,18 @@ function Tree(
         if v isa Dict
             push!(nodes, Tree(v; level=level+1, title=truncate(string(k), 22)))
         elseif v isa Pair
-            push!(leaves, Leaf(truncate(v.first, 22), asleaf(v.second)))
+            k = isnothing(v.first) ? nothing : truncate(v.first, 22)
+            push!(leaves, Leaf(v, asleaf(v.second)))
         else
-            push!(leaves, Leaf(truncate(k, 22), asleaf(v)))
+            k = isnothing(k) ? nothing : truncate(string(k), 22)
+            push!(leaves, Leaf(k, asleaf(v)))
         end
     end
 
     # if we're handling the first tree, render it. Otherwise parse nested trees.
     if level > 0
         # we don't need to render
-        return Tree(name=title, level=level, nodes=nodes, leaves=leaves)
+        return Tree(; name=title, level=level, nodes=nodes, leaves=leaves, kwargs...)
     else
         # render and get measure
         segments = render(
@@ -187,8 +191,8 @@ Render a `Tree` into segments. Recursively handle nested trees.
 
 
 """
-function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[])::Vector{Segment}
-    guides = TreeGuides(tree.guides_type, tree.guide_style)
+function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], guides=nothing)::Vector{Segment}
+    guides = isnothing(guides) ? TreeGuides(tree.guides_type, tree.guides_style) : guides
     hasleaves = length(tree.leaves) > 0
 
     segments::Vector{Segment}=[]
@@ -242,17 +246,25 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[])::
             node; 
             prevguides=prev, 
             lasttree=lasttree,
-            waslast=vcat(waslast, lasttree))
+            waslast=vcat(waslast, lasttree),
+            guides=guides
+            )
         )
-        hasleaves && _add(prevguides * guides.vline)
+        hasleaves && length(node.leaves) > 0 && _add(prevguides * guides.vline)
     end
 
     # render leaves
     if hasleaves
         for (last, leaf) in loop_last(tree.leaves)
             seg = last ? guides.leaf : guides.branch
-            k = "[$(tree.leaf_style)]$(leaf.name)[/$(tree.leaf_style)]"
-            _add(prevguides * seg * "$k: $(leaf.text)")
+            if isnothing(leaf.text)
+                k = isnothing(leaf.name) ? "" : highlight(leaf.name)
+                v = ""
+            else
+                k = isnothing(leaf.name) ? "" : "[$(tree.leaf_style)]$(leaf.name)[/$(tree.leaf_style)]: "
+                v = leaf.text
+            end
+            _add(prevguides * seg * k * v)
         end
     end
 
@@ -270,6 +282,68 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[])::
     
 end
 
+# ---------------------------------------------------------------------------- #
+#                                HIERARCHY TREE                                #
+# ---------------------------------------------------------------------------- #
+"""
+Apply style for the type whose hierarchy Tree we are making
+"""
+style_T(T) = "[orange1 italic underline]$T[/orange1 italic underline]"
 
+"""
+    make_hierarchy_dict(x::Vector{DataType}, T::DataType, Tsubs::Dict)::Dict
+
+Recursively create a dictionary with the types hierarchy for `T`.
+`Tsubs` carries information about T's subtypes.
+The Dict is made backwards. From  the deepest levels up.
+"""
+function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::Dict)::Dict
+    data = Dict()
+    prev = ""
+    for (n, y) in enumerate(x)
+        if n == 1
+            continue
+        elseif n < length(x)
+            subs = Dict()
+            for s in subtypes(y)
+                if s == T
+                    subs[style_T(s)] = Tsubs
+                else
+                    subs[string(s)] = nothing
+                end
+            end
+            
+            if n == 2
+                data = subs
+            else
+                subs[prev] = data
+                data = subs
+            end
+
+            prev = string(y)            
+        end
+    end
+    return data
+end
+
+"""
+    Tree(T::DataType)::Tree
+
+Construct a `Tree` visualization of `T`'s types hierarchy
+"""
+function Tree(T::DataType)::Tree
+    # create a dictionary of types hierarchy
+    subs = Dict(string(s)=>nothing for s in subtypes(T))
+    data = make_hierarchy_dict(supertypes(T), T, subs)
+
+
+    return Tree(
+            data; 
+            # title=string(supertypes(T)[end]),
+            title="Any",
+            title_style="bright_green italic",
+            guides_style="green dim",
+        )
+end
 
 end

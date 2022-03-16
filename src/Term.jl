@@ -22,18 +22,18 @@ include("console.jl")
 include("renderables.jl")
 include("layout.jl")
 include("panel.jl")
-include("inspect.jl")
 include("errors.jl")
 include("logging.jl")
 include("tprint.jl")
 include("progress.jl")
 include("tree.jl")
 include("logo.jl")
+include("inspect.jl")
 
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine
 export theme, highlight
-export inspect
+export inspect, typestree
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
@@ -95,8 +95,6 @@ measure.height(seg::Segment) = seg.measure.h
 measure.height(ren::AbstractRenderable) = ren.measure.h
 
 # ---------------------------------- others ---------------------------------- #
-using .introspection: inspect
-
 using .errors: install_stacktrace
 
 using .logging: install_term_logger, uninstall_term_logger, TermLogger
@@ -106,6 +104,8 @@ using .Tprint: tprint, tprintln
 using .progress: ProgressBar, update, track
 
 using .tree: Tree
+
+using .introspection: inspect, typestree
 
 
 end

@@ -53,7 +53,7 @@ end
 
 # shorthand to highlight objects based on type
 
-highlight(x::DataType; theme::Theme=theme) = highlight(string(x), :type; theme=theme)
+highlight(x::Union{UnionAll, DataType}; theme::Theme=theme) = highlight(string(x), :type; theme=theme)
 highlight(x::Number; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
 highlight(x::Function; theme::Theme=theme) = highlight(string(x), :func; theme=theme)
 highlight(x::Symbol; theme::Theme=theme) = highlight(string(x), :symbol; theme=theme)
