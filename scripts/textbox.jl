@@ -1,12 +1,15 @@
 using Term
 
-prt(tb) = print(tb, tb.measure, "\n")
 
-# prt(TextBox(
-#     "nofit"
-# ))
+prt(pan) = begin
+    print(" " * hLine(pan.measure.w; style="red"))
+    print(vLine(pan.measure.h; style="red") * pan)
+    println(pan.measure, "   ", length(chars(pan.segments[1].plain)), "  ", length(pan.segments) )
+end
 
-print("\n"^20)
+
+
+
 
 # check that unreasonable widhts are ignored
 prt(TextBox(
@@ -39,3 +42,12 @@ prt(TextBox(
     "[red]tru\nncate[/red]test"^1;
     fit=:fit
 ))
+
+
+prt(
+    TextBox(
+    "[red]truncate[/red]test"^8;
+    fit=:fit,
+    justify=:left
+)
+)

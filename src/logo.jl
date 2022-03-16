@@ -62,7 +62,7 @@ function make_logo()
     content =
         circles *
         vspacer *
-        vLine(circles.measure.h; style = indigo * " dim") *
+        vLine(main.measure.h; style = indigo * " dim") *
         main
 
     # add second message

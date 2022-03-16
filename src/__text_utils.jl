@@ -216,6 +216,25 @@ end
 
 # ------------------------------- reshape text ------------------------------- #
 """
+    fillin(text::AbstractString)::AbstractString
+
+Ensure that each line in a multi-line text has the same width.
+"""
+function fillin(text::AbstractString)::AbstractString
+    lines = split_lines(text)
+    length(lines) == 1 && return text
+
+    widths = map(textlen, lines)
+    w = max(widths...)
+    filled::Vector{AbstractString} = []
+    for (i, ln) in enumerate(lines)
+        push!(filled, ln * " "^(w - widths[i]))
+    end
+    return join_lines(filled)
+end
+
+
+"""
     truncate(text::AbstractString, width::Int)
 
 Shorten a string of text to a target width
@@ -261,7 +280,7 @@ end
 
 Get length of text after all style information is removed.
 """
-textlen(x::AbstractString) = (length ∘ remove_markup ∘ remove_markup_open ∘ remove_ansi)(x)
+textlen(x::AbstractString) = (textwidth ∘ remove_markup ∘ remove_markup_open ∘ remove_ansi)(x)
 
 """
     reshape_text(text::AbstractString, width::Int)

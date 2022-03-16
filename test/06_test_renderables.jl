@@ -29,7 +29,7 @@ end
 
     r = Renderable(".\n".^10)
     @test r.measure.w == 1
-    @test r.measure.h == 10
+    @test r.measure.h == 11
 end
 
 

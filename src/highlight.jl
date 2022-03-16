@@ -51,6 +51,20 @@ function highlight(text::AbstractString, like::Symbol; theme::Theme=theme)
     return do_by_line(x -> "[$markup]$x[/$markup]", chomp(text))
 end
 
+# shorthand to highlight objects based on type
+
+highlight(x::DataType; theme::Theme=theme) = highlight(string(x), :type; theme=theme)
+highlight(x::Number; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
+highlight(x::Function; theme::Theme=theme) = highlight(string(x), :func; theme=theme)
+highlight(x::Symbol; theme::Theme=theme) = highlight(string(x), :symbol; theme=theme)
+highlight(x::Expr; theme::Theme=theme) = highlight(string(x), :expression; theme=theme)
+highlight(x::AbstractVector; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
+highlight(x; theme=theme) = string(x)  # capture all other cases
+
+
+
+
+
 # ------------------------------ Highlighters.jl ----------------------------- #
 
 """

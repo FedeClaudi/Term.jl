@@ -1,4 +1,5 @@
 module segment
+import Term
 import Term: remove_markup, remove_ansi
 import ..style: apply_style, MarkupStyle
 import ..measure: Measure
@@ -72,6 +73,29 @@ function Base.show(io::IO, seg::Segment)
     end
 end
 
+
+
+# ---------------------------------------------------------------------------- #
+#                                    LAYOUT                                    #
+# ---------------------------------------------------------------------------- #
+
+"""
+    Term.fillin(segments::Vector{Segment})::Vector{Segment}
+
+Ensure that for each segment the text has the same width
+"""
+function Term.fillin(segments::Vector{Segment})::Vector{Segment}
+    widths = [seg.measure.w for seg in segments]
+    w = max(widths...)
+
+    filled::Vector{Segment} = []
+    for seg in segments
+        push!(filled, Segment(seg.text * " "^(w-seg.measure.w)))
+    end
+    return filled
+end
+
+# -------------------------------- concatenate ------------------------------- #
 """
 concatenate strings and segments
 """

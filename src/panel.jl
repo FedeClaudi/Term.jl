@@ -5,7 +5,8 @@ import Term:
     do_by_line,
     join_lines,
     truncate,
-    textlen
+    textlen,
+    fillin
 
 import ..consoles: console_width, console_height
 import ..measure: Measure
@@ -89,6 +90,9 @@ function Panel(
 
 )
     box = eval(box)  # get box object from symbol
+
+    # if content is text, ensure all lines have same width
+    content = content isa AbstractString ? fillin(content) : content
 
     # get measure
     WIDTH = console_width(stdout)
@@ -298,13 +302,13 @@ function TextBox(
             fit = true
         end
     else
-        width = width > console_width(stdout) ? console_width(stdout) : width
+        width = width > console_width(stdout) ? console_width(stdout) - 4 : width
     end
 
     # truncate or reshape text
     if fit == :truncate
         # truncate the text to fit the given width
-        text = do_by_line(ln -> truncate(ln, width - 4), text)
+        text = do_by_line(ln -> truncate(ln, width - 7), text)
     else
         text = do_by_line((ln) -> reshape_text(ln, width - 4), text)
     end

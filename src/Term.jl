@@ -27,6 +27,7 @@ include("errors.jl")
 include("logging.jl")
 include("tprint.jl")
 include("progress.jl")
+include("tree.jl")
 include("logo.jl")
 
 export RenderableText, Panel, TextBox
@@ -39,6 +40,7 @@ export tprint, tprintln
 export install_stacktrace
 export install_term_logger, uninstall_term_logger
 export track
+export Tree
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -102,6 +104,8 @@ using .logging: install_term_logger, uninstall_term_logger, TermLogger
 using .Tprint: tprint, tprintln
 
 using .progress: ProgressBar, update, track
+
+using .tree: Tree
 
 
 end
