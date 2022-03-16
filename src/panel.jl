@@ -97,9 +97,9 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # define convenience function
-    function resize_text(content)
+    function resize_text(content, _width)
         if content isa AbstractString || content isa RenderableText
-            content = RenderableText(content; width=width-Δw)
+            content = RenderableText(content; width=_width)
             content_measure = content.measure
             return content, content.measure
         else
@@ -124,8 +124,8 @@ function Panel(
             # if content width too large, resize content if its text
             if content_measure.w > WIDTH - Δw
                 width = WIDTH-Δw
-                content, content_measure = resize_text(content)
-                panel_measure = Measure(width+Δw, content_measure.h+Δh)
+                content, content_measure = resize_text(content, width-Δw+2)
+                panel_measure = Measure(width+2, content_measure.h+Δh+2)
             else
                 panel_measure = Measure(content_measure.w+Δw, content_measure.h+Δh+2)
             end
@@ -136,7 +136,7 @@ function Panel(
             if content isa AbstractString || content isa RenderableText
                 width = min(width, WIDTH)
                 if content_measure.w > width-Δw
-                    content, content_measure = resize_text(content)
+                    content, content_measure = resize_text(content, width-Δw)
                 end
             else
                 # if width too small for content, try to enlarge

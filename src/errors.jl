@@ -32,7 +32,7 @@ const ErrorsExplanations = Dict(
     UndefVarError => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
 )
 
-_width() = min(Console(stderr).width, 120)
+_width() = min(Console(stderr).width, 100)
 
 # ----------------------- error type specific messages ----------------------- #
 

@@ -27,6 +27,7 @@ Stores information about ammount of padding.
     bottom::Int
 end
 
+
 """
     pad(text::AbstractString, target_width::Int, method::Symbol)::String
 

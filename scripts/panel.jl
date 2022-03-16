@@ -1,10 +1,13 @@
 using Term
 import Term: chars
+import Term.consoles: clear
 install_term_logger()
 
+clear()
 
 pprint(pan) = begin
-    print(pan)
+    print(" " * hLine(pan.measure.w; style="red"))
+    print(vLine(pan.measure.h; style="red") * pan)
     println(pan.measure, "   ", length(chars(pan.segments[1].plain)), "  ", length(pan.segments) )
 end
 
@@ -228,6 +231,11 @@ end
 # )
 
 
-pprint(
-    Panel("."^24; padding = [4, 4, 2, 2], fit=true)
-)
+# pprint(
+#     Panel("."^24; padding = [4, 4, 2, 2], fit=true)
+# )
+
+
+# pprint(
+#     Panel("."^24; padding = [0, 0, 0, 0], fit=true)
+# )

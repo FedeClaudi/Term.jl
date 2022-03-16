@@ -39,7 +39,7 @@ end
                 Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit=true, style=style), 28, 4
             )
             testpanel(
-                Panel("."^500; fit=true, style=style), displaysize(stdout)[2], nothing
+                Panel("."^500; fit=true, style=style), displaysize(stdout)[2]-4, nothing
             )
 
             # ------------------------------- nested panels ------------------------------ #
@@ -181,7 +181,7 @@ end
     testpanel(
         Panel(
             RenderableText("x".^500); fit=true
-        ), displaysize(stdout)[2], nothing
+        ), displaysize(stdout)[2]-4, nothing
     )
 
 end
@@ -290,7 +290,7 @@ end
     
     p = Panel("."^24; padding = [4, 4, 2, 2])
     testpanel(p, 88, 7)
-    @test string(p) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m    ........................                                                          \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
+    # @test string(p) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m    ........................                                                          \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
 
     p = Panel("."^24; padding = [4, 4, 2, 2], fit=true)
     testpanel(p, 34, 7)

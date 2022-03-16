@@ -1,7 +1,7 @@
 name = "Term"
 uuid = "22787eb5-b846-44ae-b979-8e399b8463ab"
 authors = ["FedeClaudi <federicoclaudi@protonmail.com> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 Coverage = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
@@ -23,7 +23,7 @@ Coverage = "1"
 Documenter = "0.27"
 Highlights = "0.5"
 JuliaFormatter = "0.22"
-MyterialColors = "0.2"
+MyterialColors = "0.3"
 Parameters = "0.12"
 PkgTemplates = "0.7"
 Revise = "3"
