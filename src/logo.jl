@@ -1,11 +1,11 @@
 function make_logo()
-    circle = """
-        oooo    
-    oooooooooo 
-    oooooooooooo
-    oooooooooooo
-    oooooooooo 
-        oooo    """
+circle = """
+    oooo    
+ oooooooooo 
+oooooooooooo
+oooooooooooo
+ oooooooooo 
+    oooo    """
 
     # create circles
     green = Panel(
@@ -13,6 +13,7 @@ function make_logo()
         fit=true,
         style = "dim #389826",
         justify = :center,
+        padding=(0, 0, 0, 0),
         title = "[italic]Made",
         title_style = "bold red",
     )
@@ -21,6 +22,7 @@ function make_logo()
         fit=true,
         style = "dim #CB3C33",
         justify = :center,
+        padding=(0, 0, 0, 0),
         subtitle = "[italic]with",
         subtitle_style = "bold #b656e3",
         subtitle_justify = :right,
@@ -30,6 +32,7 @@ function make_logo()
         fit=true,
         style = "dim #9558B2",
         justify = :center,
+        padding=(0, 0, 0, 0),
         subtitle = "[italic]Term",
         subtitle_style = "bold #389826",
     )
@@ -39,29 +42,23 @@ function make_logo()
     as_code(x) = "[orange1 italic]`$x`[/orange1 italic]"
 
     main = TextBox(
-        """
-
-        Term.jl is a [#9558B2]Julia[/#9558B2] package for creating styled terminal outputs.
+        """Term.jl is a [#9558B2]Julia[/#9558B2] package for creating styled terminal outputs.
 
         Term provides a simple [italic green4 bold]markup language[/italic green4 bold] toadd [bold bright_blue]color[/bold bright_blue] and [bold underline]styles[/bold underline] to your text.
         More complicated text layout can be created using $(as_code("Renderable")) objects such 
         as $(as_code("Panel")) and $(as_code("TextBox")).
         These can also be nested and stacked to create[italic pink3]fancy[/italic pink3]and [underline]informative[/underline] terminal ouputs for your Julia code""";
-        title = "Term.jl",
-        title_style = indigo * " bold",
-        width = 33,
+        width = 35,
     )
 
     # create "spacers" and stack renderables
-    hspacer = Spacer(green.measure.w / 2 + 2, green.measure.h)
+    hspacer = Spacer(green.measure.w / 2 + 1, green.measure.h)
     line = Spacer(green.measure.w * 2 + 6, 1)
     circles =  line / (hspacer * green * hspacer) / (red * Spacer(2, purple.measure.h) * purple)
 
-    vspacer = Spacer(2, circles.measure.h)
 
     content =
         circles *
-        vspacer *
         vLine(main.measure.h; style = indigo * " dim") *
         main
 
@@ -91,7 +88,7 @@ function make_logo()
             subtitle_justify = :right,
             subtitle_style = "dim",
             fit = true,
-        ) / "" / (Spacer(18, 2) * msg)
+        ) / "" / (Spacer(12, 2) * msg)
 
     return logo
 end
