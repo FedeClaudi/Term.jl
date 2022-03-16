@@ -137,11 +137,16 @@ function render(tree::Tree; prevhasleaves=true, lasttree=false)::Vector{Segment}
 
 
     segments::Vector{Segment}=[]
+
+    """
+        Add a segment to the segments vector
+    """
     function _add(x::String, style)
         push!(segments, Segment(x, style))
     end
     _add(x::String) = _add(x, "default")
 
+    # ------------------------------ render in parts ----------------------------- #
     # get spacing based on what was before
     if haschildren && !lasttree
         pre = "[$(tree.guide_style)]$(guides.vline^tree.level)[/$(tree.guide_style)]"

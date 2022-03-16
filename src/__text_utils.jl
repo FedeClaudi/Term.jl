@@ -245,7 +245,7 @@ function get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
     end
 
     if s2 > length(valid_chars)
-        @warn "How can tag close after valid chars?" tag tag.open tag.close length(
+        @debug "How can tag close after valid chars?" tag tag.open tag.close length(
             valid_chars
         ) tag.text
     else
