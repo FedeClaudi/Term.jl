@@ -2,9 +2,11 @@ import Term: install_term_logger, uninstall_term_logger
 
 install_term_logger()
 
-println("\nTesting logging, stdout temporarily disabled")
-@suppress_out begin
-    @testset "\e[34mLOGS test" begin
+
+@testset "\e[34mLOGS test" begin
+    println("\nTesting logging, stdout temporarily disabled")
+
+    @suppress_out begin
         @test_nothrow @info "my log!"
 
         @test_nothrow @warn "tell us if this was [bold red]undexpected![/bold red]"
@@ -25,7 +27,7 @@ println("\nTesting logging, stdout temporarily disabled")
 
         # uninstall_term_logger()
         # @info "removed"
-        
-
+    
     end
 end
+

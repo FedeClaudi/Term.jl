@@ -1,4 +1,4 @@
-import Term: remove_markup, remove_ansi, truncate, reshape_text, textlen
+import Term: remove_markup, remove_ansi, truncate, reshape_text, textlen, fillin
 import Term.style: apply_style
 
 @testset "\e[34mTU - remove" begin
@@ -36,18 +36,24 @@ import Term.style: apply_style
 end
 
 @testset "\e[34mTU - reshape text" begin
-
-
-
-
-    nlines(x) = length(split(x, "\n"))
-    lw(x) = length(split(x, "\n")[1])
-
     # --------------------------------- truncate --------------------------------- #
     strings = [("a"^20, 6), ("asd"^33, 12), ("c"^3, 22)]
     for (str, w) in strings
         @test length(truncate(str, w)) <= w
     end
+
+    # ---------------------------------- fillin ---------------------------------- #
+    a = """asdasd
+asdasdsaasdasdasdasdsadsadasd
+asdasdasda"""
+    filled = fillin(a)
+
+    @test nlines(filled) == 3
+    @test lw(filled) == 29
+
+    widths = [textlen(ln) for ln in split(filled, "\n")]
+    @test length(unique(widths)) == 1
+
 
     # ---------------------------------- reshape --------------------------------- #
     s1 = "."^500

@@ -1,4 +1,4 @@
-import Term: Panel, TextBox, cleantext, textlen, chars
+import Term: Panel, TextBox
 
 
 
@@ -39,7 +39,7 @@ end
                 Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit=true, style=style), 28, 4
             )
             testpanel(
-                Panel("."^500; fit=true, style=style), displaysize(stdout)[2], nothing
+                Panel("."^500; fit=true, style=style), displaysize(stdout)[2]-4, nothing
             )
 
             # ------------------------------- nested panels ------------------------------ #
@@ -181,7 +181,7 @@ end
     testpanel(
         Panel(
             RenderableText("x".^500); fit=true
-        ), displaysize(stdout)[2], nothing
+        ), displaysize(stdout)[2]-4, nothing
     )
 
 end
@@ -239,7 +239,7 @@ end
                 "nofit"^25;
                 width=1000,
                 justify=justify
-            ),w, nothing)
+            ),w - 4, nothing)
 
         testpanel(
             TextBox(
@@ -247,7 +247,7 @@ end
                 width=100,
                 fit=:truncate,
                 justify=justify
-        ), 100, 4)
+        ), 100, 3)
 
         testpanel(
             TextBox(
@@ -270,18 +270,18 @@ end
                 justify=justify
             ), 68, 4)
 
-        # testpanel(
-        #     TextBox(
-        #         "[red]tru\nncate[/red]test"^8;
-        #         fit=:fit,
-        #         justify=justify
-        #     ), 16, 11)
+        testpanel(
+            TextBox(
+                "[red]truncate[/red]test"^8;
+                fit=:fit,
+                justify=justify
+            ), 100, 4)
 
         testpanel(TextBox(
                 "[red]tru\nncate[/red]test"^1;
                 fit=:fit,
                 justify=justify
-            ), 13, 6)
+            ), 13, 7)
     end
 end
 

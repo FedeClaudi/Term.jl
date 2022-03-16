@@ -1,3 +1,5 @@
+import Term: cleantext, chars, textlen
+
 
 """
 Extensively test a panel making sure it has

@@ -5,7 +5,8 @@ import Term:
     do_by_line,
     join_lines,
     truncate,
-    textlen
+    textlen,
+    fillin
 
 import ..consoles: console_width, console_height
 import ..measure: Measure
@@ -90,6 +91,9 @@ function Panel(
 )
     box = eval(box)  # get box object from symbol
 
+    # if content is text, ensure all lines have same width
+    content = content isa AbstractString ? fillin(content) : content
+
     # get measure
     WIDTH = console_width(stdout)
     padding = padding isa Padding ? padding : Padding(padding...)
@@ -97,9 +101,9 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # define convenience function
-    function resize_text(content)
+    function resize_text(content, _width)
         if content isa AbstractString || content isa RenderableText
-            content = RenderableText(content; width=width-Δw)
+            content = RenderableText(content; width=_width)
             content_measure = content.measure
             return content, content.measure
         else
@@ -124,8 +128,8 @@ function Panel(
             # if content width too large, resize content if its text
             if content_measure.w > WIDTH - Δw
                 width = WIDTH-Δw
-                content, content_measure = resize_text(content)
-                panel_measure = Measure(width+Δw, content_measure.h+Δh)
+                content, content_measure = resize_text(content, width-Δw+2)
+                panel_measure = Measure(width+2, content_measure.h+Δh+2)
             else
                 panel_measure = Measure(content_measure.w+Δw, content_measure.h+Δh+2)
             end
@@ -136,7 +140,7 @@ function Panel(
             if content isa AbstractString || content isa RenderableText
                 width = min(width, WIDTH)
                 if content_measure.w > width-Δw
-                    content, content_measure = resize_text(content)
+                    content, content_measure = resize_text(content, width-Δw)
                 end
             else
                 # if width too small for content, try to enlarge
@@ -298,13 +302,13 @@ function TextBox(
             fit = true
         end
     else
-        width = width > console_width(stdout) ? console_width(stdout) : width
+        width = width > console_width(stdout) ? console_width(stdout) - 4 : width
     end
 
     # truncate or reshape text
     if fit == :truncate
         # truncate the text to fit the given width
-        text = do_by_line(ln -> truncate(ln, width - 4), text)
+        text = do_by_line(ln -> truncate(ln, width - 7), text)
     else
         text = do_by_line((ln) -> reshape_text(ln, width - 4), text)
     end

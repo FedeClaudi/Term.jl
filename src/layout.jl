@@ -67,6 +67,12 @@ function pad(text::AbstractString, left::Int=0, right::Int=0)::String
     return " "^left * text * " "^right
 end
 
+function pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
+    return map(
+        (s)->Segment(" "^left * s.text * " "^right),
+        segments
+    )
+end
 
 # ---------------------------------------------------------------------------- #
 #                                   STACKING                                   #

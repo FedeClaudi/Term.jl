@@ -3,7 +3,7 @@ module renderables
 import ..measure: Measure
 import ..segment: Segment
 import ..consoles: console_width
-import Term: split_lines, reshape_text, do_by_line
+import Term: split_lines, reshape_text, do_by_line, fillin
 
 export AbstractRenderable, Renderable, RenderableText
 
@@ -88,6 +88,9 @@ Construct a `RenderableText` out of a string.
 If a `width` is passed the text is resized to match the width.
 """
 function RenderableText(text::AbstractString, style="default"; width::Union{Nothing,Int} = nothing)
+    # ensure all lines have the same width
+    text = fillin(text)
+
     width = isnothing(width) ? console_width(stdout) : width
     if width isa Number
         width = min(console_width(stdout), width)
