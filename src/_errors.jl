@@ -120,7 +120,7 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
         chomp(line),
         code;
         title = title,
-        width = :fit,
+        fit = true,
         style = "dim blue",
         title_style = "bold bright_yellow",
     )

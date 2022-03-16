@@ -12,7 +12,7 @@ import ..measure: Measure
 import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..segment: Segment
 using ..box
-import ..layout: Padding, vstack
+import ..layout: pad, vstack, Padding
 import ..style: apply_style
 
 export Panel, TextBox
@@ -61,8 +61,15 @@ end
 `title` can be used to specify a title to be addded to the top row and 
 `title_style` and `title_justify` set its appearance and position.
 Same for `subtitle` but for the panel's bottom row.
-`width` and `height` are used to set the `Panel`'s size. If not passed
-they are computed to fit tot the `content`'s size.
+`box` accepts one of the named `Term.box.Box` object and sets
+which box should be used.
+
+`width` and `height` are used to set the `Panel`'s size. 
+If `fit=true` is passed the width and height arguments are 
+ignored and the panel's box is fitted to the content's size
+`justify` (:left, :center, :right) defines how the content should
+be justified withing the panel. 
+`padding` specifies the ammount of padding between the box and the content.
 """
 function Panel(
     content::Union{Nothing, RenderablesUnion};
@@ -77,18 +84,22 @@ function Panel(
     width::Int = 88,
     height::Union{Nothing,Int} = nothing,
     fit::Bool=false,
-    justify = :left,
+    justify::Symbol = :left,
+    padding::Union{Vector, Padding, NTuple} = Padding(2, 2, 0, 0)
+
 )
     box = eval(box)  # get box object from symbol
 
-
     # get measure
     WIDTH = console_width(stdout)
-    HEIGHT = console_height(stdout)
+    padding = padding isa Padding ? padding : Padding(padding...)
+    Δw = padding.left + padding.right + 2
+    Δh = padding.top + padding.bottom
 
-    resize_text(content, content_measure, wodth) = begin
+    # define convenience function
+    function resize_text(content)
         if content isa AbstractString || content isa RenderableText
-            content = RenderableText(content; width=width-4)
+            content = RenderableText(content; width=width-Δw)
             content_measure = content.measure
             return content, content.measure
         else
@@ -96,6 +107,7 @@ function Panel(
         end
     end
 
+    # get measure of panel's box and optionally resize text.
     if isnothing(content)
         if fit
             panel_measure = Measure(3, 2)
@@ -110,12 +122,12 @@ function Panel(
         content_measure = Measure(content)
         if fit
             # if content width too large, resize content if its text
-            if content_measure.w > WIDTH - 4
-                width = WIDTH-4
-                content, content_measure = resize_text(content, content_measure, width)
-                panel_measure = Measure(width+2, content_measure.h+2)
+            if content_measure.w > WIDTH - Δw
+                width = WIDTH-Δw
+                content, content_measure = resize_text(content)
+                panel_measure = Measure(width+Δw, content_measure.h+Δh)
             else
-                panel_measure = Measure(content_measure.w+4, content_measure.h+2)
+                panel_measure = Measure(content_measure.w+Δw, content_measure.h+Δh+2)
             end
         end
 
@@ -123,16 +135,17 @@ function Panel(
             # check that the content fits within the given width
             if content isa AbstractString || content isa RenderableText
                 width = min(width, WIDTH)
-                if content_measure.w > width-2
-                    content, content_measure = resize_text(content, content_measure, width)
+                if content_measure.w > width-Δw
+                    content, content_measure = resize_text(content)
                 end
             else
                 # if width too small for content, try to enlarge
-                width = width < content_measure.w+2 ?  min(content_measure.w+2, WIDTH-2) : width
+                width = width < content_measure.w+Δw ?  min(content_measure.w+Δw, WIDTH-Δw) : width
             end
 
             # get target height
-            height = isnothing(height) ? content_measure.h + 2 : max(height, content_measure.h+2)
+            _h = content_measure.h + Δh + 2
+            height = isnothing(height) ? _h  : max(height, _h)
             panel_measure = Measure(width, height)
         end
     end
@@ -168,27 +181,40 @@ function Panel(
 
     # add a panel row for each content row
     push!(segments, top)
+
+    # add padding lines at top
     left, right = σ(string(box.mid.left)), σ(string(box.mid.right))
+
+    addempty() = push!(segments, Segment(left * " "^(panel_measure.w-2) * right)) 
+    for i in 1:padding.top
+        addempty()
+    end
+
     content_lines = split_lines(content)
 
     for n in 1:(content_measure.h)
-        # get padding
-        line = content_lines[n]
-        padding = Padding(line, panel_measure.w-2, justify)
+        # apply style and pad
+        line = pad(apply_style(content_lines[n]), panel_measure.w-Δw, justify)
+        line = pad(line, padding.left, padding.right)
 
         # make line
-        segment = Segment(left * padding.left * apply_style(line) * padding.right * right)
+        segment = Segment(left * line * right)
 
         push!(segments, segment)
     end
 
     # add empty lines to ensure target height is reached
-    if content_measure.h < panel_measure.h-2
+    if content_measure.h < panel_measure.h - 2 - Δh
         for i in 1:(panel_measure.h-2 - content_measure.h)
-            line = " "^(panel_measure.w-2)
-            push!(segments, Segment(left * line * right))
+            addempty()
         end
     end
+
+    # add padding at the bottom
+    for i in 1:padding.bottom
+        addempty()
+    end
+
     push!(segments, bottom)
 
     return Panel(

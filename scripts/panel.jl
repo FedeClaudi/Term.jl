@@ -5,7 +5,7 @@ install_term_logger()
 
 pprint(pan) = begin
     print(pan)
-    println(pan.measure, "   ", length(chars(pan.segments[1].plain)) )
+    println(pan.measure, "   ", length(chars(pan.segments[1].plain)), "  ", length(pan.segments) )
 end
 
 # TODO test panels layout
@@ -14,18 +14,18 @@ end
 #                                  no content                                  #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- fitted ---------------------------------- #
-pprint(
-    Panel(;fit=true)
-)
+# pprint(
+#     Panel(;fit=true)
+# )
 
-# --------------------------------- unfitted --------------------------------- #
-pprint(
-    Panel()
-)
+# # --------------------------------- unfitted --------------------------------- #
+# pprint(
+#     Panel()
+# )
 
-pprint(
-    Panel(; width=12, height=4)
-)
+# pprint(
+#     Panel(; width=12, height=4)
+# )
 
 
 
@@ -115,7 +115,7 @@ pprint(
 
 # pprint(
 #     Panel(
-#         Panel("."^2050); fit=true
+#         Panel("."^250); fit=true
 #     )
 # )
 
@@ -147,6 +147,12 @@ pprint(
 
 # pprint(
 #     Panel(
+#         Panel("test", width=22);  width=30, height=8
+#     )
+# )
+
+# pprint(
+#     Panel(
 #         Panel("test", width=42);  width=30, height=8
 #     )
 # )
@@ -161,7 +167,7 @@ pprint(
 
 # pprint(
 #     Panel(
-#         Panel("test", width=42,height=12);  width=30, height=8
+#         Panel("test", width=42,height=12);  width=30, height=14
 #     )
 # )
 
@@ -188,7 +194,7 @@ pprint(
 
 # pprint(
 #     Panel(
-#         RenderableText("x".^500); fit=false
+#         RenderableText("x".^500); fit=true
 #     )
 # )
 
@@ -204,3 +210,24 @@ pprint(
 #     )
 # )
 
+# pprint(
+#     Panel("."^50, title="test",
+#                             subtitle="subtest",
+#                             subtitle_style="red",
+#                             fit=false
+#                             )
+# )
+
+
+# ---------------------------------------------------------------------------- #
+#                                    PADDING                                   #
+# ---------------------------------------------------------------------------- #
+
+# pprint(
+#     Panel("."^24; padding = [4, 4, 2, 2])
+# )
+
+
+pprint(
+    Panel("."^24; padding = [4, 4, 2, 2], fit=true)
+)

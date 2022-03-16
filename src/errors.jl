@@ -218,6 +218,7 @@ function install_stacktrace()
     @eval begin
 
         # ---------------------------- handle load errors ---------------------------- #
+
         function Base.showerror(io::IO, er::LoadError, bt; backtrace = true)
             print("\n")
             println(hLine(_width(), "[bold red]LoadError[/bold red]"; style = "dim red"))
@@ -230,6 +231,7 @@ function install_stacktrace()
         prints a line to mark te start of the error followed
         by the error's stack trace
         """
+
         function Base.showerror(io::IO, er, bt; backtrace = true)
             ename = string(typeof(er))
             print(hLine(_width(), "[bold red]$ename[/bold red]"; style = "dim red"))
@@ -247,6 +249,7 @@ function install_stacktrace()
         """
         Re-define Base module function. Prints a nicely formatted error message.
         """
+        
         function Base.display_error(io::IO, er, bt)
             try
                 err, err_msg = style_error(io, er)

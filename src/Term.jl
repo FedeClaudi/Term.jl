@@ -79,7 +79,7 @@ using .consoles: Console, console, err_console, console_height, console_width
 
 using .renderables: AbstractRenderable, Renderable, RenderableText
 
-using .layout: Padding, vstack, hstack, Spacer, vLine, hLine
+using .layout: Padding, vstack, hstack, Spacer, vLine, hLine, pad
 
 using .panel: Panel, TextBox
 

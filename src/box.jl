@@ -2,7 +2,14 @@ module box
 
 import ..segment: Segment
 import ..style: apply_style
-import Term: int, chars, remove_markup_open, get_last_valid_str_idx, get_next_valid_str_idx, join_lines
+import Term: int,
+            chars,
+            remove_markup_open,
+            get_last_valid_str_idx,
+            get_next_valid_str_idx,
+            join_lines,
+            loop_last
+
 
 export get_row, get_title_row
 export ASCII,
@@ -10,15 +17,7 @@ export ASCII,
 export MINIMAL_DOUBLE_HEAD, SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, HORIZONTALS, ROUNDED, HEAVY
 export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
 
-"""
-  loop_last(v::Vector)
 
-  Returns an iterable yielding tuples (is_last, value).
-"""
-function loop_last(v::Vector)
-    is_last = [i == length(v) for i in 1:length(v)]
-    return zip(is_last, v)
-end
 
 # ---------------------------------------------------------------------------- #
 #                                      BOX                                     #
