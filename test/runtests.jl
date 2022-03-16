@@ -79,8 +79,8 @@ tprint("\n\n[bold green]Running: '99_test_errors.jl' ")
 @time @timeit_include("99_test_errors.jl")
 
 # ? EXAMPLES
-tprint("\n\n[bold green]Running: '999_test_examples.jl' ")
-@time @timeit_include("999_test_examples.jl")
+# tprint("\n\n[bold green]Running: '999_test_examples.jl' ")
+# @time @timeit_include("999_test_examples.jl")
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")
