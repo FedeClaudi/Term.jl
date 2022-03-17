@@ -1,4 +1,4 @@
-# Panel API
+# Panel
 ```@meta
 CurrentModule = Term.panel
 ```

@@ -1,4 +1,4 @@
-# Term API
+# Term
 ```@meta
 CurrentModule = Term
 ```

@@ -1,4 +1,4 @@
-# Introspection API
+# Introspection
 ```@meta
 CurrentModule = Term.introspection
 ```

@@ -1,4 +1,4 @@
-# Measure API
+# Measure
 ```@meta
 CurrentModule = Term.measure
 ```

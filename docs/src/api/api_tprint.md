@@ -1,4 +1,4 @@
-# Layout API
+# Layout
 ```@meta
 CurrentModule = Term.Tprint
 ```

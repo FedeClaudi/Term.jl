@@ -1,4 +1,4 @@
-# Logging API
+# Logging
 ```@meta
 CurrentModule = Term.logging
 ```

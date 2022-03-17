@@ -1,4 +1,4 @@
-# Console API
+# Console
 ```@meta
 CurrentModule = Term.consoles
 ```

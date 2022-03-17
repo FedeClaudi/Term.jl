@@ -1,4 +1,4 @@
-# Style API
+# Style
 ```@meta
 CurrentModule = Term.style
 ```

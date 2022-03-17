@@ -1,4 +1,4 @@
-# Box API
+# Box
 
 ```@meta
 CurrentModule = Term.box

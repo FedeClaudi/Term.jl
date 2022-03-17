@@ -1,4 +1,4 @@
-# Markup API
+# Markup
 ```@meta
 CurrentModule = Term.markup
 ```

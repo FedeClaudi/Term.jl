@@ -1,4 +1,4 @@
-# Tree API
+# Tree
 ```@meta
 CurrentModule = Term.tree
 ```
