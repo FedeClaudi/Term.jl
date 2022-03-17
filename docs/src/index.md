@@ -28,7 +28,7 @@ structured visual displays in your terminal.
 
 
 !!! info "`Term` and `rich`"
-    While `Term` was written from scratch in Julia, it's based upon a pre-existing python library called [`rich`](https://github.com/Textualize/rich). If you have never used `rich`, just know that it's absolutely awesome. And its creator, Will McGugan, made it open source for anyone to use. That also meant people like us could took inspiration from `rich` to create related packages in other languages. We are very grateful to Will, and we hope that `Term` will end up beign a fraction as cool as `rich`.
+    While `Term` was written from scratch in Julia, it's based upon a pre-existing python library called [`rich`](https://github.com/Textualize/rich). If you have never used `rich`, just know that it's absolutely awesome. And its creator, Will McGugan, made it open source for anyone to use. That also meant people like us could took inspiration from `rich` to create related packages in other languages. We are very grateful to Will, and we hope that `Term` will end up being a fraction as cool as `rich`.
 
 ### Installation
 In a Julia script:
