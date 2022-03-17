@@ -14,7 +14,7 @@ In this section we will look at `Renderable` objects (subtypes of `AbstractRende
 This section focuses a bit on how renderables work under the hood. If you just want use `Term` and you don't care too much for how it works, skip ahead to the next section!
 
 
-When you venture beyond styling simple strings, virtually every object you'll encounter will be a subtype of the  [`Term.renderables.AbstractRenderable`](@ref) type. We will call these objects renderables. Renderable types vary, but they all must have two fields: [`Term.segment.Segment`](@ref) and [`Term.measure.Measure`](@ref):
+When you venture beyond styling simple strings, virtually every object you'll encounter will be a subtype of the  [`AbstractRenderable`](@ref Term.renderables.AbstractRenderable) type. We will call these objects renderables. Renderable types vary, but they all must have two fields: [`Segment`](@ref Term.segment.Segment) and [`Measure`](@ref Term.measure.Measure):
 
 
 A `Segment` is roughly equivalent to one line of text. Let's take something like this (printed out in your terminal):

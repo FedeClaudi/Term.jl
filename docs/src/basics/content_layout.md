@@ -1,4 +1,4 @@
-# Content layout
+# [Content layout](@id content_layout)
 Okay, so we can style text and we can create fancy panels. Cool. Not enough. If we want to get **real fancy** we need to combine multiple renderable elements. Like this:
 
 ```@example
