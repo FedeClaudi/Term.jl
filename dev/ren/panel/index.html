@@ -28,7 +28,9 @@ HEAVY
 HEAVY_EDGE,
 HEAVY_HEAD,
 DOUBLE,
-DOUBLE_EDGE</code></pre><p>And you can use any of these with your panels:</p><pre><code class="language-julia hljs">print(
+DOUBLE_EDGE</code></pre><p>And you can use any of these with your panels:</p><pre><code class="language-julia hljs">import Term: Panel
+
+print(
     Panel(width=8, box=:DOUBLE, style=&quot;green&quot;) *
     Panel(width=8, box=:HEAVY, style=&quot;white&quot;) *
     Panel(width=8, box=:ROUNDED, style=&quot;red&quot;),
@@ -40,11 +42,8 @@ DOUBLE_EDGE</code></pre><p>And you can use any of these with your panels:</p><pr
 )
 print(&quot;\n&quot;)
 
-# padding!
 print(
-    Panel(&quot;content &quot;^10; fit=true, padding=(0, 0, 0, 0)),
-    Panel(&quot;content &quot;^10; fit=true, padding=(4, 4, 0, 0)),
-    Panel(&quot;content &quot;^10; fit=true, padding=(2, 2, 2, 2)),
+    Panel(&quot;Titles have style too!!&quot;; width = 60, justify = :center, title=&quot;My Title&quot;, title_style=&quot;red bold&quot;, title_justify=:right, subtitle=&quot;Made with Term&quot;, subtitle_style=&quot;dim&quot;, subtitle_justify=:left)
 )</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭────────────────────────────────────────────────────────────────╮
 │  this panel has fixed width, text on the left                  │
 ╰────────────────────────────────────────────────────────────────╯
@@ -55,22 +54,9 @@ print(
 │                                             the text is here!  │
 ╰────────────────────────────────────────────────────────────────╯
 
-╭──────────────────────────────────────────────────────────────────────────────╮
-│content content content content content content content content content       │
-│content                                                                       │
-╰──────────────────────────────────────────────────────────────────────────────╯
-╭──────────────────────────────────────────────────────────────────────╮
-│    content content content content content content content           │
-│    content content content                                           │
-╰──────────────────────────────────────────────────────────────────────╯
-╭──────────────────────────────────────────────────────────────────────────╮
-│                                                                          │
-│                                                                          │
-│  content content content content content content content content         │
-│  content content                                                         │
-│                                                                          │
-│                                                                          │
-╰──────────────────────────────────────────────────────────────────────────╯</code></pre><p>By the way, <code>Panels</code> are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!</p><pre><code class="language-julia hljs">print(
+╭────────────────────────────────────────────── <span class="sgr31"><span class="sgr1">My Title</span></span> ──╮
+│                 Titles have style too!!                  │
+╰─ <span class="sgr2">Made with Term</span> ─────────────────────────────────────────╯</code></pre><p>By the way, <code>Panels</code> are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!</p><pre><code class="language-julia hljs">print(
     Panel(
         Panel(width=18, style=&quot;green&quot;),
         Panel(width=18, style=&quot;white&quot;),
@@ -87,9 +73,7 @@ print(
 │  <span class="sgr37">╰────────────────╯</span>  │
 │  <span class="sgr31">╭────────────────╮</span>  │
 │  <span class="sgr31">╰────────────────╯</span>  │
-╰──────────────────────╯</code></pre><h2 id="Size-and-fitting"><a class="docs-heading-anchor" href="#Size-and-fitting">Size &amp; fitting</a><a id="Size-and-fitting-1"></a><a class="docs-heading-anchor-permalink" href="#Size-and-fitting" title="Permalink"></a></h2><p>By default <code>Panel</code>s are created to be 88 in width (or less if you have a small terminal) and as high as required to fit your content (+2 for the top and bottom line). If you content is narrowe than the panel&#39;s width, then all is good (and you can use <code>justify</code> to place it as you like). If not, there&#39;s two options: reshape your text to fit in the panel or enlarge the panel to envelop your content. The first is used when the content is a text type, the latter if its another renderable:</p><pre><code class="language-julia hljs">import Term: Panel
-
-reshaped = Panel(&quot;very long text&quot;^25)
+╰──────────────────────╯</code></pre><h2 id="Size-and-fitting"><a class="docs-heading-anchor" href="#Size-and-fitting">Size &amp; fitting</a><a id="Size-and-fitting-1"></a><a class="docs-heading-anchor-permalink" href="#Size-and-fitting" title="Permalink"></a></h2><p>By default <code>Panel</code>s are created to be 88 in width (or less if you have a small terminal) and as high as required to fit your content (+2 for the top and bottom line). If you content is narrowe than the panel&#39;s width, then all is good (and you can use <code>justify</code> to place it as you like). If not, there&#39;s two options: reshape your text to fit in the panel or enlarge the panel to envelop your content. The first is used when the content is a text type, the latter if its another renderable:</p><pre><code class="language-julia hljs">reshaped = Panel(&quot;very long text&quot;^24)
 
 print(
     reshaped,
@@ -99,7 +83,7 @@ print(
 │  textvery long textvery long textvery long textvery long textvery long       │
 │  textvery long textvery long textvery long textvery long textvery long       │
 │  textvery long textvery long textvery long textvery long textvery long       │
-│  textvery long textvery long textvery long textvery long textvery long text  │
+│  textvery long textvery long textvery long textvery long text                │
 ╰──────────────────────────────────────────────────────────────────────────────╯
 ╭──────────────────────────────────────────────────────────────────────────────────────╮
 │  ╭──────────────────────────────────────────────────────────────────────────────╮    │
@@ -107,7 +91,7 @@ print(
 │  │  textvery long textvery long textvery long textvery long textvery long       │    │
 │  │  textvery long textvery long textvery long textvery long textvery long       │    │
 │  │  textvery long textvery long textvery long textvery long textvery long       │    │
-│  │  textvery long textvery long textvery long textvery long textvery long text  │    │
+│  │  textvery long textvery long textvery long textvery long text                │    │
 │  ╰──────────────────────────────────────────────────────────────────────────────╯    │
 ╰──────────────────────────────────────────────────────────────────────────────────────╯</code></pre><p>If you want to though, you can set the size to be whatever you like:</p><pre><code class="language-julia hljs">print(
     Panel(; width=22, height=9)
@@ -147,4 +131,4 @@ print(
 │                            │
 │                            │
 │                            │
-╰────────────────────────────╯</code></pre><p>The syntax is <code>(left, right, top, bottom)</code> and the default is <code>(2, 2, 0, 0)</code>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../text/">« RenderableText</a><a class="docs-footer-nextpage" href="../tbox/">TextBox »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Thursday 17 March 2022 18:17">Thursday 17 March 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+╰────────────────────────────╯</code></pre><p>The syntax is <code>(left, right, top, bottom)</code> and the default is <code>(2, 2, 0, 0)</code>.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../text/">« RenderableText</a><a class="docs-footer-nextpage" href="../tbox/">TextBox »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Thursday 17 March 2022 18:38">Thursday 17 March 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
