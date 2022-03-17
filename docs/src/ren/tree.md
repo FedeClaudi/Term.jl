@@ -68,7 +68,7 @@ print(
 ## TypeTree
 As you know, Julia allows for hierarchical types structures. Trees are for visualizing hierarchical data structures. So...
 
-```@exaple
+```@example
 import Term: typestree
 
 typestree(AbstractFloat)

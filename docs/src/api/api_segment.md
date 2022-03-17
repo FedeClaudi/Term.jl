@@ -1,4 +1,4 @@
-# Segment
+# Segment API
 ```@meta
 CurrentModule = Term.segment
 ```

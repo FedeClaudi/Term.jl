@@ -1,4 +1,4 @@
-# Renderables
+# Renderables API
 ```@meta
 CurrentModule = Term.renderables
 ```

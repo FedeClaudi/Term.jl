@@ -1,4 +1,4 @@
-# Errors
+# Errors API
 ```@meta
 CurrentModule = Term.errors
 ```

@@ -1,4 +1,4 @@
-# ProgressBars
+# ProgressBars API
 
 ```@meta
 CurrentModule = Term.progress

@@ -74,7 +74,7 @@ println(
 ```
 
 
-what's that red text doing in there? We didn't use `tprint`, or `apply_style`, we didn't put it into a [`RenderableText`](@ref RtexDoc) or a [`TextBox`](@ref TBoxDoc) (see [Renderables](@ref RenIntro))... why didn't it print as `"[bold red]supripse![/bold red]"`??
+what's that red text doing in there? We didn't use `tprint`, or `apply_style`, we didn't put it into a [`RenderableText`](@ref RtextDoc) or a [`TextBox`](@ref TBoxDoc) (see [Renderables](@ref RenIntro))... why didn't it print as `"[bold red]supripse![/bold red]"`??
 
 The answer is that stacking operators return the generic `Renderable` type object, and `Renderable`s apply their styles before printing out to console. Okay, not a huge surprise I guess, but I just wanted an excuse to say that regardless of what goes into `*` and `/` the output is a generic `Renderable` (well with the exception of `*` between two strings which returns a string; also `*` and `/` don't work with things like `::Number` & co., but you get the idea). The reason for the generic `Renderable` type is that the product of two stacked renderables should act as a unitary single renderable in its own right. You should be able to print it, stack it etc... So `Renderable` is the simplest type of renderable that can do this (it only has segments and measure, no other features - see previous section), so when we stack together multiple different types of renderables we create a generic container. 
 
