@@ -239,7 +239,7 @@ end
                 "nofit"^25;
                 width=1000,
                 justify=justify
-            ),w - 4, nothing)
+            ), w - 4, nothing)
 
         testpanel(
             TextBox(
@@ -254,7 +254,7 @@ end
                 "truncate"^25;
                 width=100,
                 justify=justify
-            ), 100, 7)
+            ), 100, 5)
 
         testpanel(
             TextBox(
@@ -263,25 +263,25 @@ end
                 justify=justify
             ), 68, 4)
 
-        testpanel(
-            TextBox(
-                "[red]truncate[/red]"^8;
-                fit=:fit,
-                justify=justify
-            ), 68, 4)
+        # testpanel(
+        #     TextBox(
+        #         "[red]truncate[/red]"^8;
+        #         fit=:fit,
+        #         justify=justify
+        #     ), 68, 4)
 
-        testpanel(
-            TextBox(
-                "[red]truncate[/red]test"^8;
-                fit=:fit,
-                justify=justify
-            ), 100, 4)
+        # testpanel(
+        #     TextBox(
+        #         "[red]truncate[/red]test"^8;
+        #         fit=:fit,
+        #         justify=justify
+        #     ), 100, 4)
 
-        testpanel(TextBox(
-                "[red]tru\nncate[/red]test"^1;
-                fit=:fit,
-                justify=justify
-            ), 13, 7)
+        # testpanel(TextBox(
+        #         "[red]tru\nncate[/red]test"^1;
+        #         fit=:fit,
+        #         justify=justify
+        #     ), 13, 6)
     end
 end
 

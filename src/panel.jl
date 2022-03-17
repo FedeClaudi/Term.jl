@@ -310,7 +310,7 @@ function TextBox(
         # truncate the text to fit the given width
         text = do_by_line(ln -> truncate(ln, width - 7), text)
     else
-        text = do_by_line((ln) -> reshape_text(ln, width - 4), text)
+        text = do_by_line((ln) -> reshape_text(ln, width - 6), text)
     end
     
     # create panel with text inside

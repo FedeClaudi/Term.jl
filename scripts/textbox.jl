@@ -1,5 +1,5 @@
 using Term
-
+import Term: chars
 
 prt(pan) = begin
     print(" " * hLine(pan.measure.w; style="red"))

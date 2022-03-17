@@ -109,4 +109,8 @@ tree_dict_4 = Dict(
             guides_style="red dim"
         ), 30, 6
     )
+
+    # test with no errors
+    @test_nothrow Tree(Float64)
+    @test_nothrow Tree(AbstractFloat)
 end
