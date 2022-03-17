@@ -13,6 +13,7 @@ makedocs(;
         assets = String[],
         collapselevel = 1,
     ),
+    strict=false,
     pages = [
         "Home" => "index.md",
         "Basics" => Any[

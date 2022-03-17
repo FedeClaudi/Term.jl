@@ -2,7 +2,7 @@
 
 The `Tree` renderable shows hierarchical structures:
 
-```@example
+```@example tree
 import Term.tree: Tree
 
 data = Dict(
@@ -18,8 +18,7 @@ As you can see, the starting point is a `Dict` with `key -> value` entries which
 
 If you have nested data, just create nested dictionaries!
 
-```@example
-import Term.tree: Tree
+```@example tree
 
 data = Dict(
     "a" => 1,
@@ -35,18 +34,7 @@ print(Tree(data))
 
 Easy! [`Tree](@ref) has lots of options to allow you to style it as you like:
 
-```@example
-import Term.tree: Tree # hide
-
-data = Dict( # hide
-    "a" => 1, # hide
-    "b" => Int64, # hide
-    "deep" => Dict( # hide
-            "x" => 1, # hide
-            "y" => :x # hide
-    ), # hide
-) # hide
-
+```@example tree
 print(
     Tree(data,
         title="my custom tree",
@@ -59,7 +47,8 @@ print(
 ```
 
 And of course trees behave just like any renderable so you can create layouts with them:
-```@example
+```@example 
+import Term: Panel, Tree
 data = Dict(
     "a" => 1,
     "b" => Int64,
@@ -72,7 +61,7 @@ data = Dict(
 tree = Tree(data)
 
 print(
-    ("\n" / tree) * "  " * Panel(tree;fit=true)
+    ("\n" / tree) * "  " * Panel(tree; fit=true)
 )
 ```
 

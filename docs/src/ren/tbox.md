@@ -3,7 +3,7 @@
 In fact you can think of  just a panel with a some text inside and with its box hidden. 
 Why do we need them, you say? Well because now you can have a piece of text, with a nice title and sub title.
 
-```@example
+```@example tbox
 import Term: TextBox
 
 print(
@@ -21,7 +21,7 @@ print(
 
 Okay, admittedly that's not huge. But it still nice to have. It also helps with keeping layout consistent when mixing panels and text, have a look:
 
-```@example
+```@example tbox
 import Term: RenderableText, Panel
 
 t = ","^100
@@ -36,11 +36,7 @@ print(
 ```
 you see? The panel and the text have the same width, BUT, the panel must fit its box, some padding *and* its content within the same width. So the size of the text inside will need to change compared to `RenderableText(t; width=22)`. If we use a `TextBox` on the other hand:
 
-```@example
-
-import Term: TextBox, Panel # hide
-
-t = ","^100 # hide
+```@example tbox
 
 tbox = TextBox(t, width=22)
 panel = Panel(t, width=22)
@@ -55,7 +51,7 @@ Now the two pieces of text look the same and the final layout is a lot more homo
 ## Fitting and truncating
 Like for panel, we have a few options on how we want the length of the text and the size of the textbox to look like. The simplest thing is specifying the width of the textbox, the text will be reshaped to fit in:
 
-```@example
+```@example tbox2
 import Term: TextBox 
 text = "x"^500
 
@@ -65,18 +61,13 @@ print(TextBox(text; width=44))
 
 But we can also fit the box to the text. In that case the box will be as large as it needs to be (still fitting within your terminal window):
 
-```@example
-import Term: TextBox # hide
-text = "x"^500 # hide
-
+```@example tbox2
 print(TextBox(text; fit=:fit))
 ```
 
 and finally, we can truncate the text so that it's as wide at the box,  discarding what's left:
 
-```@example
-import Term: TextBox # hide
-text = "x"^500 # hide
+```@example tbox2
 
 print(TextBox(text; fit=:truncate))
 ```

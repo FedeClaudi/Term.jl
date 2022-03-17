@@ -59,9 +59,8 @@ DOUBLE_EDGE
 ```
 
 And you can use any of these with your panels:
-```@example
-
-import Term: Panel # hide
+```@example panel
+import Term: Panel
 
 print(
     Panel(width=8, box=:DOUBLE, style="green") *
@@ -72,9 +71,7 @@ print(
 
 
 Let's look at some more examples:
-```@example
-
-import Term: Panel # hide
+```@example panel
 
 print(
     Panel("this panel has fixed width, text on the left"; width = 66, justify = :left),    
@@ -83,19 +80,14 @@ print(
 )
 print("\n")
 
-# padding!
 print(
-    Panel("content "^10; fit=true, padding=(0, 0, 0, 0)),
-    Panel("content "^10; fit=true, padding=(4, 4, 0, 0)),
-    Panel("content "^10; fit=true, padding=(2, 2, 2, 2)),
+    Panel("Titles have style too!!"; width = 60, justify = :center, title="My Title", title_style="red bold", title_justify=:right, subtitle="Made with Term", subtitle_style="dim", subtitle_justify=:left)
 )
+
 ```
 
 By the way, `Panels` are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!
-```@example
-
-import Term: Panel # hide
-
+```@example panel
 print(
     Panel(
         Panel(width=18, style="green"),
@@ -112,14 +104,10 @@ print(
 ## Size & fitting
 By default `Panel`s are created to be 88 in width (or less if you have a small terminal) and as high as required to fit your content (+2 for the top and bottom line). If you content is narrowe than the panel's width, then all is good (and you can use `justify` to place it as you like). If not, there's two options: reshape your text to fit in the panel or enlarge the panel to envelop your content. The first is used when the content is a text type, the latter if its another renderable:
 
-```@meta
-CurrentModule = Term
-```
-```@example
 
-import Term: Panel
+```@example panel
 
-reshaped = Panel("very long text"^25)
+reshaped = Panel("very long text"^24)
 
 print(
     reshaped,
@@ -128,9 +116,7 @@ print(
 ```
 
 If you want to though, you can set the size to be whatever you like:
-```@example
-import Term: Panel # hide
-
+```@example panel
 print(
     Panel(; width=22, height=9)
 )
@@ -138,8 +124,7 @@ print(
 
 Sometimes though, you just want your panel to snugly envelop your content without extra space and without having to specify the width. Easy:
 
-```@example
-import Term: Panel  # hide
+```@example panel
 
 p = Panel(; width=22, height=4)
 print(
@@ -149,10 +134,8 @@ print(
 
 ## Padding
 You'll notice in the example above that there's still some space around our nested panel, even though we wanted `fit=true`, why is that? Well, `Panel` by default applies some `Padding` around your content. You can control how much padding you want:
-```@example
-import Term: Panel # hide
+```@example panel
 
-p = Panel(; width=22, height=4) # hide
 print(
     Panel(p; fit=true, padding=(0, 0, 0, 0)),
     Panel(p; fit=true, padding=(3, 3, 3, 3)),

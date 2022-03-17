@@ -3,7 +3,7 @@
 ```@example
 using Term # hide
 rend = RenderableText("""
-    [bold red]Woah, my first [yellow italic]`Renderable`!
+[bold red]Woah, my first [yellow italic]`Renderable`!
 """)
 print(rend)
 ```
@@ -15,8 +15,9 @@ Now, do we really need a whole new type just to print a bit of text? Of course n
 ```@example
 import Term: RenderableText
 
-rend = RenderableText("."^100; width=25)
-print(rend)
+print(RenderableText(","^100; width=25))
+print("\n"^2)
+print(RenderableText(","^100; width=50))
 ```
 
 magic! When we pass a width argument `RenderableText` reshapes our input text to the desired width! As you can imagine, when you're creating a layout made up of multiple elements, you want to be able to control the width of each element, so here you go! 
