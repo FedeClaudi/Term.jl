@@ -5,7 +5,7 @@ CurrentModule = Term.tree
 
 
 ```@index
-Pages   = ["api_tree.ms"]
+Pages   = ["api_tree.md"]
 ```
 
 

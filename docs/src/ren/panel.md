@@ -1,4 +1,4 @@
-## Panel
+# [Panel](@id PanelDocs)
 Okay, time to move beyond simple text. It's time for:
 ```@example
 import Term: Panel # hide
@@ -17,9 +17,9 @@ print(# hide
 ) # hide
 ```
 
-Simply put, a `Panel` showing a piece of content (generally a styled string, but it can be any `Renderable` really) surrounded by a box. Simple but effective.
+Simply put, a `Panel` shows a piece of content (generally a styled string, but it can be any `Renderable` really) surrounded by a box. Simple but effective.
 
-Well not that simple actually because `Panel` is the first renderable that allows you lots of options to personalize its appearance. For instance the panel printed above is given by:
+Well not that simple actually because [`Term.panel.Panel`](@ref) is the first renderable that allows you lots of options to personalize its appearance. For instance the panel printed above is given by:
 ```julia
     Panel(
         "[red]awesome[/red]",
@@ -35,7 +35,6 @@ Well not that simple actually because `Panel` is the first renderable that allow
 ```
 
 The first argument is the content, the rest is styling options. As you can see you can specify the titles and subtitles (or leave them out if you prefer, do your thing!), their appearance (via `markup` style information) and their position (`:left, :center` or `:right`). The `style` argument sets the style of the box itself (and title/subtitle if they don't have dedicated style information).
-
 
 The box is created using `Term`'s own `Box` type! It's not worth going too much into exactly how it works, but it's worth pointing out that there's loads of types of boxes:
 ```
@@ -71,6 +70,7 @@ print(
 )
 ```
 
+
 Let's look at some more examples:
 ```@example
 
@@ -91,7 +91,6 @@ print(
 )
 ```
 
-
 By the way, `Panels` are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!
 ```@example
 
@@ -109,3 +108,55 @@ print(
     )
 )
 ```
+
+## Size & fitting
+By default `Panel`s are created to be 88 in width (or less if you have a small terminal) and as high as required to fit your content (+2 for the top and bottom line). If you content is narrowe than the panel's width, then all is good (and you can use `justify` to place it as you like). If not, there's two options: reshape your text to fit in the panel or enlarge the panel to envelop your content. The first is used when the content is a text type, the latter if its another renderable:
+
+```@meta
+CurrentModule = Term
+```
+```@example
+
+import Term: Panel
+
+reshaped = Panel("very long text"^25)
+
+print(
+    reshaped,
+    Panel(reshaped)
+)
+```
+
+If you want to though, you can set the size to be whatever you like:
+```@example
+import Term: Panel # hide
+
+print(
+    Panel(; width=22, height=9)
+)
+```
+
+Sometimes though, you just want your panel to snugly envelop your content without extra space and without having to specify the width. Easy:
+
+```@example
+import Term: Panel  # hide
+
+p = Panel(; width=22, height=4)
+print(
+    Panel(p; fit=true)
+)
+```
+
+## Padding
+You'll notice in the example above that there's still some space around our nested panel, even though we wanted `fit=true`, why is that? Well, `Panel` by default applies some `Padding` around your content. You can control how much padding you want:
+```@example
+import Term: Panel # hide
+
+p = Panel(; width=22, height=4) # hide
+print(
+    Panel(p; fit=true, padding=(0, 0, 0, 0)),
+    Panel(p; fit=true, padding=(3, 3, 3, 3)),
+)
+```
+
+The syntax is `(left, right, top, bottom)` and the default is `(2, 2, 0, 0)`.

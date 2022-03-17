@@ -13,26 +13,9 @@ In this section we will look at `Renderable` objects (subtypes of `AbstractRende
 ## AbsractRenderable
 This section focuses a bit on how renderables work under the hood. If you just want use `Term` and you don't care too much for how it works, skip ahead to the next section!
 
-When you venture beyond styling simple strings, virtually every object you'll encounter will be a subtype of the `AbstractRenderable` type. We will call these objects renderables. Renderable types vary, but they all must have two fields: `segments` and `measure`:
 
-```@meta
-CurrentModule = Term.renderables
-```
-```@docs
-Renderable
-```
-```@meta
-CurrentModule = Term.measure
-```
-```@docs
-Measure
-```
-```@meta
-CurrentModule = Term.segment
-```
-```@docs
-Segment
-```
+When you venture beyond styling simple strings, virtually every object you'll encounter will be a subtype of the  [`Term.renderables.AbstractRenderable`](@ref) type. We will call these objects renderables. Renderable types vary, but they all must have two fields: [`Term.segment.Segment`](@ref) and [`Term.measure.Measure`](@ref):
+
 
 A `Segment` is roughly equivalent to one line of text. Let's take something like this (printed out in your terminal):
 ```
@@ -55,7 +38,7 @@ you can think of this as being made of three segments:
 When the renderable get's printed each of its segments is printed separately on a new line, giving the illusion of a single object (if we designed the segments correctly). 
 In addition, the text stored by a `Segment` already has applied style information to it (i.e. markup tags are converted to ANSI codes), so it's ready to print!
 
-In addition to a vector of segments, a renderable is defined by a `Measure` object. Roughly speaking, a `Measure` object stores information about the size of a renderable **as it will appear in the terminal**. Anything can have a measure: a string of text, a segment (the measure of its text) and a renderable (the combined measure of its segments). This information is crucial when we start putting multiple renderables together. For instance the renderable shown above is a `Panel` and a `Panel` can be created to fit a piece of text:
+In addition to a vector of segments, a renderable is defined by a `Measure` object. Roughly speaking, a `Measure` object stores information about the size of a renderable **as it will appear in the terminal**. Anything can have a measure: a string of text, a segment (the measure of its text) and a renderable (the combined measure of its segments). This information is crucial when we start putting multiple renderables together. For instance the renderable shown above is a [Panel](@ref PanelDocs) and a `Panel` can be created to fit a piece of text:
 
 ```@example
 import Term: Panel
@@ -76,5 +59,5 @@ but more on that in the next section.
 
 ## Other renderables
 `Term` comes with a few different types of renderables (we saw `Panel` already, but there's more), but the basic idea is that they are made of segments of text and have a measure. Each renderable has its own additional features on top of that, but those are described more in detail in dedicated pages (look left!).
-Briefly, we have `Panel` which creates stuff like what we've just seen, `RenderableText` which handles rendering text in the console (surprise!) and `TextBox` which is somewhat inbetween the two. Other renderables include things like `Tree` and, in the future, `Table`. Now lets look at how we can put multiple renderables together!
+Briefly, we have `Panel` which creates stuff like what we've just seen, [RenderableText](@ref RtextDoc) which handles rendering text in the console (surprise!) and [TextBox](@ref TBoxDoc) which is somewhat inbetween the two. Other renderables include things like [Tree](@ref TreeDoc) and, in the future, `Table`. Now lets look at how we can put multiple renderables together!
 
