@@ -50,4 +50,5 @@ makedocs(;
     ],
 )
 
+
 deploydocs(; repo = "github.com/FedeClaudi/Term.jl",)
