@@ -50,4 +50,5 @@ makedocs(;
     ],
 )
 
-deploydocs(; repo = "github.com/FedeClaudi/Term.jl", versions=["stable" => "v^", "dev" => "root",  "v#.#.#" ])
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl",     target = "build",
+push_preview = true,)
