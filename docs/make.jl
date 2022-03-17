@@ -23,6 +23,14 @@ makedocs(;
             "basics/content_layout.md",
             "basics/tprint.md"
         ],
+        "Renderables" => Any[
+            "ren/intro.md",
+            "ren/text.md",
+            "ren/panel.md",
+            "ren/tbox.md",
+            "ren/layout_rens.md",
+            "ren/tree.md",
+        ],
         "Advanced" => Any[
             "adv/adv.md",    
             "adv/progressbars.md",

@@ -9,7 +9,7 @@ print(Term.make_logo())
 The example above is composed of panels and textboxes, of course, but also additional lines and spacing elements that can help with the layout. These elements are combined using a very simple syntax to create the whole thing.
 
 ## Nesting
-The easiest way to create a layout is to nest things. We've already seen how to do this with `Panel`s and `TextBox`es:
+The easiest way to create a layout is to nest things. We've already briefly seen how to do this with `Panel`s:
 ```@example
 
 import Term: Panel # hide
@@ -73,9 +73,9 @@ println(
 ```
 
 
-what's that red text doing in there? We didn't use `tprint`, or `apply_style`, we didn't put it into a `RenderableText` or a `TextBox`... why didn't it print as `"[bold red]supripse![/bold red]"`??
+what's that red text doing in there? We didn't use `tprint`, or `apply_style`, we didn't put it into a `RenderableText` or a `TextBox` (see Renderables)... why didn't it print as `"[bold red]supripse![/bold red]"`??
 
-The answer is that stacking operators return the generic `Renderable` type object, and `Renderable`s apply their styles before printing out to console. Okay, not a huge surprise I guess, but I just wanted an excuse to say that regardless of what goes into `*` and `/` the output is a generic `Renderable` (well with the exception of `*` between two strings which returns a string; also `*` and `/` don't work with things like `::Number` & co., but you get the idea).
+The answer is that stacking operators return the generic `Renderable` type object, and `Renderable`s apply their styles before printing out to console. Okay, not a huge surprise I guess, but I just wanted an excuse to say that regardless of what goes into `*` and `/` the output is a generic `Renderable` (well with the exception of `*` between two strings which returns a string; also `*` and `/` don't work with things like `::Number` & co., but you get the idea). The reason for the generic `Renderable` type is that the product of two stacked renderables should act as a unitary single renderable in its own right. You should be able to print it, stack it etc... So `Renderable` is the simplest type of renderable that can do this (it only has segments and measure, no other features - see previous section), so when we stack together multiple different types of renderables we create a generic container. 
 
 Previously we briefly mentioned the idea of the `Measure` or a renderable object. `Measure` stores information about the width and height of a renderable as it will appear in the terminal. When we stack renderables, the `Measure` of the resulting `Renderable` will do the following:
 - if we are using `*` the width will be the sum of widths of the two renderables and the height will be the height  of the tallest renderable
