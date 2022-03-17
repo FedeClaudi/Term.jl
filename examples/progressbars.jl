@@ -128,6 +128,6 @@ for i in 1:3
 
     end
 end
-tprint("[bright_blue bold]poof![/bright_blue bold] [underline bright_blue]They disappeared[/]")
+tprintln("[bright_blue bold]poof![/bright_blue bold] [underline bright_blue]They disappeared[/]")
 
 tprint(hLine("Done"; style="green"))

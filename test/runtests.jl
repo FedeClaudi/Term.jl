@@ -70,17 +70,17 @@ tprint("\n\n[bold green]Running: '14_test_highlight.jl' ")
 tprint("\n\n[bold green]Running: '15_test_progress.jl' ")
 @time @timeit_include("15_test_progress.jl")
 
-# ? 16 5433
+# ? 16 Tree
 tprint("\n\n[bold green]Running: '16_test_tree.jl' ")
 @time @timeit_include("16_test_tree.jl")
 
-# ? ERRORS
+# ? 999 EXAMPLES
+tprint("\n\n[bold green]Running: '999_test_examples.jl' ")
+@time @timeit_include("999_test_examples.jl")
+
+# ? 99 ERRORS
 tprint("\n\n[bold green]Running: '99_test_errors.jl' ")
 @time @timeit_include("99_test_errors.jl")
-
-# ? EXAMPLES
-# tprint("\n\n[bold green]Running: '999_test_examples.jl' ")
-# @time @timeit_include("999_test_examples.jl")
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")

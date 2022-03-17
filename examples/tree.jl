@@ -34,7 +34,7 @@ print(
         title_style="bold red",
         node_style="blue underline",
         leaf_style="green",
-        guide_style="red dim"
+        guides_style="red dim"
     )
 )
 

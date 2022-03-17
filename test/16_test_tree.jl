@@ -72,6 +72,7 @@ tree_dict_4 = Dict(
 
 
 @testset "\e[34mTree" begin
+    # creation
     testpanel(
         Tree(tree_dict), 28, 6
     )
@@ -91,5 +92,21 @@ tree_dict_4 = Dict(
 
     testpanel(
         Tree(tree_dict_4), 33, 19
+    )
+
+    # styling
+    for guides_type in (:standardtree, :boldtree, :asciitree)
+         @test_nothrow Tree(tree_dict; title=string(guides_type), guides_type=guides_type)
+    end
+
+    testpanel(
+        Tree(
+            tree_dict,
+            title="my colors",
+            title_style="bold red",
+            node_style="blue underline",
+            leaf_style="green",
+            guides_style="red dim"
+        ), 30, 6
     )
 end

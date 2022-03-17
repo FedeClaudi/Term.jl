@@ -6,7 +6,7 @@
 
         @test_nothrow include("../examples/inspect.jl")
 
-        @test_nothrow include("../examples/logging.jl")
+        # @test_nothrow include("../examples/logging.jl")
 
         @test_nothrow include("../examples/progressbars.jl")
 

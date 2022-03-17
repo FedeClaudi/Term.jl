@@ -1,6 +1,3 @@
-using Revise
-Revise.revise()
-
 using Term
 import Term: Renderable
 
