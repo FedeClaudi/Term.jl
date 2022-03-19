@@ -57,18 +57,18 @@ end
 # ---------------------------- extract markup tags --------------------------- #
 
 """
-    has_markup(text::AbstractString)
+    has_markup(text::String)
 
 Returns `true` if `text` includes a `MarkupTag`
 """
-has_markup(text::AbstractString) = occursin(OPEN_TAG_REGEX, replace_double_brackets(text))
+has_markup(text::String) = occursin(OPEN_TAG_REGEX, text)
 
 """
-    extract_markup(input_text::AbstractString; firstonly=false)
+    extract_markup(input_text::String; firstonly=false)
 
 Extracts `MarkupTag`s from a piece of text.
 """
-function extract_markup(input_text::AbstractString; firstonly = false)
+function extract_markup(input_text::String; firstonly = false)
     text = input_text  # copy so that we can edit it
     tags = []
 
@@ -125,7 +125,7 @@ end
 # ----------------------------- helper functions ----------------------------- #
 
 """
-    clean_nested_tags(text::AbstractString)::AbstractString
+    clean_nested_tags(text::String)::String
 
 Given a text with nested string like:
 `[red]aaaa [green]bbbb[/green] cccc [blue] ddddd [/blue]eeee[/red]`
@@ -133,7 +133,7 @@ Given a text with nested string like:
 it adds extra tags to ensure that text within inner tags is handled properly, giving:
 `[red]aaaa [green]bbbb[/green][red] cccc [/red][blue] ddddd [/blue][red]eeee[/red]`
 """
-function clean_nested_tags(text::AbstractString)
+function clean_nested_tags(text::String)
     if !has_markup(text)
         return text
     end
@@ -169,12 +169,12 @@ function clean_nested_tags(tag::MarkupTag, text::AbstractString)
 end
 
 """
-    pairup_tags(text::Vector{AbstractString})
+    pairup_tags(text::Vector{String})
 
 Given a vector of string with markup tags not properly closed/opened across lines, 
 it fixes things up.
 """
-function pairup_tags(text::Vector{AbstractString})::Vector{AbstractString}
+function pairup_tags(text::Vector{String})::Vector{String}
     # sweep lines to add tags starts/end
     for i in length(text):-1:1
         # get all open tags
@@ -215,7 +215,6 @@ function pairup_tags(text::Vector{AbstractString})::Vector{AbstractString}
             open_regex = r"\[" * markup * r"\]"
             if !occursin(open_regex, line[1:(match.offset)])
                 line = "[$markup]" * line
-                # @info "injected" markup i line
             end
         end
         text[i] = line

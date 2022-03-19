@@ -77,27 +77,27 @@ See also [`Renderable`](@ref), [`TextBox`](@ref)
 mutable struct RenderableText <: AbstractRenderable
     segments::Vector
     measure::Measure
-    text::AbstractString
+    text::String
 end
 
 """
-    RenderableText(text::AbstractString; width::Union{Nothing, Int, Symbol}=nothing)
+    RenderableText(text::String; width::Union{Nothing, Int, Symbol}=nothing)
 
 Construct a `RenderableText` out of a string.
 
 If a `width` is passed the text is resized to match the width.
 """
-function RenderableText(text::AbstractString, style="default"; width::Union{Nothing,Int} = nothing)
+function RenderableText(text::String, style="default"; width::Union{Nothing,Int} = nothing)
     # ensure all lines have the same width
     text = fillin(text)
 
     width = isnothing(width) ? console_width(stdout) : width
     if width isa Number
         width = min(console_width(stdout), width)
-        text = do_by_line((ln) -> reshape_text(ln, width), text)
+        text = reshape_text(text, width)
     end
 
-    segments = [Segment(line, style) for line in split_lines(chomp(text))]
+    segments = [Segment(line, style) for line in split_lines(text)]
     return RenderableText(segments, Measure(segments), text)
 end
 

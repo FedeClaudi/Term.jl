@@ -1,6 +1,6 @@
 module style
-
 import Parameters: @with_kw
+
 
 import Term: unspace_commas, NAMED_MODES, CODES, ANSICode
 
@@ -133,7 +133,7 @@ Apply a `style` to a `text`.
 function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
     style_init, style_finish = get_style_codes(style)
 
-    return text = style_init * text * style_finish
+    return style_init * text * style_finish
 end
 
 """
@@ -142,8 +142,7 @@ end
 Appliy the style of a markup tag and it's nested tags
 """
 function apply_style(
-    text::AbstractString, tag::MarkupTag; isinner::Bool = false
-)::AbstractString
+    text::AbstractString, tag::MarkupTag; isinner::Bool = false)::AbstractString
     style = MarkupStyle(tag)
     style_init, _ = get_style_codes(style)
 
@@ -166,27 +165,29 @@ function apply_style(
     # apply outer tag
     text = apply_style(text, style)
     # @info "\e[33mdone a style" tag.open.markup style_init text
-
     return text
 end
 
+
+
 """
-    apply_style(text::AbstractString)
+    apply_style(text::String)
 
 Extract and apply all markup style in a string.
 """
-function apply_style(text::AbstractString;)::AbstractString
+function apply_style(text::String;)::String
     # @info "Applying style to " text
     text = clean_nested_tags(text)
 
     while has_markup(text)
-        tag = extract_markup(text; firstonly = true)
+        tag =  extract_markup(text; firstonly = true)
         # @info "tag" tag tag.markup tag.open.start tag.close.stop
 
         pre = text[1:(tag.open.start - 1)]
         post = text[(tag.close.stop + 1):end]
 
-        text = pre * apply_style(text, tag) * post
+        with_style = apply_style(text, tag)
+        text =   pre * with_style * post
         # @info "     \e[31mdoing a style: " tag.markup pre post tag.open.start tag.close.stop
 
     end

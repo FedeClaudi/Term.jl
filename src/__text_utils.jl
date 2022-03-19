@@ -1,108 +1,93 @@
+""" multiple strings replacement, for multiple on Julia version """
+function replace_multi(text, pairs...) ::String
+    VERSION >= v"1.7" && return replace(text, pairs...)
+    VERSION < v"1.7" && begin
+        for pair in pairs
+            text = replace(text, pair)
+        end
+    end
+    return text
+end
 
 # ---------------------------------------------------------------------------- #
 #                                     REGEX                                    #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- markup ---------------------------------- #
-const OPEN_TAG_REGEX = r"\[[a-zA-Z _0-9. ,()#]+[^/\[]\]"
-const CLOSE_TAG_REGEX = r"\[\/[a-zA-Z _0-9. ,()#]+[^/\[]\]"
-const GENERIC_CLOSER_REGEX = r"\[\/\]"
+
+"""
+This regex uses lookahead and lookbehind to exclude [[
+at the beginning of a tag, with this:
+    (?<!\\[)\\[(?!\\[)
+"""
+const OPEN_TAG_REGEX = r"(?<!\[)\[(?!\[)[a-zA-Z _0-9. ,()#]*\]"
+const CLOSE_TAG_REGEX = r"(?<!\[)\[(?!\[)\/[a-zA-Z _0-9. ,()#]+[^/\[]\]"
+const GENERIC_CLOSER_REGEX = r"(?<!\[)\[(?!\[)\/\]"
 
 """
     remove_markup(input_text::AbstractString)::AbstractString
 
 Remove all markup tags from a string of text.
 """
-function remove_markup(input_text::AbstractString)::AbstractString
-    text = replace_double_brackets(input_text)
+remove_markup(input_text)::String = replace_multi(input_text, 
+                                        OPEN_TAG_REGEX => "", 
+                                        GENERIC_CLOSER_REGEX => "", 
+                                        CLOSE_TAG_REGEX => ""
+                                            )
 
-    # remove extra closing tags
-    text = remove_markup_open(text)
-    text = replace(text, GENERIC_CLOSER_REGEX => "")
-    text = replace(text, CLOSE_TAG_REGEX => "")
 
-    return reinsert_double_brackets(text)
-end
-
-"""
-    remove_markup_open(text::AbstractString)
-
-Remove all opening markup tags from a string of text
-"""
-remove_markup_open(text::AbstractString)::AbstractString =
-    replace(text, OPEN_TAG_REGEX => "")
 
 # ----------------------------------- ansi ----------------------------------- #
 const ANSI_REGEXEs = [r"\e\[[0-9]*m", r"\e\[[0-9;]*m"]
 
 """
-    remove_ansi(str::AbstractString)::AbstractString
+    remove_ansi(input_text::AbstractString)::AbstractString
 
 Remove all ANSI tags from a string of text
 """
-function remove_ansi(str::AbstractString)::AbstractString
-    for regex in ANSI_REGEXEs
-        str = replace(str, regex => "")
-    end
-    return str
-end
+remove_ansi(input_text)::String = replace_multi(input_text, 
+                                    ANSI_REGEXEs[1] => "", 
+                                    ANSI_REGEXEs[2] => ""
+                                    )
+
 
 """
     cleantext(str::AbstractString)
 
 Remove all style information from a string.
 """
-cleantext(str::AbstractString) = (remove_ansi ∘ remove_markup_open ∘ remove_markup)(str)
+cleantext(str)::String = (remove_ansi ∘ remove_markup)(str)
 
 # --------------------------------- brackets --------------------------------- #
-const brackets_regexes = [(r"\[", "[["), (r"\]", "]]")]
+const brackets_regexes = [
+    r"(?<!\[)\[(?!\[)",
+    r"(?<!\])\](?!\])",
+]
 
 """
-    remove_ansi(str::AbstractString)::AbstractString
+    remove_ansi(str)::String
 
 Replace each squared bracket with a double copy of itself
 """
-function escape_brackets(text::AbstractString)::AbstractString
-    for (regex, replacement) in brackets_regexes
-        text = replace(text, regex => replacement)
-    end
-    return text
-end
+escape_brackets(text)::String = replace_multi(text, 
+        brackets_regexes[1]=>"[[",
+        brackets_regexes[2]=>"]]",
+)
 
-const remove_brackets_regexes = [(r"\[\[", "["), (r"\]\]", "]")]
+const remove_brackets_regexes = [
+    r"\[\[",
+    r"\]\]",
+]
 
 """
-    unescape_brackets(text::AbstractString)::AbstractString
+    unescape_brackets(text)::String
 
 Replece every double squared parenthesis with a single copy of itself
 """
-function unescape_brackets(text::AbstractString)::AbstractString
-    for (regex, replacement) in remove_brackets_regexes
-        text = replace(text, regex => replacement)
-    end
-    return text
-end
+unescape_brackets(text)::String = replace_multi(text, 
+    remove_brackets_regexes[1]=>"[",
+    remove_brackets_regexes[2]=>"]",
+)
 
-"""
-    replace_double_brackets(text::AbstractString)::AbstractString
-
-Replace double brackets with %% and ±± to avoid them being picked up by markup extraction
-"""
-function replace_double_brackets(text::AbstractString)::AbstractString
-    text = replace(text, "[[" => "%%")
-    text = replace(text, "]]" => "±±")
-    return text
-end
-
-"""
-    reinsert_double_brackets(text::AbstractString)::AbstractString
-
-Insert previously replaced double brackets
-"""
-function reinsert_double_brackets(text::AbstractString)::AbstractString
-    text = replace(text, "%%" => "[[")
-    text = replace(text, "±±" => "]]")
-    return text
-end
 
 # ---------------------------------------------------------------------------- #
 #                                      I/O                                     #
@@ -130,7 +115,7 @@ end
 
 Replace a section of a `text` between `start` and `stop` with `replace`.
 """
-function replace_text(text::AbstractString, start::Int, stop::Int, replace::AbstractString)
+function replace_text(text, start::Int, stop::Int, replace)::String
     if start == 1
         return replace * text[stop:end]
     elseif stop == length(text)
@@ -145,7 +130,7 @@ end
 
 Replace a section of a `text`  between `start` and `stop` with another string composed of repeats of a given character `char`.
 """
-function replace_text(text::AbstractString, start::Int, stop::Int, char::Char = '_')
+function replace_text(text, start::Int, stop::Int, char::Char = '_')::String
     replacement = char^(stop - start - 1)
     return replace_text(text, start, stop, replacement)
 end
@@ -162,44 +147,36 @@ nospaces(text::AbstractString) = replace(text, " " => "")
 
 Remove all () brackets from a string.
 """
-remove_brackets(text::AbstractString) = replace(replace(text, "(" => ""), ")" => "")
+remove_brackets(text)::String = replace_multi(text, "(" => "", ")" => "")
 
-"""
-    square_to_round_brackets(text::AbstractString)
-
-Replace square brackets with round ones.
-"""
-function square_to_round_brackets(text::AbstractString)
-    return replace(replace(text, "[" => "("), "]" => ")")
-end
 
 """
     unspace_commas(text::AbstractString)
 
 Remove spaces after commas.
 """
-unspace_commas(text::AbstractString) = replace(replace(text, ", " => ","), ". " => ".")
+unspace_commas(text)::String = square_to_round_brackets(text, ", " => ",", ". " => ".")
 
 """
 Split a string into a vector of Chars.
 """
-chars(text::AbstractString)::Vector{Char} = [x for x in text]
+chars(text::AbstractString)::Vector{Char} = collect(text)
 
 """
     join_lines(lines)
 
 Merge a vector of strings in a single string.
 """
-join_lines(lines) = join(lines, "\n")
+join_lines(lines::Vector{String})::String = join(lines, "\n")
 
 """
     split_lines(text::AbstractString)
 
 Split a string into its composing lines.
 """
-function split_lines(text::AbstractString)
-    return split(text, "\n")
-end
+split_lines(text::String)::Vector{String} = split(text, "\n")
+split_lines(text::SubString)::Vector{String} = String.(split(text, "\n"))
+
 
 """
     split_lines(renderable)
@@ -207,30 +184,26 @@ end
 Split a renderable's text.
 """
 function split_lines(renderable)
-    if string(typeof(renderable)) == "Segment"
-        return split_lines(renderable.text)
-    else
-        [s.text for s in renderable.segments]
-    end
+    string(typeof(renderable)) == "Segment" && return split_lines(renderable.text)
+    return [s.text for s in renderable.segments]
+
 end
 
 # ------------------------------- reshape text ------------------------------- #
 """
-    fillin(text::AbstractString)::AbstractString
+    fillin(text::String)::String
 
 Ensure that each line in a multi-line text has the same width.
 """
-function fillin(text::AbstractString)::AbstractString
+function fillin(text)::String
     lines = split_lines(text)
     length(lines) == 1 && return text
 
-    widths = map(textlen, lines)
-    w = max(widths...)
-    filled::Vector{AbstractString} = []
-    for (i, ln) in enumerate(lines)
-        push!(filled, ln * " "^(w - widths[i]))
-    end
-    return join_lines(filled)
+    w = max(map(textlen, lines)...)
+    return join_lines(map(
+        (ln) -> ln * " "^(w - textlen(ln)),
+        lines
+    ))
 end
 
 
@@ -240,12 +213,8 @@ end
 Shorten a string of text to a target width
 """
 function truncate(text::AbstractString, width::Int)
-    if textlen(text) <= width
-        return text
-    end
-
-    cut = get_last_valid_str_idx(text, width - 3)
-    return text[1:cut] * "..."
+    textlen(text) <= width && return text
+    return text[1:prevind(text, width - 3)] * "..."
 end
 
 """
@@ -280,10 +249,12 @@ end
 
 Get length of text after all style information is removed.
 """
-textlen(x::AbstractString) = (textwidth ∘ remove_markup ∘ remove_markup_open ∘ remove_ansi)(x)
+textlen(x::String)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
+textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
+
 
 """
-    reshape_text(text::AbstractString, width::Int)
+    reshape_text(text::String, width::Int)
 
 Reshape `text` to have a given `width`.
 
@@ -292,8 +263,7 @@ This is done carefully to preserve style information by: avoiding
 cutting inside style markup and copying markup tags over to new lines
 so that the style is correctly applied.
 """
-function reshape_text(text::AbstractString, width::Int)::AbstractString
-
+function reshape_text(text::String, width::Int)::String
     # check if no work is required
     if textlen(text) <= width
         return text
@@ -308,7 +278,7 @@ function reshape_text(text::AbstractString, width::Int)::AbstractString
     end
 
     # create lines with splitted tex
-    lines::Vector{AbstractString} = []
+    lines::Vector{String} = []
     j = 1
     while textlen(text) > width
         # get a cutting index not in a tag's markup
@@ -328,7 +298,7 @@ function reshape_text(text::AbstractString, width::Int)::AbstractString
 
         # prep line
         try
-            newline = strip(text[1:cut])
+            newline = text[1:cut]
 
             # pad new line with spaces to ensure it has the right lengt
             newline *= " ".^(width - textlen(newline))
@@ -363,71 +333,18 @@ end
 # ------------------------------------ end ----------------------------------- #
 
 """
-    do_by_line(fn::Function, text::AbstractString)
+    do_by_line(fn::Function, text::String)
 
 Apply `fn` to each line in the `text`.
 
-The function `fn` should accept a single `::AbstractString` argument.
+The function `fn` should accept a single `::String` argument.
 """
-function do_by_line(fn::Function, text::AbstractString)
-    lines::Vector{AbstractString} = []
-    for line in split_lines(text)
-        push!(lines, fn(line))
+function do_by_line(fn::Function, text::String)::String
+    out = ""
+    for (last, line) in loop_last(split_lines(text))
+        out *= fn(line) * (last ? "" : "\n")
     end
-    return join_lines(lines)
+    return out
 end
 
-do_by_line(fn, text::Vector) = do_by_line(fn, join_lines(text))
-
-"""
-    get_last_valid_str_idx(str::AbstractString, idx::Int)
-
-Get valid index to cut a string at.
-
-When indexing a string, the number of indices is given by the
-the sum of the `ncodeunits` of each `Char`, but some indices
-will not be valid. This function ensures that given a (potentially)
-not valid index, the last valid one is elected.
-"""
-function get_last_valid_str_idx(str::AbstractString, idx::Int)
-    while !isvalid(str, idx)
-        idx -= 1
-
-        if idx <= 0
-            throw("Failed to find a valid index for $str starting at $idx")
-        end
-    end
-    return idx
-end
-
-function get_last_valid_str_idx(str::AbstractString, idx::Int, valid_places::Vector{Int64})
-    while !isvalid(str, idx) || valid_places[idx] == 0
-        idx -= 1
-
-        if idx == 0
-            break
-        end
-    end
-    return idx
-end
-
-"""
-get_next_valid_str_idx(str::AbstractString, idx::Int)
-
-Get valid index to cut a string at.
-
-When indexing a string, the number of indices is given by the
-the sum of the `ncodeunits` of each `Char`, but some indices
-will not be valid. This function ensures that given a (potentially)
-not valid index, the next valid one is elected.
-"""
-function get_next_valid_str_idx(str::AbstractString, idx::Int)
-    while !isvalid(str, idx)
-        idx += 1
-
-        if idx >= length(str)
-            throw("Failed to find a valid index for $str starting at $idx")
-        end
-    end
-    return idx
-end
+do_by_line(fn::Function, text::Vector)::String = join_lines(fn.(text))
