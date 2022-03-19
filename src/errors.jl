@@ -117,7 +117,7 @@ function error_message(io::IO, er::MethodError; kwargs...)
     # get main error message
     _args = join([string(ar) * _highlight(typeof(ar)) for ar in er.args], "\n      ")
     fn_name = "$(_highlight(string(er.f)))"
-    main_line = "No method matching $fn_name with aguments:\n      " * _args
+    main_line = "No method matching $fn_name with arguments:\n      " * _args
 
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er; context = io), "\n")

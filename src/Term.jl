@@ -47,7 +47,7 @@ using .measure: measure
 using .measure: Measure
 
 # ----------------------------------- style ---------------------------------- #
-using .markup: extract_markup, MarkupTag, pairup_tags
+using .markup: extract_markup, MarkupTag, pairup_tags, has_markup
 
 using .color: NamedColor, BitColor, RGBColor, get_color
 

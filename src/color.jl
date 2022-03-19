@@ -1,8 +1,9 @@
 module color
 
-import Term: NAMED_COLORS, nospaces, COLORS_16b, remove_brackets
+import Term: NAMED_COLORS, nospaces, COLORS_16b, remove_brackets, ANSICode, int, CODES
 
 export NamedColor, BitColor, RGBColor, get_color
+
 
 # ----------------------------- types definition ----------------------------- #
 """
@@ -23,7 +24,6 @@ struct BitColor <: AbstractColor
 end
 
 struct RGBColor <: AbstractColor
-    color::String
     r::Int
     g::Int
     b::Int
@@ -35,34 +35,62 @@ function RGBColor(s::AbstractString)
         g *= 255
         b *= 255
     end
-    return RGBColor(s, (Int64 ∘ round)(r), (Int64 ∘ round)(g), (Int64 ∘ round)(b))
+    return RGBColor(int(r), int(g), int(b))
 end
+
+"""
+    ANSICode(color; bg::Bool=false)
+
+Create ANSI tags for colors.
+"""
+function ANSICode(color::NamedColor; bg::Bool = false)
+    Δ = bg ? 40 : 30
+    v = CODES[color.color]
+    return ANSICode("\e[$(Δ + v)m", "\e[$(Δ+9)m")
+end
+
+function ANSICode(color::BitColor; bg::Bool = false)
+    Δ = bg ? 48 : 38
+    v = CODES_16BIT_COLORS[color.color]
+    return ANSICode("\e[$Δ;5;$(v)m", "\e[$(Δ+1)m")
+end
+
+function ANSICode(color::RGBColor; bg::Bool = false)
+        Δ = bg ? 48 : 38
+        rgb = "$(color.r);$(color.g);$(color.b)"
+        return ANSICode("\e[$Δ;2;$(rgb)m", "\e[$(Δ+1)m")
+end
+
+
 
 # --------------------------------- is color? -------------------------------- #
 """
-    _rgb(numbertype, txt)
+    parse_rgb(numbertype, txt)
 
 Tries to parse r,g,b out of a string based on number type.
 """
-_rgb(number_type, txt) = begin
+function parse_rgb(number_type::Int, txt)::Vector{Int}
     rgb = split(remove_brackets(nospaces(txt)), ",")
-    r = parse(number_type, rgb[1])
-    g = parse(number_type, rgb[2])
-    b = parse(number_type, rgb[3])
-    return r, g, b
+    return map((x)->parse(number_type, x), rgb)
 end
+
+function parse_rgb(number_type::Float64, txt)::Vector{Float64}
+    rgb = split(remove_brackets(nospaces(txt)), ",")
+    return map((x)->parse(number_type, x), rgb)
+end
+
+
 
 """
     _rgb(numbertype, txt)
 
 Tries to parse r,g,b out of a string.
 """
-function _rgb(txt)
+function parse_rgb(txt::String)
     try
-        r, g, b = _rgb(Float64, txt)
-
+        return parse_rgb(Float64, txt)
     catch
-        return _rgb(Int64, txt)
+        return parse_rgb(Int64, txt)
     end
 end
 
@@ -71,20 +99,15 @@ end
 
 Check if a string represents a named color.
 """
-function is_named_color(string::AbstractString)::Bool
-    if string ∈ NAMED_COLORS || string ∈ COLORS_16b
-        return true
-    else
-        return false
-    end
-end
+is_named_color(string)::Bool = string ∈ NAMED_COLORS || string ∈ COLORS_16b
+
 
 """
     is_rgb_color(string::AbstractString)::Bool
 
 Check if a string represents a RGB color.
 """
-function is_rgb_color(string::AbstractString)::Bool
+function is_rgb_color(string)::Bool
     try
         _rgb(string)
         return true
@@ -98,14 +121,10 @@ end
 
 Check if a string represents a hex color.
 """
-function is_hex_color(string::AbstractString)::Bool
+function is_hex_color(string)::Bool
     stripped = nospaces(string)
     l = length(stripped)
-    if stripped[1] == '#' && l == 7
-        return true
-    else
-        return false
-    end
+    return stripped[1] == '#' && l == 7
 end
 
 """
@@ -128,11 +147,8 @@ Check if a string represents background color information, of any type.
 """
 function is_background(string::AbstractString)::Bool
     stripped = nospaces(string)
-    if length(stripped) < 3
-        return false
-    else
-        return stripped[1:3] == "on_" && is_color(stripped[4:end])
-    end
+    length(stripped) < 3 && return false
+    return stripped[1:3] == "on_" && is_color(stripped[4:end])
 end
 
 # --------------------------------- get color -------------------------------- #

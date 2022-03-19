@@ -7,7 +7,8 @@ import Term: remove_markup,
             fillin, truncate,
             do_by_line,
             textlen,
-            join_lines, split_lines
+            join_lines, split_lines,
+            reshape_text
 
 import Term.consoles: clear
 
@@ -58,7 +59,27 @@ fn(l::String)::String = truncate(l, 5)
     fn, text
 )
 
+println("reshape text")
+text = """aaa a  aas[red]red
+red red  red red red redredred[/red] asdsdfsfsfsfsdsfdfsada [blue] blue blue
+blue blueblue blue blueblue  [/blue] asdasd
+asda """
+@time reshape_text(text, 10)
 
+pts = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+@time reshape_text(pts, 20)  
+pts = """Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+ed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+ veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex 
+ ea commodo consequat. Duis aute irure dolor in reprehenderit 
+ in voluptate velit esse cillum dolore eu fugiat nulla 
+ pariatur. Excepteur sint occaecat cupidatat non proident, 
+ sunt in culpa qui officia deserunt mollit anim 
+ id est laborum."""
+@time reshape_text(pts, 10)
+
+
+# TODO reshape_text splitting ANSI tags
 nothing
 
 

@@ -1,34 +1,8 @@
-struct ANSICode
-    open::String
-    close::String
+
+struct ANSICode{T<:AbstractString}
+    open::T
+    close::T
 end
-
-"""
-    ANSICode(color; bg::Bool=false)
-
-Create ANSI tags for colors.
-"""
-function ANSICode(color; bg::Bool = false)
-    ctype = split(string(typeof(color)), ".")[end]
-
-    if ctype == "NamedColor"
-        Δ = bg ? 40 : 30
-        v = CODES[color.color]
-        return ANSICode("\e[$(Δ + v)m", "\e[$(Δ+9)m")
-    elseif ctype == "BitColor"
-        Δ = bg ? 48 : 38
-        v = CODES_16BIT_COLORS[color.color]
-        return ANSICode("\e[$Δ;5;$(v)m", "\e[$(Δ+1)m")
-    elseif ctype == "RGBColor"
-        Δ = bg ? 48 : 38
-        rgb = "$(color.r);$(color.g);$(color.b)"
-        return ANSICode("\e[$Δ;2;$(rgb)m", "\e[$(Δ+1)m")
-    else
-        @warn "Could not figure out color type for $color, can't produce ansi code"
-    end
-end
-
-reset_code(code::ANSICode) = ANSICode(code.close, code.close)
 
 const CODES = Dict(
     :default => ANSICode("\e[22m", "\e[22m"),

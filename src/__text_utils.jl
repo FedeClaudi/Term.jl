@@ -28,11 +28,11 @@ const GENERIC_CLOSER_REGEX = r"(?<!\[)\[(?!\[)\/\]"
 
 Remove all markup tags from a string of text.
 """
-remove_markup(input_text)::String = replace_multi(input_text, 
+remove_markup(input_text)::String = has_markup(input_text) ? replace_multi(input_text, 
                                         OPEN_TAG_REGEX => "", 
                                         GENERIC_CLOSER_REGEX => "", 
                                         CLOSE_TAG_REGEX => ""
-                                            )
+                                            ) : input_text
 
 
 
@@ -56,6 +56,22 @@ remove_ansi(input_text)::String = replace_multi(input_text,
 Remove all style information from a string.
 """
 cleantext(str)::String = (remove_ansi ∘ remove_markup)(str)
+
+"""
+    textlen(x::AbstractString)
+
+Get length of text after all style information is removed.
+"""
+textlen(x::String)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
+textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
+
+"""
+    alllengths(text::String)::Vector{Int}
+
+Get the `textlen` at each char.
+"""
+alllengths(text)::Vector{Int} = map(i->textlen(text[1:i]), 1:length(text))
+
 
 # --------------------------------- brackets --------------------------------- #
 const brackets_regexes = [
@@ -155,7 +171,7 @@ remove_brackets(text)::String = replace_multi(text, "(" => "", ")" => "")
 
 Remove spaces after commas.
 """
-unspace_commas(text)::String = square_to_round_brackets(text, ", " => ",", ". " => ".")
+unspace_commas(text)::String = replace_multi(text, ", " => ",", ". " => ".")
 
 """
 Split a string into a vector of Chars.
@@ -168,6 +184,7 @@ chars(text::AbstractString)::Vector{Char} = collect(text)
 Merge a vector of strings in a single string.
 """
 join_lines(lines::Vector{String})::String = join(lines, "\n")
+join_lines(lines::Vector)::String = join(lines, "\n")
 
 """
     split_lines(text::AbstractString)
@@ -217,40 +234,93 @@ function truncate(text::AbstractString, width::Int)
     return text[1:prevind(text, width - 3)] * "..."
 end
 
-"""
-    get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
 
-Recursively extract valid characters (i.e. not in markup tags) from a string.
 """
-function get_valid_chars!(valid_chars::Vector{Int}, tag, δ::Int)
-    # get correct start/stop positions
-    s1, e1 = δ + tag.open.start, δ + tag.open.stop
-    s2, e2 = δ + tag.close.start, δ + tag.close.stop
+cutline_nospaces(line, width::Int)
 
-    # do nested tags
-    for inner in tag.inner_tags
-        get_valid_chars!(valid_chars, inner, e1)
+Cut a line to a width, without using spaces for cut. 
+It ignores ANSI codes to get the right width.
+"""
+function cutline_nospaces(line, width::Int)
+    idx = width
+    while textlen(line[1:idx]) < width
+        idx += 1
     end
 
-    if s2 > length(valid_chars)
-        @debug "How can tag close after valid chars?" tag tag.open tag.close length(
-            valid_chars
-        ) tag.text
-    else
-        valid_chars[s1:e1] .= 0
-        valid_chars[s2:e2] .= 0
-    end
-
-    return valid_chars
+    cut = prevind(line, idx)
+    return line[1:cut], line[cut+1:end]
 end
 
 """
-    textlen(x::AbstractString)
+    reshape_line_no_markup(line, width::Int)::String
 
-Get length of text after all style information is removed.
+Reshapes a line to be a multi-line string with given width.
+
+When reshaping a line with no markup we don't need to worry
+about breaking ANSI tags and we can split the text at a 
+convenient space or in the middle of a word if not possible.
 """
-textlen(x::String)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
-textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
+function reshape_line_no_markup(line, width::Int)::String
+    splitted = ""
+    while textwidth(line) > width
+        cut = findlast(' ' , first(line, width))
+        cut = isnothing(cut) ? prevind(line, width) : cut
+        splitted *= line[1:cut] * " \n"
+        line = line[cut+1:end]
+    end
+    return chomp(splitted * line)
+end
+
+"""
+    get_valid_cut_idx(shortline)::Int
+
+Get a string cut idx not in an ANSI tag.
+
+When reshaping a string line with ANSI information, if 
+no valid space is found for cutting we need to split
+a word. This function chooses a cutting point not in
+an ANSI tag to preserve style info
+"""
+function get_valid_cut_idx(shortline)::Int
+    shortline = replace_multi(shortline, ANSI_REGEXEs[1]=>"|", ANSI_REGEXEs[2]=>"|")
+    return prevind(shortline, findlast(
+        c -> c != '|', collect(shortline)
+    ))
+end
+
+"""
+    get_spaces_locations(shortline)
+
+Given a string with ANSI codes, returns the location
+of ' ' as the width of the string up to that point
+as printed out (i.e. no ANSI tags)
+"""
+function get_spaces_locations(line)::Tuple{Vector{Int}, Vector{Int}}
+    spaces = findall(' ', line)
+    locs = map(s -> textlen(line[1:s]), spaces)
+    return spaces, locs
+end
+
+"""
+    reshape_line(line, width::Int)
+
+Reshape a line with ANSI style to be of a given width.
+
+This needs to be done more carefully than if we didn't
+have ANSI to avoid braking the style info.
+"""
+function reshape_line(line, width::Int)
+    splitted = ""
+    while textwidth(line) > width
+        spaces, locs = get_spaces_locations(line)
+        cut = findlast(locs .<= width)
+        cut = isnothing(cut) ? get_valid_cut_idx(line[1:prevind(line, width)]) : spaces[cut]
+
+        splitted *= line[1:cut] * " \n"
+        line = line[cut+1:end]
+    end
+    return chomp(splitted * line)
+end
 
 
 """
@@ -259,75 +329,21 @@ textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 Reshape `text` to have a given `width`.
 
 When `text` is longer than `width`, it gets cut into multiple lines.
-This is done carefully to preserve style information by: avoiding 
-cutting inside style markup and copying markup tags over to new lines
-so that the style is correctly applied.
+This is done carefully to preserve style information. Markup
+style is applied to get ANSI tags and the text is cut to avoid 
+breaking the tags.
 """
 function reshape_text(text::String, width::Int)::String
     # check if no work is required
-    if textlen(text) <= width
-        return text
-    end
+    textlen(text) <= width && return text
 
-    # extract tag and mark valid characters and "cutting" places
-    tags = extract_markup(text)
-    valid_chars = ones(Int, length(text))
-    spaces = isspace.(chars(text))
-    for tag in tags
-        get_valid_chars!(valid_chars, tag, 0)
-    end
+    with_mkup = has_markup(text)
 
-    # create lines with splitted tex
-    lines::Vector{String} = []
-    j = 1
-    while textlen(text) > width
-        # get a cutting index not in a tag's markup
-        condition = (cumsum(valid_chars[j:end]) .<= width) .& valid_chars[j:end] .== 1 .& spaces[j:end] .== 1
-        cut = findlast(condition)
-
-        if isnothing(cut)
-            # couldnt find a cut in the spaces, try without
-            condition = (cumsum(valid_chars[j:end]) .<= width) .& valid_chars[j:end] .== 1
-            cut = findlast(condition)
-        end
-
-        if cut + j > length(valid_chars)
-            @warn "ops not valid" j cut length(valid_chars)
-            cut = length(valid_chars) - j
-        end
-
-        # prep line
-        try
-            newline = text[1:cut]
-
-            # pad new line with spaces to ensure it has the right lengt
-            newline *= " ".^(width - textlen(newline))
-
-            push!(lines, newline)
-            text = lstrip(text[(cut + 1):end])
-            j += cut
-        catch err
-            throw("Failed to reshape text: $err - target width: $width")
-        end
-    end
-
-    # add what's left of the text
-    if length(text) > 0
-        push!(lines, text * " "^(width - textlen(text)))
-    end
-
-    # do checks and pad line
-    for (n, line) in enumerate(lines)
-        h = remove_markup(line)
-        # @assert length(remove_markup(line)) <= width
-
-        ll = length(remove_markup(line))
-        if ll < width
-            lines[n] = line * " "^(width - ll)
-        end
-    end
-
-    return join_lines(pairup_tags(lines))
+    text = with_mkup ? apply_style(text) : text
+    reshape_fn = with_mkup ? reshape_line : reshape_line_no_markup
+    return do_by_line(
+        line -> reshape_fn(line, width), text
+    )
 end
 
 # ------------------------------------ end ----------------------------------- #
