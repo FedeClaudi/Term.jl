@@ -1,6 +1,6 @@
 module measure
 
-import Term: remove_ansi, remove_markup_open, remove_markup
+import Term: remove_ansi, remove_markup
 
 export Measure
 

@@ -4,8 +4,13 @@ using Dates: Dates
 using Logging
 using InteractiveUtils
 
-import Term: Theme, theme, textlen, square_to_round_brackets, escape_brackets, reshape_text
-import ..markup: has_markup
+import Term: Theme,
+            theme,
+            textlen,
+            square_to_round_brackets,
+            escape_brackets,
+            reshape_text,
+            has_markup
 import ..box: ROUNDED
 import ..style: apply_style
 import ..renderables: AbstractRenderable

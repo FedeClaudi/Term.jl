@@ -28,13 +28,19 @@ const GENERIC_CLOSER_REGEX = r"(?<!\[)\[(?!\[)\/\]"
 
 Remove all markup tags from a string of text.
 """
-remove_markup(input_text)::String = has_markup(input_text) ? replace_multi(input_text, 
+remove_markup(input_text)::String = replace_multi(input_text, 
                                         OPEN_TAG_REGEX => "", 
                                         GENERIC_CLOSER_REGEX => "", 
                                         CLOSE_TAG_REGEX => ""
-                                            ) : input_text
+                                            )
 
+""" 
+    has_markup(text::String)
 
+Returns `true` if `text` includes a `MarkupTag`
+"""
+has_markup(text::String)::Bool = occursin(OPEN_TAG_REGEX, text)
+                                        
 
 # ----------------------------------- ansi ----------------------------------- #
 const ANSI_REGEXEs = [r"\e\[[0-9]*m", r"\e\[[0-9;]*m"]
@@ -50,6 +56,29 @@ remove_ansi(input_text)::String = replace_multi(input_text,
                                     )
 
 
+""" 
+    has_markup(text::String)
+
+Returns `true` if `text` includes a `MarkupTag`
+"""
+has_ansi(text::String)::Bool = occursin(ANSI_REGEXEs[1], text) || occursin(ANSI_REGEXEs[2], text)
+
+"""
+    get_last_ANSI_code(text)::String
+
+Get the last ANSI code in a sting, returns "" if no ANSI code found.
+"""
+function get_last_ANSI_code(text)::String
+    has_ansi(text) || return ""
+
+    # get the last matching regex
+    m1 = collect((eachmatch(ANSI_REGEXEs[1], text)))[end]
+    m2 = collect((eachmatch(ANSI_REGEXEs[2], text)))[end]
+    
+    rmatch = m1.offset > m2.offset ? m1 : m2
+    return rmatch.match
+end
+# --------------------------- clean text / text len -------------------------- #
 """
     cleantext(str::AbstractString)
 
@@ -65,12 +94,6 @@ Get length of text after all style information is removed.
 textlen(x::String)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 
-"""
-    alllengths(text::String)::Vector{Int}
-
-Get the `textlen` at each char.
-"""
-alllengths(text)::Vector{Int} = map(i->textlen(text[1:i]), 1:length(text))
 
 
 # --------------------------------- brackets --------------------------------- #
@@ -316,8 +339,10 @@ function reshape_line(line, width::Int)
         cut = findlast(locs .<= width)
         cut = isnothing(cut) ? get_valid_cut_idx(line[1:prevind(line, width)]) : spaces[cut]
 
-        splitted *= line[1:cut] * " \n"
-        line = line[cut+1:end]
+        pre = line[1:cut]
+        ansi = get_last_ANSI_code(pre)
+        splitted *=pre * "\e[0m\n"
+        line = ansi * line[cut+1:end]
     end
     return chomp(splitted * line)
 end

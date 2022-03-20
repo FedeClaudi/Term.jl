@@ -1,19 +1,33 @@
 module style
 import Parameters: @with_kw
 
+import Term: unspace_commas,
+            NAMED_MODES,
+            has_markup,
+            OPEN_TAG_REGEX,
+            replace_text,
+            get_last_ANSI_code,
+            CODES,
+            ANSICode
 
-import Term: unspace_commas, NAMED_MODES, CODES, ANSICode
 
-import ..markup: MarkupTag, extract_markup, has_markup, clean_nested_tags
-import ..color:
-    AbstractColor, NamedColor, is_color, is_background, get_color, is_hex_color, hex2rgb
+import ..color: AbstractColor,
+            NamedColor,
+            is_color,
+            is_background,
+            get_color,
+            is_hex_color,
+            hex2rgb
 
-export MarkupStyle, extract_style
+export apply_style
 
-is_mode(string::AbstractString) = string ∈ NAMED_MODES
+"""
+Check if a string is a mode name
+"""
+is_mode(string) = string ∈ NAMED_MODES
 
 # ---------------------------------------------------------------------------- #
-#                                    STYLEX                                    #
+#                                  MarkupStyle                                 #
 # ---------------------------------------------------------------------------- #
 """
     MarkupStyle
@@ -21,20 +35,17 @@ is_mode(string::AbstractString) = string ∈ NAMED_MODES
 Holds information about the style specification set out by a `MarkupTag`.
 """
 @with_kw mutable struct MarkupStyle
-    default::Bool = false
-    bold::Bool = false
-    dim::Bool = false
-    italic::Bool = false
-    underline::Bool = false
-    blink::Bool = false
-    inverse::Bool = false
-    hidden::Bool = false
-    striked::Bool = false
-
-    color::Union{Nothing,AbstractColor} = nothing
-    background::Union{Nothing,AbstractColor} = nothing
-
-    tag::MarkupTag
+    default::Bool                               = false
+    bold::Bool                                  = false
+    dim::Bool                                   = false
+    italic::Bool                                = false
+    underline::Bool                             = false
+    blink::Bool                                 = false
+    inverse::Bool                               = false
+    hidden::Bool                                = false
+    striked::Bool                               = false
+    color::Union{Nothing,AbstractColor}         = nothing
+    background::Union{Nothing,AbstractColor}    = nothing
 end
 
 """
@@ -42,17 +53,17 @@ end
 
 Builds a MarkupStyle definition from a MarkupTag.
 """
-function MarkupStyle(tag::MarkupTag)
-    codes = split(unspace_commas(tag.markup))
+function MarkupStyle(markup)
+    codes = split(unspace_commas(markup))
 
-    style = MarkupStyle(; tag = tag)
+    style = MarkupStyle()
     for code in codes
         if is_mode(code)
             setproperty!(style, Symbol(code), true)
         elseif is_color(code)
-            setproperty!(style, :color, get_color(code))
+            style.color = get_color(code)
         elseif is_background(code)
-            setproperty!(style, :background, get_color(code; bg = true))
+            style.background = get_color(code; bg = true)
         elseif code != "nothing"
             @debug "Code type not recognized: $code" tag tag.markup typeof(code)
         end
@@ -60,25 +71,8 @@ function MarkupStyle(tag::MarkupTag)
     return style
 end
 
-function toDict(style::MarkupStyle)
-    return Dict(
-        fieldnames(typeof(style)) .=> getfield.(Ref(style), fieldnames(typeof(style)))
-    )
-end
-
-# ------------------------------ extract style ------------------------------ #
-"""
-    extract_style(text::AbstractString)
-
-Extract style information from a `text`.
-"""
-function extract_style(text::AbstractString)
-    tags = extract_markup(text)
-    styles = [MarkupStyle(tag) for tag in tags]
-    return styles
-end
-
 # -------------------------------- apply style ------------------------------- #
+
 
 """
     get_style_codes(style::MarkupStyle)
@@ -88,7 +82,8 @@ Get `ANSICode`s corresponding to a `MarkupStyle`.
 function get_style_codes(style::MarkupStyle)
     # start applying styles
     style_init, style_finish = "", ""
-    for (attr, value) in toDict(style)
+    for attr in fieldnames(MarkupStyle)
+        value = getfield(style, attr)
         # BACKGROUND
         if attr == :background
             if !isnothing(value)
@@ -126,72 +121,42 @@ function get_style_codes(style::MarkupStyle)
 end
 
 """
-    apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
+    apply_style(text)
 
-Apply a `style` to a `text`.
+Apply style to a piece of text.
+
+Extract markup style information and insert the 
+appropriate ANSI codes to style a string.
 """
-function apply_style(text::AbstractString, style::MarkupStyle)::AbstractString
-    style_init, style_finish = get_style_codes(style)
-
-    return style_init * text * style_finish
-end
-
-"""
-    apply_style(text::AbstractString, tag::MarkupTag)::AbstractString
-
-Appliy the style of a markup tag and it's nested tags
-"""
-function apply_style(
-    text::AbstractString, tag::MarkupTag; isinner::Bool = false)::AbstractString
-    style = MarkupStyle(tag)
-    style_init, _ = get_style_codes(style)
-
-    # if no inner tags, just style the text
-    if length(tag.inner_tags) == 0
-        return apply_style(tag.text, style)
-    end
-
-    # apply inner tags
-    for inner in tag.inner_tags
-        inner_text = apply_style(inner.text, inner; isinner = true)
-
-        text = replace(
-            isinner ? text : tag.text,
-            "[$(inner.open.markup)]$(inner.text)[$(inner.close.markup)]" => "$(inner_text)$(style_init)",
-        )
-        # @info "\e[34minner style" inner.open.markup style_init text
-    end
-
-    # apply outer tag
-    text = apply_style(text, style)
-    # @info "\e[33mdone a style" tag.open.markup style_init text
-    return text
-end
-
-
-
-"""
-    apply_style(text::String)
-
-Extract and apply all markup style in a string.
-"""
-function apply_style(text::String;)::String
-    # @info "Applying style to " text
-    text = clean_nested_tags(text)
+function apply_style(text)::String
+    has_markup(text) || return text
 
     while has_markup(text)
-        tag =  extract_markup(text; firstonly = true)
-        # @info "tag" tag tag.markup tag.open.start tag.close.stop
+        # get opening markup tag
+        open_match = match(OPEN_TAG_REGEX, text)
+        markup = open_match.match[2:end-1]
 
-        pre = text[1:(tag.open.start - 1)]
-        post = text[(tag.close.stop + 1):end]
+        # get MarkupStyle
+        style = MarkupStyle(markup)
 
-        with_style = apply_style(text, tag)
-        text =   pre * with_style * post
-        # @info "     \e[31mdoing a style: " tag.markup pre post tag.open.start tag.close.stop
+        # get styke codes
+        ansi_open, ansi_close = get_style_codes(style)
+
+        # replace markup with ANSI codes
+        text = replace_text(text, open_match.offset-1, open_match.offset + length(markup)+2, ansi_open)
+
+        # get closing tag (including [/] or missing close)
+        close_rx = r"(?<!\[)\[(?!\[)\/" * markup * r"\]"
+        @assert occursin(close_rx, text) "Did not find closing regex tag for $markup starting at position $(open_match.offset)"
+        close_match = match(close_rx, text)
+
+        # check if there was previous ansi style info
+        prev_style = get_last_ANSI_code(text[1:open_match.offset-1])
+
+        # replace close tag
+        text = replace_text(text, close_match.offset-1, close_match.offset + length(markup)+3, ansi_close * prev_style)
 
     end
-    # @info "  \e[32mAfter styling" text has_markup(text)
     return text
 end
 
