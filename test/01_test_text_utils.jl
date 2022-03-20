@@ -1,86 +1,136 @@
-import Term: remove_markup, remove_ansi, truncate, reshape_text, textlen, fillin
-import Term.style: apply_style
+import Term: remove_markup,
+        has_markup,
+        remove_ansi,
+        has_ansi,
+        get_last_ANSI_code,
+        cleantext,
+        textlen,
+        escape_brackets,
+        unescape_brackets,
+        replace_text,
+        nospaces,
+        remove_brackets,
+        unspace_commas,
+        chars,
+        join_lines,
+        split_lines,
+        textwidth,
+        fillin, 
+        truncate,
+        reshape_text
 
-@testset "\e[34mTU - remove" begin
-    # ------------------------------- remove markup ------------------------------ #
-    @test remove_markup("[red]text[/red]") == "text"
-    @test remove_markup("[red]sffsdf[green on_blue italic]") == "sffsdf"
-    @test remove_markup("[red]aa[green on_blue italic]bb[/green on_blue italic]cc[/]") ==
-        "aabbcc"
-    @test remove_markup("[(255, 1, 3)]aa[#ff0022 italic]bb[/ff0022]") == "aabb"
+@testset "TU_markup" begin
+        strings = [
+            ("this is [red] some [blue] text [/blue] that I like[/red]",
+                "this is  some  text  that I like",
+            ), (
+                "[bold underline] this is [red on_green] text [/red on_green] I like [/bold underline]",
+                " this is  text  I like ",
+            )
+        ]
 
-    # test that parentheses are ignored
+        for (s1, s2) in strings
+            @test has_markup(s1) == true
+            @test remove_markup(s1) == s2
+            @test cleantext(s1) == s2
+            @test textlen(s1) == textwidth(s2)
+        end
+end
+
+@testset "TU_ansi" begin
     strings = [
-        "1111",
-        "[222a",
-        "333asd[adsada",
-        "a444asdas]asda]asda",
-        "[a5555adsad[[sada",
-        "a6666[[asdasd]]",
+        (
+            "this is \e[31m some \e[34m text \e[39m\e[31m that I like\e[39m",
+            "this is  some  text  that I like",
+            "\e[39m"
+        ), (
+            "\e[1m\e[4m this is \e[31m\e[42m text \e[39m\e[49m\e[4m I like \e[22m\e[24m",
+            " this is  text  I like ",
+            "\e[24m"
+        )
     ]
-    for str in strings
-        @test remove_markup(str) == str
-    end
 
-    # -------------------------------- remove ansi ------------------------------- #
-    strings = [
-        ("[red]asdasdad[/red]", "asdasdad"),
-        ("aaa[bold on_green]bb[/]", "aaabb"),
-        ("[red]aa[bold]bb[#ffffff]cc[/#ffffff]dd", "aabbccdd"),
-        ("[bold italic underline]aa[/bold italic underline]", "aa"),
-    ]
-    for (str, clean) in strings
-        @test remove_ansi(apply_style(str)) == clean
-        @test remove_markup(str) == clean
+    for (s1, s2, ltag) in strings
+        @test has_ansi(s1) == true
+        @test remove_ansi(s1) == s2
+        @test get_last_ANSI_code(s1) == ltag
     end
 end
 
-@testset "\e[34mTU - reshape text" begin
-    # --------------------------------- truncate --------------------------------- #
-    strings = [("a"^20, 6), ("asd"^33, 12), ("c"^3, 22)]
-    for (str, w) in strings
-        @test length(truncate(str, w)) <= w
+
+@testset "TU_brackets" begin
+    strings = [
+        ("test [vec] nn", "test [[vec]] nn"),
+        ("[1, 2, 3]", "[[1, 2, 3]]")
+    ]
+
+    for (s1, s2) in strings
+        escaped = escape_brackets(s1)
+        @test escaped == s2
+        @test unescape_brackets(escaped) == s1
+        @test unescape_brackets(s1) == s1
+    end
+end
+
+@testset "TU_replace_text" begin
+    text = "abcdefghilmnopqrstuvz"
+
+    @test replace_text(text, 1, 5, "aaa") == "aaafghilmnopqrstuvz"
+    @test replace_text(text, 1, 5, ',') ==  ",,,,fghilmnopqrstuvz"
+
+    @test replace_text(text, 18, 21, "aaa") == "abcdefghilmnopqrstaaa"
+    @test replace_text(text, 18, 21, ',') ==  "abcdefghilmnopqrst,,,"
+
+    @test replace_text(text, 10, 15, "aaa") == "abcdefghilaaarstuvz"
+    @test replace_text(text, 10, 15, ',') ==  "abcdefghil,,,,,rstuvz"
+
+    @test nospaces("a (1, 2, 3) 4") == "a(1,2,3)4"
+    @test remove_brackets("aaa (asdsd) BB") == "aaa asdsd BB"
+
+
+    @test unspace_commas("a, 2, 3") == "a,2,3"
+end
+
+@testset "TU_misc" begin
+    @test chars("abcd") == ['a', 'b', 'c', 'd']
+
+
+    strings = [
+        "aaa\nadasda\nasdasda",
+        """
+        asdasd
+adsada
+asddsa"""
+    ]
+    for str in strings
+        @test join_lines(split_lines(str)) == str
+    end
+end
+
+@testset "TU_reshape" begin
+    strings = ["""
+    asdasas sadasd
+asadasd asdasdasdas """, """
+sdssd asdasdasda sdasdasdasdaska sbjhwbfwkbgaerfwf
+asdasd asdasdasd asdasdaswefafwfw fwefewafw
+asdasdas """, """
+
+asdasdasdasdas
+asdasd asdasda sdsdfasdfasd adsfsadfsd agaegefgcwefawe fawefawesfc waszdvearsdfv dsfasdfsd
+""", 
+""" [red] adsbiadiasd asiudha asuydba basdi [/red] ad
+in this case [red on_green] blefiw [blue] kaduasdna [/blue] ashidasda 
+sadadand [/red on_green]"""
+]
+
+    for str in strings
+        @test same_widths(fillin(str)) == true
+        @test textwidth(truncate(str, 10)) <= 10
+
+        check_widths(reshape_text(str, 10), 11)
+        check_widths(reshape_text(str, 21), 22)
+        check_widths(reshape_text(str, 25), 26)
+
     end
 
-    # ---------------------------------- fillin ---------------------------------- #
-    a = """asdasd
-asdasdsaasdasdasdasdsadsadasd
-asdasdasda"""
-    filled = fillin(a)
-
-    @test nlines(filled) == 3
-    @test lw(filled) == 29
-
-    widths = [textlen(ln) for ln in split(filled, "\n")]
-    @test length(unique(widths)) == 1
-
-
-    # ---------------------------------- reshape --------------------------------- #
-    s1 = "."^500
-
-    sizes = [(50, 10), (25, 20), (5, 100), (100, 5)]
-
-    for (w, h) in sizes
-        rs = reshape_text(s1, w)
-        @test lw(rs) == w
-        @test nlines(rs) == h
-    end
-
-    s1 = "[red]aa[green]bb[/green]c[/red]"^100
-
-    sizes = [(50, 10), (25, 20), (5, 100), (100, 5)]
-
-    for (w, h) in sizes
-        rs = remove_markup(reshape_text(s1, w))
-        @test lw(rs) == w
-        @test nlines(rs) == h
-    end    
-
-    for L in (25, 50, 125)
-        lorem = "Lorem ipsum dolor sit amet, [red]consectetur adipiscing elit, sed do[blue] eiusmod tempor[/blue] incididunt ut labore et [/red]dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        r1 = reshape_text(lorem, L)
-        for line in split(r1, "\n")
-            @test textlen(line) == L
-        end
-    end
 end

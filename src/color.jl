@@ -28,8 +28,12 @@ struct RGBColor <: AbstractColor
     g::Int
     b::Int
 end
-function RGBColor(s::AbstractString)
-    r, g, b = _rgb(s)
+
+
+
+function RGBColor(s::String)
+    to_number(x) = '.' ∈ x ? parse(Float64, x) : parse(Int, x)
+    r, g, b = to_number.(match(RGB_REGEX, s).captures)
     if r < 1 || g < 1 || b < 1
         r *= 255
         g *= 255
@@ -64,38 +68,12 @@ end
 
 
 # --------------------------------- is color? -------------------------------- #
-"""
-    parse_rgb(numbertype, txt)
 
-Tries to parse r,g,b out of a string based on number type.
-"""
-function parse_rgb(number_type::Int, txt)::Vector{Int}
-    rgb = split(remove_brackets(nospaces(txt)), ",")
-    return map((x)->parse(number_type, x), rgb)
-end
-
-function parse_rgb(number_type::Float64, txt)::Vector{Float64}
-    rgb = split(remove_brackets(nospaces(txt)), ",")
-    return map((x)->parse(number_type, x), rgb)
-end
-
-
+RGB_REGEX = r"\(\s*([\d\.]{1,3})\s*,\s*([\d\.]{1,3})\s*,\s*([\d\.]{1,3})\s*\)"
+HEX_REGEX = r"#(?:[0-9a-fA-F]{3}){1,2}$"
 
 """
-    _rgb(numbertype, txt)
-
-Tries to parse r,g,b out of a string.
-"""
-function parse_rgb(txt::String)
-    try
-        return parse_rgb(Float64, txt)
-    catch
-        return parse_rgb(Int64, txt)
-    end
-end
-
-"""
-    is_named_color(string::AbstractString)::Bool
+    is_named_color(string::String)::Bool
 
 Check if a string represents a named color.
 """
@@ -103,49 +81,33 @@ is_named_color(string)::Bool = string ∈ NAMED_COLORS || string ∈ COLORS_16b
 
 
 """
-    is_rgb_color(string::AbstractString)::Bool
+    is_rgb_color(string::String)::Bool
 
 Check if a string represents a RGB color.
 """
-function is_rgb_color(string)::Bool
-    try
-        _rgb(string)
-        return true
-    catch
-        return false
-    end
-end
+is_rgb_color(string)::Bool = !occursin("on_", string) && occursin(RGB_REGEX, string)
 
 """
-    is_hex_color(string::AbstractString)::Bool
+    is_hex_color(string::String)::Bool
 
 Check if a string represents a hex color.
 """
-function is_hex_color(string)::Bool
-    stripped = nospaces(string)
-    l = length(stripped)
-    return stripped[1] == '#' && l == 7
-end
+is_hex_color(string)::Bool = !occursin("on_", string) && occursin(HEX_REGEX, string)
 
 """
-    is_color(string::AbstractString)::Bool
+    is_color(string::String)::Bool
 
 Check if a string represents color information, of any type.
 """
-function is_color(string::AbstractString)::Bool
-    is_named = is_named_color(string)
-    is_rgb = is_rgb_color(string)
-    is_hex = is_hex_color(string)
+is_color(string)::Bool = is_named_color(string) || is_rgb_color(string) || is_hex_color(string)
 
-    return is_named || is_rgb || is_hex
-end
 
 """
-    is_background(string::AbstractString)::Bool
+    is_background(string::String)::Bool
 
 Check if a string represents background color information, of any type.
 """
-function is_background(string::AbstractString)::Bool
+function is_background(string)::Bool
     stripped = nospaces(string)
     length(stripped) < 3 && return false
     return stripped[1:3] == "on_" && is_color(stripped[4:end])
@@ -153,22 +115,22 @@ end
 
 # --------------------------------- get color -------------------------------- #
 """
-    hex2rgb(hex::AbstractString)
+    hex2rgb(hex::String)
 
 Converts a string hex color code to a RGB color
 """
-function hex2rgb(hex::AbstractString)::RGBColor
-    to_int(h::AbstractString) = parse(Int, h; base = 16)
+function hex2rgb(hex)::RGBColor
+    to_int(h) = parse(Int, h; base = 16)
     r, g, b = [to_int(hex[i:(i + 1)]) for i in (2, 4, 6)]
-    return RGBColor("($r, $g, $b)", r, g, b)
+    return RGBColor(r, g, b)
 end
 
 """
-    get_color(string::AbstractString; bg=false)::AbstractColor
+    get_color(string::String; bg=false)::AbstractColor
 
 Extract a color type from a string with color information.
 """
-function get_color(string::AbstractString; bg = false)::AbstractColor
+function get_color(string; bg = false)::AbstractColor
     if bg
         string = nospaces(string)[4:end]
     end

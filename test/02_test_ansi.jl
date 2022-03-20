@@ -24,7 +24,7 @@ import Term.color: get_color, NamedColor, RGBColor, BitColor
         @test is_named_color(rgb) == false
     end
 
-    hexes = ["#ffffff", "#000000", "#dadasa", "#123123"]
+    hexes = ["#ffffff", "#000000", "#dadada", "#123123"]
     for hex in hexes
         @test is_hex_color(hex) == true
         @test is_color(hex) == true

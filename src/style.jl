@@ -143,7 +143,7 @@ function apply_style(text)::String
         ansi_open, ansi_close = get_style_codes(style)
 
         # replace markup with ANSI codes
-        text = replace_text(text, open_match.offset-1, open_match.offset + length(markup)+2, ansi_open)
+        text = replace_text(text, open_match.offset-1, open_match.offset + length(markup)+1, ansi_open)
 
         # get closing tag (including [/] or missing close)
         close_rx = r"(?<!\[)\[(?!\[)\/" * markup * r"\]"
@@ -154,7 +154,7 @@ function apply_style(text)::String
         prev_style = get_last_ANSI_code(text[1:open_match.offset-1])
 
         # replace close tag
-        text = replace_text(text, close_match.offset-1, close_match.offset + length(markup)+3, ansi_close * prev_style)
+        text = replace_text(text, close_match.offset-1, close_match.offset + length(markup)+2, ansi_close * prev_style)
 
     end
     return text

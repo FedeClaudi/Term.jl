@@ -154,13 +154,13 @@ end
 
 Replace a section of a `text` between `start` and `stop` with `replace`.
 """
-function replace_text(text, start::Int, stop::Int, replace)::String
+function replace_text(text, start::Int, stop::Int, replace::String)::String
     if start == 1
-        return replace * text[stop:end]
+        return replace * text[stop+1:end]
     elseif stop == length(text)
         return text[1:start] * replace
     else
-        return text[1:start] * replace * text[stop:end]
+        return text[1:start] * replace * text[stop+1:end]
     end
 end
 
@@ -170,7 +170,7 @@ end
 Replace a section of a `text`  between `start` and `stop` with another string composed of repeats of a given character `char`.
 """
 function replace_text(text, start::Int, stop::Int, char::Char = '_')::String
-    replacement = char^(stop - start - 1)
+    replacement = char^(stop - start)
     return replace_text(text, start, stop, replacement)
 end
 
@@ -254,7 +254,7 @@ Shorten a string of text to a target width
 """
 function truncate(text::AbstractString, width::Int)
     textlen(text) <= width && return text
-    return text[1:prevind(text, width - 3)] * "..."
+    return text[1:prevind(text, width - 2)] * "..."
 end
 
 
