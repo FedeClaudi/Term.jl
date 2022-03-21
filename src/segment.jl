@@ -16,8 +16,7 @@ export Segment
 stores one piece of text with all the styles applied to it.
 """
 struct Segment
-    text::AbstractString   # text with ANSI codes injected
-    plain::AbstractString  # plain text with no style
+    text::String   # text with ANSI codes injected
     measure::Measure       # measure of plain text
 end
 
@@ -27,15 +26,8 @@ end
 
 Construct a Segment out of a string with markup.
 """
-function Segment(text::Union{Segment,AbstractString})
-    if typeof(text) == Segment
-        return text
-    end
-    plain = remove_ansi(remove_markup(text))
-
-    # len(x) = (length ∘ remove_ansi ∘ remove_markup)(x)
-    # @info "Creating segment" len(text) len(apply_style(text)) len(remove_markup(apply_style(text)))
-    return Segment(remove_markup(apply_style(text)), plain, Measure(plain))
+function Segment(text::String)
+    return Segment(apply_style(text), Measure(text))
 end
 
 """
@@ -43,24 +35,11 @@ end
 
 Construct a Segment out of a plain string and a markup string with style info
 """
-function Segment(text::Union{Segment,AbstractString}, markup::Union{Nothing,AbstractString})
-    return isnothing(markup) ? Segment(text) : Segment("[$markup]" * text)
+function Segment(text::String, markup::String)
+    Segment("[$markup]" * text * "[/$markup]")
 end
 
-"""
-    Segment(text::Union{Segment, AbstractString}, style::MarkupStyle)
 
-Construct a Segment out of a plain string and a MarkupStyle object.
-"""
-function Segment(text::Union{Segment,AbstractString}, style::Union{Nothing,MarkupStyle})
-    if isnothing(style)
-        Segment(text, text, Measure(text))
-    else
-        Segment(apply_style(text, style), text, Measure(text))
-    end
-end
-
-Segment(text::Union{AbstractString,Segment}, null::Nothing) = Segment(text)
 
 # --------------------------------- printing --------------------------------- #
 """print styled in stdout, info otherwise"""

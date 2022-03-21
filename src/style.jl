@@ -143,11 +143,16 @@ function apply_style(text)::String
         ansi_open, ansi_close = get_style_codes(style)
 
         # replace markup with ANSI codes
-        text = replace_text(text, open_match.offset-1, open_match.offset + length(markup)+1, ansi_open)
+        text = replace_text(text, max(open_match.offset-1, 1), open_match.offset + length(markup)+1, ansi_open)
 
         # get closing tag (including [/] or missing close)
         close_rx = r"(?<!\[)\[(?!\[)\/" * markup * r"\]"
-        @assert occursin(close_rx, text) "Did not find closing regex tag for $markup starting at position $(open_match.offset)"
+
+        if !occursin(close_rx, text)
+            text = text * "[/" * markup * "]"
+        end
+
+        # @assert occursin(close_rx, text) "Did not find closing regex tag for $markup starting at position $(open_match.offset) in '$text'"
         close_match = match(close_rx, text)
 
         # check if there was previous ansi style info

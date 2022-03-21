@@ -4,12 +4,10 @@ import ..segment: Segment
 import ..style: apply_style
 import Term: int,
             chars,
-            remove_markup_open,
-            get_last_valid_str_idx,
-            get_next_valid_str_idx,
             join_lines,
-            loop_last
-
+            loop_last,
+            textlen,
+            get_lr_widths
 
 export get_row, get_title_row
 export ASCII,
@@ -98,19 +96,58 @@ end
 
 Gets characters for a row of a Box object.
 
-The level Symbol can be used to specify the box level (:top, :footer...)
+The level Symbol can be used to specify the box level (:top, :footer...).
+The total width will be the sum of the widths +2
 """
 function get_row(box::Box, widths::Vector{Int}, level::Symbol)::String
     # get the correct level of the box
     level = getfield(box, level)
 
-    parts = [string(level.left)]
+    line = level.left
     for (last, w) in loop_last(widths)
         segment = last ? level.mid^w * level.right : level.mid^w * level.vertical
-        push!(parts, segment)
+        line *= segment
     end
-    return join(parts)
+    return line
 end
+
+"""
+    get_row(box::Box, width::Int, level::Symbol)::String
+
+Get a box's row of given width.
+"""
+function get_row(box::Box, width::Int, level::Symbol)::String
+    level = getfield(box, level)
+
+    return level.left * level.mid^(width-2) * level.right
+end
+
+"""
+    get_lrow(box::Box, width::Int, level::Symbol)::String
+
+Get a box's row's left part (no righ char)
+
+Get a box's row's right part (no left char)
+See also [`get_row`](@ref), [`get_rrow`](@ref).
+"""
+function get_lrow(box::Box, width::Int, level::Symbol)::String
+    level = getfield(box, level)
+
+    return level.left * level.mid^(width-1)
+end
+
+"""
+get_rrow(box::Box, width::Int, level::Symbol)::String
+
+Get a box's row's right part (no left char)
+See also [`get_row`](@ref), [`get_lrow`](@ref).
+"""
+function get_rrow(box::Box, width::Int, level::Symbol)::String
+    level = getfield(box, level)
+
+    return level.mid^(width-1) * level.right
+end
+
 
 """
   get_title_row(row::Symbol, box::Box, title::Union{Nothing, AbstractString}; <keyword arguments>)
@@ -121,71 +158,63 @@ Can create both titles in the top and bottom row to produce subtitles.
 
 #Arguments:
 - width::Int: width of line
-- style::Union{Nothing:  String}: style of line
-- title_style::Union{Nothing:  AbstractString}: style of title string
+- style::String: style of line
+- title_style::String: style of title string
 - justify::Symbol=:left: position of title string
 
 See also [`get_row`](@ref).
-
-
 """
 function get_title_row(
     row::Symbol,
-    box::Box,
-    title::Union{Nothing,AbstractString};
-    width::Int,
-    style::Union{Nothing,String},
-    title_style::Union{Nothing,AbstractString},
+    box,  # ::Box,
+    title::Union{Nothing, String};
+    width::Int=88,
+    style::String="default",
+    title_style::String="default",
     justify::Symbol = :left,
-)
-    initial_line = remove_markup_open(Segment(get_row(box, [width], row), style).plain)
-    # @info "Getting title row" initial_line
-
+)::Segment
+    # if no title just return a row
     if isnothing(title)
-        return Segment(initial_line, style)
-    else
-
-        # get title
-        title = apply_style("[$title_style]" * title)
-        @assert Segment(title).measure.w < width - 4 "Title too long for panel of width $width: $title, ($(Segment(title).measure.w))"
-
-        # compose title line 
-        line = getfield(box, row)
-
-        if justify == :left
-            cut_start = get_last_valid_str_idx(initial_line, 4)
-            pre = Segment(
-                Segment(initial_line[1:cut_start], style) * "\e[0m" * " " * title * " "
-            )
-
-            post = line.mid^(length(initial_line) - pre.measure.w - 1) * line.right
-
-        elseif justify == :right
-            cut_start = get_next_valid_str_idx(initial_line, ncodeunits(initial_line) - 8)
-            post = Segment(
-                "\e[0m" * " " * title * " " * Segment(initial_line[cut_start:end], style)
-            )
-
-            pre = Segment(
-                line.left * line.mid^(length(initial_line) - post.measure.w - 1), style
-            )
-
-        else  # justify :center
-            cutval = int(ncodeunits(initial_line) / 2 - ncodeunits(title) / 2 - 15)
-
-            cut_start = get_last_valid_str_idx(initial_line, cutval)
-            # @info width cutval cut_start length(initial_line) length(initial_line) ncodeunits(initial_line)
-
-            pre = Segment(
-                Segment(initial_line[1:cut_start], style) * "\e[0m" * " " * title * " "
-            )
-
-            post = line.mid^(length(initial_line) - pre.measure.w - 1) * line.right
-        end
-
-        return pre * Segment(post, style)
-        # return Segment(post, style)
+        return Segment(get_row(box, width-2, row), style)    
     end
+
+
+
+    # get title
+    title = apply_style("[$title_style]" * title)
+    @assert Segment(title).measure.w < width - 4 "Title too long for panel of width $width: $title, ($(Segment(title).measure.w))"
+
+    # compose title line 
+    boxline = getfield(box, row)
+
+    open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
+    topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]"
+    title = space * topen * title * tclose * space
+    if justify == :left
+        
+        line = open * boxline.left * boxline.mid^4 * title 
+        line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
+        return Segment(line)
+     
+
+    elseif justify == :right
+        pre_len = width - textlen(title) - 4
+        line = open * get_lrow(box, pre_len, row)
+        line *= title * boxline.mid^3 * boxline.right * close
+
+        return Segment(line)
+    else  # justify :center
+        tl, tr = get_lr_widths(textlen(title))
+        lw, rw = get_lr_widths(width)
+
+        line = open * get_lrow(box, lw-tl, row) * title * get_rrow(box, rw-tr, row) * close
+
+        return Segment(line)
+    end
+
+    return pre * Segment(post, style)
+    # return Segment(post, style)
+
 end
 
 """
