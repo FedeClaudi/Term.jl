@@ -20,9 +20,9 @@ tprint("[bold green]Running: '01_test_text_utils.jl' [/bold green]")
 tprint("\n\n[bold green]Running: '02_test_ansi.jl' [/bold green]")  # ansi & col' [/bold green]")
 @time @timeit_include("02_test_ansi.jl")  
 
-#  # ? 3 measure
-# tprint("\n\n[bold green]Running: '03_test_measure.jl' [/bold green]")
-# @time @timeit_include("03_test_measure.jl")
+ # ? 3 measure
+tprint("\n\n[bold green]Running: '03_test_measure.jl' [/bold green]")
+@time @timeit_include("03_test_measure.jl")
 
  # ? 4 style
 tprint("\n\n[bold green]Running: '04_test_style.jl' [/bold green]")
@@ -32,9 +32,13 @@ tprint("\n\n[bold green]Running: '04_test_style.jl' [/bold green]")
 tprint("\n\n[bold green]Running: '05_test_macros.jl' [/bold green]")
 @time @timeit_include("05_test_macros.jl")
 
-#  # ? 6 renderables
-# tprint("\n\n[bold green]Running: '06_test_renderables.jl' [/bold green]")
-# @time @timeit_include("06_test_renderables.jl")
+# ? 6a box
+tprint("\n\n[bold green]Running: '6a_test_box.jl' [/bold green]")
+@time @timeit_include("6a_test_box.jl")
+
+ # ? 6 renderables
+tprint("\n\n[bold green]Running: '06_test_renderables.jl' [/bold green]")
+@time @timeit_include("06_test_renderables.jl")
 
 # # ? 7 panel
 # tprint("\n\n[bold green]Running: '07_test_panel.jl' [/bold green]")
@@ -55,10 +59,6 @@ tprint("\n\n[bold green]Running: '05_test_macros.jl' [/bold green]")
 # # # ? 12 logging
 # tprint("\n\n[bold green]Running: '12_test_logging.jl' [/bold green]")
 # @time @timeit_include("12_test_logging.jl")
-
-# # ? 13 box
-# tprint("\n\n[bold green]Running: '13_test_box.jl' [/bold green]")
-# @time @timeit_include("13_test_box.jl")
 
 # # ? 14 highlight
 # tprint("\n\n[bold green]Running: '14_test_highlight.jl' [/bold green]")

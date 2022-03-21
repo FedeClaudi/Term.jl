@@ -75,12 +75,12 @@ be justified withing the panel.
 function Panel(
     content::Union{Nothing, RenderablesUnion};
     title::Union{Nothing,String} = nothing,
-    title_style::Union{String,Nothing} = nothing,
+    title_style::String="default",
     title_justify::Symbol = :left,
     subtitle::Union{String,Nothing} = nothing,
-    subtitle_style::Union{String,Nothing} = nothing,
+    subtitle_style::String="default",
     subtitle_justify::Symbol = :left,
-    style::Union{String,Nothing} = "default",
+    style::String = "default",
     box::Symbol = :ROUNDED,
     width::Int = 88,
     height::Union{Nothing,Int} = nothing,
@@ -167,7 +167,7 @@ function Panel(
         :top,
         box,
         title;
-        width = panel_measure.w-2,
+        width = panel_measure.w,
         style = style,
         title_style = title_style,
         justify = title_justify,
@@ -177,7 +177,7 @@ function Panel(
         :bottom,
         box,
         subtitle;
-        width = panel_measure.w-2,
+        width = panel_measure.w,
         style = style,
         title_style = subtitle_style,
         justify = subtitle_justify,

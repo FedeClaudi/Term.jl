@@ -193,7 +193,7 @@ function update(col::ETAColumn, i::Int, N::Int, color::String, starttime::Union{
     else
         # show minutes
         remaining = round(remaining/(60*1000); digits=2)
-        msg = "$r(emaining)min"
+        msg = "$(remaining)min"
     end
 
     msg = truncate(msg, col.measure.w-11)

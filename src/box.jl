@@ -175,7 +175,7 @@ function get_title_row(
 )::Segment
     # if no title just return a row
     if isnothing(title)
-        return Segment(get_row(box, width-2, row), style)    
+        return Segment(get_row(box, width, row), style)    
     end
 
 
