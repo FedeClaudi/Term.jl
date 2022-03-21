@@ -130,10 +130,14 @@ Get a box's row's left part (no righ char)
 Get a box's row's right part (no left char)
 See also [`get_row`](@ref), [`get_rrow`](@ref).
 """
-function get_lrow(box::Box, width::Int, level::Symbol)::String
+function get_lrow(box::Box, width::Int, level::Symbol; with_left=true)::String
     level = getfield(box, level)
 
-    return level.left * level.mid^(width-1)
+    if with_left
+        return level.left * level.mid^(width-1)
+    else
+        return level.mid^(width-1)
+    end
 end
 
 """
@@ -142,10 +146,14 @@ get_rrow(box::Box, width::Int, level::Symbol)::String
 Get a box's row's right part (no left char)
 See also [`get_row`](@ref), [`get_lrow`](@ref).
 """
-function get_rrow(box::Box, width::Int, level::Symbol)::String
+function get_rrow(box::Box, width::Int, level::Symbol; with_right=true)::String
     level = getfield(box, level)
 
-    return level.mid^(width-1) * level.right
+    if with_right
+        return level.mid^(width-1) * level.right
+    else
+        return level.mid^(width-1)
+    end
 end
 
 
@@ -191,22 +199,19 @@ function get_title_row(
     topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]"
     title = space * topen * title * tclose * space
     if justify == :left
-        
         line = open * boxline.left * boxline.mid^4 * title 
         line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
         return Segment(line)
-     
 
     elseif justify == :right
         pre_len = width - textlen(title) - 4
         line = open * get_lrow(box, pre_len, row)
         line *= title * boxline.mid^3 * boxline.right * close
-
         return Segment(line)
+
     else  # justify :center
         tl, tr = get_lr_widths(textlen(title))
         lw, rw = get_lr_widths(width)
-
         line = open * get_lrow(box, lw-tl, row) * title * get_rrow(box, rw-tr, row) * close
 
         return Segment(line)

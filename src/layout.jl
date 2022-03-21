@@ -2,11 +2,13 @@ module layout
 
 import Parameters: @with_kw
 
-import Term: int, get_last_valid_str_idx
-import ..renderables: RenderablesUnion, Renderable, AbstractRenderable
+import Term: int, get_lr_widths, textlen
+import ..renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
+import ..style: apply_style
 import ..measure: Measure
 import ..segment: Segment
 using ..box
+import ..box: get_lrow, get_rrow
 import ..consoles: console_width, console_height
 
 export Padding, vstack, hstack, pad
@@ -34,26 +36,18 @@ end
 Pad a string to width: `target_width` by adding empty spaces strings " ".
 Where the spaces are added depends on the justification `method` ∈ (:left, :center, :right).
 """
-function pad(text::AbstractString, target_width::Int, method::Symbol)::String
+function pad(text, target_width::Int, method::Symbol)::String
     # get total padding size
-    lw = Measure(text).w
-    if lw >= target_width
-        return text
-    end
+    lw = textlen(text)
+    lw >= target_width && return text
 
     npads = target_width - lw
-
     if method == :left
         return text * " "^npads
     elseif method == :right
         return " "^npads * text
     else
-        if npads % 2 == 0
-            nl = nr = Int(npads/2)
-        else
-            nl = (Int ∘ floor)(npads/2)
-            nr = nl + 1
-        end
+        nl, nr = get_lr_widths(npads)
         return " "^nl * text * " "^nr
     end
 end
@@ -63,7 +57,7 @@ end
 
 Pad a string by a fixed ammount.
 """
-function pad(text::AbstractString, left::Int=0, right::Int=0)::String
+function pad(text, left::Int=0, right::Int=0)::String
     return " "^left * text * " "^right
 end
 
@@ -77,14 +71,17 @@ end
 # ---------------------------------------------------------------------------- #
 #                                   STACKING                                   #
 # ---------------------------------------------------------------------------- #
+
+vstack(s1::String, s2::String) = s1 * "\n" * s2
+
 """
     vstack(r1::RenderablesUnion, r2::RenderablesUnion)
 
 Vertically stack two renderables to give a new renderable.
 """
 function vstack(r1::RenderablesUnion, r2::RenderablesUnion)
-    r1 = Renderable(r1)
-    r2 = Renderable(r2)
+    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
+    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
 
     # get dimensions of final renderable
     w1 = length(r1.segments) > 1 ? max([s.measure.w for s in r1.segments]...) : r1.measure.w
@@ -138,8 +135,6 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
     # get dimensions of final renderable
     h1 = r1.measure.h
     h2 = r2.measure.h
-    # h1 = max([s.measure.w for s in r1.segments]...)
-    # h2 = max([s.measure.w for s in r2.segments]...)
     Δh = abs(h2 - h1)
 
     # make sure both renderables have the same number of segments
@@ -201,13 +196,11 @@ mutable struct Spacer <: AbstractLayoutElement
     measure::Measure
 end
 
-function Spacer(width::Number, height::Number; char::Char = ' ')
-    width = int(width)
-    height = int(height)
-
+function Spacer(width::Int, height::Int; char::Char = ' ')
     line = char^width
-    segments = [Segment(line) for i in 1:height]
-    return Spacer(segments, Measure(segments))
+    seg = Segment(line)
+    segments = repeat([seg], height)
+    return Spacer(segments, Measure(seg.measure.w, height))
 end
 
 # ----------------------------------- vline ---------------------------------- #
@@ -219,7 +212,6 @@ A multi-line renderable with each line made of a | to create a vertical line
 mutable struct vLine <: AbstractLayoutElement
     segments::Vector{Segment}
     measure::Measure
-    height::Int
 end
 
 """
@@ -228,13 +220,14 @@ end
 Create a `vLine` given a height and, optionally, style information.
 """
 function vLine(
-    height::Number; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED
-)
-    height = int(height)
-    char = string(eval(box).head.left)
-    segments = [Segment(char, style) for i in 1:height]
-    return vLine(segments, Measure(segments), height)
+    height::Int; style::String = "default", box::Symbol = :ROUNDED
+)   
+    line = apply_style("["*style*"]" * eval(box).head.left * "[/"*style*"]")
+    segments = repeat([Segment(line)], height)
+    return vLine(segments, Measure(1, height))
 end
+
+vLine(ren::AbstractRenderable; kwargs...) = vLine(ren.measure.h; kwargs...)
 
 """
     vLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
@@ -242,7 +235,7 @@ end
 Create a `vLine` as tall as the `stdout` console
 """
 function vLine(; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED)
-    return vLine(console_height(); style = style, box = box)
+    return vLine(console_height(stdout); style = style, box = box)
 end
 
 """
@@ -253,7 +246,6 @@ A 1-line renderable made of repeated character from a Box.
 mutable struct hLine <: AbstractLayoutElement
     segments::Vector{Segment}
     measure::Measure
-    width::Int
 end
 
 """
@@ -262,12 +254,11 @@ end
 Create a styled `hLine` of given width.
 """
 function hLine(
-    width::Number; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED
+    width::Int; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED
 )
-    width = int(width)
     char = eval(box).row.mid
     segments = [Segment(char^width, style)]
-    return hLine(segments, Measure(segments), width)
+    return hLine(segments, Measure(width, 1))
 end
 
 """
@@ -278,28 +269,18 @@ Creates an hLine object with texte centered horizontally.
 function hLine(
     width::Number,
     text::String;
-    style::Union{String,Nothing} = nothing,
+    style::String = "default",
     box::Symbol = :ROUNDED,
 )
     box = eval(box)
+    tl, tr = get_lr_widths(textlen(text))
+    lw, rw = get_lr_widths(width)
 
-    initial_line = box.top.mid^width
+    open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
+    line = open * get_lrow(box, lw-tl, :top; with_left=false) * 
+                space * text * space * get_rrow(box, rw-tr, :top; with_right=false) * close
 
-    cutval = int(ncodeunits(initial_line) / 2 - ncodeunits(text) - 5)
-    cut_start = get_last_valid_str_idx(initial_line, cutval)
-
-    pre = Segment(
-        Segment(initial_line[1:cut_start], style) *
-        "\e[0m" *
-        " " *
-        Segment(text, style) *
-        " ",
-    )
-
-    post = Segment(box.top.mid^(length(initial_line) - pre.measure.w - 1), style)
-
-    segments = [Segment(pre * (post), style)]
-    return hLine(segments, Measure(segments), width)
+    return hLine([Segment(line, style)], Measure(width, 1))
 end
 
 """
@@ -307,8 +288,8 @@ end
 
 Construct an `hLine` as wide as the `stdout`
 """
-function hLine(; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED)
-    return hLine(console_width(); style = style, box = box)
+function hLine(; style::String="default", box::Symbol = :ROUNDED)
+    return hLine(console_width(stdout); style = style, box = box)
 end
 
 """
@@ -317,8 +298,8 @@ end
 Construct an `hLine` as wide as the `stdout` with centered text.
 """
 function hLine(
-    text::AbstractString; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED
+    text::AbstractString; style::String="default", box::Symbol = :ROUNDED
 )
-    return hLine(console_width(), text; style = style, box = box)
+    return hLine(console_width(stdout), text; style = style, box = box)
 end
 end

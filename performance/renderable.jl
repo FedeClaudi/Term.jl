@@ -16,3 +16,7 @@ println("Re-create RT")
 rt = RenderableText(lorem; style="red")
 @time RenderableText(rt; style="red", width=rt.measure.w)
 @time RenderableText(rt; style="blue", width=rt.measure.w)
+
+print("renderable of renderable")
+ren = RenderableText(lorem; style="red")
+@time Renderable(ren);

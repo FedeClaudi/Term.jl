@@ -1,4 +1,15 @@
 import Term: RenderableText, Spacer, vLine, hLine, cleantext, textlen, chars
+import Term.layout: pad
+
+@testset "Layout - pad" begin
+    @test pad("aaa", 20, :left) == "aaa                 "
+    @test pad("aaa", 20, :right) == "                 aaa"
+    @test pad("aaa", 20, :center) == "        aaa         "
+    @test pad("aaa", 10, 20) == "          aaa                    "
+    p = Panel(; width=20, height=10)
+    padded = pad(p.segments, 10, 10)
+    @test padded[1].measure.w == 40
+end
 
 @testset "\e[34mlayout - spacer" begin
     sizes = [(22, 1), (44, 123), (21, 1), (4334, 232)]
@@ -54,15 +65,7 @@ end
 @testset "\e[34mlayout - stack strings" begin
     s1 = "."^50
     s2 = ".\n"^5 * "."
-    r = s1 / s2
-    @test r.measure.w == 50
-    @test r.measure.h == 7
-
-    s1 = "."^50
-    s2 = "[red][bold blue].[/bold blue][/red]\n"^5 * "."
-    r = s1 / s2
-    @test r.measure.w == 50
-    @test r.measure.h == 7
+    @test s1 / s2 isa String
 end
 
 

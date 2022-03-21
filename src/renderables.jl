@@ -68,6 +68,8 @@ function Renderable(
     return RenderableText(str; width = width)
 end
 
+Renderable(ren::AbstractRenderable) = ren
+
 
 # ---------------------------------------------------------------------------- #
 #                                TEXT RENDERABLE                               #

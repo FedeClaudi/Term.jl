@@ -39,6 +39,8 @@ function Segment(text::String, markup::String)
     Segment("[$markup]" * text * "[/$markup]")
 end
 
+Segment(seg::Segment) = seg
+
 
 
 # --------------------------------- printing --------------------------------- #
