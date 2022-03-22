@@ -1,4 +1,4 @@
-# Content layout
+# [Content layout](@id content_layout)
 Okay, so we can style text and we can create fancy panels. Cool. Not enough. If we want to get **real fancy** we need to combine multiple renderable elements. Like this:
 
 ```@example
@@ -9,7 +9,7 @@ print(Term.make_logo())
 The example above is composed of panels and textboxes, of course, but also additional lines and spacing elements that can help with the layout. These elements are combined using a very simple syntax to create the whole thing.
 
 ## Nesting
-The easiest way to create a layout is to nest things. We've already seen how to do this with `Panel`s and `TextBox`es:
+The easiest way to create a layout is to nest things. We've already briefly seen how to do this with `Panel`s:
 ```@example
 
 import Term: Panel # hide
@@ -18,9 +18,15 @@ print(
     Panel(
         Panel(
             Panel(
-                "We need to go deeper...", height=3, width=28, style="green", box=:ASCII, title="ED", title_style="white"
+                "We need to go deeper...",
+                height=3,
+                width=28,
+                style="green",
+                box=:ASCII,
+                title="ED",title_style="white",
+                justify=:center
             ),
-            style="red", box=:HEAVY, title="ST", title_style="white"
+            style="red", box=:HEAVY, title="ST", title_style="white", fit=true
         ),
         width=44, justify=:center, style="blue", box=:DOUBLE, title="NE", title_style="white"
     )
@@ -46,11 +52,11 @@ Let's stack things:
 import Term: Panel # hide
 
 println(
-    Panel("horizontally") * Panel("stacked")
+    Panel("horizontally"; fit=true) * Panel("stacked"; fit=true)
 )
 println("&\n")
 println(
-    Panel("vertically") / Panel("stacked")
+    Panel("vertically"; fit=true) / Panel("stacked"; fit=true)
 )
 
 ```
@@ -68,9 +74,9 @@ println(
 ```
 
 
-what's that red text doing in there? We didn't use `tprint`, or `apply_style`, we didn't put it into a `RenderableText` or a `TextBox`... why didn't it print as `"[bold red]supripse![/bold red]"`??
+what's that red text doing in there? We didn't use `tprint`, or `apply_style`, we didn't put it into a [`RenderableText`](@ref RtextDoc) or a [`TextBox`](@ref TBoxDoc) (see [Renderables](@ref RenIntro))... why didn't it print as `"[bold red]supripse![/bold red]"`??
 
-The answer is that stacking operators return the generic `Renderable` type object, and `Renderable`s apply their styles before printing out to console. Okay, not a huge surprise I guess, but I just wanted an excuse to say that regardless of what goes into `*` and `/` the output is a generic `Renderable` (well with the exception of `*` between two strings which returns a string; also `*` and `/` don't work with things like `::Number` & co., but you get the idea).
+The answer is that stacking operators return the generic `Renderable` type object, and `Renderable`s apply their styles before printing out to console. Okay, not a huge surprise I guess, but I just wanted an excuse to say that regardless of what goes into `*` and `/` the output is a generic `Renderable` (well with the exception of `*` between two strings which returns a string; also `*` and `/` don't work with things like `::Number` & co., but you get the idea). The reason for the generic `Renderable` type is that the product of two stacked renderables should act as a unitary single renderable in its own right. You should be able to print it, stack it etc... So `Renderable` is the simplest type of renderable that can do this (it only has segments and measure, no other features - see previous section), so when we stack together multiple different types of renderables we create a generic container. 
 
 Previously we briefly mentioned the idea of the `Measure` or a renderable object. `Measure` stores information about the width and height of a renderable as it will appear in the terminal. When we stack renderables, the `Measure` of the resulting `Renderable` will do the following:
 - if we are using `*` the width will be the sum of widths of the two renderables and the height will be the height  of the tallest renderable
@@ -109,7 +115,7 @@ print(p * p)
 but what if we want some space between them? We can do something like
 ```@example
 using Term # hide
-p = Panel(width=5, height=3) # hide
+p = Panel(" "; fit=true) # hide
 print(p * " "^5 * p)
 print(p / "\n"^2 / p)
 ```
@@ -141,9 +147,9 @@ look at that layout! Actually don't, look at it without that clutter:
 import Term: Panel, Spacer # hide
 p = Panel(width=5, height=3) # hide
 
-top = p * Spacer(5, 3) * p
+top = p * Spacer(5, 5) * p
 mid = Spacer(top.measure.w, 2) # use top's Measure info !
-bottom = p * Spacer(5, 3) * p
+bottom = p * Spacer(5, 5) * p
 
 print(top / mid / bottom)
 ```
@@ -182,4 +188,3 @@ print(p / l / p)
 
 surprise! `hLine` is *not just like `vLine`*: it also accepts an optional text argument to create a little title line if you will. But yeah, otherwise it's just the same. 
 
-With this we conclude our overview of the content layout in `Term`. There's a lot more you can use `Term` for, but styled text, panels and layout operators will get you far! Enjoy!

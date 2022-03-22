@@ -3,7 +3,6 @@
 CurrentModule = Term.segment
 ```
 
-
 ```@index
 Pages   = ["api_segment.md"]
 ```

@@ -1,15 +1,17 @@
 using Term
+import Term: Renderable
 
-p1 = Panel(; width = 5, height = 5)
-p2 = Panel(; width = 8, height = 4)
+pprint(x) = begin
+    println(x)
+    println(x.measure)
+end
 
-print(p1 / p2)
-p1 / p2
+p1 = Panel()
+p2 = Panel(; width=24, height=3)
+p3 = Panel("test[red]aajjaja[/red]"^5, width=12)
 
-# @test (p1 * p2).measure.w == 13
-# @test (p1 * p2).measure.h == 5
+# pprint(p1 * p2)
+# pprint(p1 / p2)
 
-r1 = RenderableText("."^100; width = 25)
-r2 = RenderableText("."^100; width = 50)
-
-r = r1 / r2
+a = p1 / p2
+a.segments

@@ -2,6 +2,8 @@
 module introspection
 using InteractiveUtils
 
+import MyterialColors: orange
+
 import Term:
     highlight,
     theme,
@@ -14,9 +16,32 @@ import Term:
 import ..consoles: console
 import ..panel: Panel, TextBox
 import ..layout: Spacer, hLine
+import ..tree: Tree
+
 include("_inspect.jl")
 
-export inspect
+export inspect, typestree
+
+
+# ---------------------------------------------------------------------------- #
+#                                TYPES HIERARCHY                               #
+# ---------------------------------------------------------------------------- #
+
+function typestree(T::DataType)
+    print(
+        Panel(
+            Tree(T),
+            title="Types hierarchy",
+            style="blue dim",
+            title_style=orange,
+            title_justify=:right,
+            fit=true,
+            padding=(1, 4, 1, 1)
+            
+        )
+    )
+end
+
 
 # ---------------------------------------------------------------------------- #
 #                                   TYPEINFO                                   #
@@ -110,7 +135,7 @@ function inspect(
         style_super_types(info),
         "",
         style_sub_types(info);
-        width = width,
+        width = width-4,
         title = "Types hierarchy",
         title_style = "bold underline yellow",
     )
@@ -120,7 +145,7 @@ function inspect(
         info.docstring;
         title = "Docstring",
         title_style = "bold underline yellow",
-        width = width,
+        width = width-4,
     )
 
 
@@ -132,7 +157,7 @@ function inspect(
                 push!(
                     formatted_fields,
                     "[bold white]$(string(name))[/bold white]" *
-                    highlight("::$(type)", theme, :type),
+                    highlight("::$(type)", :type),
                 )
             end
         end
@@ -142,8 +167,8 @@ function inspect(
             title = "Arguments",
             title_style = "bold yellow",
             style = "dim yellow",
-            width = width - 2,
-            fit=:nofits
+            width = width - 6,
+            fit=false
         )
 
         insights_panel = (docs / Spacer(width - 2, 2) / fields_panel)
@@ -170,7 +195,7 @@ function inspect(
         constructors;
         title = "Constructors[dim]($n_constructors)",
         title_style = "bold underline yellow",
-        width = width,
+        width = width-4
     )
 
     # ---------------------------------- methods --------------------------------- #
@@ -193,7 +218,7 @@ function inspect(
         methods;
         title = "Methods[dim]($n_methods)",
         title_style = "bold underline yellow",
-        width = width,
+        width = width-4,
     )
 
     # ------------------------------- CREATE PANEL ------------------------------- #
@@ -210,7 +235,8 @@ function inspect(
         title = "$(typeof(type)): [bold]$(info.name)" * _title,
         title_style = "red",
         style = "blue",
-        width = width + 4,
+        width = width,
+        fit=true
     )
 
     return println(panel)
@@ -231,7 +257,7 @@ function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_metho
         info.docstring;
         title = "Docstring",
         title_style = "bold underline yellow",
-        width = width - 2,
+        width = width - 6,
     )
 
     if length(info.methods) > 0
@@ -253,13 +279,13 @@ function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_metho
         methods;
         title = "Methods[dim]($n_methods)",
         title_style = "bold underline yellow",
-        width = width - 2,
+        width = width - 6,
     )
 
     # -------------------------------- print panel ------------------------------- #
     return println(
         Panel(
-            Spacer(width - 2, 1),
+            Spacer(width - 4, 1),
             docs,
             hLine(width - 6; style = "blue dim"),
             methods_panel;
@@ -267,6 +293,7 @@ function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_metho
             title_style = "red",
             style = "blue",
             width = width,
+            fit=true
         ),
     )
 end

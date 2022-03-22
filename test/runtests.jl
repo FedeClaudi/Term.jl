@@ -2,22 +2,17 @@ using Term
 using Test
 using Suppressor
 
-# using Pkg
-# Pkg.test("Term",coverage=true)
-
-nlines(x) = length(split(x, "\n"))
-lw(x) = max(length.(split(x, "\n"))...)
+include("__test_utils.jl")
 
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
-macro timeit_include(path::AbstractString)
-    return :(@timeit TIMEROUTPUT $path include($path))
-end
+tprint("\n[bold blue]Runing all tests measuring timing and allocations\n")
 
 
-tprint("\n[bold blue]Runing all tests measuring timing and allocations")
-
+# ? 0  - misc
+tprint("[bold green]Running: '00_misc.jl' ")
+@time @timeit_include("00_misc.jl")
 
 # ? 1  - text utils
 tprint("[bold green]Running: '01_test_text_utils.jl' ")
@@ -32,8 +27,8 @@ tprint("\n\n[bold green]Running: '03_test_measure.jl' ")
 @time @timeit_include("03_test_measure.jl")
 
  # ? 4 markup
-tprint("\n\n[bold green]Running: '04_test_markup.jl' ")
-@time @timeit_include("04_test_markup.jl")
+tprint("\n\n[bold green]Running: '04_test_markup_and_style.jl' ")
+@time @timeit_include("04_test_markup_and_style.jl")
 
  # ? 5 macros
 tprint("\n\n[bold green]Running: '05_test_macros.jl' ")
@@ -43,30 +38,49 @@ tprint("\n\n[bold green]Running: '05_test_macros.jl' ")
 tprint("\n\n[bold green]Running: '06_test_renderables.jl' ")
 @time @timeit_include("06_test_renderables.jl")
 
- # ? 7 layout
-tprint("\n\n[bold green]Running: '07_test_layout.jl' ")
-@time @timeit_include("07_test_layout.jl")
+# ? 7 panel
+tprint("\n\n[bold green]Running: '07_test_panel.jl' ")
+@time @timeit_include("07_test_panel.jl")
 
- # ? 8 panel
-tprint("\n\n[bold green]Running: '08_test_panel.jl' ")
-@time @timeit_include("08_test_panel.jl")
+# ? 8 layout
+tprint("\n\n[bold green]Running: '08_test_layout.jl' ")
+@time @timeit_include("08_test_layout.jl")
 
- # ? 9 inspect
-# tprint("\n\n[bold green]Running: '09_test_inspect.jl' ")
-# @time @timeit_include("09_test_inspect.jl")
+#  ? 9 inspect
+tprint("\n\n[bold green]Running: '09_test_inspect.jl' ")
+@time @timeit_include("09_test_inspect.jl")
 
- # ? 10 errors
- tprint("\n\n[bold green]Running: '10_test_errors.jl' ")
- @time @timeit_include("10_test_errors.jl")
-
-
- # ? 11 console
+# ? 11 console
 tprint("\n\n[bold green]Running: '11_test_console.jl' ")
 @time @timeit_include("11_test_console.jl")
 
- # ? 12 logging
- tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
- @time @timeit_include("12_test_logging.jl")
+# # ? 12 logging
+tprint("\n\n[bold green]Running: '12_test_logging.jl' ")
+@time @timeit_include("12_test_logging.jl")
+
+# ? 13 box
+tprint("\n\n[bold green]Running: '13_test_box.jl' ")
+@time @timeit_include("13_test_box.jl")
+
+# ? 14 highlight
+tprint("\n\n[bold green]Running: '14_test_highlight.jl' ")
+@time @timeit_include("14_test_highlight.jl")
+
+# ? 15 progress
+tprint("\n\n[bold green]Running: '15_test_progress.jl' ")
+@time @timeit_include("15_test_progress.jl")
+
+# ? 16 Tree
+tprint("\n\n[bold green]Running: '16_test_tree.jl' ")
+@time @timeit_include("16_test_tree.jl")
+
+# ? 999 EXAMPLES
+tprint("\n\n[bold green]Running: '999_test_examples.jl' ")
+@time @timeit_include("999_test_examples.jl")
+
+# ? 99 ERRORS
+tprint("\n\n[bold green]Running: '99_test_errors.jl' ")
+@time @timeit_include("99_test_errors.jl")
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")

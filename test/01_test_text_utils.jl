@@ -1,4 +1,4 @@
-import Term: remove_markup, remove_ansi, truncate, reshape_text
+import Term: remove_markup, remove_ansi, truncate, reshape_text, textlen, fillin
 import Term.style: apply_style
 
 @testset "\e[34mTU - remove" begin
@@ -36,14 +36,24 @@ import Term.style: apply_style
 end
 
 @testset "\e[34mTU - reshape text" begin
-    nlines(x) = length(split(x, "\n"))
-    lw(x) = length(split(x, "\n")[1])
-
     # --------------------------------- truncate --------------------------------- #
     strings = [("a"^20, 6), ("asd"^33, 12), ("c"^3, 22)]
     for (str, w) in strings
         @test length(truncate(str, w)) <= w
     end
+
+    # ---------------------------------- fillin ---------------------------------- #
+    a = """asdasd
+asdasdsaasdasdasdasdsadsadasd
+asdasdasda"""
+    filled = fillin(a)
+
+    @test nlines(filled) == 3
+    @test lw(filled) == 29
+
+    widths = [textlen(ln) for ln in split(filled, "\n")]
+    @test length(unique(widths)) == 1
+
 
     # ---------------------------------- reshape --------------------------------- #
     s1 = "."^500
@@ -64,5 +74,13 @@ end
         rs = remove_markup(reshape_text(s1, w))
         @test lw(rs) == w
         @test nlines(rs) == h
+    end    
+
+    for L in (25, 50, 125)
+        lorem = "Lorem ipsum dolor sit amet, [red]consectetur adipiscing elit, sed do[blue] eiusmod tempor[/blue] incididunt ut labore et [/red]dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        r1 = reshape_text(lorem, L)
+        for line in split(r1, "\n")
+            @test textlen(line) == L
+        end
     end
 end

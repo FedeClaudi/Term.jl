@@ -71,7 +71,6 @@ tb2 = TextBox(
     title = "second column",
     title_style = "blue bold",
     title_justify = :center,
-    fit = :fit,
 )
 print(tb1 * tb2)
 
@@ -82,4 +81,4 @@ very wide piece of text
 """
 
 import Term: Panel
-print(Panel(tb1 * tb2; width = :fit, title = "My Panel"))
+print(Panel(tb1 * tb2; width = 100, justify=:center, title = "My Panel"))

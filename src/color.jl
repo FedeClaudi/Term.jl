@@ -30,7 +30,7 @@ struct RGBColor <: AbstractColor
 end
 function RGBColor(s::AbstractString)
     r, g, b = _rgb(s)
-    if r < 1
+    if r < 1 || g < 1 || b < 1
         r *= 255
         g *= 255
         b *= 255

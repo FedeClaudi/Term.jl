@@ -22,8 +22,8 @@ function get_docstring(obj)
         # docstring = join_lines([escape_brackets(d.text[1])*"\n[dim bold]----------[/dim bold]" for d in doc])
 
         # style
-        docstring = highlight(join_lines(docstrings), theme)
-        docstring = highlight(docstring, theme, :docstring)
+        docstring = highlight(join_lines(docstrings))
+        docstring = highlight(docstring, :docstring)
     end
     return doc, unescape_brackets(docstring)
 end
@@ -83,7 +83,7 @@ function style_method_line(method::AbstractString; trim::Bool = false)::String
     args = "(" * args
     file = split(file, " at ")[end]
 
-    return highlight(name, theme, :emphasis) *
-           highlight(highlight(args, theme), theme, :emphasis_light) *
+    return highlight(name, :emphasis) *
+           highlight(highlight(args), :emphasis_light) *
            "\n         [dim]$file[/dim]"
 end

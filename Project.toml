@@ -1,36 +1,27 @@
 name = "Term"
 uuid = "22787eb5-b846-44ae-b979-8e399b8463ab"
 authors = ["FedeClaudi <federicoclaudi@protonmail.com> and contributors"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
-Coverage = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 Highlights = "eafb193a-b7ab-5a9e-9068-77385905fa72"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
-JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+MyterialColors = "1c23619d-4212-4747-83aa-717207fae70f"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-PkgTemplates = "14b8a8f1-9102-5b29-a752-f990bacb7fe1"
-Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
-Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
-TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 
 [compat]
-Coverage = "1"
 Documenter = "0.27"
 Highlights = "0.5"
-JuliaFormatter = "0.22"
+MyterialColors = "0.3"
 Parameters = "0.12"
-PkgTemplates = "0.7"
-Revise = "3"
-Suppressor = "0.2"
-TimerOutputs = "0.5"
 julia = "1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
 
 [targets]
 test = ["Test"]

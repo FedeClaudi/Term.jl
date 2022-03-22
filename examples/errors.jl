@@ -37,7 +37,7 @@ corresponding error message
 
 # ------------  AssertionError
 # import Term: Panel
-# Panel("mytext", title="this title is waaaay too long!!!")
+# Panel("mytext", title="this title is waaaay too long!!!", fit=true)
 
 # ------------  UndefVarError
 # println(x)
@@ -50,10 +50,10 @@ corresponding error message
 # div(2, 0)
 
 # ------------  StackOverflowError
-# ! not working
-a() = b()
-b() = a()
-a()
+# # ! not working
+# a() = b()
+# b() = a()
+# a()
 
 # ------------  KeyError
 # mydict = Dict(:a=>"a", :b=>"b")

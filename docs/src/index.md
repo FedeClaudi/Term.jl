@@ -26,9 +26,11 @@ structured visual displays in your terminal.
     If, however, you're thinking of using `Term` in production-level code that others will need to rely upon, **we ask you to be 
     patient for a bit longer as we continue to work on `Term`**.
 
+!!! warning "OS concerns"
+    `Term` has been tested extensively so far, but only on Mac. If you're using a Linux or Windows machine you might find some bugs that have eluded us so far. Please get in touch so that we can fix them!
 
 !!! info "`Term` and `rich`"
-    While `Term` was written from scratch in Julia, it's based upon a pre-existing python library called [`rich`](https://github.com/Textualize/rich). If you have never used `rich`, just know that it's absolutely awesome. And its creator, Will McGugan, made it open source for anyone to use. That also meant people like us could took inspiration from `rich` to create related packages in other languages. We are very grateful to Will, and we hope that `Term` will end up beign a fraction as cool as `rich`.
+    While `Term` was written from scratch in Julia, it's based upon a pre-existing python library called [`rich`](https://github.com/Textualize/rich). If you have never used `rich`, just know that it's absolutely awesome. And its creator, Will McGugan, made it open source for anyone to use. That also meant people like us could took inspiration from `rich` to create related packages in other languages. We are very grateful to Will, and we hope that `Term` will end up being a fraction as cool as `rich`.
 
 ### Installation
 In a Julia script:

@@ -1,10 +1,15 @@
 using Term
+import Term: chars
 
-prt(tb) = print(tb, "\n", tb.measure, "\n")
+prt(pan) = begin
+    print(" " * hLine(pan.measure.w; style="red"))
+    print(vLine(pan.measure.h; style="red") * pan)
+    println(pan.measure, "   ", length(chars(pan.segments[1].plain)), "  ", length(pan.segments) )
+end
 
-# prt(TextBox(
-#     "nofit"
-# ))
+
+
+
 
 # check that unreasonable widhts are ignored
 prt(TextBox(
@@ -21,9 +26,28 @@ prt(TextBox(
 prt(TextBox(
     "truncate"^25;
     width=100,
-))ork
+))
 
 prt(TextBox(
-    "truncate"^25;
+    "truncate"^8;
     fit=:fit
 ))
+
+prt(TextBox(
+    "[red]truncate[/red]"^8;
+    fit=:fit
+))
+
+prt(TextBox(
+    "[red]tru\nncate[/red]test"^1;
+    fit=:fit
+))
+
+
+prt(
+    TextBox(
+    "[red]truncate[/red]test"^8;
+    fit=:fit,
+    justify=:left
+)
+)

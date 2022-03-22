@@ -1,5 +1,6 @@
 import Term: Measure
-import Term: remove_markup
+import Term.measure: width, height
+import Term: remove_markup, Panel
 
 @testset "\e[34mMeasure - str" begin
     @test Measure("a"^10).w == 10
@@ -28,3 +29,15 @@ import Term: remove_markup
         @test m.h == nlines(remove_markup(string))
     end
 end
+
+# TODO test with renderables
+
+@testset "\r34mMeasure funcs" begin
+    @test width("test") == 4
+    @test height("test") == 1
+
+    @test width(Panel(;width=5, height=5)) == 5
+    @test height(Panel(;width=5, height=5)) == 5
+end
+
+

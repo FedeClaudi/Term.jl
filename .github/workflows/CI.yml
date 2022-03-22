@@ -48,7 +48,6 @@ jobs:
 
   format:
     runs-on: ubuntu-latest
-    strategy:
     steps:
       - uses: julia-actions/setup-julia@latest
         with:

@@ -59,7 +59,7 @@ function style_error(io::IO, er)
     if !isnothing(info_msg) &&  Measure(message).w > 0
         panel = Panel(
             main_message / message,
-            hLine(WIDTH - 4; style = "red dim"),
+            hLine(WIDTH - 8; style = "red dim"),
             RenderableText(
                 "[bold yellow italic underline]hint:[/bold yellow italic underline] [bright_red]$(typeof(er))[/bright_red] " *
                 info_msg;
@@ -120,7 +120,7 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
         chomp(line),
         code;
         title = title,
-        width = :fit,
+        fit = true,
         style = "dim blue",
         title_style = "bold bright_yellow",
     )

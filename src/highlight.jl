@@ -3,7 +3,7 @@ import Highlights: Lexers
 import Highlights
 
 # ------------------------------- highlighting ------------------------------- #
-const highlight_regexes = Dict(
+highlight_regexes = Dict(
     :multiline_code => [
         r"\`\`\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \# \s \? \{ \}  \_ \- \: \!\ \" \> \'\s]*\`\`\`",
     ],
@@ -11,9 +11,14 @@ const highlight_regexes = Dict(
         r"\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \#\s \_ \- \: \!\ \? \{ \} \" \> \'\s]*\`",
     ],
     :type => [r"\:\:+[a-zA-Z0-9\.\,]*", r"\{+[a-zA-Z0-9 \,\.. ]*\}"],
+    # :number => [
+    #     r"[+-]?\d+[\.\,]?\d",
+        # r" [0-9] ",
+        # r"[ \+-\-][0-9]* ",
+    # ]
 )
 
-const code_regex = ""
+
 
 """
     highlight(text::AbstractString, theme::Theme)
@@ -21,29 +26,15 @@ const code_regex = ""
 Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object
 """
-function highlight(text::AbstractString, theme::Theme)
+function highlight(text::AbstractString; theme::Theme=theme)    
     for (like, regexes) in highlight_regexes
         markup = getfield(theme, like)
 
         prev_match = ""
         for regex in regexes
-            for match in eachmatch(regex, text)
-                # @info "L" length(match.match) match.match like
-
-                # TODO find better way to avoid repeats/mistakes with :code
-                if like == :code && length(match.match) == 2
-                    continue
-                end
-
-                if like == :code && match.match == prev_match
-                    continue
-                end
-                prev_match = match.match
-
-                with_markup = do_by_line(x -> "[$markup]$x[/$markup]", match.match)
-                text = replace(text, match.match => with_markup)
-                # text = replace(text, match.match => "[$markup]$(match.match)[/$markup]") 
-            end
+            text = replace(text, regex => s"[markup]\g<0>[/markup]")
+            text = replace(text, "[markup]"=> "[$markup]")
+            text = replace(text, "[/markup]"=> "[/$markup]")
         end
     end
     return text
@@ -55,10 +46,24 @@ end
 Hilights an entire text as if it was a type of semantically
 relevant text of type :like.
 """
-function highlight(text::AbstractString, theme::Theme, like::Symbol)
+function highlight(text::AbstractString, like::Symbol; theme::Theme=theme)
     markup = getfield(theme, like)
     return do_by_line(x -> "[$markup]$x[/$markup]", chomp(text))
 end
+
+# shorthand to highlight objects based on type
+
+highlight(x::Union{UnionAll, DataType}; theme::Theme=theme) = highlight(string(x), :type; theme=theme)
+highlight(x::Number; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
+highlight(x::Function; theme::Theme=theme) = highlight(string(x), :func; theme=theme)
+highlight(x::Symbol; theme::Theme=theme) = highlight(string(x), :symbol; theme=theme)
+highlight(x::Expr; theme::Theme=theme) = highlight(string(x), :expression; theme=theme)
+highlight(x::AbstractVector; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
+highlight(x; theme=theme) = string(x)  # capture all other cases
+
+
+
+
 
 # ------------------------------ Highlighters.jl ----------------------------- #
 
@@ -153,7 +158,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     for (n, line) in zip(linenos, codelines)
         # style
         if n == lineno
-            symb = "[red bold]▶[/red bold]"
+            symb = "[red bold]❯[/red bold]"
             color = "white"
         else
             symb = " "

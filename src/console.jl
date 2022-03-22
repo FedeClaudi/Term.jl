@@ -1,72 +1,68 @@
 module consoles
 
-import Term: highlight, theme
+export Console, console, err_console, console_height, console_width
 
-import ..renderables: AbstractRenderable
-import ..style: apply_style
+const STDOUT = stdout
+const STDERR = stderr
 
-export Console, console, err_console, console_height, console_width, tprint
-
-# ---------------------------------------------------------------------------- #
-#                                    TPRINT                                    #
-# ---------------------------------------------------------------------------- #
+# --------------------------------- controls --------------------------------- #
 
 """
-    tprint
-
-Similar to standard lib's `print` function but with added
-styling functionality
+Get cursor position
 """
-function tprint end
+cursor_position() = print("\e[6n")
+cursor_position(io::IO) = print(io, "\e[6n")
 
 """
-    tprint(x::AbstractString)
-
-Apply style to a string and print it to a new line
+Move cursor up one line
 """
-tprint(x::AbstractString) = (println ∘ apply_style)(x)
-
-"""
-    tprint(x::AbstractRenderable)
-
-Print an `AbstractRenderable`.
-
-Equivalent to `println(x)`
-"""
-tprint(x::AbstractRenderable) = println(x)
+up() = print("\e[A") 
+up(io::IO) = print(io, "\e[A") 
 
 """
-    tprint(x::Symbol)
-
-Print highlighted as a Symbol
+Move cursor to the beginning of the previous line
 """
-tprint(x::Symbol) = tprint(highlight(":" * string(x), theme, :symbol))
-
-"""
-    tprint(x::Number)
-
-Print highlighted as a Number
-"""
-tprint(x::Number) = tprint(highlight(string(x), theme, :number))
+beginning_previous_line() = print("\e[F")
+beginning_previous_line(io::IO) = print(io, "\e[F")
 
 """
-    tprint(x::Function)
-
-Print highlighted as a Function
+Move cursor down one line
 """
-tprint(x::Function) = tprint(highlight(string(x), theme, :func))
+down() = print("\e[B")
+down(io::IO) = print(io, "\e[B")
 
 """
-    tprint(x)
-
-When no dedicated method is present, print the string representation
+Clear terminal.
 """
-tprint(x) = tprint(string(x))
+clear() = print("\x1b[2J")
+clear(io::IO) = print(io, "\x1b[2J")
 
-function tprint(args...)
-    map(tprint, args)
-    return nothing
-end
+"""
+Hide cursor
+"""
+hide_cursor() = print("\x1b[?25l")
+hide_cursor(io::IO) = print(io, "\x1b[?25l")
+
+
+"""
+Show cursor
+"""
+show_cursor() = print("\x1b[?25h")
+show_cursor(io::IO) = print(io, "\x1b[?25h")
+
+"""
+Print a new line.
+"""
+line(; i=1) = print("\n"^i)
+line(io::IO; i=1) = print(io, "\n"^i)
+
+
+"""
+Erase last line in console.
+"""
+erase_line() = print("\e[2K\r")
+erase_line(io::IO) = print(io, "\e[2K\r")
+
 
 # ---------------------------------------------------------------------------- #
 #                                    CONSOLE                                   #
