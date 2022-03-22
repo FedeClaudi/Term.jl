@@ -259,7 +259,7 @@ end
 Create a styled `hLine` of given width.
 """
 function hLine(
-    width::Int; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED
+    width::Int; style::String = "default", box::Symbol = :ROUNDED
 )
     char = eval(box).row.mid
     segments = [Segment(char^width, style)]
@@ -313,5 +313,5 @@ end
 
 Construct an hLine with same width as a renderable
 """
-hLine(ren::AbstractRenderable; kwargs) = hLine(ren.measure.w; kwargs...)
+hLine(ren::AbstractRenderable; kwargs...) = hLine(ren.measure.w; kwargs...)
 end

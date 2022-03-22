@@ -12,41 +12,41 @@ const TIMEROUTPUT = TimerOutputs.TimerOutput()
 # tprint("[bold green]Running: '00_misc.jl' [/bold green]")
 # @time @timeit_include("00_misc.jl")
 
-# ? 1  - text utils
-tprint("[bold green]Running: '01_test_text_utils.jl' [/bold green]")
-@time @timeit_include("01_test_text_utils.jl")
+# # ? 1  - text utils
+# tprint("[bold green]Running: '01_test_text_utils.jl' [/bold green]")
+# @time @timeit_include("01_test_text_utils.jl")
 
- # ? 2 ansi
-tprint("\n\n[bold green]Running: '02_test_ansi.jl' [/bold green]")  # ansi & col' [/bold green]")
-@time @timeit_include("02_test_ansi.jl")  
+#  # ? 2 ansi
+# tprint("\n\n[bold green]Running: '02_test_ansi.jl' [/bold green]")  # ansi & col' [/bold green]")
+# @time @timeit_include("02_test_ansi.jl")  
 
- # ? 3 measure
-tprint("\n\n[bold green]Running: '03_test_measure.jl' [/bold green]")
-@time @timeit_include("03_test_measure.jl")
+#  # ? 3 measure
+# tprint("\n\n[bold green]Running: '03_test_measure.jl' [/bold green]")
+# @time @timeit_include("03_test_measure.jl")
 
- # ? 4 style
-tprint("\n\n[bold green]Running: '04_test_style.jl' [/bold green]")
-@time @timeit_include("04_test_style.jl")
+#  # ? 4 style
+# tprint("\n\n[bold green]Running: '04_test_style.jl' [/bold green]")
+# @time @timeit_include("04_test_style.jl")
 
- # ? 5 macros
-tprint("\n\n[bold green]Running: '05_test_macros.jl' [/bold green]")
-@time @timeit_include("05_test_macros.jl")
+#  # ? 5 macros
+# tprint("\n\n[bold green]Running: '05_test_macros.jl' [/bold green]")
+# @time @timeit_include("05_test_macros.jl")
 
-# ? 6a box
-tprint("\n\n[bold green]Running: '6a_test_box.jl' [/bold green]")
-@time @timeit_include("6a_test_box.jl")
+# # ? 6a box
+# tprint("\n\n[bold green]Running: '6a_test_box.jl' [/bold green]")
+# @time @timeit_include("6a_test_box.jl")
 
- # ? 6 renderables
-tprint("\n\n[bold green]Running: '06_test_renderables.jl' [/bold green]")
-@time @timeit_include("06_test_renderables.jl")
+#  # ? 6 renderables
+# tprint("\n\n[bold green]Running: '06_test_renderables.jl' [/bold green]")
+# @time @timeit_include("06_test_renderables.jl")
 
 # ? 7 panel
 tprint("\n\n[bold green]Running: '07_test_panel.jl' [/bold green]")
 @time @timeit_include("07_test_panel.jl")
 
-# # ? 8 layout
-# tprint("\n\n[bold green]Running: '08_test_layout.jl' [/bold green]")
-# @time @timeit_include("08_test_layout.jl")
+# ? 8 layout
+tprint("\n\n[bold green]Running: '08_test_layout.jl' [/bold green]")
+@time @timeit_include("08_test_layout.jl")
 
 # #  ? 9 inspect
 # tprint("\n\n[bold green]Running: '09_test_inspect.jl' [/bold green]")

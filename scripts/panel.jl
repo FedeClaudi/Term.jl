@@ -8,7 +8,8 @@ clear()
 pprint(pan) = begin
     print(" " * hLine(pan.measure.w; style="red"))
     print(vLine(pan.measure.h; style="red") * pan)
-    println(pan.measure, "   ", length(chars(pan.segments[1].plain)), "  ", length(pan.segments) )
+    println(pan.measure, "  ", length(pan.segments) )
+    # print(pan)
 end
 
 # TODO test panels layout
@@ -17,9 +18,9 @@ end
 #                                  no content                                  #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- fitted ---------------------------------- #
-# pprint(
-#     Panel(;fit=true)
-# )
+pprint(
+    Panel(;fit=true)
+)
 
 # # --------------------------------- unfitted --------------------------------- #
 # pprint(

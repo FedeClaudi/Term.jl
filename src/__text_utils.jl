@@ -309,9 +309,14 @@ an ANSI tag to preserve style info
 """
 function get_valid_cut_idx(shortline)::Int
     shortline = replace_multi(shortline, ANSI_REGEXEs[1]=>"|", ANSI_REGEXEs[2]=>"|")
-    return prevind(shortline, findlast(
-        c -> c != '|', collect(shortline)
-    ))
+    idx = findlast(c -> c != '|', collect(shortline))
+
+    isnothing(idx) || return prevind(
+        shortline, 
+        idx
+    )
+
+    return length(shortline)
 end
 
 """
@@ -340,6 +345,7 @@ function reshape_line(line, width::Int)
     while textwidth(line) > width
         spaces, locs = get_spaces_locations(line)
         cut = findlast(locs .<= width)
+
         cut = isnothing(cut) ? get_valid_cut_idx(line[1:prevind(line, width)]) : spaces[cut]
 
         pre = line[1:cut]

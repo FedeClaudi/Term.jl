@@ -38,12 +38,12 @@ end
     @test line.segments[1].text == "\e[31m│\e[39m"
 
     for box in (:MINIMAL_DOUBLE_HEAD, :DOUBLE, :ASCII, :DOUBLE_EDGE)
-        @test vLine(22; box = box).height == 22
+        @test vLine(22; box = box).measure.h == 22
     end
 
     panel = Panel(; width=20, height=5)
     @test length(vLine(panel).segments) == 5
-    @test vLine().height == displaysize(stdout)[1]
+    @test vLine().measure.h == displaysize(stdout)[1]
 end
 
 @testset "\e[34mlayout - hLine " begin
@@ -55,8 +55,8 @@ end
     end
 
     for box in (:MINIMAL_DOUBLE_HEAD, :DOUBLE, :ASCII, :DOUBLE_EDGE)
-        @test hLine(22; box = box).width == 22
-        @test hLine(22, "title"; box = box).width == 22
+        @test hLine(22; box = box).measure.w == 22
+        @test hLine(22, "title"; box = box).measure.w == 22
     end
 
     for style in ("bold", "red on_green", "blue")
@@ -65,7 +65,7 @@ end
     end
 
     panel = Panel(; width=20, height=5)
-    @test hLine().width == displaysize(stdout)[2]
+    @test hLine().measure.w == displaysize(stdout)[2]
     @test textlen(hLine(panel).segments[1].text) == 20
 end
 
@@ -95,7 +95,7 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 / r2
-    @test r.measure.w == 50
+    @test r.measure.w == 51
     @test r.measure.h == 6
 
     h1 = hLine(22)
@@ -107,7 +107,7 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 * r2
-    @test r.measure.w == 75
+    @test r.measure.w == 77
     @test r.measure.h == 4
 
     # stack other renderables
