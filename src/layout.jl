@@ -227,6 +227,11 @@ function vLine(
     return vLine(segments, Measure(1, height))
 end
 
+"""
+    vLine(ren::AbstractRenderable; kwargs...)
+
+Construct a vLine with the same height as a renderable
+"""
 vLine(ren::AbstractRenderable; kwargs...) = vLine(ren.measure.h; kwargs...)
 
 """
@@ -234,7 +239,7 @@ vLine(ren::AbstractRenderable; kwargs...) = vLine(ren.measure.h; kwargs...)
 
 Create a `vLine` as tall as the `stdout` console
 """
-function vLine(; style::Union{String,Nothing} = nothing, box::Symbol = :ROUNDED)
+function vLine(; style::String = "default", box::Symbol = :ROUNDED)
     return vLine(console_height(stdout); style = style, box = box)
 end
 
@@ -302,4 +307,11 @@ function hLine(
 )
     return hLine(console_width(stdout), text; style = style, box = box)
 end
+
+"""
+    hLine(ren::AbstractRenderable; kwargs)
+
+Construct an hLine with same width as a renderable
+"""
+hLine(ren::AbstractRenderable; kwargs) = hLine(ren.measure.w; kwargs...)
 end

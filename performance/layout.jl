@@ -30,3 +30,4 @@ println("hLine")
 @time hLine(10; style="red")
 @time hLine(50, "title")
 
+# TODO test hLine and vLine sizes correct

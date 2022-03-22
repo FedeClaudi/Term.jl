@@ -35,6 +35,9 @@ import Term: remove_markup,
             @test cleantext(s1) == s2
             @test textlen(s1) == textwidth(s2)
         end
+
+        @test remove_markup("text with [[double]] squares") == "text with [[double]] squares"
+        @test has_markup("text with [[double]] squares") == false
 end
 
 @testset "TU_ansi" begin

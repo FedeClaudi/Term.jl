@@ -99,7 +99,7 @@ If a `width` is passed the text is resized to match the width.
 function RenderableText(text::String; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
     # reshape text
     width = isnothing(width) ? console_width(stdout) : min(console_width(stdout), width)
-    text = fillin(reshape_text(text, width))
+    text = fillin(reshape_text(text, width+1))
 
     # create renderable
     if isnothing(style)

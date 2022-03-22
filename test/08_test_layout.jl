@@ -1,4 +1,4 @@
-import Term: RenderableText, Spacer, vLine, hLine, cleantext, textlen, chars
+import Term: RenderableText, Spacer, vLine, hLine, cleantext, textlen, chars, Panel
 import Term.layout: pad
 
 @testset "Layout - pad" begin
@@ -20,31 +20,37 @@ end
     end
 end
 
+
 @testset "\e[34mlayout - vLine " begin
     for h in [1, 22, 55, 11]
         line = vLine(h)
         @test length(line.segments) == h
         @test line.measure.h == h
-        @test line.height == h
     end
 
     lines = [(22, "bold"), (55, "red on_green")]
     for (h, style) in lines
-        @test vLine(h; style = style).measure.h == h
+        line = vLine(h; style = style)
+        @test length(line.segments) == h
+        @test line.measure.h == h
     end
+    line = vLine(5; style="red")
+    @test line.segments[1].text == "\e[31m│\e[39m"
 
     for box in (:MINIMAL_DOUBLE_HEAD, :DOUBLE, :ASCII, :DOUBLE_EDGE)
         @test vLine(22; box = box).height == 22
     end
 
+    panel = Panel(; width=20, height=5)
+    @test length(vLine(panel).segments) == 5
     @test vLine().height == displaysize(stdout)[1]
 end
 
 @testset "\e[34mlayout - hLine " begin
     for w in [1, 342, 433, 11, 22]
         line = hLine(w)
-        @test line.width == w
         @test length(line.segments) == 1
+        @test textlen(line.segments[1].text) == w
         @test line.measure.w == w
     end
 
@@ -54,11 +60,13 @@ end
     end
 
     for style in ("bold", "red on_green", "blue")
-        @test hLine(11; style = style).width == 11
-        @test hLine(11, "ttl"; style = style).width == 11
+        @test textlen(hLine(11; style = style).segments[1].text) == 11
+        @test textlen(hLine(11, "ttl"; style = style).segments[1].text) == 11
     end
 
+    panel = Panel(; width=20, height=5)
     @test hLine().width == displaysize(stdout)[2]
+    @test textlen(hLine(panel).segments[1].text) == 20
 end
 
 
