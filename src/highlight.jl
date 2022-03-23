@@ -48,11 +48,10 @@ relevant text of type :like.
 """
 function highlight(text::AbstractString, like::Symbol; theme::Theme=theme)
     markup = getfield(theme, like)
-    return do_by_line(x -> "[$markup]$x[/$markup]", chomp(text))
+    return do_by_line((x)->"["*markup*"]"*x*"[/"*markup*"]", chomp(text))
 end
 
 # shorthand to highlight objects based on type
-
 highlight(x::Union{UnionAll, DataType}; theme::Theme=theme) = highlight(string(x), :type; theme=theme)
 highlight(x::Number; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
 highlight(x::Function; theme::Theme=theme) = highlight(string(x), :func; theme=theme)

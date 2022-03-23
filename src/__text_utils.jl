@@ -211,6 +211,7 @@ Merge a vector of strings in a single string.
 """
 join_lines(lines::Vector{String})::String = join(lines, "\n")
 join_lines(lines::Vector)::String = join(lines, "\n")
+join_lines(lines...) = join(lines, "\n")
 
 """
     split_lines(text::AbstractString)
@@ -389,7 +390,7 @@ Apply `fn` to each line in the `text`.
 
 The function `fn` should accept a single `::String` argument.
 """
-function do_by_line(fn::Function, text::String)::String
+function do_by_line(fn::Function, text)::String
     out = ""
     for (last, line) in loop_last(split_lines(text))
         out *= fn(line) * (last ? "" : "\n")

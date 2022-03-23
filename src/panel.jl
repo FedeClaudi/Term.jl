@@ -335,7 +335,6 @@ function TextBox(
     justify::Symbol = :left,
     fit::Symbol = :nofit,
 )
-
     # fit text or get width
     if fit==:fit
         # the box's size depends on the text's size
@@ -376,6 +375,7 @@ function TextBox(
     return TextBox(panel.segments, Measure(panel.measure.w, panel.measure.h))
 end
 
-TextBox(texts...; kwargs...) = TextBox(join_lines(texts); kwargs...)
+TextBox(texts...; kwargs...) = TextBox(join_lines(texts...); kwargs...)
 
 end
+ 

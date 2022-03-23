@@ -13,7 +13,7 @@ import Term:
     split_lines,
     do_by_line
 
-import ..consoles: console
+import ..consoles: console_width
 import ..panel: Panel, TextBox
 import ..layout: Spacer, hLine
 import ..tree: Tree
@@ -30,7 +30,7 @@ export inspect, typestree
 function typestree(T::DataType)
     print(
         Panel(
-            Tree(T),
+            Tree(T);
             title="Types hierarchy",
             style="blue dim",
             title_style=orange,
@@ -59,7 +59,6 @@ struct TypeInfo
     fields::Union{Nothing,Dict}
     constructors::Vector
     methods::Vector  # functions using the target type
-    docs::Union{Nothing,Vector{Docs.DocStr}}
     docstring::String
 end
 
@@ -90,7 +89,7 @@ function TypeInfo(type::DataType)
     _methods = methodswith(type)
 
     return TypeInfo(
-        string(type), super, sub, fields, constructors, _methods, doc, docstring
+        string(type), super, sub, fields, constructors, _methods, docstring
     )
 end
 
@@ -107,7 +106,7 @@ function TypeInfo(fun::Function)
     _methods = split_lines(string(methods(fun)))
     _methods = length(_methods) > 1 ? _methods[2:end] : []
 
-    return TypeInfo(string(fun), nothing, nothing, nothing, [], _methods, doc, docstring)
+    return TypeInfo(string(fun), nothing, nothing, nothing, [], _methods,  docstring)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -125,7 +124,7 @@ terminal output.
 function inspect(
     type::DataType; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 3
 )
-    width = isnothing(width) ? min(console.width, 92) - 4 : width - 4
+    width = isnothing(width) ? min(console_width(stdout), 92) - 4 : width - 4
     # extract type info
     info = TypeInfo(type)
 
@@ -248,7 +247,7 @@ end
 Inspects `Function` objects providing docstrings, and methods signatures.
 """
 function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 7)
-    width = isnothing(width) ? min(console.width, 92) : width
+    width = isnothing(width) ? min(console_width(stdout), 92) : width
 
     info = TypeInfo(fun)
 
