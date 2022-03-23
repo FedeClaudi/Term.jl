@@ -78,6 +78,26 @@ function get_last_ANSI_code(text)::String
     rmatch = m1.offset > m2.offset ? m1 : m2
     return rmatch.match
 end
+
+"""
+    replace_ansi(input_text)
+
+Replace ANSI tags with ¦.
+
+The number of '¦' matches the length of the ANSI tags.
+Used when we want to hide ANSI tags but keep the string length intact.
+"""
+function replace_ansi(input_text)
+    for rx in ANSI_REGEXEs
+        while occursin(rx, input_text)
+            mtch = match(rx, input_text)
+            input_text = replace_text(input_text, mtch.offset-1, mtch.offset+length(mtch.match)-1, '¦')
+        end
+    end
+    return input_text
+end
+
+
 # --------------------------- clean text / text len -------------------------- #
 """
     cleantext(str::AbstractString)
@@ -308,10 +328,14 @@ no valid space is found for cutting we need to split
 a word. This function chooses a cutting point not in
 an ANSI tag to preserve style info
 """
-function get_valid_cut_idx(shortline)::Int
-    shortline = replace_multi(shortline, ANSI_REGEXEs[1]=>"|", ANSI_REGEXEs[2]=>"|")
-    idx = findlast(c -> c != '|', collect(shortline))
+function get_valid_cut_idx(line, width)::Int
+    textlen(line) <= width && return length(line)
 
+    # get a short line with no ANSI
+    shortline = replace_ansi(line[1:prevind(line, width)])
+
+    # get the last non-ansi char in shortline
+    idx = findlast(c -> c != '¦', collect(shortline))
     isnothing(idx) || return prevind(
         shortline, 
         idx
@@ -346,8 +370,7 @@ function reshape_line(line, width::Int)
     while textwidth(line) > width
         spaces, locs = get_spaces_locations(line)
         cut = findlast(locs .<= width)
-
-        cut = isnothing(cut) ? get_valid_cut_idx(line[1:prevind(line, width)]) : spaces[cut]
+        cut = isnothing(cut) ? get_valid_cut_idx(line, width) : spaces[cut]
 
         pre = line[1:cut]
         ansi = get_last_ANSI_code(pre)
@@ -381,7 +404,6 @@ function reshape_text(text::String, width::Int)::String
     )
 end
 
-# ------------------------------------ end ----------------------------------- #
 
 """
     do_by_line(fn::Function, text::String)

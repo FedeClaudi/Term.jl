@@ -128,12 +128,20 @@ sadadand [/red on_green]"""
 
     for str in strings
         @test same_widths(fillin(str)) == true
-        @test textwidth(truncate(str, 10)) <= 10
+        @test textwidth(truncate(str, 10)) == 10
 
-        check_widths(reshape_text(str, 10), 11)
-        # check_widths(reshape_text(str, 21), 22)
-        # check_widths(reshape_text(str, 25), 26)
+        check_widths(reshape_text(str, 10), 10)
+        check_widths(reshape_text(str, 21), 21)
+        check_widths(reshape_text(str, 25), 25)
 
     end
 
+    text = "my text is [red]red for a while [/red]and then it is [blue]also blue![/blue]"
+    for width in (10, 14, 19, 28, 36, 41, 60)
+        rsh = reshape_text(text, width)
+        @test same_widths(fillin(rsh)) == true
+        @test textwidth(truncate(rsh, width)) == width
+
+        check_widths(rsh, width)
+    end
 end

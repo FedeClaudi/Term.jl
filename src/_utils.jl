@@ -3,11 +3,11 @@ fint(x) = (Int ∘ floor)(x)
 cint(x) = (Int ∘ ceil)(x)
 
 """
-  loop_last(v::Vector)
+  loop_last(v)
 
   Returns an iterable yielding tuples (is_last, value).
 """
-function loop_last(v::Vector)
+function loop_last(v)
     is_last = [i == length(v) for i in 1:length(v)]
     return zip(is_last, v)
 end
