@@ -1,6 +1,6 @@
 module color
 
-import Term: NAMED_COLORS, nospaces, COLORS_16b, remove_brackets, ANSICode, int, CODES
+import Term: NAMED_COLORS, nospaces, COLORS_16b, remove_brackets, ANSICode, int, CODES, CODES_16BIT_COLORS
 
 export NamedColor, BitColor, RGBColor, get_color
 
