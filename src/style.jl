@@ -8,7 +8,8 @@ import Term: unspace_commas,
             replace_text,
             get_last_ANSI_code,
             CODES,
-            ANSICode
+            ANSICode,
+            tview
 
 
 import ..color: AbstractColor,
@@ -156,7 +157,7 @@ function apply_style(text)::String
         close_match = match(close_rx, text)
 
         # check if there was previous ansi style info
-        prev_style = get_last_ANSI_code(text[1:open_match.offset-1])
+        prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset-1))
 
         # replace close tag
         text = replace_text(text, close_match.offset-1, close_match.offset + length(markup)+2, ansi_close * prev_style)

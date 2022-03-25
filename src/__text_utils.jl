@@ -61,7 +61,7 @@ remove_ansi(input_text)::String = replace_multi(input_text,
 
 Returns `true` if `text` includes a `MarkupTag`
 """
-has_ansi(text::String)::Bool = occursin(ANSI_REGEXEs[1], text) || occursin(ANSI_REGEXEs[2], text)
+has_ansi(text)::Bool = occursin(ANSI_REGEXEs[1], text) || occursin(ANSI_REGEXEs[2], text)
 
 """
     get_last_ANSI_code(text)::String
@@ -168,6 +168,12 @@ end
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
+"""
+    tview(text, start::Int, stop::Int)
+
+Get a view object with appropriate indices
+"""
+tview(text, start::Int, stop::Int) = view(text, max(1, prevind(text, start)):prevind(text, stop))
 
 """
     replace_text(text::AbstractString, start::Int, stop::Int, replace::AbstractString)
