@@ -37,46 +37,44 @@ function get_nunits(text)
     widths = cumsum(textwidth.(collect(text)) .*  in_tag)
     
 
-    isspace = zeros(Int, length(text))
+    isspace = zeros(Bool, length(text))
     isspace[nchar.(findall(' ', text))] .= 1
 
     issimple = length(text) == ncodeunits(text)
-    return text, widths, in_tag, isspace, issimple, hasstyle
+    return text, widths, .!Bool.(in_tag), isspace, issimple, hasstyle
 end
 
 
 
 
 function test(text, width)
-    text, widths, isansi, isspace, issimple, hasstyle = get_nunits(text)
+    text, widths, notansi, isspace, issimple, hasstyle = get_nunits(text)
     original_widths = widths
 
     # get yhe last char within width
     cuts = [1]
     N = length(original_widths)
     while cuts[end] <= N
-        candidate = findlast(widths .<= width)
+        candidate = findlast(widths .< width)
         if isnothing(candidate)
             @info cuts text[cuts[end]:end]
+            break
         end
 
         if isspace[candidate] == 1
             cut = candidate
         else
             # get the last valid space
-            lastspace = findlast(isspace[cuts[end]:candidate] .== 1) 
+            lastspace = findlast(isspace[cuts[end]:candidate]) 
 
             if isnothing(lastspace)
                 # no valid space, get last non-ansi char
-                newcandidate = findlast(isansi[cuts[end]:candidate] .!= 1)
+                newcandidate = findlast(notansi[cuts[end]:candidate])
                 if isnothing(newcandidate)
-                    
-                    cut = min(cuts[end]+width, ncodeunits(text))
-                    # cut == cuts[end] && continue
-                    # cut == ncodeunits(text) && break
-                    # @info "no new candidate" cuts[end] candidate ncodeunits(text) original_widths[end] cut
+                    cut = candidate # min(cuts[end]+width, ncodeunits(text))
                 else
-                    cut = newcandidate + cuts[end]
+                    # cut = newcandidate + cuts[end] + 1
+                    cut = candidate
                 end
             else
                 cut = lastspace + cuts[end]
@@ -84,21 +82,20 @@ function test(text, width)
         end
         cut == cuts[end] && break
 
-        # @info widths cut candidate
         if cut <= N
             push!(cuts, cut)
             widths = original_widths .- sum(original_widths[cut])
         else
             @warn widths cut text[cut:end] length(original_widths) length(text)
-            # push!(cuts, ncodeunits(text))
             break
         end
     end
-    
+
+    # @info cuts
     cuts = unique(cuts)
-    @info cuts
     out = ""
     for (last, (pre, post)) in loop_last(zip(cuts[1:end-1], cuts[2:end]))
+        post - pre <= 1 && continue
         Δ = last ? 0 : 1
 
         if issimple
@@ -139,7 +136,7 @@ text = "Lorem[red]ipsumdolorsit[underline]amet, consectetur[/underline] adipisci
 
 
 print("\n"^3)
-for w in (9, 15, 22)
+for w in (15, 22, 46)
     println('_'^w)
     # println(t)
     println(test(text, w))
