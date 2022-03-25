@@ -177,7 +177,7 @@ end
 
 Get a view object with appropriate indices
 """
-tview(text, start::Int, stop::Int) = view(text, max(1, prevind(text, start)):prevind(text, stop))
+tview(text, start::Int, stop::Int) = view(text,thisind(text, start):thisind(text, stop))
 tview(text, start::Int, stop::Int, simple::Symbol) = view(text, start:stop)
 
 """

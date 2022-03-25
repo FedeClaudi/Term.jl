@@ -137,11 +137,8 @@ function apply_style(text)::String
         open_match = match(OPEN_TAG_REGEX, text)
         markup = open_match.match[2:end-1]
 
-        # get MarkupStyle
-        style = MarkupStyle(markup)
-
-        # get styke codes
-        ansi_open, ansi_close = get_style_codes(style)
+        # get style codes
+        ansi_open, ansi_close = get_style_codes(MarkupStyle(markup))
 
         # replace markup with ANSI codes
         text = replace_text(text, max(open_match.offset-1, 1), open_match.offset + length(markup)+1, ansi_open)
