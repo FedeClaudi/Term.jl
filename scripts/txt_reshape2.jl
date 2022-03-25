@@ -1,4 +1,4 @@
-import Term: reshape_text, RenderableText, replace_ansi, ANSI_REGEXEs, get_last_ANSI_code, loop_last, textlen, has_markup, has_ansi
+import Term: reshape_text, RenderableText, replace_ansi, ANSI_REGEXE, get_last_ANSI_code, loop_last, textlen, has_markup, has_ansi
 import Term.style: apply_style
 
 struct AnsiTag
@@ -14,7 +14,7 @@ function get_nunits(text)
         tags = map(m -> AnsiTag(
                             max(m.offset-1, 1), 
                             m.offset+textwidth(m.match)-1
-                        ), eachmatch(ANSI_REGEXEs[1], text))
+                        ), eachmatch(ANSI_REGEXE[1], text))
 
         in_tag = ones(Int, length(text))
         for tag in tags

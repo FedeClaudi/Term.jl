@@ -1,4 +1,4 @@
-import Term: reshape_text, RenderableText, replace_ansi, ANSI_REGEXEs, get_last_ANSI_code, loop_last, textlen, has_markup, has_ansi
+import Term: reshape_text, RenderableText, replace_ansi, ANSI_REGEXE, get_ANSI_codes, loop_last, textlen, has_markup, has_ansi, tview
 import Term.style: apply_style
 
 struct AnsiTag
@@ -10,6 +10,7 @@ function get_nunits(text)
     nchar(unit) = findfirst(charidxs .== unit)  # n chars at codeunit
 
     if has_markup(text) || has_ansi(text)
+        hasstyle = true
         text = apply_style(text)
         charidxs = collect(eachindex(text))  # codeunits idx of start of each char
     
@@ -17,7 +18,7 @@ function get_nunits(text)
         tags = map(m -> AnsiTag(
                             max(m.offset-1, 1), 
                             nchar(m.offset+textwidth(m.match)-1)
-                        ), eachmatch(ANSI_REGEXEs[1], text))
+                        ), eachmatch(ANSI_REGEXE, text))
 
         in_tag = ones(Int, length(text))
         for tag in tags
@@ -27,6 +28,7 @@ function get_nunits(text)
         # get a measure of the text width at each char
         nunits = cumsum(ncodeunits.(collect(text)) .*  in_tag)
     else
+        hasstyle = false
         charidxs = collect(eachindex(text))  # codeunits idx of start of each char
         nunits = cumsum(ncodeunits.(collect(text)))
         in_tag = ones(Int, length(text))
@@ -39,14 +41,14 @@ function get_nunits(text)
     isspace[nchar.(findall(' ', text))] .= 1
 
     issimple = length(text) == ncodeunits(text)
-    return text, widths, in_tag, isspace, issimple
+    return text, widths, in_tag, isspace, issimple, hasstyle
 end
 
 
 
 
 function test(text, width)
-    text, widths, isansi, isspace, issimple = get_nunits(text)
+    text, widths, isansi, isspace, issimple, hasstyle = get_nunits(text)
     original_widths = widths
 
     # get yhe last char within width
@@ -65,50 +67,62 @@ function test(text, width)
             lastspace = findlast(isspace[cuts[end]:candidate] .== 1) 
 
             if isnothing(lastspace)
-                # no valid space
+                # no valid space, get last non-ansi char
                 newcandidate = findlast(isansi[cuts[end]:candidate] .!= 1)
                 if isnothing(newcandidate)
-                    cut = cuts[end]+width
+                    
+                    cut = min(cuts[end]+width, ncodeunits(text))
+                    # cut == cuts[end] && continue
+                    # cut == ncodeunits(text) && break
+                    # @info "no new candidate" cuts[end] candidate ncodeunits(text) original_widths[end] cut
                 else
                     cut = newcandidate + cuts[end]
                 end
             else
-                cut = lastspace+ cuts[end]
+                cut = lastspace + cuts[end]
             end
         end
         cut == cuts[end] && break
 
         # @info widths cut candidate
-        if cut < N
+        if cut <= N
             push!(cuts, cut)
             widths = original_widths .- sum(original_widths[cut])
         else
-            push!(cuts, ncodeunits(text))
+            @warn widths cut text[cut:end] length(original_widths) length(text)
+            # push!(cuts, ncodeunits(text))
             break
         end
     end
     
-
+    cuts = unique(cuts)
+    @info cuts
     out = ""
     for (last, (pre, post)) in loop_last(zip(cuts[1:end-1], cuts[2:end]))
         Δ = last ? 0 : 1
 
         if issimple
-            out *= lstrip(text[pre:post-Δ]) * "\n"
+            newline = lstrip(tview(text, pre, post-Δ, :simple))
         else
             pre = max(prevind(text, pre), 1)
             post = prevind(text, post-Δ)
-            out *= lstrip(text[pre:post]) * "\n"
+            newline = lstrip(text[pre:post])
+        end
+
+        ansi = hasstyle ? get_ANSI_codes(newline) : ""
+        # @info ansi ansi
+        if last
+            out *= lstrip(newline)*"\e[0m"
+        else
+            out *= lstrip(newline)*"\e[0m\n"*ansi
         end
     end
     return out
 end
 
 text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-# text = "my text is \e[31mred for a while \e[39mand then it is \e[34malso blue!\e[39m\e[39m"^1
-# text = "[red]red[/red] and [bold black underline on_green]not[/bold black underline on_green] "^5
-# text = "thistexthasaverylongwordfirstandthenashorterone and a short little piece of text"
-# text = "thistexth[red]asaverylongw[/red]o[blue]rdfirstandt[/blue]henashorterone and a short little piece of text"
+text = "Lorem [red]ipsum dolor sit [underline]amet, consectetur[/underline] adipiscing elit, [/red][blue]sed do eiusmod tempor incididunt[/blue] ut labore et dolore magna aliqua."
+text = "Lorem[red]ipsumdolorsit[underline]amet, consectetur[/underline] adipiscing elit, [/red]seddoeiusmo[blue]dtemporincididunt[/blue]ut labore et dolore magna aliqua."
 
 
 # text = "استنكار  النشوة وتمجيد الألم نشأت بالفعل، وسأعرض لك"
@@ -135,7 +149,5 @@ for w in (9, 15, 22)
 
 end
 
-# TODO get ansi to carry over correctly
-
-# TODO get the end of the text right
+# TODO figure out why third text breaks things
 # TODO get it to work with other alphabets

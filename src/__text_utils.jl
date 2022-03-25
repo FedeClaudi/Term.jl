@@ -43,17 +43,14 @@ has_markup(text::String)::Bool = occursin(OPEN_TAG_REGEX, text)
                                         
 
 # ----------------------------------- ansi ----------------------------------- #
-const ANSI_REGEXEs = [r"\e\[[0-9]*m", r"\e\[[0-9;]*m"]
+const ANSI_REGEXE = r"\e\[[0-9;]*m"
 
 """
     remove_ansi(input_text::AbstractString)::AbstractString
 
 Remove all ANSI tags from a string of text
 """
-remove_ansi(input_text)::String = replace_multi(input_text, 
-                                    ANSI_REGEXEs[1] => "", 
-                                    ANSI_REGEXEs[2] => ""
-                                    )
+remove_ansi(input_text)::String = replace(input_text, ANSI_REGEXE => "", )
 
 
 """ 
@@ -61,7 +58,7 @@ remove_ansi(input_text)::String = replace_multi(input_text,
 
 Returns `true` if `text` includes a `MarkupTag`
 """
-has_ansi(text)::Bool = occursin(ANSI_REGEXEs[1], text) || occursin(ANSI_REGEXEs[2], text)
+has_ansi(text)::Bool = occursin(ANSI_REGEXE, text)
 
 """
     get_last_ANSI_code(text)::String
@@ -72,12 +69,21 @@ function get_last_ANSI_code(text)::String
     has_ansi(text) || return ""
 
     # get the last matching regex
-    m1 = collect((eachmatch(ANSI_REGEXEs[1], text)))[end]
-    m2 = collect((eachmatch(ANSI_REGEXEs[2], text)))[end]
-    
-    rmatch = m1.offset > m2.offset ? m1 : m2
+    rmatch = collect((eachmatch(ANSI_REGEXE, text)))[end]
     return rmatch.match
 end
+
+"""
+    get_ANSI_codes(text)::String
+
+Returns a string with all ANSI codes in the input.
+"""
+function get_ANSI_codes(text)::String
+    has_ansi(text) || return ""
+    matches = collect((eachmatch(ANSI_REGEXE, text)))
+    return *(map(m->m.match, matches)...)
+end
+
 
 """
     replace_ansi(input_text)
@@ -88,11 +94,9 @@ The number of '¦' matches the length of the ANSI tags.
 Used when we want to hide ANSI tags but keep the string length intact.
 """
 function replace_ansi(input_text)
-    for rx in ANSI_REGEXEs
-        while occursin(rx, input_text)
-            mtch = match(rx, input_text)
-            input_text = replace_text(input_text, mtch.offset-1, mtch.offset+length(mtch.match)-1, '¦')
-        end
+    while occursin(rx, input_text)
+        mtch = match(ANSI_REGEXE, input_text)
+        input_text = replace_text(input_text, mtch.offset-1, mtch.offset+length(mtch.match)-1, '¦')
     end
     return input_text
 end
@@ -174,6 +178,7 @@ end
 Get a view object with appropriate indices
 """
 tview(text, start::Int, stop::Int) = view(text, max(1, prevind(text, start)):prevind(text, stop))
+tview(text, start::Int, stop::Int, simple::Symbol) = view(text, start:stop)
 
 """
     replace_text(text::AbstractString, start::Int, stop::Int, replace::AbstractString)
