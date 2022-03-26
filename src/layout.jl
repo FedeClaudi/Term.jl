@@ -203,6 +203,8 @@ function Spacer(width::Int, height::Int; char::Char = ' ')
     return Spacer(segments, Measure(seg.measure.w, height))
 end
 
+Spacer(width::Number, height::Number; char::Char = ' ') = Spacer(int(width), int(height); char=char)
+
 # ----------------------------------- vline ---------------------------------- #
 """
     vLine

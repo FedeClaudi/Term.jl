@@ -229,7 +229,9 @@ function Panel(
 
     # define convenience function
     function resize_content(content, _width)
-        content = RenderableText(content; width=_width)
+        if content isa RenderableText
+            content = RenderableText(content; width=_width)
+        end
         return content, content.measure
     end
 
@@ -247,7 +249,7 @@ function Panel(
 
     if !fit
         # check that the content fits within the given width
-        if content isa RenderableText || content isa AbstractString
+        if content isa RenderableText
             width = min(width, WIDTH)
             if content_measure.w > width-Δw
                 content, content_measure = resize_content(content, width-Δw)
@@ -283,6 +285,7 @@ end
 `Panel` constructor for creating a panel out of multiple renderables at once.
 """
 Panel(renderables::Vector{RenderablesUnion}; kwargs...) = Panel(vstack(renderables...); kwargs...)
+Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
 Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
 # ---------------------------------------------------------------------------- #
 #                                    TextBox                                   #

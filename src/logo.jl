@@ -9,30 +9,30 @@ oooooooooooo
 
     # create circles
     green = Panel(
-        RenderableText(circle, "#389826 bold");
+        RenderableText(circle; style="#389826 bold");
         fit=true,
         style = "dim #389826",
         justify = :center,
-        padding=(0, 0, 0, 0),
+        padding=(2, 2, 0, 0),
         title = "[italic]Made",
         title_style = "bold red",
     )
     red = Panel(
-        RenderableText(circle, "#CB3C33 bold");
+        RenderableText(circle; style="#CB3C33 bold");
         fit=true,
         style = "dim #CB3C33",
         justify = :center,
-        padding=(0, 0, 0, 0),
+        padding=(2, 2, 0, 0),
         subtitle = "[italic]with",
         subtitle_style = "bold #b656e3",
         subtitle_justify = :right,
     )
     purple = Panel(
-        RenderableText(circle, "#9558B2 bold");
+        RenderableText(circle; style="#9558B2 bold");
         fit=true,
         style = "dim #9558B2",
         justify = :center,
-        padding=(0, 0, 0, 0),
+        padding=(2, 2, 0, 0),
         subtitle = "[italic]Term",
         subtitle_style = "bold #389826",
     )

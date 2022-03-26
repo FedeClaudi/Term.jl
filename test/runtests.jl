@@ -8,9 +8,9 @@ using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
 
-# # ? 0  - misc
-# tprint("[bold green]Running: '00_misc.jl' [/bold green]")
-# @time @timeit_include("00_misc.jl")
+# ? 0  - misc
+tprint("[bold green]Running: '00_misc.jl' [/bold green]")
+@time @timeit_include("00_misc.jl")
 
 # ? 1  - text utils
 tprint("[bold green]Running: '01_test_text_utils.jl' [/bold green]")
@@ -49,8 +49,8 @@ tprint("\n\n[bold green]Running: '08_test_layout.jl' [/bold green]")
 @time @timeit_include("08_test_layout.jl")
 
 # #  ? 9 inspect
-# tprint("\n\n[bold green]Running: '09_test_inspect.jl' [/bold green]")
-# @time @timeit_include("09_test_inspect.jl")
+tprint("\n\n[bold green]Running: '09_test_inspect.jl' [/bold green]")
+@time @timeit_include("09_test_inspect.jl")
 
 # ? 11 console
 tprint("\n\n[bold green]Running: '11_test_console.jl' [/bold green]")
