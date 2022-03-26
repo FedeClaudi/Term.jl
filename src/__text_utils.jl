@@ -389,7 +389,7 @@ function correct_newline_style(text)
     out = ""
     for (last, line) in loop_last(split(text, "\n"))
         out *= ansi * line * (last ? "\e[0m" : "\e[0m\n")
-        ansi = last ? "" : get_last_ANSI_code(line)
+        ansi = last ? "" : get_ANSI_codes(line)
     end
     out
 end
