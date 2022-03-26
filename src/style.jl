@@ -115,6 +115,7 @@ function get_style_codes(style::MarkupStyle)
         if !isnothing(code)
             style_init *= code.open
             style_finish *= code.close
+            style_finish *= (occursin(code.close, style_finish) ? "" : code.close)
         end
     end
 
@@ -155,7 +156,7 @@ function apply_style(text)::String
 
         # check if there was previous ansi style info
         prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset-1))
-        prev_style = prev_style == ansi_close ? "" : prev_style
+        prev_style = occursin(prev_style, ansi_close) ? "" : prev_style
         # replace close tag
         text = replace_text(text, close_match.offset-1, close_match.offset + length(markup)+2, ansi_close * prev_style)
     end

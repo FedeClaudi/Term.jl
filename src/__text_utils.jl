@@ -343,7 +343,6 @@ function excise_style(text)::Tuple{String, Vector{AnsiTag}, Bool}
         push!(tags, AnsiTag(_start, _stop, mtch.match))
         text = text[1:_start] * text[_stop:end]
     end
-
     return text, tags, hasstyle
 end
 
@@ -356,22 +355,27 @@ If the cleaned text was reshaped, `cuts` stores information about
 where new lines were added so that the ANSI style can be added
 in the right place.
 """
-function reinject_style(text, tags::Vector{AnsiTag}, cuts::Vector{Int})
-    issimple = length(text) == ncodeunits(text)
+function reinject_style(text, tags::Vector{AnsiTag}, cuts::Vector{Int}, issimple::Bool)
     for tag in reverse(tags)
         pads = findall(cuts .< tag.start)
-        pads = isnothing(pads) ? 0 : max(0, length(pads)-1)
 
         if issimple
+            pads = isnothing(pads) ? 0 : max(0, length(pads)-1)
+            
             cut1 = tag.start + pads
+            cut1 = text[cut1] == '\n' ? cut1+1 : cut1
             cut2 = cut1+1
+            
         else
+            pads = isnothing(pads) ? 0 : max(0, length(pads))
+            
             cut1 = thisind(text, tag.start+pads)
-            cut2 = thisind(text, cut1+ncodeunits(text[cut1]))
+            cut2 = thisind(text, cut1 + ncodeunits(text[cut1]))
         end
         cut1 > ncodeunits(text) && continue
-        cut2 = min(cut2, ncodeunits(text))
+        # cut2 = min(cut2, ncodeunits(text))
 
+    
         text = text[1:cut1] * tag.style * text[cut2:end]
 
     end
@@ -414,14 +418,15 @@ function get_text_info(text)
     issimple = length(text) == ncodeunits(text)
     if issimple
         isspace = ' ' .== ctext
+        nchar = identity
     else
         charidxs = collect(eachindex(text))  # codeunits idx of start of each char
-        nchar(unit) = findfirst(charidxs .== prevind(text, unit))  # n chars at codeunit
+        nchar(unit) = or(findfirst(charidxs .== prevind(text, unit)), 1)  # n chars at codeunit
         isspace = zeros(Bool, length(text))
         isspace[nchar.(findall(' ', text))] .= 1
     end
 
-    return widths, isspace, issimple, nunits
+    return widths, isspace, issimple, nunits, nchar
 end
 
 
@@ -447,14 +452,14 @@ everything right and changing anything can cause
 the whole thing to break, so do so at your peril!
 """
 function reshape_text(text, width::Int)
-    textwidth(text) <= width && return text
+    textlen(text) <= width && return text
 
     # Remove style information to simplify reshaping
     text, tags, hasstyle = excise_style(text)
 
     # extract style information
-    original_widths, isspace, issimple, nunits = get_text_info(text)
-    widths = view(original_widths, :)
+    original_widths, isspace, issimple, nunits, nchar = get_text_info(text)
+    widths = view(original_widths, :) .- 1
 
     # infer places where to cut the text
     cuts = [1]
@@ -462,7 +467,7 @@ function reshape_text(text, width::Int)
     while cuts[end] < ncodeunits(text)
         # start with the worst case: we cut mid-word
         lastcut = cuts[end]
-        candidate = findlast(widths .< width)
+        candidate = issimple ? findlast(widths .<= width) : findlast(widths .< width)
 
         if isspace[candidate] == 1
             # we got lucky
@@ -492,23 +497,23 @@ function reshape_text(text, width::Int)
 
         if issimple
             # simple means all characters have 1 codeunit length, easy
-            push!(applied_cuts, pre)
+            !isspace[pre] && push!(applied_cuts, pre)
             newline = tview(text, pre, post-Δ, :simple)
         else
             # some chars have >1 codeunit length, we need to be careful
             _pre = thisind(text, pre)
             _post = thisind(text, post)
             newline = tview(text, _pre, _post, :simple)
-            push!(applied_cuts, _pre)
+            !isspace[nchar(pre)] && push!(applied_cuts, _pre)
         end
 
         # append to output text
-        out *= lstrip(newline) * (last ? "" : "\n")
+        out *= newline * (last ? "" : "\n")
     end
 
     # if necessary re-insert style information in the reshaped text
     if hasstyle
-        return correct_newline_style(reinject_style(out, tags, cuts))
+        return correct_newline_style(reinject_style(out, tags, applied_cuts, issimple))
     else
         return out
     end

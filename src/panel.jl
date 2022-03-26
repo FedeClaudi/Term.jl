@@ -201,7 +201,7 @@ end
 Construct a `Panel` around of a `AbstractRenderable`
 """
 function Panel(
-        content::Union{String, AbstractRenderable};
+        content::Union{AbstractString, AbstractRenderable};
         width::Int = 88,
         height::Union{Nothing,Int} = nothing,
         fit::Bool=false,
@@ -219,7 +219,7 @@ function Panel(
     function resize_content(content, _width)
         if content isa RenderableText
             content = RenderableText(content; width=_width)
-        elseif content isa String
+        elseif content isa AbstractString
             content = RenderableText(content; width=_width+1)
         end
         return content, content.measure
@@ -239,7 +239,7 @@ function Panel(
 
     if !fit
         # check that the content fits within the given width
-        if content isa RenderableText || content isa String
+        if content isa RenderableText || content isa AbstractString
             width = min(width, WIDTH)
             if content_measure.w > width-Δw
                 content, content_measure = resize_content(content, width-Δw)
@@ -278,11 +278,8 @@ end
 
 `Panel` constructor for creating a panel out of multiple renderables at once.
 """
-function Panel(content::Union{String, AbstractRenderable}, renderables...; kwargs...)
-    content = vstack(content, Renderable.(renderables)...)
-    return Panel(content; kwargs...)
-end
-
+Panel(renderables::Vector; kwargs...) = Panel(vstack(renderables...); kwargs...)
+Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
 
 # ---------------------------------------------------------------------------- #
 #                                    TextBox                                   #

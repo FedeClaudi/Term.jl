@@ -3,6 +3,13 @@ fint(x) = (Int ∘ floor)(x)
 cint(x) = (Int ∘ ceil)(x)
 
 """
+  or(x, y)
+
+Return `y` if `x` is `Nothing`
+"""
+or(x, y) = isnothing(x) ? y : x
+
+"""
   loop_last(v)
 
   Returns an iterable yielding tuples (is_last, value).

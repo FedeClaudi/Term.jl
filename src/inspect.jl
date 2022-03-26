@@ -73,7 +73,7 @@ function TypeInfo(type::DataType)
     sub = length(subtypes(type)) > 0 ? subtypes(type) : nothing
 
     # get docstring
-    doc, docstring = get_docstring(Symbol(type))
+    _, docstring = get_docstring(Symbol(type))
 
     # get fields
     if !isabstracttype(type) && length(fieldnames(type)) > 0
@@ -100,7 +100,7 @@ Exctract information from a function object
 """
 function TypeInfo(fun::Function)
     # get docstring
-    doc, docstring = get_docstring(fun)
+    _, docstring = get_docstring(fun)
 
     # get methods with same name
     _methods = split_lines(string(methods(fun)))
@@ -134,7 +134,7 @@ function inspect(
         style_super_types(info),
         "",
         style_sub_types(info);
-        width = width-4,
+        width = width,
         title = "Types hierarchy",
         title_style = "bold underline yellow",
     )
@@ -199,7 +199,7 @@ function inspect(
 
     # ---------------------------------- methods --------------------------------- #
     if length(info.methods) > 0
-        methods = do_by_line(style_method_line, info.methods)
+        methods = do_by_line(m -> style_method_line(string(m)), info.methods)
         n_methods =
             length(split_lines(methods)) > 1 ? Int(length(split_lines(methods)) / 2) : 1
 

@@ -125,7 +125,7 @@ function update(col::BarColumn, i::Int, N::Int, color::String, args...)::String
     completed = completed < 0 ? 0 : completed
     remaining = remaining < 0 ? 0 : remaining
 
-    return apply_style("[$color bold]" * '━'^(completed) * "[/$color bold]"* " "^(remaining))
+    return apply_style("[" *color*" bold]" * '━'^(completed) * "[/"*color*" bold]"* " "^(remaining))
 end
 
 
@@ -360,8 +360,7 @@ function pbar_color(pbar::ProgressBar)
     r = (.8 - α) * c1.r + β * c2.r + α * c3.r
     g = (.8 - α) * c1.g + β * c2.g + α * c3.g
     b = (.8 - α) * c1.b + β * c2.b + α * c3.b
-
-    return "($r, $g, $b)"
+    return "($(int(r)), $(int(g)), $(int(b)))"
 end
 
 """

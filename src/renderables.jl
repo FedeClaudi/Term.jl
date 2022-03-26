@@ -63,13 +63,13 @@ end
 Convenience method to construct a RenderableText
 """
 function Renderable(
-    str::String; width::Union{Nothing,Int} = nothing
+    str::AbstractString; width::Union{Nothing,Int} = nothing
 )
     return RenderableText(str; width = width)
 end
 
 Renderable(ren::AbstractRenderable) = ren
-
+Renderable() = Renderable(Vector{Segment}[], Measure(0, 0))
 
 # ---------------------------------------------------------------------------- #
 #                                TEXT RENDERABLE                               #
@@ -96,7 +96,7 @@ Construct a `RenderableText` out of a string.
 
 If a `width` is passed the text is resized to match the width.
 """
-function RenderableText(text::String; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
+function RenderableText(text::AbstractString; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
     # reshape text
     width = isnothing(width) ? console_width(stdout)-1 : min(console_width(stdout)-1, width)
     text = fillin(reshape_text(text, width))

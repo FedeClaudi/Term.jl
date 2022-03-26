@@ -1,9 +1,5 @@
-import Term.progress: ProgressBar, update
+rx = r"[\e\[[0-9;]*m]*"
 
+t = "┌──────────\e[31m────\e[39m──┬\e[1m\e[34m────────────────┬\e[22m\e[39m\e[39m──────────────┬────────────────┬──────────────end"
 
-pbar = ProgressBar(; N=100, redirectstdout=false)
-
-for i in 1:100
-    update(pbar)
-    i % 25 == 0 && break
-end
+collect(eachmatch(rx, t))

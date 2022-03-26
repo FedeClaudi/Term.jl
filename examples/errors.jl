@@ -40,6 +40,7 @@ corresponding error message
 # Panel("mytext", title="this title is waaaay too long!!!", fit=true)
 
 # ------------  UndefVarError
+
 # println(x)
 
 # ------------  BoundsError

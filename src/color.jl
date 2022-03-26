@@ -13,7 +13,7 @@ Abstract color type.
 """
 abstract type AbstractColor end
 
-Base.show(io::IO, color::AbstractColor) = print(io, "$(typeof(color))('$(color.color)')")
+Base.show(io::IO, color::AbstractColor) = print(io, "$(typeof(color))")
 
 struct NamedColor <: AbstractColor
     color::String
