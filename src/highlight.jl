@@ -165,7 +165,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
         end
 
         # end
-        line = textlen(line) > 1 ? line[dedent:end] : line
+        line = textlen(line) > 1 ? lpad(line[dedent:end], 8) : line
         line = symb * " [$color]$n[/$color] " * line
         push!(cleaned_lines, line)
     end

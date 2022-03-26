@@ -183,19 +183,24 @@ function get_title_row(
     justify::Symbol = :left,
 )::Segment
 
-    # if no title just return a row
+    # if no title just return a r ow
     if isnothing(title)
         return Segment(get_row(box, width, row), style)    
     else
+        title = apply_style(title)
         title = textlen(title) < width - 8 ? title : truncate(title, width-8)
-    end
+    end 
 
     # compose title line 
     boxline = getfield(box, row)
 
     open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
     if !isnothing(title_style)
-        topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]"
+        topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]" * open
+        if style == "hidden"
+            topen =  "\e[28m"* topen
+            tclose = tclose * "\e[8m"
+        end
     else
         topen, tclose = "", ""
     end

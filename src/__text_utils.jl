@@ -452,6 +452,11 @@ everything right and changing anything can cause
 the whole thing to break, so do so at your peril!
 """
 function reshape_text(text, width::Int)
+    if occursin("\n", text)
+        return do_by_line(l -> reshape_text(l, width), text)
+    end
+
+
     textlen(text) <= width && return text
 
     # Remove style information to simplify reshaping

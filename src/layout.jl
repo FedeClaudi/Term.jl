@@ -278,12 +278,13 @@ function hLine(
     box::Symbol = :ROUNDED,
 )
     box = eval(box)
+    text = apply_style(text)
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
 
     open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
     line = open * get_lrow(box, lw-tl, :top; with_left=false) * 
-                space * text * space * get_rrow(box, rw-tr, :top; with_right=false) * close
+                space * text * space * open *  get_rrow(box, rw-tr, :top; with_right=false) * close
 
     return hLine([Segment(line, style)], Measure(width, 1))
 end

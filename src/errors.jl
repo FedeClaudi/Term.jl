@@ -221,7 +221,7 @@ function install_stacktrace()
 
         function Base.showerror(io::IO, er::LoadError, bt; backtrace = true)
             print("\n")
-            println(hLine(_width(), "[bold red]LoadError[/bold red]"; style = "dim red"))
+            println(hLine(_width(), "[default bold red]LoadError[/default bold red]"; style = "dim red"))
             Base.display_error(io, er, bt)
 
             return Base.showerror(io, er.error, bt; backtrace = true)
@@ -234,7 +234,7 @@ function install_stacktrace()
 
         function Base.showerror(io::IO, er, bt; backtrace = true)
             ename = string(typeof(er))
-            print(hLine(_width(), "[bold red]$ename[/bold red]"; style = "dim red"))
+            print("\n"*hLine(_width(), "[default bold red]$ename[/default bold red]"; style = "dim red"))
 
             try
                 stack = style_backtrace(io, bt)

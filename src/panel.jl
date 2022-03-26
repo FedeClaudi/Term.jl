@@ -356,7 +356,7 @@ function TextBox(
     # truncate or reshape text
     if fit == :truncate
         # truncate the text to fit the given width
-        text = do_by_line(ln -> truncate(ln, width - 7), text)
+        text = do_by_line(ln -> truncate(ln, width - 7), apply_style(text))
     else
         text = reshape_text(text, width-Δw-2)
     end

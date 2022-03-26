@@ -85,11 +85,11 @@ print(Panel(tb1 * tb2; width = 100, justify=:center, title = "My Panel"))
 
 
 """
-For copmarison, we can try to use RenderableText instead of TextBox
+For comparison, we can try to use RenderableText instead of TextBox
 """
 
 import Term: RenderableText
-print(Panel(RenderableText(my_long_text; width=44) * RenderableText(another_long_one; width=40); width = 100, justify=:center, title = "My Panel"))
+print(Panel(RenderableText(my_long_text; width=44) * RenderableText(another_long_one; width=40); width = 100, justify=:center, title = "Bad idea"))
 
 
 """
