@@ -423,7 +423,7 @@ function get_text_info(text)
         charidxs = collect(eachindex(text))  # codeunits idx of start of each char
         nchar(unit) = or(findfirst(charidxs .== prevind(text, unit)), 1)  # n chars at codeunit
         isspace = zeros(Bool, length(text))
-        isspace[nchar.(findall(' ', text))] .= 1
+        isspace[nchar.(only.(findall(" ", text)))] .= 1  # only.(findall(" ", text) can become findall(' ', text) for Julia > 1.6
     end
 
     return widths, isspace, issimple, nunits, nchar
