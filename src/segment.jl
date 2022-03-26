@@ -1,6 +1,6 @@
 module segment
 import Term
-import Term: remove_markup, remove_ansi
+import Term: remove_markup, remove_ansi, unescape_brackets
 import ..style: apply_style, MarkupStyle
 import ..measure: Measure
 
@@ -47,7 +47,7 @@ Segment(seg::Segment) = seg
 """print styled in stdout, info otherwise"""
 function Base.show(io::IO, seg::Segment)
     if io == stdout
-        print(io, seg.text)
+        print(io, unescape_brackets(seg.text))
 
     else
         print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")

@@ -178,7 +178,7 @@ function get_title_row(
     title::Union{Nothing, String};
     width::Int=88,
     style::String="default",
-    title_style::String="default",
+    title_style::Union{Nothing, String} = nothing,
     justify::Symbol = :left,
 )::Segment
     # if no title just return a row
@@ -187,16 +187,15 @@ function get_title_row(
     end
 
 
-
-    # get title
-    title = apply_style("[$title_style]" * title)
-    @assert Segment(title).measure.w < width - 4 "Title too long for panel of width $width: $title, ($(Segment(title).measure.w))"
-
     # compose title line 
     boxline = getfield(box, row)
 
     open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
-    topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]"
+    if !isnothing(title_style)
+        topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]"
+    else
+        topen, tclose = "", ""
+    end
     title = space * topen * title * tclose * space
     if justify == :left
         line = open * boxline.left * boxline.mid^4 * title 
@@ -216,10 +215,6 @@ function get_title_row(
 
         return Segment(line)
     end
-
-    return pre * Segment(post, style)
-    # return Segment(post, style)
-
 end
 
 """

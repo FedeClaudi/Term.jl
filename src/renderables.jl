@@ -98,8 +98,11 @@ If a `width` is passed the text is resized to match the width.
 """
 function RenderableText(text::AbstractString; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
     # reshape text
-    width = isnothing(width) ? console_width(stdout)-1 : min(console_width(stdout)-1, width)
-    text = fillin(reshape_text(text, width))
+    if !isnothing(width)
+        width = min(console_width(stdout)-1, width)
+        text = reshape_text(text, width)
+    end
+    text = fillin(text)
 
     # create renderable
     if isnothing(style)
@@ -138,6 +141,6 @@ end
 
 
 # -------------------------------- union type -------------------------------- #
-RenderablesUnion = Union{AbstractString,AbstractRenderable,RenderableText}
+RenderablesUnion = Union{AbstractString,AbstractRenderable}
 
 end

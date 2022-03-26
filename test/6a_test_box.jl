@@ -40,18 +40,18 @@ import Term: Segment
     left = get_title_row(:top, Term.box.ROUNDED, "test", width=22, 
                             justify=:left, title_style="blue", style="red")
     @test left.measure.w == 22
-    @test left.text == "\e[31m╭──── \e[34m\e[34mtest\e[39m\e[39m\e[31m ──────────╮\e[39m"
+    @test left.text == "\e[31m╭──── \e[34mtest\e[39m\e[31m ──────────╮\e[39m"
 
 
     right = get_title_row(:top, Term.box.ROUNDED, "test", width=22, 
                         justify=:right, title_style="blue", style="red")
     @test right.measure.w == 22
-    @test right.text == "\e[31m╭─────────── \e[34m\e[34mtest\e[39m\e[39m\e[31m ───╮\e[39m"
+    @test right.text == "\e[31m╭─────────── \e[34mtest\e[39m\e[31m ───╮\e[39m"
 
     center = get_title_row(:top, Term.box.ROUNDED, "test", width=22, 
                         justify=:center, title_style="blue", style="red")
     @test center.measure.w == 22
-    @test center.text == "\e[31m╭─────── \e[34m\e[34mtest\e[39m\e[39m\e[31m ───────╮\e[39m"
+    @test center.text == "\e[31m╭─────── \e[34mtest\e[39m\e[31m ───────╮\e[39m"
 
     for width in (15, 21, 33, 58), justify in (:left, :center, :right)
         line = get_title_row(:top, Term.box.DOUBLE, "test", width=width, 

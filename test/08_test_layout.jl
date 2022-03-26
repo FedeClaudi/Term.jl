@@ -95,8 +95,8 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 / r2
-    @test r.measure.w == 49
-    @test r.measure.h == 8
+    @test r.measure.w == 50
+    @test r.measure.h == 6
 
     h1 = hLine(22)
     h2 = hLine(33)
@@ -107,8 +107,8 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 * r2
-    @test r.measure.w == 73
-    @test r.measure.h == 5
+    @test r.measure.w == 75
+    @test r.measure.h == 4
 
     # stack other renderables
     h1 = vLine(22)

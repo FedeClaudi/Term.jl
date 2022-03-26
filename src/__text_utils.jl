@@ -362,7 +362,7 @@ function reinject_style(text, tags::Vector{AnsiTag}, cuts::Vector{Int}, issimple
         if issimple
             pads = isnothing(pads) ? 0 : max(0, length(pads)-1)
             
-            cut1 = tag.start + pads
+            cut1 = min(tag.start + pads, length(text))
             cut1 = text[cut1] == '\n' ? cut1+1 : cut1
             cut2 = cut1+1
             
@@ -508,7 +508,7 @@ function reshape_text(text, width::Int)
         end
 
         # append to output text
-        out *= newline * (last ? "" : "\n")
+        out *= lstrip(newline) * (last ? "" : "\n")
     end
 
     # if necessary re-insert style information in the reshaped text

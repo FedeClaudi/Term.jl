@@ -35,6 +35,14 @@ abstract type AbstractPanel <: AbstractRenderable end
 mutable struct Panel <: AbstractPanel
     segments::Vector
     measure::Measure
+    function Panel(x1, x2; kwargs...)
+        # this is necessary to handle the special case in which 2 objs are passed
+        if x1 isa Vector
+            return new(x1, x2)
+        else
+            return Panel(vstack(x1, x2); kwargs...)
+        end
+    end
 end
 
 
@@ -63,10 +71,10 @@ function render_panel(
                 box::Symbol=:ROUNDED,
                 style::String="default",
                 title::Union{String,Nothing} = nothing,
-                title_style::String = "default",
+                title_style::Union{Nothing, String} = nothing,
                 title_justify::Symbol = :left,
                 subtitle::Union{String,Nothing} = nothing,
-                subtitle_style::String = "default",
+                subtitle_style::Union{Nothing, String} = nothing,
                 subtitle_justify::Symbol = :left,
                 justify::Symbol = :left,
                 panel_measure::Measure,
@@ -209,6 +217,10 @@ function Panel(
         kwargs...
     )
 
+    if content isa String
+        content = RenderableText(content)
+    end
+
     # get measure
     WIDTH = console_width(stdout)
     padding = padding isa Padding ? padding : Padding(padding...)
@@ -217,11 +229,7 @@ function Panel(
 
     # define convenience function
     function resize_content(content, _width)
-        if content isa RenderableText
-            content = RenderableText(content; width=_width)
-        elseif content isa AbstractString
-            content = RenderableText(content; width=_width+1)
-        end
+        content = RenderableText(content; width=_width)
         return content, content.measure
     end
 
@@ -255,10 +263,6 @@ function Panel(
         panel_measure = Measure(width, height)
     end
 
-    if content isa String
-        content = RenderableText(content)
-    end
-
     return render_panel(
         content;
         panel_measure=panel_measure,
@@ -278,9 +282,8 @@ end
 
 `Panel` constructor for creating a panel out of multiple renderables at once.
 """
-Panel(renderables::Vector; kwargs...) = Panel(vstack(renderables...); kwargs...)
+Panel(renderables::Vector{RenderablesUnion}; kwargs...) = Panel(vstack(renderables...); kwargs...)
 Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
-
 # ---------------------------------------------------------------------------- #
 #                                    TextBox                                   #
 # ---------------------------------------------------------------------------- #
@@ -331,11 +334,15 @@ function TextBox(
     subtitle_justify::Symbol = :left,
     justify::Symbol = :left,
     fit::Symbol = :nofit,
+    padding::Union{Padding, NTuple} = Padding(2, 2, 0, 0),
 )
+    padding = padding isa Padding ? padding : Padding(padding...)
+    Δw =  padding.left + padding.right
+
     # fit text or get width
     if fit==:fit
         # the box's size depends on the text's size
-        width = Measure(text).w + 4
+        width = Measure(text).w + Δw
 
         # too large, fit to console
         if width > console_width(stdout)
@@ -343,7 +350,7 @@ function TextBox(
             fit = true
         end
     else
-        width = width > console_width(stdout) ? console_width(stdout) - 4 : width
+        width = width > console_width(stdout) ? console_width(stdout) - Δw : width
     end
 
     # truncate or reshape text
@@ -351,7 +358,7 @@ function TextBox(
         # truncate the text to fit the given width
         text = do_by_line(ln -> truncate(ln, width - 7), text)
     else
-        text = do_by_line((ln) -> reshape_text(ln, width - 6), text)
+        text = reshape_text(text, width-Δw-2)
     end
     
     # create panel with text inside
@@ -366,7 +373,8 @@ function TextBox(
         subtitle_justify = subtitle_justify,
         justify = justify,
         width = width,
-        fit=false
+        fit=false,
+        padding=padding
     )
 
     return TextBox(panel.segments, Measure(panel.measure.w, panel.measure.h))
