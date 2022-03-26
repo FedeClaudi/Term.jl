@@ -44,10 +44,10 @@ oooooooooooo
     main = TextBox(
         """Term.jl is a [#9558B2]Julia[/#9558B2] package for creating styled terminal outputs.
 
-        Term provides a simple [italic green4 bold]markup language[/italic green4 bold] toadd [bold bright_blue]color[/bold bright_blue] and [bold underline]styles[/bold underline] to your text.
+        Term provides a simple [italic green4 bold]markup language[/italic green4 bold] to add [bold bright_blue]color[/bold bright_blue] and [bold underline]styles[/bold underline] to your text.
         More complicated text layout can be created using $(as_code("Renderable")) objects such 
         as $(as_code("Panel")) and $(as_code("TextBox")).
-        These can also be nested and stacked to create[italic pink3]fancy[/italic pink3]and [underline]informative[/underline] terminal ouputs for your Julia code""";
+        These can also be nested and stacked to create [italic pink3]fancy[/italic pink3] and [underline]informative[/underline] terminal ouputs for your Julia code""";
         width = 35,
     )
 
@@ -68,7 +68,7 @@ oooooooooooo
         Term.jl can also be used to create [underline]fancy[/underline] $(as_code("logging")) and $(as_code("error")) messages. 
 
         Check the examples and documentation for more information!
-        Term.jl is under [bold]active[/bold] development, get in touch for questions or ideas on how to  improve it!""";
+        Term.jl is under [bold]active[/bold] development, get in touch for questions or ideas on how to improve it!""";
         width = content.measure.w,
     )
     hline = hLine(content.measure.w; style = indigo * " dim")
