@@ -7,7 +7,8 @@ import Term: int,
             join_lines,
             loop_last,
             textlen,
-            get_lr_widths
+            get_lr_widths,
+            truncate
 
 export get_row, get_title_row
 export ASCII,
@@ -181,11 +182,13 @@ function get_title_row(
     title_style::Union{Nothing, String} = nothing,
     justify::Symbol = :left,
 )::Segment
+
     # if no title just return a row
     if isnothing(title)
         return Segment(get_row(box, width, row), style)    
+    else
+        title = textlen(title) < width - 8 ? title : truncate(title, width-8)
     end
-
 
     # compose title line 
     boxline = getfield(box, row)

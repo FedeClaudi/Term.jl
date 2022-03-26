@@ -4,7 +4,7 @@
     @suppress_out begin
         @test_nothrow include("../examples/layout.jl")
 
-        @test_nothrow include("../examples/inspect.jl")
+        # @test_nothrow include("../examples/inspect.jl")
 
         # @test_nothrow include("../examples/logging.jl")
 

@@ -144,7 +144,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     end
 
     # format
-    _len = textlen ∘ lstrip ∘ remove_markup ∘ remove_markup_open
+    _len = textlen ∘ lstrip
     dedent = 100
     for ln in codelines
         if _len(ln) > 1

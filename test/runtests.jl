@@ -52,33 +52,33 @@ tprint("\n\n[bold green]Running: '08_test_layout.jl' [/bold green]")
 # tprint("\n\n[bold green]Running: '09_test_inspect.jl' [/bold green]")
 # @time @timeit_include("09_test_inspect.jl")
 
-# # ? 11 console
-# tprint("\n\n[bold green]Running: '11_test_console.jl' [/bold green]")
-# @time @timeit_include("11_test_console.jl")
+# ? 11 console
+tprint("\n\n[bold green]Running: '11_test_console.jl' [/bold green]")
+@time @timeit_include("11_test_console.jl")
 
-# # # ? 12 logging
-# tprint("\n\n[bold green]Running: '12_test_logging.jl' [/bold green]")
-# @time @timeit_include("12_test_logging.jl")
+# # ? 12 logging
+tprint("\n\n[bold green]Running: '12_test_logging.jl' [/bold green]")
+@time @timeit_include("12_test_logging.jl")
 
-# # ? 14 highlight
-# tprint("\n\n[bold green]Running: '14_test_highlight.jl' [/bold green]")
-# @time @timeit_include("14_test_highlight.jl")
+# ? 14 highlight
+tprint("\n\n[bold green]Running: '14_test_highlight.jl' [/bold green]")
+@time @timeit_include("14_test_highlight.jl")
 
-# # ? 15 progress
-# tprint("\n\n[bold green]Running: '15_test_progress.jl' [/bold green]")
-# @time @timeit_include("15_test_progress.jl")
+# ? 15 progress
+tprint("\n\n[bold green]Running: '15_test_progress.jl' [/bold green]")
+@time @timeit_include("15_test_progress.jl")
 
-# # ? 16 Tree
-# tprint("\n\n[bold green]Running: '16_test_tree.jl' [/bold green]")
-# @time @timeit_include("16_test_tree.jl")
+# ? 16 Tree
+tprint("\n\n[bold green]Running: '16_test_tree.jl' [/bold green]")
+@time @timeit_include("16_test_tree.jl")
 
-# # ? 999 EXAMPLES
-# tprint("\n\n[bold green]Running: '999_test_examples.jl' [/bold green]")
-# @time @timeit_include("999_test_examples.jl")
+# ? 999 EXAMPLES
+tprint("\n\n[bold green]Running: '999_test_examples.jl' [/bold green]")
+@time @timeit_include("999_test_examples.jl")
 
-# # ? 99 ERRORS
-# tprint("\n\n[bold green]Running: '99_test_errors.jl' [/bold green]")
-# @time @timeit_include("99_test_errors.jl")
+# ? 99 ERRORS
+tprint("\n\n[bold green]Running: '99_test_errors.jl' [/bold green]")
+@time @timeit_include("99_test_errors.jl")
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println("\n")
