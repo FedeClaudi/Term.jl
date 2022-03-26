@@ -155,10 +155,9 @@ function apply_style(text)::String
 
         # check if there was previous ansi style info
         prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset-1))
-
+        prev_style = prev_style == ansi_close ? "" : prev_style
         # replace close tag
         text = replace_text(text, close_match.offset-1, close_match.offset + length(markup)+2, ansi_close * prev_style)
-
     end
     return text
 end
