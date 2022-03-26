@@ -95,8 +95,8 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 / r2
-    @test r.measure.w == 51
-    @test r.measure.h == 6
+    @test r.measure.w == 49
+    @test r.measure.h == 8
 
     h1 = hLine(22)
     h2 = hLine(33)
@@ -107,8 +107,8 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 * r2
-    @test r.measure.w == 77
-    @test r.measure.h == 4
+    @test r.measure.w == 73
+    @test r.measure.h == 5
 
     # stack other renderables
     h1 = vLine(22)
@@ -123,7 +123,7 @@ end
 @testset "\e[34mlayout - panels" begin
     p1 = Panel()
     p2 = Panel(; width=24, height=3)
-    p3 = Panel("test[red]aajjaja[/red]"^5, width=12)
+    p3 = Panel("this [red]panel[/red]"^5, width=12)
 
     testlayout(p1 * p2, 112, 3)
     @test string(p1 * p2) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[22m╭──────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[22m│\e[22m                      \e[22m│\e[22m\n                                                                                        \e[22m╰──────────────────────╯\e[22m"

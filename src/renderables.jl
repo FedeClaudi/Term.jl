@@ -98,8 +98,8 @@ If a `width` is passed the text is resized to match the width.
 """
 function RenderableText(text::String; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
     # reshape text
-    width = isnothing(width) ? console_width(stdout) : min(console_width(stdout), width)
-    text = fillin(reshape_text(text, width+1))
+    width = isnothing(width) ? console_width(stdout)-1 : min(console_width(stdout)-1, width)
+    text = fillin(reshape_text(text, width))
 
     # create renderable
     if isnothing(style)
@@ -108,6 +108,7 @@ function RenderableText(text::String; style::Union{Nothing, String}=nothing, wid
         style_init, style_finish = get_style_codes(MarkupStyle(style))
         segments = map(ln -> Segment(style_init * ln * style_finish), split_lines(text))
     end
+
     return RenderableText(segments, Measure(segments), style)
 end
 

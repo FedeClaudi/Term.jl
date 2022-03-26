@@ -42,7 +42,7 @@ print(
 And of course it works well with markup styles too
 """
 another_long_one =
-    "This is a [red bold]very[/red bold] piece of [green italic]content[/green italic]. But TextBox can handle [underline]anything[/underline]!! "^10
+    "This is a [red bold]very long[/red bold] piece of [green italic]content[/green italic]. But TextBox can handle [underline]anything[/underline]!! "^5
 
 print(TextBox(another_long_one; width = 44))
 
@@ -67,7 +67,7 @@ tb1 = TextBox(
 
 tb2 = TextBox(
     another_long_one;
-    width = 30,
+    width = 40,
     title = "second column",
     title_style = "blue bold",
     title_justify = :center,

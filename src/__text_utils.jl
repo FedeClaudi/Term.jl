@@ -369,6 +369,8 @@ function reinject_style(text, tags::Vector{AnsiTag}, cuts::Vector{Int})
             cut1 = thisind(text, tag.start+pads)
             cut2 = thisind(text, cut1+ncodeunits(text[cut1]))
         end
+        cut1 > ncodeunits(text) && continue
+        cut2 = min(cut2, ncodeunits(text))
 
         text = text[1:cut1] * tag.style * text[cut2:end]
 
@@ -445,6 +447,8 @@ everything right and changing anything can cause
 the whole thing to break, so do so at your peril!
 """
 function reshape_text(text, width::Int)
+    textwidth(text) <= width && return text
+
     # Remove style information to simplify reshaping
     text, tags, hasstyle = excise_style(text)
 

@@ -218,9 +218,9 @@ function Panel(
     # define convenience function
     function resize_content(content, _width)
         if content isa RenderableText
-            content = RenderableText(content; width=_width-2)
+            content = RenderableText(content; width=_width)
         elseif content isa String
-            content = RenderableText(content; width=_width-1)
+            content = RenderableText(content; width=_width+1)
         end
         return content, content.measure
     end

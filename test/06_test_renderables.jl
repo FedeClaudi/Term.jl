@@ -30,11 +30,11 @@ end
     @test r.measure.h == 1
 
     r = RenderableText(lorem; width=22)
-    @test string(r) == "Lorem ipsum dolor sit  \namet, consectetur      \nadipiscing elit, sed   \ndo eiusmod tempor      \nincididunt ut labore   "
+    @test string(r) == "Lorem ipsum dolor    \nsit amet, consectetur\nadipiscing elit, sed \ndo eiusmod tempor    \nincididunt ut        \nlabore               "
     @test r.measure.w <= 23
 
     r = RenderableText(lorem; width=22, style="red")
-    @test string(r) == "\e[31mLorem ipsum dolor sit  \e[39m\n\e[31mamet, consectetur      \e[39m\n\e[31madipiscing elit, sed   \e[39m\n\e[31mdo eiusmod tempor      \e[39m\n\e[31mincididunt ut labore   \e[39m"
+    @test string(r) == "\e[31mLorem ipsum dolor    \e[39m\n\e[31msit amet, consectetur\e[39m\n\e[31madipiscing elit, sed \e[39m\n\e[31mdo eiusmod tempor    \e[39m\n\e[31mincididunt ut        \e[39m\n\e[31mlabore               \e[39m"
     @test r.measure.w <= 23
 end
 
