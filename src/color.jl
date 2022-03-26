@@ -31,7 +31,7 @@ end
 
 
 
-function RGBColor(s::String)
+function RGBColor(s)
     to_number(x) = '.' ∈ x ? parse(Float64, x) : parse(Int, x)
     r, g, b = to_number.(match(RGB_REGEX, s).captures)
     if r < 1 || g < 1 || b < 1

@@ -35,7 +35,8 @@ strings = [
 clear()
 width = 21
 for text in strings
-    println('_'^width)
-    println(reshape_text(text, width))
-    @time reshape_text(text, width)
+    # println('_'^width)
+    # println(reshape_text(text, width))
+    show(reshape_text(text, width))
+    print("\n")
 end

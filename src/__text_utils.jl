@@ -186,9 +186,11 @@ tview(text, start::Int, stop::Int, simple::Symbol) = view(text, start:stop)
 Replace a section of a `text` between `start` and `stop` with `replace`.
 """
 function replace_text(text, start::Int, stop::Int, replace::String)::String
-    # start = max(prevind(text, start), 1)
+    if start == 0
+        return  replace * text[stop+1:end]
+    end
+    
     start = isvalid(text, start) ? start : max(prevind(text, start), 1)
-    # stop = min(nextind(text, stop+1), ncodeunits(text))
     if start == 1
         return text[1] * replace * text[stop+1:end]
     elseif stop == length(text)
