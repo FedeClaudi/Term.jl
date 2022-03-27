@@ -1,5 +1,5 @@
 # Styled text
-The term `styled text` refers to text printed out to a terminal (or other `::IO`) with either color or other style (e.g., bold, italic) information. This is done by adding `ANSI` escape sequences in a string being printed to the terminal. These escape sequences are not rendered as caracters but add the style information.
+The term `styled text` refers to text printed out to a terminal (or other `::IO`) with either color or other style (e.g., bold, italic) information. This is done by adding `ANSI` escape sequences in a string being printed to the terminal. These escape sequences are not rendered as characters but add the style information.
 
 ## Style macros
 The easiest way to add style information to a `String` in `Term` is using the dedicated macros:
@@ -28,7 +28,7 @@ println(
 )
 ```
 
-With these style macros you can do some simply styling, but it gets clunky when you want to go beyond adding some color. Let's say you want you text to be blue, bold and underlined; do you really need to use three macros?
+With these style macros you can do some simple styling, but it gets clunky when you want to go beyond adding some color. Let's say you want you text to be blue, bold and underlined; do you really need to use three macros?
 
 Of course not, you can use the `@style` macro!
 
