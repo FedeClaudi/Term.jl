@@ -59,7 +59,7 @@ Head to the [GitHub](https://github.com/FedeClaudi/Term.jl) repository to find s
 ## Getting in touch
 If you want to get in touch with us, the easiest way is on GitHub. You can open an [issue]() to report a bug or ask for a new feature or join the [discussions](https://github.com/FedeClaudi/Term.jl/discussions) for more general chats about `Term`. The discussion section is also a good place to go for general questions about `Term` and how to use it. 
 
-`Term` is written to be a useful piece of software for anyone using Julia, from beginners to more advanced users. If you're comfortable writing and testing code, you can jump in right now and start actively working on `Term` with us. If you're not, that's totally fine. There's a lot of ways in which you can help: open an issue to report problems with `Term`, ask questions on GitHub, help expand the docs and examples for other users too. Or just tell us what you're experience using `Term` was like, any feedback can help us improve!.
+`Term` is written to be a useful piece of software for anyone using Julia, from beginners to more advanced users. If you're comfortable writing and testing code, you can jump in right now and start actively working on `Term` with us. If you're not, that's totally fine. There's a lot of ways in which you can help: open an issue to report problems with `Term`, ask questions on GitHub, help expand the docs and examples for other users too. Or just tell us what you're experience using `Term` was like, any feedback can help us improve!
 
 ## Related packages
 As mentioned, `Term` is inspired on `rich` in python. There's also a project called [Spectre console](https://spectreconsole.net/) which is a .NET Standard 2.0 version of `rich`.
