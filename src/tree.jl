@@ -221,7 +221,7 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
 
             else
                 _end = n == length(waslast) ? guides.branch : guides.vline
-                _pre_guides *= lasttree ? guides.leaf : _end
+                _pre_guides *= lasttree ? (l ? guides.leaf : guides.vline) : _end
             end
         end
 
