@@ -16,7 +16,7 @@ tprint("This is a: ", 1, "of type", typeof(1), "this is a function", print)
 
 you can see two differences. The first is that when passing multiple comma separated arguments `tprint` inserts a space between them, making the output easier to parse. The second is that it colors certain objects types (`Number`, `DataType` and `Function` in the example). Thus any number will be printed blue, function names will be yellow etc.
 
-Note that `tprint` can only highlight objects based on their type (e.g., `1` abose is of type `Int64`, not a string `"1"`.). So this won't work:
+Note that `tprint` can only highlight objects based on their type (e.g., `1` above is of type `Int64`, not a string `"1"`.). So this won't work:
 ```example
 using Term # hide
 tprint("This is a: 1 of type Int64 this is a function print")
