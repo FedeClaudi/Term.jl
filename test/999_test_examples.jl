@@ -7,7 +7,7 @@
         # @test_nothrow include("../examples/inspect.jl")
         include("../examples/inspect.jl")
         # @test_nothrow include("../examples/logging.jl")
-        include("../examples/logging.jl")
+        # include("../examples/logging.jl")
         # @test_nothrow include("../examples/progressbars.jl")
         include("../examples/progressbars.jl")
         # @test_nothrow include("../examples/text_box.jl")
