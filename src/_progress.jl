@@ -56,18 +56,18 @@ struct CompletedColumn <: AbstractColumn
             seg = Segment(" "^10)
             return new(job, [seg], seg.measure, "", 0)
         else
-            width = length(string(N))*2+1
+            width = length(string(job.N))*2+1
             seg = Segment(" "^width)
-            text = apply_style("[white bold]/[/white bold][(.1, .8, .4) underline]$N[/(.1, .8, .4) underline]")
-            return new(job, [seg], seg.measure, text, length(digits(N)))
+            text = apply_style("[white bold]/[/white bold][(.1, .8, .4) underline]$(job.N)[/(.1, .8, .4) underline]")
+            return new(job, [seg], seg.measure, text, length(digits(job.N)))
         end
     end
 end
 
 
 function update!(col::CompletedColumn, color::String, args...)::String
-    isnothing(job.N) && return apply_style(string(job.i), color*" bold")
-    return apply_style(lpad(string(job.i), col.padwidth), color*" bold")
+    isnothing(col.job.N) && return apply_style(string(col.job.i), color*" bold")
+    return apply_style(lpad(string(col.job.i), col.padwidth), color*" bold")
 end
 
 
@@ -86,8 +86,8 @@ struct PercentageColumn <: AbstractColumn
 end
 
 function update!(col::PercentageColumn, args...)::String
-    isnothing(job.N) && return ""
-    p = string(int(job.i / job.N * 100))
+    isnothing(col.job.N) && return ""
+    p = string(int(col.job.i / col.job.N * 100))
     p = lpad(p, col.padwidth)
     return "\e[2m"*p*" %\e[0m"
 end
@@ -113,7 +113,7 @@ function update!(col::ProgressColumn, color::String, args...)::String
         # TODO update as spinner
         return "make spinner"
     else
-        completed = int(col.nsegs * job.i/job.N)
+        completed = int(col.nsegs * col.job.i/col.job.N)
         remaining = col.nsegs - completed
 
         completed = completed < 0 ? 0 : completed
@@ -139,8 +139,8 @@ end
 
 
 function update!(col::ElapsedColumn, args...)::String
-    isnothing(job.starttime) && return " "^(col.measure.w)
-    elapsedtime = (now() - job.starttime).value  # in ms
+    isnothing(col.job.starttime) && return " "^(col.measure.w)
+    elapsedtime = (now() - col.job.starttime).value  # in ms
 
     # format elapsed message
     if elapsedtime < 1000
@@ -176,11 +176,11 @@ end
 
 
 function update!(col::ETAColumn, args...)::String
-    isnothing(job.starttime) && return " "^(col.measure.w)
+    isnothing(col.job.starttime) && return " "^(col.measure.w)
 
     # get remaining time in ms
-    elapsed = (now() - job.starttime).value  # in ms
-    perc = job.i/job.N
+    elapsed = (now() - col.job.starttime).value  # in ms
+    perc = col.job.i/col.job.N
     remaining = elapsed * (1 - perc) / perc
 
      # format elapsed message

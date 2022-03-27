@@ -66,7 +66,7 @@ end
 
 Construct a `Panel` given all required info.
 """
-function render_panel(
+function render(
                 content;
                 box::Symbol=:ROUNDED,
                 style::String="default",
@@ -265,7 +265,7 @@ function Panel(
         panel_measure = Measure(width, height)
     end
 
-    return render_panel(
+    return render(
         content;
         panel_measure=panel_measure,
         content_measure=content_measure,

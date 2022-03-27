@@ -25,6 +25,13 @@ Move cursor to the beginning of the previous line
 beginning_previous_line() = beginning_previous_line(stdout)
 beginning_previous_line(io::IO) = print(io, "\e[F")
 
+
+prev_line(; n::String="1") = prev_line(stdout; n=n)
+prev_line(io::IO; n::String="1") = print(io, "\e["*n*"F")
+
+next_line(; n::String="1") = next_line(stdout; n=n)
+next_line(io::IO; n::String="1") = print(io, "\e["*n*"E")
+
 """
 Move cursor down one line
 """

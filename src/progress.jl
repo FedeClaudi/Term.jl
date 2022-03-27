@@ -14,16 +14,16 @@ import ..consoles: console_width,
                 line,
                 erase_line,
                 beginning_previous_line,
-                down
+                prev_line,
+                next_line
 
 import ..renderables: AbstractRenderable
 import ..measure: Measure
 import ..segment: Segment
 import ..color: RGBColor
 
-export ProgressBar, ProgressJob, addjob!
+export ProgressBar, ProgressJob, addjob!, start!, stop!, update!
 
-# , update, track, start, stop
 
 
 # ---------------------------------------------------------------------------- #
@@ -36,10 +36,10 @@ mutable struct ProgressJob
 
     i::Int   # keep track of progress
     N::Union{Nothing, Int}
-    update_every::Int
 
     description::String
     columns  
+    width::Int
 
     started::Bool
     finished::Bool
@@ -50,11 +50,11 @@ mutable struct ProgressJob
             id::Int,
             N::Union{Int, Nothing},
             description::String,
-            columns::Vector{DataType}; 
-            update_every::Int=1,
+            columns::Vector{DataType},
+            width::Int; 
         )
         return new(
-            id, 1, N, update_every, description, columns, false, false, nothing, nothing
+            id, 0, N, description, columns, width, false, false, nothing, nothing
         )
     end
 end
@@ -70,20 +70,21 @@ function start!(job::ProgressJob)
         filter!(c->c != ProgressColumn, job.columns)
     end
 
+
     # create columns type instances
     job.columns = map(
         c -> eval(:($c($job))), job.columns
     )
 
     # if there's a progress column, set its width
-    if !isnothing(job.N) && any(job.columns isa ProgressColumn)        
+    if !isnothing(job.N) && any(map(c -> c isa ProgressColumn, job.columns))
         # get the progress column width
-        spaces = length(columns)-1
-        colwidths = sum(map((c)-> c isa ProgressColumn ? 0 : c.measure.w, columns))
-        bcol_width = width - colwidths - spaces
-
+        spaces = length(job.columns)-1
+        colwidths = sum(map((c)-> c isa ProgressColumn ? 0 : c.measure.w, job.columns))
+        bcol_width = job.width - colwidths - spaces
+        
         # set width
-        for col in columns
+        for col in job.columns
             col isa ProgressColumn && setwidth!(col, bcol_width)
         end
     end
@@ -93,51 +94,17 @@ function start!(job::ProgressJob)
     job.startime = now()
 end
 
+function update!(job::ProgressJob)
+    (!isnothing(job.N) && job.i >= job.N) && return stop!(job)
+    job.i += 1
+end
+
 function stop!(job::ProgressJob)
     job.stoptime = now()
     job.finished = true
 end
 
 
-"""
-
-
-# get the width of the ProgressColumn
-spaces = length(columns) -1
-colwidths = sum(map((c)-> c isa ProgressColumn ? 0 : c.measure.w, columns))
-bcol_width = width - colwidths - spaces
-
-# if it doesn't have a bar column, add one
-bars = sum(map((c)-> c isa ProgressColumn ? 1 : 0, columns))
-if bars == 0
-    push!(columns, ProgressColumn())
-elseif bars > 1
-    bcol_width /= bars
-end
-
-# set width of bar columns
-for col in columns
-    col isa ProgressColumn && setwidth!(col, bcol_width)
-end
-
-# create progress bar
-new(
-    1,
-    N,
-    width,
-    false, # started
-    false, # finished
-    transient,
-    update_every,
-    columns,
-    nothing, # start time
-    nothing, # stop time
-    redirectstdout,
-    nothing, # originalstdout
-    nothing, # out
-    colors,
-)
-"""
 
 # ---------------------------------------------------------------------------- #
 #                                    COLUMNS                                   #
@@ -168,6 +135,10 @@ mutable struct ProgressBar
     out  # will be used to store temporarily re-directed stdout
     colors::Vector{RGBColor}
 
+    running::Bool
+    Δt::Float64
+    task::Union{Task, Nothing}
+
     function ProgressBar(;
         width::Int=88,
         columns::Union{Vector{DataType}, Symbol} = :default,
@@ -181,6 +152,7 @@ mutable struct ProgressBar
             RGBColor("(.05, .05, 1)"),
             RGBColor("(.05, 1, .05)"),
         ],
+        refresh_rate::Int=60,  # FPS of rendering
     )
 
     columns = columns isa Symbol ? get_columns(columns) : columns
@@ -189,16 +161,19 @@ mutable struct ProgressBar
     width = expand ? console_width()-5 : min(max(width, 20), console_width()-5)
 
     return new(
-        Vector{ProgressJob}(),
-        width,
-        columns,
-        transient,
-        redirectstdout,
-        originalstdout,
-        out,
-        colors
-    )
-end
+            Vector{ProgressJob}(),
+            width,
+            columns,
+            transient,
+            redirectstdout,
+            originalstdout,
+            out,
+            colors,
+            false,
+            1/refresh_rate,
+            nothing,
+        )
+    end
 end
 
 Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar) = print(io, "Progress bar \e[2m($(length(pbar.jobs)) jobs)\e[0m")
@@ -211,36 +186,75 @@ function addjob!(
         description::String="Running...",
         N::Union{Int, Nothing}=nothing,
         start::Bool=true,
-        update_every::Int=1
     )::ProgressJob
 
     # create Job
-    job = ProgressJob(length(pbar.jobs) + 1, N, description, pbar.columns; update_every=update_every)
+    job = ProgressJob(length(pbar.jobs) + 1, N, description, pbar.columns, pbar.width)
 
     # start job
     start && start!(job)
 
-    push!(pbar.jobs, job)
+    pushfirst!(pbar.jobs, job)
     return job
 end
 
+function start!(pbar::ProgressBar)
+    pbar.running = true
 
+    pbar.task = @task begin
+        while pbar.running
+            render(pbar)
+            sleep(pbar.Δt)
+        end
+    end
+    schedule(pbar.task)
+    return nothing
+end
+
+function stop!(pbar::ProgressBar)
+    pbar.running = false
+    return nothing
+end
+
+function render(pbar::ProgressBar)
+    pbar.running || return nothing
+
+    for (n, job) in enumerate(pbar.jobs)
+        job.finished && continue
+        # get line contents
+        color = jobcolor(pbar, job)
+        contents = apply_style(join(update!.(job.columns, color), " "))
+
+        # move cursor to the right place
+        nshifts = string(n)
+        prev_line(; n=string(nshifts))
+
+        # print
+        # erase_line()
+        print(contents)
+
+        # restore cursor position
+        next_line(; n=string(nshifts))
+    end
+end
 
 # ------------------------------- general utils ------------------------------ #
 """
-pbar_color(pbar::ProgressBar)
+jobcolor(job::ProgressJob)
 
 Get the RGB color of of a progress bar's bar based on progress.
 """
-function pbar_color(pbar::ProgressBar)
-    α = .8 * pbar.i/pbar.N
-    β = max(sin(π * pbar.i/pbar.N) * .7, .4)
+function jobcolor(pbar::ProgressBar, job::ProgressJob)
+    isnothing(job.N) && return "(255, 255, 255)"
+
+    α = .8 * job.i/job.N
+    β = max(sin(π * job.i/job.N) * .7, .4)
 
     c1, c2, c3 = pbar.colors
-    r = (.8 - α) * c1.r + β * c2.r + α * c3.r
-    g = (.8 - α) * c1.g + β * c2.g + α * c3.g
-    b = (.8 - α) * c1.b + β * c2.b + α * c3.b
-    return "($(int(r)), $(int(g)), $(int(b)))"
+    r = string(int((.8 - α) * c1.r + β * c2.r + α * c3.r))
+    g = string(int((.8 - α) * c1.g + β * c2.g + α * c3.g))
+    b = string(int((.8 - α) * c1.b + β * c2.b + α * c3.b))
+    return "(" * r * ", " * g * ", " * b * ")"
 end
 
 end
