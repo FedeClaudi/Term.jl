@@ -5,7 +5,6 @@ version = "0.2.0"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
-Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 Highlights = "eafb193a-b7ab-5a9e-9068-77385905fa72"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -13,7 +12,6 @@ MyterialColors = "1c23619d-4212-4747-83aa-717207fae70f"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 
 [compat]
-Documenter = "0.27"
 Highlights = "0.5"
 MyterialColors = "0.3"
 Parameters = "0.12"
@@ -21,7 +19,6 @@ julia = "1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
 
 [targets]
 test = ["Test"]

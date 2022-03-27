@@ -11,7 +11,7 @@ import Term.tree: Tree
 data = Dict(
     "a" => 1,
     "b" => Int64,
-    "c" => (1, 2, 3),
+    "c" => [1, 2, 3],
 )
 
 print(Tree(data))

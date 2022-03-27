@@ -66,7 +66,7 @@ function style_error(io::IO, er)
                 width = WIDTH - 4,
             );
             title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
-            title_style = "red",
+            title_style = "default red",
             style = "dim red",
             width = WIDTH,
             title_justify = :left,
@@ -75,7 +75,7 @@ function style_error(io::IO, er)
         panel = Panel(
             main_message;
             title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
-            title_style = "red",
+            title_style = "default red",
             style = "dim red",
             width = WIDTH,
             title_justify = :left,
@@ -106,7 +106,7 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
     try
         code = load_code_and_highlight(file, lineno; δ = 2)
         if length(code) > 0
-            code = TextBox(code; width = WIDTH - 26)
+            code = TextBox(code; width = WIDTH-10, padding=(0, 0, 0, 0))
             code = Spacer(8, code.measure.h) * code
         end
     catch SystemError  # file not found
@@ -122,7 +122,7 @@ function backtrace_subpanel(line::String, WIDTH::Int, title::String)
         title = title,
         fit = true,
         style = "dim blue",
-        title_style = "bold bright_yellow",
+        title_style = "default bold bright_yellow",
     )
     # @info "Created backtrace subpanel"
     return panel
@@ -190,7 +190,7 @@ function style_backtrace(io::IO, t::Vector)
             stack;
             title = "StackTrace",
             style = "yellow dim",
-            title_style = "yellow",
+            title_style = "default yellow",
             title_justify = :left,
             width = WIDTH,
         )

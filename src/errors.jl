@@ -117,7 +117,7 @@ function error_message(io::IO, er::MethodError; kwargs...)
     # get main error message
     _args = join([string(ar) * _highlight(typeof(ar)) for ar in er.args], "\n      ")
     fn_name = "$(_highlight(string(er.f)))"
-    main_line = "No method matching $fn_name with aguments:\n      " * _args
+    main_line = "No method matching $fn_name with arguments:\n      " * _args
 
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er; context = io), "\n")
@@ -221,7 +221,7 @@ function install_stacktrace()
 
         function Base.showerror(io::IO, er::LoadError, bt; backtrace = true)
             print("\n")
-            println(hLine(_width(), "[bold red]LoadError[/bold red]"; style = "dim red"))
+            println(hLine(_width(), "[default bold red]LoadError[/default bold red]"; style = "dim red"))
             Base.display_error(io, er, bt)
 
             return Base.showerror(io, er.error, bt; backtrace = true)
@@ -234,7 +234,7 @@ function install_stacktrace()
 
         function Base.showerror(io::IO, er, bt; backtrace = true)
             ename = string(typeof(er))
-            print(hLine(_width(), "[bold red]$ename[/bold red]"; style = "dim red"))
+            print("\n"*hLine(_width(), "[default bold red]$ename[/default bold red]"; style = "dim red"))
 
             try
                 stack = style_backtrace(io, bt)

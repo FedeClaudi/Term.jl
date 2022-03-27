@@ -111,7 +111,7 @@ If you're reading here you're curious about what exactly is happening under the 
 `Term.jl`, like `rich` in python, defines a simple markup language to specify the style of bits of strings.
 As we saw, the syntax is very simple with an opening and closing tag specifying the style and marking the start and end of the styled text. 
 
-So the first thing that needs to happen is the **detection** of these markup tags. This is surprisingly hard because there's so many possible combinations. You can have markup tags whose style information varies considerably, you can have nested tags, you can have tags spread across lines and you can have nested tags spread across lines:
+So the first thing that needs to happen is the **detection** of these markup tags. This is surprisingly hard because there are so many possible combinations. You can have markup tags whose style information varies considerably, you can have nested tags, you can have tags spread across lines and you can have nested tags spread across lines:
 
 ```@example
 using Term # hide

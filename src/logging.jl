@@ -4,15 +4,20 @@ using Dates: Dates
 using Logging
 using InteractiveUtils
 
-import Term: Theme, theme, textlen, square_to_round_brackets, escape_brackets, reshape_text
-import ..markup: has_markup
+import Term: Theme,
+            theme,
+            textlen,
+            escape_brackets,
+            unescape_brackets,
+            reshape_text,
+            has_markup
 import ..box: ROUNDED
 import ..style: apply_style
 import ..renderables: AbstractRenderable
 
 export TermLogger, install_term_logger
 
-tprint = (println ∘ apply_style)
+tprint = (println ∘ unescape_brackets ∘ apply_style)
 
 DEFAULT_LOGGER = global_logger()
 
@@ -155,8 +160,8 @@ function Logging.handle_message(
         elseif v isa AbstractVector
             _style = logger.theme.number
             _size = size(v)
-            v = square_to_round_brackets(string(v))
-            v = textlen(v) > 33 ? v[1:30] * " ...)" : v
+            v = escape_brackets(string(v))
+            v = textlen(v) > 33 ? v[1:30] * "..." : v
             v *= "\n [dim]size: $(_size)[/dim]"
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
@@ -176,7 +181,9 @@ function Logging.handle_message(
         vlines = split(string(v), "\n")
 
         if !isnothing(_style)
-            vlines = ["[$_style]$ln[/$_style]" for ln in vlines]
+            vlines = map(
+                ln -> "["*_style*"]"*ln*"[/"*_style*"]", vlines
+            )
         end
 
         if length(vlines) == 1

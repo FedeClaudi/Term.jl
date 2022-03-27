@@ -18,16 +18,16 @@ all separated by a space. You can also use hexcodes (like #ff0022) to specify
 the color of your text.
 
 
-Once you're happy with your markup string, you can use `Term.tprint` to print it!
+Once you're happy with your markup string, you can use `Term.tprintln` to print it!
 
 Note: the second set of parentheses, [/xx], terminates the markup tag and the style
 information 'xx' must be identical between the start/end parentheses.
 """
 
-import Term: tprint
+import Term: tprintln
 
-my_string = "[bold underline]This[/bold underline] is [red italic]my[/red italic] [on_green black]string[/on_green black]"
-tprint(my_string)
+my_string = "[bold underline]This[/bold underline] is [red italic]my[/red italic] [on_green black bold]string[/on_green black bold]"
+tprintln(my_string)
 
 """
 Using markup tags is great when you want your styled text to be printed within other `Renderable` object

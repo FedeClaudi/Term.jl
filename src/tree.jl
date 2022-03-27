@@ -5,7 +5,6 @@ using InteractiveUtils
 
 
 import Term: loop_last,
-        replace_double_brackets,
         escape_brackets,
         fillin,
         highlight, 
@@ -73,7 +72,7 @@ function asleaf end
 
 asleaf(x) = truncate(highlight(x), 22)
 asleaf(x::Nothing) = nothing
-asleaf(x::AbstractVector) = truncate((replace_double_brackets ∘ escape_brackets ∘ string)(x), 22)
+asleaf(x::AbstractVector) = truncate((escape_brackets ∘ string)(x), 22)
 asleaf(x::AbstractString) = truncate(highlight(x, :string), 22)
 
 """
@@ -222,7 +221,7 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
 
             else
                 _end = n == length(waslast) ? guides.branch : guides.vline
-                _pre_guides *= lasttree ? guides.leaf : _end
+                _pre_guides *= lasttree ? (l ? guides.leaf : guides.vline) : _end
             end
         end
 
