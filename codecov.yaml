@@ -1,0 +1,5 @@
+# sample regex patterns
+ignore:
+  - "./src/console.jl"
+  - "./test"       
+  - "./scripts"         

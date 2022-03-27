@@ -16,6 +16,13 @@ import Term: fillin
     seg = Segment("aa\n[blue]123[/blue]")
     @test seg.measure.w == 3
     @test seg.measure.h == 2
+
+
+    seg = Segment("test")
+    @test seg * "test" isa Segment
+    @test (seg*"t2").text == "testt2"
+    @test ("t2"*seg).text == "t2test"
+    @test (seg*seg).text == "testtest"
 end
 
 @testset "\e[34mRenderables - Renderable" begin
