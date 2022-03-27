@@ -1,4 +1,16 @@
-import Term: cleantext, chars, textlen
+import Term: cleantext, chars, textlen, split_lines
+
+
+function same_widths(text::String)::Bool
+    widths = textlen.(split_lines(text))
+    return length(unique(widths)) == 1
+end
+
+function check_widths(text, width)
+    for line in split_lines(text)
+        @test textlen(line) <= width
+    end
+end
 
 
 """

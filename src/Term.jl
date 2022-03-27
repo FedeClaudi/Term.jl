@@ -11,7 +11,6 @@ include("theme.jl")
 include("highlight.jl")
 
 # rely on other modules
-include("markup.jl")
 include("style.jl")
 include("segment.jl")
 include("macros.jl")
@@ -47,11 +46,10 @@ using .measure: measure
 using .measure: Measure
 
 # ----------------------------------- style ---------------------------------- #
-using .markup: extract_markup, MarkupTag, pairup_tags
 
 using .color: NamedColor, BitColor, RGBColor, get_color
 
-using .style: MarkupStyle, extract_style, apply_style
+using .style: apply_style
 
 using .segment: Segment
 

@@ -19,7 +19,6 @@ for i in track(myvec)
     sleep(.025)
 end
 
-
 """
 `track` creates and updates a `ProgressBar` object for you.
 But you can do it manually if you want more control over it 
@@ -128,6 +127,6 @@ for i in 1:3
 
     end
 end
-tprintln("[bright_blue bold]poof![/bright_blue bold] [underline bright_blue]They disappeared[/]")
+tprintln("[bright_blue bold]poof![/bright_blue bold] [underline]They disappeared")
 
 tprint(hLine("Done"; style="green"))

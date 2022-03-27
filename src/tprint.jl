@@ -1,6 +1,6 @@
 module Tprint
 
-import Term: highlight, theme
+import Term: highlight, theme, unescape_brackets
 import ..renderables: AbstractRenderable
 import ..style: apply_style
 import ..layout: hstack
@@ -19,7 +19,7 @@ tprint(x::AbstractString)
 
 Apply style to a string and print it to a new line
 """
-tprint(io::IO, x::AbstractString) = print(io, apply_style(x))
+tprint(io::IO, x::AbstractString) = print(io, (unescape_brackets ∘  apply_style)(x))
 tprint(x::AbstractString) = tprint(stdout, x)
 
 """

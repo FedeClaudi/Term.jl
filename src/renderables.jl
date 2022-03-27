@@ -3,7 +3,8 @@ module renderables
 import ..measure: Measure
 import ..segment: Segment
 import ..consoles: console_width
-import Term: split_lines, reshape_text, do_by_line, fillin
+import ..style: get_style_codes, MarkupStyle
+import Term: split_lines, reshape_text, fillin, join_lines
 
 export AbstractRenderable, Renderable, RenderableText
 
@@ -47,21 +48,28 @@ end
 
 Generic `Renderable` object.
 """
-mutable struct Renderable <: AbstractRenderable
-    segments::Vector
+
+struct Renderable <: AbstractRenderable
+    segments::Vector{Segment}
     measure::Measure
 end
 
-Renderable() = Renderable([], Measure(0, 0))
+
+"""
+    Renderable(
+        str::String; width::Union{Nothing,Int} = nothing
+    )
+
+Convenience method to construct a RenderableText
+"""
 function Renderable(
-    str::Union{Vector,AbstractString}; width::Union{Nothing,Int} = nothing
+    str::AbstractString; width::Union{Nothing,Int} = nothing
 )
     return RenderableText(str; width = width)
 end
-Renderable(ren::AbstractRenderable; width::Union{Nothing,Int,Symbol} = nothing) = ren  # returns the renderable
-function Renderable(segment::Segment; width::Union{Nothing,Int,Symbol} = nothing)
-    return Renderable([segment], Measure([segment]))
-end
+
+Renderable(ren::AbstractRenderable) = ren
+Renderable() = Renderable(Vector{Segment}[], Measure(0, 0))
 
 # ---------------------------------------------------------------------------- #
 #                                TEXT RENDERABLE                               #
@@ -74,31 +82,37 @@ end
 
 See also [`Renderable`](@ref), [`TextBox`](@ref)
 """
-mutable struct RenderableText <: AbstractRenderable
+
+struct RenderableText <: AbstractRenderable
     segments::Vector
     measure::Measure
-    text::AbstractString
+    style::Union{Nothing, String}
 end
 
 """
-    RenderableText(text::AbstractString; width::Union{Nothing, Int, Symbol}=nothing)
+    RenderableText(text::String; width::Union{Nothing, Int, Symbol}=nothing)
 
 Construct a `RenderableText` out of a string.
 
 If a `width` is passed the text is resized to match the width.
 """
-function RenderableText(text::AbstractString, style="default"; width::Union{Nothing,Int} = nothing)
-    # ensure all lines have the same width
+function RenderableText(text::AbstractString; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
+    # reshape text
+    if !isnothing(width)
+        width = min(console_width(stdout)-1, width)
+        text = reshape_text(text, width)
+    end
     text = fillin(text)
 
-    width = isnothing(width) ? console_width(stdout) : width
-    if width isa Number
-        width = min(console_width(stdout), width)
-        text = do_by_line((ln) -> reshape_text(ln, width), text)
+    # create renderable
+    if isnothing(style)
+        segments = Segment.(split_lines(text))
+    else
+        style_init, style_finish = get_style_codes(MarkupStyle(style))
+        segments = map(ln -> Segment(style_init * ln * style_finish), split_lines(text))
     end
 
-    segments = [Segment(line, style) for line in split_lines(chomp(text))]
-    return RenderableText(segments, Measure(segments), text)
+    return RenderableText(segments, Measure(segments), style)
 end
 
 """
@@ -106,20 +120,27 @@ end
 
 Construct a RenderableText by possibly re-shaping a RenderableText
 """
-RenderableText(rt::RenderableText, style="default"; width::Union{Nothing,Int} = nothing) = RenderableText(chomp(replace(rt.text, "\n"=>"")), style; width=width)
+function RenderableText(rt::RenderableText; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
+    if rt.style == style && rt.measure.w == width
+        return rt
+    else
+        text = join_lines([seg.text for seg in rt.segments])
+        return RenderableText(text; style=style, width=width)   
+    end
+end
 
 """
     RenderableText(text::Vector; width::Union{Nothing,Int} = nothing)
 
 Construct a RenderableText out a vector of objects.
 """
-function RenderableText(text::Vector, style="default"; width::Union{Nothing,Int} = nothing)
-    return RenderableText(join(string(text), "\n"), style; width = width)
+function RenderableText(text::Vector; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
+    return RenderableText(join(string(text), "\n"); style=style, width = width)
 end
 
 
 
 # -------------------------------- union type -------------------------------- #
-RenderablesUnion = Union{AbstractString,AbstractRenderable,RenderableText}
+RenderablesUnion = Union{AbstractString,AbstractRenderable}
 
 end

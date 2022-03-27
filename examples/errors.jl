@@ -36,8 +36,7 @@ corresponding error message
 # sqrt(-1)
 
 # ------------  AssertionError
-# import Term: Panel
-# Panel("mytext", title="this title is waaaay too long!!!", fit=true)
+# @assert 1 == 2
 
 # ------------  UndefVarError
 # println(x)
@@ -50,7 +49,6 @@ corresponding error message
 # div(2, 0)
 
 # ------------  StackOverflowError
-# # ! not working
 # a() = b()
 # b() = a()
 # a()
@@ -60,7 +58,7 @@ corresponding error message
 # mydict["a"]
 
 # ------------  InexactError
-# Int(2.5)
+Int(2.5)
 
 # ------------  UndefKeywordError
 # function my_func(;my_arg::Int)
