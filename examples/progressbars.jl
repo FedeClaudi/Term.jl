@@ -81,7 +81,7 @@ width regardless of how many columns there are. The only thing
 left to see is how to create your own column.
 """
 
-import Term.progress: AbstractColumn, DescriptionColumn, BarColumn
+import Term.progress: AbstractColumn, DescriptionColumn, ProgressColumn
 import Term.style: apply_style  # to style strings
 import Term.measure: Measure  # to define the column's size
 
@@ -103,7 +103,7 @@ Term.progress.update(col::MyCol, i::Int, args...)::String = return apply_style("
 # okay let's create a progress bar with out columns
 cols = [
     DescriptionColumn("MY columns!!!"),
-    BarColumn(),  # this will show the actual bar
+    ProgressColumn(),  # this will show the actual bar
     MyCol("bold red"),
 ]
 

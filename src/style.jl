@@ -22,6 +22,11 @@ import ..color: AbstractColor,
 
 export apply_style
 
+
+apply_style(text::String, style::String) = apply_style(
+    "["*style*"]"*text*"[/"*style*"]"
+)
+
 """
 Check if a string is a mode name
 """

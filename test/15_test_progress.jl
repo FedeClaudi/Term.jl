@@ -32,8 +32,8 @@
         end
     end
 
-    import Term.progress: DescriptionColumn, BarColumn, PercentageColumn
-    cols = [DescriptionColumn("test"), BarColumn(), PercentageColumn()]
+    import Term.progress: DescriptionColumn, ProgressColumn, PercentageColumn
+    cols = [DescriptionColumn("test"), ProgressColumn(), PercentageColumn()]
     @test_nothrow begin
         for i in track(1:10; columns=cols)
             sleep(0.001)

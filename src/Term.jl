@@ -99,7 +99,7 @@ using .logging: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
 
-using .progress: ProgressBar, update, track
+using .progress: ProgressBar, ProgressJob # update, track
 
 using .tree: Tree
 
