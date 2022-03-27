@@ -29,7 +29,7 @@ import Term.progress: ProgressBar
 pbar = ProgressBar(100)
 ```
 
-When you want to sue your progress bar you need to `start` it, `update` it and `stop` it. Everytime you `update` `pbar` it adds a `+1` to its internal counter of how many iterations it's done (until it's done all the iterations you've set out at the beginning), You can reset this by specifying the iteration number: `update(pbar, 50)`.
+When you want to use your progress bar you need to `start` it, `update` it and `stop` it. Everytime you `update` `pbar` it adds a `+1` to its internal counter of how many iterations it's done (until it's done all the iterations you've set out at the beginning), You can reset this by specifying the iteration number: `update(pbar, 50)`.
 So this is what it looks like:
 
 ```@example
