@@ -10,6 +10,8 @@ InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 MyterialColors = "1c23619d-4212-4747-83aa-717207fae70f"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+ProgressLogging = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
+TerminalLoggers = "5d786b92-1e48-4d6f-9151-6b4477ca9bed"
 
 [compat]
 Highlights = "0.5"

@@ -22,7 +22,7 @@ import ..measure: Measure
 import ..segment: Segment
 import ..color: RGBColor
 
-export ProgressBar, ProgressJob, addjob!, start!, stop!, update!
+export ProgressBar, ProgressJob, addjob!, start!, stop!, update!, removejob!
 
 
 
@@ -38,7 +38,8 @@ mutable struct ProgressJob
     N::Union{Nothing, Int}
 
     description::String
-    columns  
+    columns
+    columns_kwargs::Dict
     width::Int
 
     started::Bool
@@ -51,10 +52,11 @@ mutable struct ProgressJob
             N::Union{Int, Nothing},
             description::String,
             columns::Vector{DataType},
-            width::Int; 
+            width::Int,
+            columns_kwargs::Dict,
         )
         return new(
-            id, 0, N, description, columns, width, false, false, nothing, nothing
+            id, isnothing(N) ? 0 : 1, N, description, columns, columns_kwargs, width, false, false, nothing, nothing
         )
     end
 end
@@ -72,15 +74,18 @@ function start!(job::ProgressJob)
 
 
     # create columns type instances
+    csymbol(c) = Symbol(split(string(c), ".")[end])
+    makecol(c) = haskey(job.columns_kwargs, csymbol(c)) ? c(job; job.columns_kwargs[csymbol(c)]...) : c(job)
     job.columns = map(
-        c -> eval(:($c($job))), job.columns
+        c -> makecol(c), job.columns
     )
+    
 
     # if there's a progress column, set its width
     if !isnothing(job.N) && any(map(c -> c isa ProgressColumn, job.columns))
         # get the progress column width
         spaces = length(job.columns)-1
-        colwidths = sum(map((c)-> c isa ProgressColumn ? 0 : c.measure.w, job.columns))
+        colwidths = sum(c -> c.measure.w, job.columns)
         bcol_width = job.width - colwidths - spaces
         
         # set width
@@ -97,11 +102,13 @@ end
 function update!(job::ProgressJob)
     (!isnothing(job.N) && job.i >= job.N) && return stop!(job)
     job.i += 1
+    nothing
 end
 
 function stop!(job::ProgressJob)
     job.stoptime = now()
     job.finished = true
+    nothing
 end
 
 
@@ -127,7 +134,9 @@ to render a progress bar renderable.
 mutable struct ProgressBar
     jobs::Vector{ProgressJob}
     width::Int
+
     columns::Vector{DataType}
+    columns_kwargs::Dict
 
     transient::Bool
     redirectstdout::Bool
@@ -136,12 +145,14 @@ mutable struct ProgressBar
     colors::Vector{RGBColor}
 
     running::Bool
+    paused::Bool
     Δt::Float64
     task::Union{Task, Nothing}
 
     function ProgressBar(;
         width::Int=88,
         columns::Union{Vector{DataType}, Symbol} = :default,
+        columns_kwargs::Dict = Dict(),
         expand::Bool=false,
         transient::Bool = false,
         redirectstdout::Bool = false,
@@ -164,11 +175,13 @@ mutable struct ProgressBar
             Vector{ProgressJob}(),
             width,
             columns,
+            columns_kwargs,
             transient,
             redirectstdout,
             originalstdout,
             out,
             colors,
+            false,
             false,
             1/refresh_rate,
             nothing,
@@ -177,7 +190,6 @@ mutable struct ProgressBar
 end
 
 Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar) = print(io, "Progress bar \e[2m($(length(pbar.jobs)) jobs)\e[0m")
-
 
 
 # ---------------------------------- methods --------------------------------- #
@@ -189,21 +201,30 @@ function addjob!(
     )::ProgressJob
 
     # create Job
-    job = ProgressJob(length(pbar.jobs) + 1, N, description, pbar.columns, pbar.width)
+    pbar.paused = true
+    job = ProgressJob(length(pbar.jobs) + 1, N, description, pbar.columns, pbar.width, pbar.columns_kwargs)
 
     # start job
     start && start!(job)
 
     pushfirst!(pbar.jobs, job)
+    pbar.paused = false
     return job
+end
+
+function removejob!(pbar::ProgressBar, job::ProgressJob)
+    stop!(job)
+    deleteat!(pbar.jobs, findfirst(j -> j == job, pbar.jobs))
 end
 
 function start!(pbar::ProgressBar)
     pbar.running = true
+    print("\n"^(length(pbar.jobs)))
+    hide_cursor()
 
     pbar.task = @task begin
         while pbar.running
-            render(pbar)
+            pbar.paused || render(pbar)
             sleep(pbar.Δt)
         end
     end
@@ -212,29 +233,31 @@ function start!(pbar::ProgressBar)
 end
 
 function stop!(pbar::ProgressBar)
+    render(pbar)
     pbar.running = false
+    pbar.jobs = Vector{ProgressJob}()
+    # print("\n"^(length(pbar.jobs)))
+    show_cursor()
     return nothing
 end
+
 
 function render(pbar::ProgressBar)
     pbar.running || return nothing
 
-    for (n, job) in enumerate(pbar.jobs)
+    for (n,job) in enumerate(pbar.jobs)
         job.finished && continue
-        # get line contents
         color = jobcolor(pbar, job)
         contents = apply_style(join(update!.(job.columns, color), " "))
-
+    
         # move cursor to the right place
         nshifts = string(n)
-        prev_line(; n=string(nshifts))
-
+    
         # print
+        prev_line(; n=nshifts)
         # erase_line()
         print(contents)
-
-        # restore cursor position
-        next_line(; n=string(nshifts))
+        next_line(; n=nshifts)
     end
 end
 
