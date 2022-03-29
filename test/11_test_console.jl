@@ -1,4 +1,4 @@
-import Term.consoles: console_height,
+import Term.console: console_height,
         console_width,
         console,
         err_console,

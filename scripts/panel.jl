@@ -1,6 +1,6 @@
 using Term
 import Term: chars
-import Term.consoles: clear
+import Term.console: clear
 install_term_logger()
 
 clear()

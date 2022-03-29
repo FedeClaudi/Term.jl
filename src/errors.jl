@@ -9,7 +9,7 @@ import Term.style: apply_style
 import ..panel: Panel, TextBox
 import ..renderables: RenderableText
 import ..layout: hLine, Spacer
-import ..consoles: Console
+import ..console: console_width
 import ..measure: Measure
 
 export install_stacktrace
@@ -32,7 +32,7 @@ const ErrorsExplanations = Dict(
     UndefVarError => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
 )
 
-_width() = min(Console(stderr).width, 100)
+_width() = min(console_width(stderr), 100)
 
 # ----------------------- error type specific messages ----------------------- #
 

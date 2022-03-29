@@ -1,6 +1,6 @@
 using Term
 import Term.progress: track, ProgressBar, update, start, stop
-import Term.consoles: clear
+import Term.console: clear
 import Term.color: RGBColor
 
 

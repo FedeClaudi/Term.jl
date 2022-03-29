@@ -13,7 +13,7 @@ import Term:
     split_lines,
     do_by_line
 
-import ..consoles: console_width
+import ..console: console_width
 import ..panel: Panel, TextBox
 import ..layout: Spacer, hLine
 import ..tree: Tree

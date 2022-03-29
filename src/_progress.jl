@@ -1,3 +1,4 @@
+import MyterialColors: orange_light
 
 """
 Definition of several type of columns for progress bars.
@@ -20,8 +21,8 @@ mutable struct DescriptionColumn <: AbstractColumn
     measure::Measure
     text::String
 
-    function DescriptionColumn(job::ProgressJob)
-        seg = Segment(job.description)
+    function DescriptionColumn(job::ProgressJob; style::String=orange_light)
+        seg = Segment(job.description, style)
         new(job, [seg], seg.measure, seg.text)
     end
 end

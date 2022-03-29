@@ -9,7 +9,7 @@ import ..measure: Measure
 import ..segment: Segment
 using ..box
 import ..box: get_lrow, get_rrow
-import ..consoles: console_width, console_height
+import ..console: console_width, console_height
 
 export Padding, vstack, hstack, pad
 export Spacer, vLine, hLine
@@ -284,7 +284,7 @@ function hLine(
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
 
-    open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
+    open, close, space =  "[" * style * "]",  "[/" * style * "]\e[0m", " "
     line = open * get_lrow(box, lw-tl, :top; with_left=false) * 
                 space * text * space * open *  get_rrow(box, rw-tr, :top; with_right=false) * close
 

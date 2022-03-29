@@ -2,7 +2,7 @@ module renderables
 
 import ..measure: Measure
 import ..segment: Segment
-import ..consoles: console_width
+import ..console: console_width
 import ..style: get_style_codes, MarkupStyle
 import Term: split_lines, reshape_text, fillin, join_lines
 

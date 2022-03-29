@@ -9,7 +9,7 @@ import Term:
     fillin,
     do_by_line
 
-import ..consoles: console_width, console_height
+import ..console: console_width, console_height
 import ..measure: Measure
 import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..segment: Segment

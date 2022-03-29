@@ -1,26 +1,24 @@
 module progress
 
 using Dates
-import MyterialColors: pink, yellow_dark, teal
 import Parameters: @with_kw
 
 import Term: int, textlen, truncate
 import ..Tprint: tprint, tprintln
 import ..style: apply_style
-import ..consoles: console_width,
-                clear,
+import ..console: console_width,
                 hide_cursor,
                 show_cursor,
-                line,
-                erase_line,
-                beginning_previous_line,
-                prev_line,
-                next_line
-
+                move_to_line,
+                cleartoend,
+                change_scroll_region,
+                console_height,
+                up
 import ..renderables: AbstractRenderable
 import ..measure: Measure
 import ..segment: Segment
 import ..color: RGBColor
+import ..layout: hLine
 
 export ProgressBar, ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track
 
@@ -124,8 +122,15 @@ include("_progress.jl")
 
 
 # ---------------------------------------------------------------------------- #
-#                                  PROGESS BAR                                 #
+#                                  PROGRESS BAR                                #
 # ---------------------------------------------------------------------------- #
+
+Base.@kwdef mutable struct RenderStatus
+    rendered::Bool = false
+    nlines::Int = 0
+    hline::String = ""
+end
+
 
 # ------------------------------- constructors ------------------------------- #
 """
@@ -142,54 +147,45 @@ mutable struct ProgressBar
     columns_kwargs::Dict
 
     transient::Bool
-    redirectstdout::Bool
-    originalstdout::Union{Nothing, IO}  # stores a reference to the original stdout
-    out  # will be used to store temporarily re-directed stdout
     colors::Vector{RGBColor}
+    Δt::Float64
 
+    buff::IOBuffer  # will be used to store temporarily re-directed stdout
     running::Bool
     paused::Bool
-    Δt::Float64
     task::Union{Task, Nothing}
+    renderstatus
+end
 
-    function ProgressBar(;
-        width::Int=88,
-        columns::Union{Vector{DataType}, Symbol} = :default,
-        columns_kwargs::Dict = Dict(),
-        expand::Bool=false,
-        transient::Bool = false,
-        redirectstdout::Bool = false,
-        originalstdout::Union{Nothing, IO}  = nothing, # stores a reference to the original stdout
-        out = nothing,  # will be used to store temporarily re-directed stdout
-        colors::Vector{RGBColor} = [
-            RGBColor("(1, .05, .05)"),
-            RGBColor("(.05, .05, 1)"),
-            RGBColor("(.05, 1, .05)"),
-        ],
-        refresh_rate::Int=60,  # FPS of rendering
-    )
+function ProgressBar(;
+    width::Int=88,
+    columns::Union{Vector{DataType}, Symbol} = :default,
+    columns_kwargs::Dict = Dict(),
+    expand::Bool=false,
+    transient::Bool = false,
+    colors::Vector{RGBColor} = [
+        RGBColor("(1, .05, .05)"),
+        RGBColor("(.05, .05, 1)"),
+        RGBColor("(.05, 1, .05)"),
+    ],
+    refresh_rate::Int=60,  # FPS of rendering
+)
 
     columns = columns isa Symbol ? get_columns(columns) : columns
 
     # check that width is large enough
     width = expand ? console_width()-5 : min(max(width, 20), console_width()-5)
 
-    return new(
+    return ProgressBar(
             Vector{ProgressJob}(),
             width,
             columns,
             columns_kwargs,
             transient,
-            redirectstdout,
-            originalstdout,
-            out,
             colors,
-            false,
-            false,
             1/refresh_rate,
-            nothing,
+            IOBuffer(), false, false, nothing, RenderStatus()
         )
-    end
 end
 
 Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar) = print(io, "Progress bar \e[2m($(length(pbar.jobs)) jobs)\e[0m")
@@ -210,7 +206,7 @@ function addjob!(
     # start job
     start && start!(job)
 
-    pushfirst!(pbar.jobs, job)
+    push!(pbar.jobs, job)
     pbar.paused = false
     return job
 end
@@ -240,8 +236,20 @@ end
 function stop!(pbar::ProgressBar)
     pbar.paused = true
     pbar.running = false
-    # pbar.jobs = Vector{ProgressJob}()
+
+    # if transient, delete 
+    if pbar.transient
+        # move cursor to stale scrollregion and clear
+        h = console_height() - pbar.renderstatus.nlines
+        move_to_line(stdout, h)
+        cleartoend(stdout)
+        up(stdout, h)
+    end
+    
+    # restorue scrollbar region
+    change_scroll_region(stdout, console_height())
     show_cursor()
+    print("\n")
     return nothing
 end
 
@@ -257,14 +265,47 @@ end
 
 function render(pbar::ProgressBar)
     pbar.running || return nothing
+    njobs, height = length(pbar.jobs)+1, console_height()
+    iob = pbar.buff
 
-    for (n,job) in enumerate(pbar.jobs)
-        job.finished && continue
-        contents = job.needstextupdate ? render(job, pbar) : job.lasttext
-    
-        # move cursor to the right place, print and restore position
-        print("\e[F"^n * contents*  "\e[E"^n)
+    # on the first render, create sticky region
+    if !pbar.renderstatus.rendered
+        print("\n"^njobs)
+        change_scroll_region(iob, height - njobs)
+        pbar.renderstatus.rendered = true
+        pbar.renderstatus.hline = string(
+            hLine(pbar.width, "progress"; style="blue dim")
+        )
+        pbar.renderstatus.nlines = njobs
     end
+
+    # adjust sticky region if number of jobs changed
+    if njobs != pbar.renderstatus.nlines
+        # move cursor to stale scrollregion and clear
+        move_to_line(iob, height - pbar.renderstatus.nlines)
+        cleartoend(iob)
+
+        # create a new scrollregion
+        change_scroll_region(iob, height - njobs)
+        pbar.renderstatus.nlines = njobs
+    end
+    
+    # move cursor to scrollregion and clear
+    move_to_line(iob, height - njobs + 1)
+    cleartoend(iob)
+
+    # render the progressbars
+    println(iob, pbar.renderstatus.hline)
+    for job in pbar.jobs
+        # job.finished && continue
+        contents = job.needstextupdate ? render(job, pbar) : job.lasttext
+        write(iob, contents*"\n")
+    end
+
+    # restore position and write
+    move_to_line(iob, height - njobs)
+    write(stdout, take!(iob))
+    nothing
 end
 
 

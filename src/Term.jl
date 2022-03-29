@@ -75,7 +75,7 @@ end
 # -------------------------------- renderables ------------------------------- #
 using .box
 
-using .consoles: Console, console, err_console, console_height, console_width
+using .console: console_height, console_width
 
 using .renderables: AbstractRenderable, Renderable, RenderableText
 
