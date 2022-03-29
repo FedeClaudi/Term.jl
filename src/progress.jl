@@ -22,7 +22,7 @@ import ..measure: Measure
 import ..segment: Segment
 import ..color: RGBColor
 
-export ProgressBar, ProgressJob, addjob!, start!, stop!, update!, removejob!
+export ProgressBar, ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track
 
 
 
@@ -36,6 +36,9 @@ mutable struct ProgressJob
 
     i::Int   # keep track of progress
     N::Union{Nothing, Int}
+
+    needstextupdate::Bool
+    lasttext::String
 
     description::String
     columns
@@ -56,7 +59,7 @@ mutable struct ProgressJob
             columns_kwargs::Dict,
         )
         return new(
-            id, isnothing(N) ? 0 : 1, N, description, columns, columns_kwargs, width, false, false, nothing, nothing
+            id, isnothing(N) ? 0 : 1, N, true, "", description, columns, columns_kwargs, width, false, false, nothing, nothing
         )
     end
 end
@@ -72,7 +75,6 @@ function start!(job::ProgressJob)
         filter!(c->c != ProgressColumn, job.columns)
     end
 
-
     # create columns type instances
     csymbol(c) = Symbol(split(string(c), ".")[end])
     makecol(c) = haskey(job.columns_kwargs, csymbol(c)) ? c(job; job.columns_kwargs[csymbol(c)]...) : c(job)
@@ -80,7 +82,6 @@ function start!(job::ProgressJob)
         c -> makecol(c), job.columns
     )
     
-
     # if there's a progress column, set its width
     if !isnothing(job.N) && any(map(c -> c isa ProgressColumn, job.columns))
         # get the progress column width
@@ -97,11 +98,13 @@ function start!(job::ProgressJob)
     # start job
     job.started = true
     job.startime = now()
+    return nothing
 end
 
 function update!(job::ProgressJob)
     (!isnothing(job.N) && job.i >= job.N) && return stop!(job)
     job.i += 1
+    job.needstextupdate = true
     nothing
 end
 
@@ -199,7 +202,7 @@ function addjob!(
         N::Union{Int, Nothing}=nothing,
         start::Bool=true,
     )::ProgressJob
-
+    pbar.running && print("\n")
     # create Job
     pbar.paused = true
     job = ProgressJob(length(pbar.jobs) + 1, N, description, pbar.columns, pbar.width, pbar.columns_kwargs)
@@ -214,7 +217,9 @@ end
 
 function removejob!(pbar::ProgressBar, job::ProgressJob)
     stop!(job)
+    pbar.paused = true
     deleteat!(pbar.jobs, findfirst(j -> j == job, pbar.jobs))
+    pbar.paused = false
 end
 
 function start!(pbar::ProgressBar)
@@ -233,12 +238,20 @@ function start!(pbar::ProgressBar)
 end
 
 function stop!(pbar::ProgressBar)
-    render(pbar)
+    pbar.paused = true
     pbar.running = false
-    pbar.jobs = Vector{ProgressJob}()
-    # print("\n"^(length(pbar.jobs)))
+    # pbar.jobs = Vector{ProgressJob}()
     show_cursor()
     return nothing
+end
+
+
+function render(job::ProgressJob, pbar::ProgressBar)::String
+    color = jobcolor(pbar, job)
+    contents = apply_style(join(update!.(job.columns, color), " "))
+    job.lasttext = contents
+    job.needstextupdate = false
+    return contents
 end
 
 
@@ -247,19 +260,53 @@ function render(pbar::ProgressBar)
 
     for (n,job) in enumerate(pbar.jobs)
         job.finished && continue
-        color = jobcolor(pbar, job)
-        contents = apply_style(join(update!.(job.columns, color), " "))
+        contents = job.needstextupdate ? render(job, pbar) : job.lasttext
     
-        # move cursor to the right place
-        nshifts = string(n)
-    
-        # print
-        prev_line(; n=nshifts)
-        # erase_line()
-        print(contents)
-        next_line(; n=nshifts)
+        # move cursor to the right place, print and restore position
+        print("\e[F"^n * contents*  "\e[E"^n)
     end
 end
+
+
+# ---------------------------------------------------------------------------- #
+#                                     WITH                                     #
+# ---------------------------------------------------------------------------- #
+function with(expr, pbar::ProgressBar)
+    try
+        start!(pbar)
+        expr()
+        render(pbar)
+    finally
+        stop!(pbar)
+    end
+end
+
+# ---------------------------------------------------------------------------- #
+#                                     TRACK                                    #
+# ---------------------------------------------------------------------------- #
+macro track(ex)
+    iter = esc(ex.args[1].args[2])
+    i = esc(ex.args[1].args[1])
+    body = esc(ex.args[2])
+    quote
+        pbar = nothing
+        try
+            pbar = ProgressBar()
+            start!(pbar)
+            __pbarjob = addjob!(pbar; N=length($iter))
+            for $i in $iter
+                update!(__pbarjob) 
+                $body
+            end
+            update!(__pbarjob)
+            render(pbar)
+        finally 
+            stop!(pbar)
+        end
+        nothing
+    end
+end
+
 
 # ------------------------------- general utils ------------------------------ #
 """
