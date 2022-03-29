@@ -42,8 +42,8 @@ Move cursor up one one or more lines
 prev_line(io::IO=stdout) = write(io, "\e[1F")
 prev_line(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*"F")
 
-up(io::IO) = write(io, "\e[A")
-up(io::IO, n::Int=1) = write(io, "\e["*string(n)*"A")
+up(io::IO=stdout) = write(io, "\e[A")
+up(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*"A")
 
 
 """
@@ -52,8 +52,8 @@ Move cursor down one or more lines
 next_line(io::IO=stdout) = write(io, "\e[1E")
 next_line(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*"E")
 
-down(io::IO) = write(io, "\e[B")
-down(io::IO, n::Int=1) = write(io, "\e["*string(n)*"B")
+down(io::IO=stdout) = write(io, "\e[B")
+down(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*"B")
 
 move_to_line(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*";1H")
 

@@ -4,7 +4,7 @@ import Term.progress: SPINNERS
 import Term: tprintln, Panel
 
 function simple(; kwargs...)
-    pbar = ProgressBar(; refresh_rate=60, expand=true, width=150, kwargs...)
+    pbar = ProgressBar(; refresh_rate=60, expand=false, width=150, kwargs...)
     j1 = addjob!(pbar; N=100, description="First")
 
     with(pbar) do
@@ -52,8 +52,8 @@ function multi_nested_double()
     end
 end
 
-function multi()
-    pbar = ProgressBar(; refresh_rate=60, expand=false, width=150)
+function multi(; kwargs...)
+    pbar = ProgressBar(; refresh_rate=60, expand=false, width=150, kwargs...)
     j1 = addjob!(pbar; N=50, description="First")
     j2 = addjob!(pbar; N=75, description="Second")
     j3 = addjob!(pbar; N=100, description="Third")
@@ -122,11 +122,12 @@ end
 
 clear()
 println("starting")
-simple(; transient=true)
-println("test")
-multi_nested()
+print("_"^150)
+simple(; transient=true, columns=:detailed)
+# println("test")
+# multi_nested()
 # multi_nested_double()
-# multi()
+multi(; transient=true)
 # spinner()
 println("done")
 
@@ -134,6 +135,4 @@ println("done")
 
 # TODO look at integrating with loggr stuff
 
-# TODO handle transient bars
 
-# TODO fix width bugs

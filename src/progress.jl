@@ -13,7 +13,9 @@ import ..console: console_width,
                 cleartoend,
                 change_scroll_region,
                 console_height,
-                up
+                up, down,
+                erase_line
+
 import ..renderables: AbstractRenderable
 import ..measure: Measure
 import ..segment: Segment
@@ -88,9 +90,7 @@ function start!(job::ProgressJob)
         bcol_width = job.width - colwidths - spaces
         
         # set width
-        for col in job.columns
-            col isa ProgressColumn && setwidth!(col, bcol_width)
-        end
+        setwidth!.(job.columns, bcol_width)
     end
 
     # start job
@@ -191,7 +191,10 @@ end
 Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar) = print(io, "Progress bar \e[2m($(length(pbar.jobs)) jobs)\e[0m")
 
 
-# ---------------------------------- methods --------------------------------- #
+# ---------------------------------------------------------------------------- #
+#                                    METHODS                                   #
+# ---------------------------------------------------------------------------- #
+# --------------------------------- edit pbar -------------------------------- #
 function addjob!(
         pbar::ProgressBar;
         description::String="Running...",
@@ -236,24 +239,25 @@ end
 function stop!(pbar::ProgressBar)
     pbar.paused = true
     pbar.running = false
-
-    # if transient, delete 
-    if pbar.transient
-        # move cursor to stale scrollregion and clear
-        h = console_height() - pbar.renderstatus.nlines
-        move_to_line(stdout, h)
-        cleartoend(stdout)
-        up(stdout, h)
-    end
     
     # restorue scrollbar region
     change_scroll_region(stdout, console_height())
     show_cursor()
     print("\n")
+
+    # if transient, delete 
+    if pbar.transient
+        # move cursor to stale scrollregion and clear
+        move_to_line(stdout, console_height() )
+        for i in 1:pbar.renderstatus.nlines+1
+            erase_line(stdout)
+            up(stdout)
+        end
+    end
     return nothing
 end
 
-
+# --------------------------------- rendering -------------------------------- #
 function render(job::ProgressJob, pbar::ProgressBar)::String
     color = jobcolor(pbar, job)
     contents = apply_style(join(update!.(job.columns, color), " "))

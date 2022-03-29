@@ -1,4 +1,4 @@
-import MyterialColors: orange_light
+import MyterialColors: orange_light, teal, purple_light, pink
 
 """
 Definition of several type of columns for progress bars.
@@ -10,6 +10,7 @@ Used in progress.jl.
 # ---------------------------------------------------------------------------- #
 abstract type AbstractColumn <: AbstractRenderable end
 
+setwidth!(col::AbstractColumn, width::Int) = nothing
 
 # ---------------------------------------------------------------------------- #
 #                                 TEXT COLUMNS                                 #
@@ -39,7 +40,7 @@ struct SeparatorColumn <: AbstractColumn
 
     function SeparatorColumn(job::ProgressJob)
         seg = Segment("●", pink)
-        return new(job, [seg], seg.measure, seg.text)
+        return new(job, [seg], Measure(1, 1), seg.text)
     end
 end
 
@@ -86,7 +87,7 @@ end
 
 function update!(col::CompletedColumn, color::String, args...)::String
     isnothing(col.job.N) && return apply_style(string(col.job.i), col.style)
-    return apply_style(lpad(string(col.job.i), col.padwidth), color*" bold")
+    return apply_style(lpad(string(col.job.i), col.padwidth) * col.text, color*" bold")
 end
 
 
@@ -95,20 +96,20 @@ struct PercentageColumn <: AbstractColumn
     job::ProgressJob
     segments::Vector{Segment}
     measure::Measure
-    padwidth::Int
 
     function PercentageColumn(job::ProgressJob)
-        seg = Segment(" "^5) # "xxx %
-        return new(job, [seg], seg.measure, seg.measure.w-2)
+        seg = Segment(" "^4) # "xxx %
+        return new(job, [seg], seg.measure)
     end
     
 end
 
 function update!(col::PercentageColumn, args...)::String
     isnothing(col.job.N) && return ""
-    p = string(int(col.job.i / col.job.N * 100))
-    p = lpad(p, col.padwidth)
-    return "\e[2m"*p*" %\e[0m"
+    frac = int(col.job.i / col.job.N * 100)
+    p = string(frac)
+    p = frac == 100 ? p : lpad(p, 3)
+    return "\e[2m"*p*"%\e[0m"
 end
 
 
@@ -124,7 +125,7 @@ struct ElapsedColumn <: AbstractColumn
     style::String
     padwidth::Int
     
-    ElapsedColumn(job::ProgressJob) = new(job, [], Measure(6+9, 1), style, 6)
+    ElapsedColumn(job::ProgressJob; style=purple_light) = new(job, [], Measure(6+9, 1), style, 6)
 
 end
 
@@ -221,8 +222,6 @@ function update!(col::ProgressColumn, color::String, args...)::String
         completed = int(col.nsegs * col.job.i/col.job.N)
         remaining = col.nsegs - completed
 
-        # completed = completed < 0 ? 0 : completed
-        # remaining = remaining < 0 ? 0 : remaining
 
         return apply_style("[" *color*" bold]" * '━'^(completed) * "[/"*color*" bold]"* " "^(remaining))
     end
