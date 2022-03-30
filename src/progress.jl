@@ -3,7 +3,7 @@ module progress
 using Dates
 import Parameters: @with_kw
 
-import Term: int, textlen, truncate
+import Term: int, textlen, truncate, loop_last
 import ..Tprint: tprint, tprintln
 import ..style: apply_style
 import ..console: console_width,
@@ -14,7 +14,9 @@ import ..console: console_width,
                 change_scroll_region,
                 console_height,
                 up, down,
-                erase_line
+                erase_line,
+                savecursor,
+                restorecursor
 
 import ..renderables: AbstractRenderable
 import ..measure: Measure
@@ -136,6 +138,7 @@ include("_progress.jl")
 Base.@kwdef mutable struct RenderStatus
     rendered::Bool = false
     nlines::Int = 0
+    maxnlines::Int = 0
     hline::String = ""
 end
 
@@ -224,16 +227,17 @@ function addjob!(
 end
 
 function removejob!(pbar::ProgressBar, job::ProgressJob)
-    stop!(job)
     pbar.paused = true
+    stop!(job)
     deleteat!(pbar.jobs, findfirst(j -> j == job, pbar.jobs))
     pbar.paused = false
 end
 
 function start!(pbar::ProgressBar)
     pbar.running = true
+    pbar.paused = false
     print("\n"^(length(pbar.jobs)))
-    hide_cursor()
+    # hide_cursor()
 
     pbar.task = @task begin
         while pbar.running
@@ -252,9 +256,10 @@ function stop!(pbar::ProgressBar)
     # restorue scrollbar region
     change_scroll_region(stdout, console_height())
     show_cursor()
-    print("\n")
+    
 
     # if transient, delete 
+    print("\n")
     if pbar.transient
         # move cursor to stale scrollregion and clear
         move_to_line(stdout, console_height() )
@@ -277,15 +282,16 @@ end
 
 
 function render(pbar::ProgressBar)
+
     # check if running
     pbar.running || return nothing
     
     # remove completed, transient jobs
-    # for job in pbar.jobs
-    #     if job.finished && job.transient
-    #         removejob!(pbar, job)
-    #     end
-    # end
+    for job in pbar.jobs
+        if job.finished && job.transient
+            removejob!(pbar, job)
+        end
+    end
 
     # get variables
     njobs, height = length(pbar.jobs)+1, console_height()
@@ -293,43 +299,56 @@ function render(pbar::ProgressBar)
 
     # on the first render, create sticky region
     if !pbar.renderstatus.rendered
-        print("\n"^njobs)
+        print(iob, "\n"^(njobs))
         change_scroll_region(iob, height - njobs)
+
         pbar.renderstatus.rendered = true
         pbar.renderstatus.hline = string(
             hLine(pbar.width, "progress"; style="blue dim")
         )
         pbar.renderstatus.nlines = njobs
-    end
+        pbar.renderstatus.maxnlines = njobs
 
-    # adjust sticky region if number of jobs changed
-    if njobs != pbar.renderstatus.nlines
+    elseif njobs != pbar.renderstatus.nlines
+        # if we need more lines, scroll
+        if njobs > pbar.renderstatus.maxnlines
+            print(iob, "\n"^(njobs - pbar.renderstatus.maxnlines - 1))
+        end
+        pbar.renderstatus.maxnlines = max(pbar.renderstatus.maxnlines, njobs)
+
         # move cursor to stale scrollregion and clear
-        move_to_line(iob, height - pbar.renderstatus.nlines +1)
+        move_to_line(iob, height - pbar.renderstatus.nlines + 1)
         cleartoend(iob)
-        # change_scroll_region(stdout, height)
+        change_scroll_region(iob, height)
 
         # create a new scrollregion
-        change_scroll_region(iob, height - njobs - 1)
+        change_scroll_region(iob, height - pbar.renderstatus.maxnlines)
         pbar.renderstatus.nlines = njobs
     end
+
+    # move_to_line(iob, height - pbar.renderstatus.maxnlines)
+    savecursor(iob)
+
     
     # move cursor to scrollregion and clear
-    move_to_line(iob, height - njobs + 1)
+    move_to_line(iob, height - pbar.renderstatus.maxnlines + 1)
     cleartoend(iob)
 
     # render the progressbars
     println(iob, pbar.renderstatus.hline)
-    for job in pbar.jobs
+    for (last, job) in loop_last(pbar.jobs)
         # job.finished && continue
         contents = job.needstextupdate ? render(job, pbar) : job.lasttext
-        write(iob, contents*"\n")
+        coda = last ? "" : "\n"
+        write(iob, contents * coda)
     end
 
     # restore position and write
-    move_to_line(iob, height - njobs)
+    # move_to_line(iob, height - pbar.renderstatus.maxnlines - 1)
+    restorecursor(iob)
     write(stdout, take!(iob))
-    nothing
+    
+    # nothing
 end
 
 

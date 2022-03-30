@@ -1,5 +1,5 @@
 using Term.progress
-import Term.console: clear
+import Term.console: clear, cursor_position
 import Term.progress: SPINNERS
 import Term: tprintln, Panel
 
@@ -28,7 +28,7 @@ function multi_nested()
 
             update!(outer)
             removejob!(pbar, inner)
-            sleep(0.02)
+            sleep(1)
         end
     end
 end
@@ -38,6 +38,7 @@ function multi_nested_double()
     with(pbar) do
         outer = addjob!(pbar; N=3, description="outer")
         for i in 1:3
+            println(i)
             inner = addjob!(pbar, N=100, description="inner $i")
             inner2 = addjob!(pbar, N=100, description="inner $i v2")
             for j in 1:100
@@ -109,36 +110,64 @@ function mixed()
 
     pbar = ProgressBar(; columns_kwargs=columns_kwargs)
     with(pbar) do
-        j1 = addjob!(pbar; N=length(keys(SPINNERS)), transient=true)
+        j1 = addjob!(pbar; N=length(keys(SPINNERS)))
 
         for spinner in keys(SPINNERS)
             update!(j1)
-            with(pbar) do
-                job = addjob!(pbar; description="...")
-                for i in 1:500
-                    update!(job)
-                    sleep(.001)
-                end
+            job = addjob!(pbar; description="...",)
+            for i in 1:500
+                update!(job)
+                sleep(.001)
             end
         end
     end
 end
 
 
+function transientjobs()
+    columns_kwargs = Dict(
+        :SpinnerColumn => Dict(:style=>"bold green"),
+        :CompletedColumn => Dict(:style => "dim")
+    )
+
+    pbar = ProgressBar(; columns_kwargs=columns_kwargs)
+    with(pbar) do
+        j1 = addjob!(pbar; N=length(keys(SPINNERS)))
+
+        for spinner in keys(SPINNERS)
+            println(spinner)
+            # println("I print")
+            # pos = sprint(cursor_position)
+            # @info "cursor_position()"
+            update!(j1)
+            job = addjob!(pbar; N=500, description="...", transient=true)
+            for i in 1:500
+                update!(job)
+                sleep(.001)
+            end
+        end
+    end
+end
+
+
+
 clear()
 println("starting")
 print("_"^150)
 # simple(; transient=true, columns=:detailed)
-# println("test")
-multi_nested()
-# multi_nested_double()
 # multi(; transient=true)
+# multi_nested()
+# multi_nested_double()
 # spinner()
 # mixed()
+transientjobs()
 println("done")
 
 
-
+# TODO make transient jobs work
 # TODO look at integrating with loggr stuff
+
+
+
 
 

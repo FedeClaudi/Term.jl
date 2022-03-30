@@ -13,7 +13,9 @@ export console_height,
         erase_line,
         cleartoend,
         move_to_line,
-        change_scroll_region
+        change_scroll_region,
+        savecursor,
+        restorecursor
 
 const STDOUT = stdout
 const STDERR = stderr
@@ -21,11 +23,22 @@ const STDERR = stderr
 # ---------------------------------------------------------------------------- #
 #                                CURSOR CONTROL                                #
 # ---------------------------------------------------------------------------- #
-# --------------------------------- movement --------------------------------- #
+"""
+Save the current cursor position
+"""
+savecursor(io::IO=stdout) = write(io, "\e[s")
+
+"""
+Restore a previously saved cursor position
+"""
+restorecursor(io::IO=stdout) = write(io, "\e[u")
+
 """
 Get cursor position
 """
 cursor_position(io::IO=stdout) = write(io, "\e[6n")
+
+# --------------------------------- movement --------------------------------- #
 
 
 up(io::IO=stdout) = write(io, "\e[A") 
