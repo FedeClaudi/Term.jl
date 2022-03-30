@@ -205,9 +205,8 @@ mutable struct ProgressColumn <: AbstractColumn
     segments::Vector{Segment}
     measure::Measure
     nsegs::Int
-    is_spinner::Bool
 
-    ProgressColumn(job::ProgressJob) = new(job, Vector{Segment}(), Measure(0, 0), 0, isnothing(job.N))
+    ProgressColumn(job::ProgressJob) = new(job, Vector{Segment}(), Measure(0, 0), 0)
 end
 
 function setwidth!(col::ProgressColumn, width::Int)
@@ -216,15 +215,9 @@ function setwidth!(col::ProgressColumn, width::Int)
 end
 
 function update!(col::ProgressColumn, color::String, args...)::String
-    if col.is_spinner
-        return ""
-    else
-        completed = int(col.nsegs * col.job.i/col.job.N)
-        remaining = col.nsegs - completed
-
-
-        return apply_style("[" *color*" bold]" * '━'^(completed) * "[/"*color*" bold]"* " "^(remaining))
-    end
+    completed = int(col.nsegs * col.job.i/col.job.N)
+    remaining = col.nsegs - completed
+    return apply_style("[" *color*" bold]" * '━'^(completed) * "[/"*color*" bold]"* " "^(remaining))
 end
 
 # ------------------------------ spinner columns ----------------------------- #

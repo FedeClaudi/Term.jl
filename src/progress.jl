@@ -49,6 +49,7 @@ mutable struct ProgressJob
     finished::Bool
     startime::Union{Nothing, DateTime}
     stoptime::Union{Nothing, DateTime}
+    transient::Bool
 
     function ProgressJob(
             id::Int,
@@ -57,9 +58,10 @@ mutable struct ProgressJob
             columns::Vector{DataType},
             width::Int,
             columns_kwargs::Dict,
+            transient::Bool,
         )
         return new(
-            id, isnothing(N) ? 0 : 1, N, true, "", description, columns, columns_kwargs, width, false, false, nothing, nothing
+            id, isnothing(N) ? 0 : 1, N, true, "", description, columns, columns_kwargs, width, false, false, nothing, nothing, transient
         )
     end
 end
@@ -73,7 +75,13 @@ function start!(job::ProgressJob)
     # if the job doesn't have a defined `N`, we can't have a progress column display
     if isnothing(job.N)
         filter!(c->c != ProgressColumn, job.columns)
+
+        # but we should have a spinner column if there isnt one.
+        if !any(job.columns .== SpinnerColumn)
+            push!(job.columns, SpinnerColumn)
+        end
     end
+
 
     # create columns type instances
     csymbol(c) = Symbol(split(string(c), ".")[end])
@@ -200,11 +208,12 @@ function addjob!(
         description::String="Running...",
         N::Union{Int, Nothing}=nothing,
         start::Bool=true,
+        transient::Bool=false,
     )::ProgressJob
     pbar.running && print("\n")
     # create Job
     pbar.paused = true
-    job = ProgressJob(length(pbar.jobs) + 1, N, description, pbar.columns, pbar.width, pbar.columns_kwargs)
+    job = ProgressJob(length(pbar.jobs) + 1, N, description, pbar.columns, pbar.width, pbar.columns_kwargs, transient)
 
     # start job
     start && start!(job)
@@ -268,7 +277,17 @@ end
 
 
 function render(pbar::ProgressBar)
+    # check if running
     pbar.running || return nothing
+    
+    # remove completed, transient jobs
+    # for job in pbar.jobs
+    #     if job.finished && job.transient
+    #         removejob!(pbar, job)
+    #     end
+    # end
+
+    # get variables
     njobs, height = length(pbar.jobs)+1, console_height()
     iob = pbar.buff
 
@@ -286,11 +305,12 @@ function render(pbar::ProgressBar)
     # adjust sticky region if number of jobs changed
     if njobs != pbar.renderstatus.nlines
         # move cursor to stale scrollregion and clear
-        move_to_line(iob, height - pbar.renderstatus.nlines)
+        move_to_line(iob, height - pbar.renderstatus.nlines +1)
         cleartoend(iob)
+        # change_scroll_region(stdout, height)
 
         # create a new scrollregion
-        change_scroll_region(iob, height - njobs)
+        change_scroll_region(iob, height - njobs - 1)
         pbar.renderstatus.nlines = njobs
     end
     
@@ -360,7 +380,7 @@ jobcolor(job::ProgressJob)
 Get the RGB color of of a progress bar's bar based on progress.
 """
 function jobcolor(pbar::ProgressBar, job::ProgressJob)
-    isnothing(job.N) && return "(255, 255, 255)"
+    isnothing(job.N) && return "white"
 
     α = .8 * job.i/job.N
     β = max(sin(π * job.i/job.N) * .7, .4)

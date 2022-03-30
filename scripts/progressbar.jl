@@ -101,34 +101,40 @@ function spinner()
     end
 end
 
+function mixed()
+    columns_kwargs = Dict(
+        :SpinnerColumn => Dict(:style=>"bold green"),
+        :CompletedColumn => Dict(:style => "dim")
+    )
 
-function stdouttest()
-    pbar = ProgressBar(;)
-    job = addjob!(pbar; N=500, description="[blue]$spinner...")
-    
+    pbar = ProgressBar(; columns_kwargs=columns_kwargs)
     with(pbar) do
-        for i in 1:500
-            update!(job)
-            sleep(.001)
-            if i % 100 == 0
-                println("test")
+        j1 = addjob!(pbar; N=length(keys(SPINNERS)), transient=true)
+
+        for spinner in keys(SPINNERS)
+            update!(j1)
+            with(pbar) do
+                job = addjob!(pbar; description="...")
+                for i in 1:500
+                    update!(job)
+                    sleep(.001)
+                end
             end
         end
     end
 end
 
 
-
-
 clear()
 println("starting")
 print("_"^150)
-simple(; transient=true, columns=:detailed)
+# simple(; transient=true, columns=:detailed)
 # println("test")
-# multi_nested()
+multi_nested()
 # multi_nested_double()
-multi(; transient=true)
+# multi(; transient=true)
 # spinner()
+# mixed()
 println("done")
 
 
