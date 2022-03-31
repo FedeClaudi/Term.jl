@@ -108,7 +108,7 @@ function render(
 
     # get left/right vertical lines
     σ(s) = apply_style("[" * style * "]" * s * "[/" * style * "]")
-    left, right = σ(box.mid.left), σ(box.mid.right)
+    left, right = σ(box.mid.left), "\e[0m"*σ(box.mid.right)*"\e[0m"
 
     # get an empty padding line
     empty = [Segment(left * " "^(panel_measure.w-2) * right)]

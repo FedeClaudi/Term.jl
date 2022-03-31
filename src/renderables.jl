@@ -3,7 +3,7 @@ module renderables
 import ..measure: Measure
 import ..segment: Segment
 import ..console: console_width
-import ..style: get_style_codes, MarkupStyle
+import ..style: get_style_codes, MarkupStyle, apply_style
 import Term: split_lines, reshape_text, fillin, join_lines
 
 export AbstractRenderable, Renderable, RenderableText
@@ -97,6 +97,7 @@ Construct a `RenderableText` out of a string.
 If a `width` is passed the text is resized to match the width.
 """
 function RenderableText(text::AbstractString; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
+    text = apply_style(text)
     # reshape text
     if !isnothing(width)
         width = min(console_width(stdout)-1, width)

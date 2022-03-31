@@ -157,6 +157,20 @@ end
 end
 
 
+@testset "PANEL - compare to string" begin
+    pts = """Lorem[red] ipsum dolor s[/red]it amet, consectetur adipiscing elit,
+    ed do eiusmod tempor [bold blue]incididu[underline]nt ut labore et dolore magna aliqua. Ut enim ad minim
+     veniam, quis nos[/underline]trud exercitation ullamco laboris nisi ut aliquip ex 
+     ea commodo consequat. Duis aute [/bold blue][red on_black]irure dolor in reprehenderit 
+     in voluptate velit esse cillum dolore eu fugiat nulla 
+     pariatur. Excepteur sint occaecat[/red on_black] cupidatat non proident, 
+     sunt in [green]culpa qui officia[/green] deserunt mollit anim 
+     id est laborum."""
+    
+    @test string(Panel(pts; style="red")) == "\e[31m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[39m\n\e[31m│\e[39m  Lorem\e[31m ipsum dolor s\e[39mit amet, consectetur adipiscing elit,                            \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  ed do eiusmod tempor \e[1m\e[34mincididu\e[4mnt ut labore et dolore magna aliqua. Ut enim ad minim  \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m   veniam, quis nos\e[24m\e[34mtrud exercitation ullamco laboris nisi ut aliquip ex               \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m   ea commodo consequat. Duis aute \e[22m\e[39m\e[31m\e[40mirure dolor in reprehenderit                       \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m   in voluptate velit esse cillum dolore eu fugiat nulla                              \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m   pariatur. Excepteur sint occaecat\e[39m\e[49m cupidatat non proident,                          \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m   sunt in \e[32mculpa qui officia\e[39m\e[49m deserunt mollit anim                                     \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m   id est laborum.                                                                    \e[0m\e[31m│\e[39m\e[0m\n\e[31m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[39m"
+end
+
+
 @testset "\e[34mPanel + renderables" begin
     testpanel(
         Panel(

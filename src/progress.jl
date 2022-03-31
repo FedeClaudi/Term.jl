@@ -2,6 +2,7 @@ module progress
 
 using Dates
 import Parameters: @with_kw
+import UUIDs: UUID
 
 import Term: int, textlen, truncate, loop_last
 import ..Tprint: tprint, tprintln
@@ -34,13 +35,10 @@ export ProgressBar, ProgressJob, addjob!, start!, stop!, update!, removejob!, wi
 
 # ------------------------------- constructors ------------------------------- #
 mutable struct ProgressJob
-    id::Int
+    id::Union{Int, UUID}
 
     i::Int   # keep track of progress
     N::Union{Nothing, Int}
-
-    needstextupdate::Bool
-    lasttext::String
 
     description::String
     columns
@@ -54,7 +52,7 @@ mutable struct ProgressJob
     transient::Bool
 
     function ProgressJob(
-            id::Int,
+            id::Union{Int, UUID},
             N::Union{Int, Nothing},
             description::String,
             columns::Vector{DataType},
@@ -63,7 +61,7 @@ mutable struct ProgressJob
             transient::Bool,
         )
         return new(
-            id, isnothing(N) ? 0 : 1, N, true, "", description, columns, columns_kwargs, width, false, false, nothing, nothing, transient
+            id, isnothing(N) ? 0 : 1, N, description, columns, columns_kwargs, width, false, false, nothing, nothing, transient
         )
     end
 end
@@ -83,7 +81,6 @@ function start!(job::ProgressJob)
             push!(job.columns, SpinnerColumn)
         end
     end
-
 
     # create columns type instances
     csymbol(c) = Symbol(split(string(c), ".")[end])
@@ -109,10 +106,9 @@ function start!(job::ProgressJob)
     return nothing
 end
 
-function update!(job::ProgressJob)
+function update!(job::ProgressJob; i = nothing)
     (!isnothing(job.N) && job.i >= job.N) && return stop!(job)
-    job.i += 1
-    job.needstextupdate = true
+    job.i = isnothing(i) ? job.i + 1 : i
     nothing
 end
 
@@ -212,11 +208,13 @@ function addjob!(
         N::Union{Int, Nothing}=nothing,
         start::Bool=true,
         transient::Bool=false,
+        id=nothing
     )::ProgressJob
     pbar.running && print("\n")
     # create Job
     pbar.paused = true
-    job = ProgressJob(length(pbar.jobs) + 1, N, description, pbar.columns, pbar.width, pbar.columns_kwargs, transient)
+    id = isnothing(id) ? length(pbar.jobs) + 1 : id
+    job = ProgressJob(id, N, description, pbar.columns, pbar.width, pbar.columns_kwargs, transient)
 
     # start job
     start && start!(job)
@@ -233,11 +231,17 @@ function removejob!(pbar::ProgressBar, job::ProgressJob)
     pbar.paused = false
 end
 
+function getjob(pbar::ProgressBar, id)
+    idx = findfirst(j -> j.id == id, pbar.jobs)
+    isnothing(idx) && return nothing
+    return pbar.jobs[idx]
+end
+
+
 function start!(pbar::ProgressBar)
     pbar.running = true
-    pbar.paused = false
+    
     print("\n"^(length(pbar.jobs)))
-    # hide_cursor()
 
     pbar.task = @task begin
         while pbar.running
@@ -252,37 +256,38 @@ end
 function stop!(pbar::ProgressBar)
     pbar.paused = true
     pbar.running = false
-    
-    # restorue scrollbar region
-    change_scroll_region(stdout, console_height())
-    show_cursor()
-    
+
 
     # if transient, delete 
     print("\n")
     if pbar.transient
         # move cursor to stale scrollregion and clear
-        move_to_line(stdout, console_height() )
-        for i in 1:pbar.renderstatus.nlines+1
+        move_to_line(stdout, console_height())
+        for i in 1:pbar.renderstatus.nlines+2
             erase_line(stdout)
             up(stdout)
         end
     end
+    # restore scrollbar region
+    change_scroll_region(stdout, console_height())
+    show_cursor()
+
     return nothing
 end
 
 # --------------------------------- rendering -------------------------------- #
 function render(job::ProgressJob, pbar::ProgressBar)::String
     color = jobcolor(pbar, job)
-    contents = apply_style(join(update!.(job.columns, color), " "))
-    job.lasttext = contents
-    job.needstextupdate = false
-    return contents
+    return apply_style(join(update!.(job.columns, color), " "))
+end
+
+function render(job::ProgressJob)::String
+    color = jobcolor(job)
+    return apply_style(join(update!.(job.columns, color), " "))
 end
 
 
 function render(pbar::ProgressBar)
-
     # check if running
     pbar.running || return nothing
     
@@ -338,7 +343,7 @@ function render(pbar::ProgressBar)
     println(iob, pbar.renderstatus.hline)
     for (last, job) in loop_last(pbar.jobs)
         # job.finished && continue
-        contents = job.needstextupdate ? render(job, pbar) : job.lasttext
+        contents = render(job, pbar)
         coda = last ? "" : "\n"
         write(iob, contents * coda)
     end
@@ -405,6 +410,24 @@ function jobcolor(pbar::ProgressBar, job::ProgressJob)
     β = max(sin(π * job.i/job.N) * .7, .4)
 
     c1, c2, c3 = pbar.colors
+    r = string(int((.8 - α) * c1.r + β * c2.r + α * c3.r))
+    g = string(int((.8 - α) * c1.g + β * c2.g + α * c3.g))
+    b = string(int((.8 - α) * c1.b + β * c2.b + α * c3.b))
+    return "(" * r * ", " * g * ", " * b * ")"
+end
+
+
+const PbarCol1 = RGBColor("(1, .05, .05)")
+const PbarCol2 = RGBColor("(.05, .05, 1)")
+const PbarCol3 = RGBColor("(.05, 1, .05)")
+
+function jobcolor(job::ProgressJob)
+    isnothing(job.N) && return "white"
+
+    α = .8 * job.i/job.N
+    β = max(sin(π * job.i/job.N) * .7, .4)
+
+    c1, c2, c3 = PbarCol1, PbarCol2, PbarCol3
     r = string(int((.8 - α) * c1.r + β * c2.r + α * c3.r))
     g = string(int((.8 - α) * c1.g + β * c2.g + α * c3.g))
     b = string(int((.8 - α) * c1.b + β * c2.b + α * c3.b))

@@ -41,8 +41,6 @@ cursor_position(io::IO=stdout) = write(io, "\e[6n")
 # --------------------------------- movement --------------------------------- #
 
 
-up(io::IO=stdout) = write(io, "\e[A") 
-
 """
 Move cursor to the beginning of the previous line
 """
@@ -52,22 +50,22 @@ beginning_previous_line(io::IO=stdout) = write(io, "\e[F")
 """
 Move cursor up one one or more lines
 """
-prev_line(io::IO=stdout) = write(io, "\e[1F")
+
 prev_line(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*"F")
 
-up(io::IO=stdout) = write(io, "\e[A")
 up(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*"A")
 
 
 """
 Move cursor down one or more lines
 """
-next_line(io::IO=stdout) = write(io, "\e[1E")
 next_line(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*"E")
 
-down(io::IO=stdout) = write(io, "\e[B")
 down(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*"B")
 
+"""
+Move cursor to a specific line
+"""
 move_to_line(io::IO=stdout, n::Int=1) = write(io, "\e["*string(n)*";1H")
 
 # ---------------------------------- display --------------------------------- #
@@ -100,9 +98,11 @@ erase_line(io::IO=stdout) = write(io, "\e[2K")
 
 """
 Change the position of the scrolling region in the terminal.
+
+See: http://www.sweger.com/ansiplus/EscSeqScroll.html
 """
 function change_scroll_region(io::IO=stdout, n::Int=1)
-    write(io, "\e[1;" * string(n) * "r")
+    write(io, "\e[1;" * string(n) * "r")  # from row 1 to n, all columns
     down(io, n)
 end
 

@@ -3,6 +3,7 @@ module logging
 using Dates: Dates
 using Logging
 using InteractiveUtils
+using ProgressLogging: asprogress
 
 import Term: Theme,
             theme,
@@ -10,14 +11,32 @@ import Term: Theme,
             escape_brackets,
             unescape_brackets,
             reshape_text,
-            has_markup
+            has_markup,
+            int
+
+
 import ..box: ROUNDED
 import ..style: apply_style
 import ..renderables: AbstractRenderable
+import ..Tprint: tprintln
+import ..progress: ProgressBar,
+                ProgressJob,
+                DescriptionColumn,
+                ProgressColumn,
+                render,
+                start!,
+                stop!,
+                addjob!,
+                removejob!,
+                update!,
+                getjob,
+                SeparatorColumn,
+                PercentageColumn
+
+import ..console: console_width, console_height, change_scroll_region, move_to_line
 
 export TermLogger, install_term_logger
 
-tprint = (println ∘ unescape_brackets ∘ apply_style)
 
 DEFAULT_LOGGER = global_logger()
 
@@ -30,11 +49,24 @@ Custom logger type.
 struct TermLogger <: Logging.AbstractLogger
     io::IO
     theme::Theme
+    pbar::ProgressBar
+
 end
-TermLogger(theme::Theme) = TermLogger(stderr, theme)
+TermLogger(theme::Theme) = TermLogger(
+    stderr,
+    theme,
+    ProgressBar(; 
+            transient=true, 
+            columns=[DescriptionColumn,
+            SeparatorColumn,
+            ProgressColumn,
+            SeparatorColumn,
+            PercentageColumn
+            ])
+    )
 
 # set logger beavior
-Logging.min_enabled_level(logger::TermLogger) = Logging.Info
+Logging.min_enabled_level(logger::TermLogger) = Logging.Debug
 function Logging.shouldlog(logger::TermLogger, level, _module, group, id)
     return true
 end
@@ -48,7 +80,7 @@ Logging.catch_exceptions(logger::TermLogger) = true
 Print the final line of a log message with style and date info
 """
 function print_closing_line(color::String, width::Int = 48)
-    tprint(
+    tprintln(
         "  [$color bold dim]$(ROUNDED.bottom.left)" *
         "$(ROUNDED.row.mid)"^(width) *
         "[/$color bold dim]",
@@ -56,10 +88,49 @@ function print_closing_line(color::String, width::Int = 48)
     _date = Dates.format(Dates.now(), "e, dd u yyyy")
     _time = Dates.format(Dates.now(), "HH:MM:SS")
     pad = width - textlen(_date * _time) - 2
-    return tprint(
+    return tprintln(
         " "^pad * "[dim]$_date[/dim] [bold dim underline]$_time[/bold dim underline]"
     )
 end
+
+
+function handle_progress(logger::TermLogger, prog)
+    pbar = logger.pbar
+    pbar.running || start!(pbar)
+    
+
+    # if progress not started yet, ignore
+    if isnothing(prog.fraction) || prog.fraction == 0
+        return
+    end
+
+    # check if a job exists for this progress, or add one
+    job = getjob(pbar, prog.id)
+    job = isnothing(job) ? addjob!(
+                pbar; 
+                description=length(prog.name) > 0 ? prog.name : "running...", 
+                N = 100,
+                transient=false,
+                id = prog.id
+            ) : job
+
+    # if done, remove job.
+    if prog.done || prog.fraction == 1.0
+        job.i = 100
+        stop!(job)
+    else
+        update!(job; i = (Int ∘ floor)(prog.fraction * 100))
+    end
+
+    # render
+    if all(map(j -> j.finished, pbar.jobs))
+        map(j -> removejob!(pbar, j), pbar.jobs)
+        stop!(pbar)
+    else
+        render(pbar)
+    end
+end
+
 
 """
     Logging.handle_message(logger::TermLogger,
@@ -71,7 +142,9 @@ it prints kwargs styled by their type.
 """
 function Logging.handle_message(
     logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...
-)
+)       
+    _progress = asprogress(lvl, msg, _mod, group, id, file, line; kwargs...)
+    isnothing(_progress) || return handle_progress(logger, _progress)
 
     # get name of function where logging message was called from
     fname = ""
@@ -115,8 +188,8 @@ function Logging.handle_message(
         msg_lines[n] = "  $vert   " * " "^textlen(content) * "[#8abeff]" * msg_lines[n]
     end
     content *= "  " * msg_lines[1]
-    tprint(content)
-    tprint.(msg_lines[2:end])
+    tprintln(content)
+    tprintln.(msg_lines[2:end])
 
     # if no kwargs we can just quit
     if length(kwargs) == 0
@@ -136,7 +209,7 @@ function Logging.handle_message(
     namepad = max(textlen.(string.([v for v in keys(kwargs)]))...)
 
     # print all kwargs
-    tprint("  $vert")
+    tprintln("  $vert")
     for ((k, v), _type) in zip(kwargs, _types)
         # get line stub
         pad = wpad - textlen(_type)
@@ -187,11 +260,11 @@ function Logging.handle_message(
         end
 
         if length(vlines) == 1
-            tprint(line * vlines[1])
+            tprintln(line * vlines[1])
         else
-            tprint(line * vlines[1])
+            tprintln(line * vlines[1])
             for ln in vlines[2:end]
-                tprint("  $vert " * " "^lpad * ln)
+                tprintln("  $vert " * " "^lpad * ln)
             end
         end
     end
