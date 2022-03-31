@@ -1,7 +1,11 @@
+using ProgressLogging
+
 using Term.progress
 import Term.console: clear, cursor_position
 import Term.progress: SPINNERS
-import Term: tprintln, Panel
+import Term: tprintln, Panel, install_term_logger
+
+install_term_logger()
 
 function simple(; kwargs...)
     pbar = ProgressBar(; refresh_rate=60, expand=false, width=150, kwargs...)
@@ -20,6 +24,7 @@ function multi_nested()
     with(pbar) do
         outer = addjob!(pbar; N=3, description="outer")
         for i in 1:3
+            println("iii", i)
             inner = addjob!(pbar, N=100, description="inner $i")
             for j in 1:100
                 update!(inner)
@@ -73,7 +78,6 @@ function multi(; kwargs...)
                 tprintln(text[idx])
                 idx += 1
             end
-
 
             update!(j1)
             update!(j2)
@@ -149,18 +153,27 @@ function transientjobs()
     end
 end
 
-
+function progresslogging()
+    @progress "outer...." for i in 1:6
+        @progress "inner... $i" for j in  1:100
+            sleep(0.01)
+        end
+    end
+end
 
 clear()
 println("starting")
 print("_"^150)
-# simple(; transient=true, columns=:detailed)
-# multi(; transient=true)
+
+# simple(; transient=false, columns=:detailed)
+multi(; transient=false)
 # multi_nested()
 # multi_nested_double()
 # spinner()
 # mixed()
-transientjobs()
+# transientjobs()
+# progresslogging()
+
 println("done")
 
 
