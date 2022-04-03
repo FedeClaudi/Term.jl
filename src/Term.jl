@@ -26,6 +26,7 @@ include("tprint.jl")
 include("progress.jl")
 include("logging.jl")
 include("tree.jl")
+include("dendogram.jl")
 include("logo.jl")
 include("inspect.jl")
 
@@ -40,6 +41,7 @@ export install_stacktrace
 export install_term_logger, uninstall_term_logger
 export track
 export Tree
+export Dendogram
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -102,6 +104,8 @@ using .Tprint: tprint, tprintln
 using .progress: ProgressBar, ProgressJob # update, track
 
 using .tree: Tree
+
+using .dendogram: Dendogram
 
 using .introspection: inspect, typestree
 

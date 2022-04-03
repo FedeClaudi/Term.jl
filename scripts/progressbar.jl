@@ -177,9 +177,6 @@ multi(; transient=false)
 println("done")
 
 
-# TODO make transient jobs work
-# TODO look at integrating with loggr stuff
-
 
 
 

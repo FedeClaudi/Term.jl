@@ -98,6 +98,7 @@ If a `width` is passed the text is resized to match the width.
 """
 function RenderableText(text::AbstractString; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
     text = apply_style(text)
+    
     # reshape text
     if !isnothing(width)
         width = min(console_width(stdout)-1, width)

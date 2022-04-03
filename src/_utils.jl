@@ -15,8 +15,15 @@ or(x, y) = isnothing(x) ? y : x
   Returns an iterable yielding tuples (is_last, value).
 """
 function loop_last(v)
-    is_last = [i == length(v) for i in 1:length(v)]
+  is_last =  1:length(v) .== length(v)
     return zip(is_last, v)
+end
+
+
+function loop_firstlast(v)
+  is_first =  1:length(v) .== 1
+  is_last =  1:length(v) .== length(v)
+  return zip(is_first, is_last, v)
 end
 
 """

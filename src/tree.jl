@@ -2,7 +2,7 @@ module tree
 import Base: @kwdef
 import MyterialColors: yellow, orange, red, blue
 using InteractiveUtils
-
+import OrderedCollections: OrderedDict
 
 import Term: loop_last,
         escape_brackets,
@@ -129,7 +129,7 @@ end
 Construct a `Tree` out of a `Dict`. Recursively handle nested `Dict`s.
 """
 function Tree(
-        data::Union{Dict, Pair};
+        data::Union{AbstractDict, Pair};
         level=0,
         title::String="tree",
         kwargs...
@@ -141,7 +141,7 @@ function Tree(
 
     # go over all entries
     for (k, v) in zip(keys(data), values(data))
-        if v isa Dict
+        if v isa AbstractDict
             push!(nodes, Tree(v; level=level+1, title=truncate(string(k), 22)))
         elseif v isa Pair
             k = isnothing(v.first) ? nothing : truncate(v.first, 22)
@@ -344,5 +344,23 @@ function Tree(T::DataType)::Tree
             guides_style="green dim",
         )
 end
+
+"""
+    Base.Dict(e::Expr)
+
+Recursively convert an expression to nested dictionaries.
+"""
+function OrderedDict(e::Expr)
+    return OrderedDict(
+        e.head => OrderedDict(
+            map(
+                e -> e isa Expr ? (e => OrderedDict(e)) : (e => e),
+                e.args
+            )
+        )
+    )
+end
+
+Tree(expr::Expr; kwargs...) = Tree(OrderedDict(expr); kwargs...)
 
 end

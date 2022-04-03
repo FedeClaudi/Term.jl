@@ -151,4 +151,36 @@ function get_color(string; bg = false)::AbstractColor
     end
 end
 
+
+
+
+"""
+Convert HSL values to RGB values, return a markup color string.
+"""
+function hsl2rgb(h, s, l)
+    C = (1 - abs(2*l - 1)) * s
+    X = C * (1 - abs(mod(h/60, 2) - 1))
+    M = l - C/2
+
+
+    if 0 ≤ h < 60
+        r, g, b = C, X, 0
+    elseif 60 ≤ h < 120
+        r, g, b = X, C, 0
+    elseif 120 ≤ h < 180
+        r, g, b = 0, C, X
+    elseif 180 ≤ h < 240
+        r, g, b = 0, X, C
+    elseif 240 ≤ h < 300
+        r, g, b = X, 0, C
+    elseif 300 ≤ h ≤ 360
+        r, g, b = C, 0, X
+    end
+
+    r = (Int ∘ round)((r+M) * 255)
+    g = (Int ∘ round)((g+M) * 255)
+    b = (Int ∘ round)((b+M) * 255)
+
+    return "($r, $g, $b)"
+end
 end

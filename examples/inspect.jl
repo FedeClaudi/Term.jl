@@ -81,3 +81,11 @@ If you just want to see the type's hierarchy for a type, you can use typestree
 """
 
 typestree(AbstractFloat)
+
+
+"""
+You can also use Tree to visualize `Expr` objects
+"""
+import Term: Tree
+e = :(x^2 + 2y)
+print(Tree(e; name=string(e)))

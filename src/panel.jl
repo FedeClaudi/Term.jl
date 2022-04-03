@@ -217,9 +217,7 @@ function Panel(
         kwargs...
     )
 
-    if content isa String
-        content = RenderableText(content)
-    end
+    content = string(content)
 
     # get measure
     WIDTH = console_width(stdout)
@@ -229,10 +227,10 @@ function Panel(
 
     # define convenience function
     function resize_content(content, _width)
-        if content isa RenderableText
-            content = RenderableText(content; width=_width)
+        if content isa AbstractString
+            content = reshape_text(content, _width)
         end
-        return content, content.measure
+        return content, Measure(content)
     end
 
     # get measure of panel's box and optionally resize text.
@@ -249,7 +247,7 @@ function Panel(
 
     if !fit
         # check that the content fits within the given width
-        if content isa RenderableText
+        if content isa AbstractString
             width = min(width, WIDTH)
             if content_measure.w > width-Δw
                 content, content_measure = resize_content(content, width-Δw)
@@ -266,7 +264,7 @@ function Panel(
     end
 
     return render(
-        content;
+        Renderable(content);
         panel_measure=panel_measure,
         content_measure=content_measure,
         Δw=Δw,
@@ -341,6 +339,8 @@ function TextBox(
 )
     padding = padding isa Padding ? padding : Padding(padding...)
     Δw =  padding.left + padding.right
+
+    text = apply_style(text)
 
     # fit text or get width
     if fit==:fit

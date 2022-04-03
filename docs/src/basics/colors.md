@@ -50,6 +50,7 @@ Below all named colors, 16bit colors and (many) RGB colors are printed for displ
 ```@example
 import Term: CODES_16BIT_COLORS
 import Term: Panel
+import Term.color: hsl2rgb
 
 function make_named_colors()
     sort_idx = sortperm(collect(values(CODES_16BIT_COLORS)))
@@ -61,30 +62,41 @@ function make_named_colors()
     return colors
 end
 
+
 function make_16bit_colors()
     sort_idx = sortperm(collect(values(CODES_16BIT_COLORS)))
     cnames = collect(keys(CODES_16BIT_COLORS))[sort_idx][9:end]
     colors = ""
     colors = join(map(
-        (c)->"[on_$c] [/on_$c]", cnames
+        (c)->c[1] %  20 == 0 ? "[on_$(c[2])] [/on_$(c[2])]\n" : "[on_$(c[2])] [/on_$(c[2])]", enumerate(cnames)
     ))
     return colors
 end
 
-function make_rgb_colors()
-    values = 1:25:255
+function make_rgb_colors(; max_width=88)
     colors = ""
-    for r in values, b in values, g in values[1:end-1]
-        colors *= "[on_($r, $g, $b)] [/on_($r, $g, $b)]"
+
+    for y in 0:5
+        for x in 0:max_width
+            h = x / max_width
+            l = 0.1 + (((5-y) / 5) * 0.7)
+            color = hsl2rgb(h*360, .9, l)
+            bg = hsl2rgb(h*360, .9, l + 0.7/10)
+
+            colors *= "[$color on_$bg]▄[/$color on_$bg]"
+        end
+        colors *= "\n"
     end
+
     return colors
 end
 
 
 
+
 print(
-    Panel(make_named_colors(), width=20, justify=:center, title="Named  colors", style="bold yellow") / # stacking operator, see layout page
-    Panel(make_16bit_colors(), width=42, title="16 bit colors", style="bold yellow") / 
-    Panel(make_rgb_colors(), width=88, title="RGB colors", style="bold yellow")
+    Panel(make_named_colors(), width=20, justify=:center, title="Named", style="bold yellow", padding=(2, 2, 1, 0)) / # stacking operator, see layout page
+    Panel(make_16bit_colors(), width=42, fit=true, title="16 bit colors", style="bold yellow", padding=(2, 2, 1, 0)) /
+    Panel(make_rgb_colors(), width=88, title="RGB colors", style="bold yellow", fit=true, padding=(2, 2, 1, 0))
 )
 ```
