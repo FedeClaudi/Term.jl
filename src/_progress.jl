@@ -352,7 +352,7 @@ function get_columns(columnsset::Symbol)::Vector{DataType}
             SpaceColumn,
             CompletedColumn,
         ]
-    else
+    elseif columnsset == :detailed
         # extensive
         return [
             DescriptionColumn,
@@ -365,6 +365,9 @@ function get_columns(columnsset::Symbol)::Vector{DataType}
             ElapsedColumn,
             ETAColumn
         ]
+    else
+        @warn "Columns name not recognized: $columnsset"
+        return get_columns(:minimal)
     end
 end
 

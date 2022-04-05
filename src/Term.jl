@@ -33,7 +33,7 @@ include("inspect.jl")
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine
 export theme, highlight
-export inspect, typestree
+export inspect, typestree, expressiontree
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
@@ -107,7 +107,7 @@ using .tree: Tree
 
 using .dendogram: Dendogram
 
-using .introspection: inspect, typestree
+using .introspection: inspect, typestree, expressiontree
 
 
 end

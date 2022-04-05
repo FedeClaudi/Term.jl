@@ -140,9 +140,6 @@ function transientjobs()
 
         for spinner in keys(SPINNERS)
             println(spinner)
-            # println("I print")
-            # pos = sprint(cursor_position)
-            # @info "cursor_position()"
             update!(j1)
             job = addjob!(pbar; N=500, description="...", transient=true)
             for i in 1:500
@@ -161,18 +158,25 @@ function progresslogging()
     end
 end
 
+function _track()
+    @track for i in 1:10
+        sleep(0.1)
+    end
+end
+
 clear()
 println("starting")
 print("_"^150)
 
 # simple(; transient=false, columns=:detailed)
-multi(; transient=false)
+# multi(; transient=false)
 # multi_nested()
 # multi_nested_double()
 # spinner()
 # mixed()
 # transientjobs()
 # progresslogging()
+_track()
 
 println("done")
 

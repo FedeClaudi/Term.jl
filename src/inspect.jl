@@ -2,7 +2,7 @@
 module introspection
 using InteractiveUtils
 
-import MyterialColors: orange
+import MyterialColors: orange, grey_dark, light_green
 
 import Term:
     highlight,
@@ -11,12 +11,14 @@ import Term:
     join_lines,
     unescape_brackets,
     split_lines,
-    do_by_line
+    do_by_line,
+    expr2string
 
 import ..console: console_width
 import ..panel: Panel, TextBox
 import ..layout: Spacer, hLine
 import ..tree: Tree
+import ..dendogram: Dendogram
 
 include("_inspect.jl")
 
@@ -33,7 +35,7 @@ function typestree(T::DataType)
             Tree(T);
             title="Types hierarchy",
             style="blue dim",
-            title_style=orange,
+            title_style=orange * " default",
             title_justify=:right,
             fit=true,
             padding=(1, 4, 1, 1)
@@ -41,6 +43,54 @@ function typestree(T::DataType)
         )
     )
 end
+
+
+function expressiontree(e::Expr)
+    _expr = expr2string(e)
+    tree = Tree(e)
+
+    print(
+        Panel(
+            tree,
+            title=_expr,
+            title_style = "$light_green default bold",
+            title_justify = :center,
+            style=grey_dark,
+            fit=tree.measure.w > 88,
+            width=max(tree.measure.w, 88),
+            subtitle="inspect",
+            subtitle_justify=:right,
+            justify=:center,
+            padding=(1, 1, 1, 1)
+        )
+    )
+end
+
+# ---------------------------------------------------------------------------- #
+#                                EXPR. DENDOGRAM                               #
+# ---------------------------------------------------------------------------- #
+
+function inspect(expr::Expr)
+    _expr = expr2string(expr)
+    dendo = Dendogram(expr)
+
+    print(
+        Panel(
+            dendo,
+            title=_expr,
+            title_style = "$light_green default bold",
+            title_justify = :center,
+            style=grey_dark,
+            fit=true,
+            # width=dendo.measure.w,
+            subtitle="inspect",
+            subtitle_justify=:right,
+            justify=:center,
+            padding=(1, 1, 1, 1)
+        )
+    )
+end
+
 
 
 # ---------------------------------------------------------------------------- #

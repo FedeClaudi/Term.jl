@@ -39,3 +39,12 @@ function get_lr_widths(width::Int)::Tuple{Int, Int}
   iseven(width) && return (int(width/2), int(width/2))
   return (fint(width/2), cint(width/2))
 end
+
+"""
+Get a clean string representation of an expression
+"""
+function expr2string(e::Expr)::String
+  return replace_multi(
+    string(e), 
+    '\n'=>"", ' '=>"", r"#=.*=#"=>"", "begin"=>"", "end"=>"")
+end

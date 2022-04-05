@@ -93,7 +93,14 @@ function print_closing_line(color::String, width::Int = 48)
     )
 end
 
+"""
+    handle_progress(logger::TermLogger, prog)
 
+Handle progress information passed by `ProgressLogging`
+
+It creates/adds/removes `ProgressJob`s to the logger's
+`ProgressBar` to create progress visualizations. 
+"""
 function handle_progress(logger::TermLogger, prog)
     pbar = logger.pbar
     pbar.running || start!(pbar)

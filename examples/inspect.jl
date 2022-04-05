@@ -9,7 +9,7 @@ can go on the GitHub repository and look around, or yo can use Term!
 Term provides an `inspect` method that provides a lot of useful information!
 """
 
-import Term: inspect, typestree
+import Term: inspect, typestree, expressiontree
 
 # define some types
 abstract type T1 end
@@ -86,6 +86,14 @@ typestree(AbstractFloat)
 """
 You can also use Tree to visualize `Expr` objects
 """
-import Term: Tree
+
 e = :(x^2 + 2y)
-print(Tree(e; name=string(e)))
+expressiontree(e)
+
+"""
+or, if you prefer, you can visualize it as a Dendogram
+"""
+
+inspect(e)
+
+

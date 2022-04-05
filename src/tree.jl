@@ -11,7 +11,9 @@ import Term: loop_last,
         int,
         theme,
         textlen,
-        truncate
+        truncate,
+        theme,
+        expr2string
 import ..segment: Segment
 import ..measure: Measure
 import ..renderables: AbstractRenderable
@@ -70,10 +72,10 @@ Style an object to render it as a a string
 """
 function asleaf end
 
-asleaf(x) = truncate(highlight(x), 22)
+asleaf(x) = truncate(highlight(string(x)), theme.tree_max_width)
 asleaf(x::Nothing) = nothing
-asleaf(x::AbstractVector) = truncate((escape_brackets ∘ string)(x), 22)
-asleaf(x::AbstractString) = truncate(highlight(x, :string), 22)
+asleaf(x::AbstractVector) = truncate((escape_brackets ∘ string)(x), theme.tree_max_width)
+asleaf(x::AbstractString) = truncate(highlight(x, :string), theme.tree_max_width)
 
 """
     Leaf
@@ -124,12 +126,37 @@ end
 
 
 """
+Add a new node to an existing tree's nodes or levaes.
+"""
+function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::AbstractDict)
+    push!(nodes, Tree(v; level=level+1, title=truncate(string(k), theme.tree_max_width)))
+end
+
+function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Pair)
+    k = isnothing(v.first) ? nothing : truncate(string(v.first), theme.tree_max_width)
+    push!(leaves, Leaf(k, asleaf(v.second)))
+end
+
+function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Any)
+    k = isnothing(k) ? nothing : truncate(string(k), theme.tree_max_width)
+    push!(leaves, Leaf(k, asleaf(v)))
+end
+
+function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Vector)
+    for _v in v
+        _k = _v isa Dict ? collect(keys(_v))[1] : _v.first
+        addnode!(nodes, leaves, level+1, _k, _v)
+    end
+end
+
+
+"""
     Tree(data::Union{Dict, Pair}; level=0, title::String="tree", kwargs...)
 
 Construct a `Tree` out of a `Dict`. Recursively handle nested `Dict`s.
 """
 function Tree(
-        data::Union{AbstractDict, Pair};
+        data::Union{AbstractDict, Pair, Vector};
         level=0,
         title::String="tree",
         kwargs...
@@ -141,15 +168,7 @@ function Tree(
 
     # go over all entries
     for (k, v) in zip(keys(data), values(data))
-        if v isa AbstractDict
-            push!(nodes, Tree(v; level=level+1, title=truncate(string(k), 22)))
-        elseif v isa Pair
-            k = isnothing(v.first) ? nothing : truncate(v.first, 22)
-            push!(leaves, Leaf(v, asleaf(v.second)))
-        else
-            k = isnothing(k) ? nothing : truncate(string(k), 22)
-            push!(leaves, Leaf(k, asleaf(v)))
-        end
+        addnode!(nodes, leaves, level, k, v)
     end
 
     # if we're handling the first tree, render it. Otherwise parse nested trees.
@@ -172,7 +191,7 @@ function Tree(
         return Tree(;
             segments=segments, 
             measure=measure, 
-            name=truncate(title, 22), 
+            name=truncate(title, theme.tree_max_width), 
             level=level, 
             nodes=nodes, 
             leaves=leaves,
@@ -345,22 +364,21 @@ function Tree(T::DataType)::Tree
         )
 end
 
-"""
-    Base.Dict(e::Expr)
 
-Recursively convert an expression to nested dictionaries.
-"""
-function OrderedDict(e::Expr)
-    return OrderedDict(
-        e.head => OrderedDict(
-            map(
-                e -> e isa Expr ? (e => OrderedDict(e)) : (e => e),
-                e.args
+_key(e::Expr) = length(e.args) > 1 ? "$(expr2string(e))  [dim blue]($(e.head): [/dim blue][red bold default]$(e.args[1])[/red bold default][dim blue])[/dim blue]" : string(e.head)
+_values(e::Expr) = length(e.args) > 1 ? e.args[2:end] : e.args
+
+_pair(x) = nothing => x
+function _pair(e::Expr)
+    return Dict(
+                _key(e) => 
+                _pair.(_values(e))
             )
-        )
-    )
 end
 
-Tree(expr::Expr; kwargs...) = Tree(OrderedDict(expr); kwargs...)
-
+function Tree(expr::Expr; kwargs...)
+    parsed = _pair(expr)
+    parsed = Dict(collect(keys(parsed))[1] => parsed)
+    Tree(parsed; title=expr2string(expr))
+end
 end
