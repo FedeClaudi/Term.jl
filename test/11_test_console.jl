@@ -1,17 +1,4 @@
-import Term.console: console_height,
-        console_width,
-        console,
-        err_console,
-        Console,
-        cursor_position,
-        up,
-        beginning_previous_line,
-        down, 
-        clear,
-        hide_cursor,
-        show_cursor,
-        line,
-        erase_line
+using Term.console
 import Term: tprint, tprintln
 
 println("\nTesting tprint, stdout temporarily disabled")
@@ -49,31 +36,24 @@ end
 
 @testset "\e[34mCONSOLE" begin
     @test console_height() == displaysize(stdout)[1]
-    @test console_height(stdout) == displaysize(stdout)[1]
 
     @test console_width() == displaysize(stdout)[2]
-    @test console_width(stdout) == displaysize(stdout)[2]
 
-    @test Console(stdout) == Console()
-
-
-    @test_nothrow cursor_position()
-    @test_nothrow up()
-    @test_nothrow beginning_previous_line()
-    @test_nothrow down()
-    @test_nothrow clear()
-    @test_nothrow hide_cursor()
-    @test_nothrow show_cursor()
-    @test_nothrow line()
-
-
-    @test_nothrow cursor_position(stdout)
-    @test_nothrow up(stdout)
-    @test_nothrow beginning_previous_line(stdout)
-    @test_nothrow down(stdout)
-    @test_nothrow clear(stdout)
-    @test_nothrow hide_cursor(stdout)
-    @test_nothrow show_cursor(stdout)
-    @test_nothrow line(stdout)
+    @test sprint(cursor_position) == "\e[6n"
+    @test sprint(up) == "\e[1A"
+    @test sprint(beginning_previous_line) == "\e[F"
+    @test sprint(down) == "\e[1B"
+    @test sprint(clear) == "\e[2J"
+    @test sprint(hide_cursor) == "\e[?25l"
+    @test sprint(show_cursor) == "\e[?25h"
+    @test sprint(line) == "\n"
+    @test sprint(prev_line) == "\e[1F"
+    @test sprint(next_line) == "\e[1E"
+    @test sprint(erase_line) == "\e[2K"
+    @test sprint(cleartoend) == "\e[0J"
+    @test sprint(move_to_line) == "\e[1;1H"
+    @test sprint(change_scroll_region) == "\e[1;1r\e[1B"
+    @test sprint(savecursor) == "\e[s"
+    @test sprint(restorecursor) == "\e[u"
 
 end

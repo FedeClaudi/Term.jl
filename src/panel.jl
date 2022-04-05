@@ -217,7 +217,7 @@ function Panel(
         kwargs...
     )
 
-    content = string(content)
+    content = content isa RenderableText ? string(content) : content
 
     # get measure
     WIDTH = console_width(stdout)

@@ -49,8 +49,8 @@ tprint("\n\n[bold green]Running: '08_test_layout.jl' [/bold green]")
 @time @timeit_include("08_test_layout.jl")
 
 # #  ? 9 inspect
-tprint("\n\n[bold green]Running: '09_test_inspect.jl' [/bold green]")
-@time @timeit_include("09_test_inspect.jl")
+# tprint("\n\n[bold green]Running: '09_test_inspect.jl' [/bold green]")
+# @time @timeit_include("09_test_inspect.jl")
 
 # ? 11 console
 tprint("\n\n[bold green]Running: '11_test_console.jl' [/bold green]")
@@ -64,9 +64,9 @@ tprint("\n\n[bold green]Running: '12_test_logging.jl' [/bold green]")
 tprint("\n\n[bold green]Running: '14_test_highlight.jl' [/bold green]")
 @time @timeit_include("14_test_highlight.jl")
 
-# ? 15 progress
-tprint("\n\n[bold green]Running: '15_test_progress.jl' [/bold green]")
-@time @timeit_include("15_test_progress.jl")
+# # ? 15 progress
+# tprint("\n\n[bold green]Running: '15_test_progress.jl' [/bold green]")
+# @time @timeit_include("15_test_progress.jl")
 
 # ? 16 Tree
 tprint("\n\n[bold green]Running: '16_test_tree.jl' [/bold green]")

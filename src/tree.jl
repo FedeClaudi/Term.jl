@@ -144,7 +144,7 @@ end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Vector)
     for _v in v
-        _k = _v isa Dict ? collect(keys(_v))[1] : _v.first
+        _k = _v isa Dict ? collect(keys(_v))[1] : (v isa Pair ? _v.first : v)
         addnode!(nodes, leaves, level+1, _k, _v)
     end
 end
