@@ -29,7 +29,7 @@ function Base.string(r::AbstractRenderable)::String
 end
 
 function Base.show(io::IO, renderable::AbstractRenderable)
-    if io == stdout
+    if io isa Base.TTY || io isa IOBuffer
         for seg in renderable.segments
             println(io, seg)
         end

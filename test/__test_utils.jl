@@ -1,4 +1,41 @@
-import Term: cleantext, chars, textlen, split_lines
+import Term: cleantext, chars, textlen, split_lines, replace_multi
+
+"""
+Write one or multiple strings to a text file so that they can 
+later be used for testing.
+"""
+function tofile(content::Vector, filepath)
+    open(filepath, "w") do io
+        map(ln -> println(io, ln), content)
+        close(io)
+    end
+end
+
+function tofile(content::String, filepath)
+    open(filepath, "w") do io
+        print(io, content)
+        close(io)
+    end
+end
+
+
+"""
+Load a string representation of a renderable from file
+and clean it up
+"""
+function fromfile(filepath)::String
+    return replace_multi(
+        read(filepath, String), "\\n"=>"\n", "\\e" => "\e"
+    )
+end
+
+function fromfilelines(filepath)
+    lines = readlines(filepath)
+end
+
+
+
+
 
 
 function same_widths(text::String)::Bool

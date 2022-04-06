@@ -29,8 +29,9 @@ export inspect, typestree
 #                                TYPES HIERARCHY                               #
 # ---------------------------------------------------------------------------- #
 
-function typestree(T::DataType)
+function typestree(io::IO, T::DataType)
     print(
+        io,
         Panel(
             Tree(T);
             title="Types hierarchy",
@@ -43,13 +44,14 @@ function typestree(T::DataType)
         )
     )
 end
+typestree(T::DataType) = typestree(stdout, T)
 
-
-function expressiontree(e::Expr)
+function expressiontree(io::IO, e::Expr)
     _expr = expr2string(e)
     tree = Tree(e)
 
     print(
+        io,
         Panel(
             tree,
             title=_expr,
@@ -65,16 +67,18 @@ function expressiontree(e::Expr)
         )
     )
 end
+expressiontree(e::Expr) = expressiontree(stdout, e)
 
 # ---------------------------------------------------------------------------- #
 #                                EXPR. DENDOGRAM                               #
 # ---------------------------------------------------------------------------- #
 
-function inspect(expr::Expr)
+function inspect(io::IO, expr::Expr)
     _expr = expr2string(expr)
     dendo = Dendogram(expr)
 
     print(
+        io, 
         Panel(
             dendo,
             title=_expr,
@@ -123,7 +127,7 @@ function TypeInfo(type::DataType)
     sub = length(subtypes(type)) > 0 ? subtypes(type) : nothing
 
     # get docstring
-    _, docstring = get_docstring(Symbol(type))
+    _, docstring = get_docstring(type)
 
     # get fields
     if !isabstracttype(type) && length(fieldnames(type)) > 0
@@ -172,7 +176,7 @@ Extract  info like docstring, fields, types etc. and show it in a structured
 terminal output.
 """
 function inspect(
-    type::DataType; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 3
+    io::IO, type::DataType; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 3
 )
     width = isnothing(width) ? min(console_width(stdout), 92) - 4 : width - 4
     # extract type info
@@ -288,7 +292,7 @@ function inspect(
         fit=true
     )
 
-    return println(panel)
+    return println(io, panel)
 end
 
 """
@@ -296,7 +300,7 @@ end
 
 Inspects `Function` objects providing docstrings, and methods signatures.
 """
-function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 7)
+function inspect(io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 7)
     width = isnothing(width) ? min(console_width(stdout), 92) : width
 
     info = TypeInfo(fun)
@@ -333,6 +337,7 @@ function inspect(fun::Function; width::Union{Nothing,Int} = nothing, max_n_metho
 
     # -------------------------------- print panel ------------------------------- #
     return println(
+        io, 
         Panel(
             Spacer(width - 4, 1),
             docs,
@@ -350,13 +355,17 @@ end
 """
 generic inspect method, dispatches to type-specific methods when they can be found
 """
-function inspect(obj; kwargs...)
+function inspect(io::IO, obj; kwargs...)
     if typeof(obj) <: Function
-        inspect(obj; kwargs...)
+        inspect(io, obj; kwargs...)
     elseif typeof(typeof(obj)) == DataType
-        inspect(typeof(obj); kwargs...)
+        inspect(io, typeof(obj); kwargs...)
     else
         throw("Cannot inspect $obj ($(typeof(obj)))")
     end
 end
+
+
+inspect(obj) = inspect(stdout, obj)
+
 end

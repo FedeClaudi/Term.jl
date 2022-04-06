@@ -46,7 +46,7 @@ Segment(seg::Segment) = seg
 # --------------------------------- printing --------------------------------- #
 """print styled in stdout, info otherwise"""
 function Base.show(io::IO, seg::Segment)
-    if io == stdout
+    if io isa Base.TTY || io isa IOBuffer
         print(io, unescape_brackets(seg.text))
 
     else
