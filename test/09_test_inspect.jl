@@ -24,9 +24,9 @@ println("\nTesting logging, stdout temporarily disabled")
     end
 
     #  Now, what is MyType like?
-    # tofile(sprint(inspect, MyType), "./txtfiles/inspect_01.txt")
+    # tofile(cleansprint(inspect, MyType), "./txtfiles/inspect_01.txt")
     if dotest
-        @test sprint(inspect, MyType) == fromfile("./txtfiles/inspect_01.txt")
+        @test cleansprint(inspect, MyType) == fromfile("./txtfiles/inspect_01.txt")
     else
         @test_nothrow inspect(MyType)
     end
@@ -46,16 +46,16 @@ println("\nTesting logging, stdout temporarily disabled")
     another_method(m1::MyType, m2::MyType) = print(m1, m2)
 
 
-    # tofile(sprint(inspect, MyType), "./txtfiles/inspect_02.txt")
-    # tofile(sprint(inspect, 1), "./txtfiles/inspect_03.txt")
-    # tofile(sprint(inspect, T2), "./txtfiles/inspect_04.txt")
-    # tofile(sprint(inspect, inspect), "./txtfiles/inspect_05.txt")
+    # tofile(cleansprint(inspect, MyType), "./txtfiles/inspect_02.txt")
+    # tofile(cleansprint(inspect, 1), "./txtfiles/inspect_03.txt")
+    # tofile(cleansprint(inspect, T2), "./txtfiles/inspect_04.txt")
+    # tofile(cleansprint(inspect, inspect), "./txtfiles/inspect_05.txt")
     
     if dotest
-        @test sprint(inspect, MyType) == fromfile("./txtfiles/inspect_02.txt")
-        @test sprint(inspect, 1) == fromfile("./txtfiles/inspect_03.txt")
-        @test sprint(inspect, T2) == fromfile("./txtfiles/inspect_04.txt")
-        @test sprint(inspect, inspect) == fromfile("./txtfiles/inspect_05.txt")
+        @test cleansprint(inspect, MyType) == fromfile("./txtfiles/inspect_02.txt")
+        @test cleansprint(inspect, 1) == fromfile("./txtfiles/inspect_03.txt")
+        @test cleansprint(inspect, T2) == fromfile("./txtfiles/inspect_04.txt")
+        @test cleansprint(inspect, inspect) == fromfile("./txtfiles/inspect_05.txt")
     else
         @test_nothrow inspect(MyType)
         @test_nothrow inspect(1)
@@ -93,12 +93,12 @@ expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
         tree = Tree(e)
 
         @test dendo isa Dendogram
-        @test fromfile("./txtfiles/dendo_expr_$i.txt") == string(dendo)
+        @test fromfile("./txtfiles/dendo_expr_$i.txt") == cleanstring(dendo)
 
         @test tree isa Tree
-        @test fromfile("./txtfiles/tree_expr_$i.txt") == string(tree)
+        @test fromfile("./txtfiles/tree_expr_$i.txt") == cleanstring(tree)
 
-        @test fromfile("./txtfiles/exptree_expr_$i.txt") == sprint(expressiontree, e)
+        @test fromfile("./txtfiles/exptree_expr_$i.txt") == cleansprint(expressiontree, e)
     end
     
 end
@@ -107,7 +107,7 @@ end
 
 @testset "Inspect: typestree" begin
     if console_width() >= 88
-        @test sprint(typestree, Float64) == "\e[2m\e[34m╭───────────── \e[22m\e[38;2;255;167;38mTypes hierarchy\e[22m\e[39m\e[34m\e[2m\e[34m ───╮\e[22m\e[39m\e[22m\e[39m\e[34m\n\e[2m\e[34m│\e[22m\e[39m                                 \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m  \e[3m\e[38;5;10mAny\e[23m\e[39m                            \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m \e[2m\e[3m\e[38;5;10m━━━━━\e[22m\e[23m\e[39m                           \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[22m                          \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m├── \e[22m\e[39m\e[3m\e[38;2;255;238;88mReal\e[23m\e[39m\e[22m                      \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39m\e[3m\e[38;2;255;238;88mAbstractFloat\e[23m\e[39m\e[22m         \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39m\e[3m\e[38;2;255;238;88m\e[3m\e[4m\e[38;5;214mFloat64\e[23m\e[24m\e[39m\e[38;2;255;238;88m\e[23m\e[39m\e[22m           \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39mBigFloat\e[22m          \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39mFloat32\e[22m           \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m└── \e[22m\e[39mFloat16\e[22m           \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[22m                      \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39mRational\e[22m              \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39mAbstractIrrational\e[22m    \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m└── \e[22m\e[39mInteger\e[22m               \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[22m                          \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m└── \e[22m\e[39mComplex\e[22m                   \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m                                 \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m╰─────────────────────────────────╯\e[22m\e[39m\n"
+        @test cleansprint(typestree, Float64) == "\e[2m\e[34m╭───────────── \e[22m\e[38;2;255;167;38mTypes hierarchy\e[22m\e[39m\e[34m\e[2m\e[34m ───╮\e[22m\e[39m\e[22m\e[39m\e[34m\n\e[2m\e[34m│\e[22m\e[39m                                 \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m  \e[3m\e[38;5;10mAny\e[23m\e[39m                            \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m \e[2m\e[3m\e[38;5;10m━━━━━\e[22m\e[23m\e[39m                           \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[22m                          \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m├── \e[22m\e[39m\e[3m\e[38;2;255;238;88mReal\e[23m\e[39m\e[22m                      \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39m\e[3m\e[38;2;255;238;88mAbstractFloat\e[23m\e[39m\e[22m         \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39m\e[3m\e[38;2;255;238;88m\e[3m\e[4m\e[38;5;214mFloat64\e[23m\e[24m\e[39m\e[38;2;255;238;88m\e[23m\e[39m\e[22m           \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39mBigFloat\e[22m          \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39mFloat32\e[22m           \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m└── \e[22m\e[39mFloat16\e[22m           \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m│   \e[22m\e[39m\e[22m                      \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39mRational\e[22m              \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m├── \e[22m\e[39mAbstractIrrational\e[22m    \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[2m\e[32m└── \e[22m\e[39mInteger\e[22m               \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m│   \e[22m\e[39m\e[22m                          \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m   \e[22m\e[2m\e[32m└── \e[22m\e[39mComplex\e[22m                   \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m│\e[22m\e[39m                                 \e[0m\e[2m\e[34m│\e[22m\e[39m\e[0m\n\e[2m\e[34m╰─────────────────────────────────╯\e[22m\e[39m\n"
     else
         @test_nothrow typestree(Float64)
     end

@@ -1,5 +1,20 @@
 import Term: cleantext, chars, textlen, split_lines, replace_multi
 
+
+function cleanstring(x)
+    replace(
+        string(x),
+        "\r\n" => "\n"
+    )
+end
+
+function cleansprint(fn, x)
+    replace(
+        sprint(fn, x),
+        "\r\n" => "\n"
+    )
+end
+
 """
 Write one or multiple strings to a text file so that they can 
 later be used for testing.
