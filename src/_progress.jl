@@ -169,6 +169,7 @@ end
 
 function update!(col::ETAColumn, args...)::String
     isnothing(col.job.startime) && return " "^(col.measure.w)
+    isnothing(col.job.N) && return " "^(col.measure.w)
 
     # get remaining time in ms
     elapsed = (now() - col.job.startime).value  # in ms

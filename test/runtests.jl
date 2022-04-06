@@ -64,9 +64,9 @@ tprint("\n\n[bold green]Running: '12_test_logging.jl' [/bold green]")
 tprint("\n\n[bold green]Running: '14_test_highlight.jl' [/bold green]")
 @time @timeit_include("14_test_highlight.jl")
 
-# # ? 15 progress
-# tprint("\n\n[bold green]Running: '15_test_progress.jl' [/bold green]")
-# @time @timeit_include("15_test_progress.jl")
+# ? 15 progress
+tprint("\n\n[bold green]Running: '15_test_progress.jl' [/bold green]")
+@time @timeit_include("15_test_progress.jl")
 
 # ? 16 Tree
 tprint("\n\n[bold green]Running: '16_test_tree.jl' [/bold green]")

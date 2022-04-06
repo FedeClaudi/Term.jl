@@ -58,8 +58,8 @@ function expressiontree(io::IO, e::Expr)
             title_style = "$light_green default bold",
             title_justify = :center,
             style=grey_dark,
-            fit=tree.measure.w > 88,
-            width=max(tree.measure.w, 88),
+            fit=tree.measure.w > 60,
+            width=max(tree.measure.w, 60),
             subtitle="inspect",
             subtitle_justify=:right,
             justify=:center,
@@ -178,7 +178,7 @@ terminal output.
 function inspect(
     io::IO, type::DataType; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 3
 )
-    width = isnothing(width) ? min(console_width(stdout), 92) - 4 : width - 4
+    width = isnothing(width) ? min(console_width(stdout), 60) - 4 : width - 4
     # extract type info
     info = TypeInfo(type)
 
@@ -296,12 +296,12 @@ function inspect(
 end
 
 """
-    inspect(fun::Function; width::Int=88, max_n_methods::Int = 7)
+    inspect(fun::Function; width::Int=60, max_n_methods::Int = 7)
 
 Inspects `Function` objects providing docstrings, and methods signatures.
 """
 function inspect(io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 7)
-    width = isnothing(width) ? min(console_width(stdout), 92) : width
+    width = isnothing(width) ? min(console_width(stdout), 60) : width
 
     info = TypeInfo(fun)
 

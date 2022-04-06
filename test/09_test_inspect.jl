@@ -22,7 +22,9 @@ println("\nTesting logging, stdout temporarily disabled")
     end
 
     #  Now, what is MyType like?
+    # tofile(sprint(inspect, MyType), "./txtfiles/inspect_01.txt")
     @test sprint(inspect, MyType) == fromfile("./txtfiles/inspect_01.txt")
+    
 
     # Let's define some constructors and methods using MyType
 
@@ -38,10 +40,15 @@ println("\nTesting logging, stdout temporarily disabled")
     another_method(m1::MyType, m2::MyType) = print(m1, m2)
 
     # let's inspect MyType again!
+    # tofile(sprint(inspect, MyType), "./txtfiles/inspect_02.txt")
     @test sprint(inspect, MyType) == fromfile("./txtfiles/inspect_02.txt")
 
 
     # other object types
+    # tofile(sprint(inspect, 1), "./txtfiles/inspect_03.txt")
+    # tofile(sprint(inspect, T2), "./txtfiles/inspect_04.txt")
+    # tofile(sprint(inspect, inspect), "./txtfiles/inspect_05.txt")
+
     @test sprint(inspect, 1) == fromfile("./txtfiles/inspect_03.txt")
     @test sprint(inspect, T2) == fromfile("./txtfiles/inspect_04.txt")
     @test sprint(inspect, inspect) == fromfile("./txtfiles/inspect_05.txt")
