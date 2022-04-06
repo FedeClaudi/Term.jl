@@ -1,8 +1,10 @@
 import Term: inspect, expressiontree, typestree, Dendogram, Tree
+import Term.console: console_width
 
 println("\nTesting logging, stdout temporarily disabled")
 # @suppress_out begin
 @testset "\e[34mINSPECT test" begin
+    dotest = console_width() >= 88
 
     # define some types
     abstract type T1 end
@@ -23,7 +25,11 @@ println("\nTesting logging, stdout temporarily disabled")
 
     #  Now, what is MyType like?
     # tofile(sprint(inspect, MyType), "./txtfiles/inspect_01.txt")
-    @test sprint(inspect, MyType) == fromfile("./txtfiles/inspect_01.txt")
+    if dotest
+        @test sprint(inspect, MyType) == fromfile("./txtfiles/inspect_01.txt")
+    else
+        @test_nothrow inspect(MyType)
+    end
     
 
     # Let's define some constructors and methods using MyType
@@ -39,19 +45,23 @@ println("\nTesting logging, stdout temporarily disabled")
     useless_method(m::MyType) = m
     another_method(m1::MyType, m2::MyType) = print(m1, m2)
 
-    # let's inspect MyType again!
+
     # tofile(sprint(inspect, MyType), "./txtfiles/inspect_02.txt")
-    @test sprint(inspect, MyType) == fromfile("./txtfiles/inspect_02.txt")
-
-
-    # other object types
     # tofile(sprint(inspect, 1), "./txtfiles/inspect_03.txt")
     # tofile(sprint(inspect, T2), "./txtfiles/inspect_04.txt")
     # tofile(sprint(inspect, inspect), "./txtfiles/inspect_05.txt")
-
-    @test sprint(inspect, 1) == fromfile("./txtfiles/inspect_03.txt")
-    @test sprint(inspect, T2) == fromfile("./txtfiles/inspect_04.txt")
-    @test sprint(inspect, inspect) == fromfile("./txtfiles/inspect_05.txt")
+    
+    if dotest
+        @test sprint(inspect, MyType) == fromfile("./txtfiles/inspect_02.txt")
+        @test sprint(inspect, 1) == fromfile("./txtfiles/inspect_03.txt")
+        @test sprint(inspect, T2) == fromfile("./txtfiles/inspect_04.txt")
+        @test sprint(inspect, inspect) == fromfile("./txtfiles/inspect_05.txt")
+    else
+        @test_nothrow inspect(MyType)
+        @test_nothrow inspect(1)
+        @test_nothrow inspect(T2)
+        @test_nothrow inspect(inspect)
+    end
 end
 # end
 
