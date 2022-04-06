@@ -17,7 +17,7 @@ import Term: load_code_and_highlight, highlight_syntax, highlight, theme
 
     @test highlight([1, 2, 3]) == "[#42A5F5][1, 2, 3][/#42A5F5]"
 
-    @test highlight(Int) == "[#CE93D8]Int64[/#CE93D8]"
+    @test highlight(Int32) == "[#CE93D8]Int32[/#CE93D8]"
 
     @test highlight(print) == "[#FFEE58]print[/#FFEE58]"
 
