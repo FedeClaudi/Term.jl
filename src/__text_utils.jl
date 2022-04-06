@@ -39,7 +39,7 @@ remove_markup(input_text)::String = replace_multi(input_text,
 
 Returns `true` if `text` includes a `MarkupTag`
 """
-has_markup(text::String)::Bool = occursin(OPEN_TAG_REGEX, text)
+has_markup(text)::Bool = occursin(OPEN_TAG_REGEX, text)
                                         
 
 # ----------------------------------- ansi ----------------------------------- #

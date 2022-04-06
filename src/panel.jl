@@ -9,7 +9,7 @@ import Term:
     fillin,
     do_by_line
 
-import ..consoles: console_width, console_height
+import ..console: console_width, console_height
 import ..measure: Measure
 import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..segment: Segment
@@ -66,7 +66,7 @@ end
 
 Construct a `Panel` given all required info.
 """
-function render_panel(
+function render(
                 content;
                 box::Symbol=:ROUNDED,
                 style::String="default",
@@ -108,7 +108,7 @@ function render_panel(
 
     # get left/right vertical lines
     σ(s) = apply_style("[" * style * "]" * s * "[/" * style * "]")
-    left, right = σ(box.mid.left), σ(box.mid.right)
+    left, right = σ(box.mid.left), "\e[0m"*σ(box.mid.right)*"\e[0m"
 
     # get an empty padding line
     empty = [Segment(left * " "^(panel_measure.w-2) * right)]
@@ -217,9 +217,7 @@ function Panel(
         kwargs...
     )
 
-    if content isa String
-        content = RenderableText(content)
-    end
+    content = content isa RenderableText ? string(content) : content
 
     # get measure
     WIDTH = console_width(stdout)
@@ -229,10 +227,10 @@ function Panel(
 
     # define convenience function
     function resize_content(content, _width)
-        if content isa RenderableText
-            content = RenderableText(content; width=_width)
+        if content isa AbstractString
+            content = reshape_text(content, _width)
         end
-        return content, content.measure
+        return content, Measure(content)
     end
 
     # get measure of panel's box and optionally resize text.
@@ -249,7 +247,7 @@ function Panel(
 
     if !fit
         # check that the content fits within the given width
-        if content isa RenderableText
+        if content isa AbstractString
             width = min(width, WIDTH)
             if content_measure.w > width-Δw
                 content, content_measure = resize_content(content, width-Δw)
@@ -265,8 +263,8 @@ function Panel(
         panel_measure = Measure(width, height)
     end
 
-    return render_panel(
-        content;
+    return render(
+        Renderable(content);
         panel_measure=panel_measure,
         content_measure=content_measure,
         Δw=Δw,
@@ -341,6 +339,8 @@ function TextBox(
 )
     padding = padding isa Padding ? padding : Padding(padding...)
     Δw =  padding.left + padding.right
+
+    text = apply_style(text)
 
     # fit text or get width
     if fit==:fit

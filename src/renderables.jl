@@ -2,8 +2,8 @@ module renderables
 
 import ..measure: Measure
 import ..segment: Segment
-import ..consoles: console_width
-import ..style: get_style_codes, MarkupStyle
+import ..console: console_width
+import ..style: get_style_codes, MarkupStyle, apply_style
 import Term: split_lines, reshape_text, fillin, join_lines
 
 export AbstractRenderable, Renderable, RenderableText
@@ -29,7 +29,7 @@ function Base.string(r::AbstractRenderable)::String
 end
 
 function Base.show(io::IO, renderable::AbstractRenderable)
-    if io == stdout
+    if io isa Base.TTY || io isa IOBuffer
         for seg in renderable.segments
             println(io, seg)
         end
@@ -97,6 +97,8 @@ Construct a `RenderableText` out of a string.
 If a `width` is passed the text is resized to match the width.
 """
 function RenderableText(text::AbstractString; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
+    text = apply_style(text)
+    
     # reshape text
     if !isnothing(width)
         width = min(console_width(stdout)-1, width)

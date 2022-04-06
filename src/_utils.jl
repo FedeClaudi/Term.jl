@@ -15,8 +15,15 @@ or(x, y) = isnothing(x) ? y : x
   Returns an iterable yielding tuples (is_last, value).
 """
 function loop_last(v)
-    is_last = [i == length(v) for i in 1:length(v)]
+  is_last =  1:length(v) .== length(v)
     return zip(is_last, v)
+end
+
+
+function loop_firstlast(v)
+  is_first =  1:length(v) .== 1
+  is_last =  1:length(v) .== length(v)
+  return zip(is_first, is_last, v)
 end
 
 """
@@ -31,4 +38,13 @@ be careful.
 function get_lr_widths(width::Int)::Tuple{Int, Int}
   iseven(width) && return (int(width/2), int(width/2))
   return (fint(width/2), cint(width/2))
+end
+
+"""
+Get a clean string representation of an expression
+"""
+function expr2string(e::Expr)::String
+  return replace_multi(
+    string(e), 
+    '\n'=>"", ' '=>"", r"#=.*=#"=>"", "begin"=>"", "end"=>"")
 end

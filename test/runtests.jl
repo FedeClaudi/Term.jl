@@ -48,7 +48,7 @@ tprint("\n\n[bold green]Running: '07_test_panel.jl' [/bold green]")
 tprint("\n\n[bold green]Running: '08_test_layout.jl' [/bold green]")
 @time @timeit_include("08_test_layout.jl")
 
-# #  ? 9 inspect
+#  ? 9 inspect
 tprint("\n\n[bold green]Running: '09_test_inspect.jl' [/bold green]")
 @time @timeit_include("09_test_inspect.jl")
 
@@ -71,6 +71,10 @@ tprint("\n\n[bold green]Running: '15_test_progress.jl' [/bold green]")
 # ? 16 Tree
 tprint("\n\n[bold green]Running: '16_test_tree.jl' [/bold green]")
 @time @timeit_include("16_test_tree.jl")
+
+# ? 17 Tree
+tprint("\n\n[bold green]Running: '17_test_dendogram.jl' [/bold green]")
+@time @timeit_include("17_test_dendogram.jl")
 
 # ? 999 EXAMPLES
 tprint("\n\n[bold green]Running: '999_test_examples.jl' [/bold green]")

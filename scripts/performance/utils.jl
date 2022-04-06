@@ -10,7 +10,7 @@ import Term: remove_markup,
             join_lines, split_lines,
             reshape_text
 
-import Term.consoles: clear
+import Term.console: clear
 
 # clear()
 print("\n"^3)

@@ -1,132 +1,143 @@
 using Term
-import Term.progress: track, ProgressBar, update, start, stop
-import Term.consoles: clear
-import Term.color: RGBColor
+import Term.progress: ProgressBar, start!, update!, stop!, with, @track, addjob!
+import Term.console: clear
 
 
 tprint(hLine("progress bars"; style="blue"))
 
 """
-The easiest way to use Term's progress bars is through the 
-`track` function. This just takes an iterable object as input
-when you're doing a for loop over the object. It will print
-out a visualization of progress along the for loop:
+This example shows how to create progress bars visualizations in Term.
+
+Progress bars in Term can handle multiple simultaneous tasks ('jobs') 
+whose progress we can monitor (think of nested for loops). The
+basic workflow involves creating a progress bars, adding jobs
+and updating them to update the visual display
+
 """
 
-myvec = collect(1:100)
-for i in track(myvec)
-    # do stuff
-    sleep(.025)
+pbar = ProgressBar()
+job = addjob!(pbar; N=100)
+start!(pbar)
+for i in 1:100
+    update!(job)
+    sleep(0.01)
+    i % 25 == 0 && println("We can print from here too")
+end
+stop!(pbar)
+
+"""
+Or with multiple jobs
+"""
+
+pbar = ProgressBar()
+job = addjob!(pbar; N=100)
+job2 = addjob!(pbar; N=50)
+job3 = addjob!(pbar; N=25)
+
+start!(pbar)
+for i in 1:100
+    update!(job)
+    i % 2 == 0 && update!(job2)
+    i % 3 == 0 && update!(job3)
+    sleep(0.01)
+end
+stop!(pbar)
+
+"""
+As you can see, the progress bar display stays as the bottom while the text is printed above.
+To make that happen Term needs to mess around with your terminal, calling
+`stop!` ensures that the normal terminal behavior is restored. If you
+don't call `stop!` (e.g. because your code gave an error), then the 
+terminal is not correctly restored. To avoid that we can use `with(pbar)`, this
+will ensure that the progress bar is correctly stopped no matter what happens.
+
+"""
+
+pbar = ProgressBar(expand=true)
+job = addjob!(pbar; N=100)
+
+with(pbar) do 
+    for i in 1:100
+        update!(job)
+        sleep(0.01)
+        i % 25 == 0 && println("We can print from here too")
+    end
 end
 
 """
-`track` creates and updates a `ProgressBar` object for you.
-But you can do it manually if you want more control over it 
-"""
-# create progress bar
-pbar = ProgressBar(;N=250, description="Manual pbar", width=120)
-# loop da loop
-for i in 1:250
-    # do stuff
-    sleep(.007)
+As you can see, we don't need to call `start!` and `stop!` any more, `with` takes
+care of that (even if there's an error in the loop).
 
-    # manually update the progress bar
-    update(pbar)
+Also, you might have noticed that `expand=true` makes the progress bar expand
+to fill in all the available space. An alternative is to set the `width` value.
+
+In addition to `width`, you can also use a convenient macro called @track
+to wrap any loop with a progress bar display.
+"""
+
+@track for i in 1:100
+    sleep(0.01)
 end
-stop(pbar)
+
 
 """
-As you can see, progress bars have parameters to set their appearance.
-The same parameters can be used for both ProgressBar and track.
-Here's more:
+You can customiza what kind of information should show in your progress bar and what it 
+should look like. Each bit of information (the text, the percentage count...) is a 
+"column" and you can choose which columns to display and in which order:
 """
 
-print("\n")
-trk(x) = track(x;
-    description="[red bold]Choose your colors![/red bold]",
-    expand=true,  #  fill the screen
-    update_every=5,  # don't update at every iteration
-    columns=:detailed,  # print more info
-    colors = [
-        RGBColor("(.3, .3, 1)"),
-        RGBColor("(1, 1, 1)"),
-        RGBColor("(.9, .3, .3)"),
-    ]
+for details in (:minimal, :default, :detailed)
+    pbar = ProgressBar(; columns=details, width=140)
+    with(pbar) do 
+        job = addjob!(pbar; N=100)
+        for i in 1:100
+            update!(job)
+            sleep(0.02)
+        end
+    end
+end
+
+"""
+Or you can create your choice of columns
+"""
+
+import Term.progress: CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn
+
+mycols = [DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn]
+cols_kwargs = Dict(
+    :DescriptionColumn => Dict(:style=>"red bold")
 )
 
-print("\n")
-for i in trk(1:500)
-    sleep(0.005)
-end
-
-"""
-Each bit of information (the description, the progress bar, the number of 
-completed iterations...) is a `column`. A progress bar can be made up
-of different sets of columns, and you can create your own.
-
-Term provides three different presets to display different ammounts of information:
-"""
-
-print("\n")
-for (level, color) in zip((:minimal, :default, :detailed), ("yellow1", "green","blue"))
-    for i in track(1:100; description="[bold $color italic]$level[/bold $color italic]", columns=level, width=150)
-        sleep(.005)
+pbar = ProgressBar(; columns=mycols, columns_kwargs=cols_kwargs, width=140)
+with(pbar) do 
+    job = addjob!(pbar; N=100)
+    for i in 1:100
+        update!(job)
+        sleep(0.02)
     end
 end
 
-
 """
-As you can see the display is adjusted so that it always has the right
-width regardless of how many columns there are. The only thing
-left to see is how to create your own column.
-"""
+As you can see you can use `cols_kwargs` to pass additional info to each column.
 
-import Term.progress: AbstractColumn, DescriptionColumn, BarColumn
-import Term.style: apply_style  # to style strings
-import Term.measure: Measure  # to define the column's size
-
-# define a new column type
-struct MyCol <: AbstractColumn
-    segments::Vector
-    measure::Measure
-    style::String
-end
-
-# constructor
-MyCol(style::String) = MyCol([], Measure(10, 1), style)
-
-# define a function to update the column when the progress bar is updated
-# it must return a string
-Term.progress.update(col::MyCol, i::Int, args...)::String = return apply_style("[$(col.style)]$i[/$(col.style)]")
-
-
-# okay let's create a progress bar with out columns
-cols = [
-    DescriptionColumn("MY columns!!!"),
-    BarColumn(),  # this will show the actual bar
-    MyCol("bold red"),
-]
-
-for i in track(1:100; columns=cols)
-    sleep(.01)
-end
-
-
-"""
-Our simple column simply keeps track of the number of iterations in the loop,
-but you can go crazy and make all sorts of columns! Check the docs for more info.
-
-Sometimes you want to create a lot of progress bars, but don't want to 
-clutter the console space too much, make them transient!
+Sometimes you are not sure how many iterations your loop should run for.
+In that case you can use spinners!
 """
 
-print("\n")
-for i in 1:3
-    for j in track(1:250; description="[yellow bold]Transient pbars![/yellow bold]", transient=true, width=250)
-        sleep(0.001)
+import Term.progress: SPINNERS
 
+for spinner in keys(SPINNERS)
+    columns_kwargs = Dict(
+        :SpinnerColumn => Dict(:spinnertype => spinner, :style=>"bold green"),
+        :CompletedColumn => Dict(:style => "dim")
+    )
+
+    pbar = ProgressBar(; columns=:spinner, columns_kwargs=columns_kwargs)
+    with(pbar) do
+        job = addjob!(pbar; description="[orange1]$spinner...")
+        for i in 1:250
+            update!(job)
+            sleep(.0025)
+        end
     end
 end
-tprintln("[bright_blue bold]poof![/bright_blue bold] [underline]They disappeared")
-
-tprint(hLine("Done"; style="green"))

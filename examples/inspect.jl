@@ -9,7 +9,7 @@ can go on the GitHub repository and look around, or yo can use Term!
 Term provides an `inspect` method that provides a lot of useful information!
 """
 
-import Term: inspect, typestree
+import Term: inspect, typestree, expressiontree
 
 # define some types
 abstract type T1 end
@@ -81,3 +81,19 @@ If you just want to see the type's hierarchy for a type, you can use typestree
 """
 
 typestree(AbstractFloat)
+
+
+"""
+You can also use Tree to visualize `Expr` objects
+"""
+
+e = :(x^2 + 2y)
+expressiontree(e)
+
+"""
+or, if you prefer, you can visualize it as a Dendogram
+"""
+
+inspect(e)
+
+

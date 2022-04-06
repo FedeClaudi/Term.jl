@@ -97,7 +97,7 @@ Nice right? Let's see how to make your own column with a simple exampe: a column
 All columns are subtypes of an `AbstractColumn <: AbstractRenderable` type, so they must have a `segments` and a `measure` field. You can create a column like this:
 
 ```julia
-import Term.progress: AbstractColumn, DescriptionColumn, BarColumn
+import Term.progress: AbstractColumn, DescriptionColumn, ProgressColumn
 import Term.style: apply_style  # to style strings
 import Term.measure: Measure  # to define the column's size
 
@@ -124,7 +124,7 @@ That should do it. Now we can specify our own set fo columns before creating the
 ```julia
 cols = [
     DescriptionColumn("MY columns!!!"),
-    BarColumn(),  # this will show the actual bar
+    ProgressColumn(),  # this will show the actual bar
     MyCol("bold red"),
 ]
 

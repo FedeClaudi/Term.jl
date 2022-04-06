@@ -22,17 +22,18 @@ include("renderables.jl")
 include("layout.jl")
 include("panel.jl")
 include("errors.jl")
-include("logging.jl")
 include("tprint.jl")
 include("progress.jl")
+include("logging.jl")
 include("tree.jl")
+include("dendogram.jl")
 include("logo.jl")
 include("inspect.jl")
 
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine
 export theme, highlight
-export inspect, typestree
+export inspect, typestree, expressiontree
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
@@ -40,6 +41,7 @@ export install_stacktrace
 export install_term_logger, uninstall_term_logger
 export track
 export Tree
+export Dendogram
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -75,7 +77,7 @@ end
 # -------------------------------- renderables ------------------------------- #
 using .box
 
-using .consoles: Console, console, err_console, console_height, console_width
+using .console: console_height, console_width
 
 using .renderables: AbstractRenderable, Renderable, RenderableText
 
@@ -99,11 +101,13 @@ using .logging: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
 
-using .progress: ProgressBar, update, track
+using .progress: ProgressBar, ProgressJob # update, track
 
 using .tree: Tree
 
-using .introspection: inspect, typestree
+using .dendogram: Dendogram
+
+using .introspection: inspect, typestree, expressiontree
 
 
 end

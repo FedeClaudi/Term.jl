@@ -1,6 +1,6 @@
 using Term
 import Term: chars
-import Term.consoles: clear
+import Term.console: clear
 install_term_logger()
 
 clear()
@@ -18,18 +18,18 @@ end
 #                                  no content                                  #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- fitted ---------------------------------- #
-pprint(
+@time pprint(
     Panel(;fit=true)
 )
 
 # # --------------------------------- unfitted --------------------------------- #
-# pprint(
-#     Panel()
-# )
+@time pprint(
+    Panel()
+)
 
-# pprint(
-#     Panel(; width=12, height=4)
-# )
+@time pprint(
+    Panel(; width=12, height=4)
+)
 
 
 
@@ -38,173 +38,173 @@ pprint(
 #                                   text only                                  #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- fitted ---------------------------------- #
-# pprint(
-#     Panel("t"; fit=true)
-# )
+@time pprint(
+    Panel("t"; fit=true)
+)
 
-# pprint(
-#     Panel("test"; fit=true)
-# )
+@time pprint(
+    Panel("test"; fit=true)
+)
 
-# pprint(
-#     Panel("1234\n123456789012"; fit=true)
-# )
+@time pprint(
+    Panel("1234\n123456789012"; fit=true)
+)
 
-# pprint(
-#     Panel("나랏말싸미 듕귁에 달아"; fit=true)
-# )
+@time pprint(
+    Panel("나랏말싸미 듕귁에 달아"; fit=true)
+)
 
-# pprint(
-#     Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit=true)
-# )
+@time pprint(
+    Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit=true)
+)
 
-# pprint(
-#     Panel("."^500; fit=true)
-# )
+@time pprint(
+    Panel("."^500; fit=true)
+)
 
 # --------------------------------- unfitted --------------------------------- #
-# pprint(
-#     Panel("t")
-# )
+@time pprint(
+    Panel("t")
+)
 
-# pprint(
-#     Panel("test")
-# )
+@time pprint(
+    Panel("test")
+)
 
-# pprint(
-#     Panel("1234\n123456789012")
-# )
+@time pprint(
+    Panel("1234\n123456789012")
+)
 
-# pprint(
-#     Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012")
-# )
+@time pprint(
+    Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012")
+)
 
-# pprint(
-#     Panel("."^500)
-# )
+@time pprint(
+    Panel("."^500)
+)
 
 
 # ---------------------------------------------------------------------------- #
 #                                 nested panels                                #
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- fitted ---------------------------------- #
-# pprint(
-#     Panel(
-#         Panel("test"; fit=true);
-#     fit=true)
-# )
+@time pprint(
+    Panel(
+        Panel("test"; fit=true);
+    fit=true)
+)
 
 
-# pprint(
-#     Panel(
-#         Panel(Panel("."; fit=true); fit=true);
-#     fit=true)
-# )
+@time pprint(
+    Panel(
+        Panel(Panel("."; fit=true); fit=true);
+    fit=true)
+)
 
-# pprint(
-#     Panel(
-#         Panel("."^500; fit=true); fit=true
-#     )
-# )
+@time pprint(
+    Panel(
+        Panel("."^500; fit=true); fit=true
+    )
+)
 
 # --------------------------------- unfitted --------------------------------- #
-# pprint(
-#     Panel(
-#         Panel("test");
-#     fit=true)
-# )
+@time pprint(
+    Panel(
+        Panel("test");
+    fit=true)
+)
 
 
-# pprint(
-#     Panel(
-#         Panel(Panel("."); fit=true);
-#     fit=true)
-# )
+@time pprint(
+    Panel(
+        Panel(Panel("."); fit=true);
+    fit=true)
+)
 
-# pprint(
-#     Panel(
-#         Panel("."^250); fit=true
-#     )
-# )
+@time pprint(
+    Panel(
+        Panel("."^250); fit=true
+    )
+)
 
-# pprint(
-#     Panel(
-#         Panel("test");
-# )
-# )
-
-
-# pprint(
-#     Panel(
-#         Panel(Panel("."););
-# )
-# )
-
-# pprint(
-#     Panel(
-#         Panel("."^250);
-#     )
-# )
-
-# pprint(
-#     Panel(
-#         Panel("t1"),
-#         Panel("t2"),
-#     )
-# )
-
-# pprint(
-#     Panel(
-#         Panel("test", width=22);  width=30, height=8
-#     )
-# )
-
-# pprint(
-#     Panel(
-#         Panel("test", width=42);  width=30, height=8
-#     )
-# )
+@time pprint(
+    Panel(
+        Panel("test");
+)
+)
 
 
-# pprint(
-#     Panel(
-#         Panel("test", width=42,height=12);  width=30, height=8
-#     )
-# )
+@time pprint(
+    Panel(
+        Panel(Panel("."););
+)
+)
+
+@time pprint(
+    Panel(
+        Panel("."^250);
+    )
+)
+
+@time pprint(
+    Panel(
+        Panel("t1"),
+        Panel("t2"),
+    )
+)
+
+@time pprint(
+    Panel(
+        Panel("test", width=22);  width=30, height=8
+    )
+)
+
+@time pprint(
+    Panel(
+        Panel("test", width=42);  width=30, height=8
+    )
+)
 
 
-# pprint(
-#     Panel(
-#         Panel("test", width=42,height=12);  width=30, height=14
-#     )
-# )
+@time pprint(
+    Panel(
+        Panel("test", width=42,height=12);  width=30, height=8
+    )
+)
+
+
+@time pprint(
+    Panel(
+        Panel("test", width=42,height=12);  width=30, height=14
+    )
+)
 
 # -------------------------- with other renderables -------------------------- #
-# pprint(
-#     Panel(
-#         RenderableText("x".^5)
-#     )
-# )
+@time pprint(
+    Panel(
+        RenderableText("x".^5)
+    )
+)
 
 
-# pprint(
-#     Panel(
-#         RenderableText("x".^500)
-#     )
-# )
+@time pprint(
+    Panel(
+        RenderableText("x".^500)
+    )
+)
 
-# pprint(
-#     Panel(
-#         RenderableText("x".^5); fit=true
-#     )
-# )
+@time pprint(
+    Panel(
+        RenderableText("x".^5); fit=true
+    )
+)
 
 
-# pprint(
-#     Panel(
-#         RenderableText("x".^500); fit=true
-#     )
-# )
+@time pprint(
+    Panel(
+        RenderableText("x".^500); fit=true
+    )
+)
 
 
 
@@ -212,35 +212,35 @@ pprint(
 #                                    titles                                    #
 # ---------------------------------------------------------------------------- #
 
-# pprint(
-#     Panel(
-#         Panel("[red].[/red]"^50, title="test", subtitle="subtest")
-#     )
-# )
+@time pprint(
+    Panel(
+        Panel("[red].[/red]"^50, title="test", subtitle="subtest")
+    )
+)
 
-# pprint(
-#     Panel("."^50, title="test",
-#                             subtitle="subtest",
-#                             subtitle_style="red",
-#                             fit=false
-#                             )
-# )
+@time pprint(
+    Panel("."^50, title="test",
+                            subtitle="subtest",
+                            subtitle_style="red",
+                            fit=false
+                            )
+)
 
 
 # ---------------------------------------------------------------------------- #
 #                                    PADDING                                   #
 # ---------------------------------------------------------------------------- #
 
-# pprint(
-#     Panel("."^24; padding = [4, 4, 2, 2])
-# )
+@time pprint(
+    Panel("."^24; padding = (4, 4, 2, 2))
+)
 
 
-# pprint(
-#     Panel("."^24; padding = [4, 4, 2, 2], fit=true)
-# )
+@time pprint(
+    Panel("."^24; padding = (4, 4, 2, 2), fit=true)
+)
 
 
-# pprint(
-#     Panel("."^24; padding = [0, 0, 0, 0], fit=true)
-# )
+@time pprint(
+    Panel("."^24; padding = (0, 0, 0, 0), fit=true)
+)

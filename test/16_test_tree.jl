@@ -73,24 +73,24 @@ tree_dict_4 = Dict(
 
 @testset "\e[34mTree" begin
     # creation
-    testpanel(
-        Tree(tree_dict), 28, 6
+    testtree(
+        Tree(tree_dict), 50, 6
     )
 
 
-    testpanel(
+    testtree(
         Tree(tree_dict_1), 15, 9
     )
 
-    testpanel(
+    testtree(
         Tree(tree_dict_2), 18, 11
     )
 
-    testpanel(
+    testtree(
         Tree(tree_dict_3), 33, 13
     )
 
-    testpanel(
+    testtree(
         Tree(tree_dict_4), 33, 19
     )
 
@@ -99,7 +99,7 @@ tree_dict_4 = Dict(
          @test_nothrow Tree(tree_dict; title=string(guides_type), guides_type=guides_type)
     end
 
-    testpanel(
+    testtree(
         Tree(
             tree_dict,
             title="my colors",
@@ -107,7 +107,7 @@ tree_dict_4 = Dict(
             node_style="blue underline",
             leaf_style="green",
             guides_style="red dim"
-        ), 30, 6
+        ), 52, 6
     )
 
     # test with no errors

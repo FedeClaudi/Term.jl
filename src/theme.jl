@@ -23,7 +23,7 @@ import Parameters: @with_kw
 Stores colors for different semantically relevant items, used to 
 style outputs to terminal.
 """
-@with_kw struct Theme
+@with_kw mutable struct Theme
     docstring::String           = green
     string::String              = green_light
     type::String                = purple_light
@@ -48,6 +48,7 @@ style outputs to terminal.
     tree_node_style::String     = "$yellow italic"
     tree_leaf_style::String     = yellow_light
     tree_guide_style::String    = blue
+    tree_max_width::Int         = 44
 end
 
 theme = Theme() # default theme

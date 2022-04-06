@@ -157,6 +157,22 @@ end
 end
 
 
+@testset "PANEL - compare to string" begin
+    pts = """Lorem[red] ipsum dolor s[/red]it amet, consectetur adipiscing elit,
+    ed do eiusmod tempor [bold blue]incididu[underline]nt ut labore et dolore magna aliqua. Ut enim ad minim
+     veniam, quis nos[/underline]trud exercitation ullamco laboris nisi ut aliquip ex 
+     ea commodo consequat. Duis aute [/bold blue][red on_black]irure dolor in reprehenderit 
+     in voluptate velit esse cillum dolore eu fugiat nulla 
+     pariatur. Excepteur sint occaecat[/red on_black] cupidatat non proident, 
+     sunt in [green]culpa qui officia[/green] deserunt mollit anim 
+     id est laborum."""
+
+     pts = replace(pts, "\n"=>"")
+    
+    @test string(Panel(pts; style="red", width=44)) == "\e[31m╭──────────────────────────────────────────╮\e[39m\n\e[31m│\e[39m  Lorem\e[31m ipsum dolor s\e[39mit amet, \e[0m            \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  \e[31m\e[39mconsectetur adipiscing elit,ed do \e[0m      \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  eiusmod tempor \e[1m\e[34mincididu\e[4mnt ut labore et\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  \e[1m\e[34m\e[4mdolore magna aliqua. Ut enim ad minim\e[0m   \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  veniam, quis nos\e[24m\e[34mtrud exercitation \e[0m      \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  \e[24m\e[34mullamco laboris nisi ut aliquip ex  ea\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  commodo consequat. Duis aute \e[22m\e[39m\e[31m\e[40mirure \e[0m     \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  \e[22m\e[39m\e[31m\e[40mdolor in reprehenderit  in voluptate \e[0m   \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  velit esse cillum dolore eu fugiat \e[0m     \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  nulla  pariatur. Excepteur sint \e[0m        \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  occaecat\e[39m\e[49m cupidatat non proident,  sunt\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  \e[39m\e[49min \e[32mculpa qui officia\e[39m\e[49m deserunt mollit \e[0m   \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  \e[32m\e[39m\e[49manim  id est \e[0m                           \e[0m\e[31m│\e[39m\e[0m\n\e[31m│\e[39m  laborum.\e[0m                                \e[0m\e[31m│\e[39m\e[0m\n\e[31m╰──────────────────────────────────────────╯\e[39m"
+end
+
+
 @testset "\e[34mPanel + renderables" begin
     testpanel(
         Panel(

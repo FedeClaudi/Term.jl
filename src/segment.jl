@@ -26,7 +26,7 @@ end
 
 Construct a Segment out of a string with markup.
 """
-function Segment(text::String)
+function Segment(text)
     return Segment(apply_style(text), Measure(text))
 end
 
@@ -35,7 +35,7 @@ end
 
 Construct a Segment out of a plain string and a markup string with style info
 """
-function Segment(text::String, markup::String)
+function Segment(text, markup::String)
     Segment("[$markup]" * text * "[/$markup]")
 end
 
@@ -46,7 +46,7 @@ Segment(seg::Segment) = seg
 # --------------------------------- printing --------------------------------- #
 """print styled in stdout, info otherwise"""
 function Base.show(io::IO, seg::Segment)
-    if io == stdout
+    if io isa Base.TTY || io isa IOBuffer
         print(io, unescape_brackets(seg.text))
 
     else
