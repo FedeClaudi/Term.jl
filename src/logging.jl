@@ -52,18 +52,21 @@ struct TermLogger <: Logging.AbstractLogger
     pbar::ProgressBar
 
 end
-TermLogger(theme::Theme) = TermLogger(
-    stderr,
+TermLogger(theme::Theme) = TermLogger(stderr, theme)
+
+TermLogger(io::IO, theme::Theme) = TermLogger(
+    io,     
     theme,
     ProgressBar(; 
-            transient=true, 
-            columns=[DescriptionColumn,
-            SeparatorColumn,
-            ProgressColumn,
-            SeparatorColumn,
-            PercentageColumn
-            ])
-    )
+        transient=true, 
+        columns=[DescriptionColumn,
+        SeparatorColumn,
+        ProgressColumn,
+        SeparatorColumn,
+        PercentageColumn
+        ])
+)
+
 
 # set logger beavior
 Logging.min_enabled_level(logger::TermLogger) = Logging.Debug

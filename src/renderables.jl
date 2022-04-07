@@ -29,15 +29,13 @@ function Base.string(r::AbstractRenderable)::String
 end
 
 function Base.show(io::IO, renderable::AbstractRenderable)
-    if io isa Base.TTY || io isa IOBuffer
-        for seg in renderable.segments
-            println(io, seg)
-        end
-    else
+    if io isa IOContext{Base.TTY}
         print(
             io,
-            "$(typeof(renderable)) <: AbstractRenderable \e[2msize: $(renderable.measure)\e[0m",
+            "$(typeof(renderable)) <: AbstractRenderable \e[2msize: $(renderable.measure)\e[0m"
         )
+    else
+        map(s -> println(io, s), renderable.segments)
     end
 end
 

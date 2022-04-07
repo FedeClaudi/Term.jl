@@ -1,5 +1,6 @@
 using Term.progress
 import Term.progress: AbstractColumn, getjob, get_columns
+using ProgressLogging
 
 @testset "\e[34mProgress - jobs" begin
     pbar = ProgressBar()
@@ -86,10 +87,20 @@ end
         end
     end
 
-
     colkwargs = Dict(:DescriptionColumn=>Dict(:style=>"red"))
     pbar = ProgressBar(;columns_kwargs=colkwargs)
     job = addjob!(pbar; N=100)
     @test job.columns[1].segments[1].text == "\e[31mRunning...\e[39m"
 
+end
+
+
+@testset "\e[34mProgress ProgressLogging" begin
+    @test_nothrow begin
+        @progress "outer...." for i in 1:6
+            @progress "inner... $i" for j in  1:100
+                sleep(0.01)
+            end
+        end
+    end
 end
