@@ -22,7 +22,7 @@ import ..dendogram: Dendogram
 
 include("_inspect.jl")
 
-export inspect, typestree
+export inspect, typestree, expressiontree
 
 
 # ---------------------------------------------------------------------------- #

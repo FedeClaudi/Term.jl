@@ -29,6 +29,7 @@ makedocs(;
             "ren/text.md",
             "ren/panel.md",
             "ren/tbox.md",
+            "ren/dendogram.md",
             "ren/layout_rens.md",
             "ren/tree.md",
         ],

@@ -1,5 +1,6 @@
 # Introspection
 
+## Inspect
 If you often use the (awesome) Julia REPL, you'll be familiar witht he fact that you can type `?` to enter the docs section. Then typing a name (e.g., of a `Type` or `function`) will bring up the relevant docs.
 E.g. you might get something like this:
 
@@ -88,3 +89,33 @@ As you can see, with a `DataType` argument, `inspect` shows you the type's hiera
 !!! note
     `inspect` accepts an optional keyword argument to choose how many constructors and methods to show: `max_n_methods::Int`. If an object has loads of methods, only the first `max_n_methods` will be shown.
 
+
+## `typestree`
+As you know, one of Julia's defining features is its hierarchical types structure. Sometimes, you want to get an overview of this hierarchy but there isn't always a convenient way achieve that... or is there...
+
+```@example
+import Term: typestree
+
+print(typestree(Float65))
+
+```
+
+:D
+
+## Expression & `expressiontree`
+If you're doing a bit of metaprogramming (or teaching it to new Julia coders), you want to get an idea of what the parts of the `Expr` you're building are. Term's here to help: you can use `inspect(::Expr)` to get a [Dendogram](@ref DendoDoc) based visualization`
+
+```@example
+
+expr = :(2x + √x^y)
+inspect(expr)
+```
+
+For long expressions, though, this gets out of hand. In that case you can use `expressiontree` to get a [Tree](@ref TreeDoc) based visualization:
+
+```@example
+expr = :(2x + √x^y)
+expressiontree(expr)
+```
+
+enjoy!
