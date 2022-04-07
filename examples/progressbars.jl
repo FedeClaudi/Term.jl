@@ -141,3 +141,52 @@ for spinner in keys(SPINNERS)
         end
     end
 end
+
+
+"""
+You can make your own column too! You just need to define a type and an update! method for them
+
+"""
+
+using Random
+
+import Term.progress
+using Term.progress
+import Term.progress: AbstractColumn, DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn
+import Term.segment: Segment
+import Term.measure: Measure
+
+struct RandomColumn <: AbstractColumn
+    job::ProgressJob
+    segments::Vector{Segment}
+    measure::Measure
+    style::String
+
+    function RandomColumn(job::ProgressJob; style="red" )
+        txt = Segment(randstring(6), style)
+        return new(job, [txt], txt.measure, style)
+    end
+end
+
+
+function progress.update!(col::RandomColumn, color::String, args...)::String
+    txt = Segment(randstring(6), col.style)
+    return txt.text
+end
+
+
+
+mycols = [DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn, RandomColumn]
+cols_kwargs = Dict(
+    :RandomColumn => Dict(:style=>"green bold")
+)
+
+pbar = ProgressBar(; columns=mycols, columns_kwargs=cols_kwargs, width=140)
+with(pbar) do 
+    job = addjob!(pbar; N=100)
+    for i in 1:100
+        update!(job)
+        sleep(0.02)
+    end
+end
+

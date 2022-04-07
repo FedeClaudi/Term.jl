@@ -15,7 +15,7 @@ As you can see, the first argument is the "trunk" or title of the dendogram whil
 import Term: Tree
 print(
     Tree(
-        Dict("trunk"=>["the", "tree", "has", "leaves"])
+        Dict(:a=>"the", :b=>"tree", :c=>"has", :d=>"leaves")
     )
 )
 ```
@@ -25,11 +25,11 @@ If you've seen [Tree](@ref TreeDoc), you'll know that `Tree` can handle nested h
 ```@example dendo
 import Term.dendogram: link
 
-mydend = Dendogram("first", 1, 2)
+mydend = Dendogram("first", [1, 2])
 otherdend = Dendogram("other", [:a, :b])
 
 print(
-    link(mydend, link(otherdend, otherdend; title="another level); title="One level")
+    link(mydend, link(otherdend, otherdend; title="another level"); title="One level")
 )
 ```
 
