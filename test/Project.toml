@@ -1,4 +1,5 @@
 [deps]
+ProgressLogging = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
 Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"

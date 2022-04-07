@@ -1,5 +1,5 @@
 import Term.color: is_named_color, is_rgb_color, is_hex_color, is_color, is_background
-import Term.color: get_color, NamedColor, RGBColor, BitColor
+import Term.color: get_color, NamedColor, RGBColor, BitColor, hsl2rgb
 
 @testset "\e[34mANSI detect color" begin
     for name in ["red", "blue", "black", "grey42", "deep_sky_blue3", "dark_blue"]
@@ -84,4 +84,11 @@ end
         @test is_background(hex) == true
         @test typeof(get_color(hex; bg = true)) == RGBColor
     end
+end
+
+
+@testset "\e[34mHSL to RGB" begin
+    @test hsl2rgb(0, 0, 0) == "(0, 0, 0)"
+    @test hsl2rgb(0, 0, 1) == "(255, 255, 255)"
+
 end

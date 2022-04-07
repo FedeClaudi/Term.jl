@@ -1,4 +1,4 @@
-# Logging
+# [Logging](@id LoggingDoc)
 
 Julia has a [great logging system](https://docs.julialang.org/en/v1/stdlib/Logging/). If you come from other programming languages like Python you'll likely already love it, but it can be better!
 

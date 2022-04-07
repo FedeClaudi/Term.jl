@@ -222,3 +222,19 @@ end
 ```
 
 done!
+
+
+## ProgressLogging
+I know that some of you will be thinking: hold on, Julia already had a perfectly functioning progress API with `ProgressLogging.jl`, can't we just use that? Long story short, yes you can. But `Term`'s API gives you so much more control over what kind information to display and what it should look like. Nonetheless, many of you will want to use `ProgressLogging` in conjuction with Term, so we've made it possible, you just need to use Term's logger (see [Logger](@ref)):
+
+
+```Julia
+using ProgressLogging
+import Term: install_term_logger
+install_term_logger()
+
+@progress "outer...." for i in 1:3
+    sleep(0.01)
+end
+
+```
