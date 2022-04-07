@@ -98,13 +98,13 @@ end
 end
 
 
-@testset "\e[34mProgress ProgressLogging" begin
+# @testset "\e[34mProgress ProgressLogging" begin
 
-    install_term_logger()
+#     install_term_logger()
 
-    @test_nothrow begin
-        @progress "inner... $i" for j in  1:10
-            sleep(0.01)
-        end
-    end
-end
+#     @test_nothrow begin
+#         @progress "inner... $i" for j in  1:10
+#             sleep(0.01)
+#         end
+#     end
+# end
