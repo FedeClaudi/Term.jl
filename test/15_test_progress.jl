@@ -1,5 +1,7 @@
 using Term.progress
 import Term.progress: AbstractColumn, getjob, get_columns
+import Term: install_term_logger, uninstall_term_logger
+
 using ProgressLogging
 
 @testset "\e[34mProgress - jobs" begin
@@ -97,11 +99,12 @@ end
 
 
 @testset "\e[34mProgress ProgressLogging" begin
+
+    install_term_logger()
+
     @test_nothrow begin
-        @progress "outer...." for i in 1:6
-            @progress "inner... $i" for j in  1:10
-                sleep(0.01)
-            end
+        @progress "inner... $i" for j in  1:10
+            sleep(0.01)
         end
     end
 end
