@@ -3,6 +3,8 @@ import Term.progress: AbstractColumn, getjob, get_columns
 using ProgressLogging
 
 @testset "\e[34mProgress - jobs" begin
+    @suppress_out begin
+
     pbar = ProgressBar()
 
     j1 = addjob!(pbar; description="test", N=100)
@@ -23,10 +25,12 @@ using ProgressLogging
 
     removejob!(pbar, j1)
     @test length(pbar.jobs) == 0
-
+    end
 end
 
 @testset "\e[34mProgress basic" begin
+    @suppress_out begin
+
     @test_nothrow begin
         pbar = ProgressBar()
         with(pbar) do 
@@ -68,9 +72,12 @@ end
         end
     end
 end
+end
 
 
 @testset "\e[34mProgress columns" begin
+    @suppress_out begin
+
     for colinfo in (:minimal, :default, :spinner, :detailed)
         pbar = ProgressBar(columns=colinfo)
         @test pbar.columns == get_columns(colinfo)
@@ -91,11 +98,13 @@ end
     pbar = ProgressBar(;columns_kwargs=colkwargs)
     job = addjob!(pbar; N=100)
     @test job.columns[1].segments[1].text == "\e[31mRunning...\e[39m"
-
+end
 end
 
 
 @testset "\e[34mProgress ProgressLogging" begin
+    @suppress_out begin
+
     @test_nothrow begin
         @progress "outer...." for i in 1:6
             @progress "inner... $i" for j in  1:100
@@ -103,4 +112,5 @@ end
             end
         end
     end
+end
 end
