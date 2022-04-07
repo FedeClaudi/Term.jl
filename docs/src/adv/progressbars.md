@@ -4,8 +4,8 @@ Progress bars! We all love progress bars, and julia has some great [progress bar
 But this is `Term`, and `Term` too has its own progress bars API. We think you'll like it. If not, worry not! `Term`'s progress bars play well `ProgressLogging.jl`, scroll to the bottomof this page!
 
 !!! warning
-    In the docs each "update" of the progress bar gets printed in a new line. This is not what it looks like in reality.
-    We **encourage** you to copy-paste the code below and try it out in your own console. Or head to [github](https://github.com/FedeClaudi/Term.jl) where you can find more examples.
+    Progress bars do some terminal magic that doesn't play well with how the docs are rendered here. If you want to see what progress bars actually look like, 
+    we **encourage** you to copy-paste the code below and try it out in your own console. Or head to [github](https://github.com/FedeClaudi/Term.jl) where you can find more examples.
 
 So this is what a progress bar looks like in `Term`:
 

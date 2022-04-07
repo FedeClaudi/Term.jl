@@ -100,3 +100,8 @@ print(
     Panel(make_rgb_colors(), width=88, title="RGB colors", style="bold yellow", fit=true, padding=(2, 2, 1, 0))
 )
 ```
+
+
+Oooops, it seems that we broke Documenter's layout again. This is what it looks like if you run this code in your terminal:
+
+![](colors.png)
