@@ -8,10 +8,6 @@ strings = [
     "Lorem [red]ipsum dolor sit [underline]amet, consectetur[/underline] adipiscing elit, [/red][blue]sed do eiusmod tempor incididunt[/blue] ut labore et dolore magna aliqua.",
     "Lorem[red]ipsumdolorsit[underline]amet, consectetur[/underline] adipiscing elit, [/red]seddoeiusmo[blue]dtemporincididunt[/blue]ut labore et dolore magna aliqua.",
 
-    # arab
-    "استنكار  النشوة وتمجيد الألم نشأت بالفعل، وسأعرض لك",
-    "لكن لا بد أن أوضح لك أن كل ه[/green]ذه الأفكار[green] المغلوطة حو[/red]ل استنكار  النشوة وتمجيد الألم نشأت بالفعل، وسأعرض لك التفاصيل لتكتشف حقيقة و[red]أساس تلك السعادة",
-
     # thai
     "ต้าอ่วยวาทกรรมอาว์เซี้ยว กระดี๊กระด๊า ช็อปซาดิสต์โมจิดีพาร์ตเมนต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
     "ต้าอ่วยวาท[red]กรรมอาว์เซี้ยว กระดี๊กระด๊า [/red]ช็อปซาดิสต์โมจิดีพาร์ตเม[blue underline]นต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต[/blue underline]อร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
@@ -30,15 +26,28 @@ strings = [
     "."^100  ,
     ".[red]|||[/red]...."^10,
     ".|||...."^10, 
+
+
+    replace("""
+Lorem ipsum [bold]dolor sit[/bold] amet, consectetur adipiscing elit,
+ed do e[red]iusmod tempor incididunt[/red] ut [bold]labore et [underline]dolore[/underline] magna aliqua.[/bold] Ut enim ad minim
+veniam, quis[green] nostrud exercitation [on_black]ullamco laboris nisi ut aliquip ex [/on_black]
+ea commodo consequat.[blue] Duis aute irure dolor in[/blue] reprehenderit 
+in voluptate velit[/green] esse [italic]cillum dolore[/italic][red] eu[/red][italic green] fugiat [/italic green]nulla 
+pariatur. Excepteur[red] sint[/red][blue] occaecat cupidatat [/blue]non proident, 
+sunt in culpa qui [italic]officia[/italic] deserunt mollit anim 
+id est laborum.""", "\n"=>""),
 ]
 
-clear()
-width = 21
+print("\n"^3)
+width = 33
 for text in strings
-    println('_'^width)
-    println(reshape_text(text, width))
-    # show(reshape_text(text, width))
-    # print("\n")
+    # println('_'^width)
+    # println(reshape_text(text, width))
+    # println('_'^width)
+        
+    show(reshape_text(text, width))
+    print("\n\n")
 end
 
 

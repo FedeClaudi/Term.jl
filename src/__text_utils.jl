@@ -54,7 +54,7 @@ remove_ansi(input_text)::String = replace(input_text, ANSI_REGEXE => "", )
 
 
 """ 
-    has_markup(text::String)
+    has_ansi(text::String)
 
 Returns `true` if `text` includes a `MarkupTag`
 """
@@ -100,6 +100,16 @@ function replace_ansi(input_text)
     end
     return input_text
 end
+
+
+ANSI_CLEANUP_REGEXES = [
+    r"\e\[[0-9][0-9]m\e\[39m"=>"",
+    r"\e\[[0-9][0-9]m\e\[49m"=>"",
+    r"\e\[[0-9]m\e\[2[0-9]m"=>"",
+    r"\e\[22m\e\[22m"=>"",
+]
+
+cleanup_ansi(text) = replace_multi(text, ANSI_CLEANUP_REGEXES...)
 
 
 # --------------------------- clean text / text len -------------------------- #
@@ -193,7 +203,7 @@ function replace_text(text, start::Int, stop::Int, replace::String)::String
     start = isvalid(text, start) ? start : max(prevind(text, start), 1)
     if start == 1
         return text[1] * replace * text[stop+1:end]
-    elseif stop == length(text)
+    elseif stop == ncodeunits(text)
         return text[1:start] * replace
     else
         return text[1:start] * replace * text[stop+1:end]
@@ -316,118 +326,6 @@ end
 #                                 RESHAPE TEXT                                 #
 # ---------------------------------------------------------------------------- #
 
-"""
-Store information about the location and style of an ansi tag
-"""
-struct AnsiTag
-    start::Int
-    stop::Int
-    style::SubString
-end
-
-"""
-    excise_style(text)::Tuple{String, Vector{AnsiTag}, Bool}
-
-Cut ANSI style information out of a string and store ANSI tags locations.
-"""
-function excise_style(text)::Tuple{String, Vector{AnsiTag}, Bool}
-    hasstyle = has_markup(text) || has_ansi(text)
-    text = apply_style(text)
-
-    tags::Vector{AnsiTag} = []
-    while occursin(ANSI_REGEXE, text)
-        mtch = match(ANSI_REGEXE, text)
-        _start = thisind(text, max(mtch.offset-1, 1))
-        _stop = thisind(text, mtch.offset + length(mtch.match))
-        
-        push!(tags, AnsiTag(_start, _stop, mtch.match))
-        text = text[1:_start] * text[_stop:end]
-    end
-    return text, tags, hasstyle
-end
-
-
-"""
-    reinject_style(text, tags::Vector{AnsiTag}, cuts::Vector{Int})
-
-Re-insert previously excised ANSI style tags.
-If the cleaned text was reshaped, `cuts` stores information about
-where new lines were added so that the ANSI style can be added
-in the right place.
-"""
-function reinject_style(text, tags::Vector{AnsiTag}, cuts::Vector{Int}, issimple::Bool)
-    for tag in reverse(tags)
-        pads = findall(cuts .< tag.start)
-
-        if issimple
-            pads = isnothing(pads) ? 0 : max(0, length(pads)-1)
-            
-            cut1 = min(tag.start + pads, length(text))
-            cut1 = text[cut1] == '\n' ? cut1+1 : cut1
-            cut2 = cut1+1
-            
-        else
-            pads = isnothing(pads) ? 0 : max(0, length(pads))
-            
-            cut1 = thisind(text, tag.start+pads)
-            cut2 = thisind(text, cut1 + ncodeunits(text[cut1]))
-        end
-        cut1 > ncodeunits(text) && continue
-        # cut2 = min(cut2, ncodeunits(text))
-
-    
-        text = text[1:cut1] * tag.style * text[cut2:end]
-
-    end
-    return text
-end
-
-"""
-    correct_newline_style(text)
-
-Given a multi-line text with ANSI style, add an ANSI close
-tag at the end of each line and restore the style in the next.
-
-This is important for reshaped text that needs to be put in
-layouts with other text and you don't want the ANSI style
-to bleed into other renderables.
-"""
-function correct_newline_style(text)
-    ansi = ""
-    out = ""
-    for (last, line) in loop_last(split(text, "\n"))
-        out *= ansi * line * (last ? "\e[0m" : "\e[0m\n")
-        ansi = last ? "" : get_ANSI_codes(line)
-    end
-    out
-end
-
-"""
-    get_text_info(text) 
-
-Extract a bunch of information from a string of text.
-Info includes with at each char, number of codeunits at each char,
-which characters are spaces and wether the text is 'simple' (i.e.
-each char has ncodeunits=1) or not.
-"""
-function get_text_info(text) 
-    ctext = collect(text)    
-    widths = cumsum(textwidth.(ctext))
-    nunits = cumsum(ncodeunits.(ctext))
-
-    issimple = length(text) == ncodeunits(text)
-    if issimple
-        isspace = ' ' .== ctext
-        nchar = identity
-    else
-        charidxs = collect(eachindex(text))  # codeunits idx of start of each char
-        nchar(unit) = or(findfirst(charidxs .== prevind(text, unit)), 1)  # n chars at codeunit
-        isspace = zeros(Bool, length(text))
-        isspace[nchar.(only.(findall(" ", text)))] .= 1  # only.(findall(" ", text) can become findall(' ', text) for Julia > 1.6
-    end
-
-    return widths, isspace, issimple, nunits, nchar
-end
 
 
 """
@@ -440,86 +338,107 @@ has at most `width` when printed to terminal: ignoring
 ANSI style but taking into account characters with
 widths > 1. Text is preferentially split at a space
 when possible to improve readability.
-
-Future developer, this function is highly optimized to
-reshape text as accurately as possible and as fast as possible.
-It took several days to get it to be able to handle 
-style information correctly, handle multi codeunit
-characters, handle characters with width >1, handle
-situations in which the string can't be split up
-at a space etc... It's a very delicate balance to get
-everything right and changing anything can cause
-the whole thing to break, so do so at your peril!
 """
 function reshape_text(text, width::Int)
     if occursin("\n", text)
         return do_by_line(l -> reshape_text(l, width), text)
     end
 
-
     textlen(text) <= width && return text
 
-    # Remove style information to simplify reshaping
-    text, tags, hasstyle = excise_style(text)
+    has_style = has_ansi(text) || has_markup(text)
+    has_special = length(text) != ncodeunits(text)
+    text = apply_style(text)
 
-    # extract style information
-    original_widths, isspace, issimple, nunits, nchar = get_text_info(text)
-    widths = view(original_widths, :) .- 1
+    chars::Vector{Union{Char, String}} = collect(text)
+    L = length(chars)
+    spaces::Vector{Bool} = Bool.(chars .== ' ')
 
-    # infer places where to cut the text
-    cuts = [1]
-    N = length(original_widths)
-    while cuts[end] < ncodeunits(text)
-        # start with the worst case: we cut mid-word
-        lastcut = cuts[end]
-        candidate = issimple ? findlast(widths .<= width) : findlast(widths .< width)
+    # get width at each char (ignoring ANSI codes)
+    widths::Vector{Int} = textwidth.(chars)
 
-        if isspace[candidate] == 1
-            # we got lucky
-            cut = candidate
-        else
-            # try to get a space in the current line and cut there if possible
-            lastspace = findlast(view(isspace, lastcut:candidate)) 
-            cut = isnothing(lastspace) ? candidate : lastspace + lastcut
-        end
+    # ensure ANSI tags don't affect width
+    if has_style
+        for mtch in eachmatch(ANSI_REGEXE, text)
+            if has_special
+                # tag position in code units
+                _i0 = mtch.offset 
+                _i1 = mtch.offset + ncodeunits(mtch.match) - 1
 
-        if cut <= N
-            # adjust widths so that we ignore already cut text
-            push!(cuts, nunits[cut])
-            widths = original_widths .- original_widths[cut]
-        else
-            # done
-            break
+                # tag position in characters
+                i0 = length(text[1:_i0])
+                i1 = length(text[_i0:_i1]) + i0 - 1
+            else
+                i0 = mtch.offset 
+                i1 = mtch.offset + length(mtch.match) - 1
+            end
+
+            widths[i0:i1] .= 0
         end
     end
 
-    # create output text by slicing up the input text
-    out = ""
-    applied_cuts::Vector{Int} = []
-    for (last, (pre, post)) in loop_last(zip(cuts[1:end-1], cuts[2:end]))
-        post - pre <= 1 && continue
-        Δ = last ? 0 : 1
+    cumwidths = cumsum(widths)
+    cuts = findall(diff(mod.(cumwidths, width)) .< 0) .+ 1
+    ncuts = length(cuts)
+    n = 1
+    while n <= length(cuts)
+        cut = cuts[n]
+        # @warn "processing cut $n: $cut"
 
-        if issimple
-            # simple means all characters have 1 codeunit length, easy
-            !isspace[pre] && push!(applied_cuts, pre)
-            newline = tview(text, pre, post-Δ, :simple)
-        else
-            # some chars have >1 codeunit length, we need to be careful
-            _pre = thisind(text, pre)
-            _post = thisind(text, post)
-            newline = tview(text, _pre, _post, :simple)
-            !isspace[nchar(pre)] && push!(applied_cuts, _pre)
+        for i in 1:4
+            if spaces[cut-i] == true
+                # get width of text excluded by new cut position
+                if n < ncuts
+                    # adjust cuts poisitions
+                    Δw = cumwidths[cut] - cumwidths[cut-i]
+                    newcuts = findall(
+                        diff(
+                            mod.(cumwidths .- cumwidths[cut] .+ Δw, width)
+                            ) .< 0
+                    )
+                    
+                    newcuts = newcuts[newcuts .> cut]
+                    cuts = [cuts[1:n]..., newcuts...]
+                end
+
+                cut -= i
+                break
+            end
         end
 
-        # append to output text
-        out *= lstrip(newline) * (last ? "" : "\n")
+        # make sure cut is at the end of an ANSI tag
+        while cut < L && widths[cut+1] == 0
+            cut -= 1
+            cuts .-= 1
+        end
+
+        chars[cut] *= '\n'
+        n += 1
     end
 
-    # if necessary re-insert style information in the reshaped text
-    if hasstyle
-        return correct_newline_style(reinject_style(out, tags, applied_cuts, issimple))
-    else
-        return out
+    # check that the last line has the right width
+    if sum(widths[cuts[end]:end]) > width
+        _chars = chars[cuts[end]+1:end]
+        chars = chars[1:cuts[end]]
+        append!(chars, collect(
+                reshape_text(join(_chars), width)
+                )
+        )
     end
+  
+    # stitch it back together
+    text = join(chars)
+    lines = strip.(split(text, "\n"))
+
+    # handle style
+    if has_style
+        styles = map(l -> get_ANSI_codes(l), lines)
+        lines[1] *= "\e[0m"
+        for i in 2:length(lines)
+            lines[i] = cleanup_ansi(*(styles[1:i-1]...)) * lines[i] * "\e[0m"
+        end
+    end
+
+    return chomp(cleanup_ansi(join(lines, "\n")))
 end
+

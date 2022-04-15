@@ -56,7 +56,7 @@ tprint("\n\n[bold green]Running: '09_test_inspect.jl' [/bold green]")
 tprint("\n\n[bold green]Running: '11_test_console.jl' [/bold green]")
 @time @timeit_include("11_test_console.jl")
 
-# # ? 12 logging
+# ? 12 logging
 tprint("\n\n[bold green]Running: '12_test_logging.jl' [/bold green]")
 @time @timeit_include("12_test_logging.jl")
 

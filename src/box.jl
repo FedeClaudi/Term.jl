@@ -194,9 +194,9 @@ function get_title_row(
     # compose title line 
     boxline = getfield(box, row)
 
-    open, close, space =  "\e[0m[" * style * "]",  "[/" * style * "]\e[0m", " "
+    open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
     if !isnothing(title_style)
-        topen, tclose  = "\e[0m[" * title_style * "]", "[/" * title_style * "]" * open
+        topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]" * open
         if style == "hidden"
             topen =  "\e[28m"* topen
             tclose = tclose * "\e[8m"
@@ -208,20 +208,19 @@ function get_title_row(
     if justify == :left
         line = open * boxline.left * boxline.mid^4 * title 
         line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
-        return Segment(line)
+        return Segment(line * "\e[0m")
 
     elseif justify == :right
         pre_len = width - textlen(title) - 4
         line = open * get_lrow(box, pre_len, row)
         line *= title * boxline.mid^3 * boxline.right * close
-        return Segment(line)
+        return Segment(line * "\e[0m")
 
     else  # justify :center
         tl, tr = get_lr_widths(textlen(title))
         lw, rw = get_lr_widths(width)
-        line = open * get_lrow(box, lw-tl, row) * title * get_rrow(box, rw-tr, row) * close
-
-        return Segment(line)
+        line = open * get_lrow(box, lw-tl, row) * close * title * get_rrow(box, rw-tr, row) * close
+        return Segment(line * "\e[0m")
     end
 end
 

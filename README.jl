@@ -61,6 +61,7 @@ function make_rgb_colors(; max_width=88)
             bg = hsl2rgb(h*360, .9, l + 0.7/10)
 
             colors *= "[$color on_$bg]▄[/$color on_$bg]"
+            # colors *= "[$color on_$bg]▬▄x[/$color on_$bg]"
         end
         colors *= "\n"
     end

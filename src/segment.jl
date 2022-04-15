@@ -1,3 +1,4 @@
+
 module segment
 import Term
 import Term: remove_markup, remove_ansi, unescape_brackets

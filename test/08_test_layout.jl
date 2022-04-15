@@ -124,7 +124,7 @@ end
     p1 = Panel()
     p2 = Panel(; width=24, height=3)
     p3 = Panel("this [red]panel[/red]"^5, width=12)
-
+    
     testlayout(p1 * p2, 112, 3)
     @test string(p1 * p2) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[22m╭──────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[22m│\e[22m                      \e[0m\e[22m│\e[22m\e[0m\n                                                                                        \e[22m╰──────────────────────╯\e[22m"
 
@@ -135,8 +135,8 @@ end
     testlayout(p2 * p1, 112, 3)
     testlayout(p2 / p1, 88, 5)
 
-    testlayout(p1 * p2 * p3, 124, 12)
-    testlayout(p1 / p2 / p3, 88, 17)
-    testlayout(p3 * p1 * p2, 124, 12)
-    testlayout(p3 / p1 / p2, 88, 17)     
+    testlayout(p1 * p2 * p3, 124, 11)
+    testlayout(p1 / p2 / p3, 88, 16)
+    testlayout(p3 * p1 * p2, 124, 11)
+    testlayout(p3 / p1 / p2, 88, 16)     
 end
