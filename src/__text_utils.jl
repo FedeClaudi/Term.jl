@@ -318,7 +318,9 @@ end
 Shorten a string of text to a target width
 """
 function truncate(text::AbstractString, width::Int)
-    textlen(text) <= width && return text
+    width < 0 && return text
+    # textlen(text) <= width && return text
+    Measure(text).w <= width && return text
     return text[1:prevind(text, width - 2)] * "..."
 end
 

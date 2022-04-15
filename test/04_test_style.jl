@@ -1,7 +1,7 @@
 import Term.style: apply_style
 import Term: tprint, tprintln
 
-@testset "\e34mStyle" begin
+@testset "\e[34mStyle\e[0m" begin
     @test apply_style("test") == "test"
 
     @test apply_style("[red]test[/red]") == "\e[31mtest\e[39m"
@@ -18,7 +18,7 @@ import Term: tprint, tprintln
 end
 
 
-@testset "\e34mTprint" begin
+@testset "\e[34mTprint\e[0m" begin
     stprint(x) = chomp(sprint(tprint, x; context=stdout))
     stprintln(x) = chomp(sprint(tprintln, x; context=stdout))
 
