@@ -4,7 +4,7 @@ using Dates
 import Parameters: @with_kw
 import UUIDs: UUID
 
-import Term: int, textlen, truncate, loop_last
+import Term: int, textlen, truncate, loop_last, get_file_format
 import ..Tprint: tprint, tprintln
 import ..style: apply_style
 import ..console: console_width,
@@ -160,7 +160,8 @@ Update a job's progress `i` by setting its value or adding `+1`.
 """
 function update!(job::ProgressJob; i = nothing)
     (!isnothing(job.N) && job.i >= job.N) && return stop!(job)
-    job.i = isnothing(i) ? job.i + 1 : i
+
+    job.i = isnothing(i) ? job.i + 1 : job.i + i
     nothing
 end
 

@@ -112,6 +112,28 @@ function update!(col::PercentageColumn, args...)::String
     return "\e[2m"*p*"%\e[0m"
 end
 
+# ----------------------------- downloaded column ---------------------------- #
+struct DownloadedColumn <: AbstractColumn
+    job::ProgressJob
+    segments::Vector{Segment}
+    measure::Measure
+    tot_size::String
+
+    function DownloadedColumn(job::ProgressJob)
+        tot_size = get_file_format(job.N)
+        seg = Segment(" "^(length(tot_size)*2+1))
+        return new(job, [seg], seg.measure, tot_size)
+    end
+    
+end
+
+function update!(col::DownloadedColumn, args...)::String
+    isnothing(col.job.N) && return ""
+    completed = get_file_format(col.job.i)
+
+    return lpad(completed * "/" * col.tot_size, col.measure.w)
+end
+
 
 # ---------------------------------------------------------------------------- #
 #                                TIMING COLUMNS                                #

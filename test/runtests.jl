@@ -1,12 +1,14 @@
 using Term
 using Test
 using Suppressor
+import Term: console_width
 
 include("__test_utils.jl")
 
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
+dotest = console_width() >= 88
 
 # ? 0  - misc
 tprint("[bold green]Running: '00_misc.jl' [/bold green]")

@@ -48,3 +48,20 @@ function expr2string(e::Expr)::String
     string(e), 
     '\n'=>"", ' '=>"", r"#=.*=#"=>"", "begin"=>"", "end"=>"")
 end
+
+
+"""
+  get_file_format(nbytes; suffix="B")
+
+Return a string with formatted file size.
+"""
+function get_file_format(nbytes; suffix="B")
+  for unit in ["", "K", "M", "G", "T", "P", "E", "Z", "Y"]
+      if nbytes < 1024.0
+          _nd = round(nbytes; digits=2)
+          return string(_nd) * " $unit$suffix"
+      end
+      nbytes = nbytes / 1024.0
+  end
+  return "cacca"
+end

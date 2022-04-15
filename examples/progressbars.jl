@@ -190,3 +190,29 @@ with(pbar) do
     end
 end
 
+
+
+"""
+This is an example of how to use a progress bar to show file
+downloading/loading progress.
+"""
+
+import Term.progress: SeparatorColumn, ProgressColumn, DescriptionColumn, DownloadedColumn
+
+
+FILESIZE = 2342341
+CHUNK = 2048
+nsteps = Int64(ceil(FILESIZE / CHUNK))
+@info nsteps
+
+mycols = [DescriptionColumn, SeparatorColumn, ProgressColumn, DownloadedColumn]
+
+pbar = ProgressBar(; columns=mycols,  width=140)
+job = addjob!(pbar; N=FILESIZE)
+
+with(pbar) do 
+    for i in 1:nsteps
+        update!(job; i=CHUNK)
+        sleep(0.001)
+    end
+end

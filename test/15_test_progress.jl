@@ -20,7 +20,7 @@ using ProgressLogging
     update!(j1)
     @test j1.i == 2
     update!(j1; i=10)
-    @test j1.i == 10
+    @test j1.i == 12
 
     @test getjob(pbar, j1.id).id == j1.id
 

@@ -4,7 +4,7 @@ import Term.console: console_width
 println("\nTesting logging, stdout temporarily disabled")
 # @suppress_out begin
 @testset "\e[34mINSPECT test" begin
-    dotest = console_width() >= 88
+    
 
     # define some types
     abstract type T1 end
