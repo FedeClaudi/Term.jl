@@ -87,19 +87,20 @@ circles = make_julia_circles()  # 42 x 17
 
 _code_style = "yellow italic bold"
 
-bfc = rainbow_maker(8)
+bfc = rainbow_maker(9)
 basic_features = Panel("""
     [bright_red bold underline]Features[/bright_red bold underline]
 
-[$(bfc[1])]✔[/$(bfc[1])] [blue]Colored text[/blue]
-[$(bfc[2])]✔[/$(bfc[2])] [italic]italic[/italic], [bold]bold[/bold], [underline]underline[/underline], [striked]striked[/striked], [inverse]inverse[/inverse]
-[$(bfc[3])]✔[/$(bfc[3])] styling [$_code_style]@macros[/$_code_style]
-[$(bfc[4])]✔[/$(bfc[4])] [italic white]markup[/italic white] style syntax
-[$(bfc[5])]✔[/$(bfc[5])] progress bars
-[$(bfc[6])]✔[/$(bfc[6])] [$_code_style]`Expr`[/$_code_style] and [$_code_style]`Type`[/$_code_style] introspection
-[$(bfc[7])]✔[/$(bfc[7])] logging
-[$(bfc[8])]✔[/$(bfc[8])] stacktraces
-"""; width=70, padding=(2, 2, 2, 2), justify=:center, style="default blue dim",
+[bold $(bfc[1])]✔[/bold $(bfc[1])][white] [blue]Colored text[/blue][/white]
+[bold $(bfc[2])]✔[/bold $(bfc[2])][white] [italic]italic[/italic], [bold]bold[/bold], [underline]underline[/underline], [striked]striked[/striked], [inverse]inverse[/inverse][/white]
+[bold $(bfc[3])]✔[/bold $(bfc[3])][white] styling [$_code_style]@macros[/$_code_style][/white]
+[bold $(bfc[4])]✔[/bold $(bfc[4])][white] [italic white]markup[/italic white] style syntax[/white]
+[bold $(bfc[5])]✔[/bold $(bfc[5])][white] progress bars[/white]
+[bold $(bfc[6])]✔[/bold $(bfc[6])][white] [$_code_style]`Expr`[/$_code_style] and [$_code_style]`Type`[/$_code_style] introspection[/white]
+[bold $(bfc[7])]✔[/bold $(bfc[7])][white] logging[/white]
+[bold $(bfc[8])]✔[/bold $(bfc[8])][white] stacktraces[/white]
+[bold $(bfc[9])]✔[/bold $(bfc[9])][white] syntax highlighting[/white]
+"""; width=70, padding=(2, 2, 1, 2), justify=:center, style="default blue dim",
 title="Term.jl", title_style="bright_blue bold", 
 subtitle="https://github.com/FedeClaudi/Term.jl", subtitle_style="default dim", subtitle_justify=:right
 )
@@ -124,7 +125,7 @@ lorem_description = TextBox(
 [bright_yellow bold]✔[/bright_yellow bold] Asian languages support
 """; width=28, padding=(0, 0, 0, 0))
 lorem1 = TextBox(_lorem; width=62, padding=(0, 0, 0, 0))
-lorem2 = TextBox(_lorem; width=44, padding=(0, 0, 0, 0))
+lorem2 = TextBox(_lorem; width=42, padding=(0, 0, 0, 0))
 
 
 expr = :(2x + 2π/θ)
@@ -141,13 +142,17 @@ renderables_info = TextBox(
 
 
 [bold bright_cyan]Renderables layout[/bold bright_cyan]
-[bold bright_cyan]✔[/bold bright_cyan] Horizontal stacking ([bold red]*[/bold red])
-[bold bright_cyan]✔[/bold bright_cyan] Vertical stacking ([bold red]/[/bold red])
+[bold bright_cyan]✔[/bold bright_cyan] Horizontal stacking
+[bold bright_cyan]✔[/bold bright_cyan] Vertical stacking
+[bold bright_cyan]✔[/bold bright_cyan] Shorthand syntax: [bold bright_red]* /[/bold bright_red]
 
 """; width=28, padding=(0, 0, 0, 0)
 )
 
 line = hLine(140; style="bold dim grey35", box=:HEAVY)
+
+
+
 # ----------------------------------- print ---------------------------------- #
 # width is 140
 print("\n"^3)
@@ -161,3 +166,4 @@ line /
 (Spacer(3, tree.measure.h) * renderables_info * tree * Spacer(5, tree.measure.h) * dendo)
 
 print(Spacer(10, readme.measure.h) * readme)
+
