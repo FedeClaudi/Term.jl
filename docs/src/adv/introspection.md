@@ -1,7 +1,7 @@
 # Introspection
 
 ## Inspect
-If you often use the (awesome) Julia REPL, you'll be familiar witht he fact that you can type `?` to enter the docs section. Then typing a name (e.g., of a `Type` or `function`) will bring up the relevant docs.
+If you often use the (awesome) Julia REPL, you'll be familiar with the fact that you can type `?` to enter the docs section. Then typing a name (e.g., of a `Type` or `function`) will bring up the relevant docs.
 E.g. you might get something like this:
 
 ```
