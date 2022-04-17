@@ -580,13 +580,13 @@ macro track(ex)
     i = esc(ex.args[1].args[1])
     body = esc(ex.args[2])
     quote
+        __pbar = ProgressBar()
         try
-            __pbar = ProgressBar()
             start!(__pbar)
             __pbarjob = addjob!(__pbar; N=length($iter))
             for $i in $iter
-                update!(__pbarjob) 
                 $body
+                update!(__pbarjob) 
             end
             update!(__pbarjob)
             render(__pbar)

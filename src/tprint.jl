@@ -14,7 +14,7 @@ styling functionality
 """
 function tprint end
 tprint(x) = tprint(stdout, x)
-tprint(io::IO, x) = tprint(io, x)
+tprint(io::IO, x) = tprint(io, string(x))
 tprint(io::IO, ::MIME"text/html", x) = tprint(io, x)
 
 """
@@ -61,12 +61,7 @@ Print highlighted as a DataType
 """
 tprint(io::IO, x::DataType) = tprint(io, highlight(string(x), :type))
 
-"""
-tprint(x)
 
-When no dedicated method is present, print the string representation
-"""
-tprint(io::IO, x) = tprint(io, string(x))
 
 function tprint(io::IO, args...)
     for (n, arg) in enumerate(args)
