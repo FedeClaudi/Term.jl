@@ -3,9 +3,9 @@
 [![Dev docs](https://img.shields.io/badge/docs-stable-blue.svg)](https://fedeclaudi.github.io/Term.jl/dev/)
 [![Term.jl Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/Term)](https://pkgs.genieframework.com?packages=Term)
 
-![](logo.png)
+![](readme.png)
 
-
+(To see how the content in the image above was created, check: README.jl)
 # Term
 
 ## Documentation & installation
