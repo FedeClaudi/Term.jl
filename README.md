@@ -13,6 +13,7 @@
 🖥️  [Documentation](https://fedeclaudi.github.io/Term.jl) 
 
 
+
 Install with:
 ```
 julia> ]  # enters the pkg interface
