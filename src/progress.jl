@@ -542,9 +542,12 @@ end
 ```
 """
 function with(expr, pbar::ProgressBar)
+    val = nothing
     try
         start!(pbar)
-        expr()
+        render(pbar)
+        val = expr()
+        @info val
         render(pbar)
     catch  err
         stop!(pbar)
@@ -552,7 +555,7 @@ function with(expr, pbar::ProgressBar)
         quit()
     end
     stop!(pbar)
-    return nothing
+    return val
 end
 
 # ---------------------------------------------------------------------------- #

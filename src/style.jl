@@ -71,7 +71,7 @@ function MarkupStyle(markup)
         elseif is_background(code)
             style.background = get_color(code; bg = true)
         elseif code != "nothing"
-            @debug "Code type not recognized: $code" tag tag.markup typeof(code)
+            @debug "Code type not recognized: $code"
         end
     end
     return style
