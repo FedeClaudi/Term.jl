@@ -547,7 +547,6 @@ function with(expr, pbar::ProgressBar)
         start!(pbar)
         render(pbar)
         val = expr()
-        @info val
         render(pbar)
     catch  err
         stop!(pbar)
@@ -584,23 +583,13 @@ macro track(ex)
     body = esc(ex.args[2])
     quote
         __pbar = ProgressBar()
-        try
-            start!(__pbar)
-            __pbarjob = addjob!(__pbar; N=length($iter))
+        __pbarjob = addjob!(__pbar; N=length($iter))
+        with(__pbar) do
             for $i in $iter
+                update!(__pbarjob)
                 $body
-                update!(__pbarjob) 
             end
-            update!(__pbarjob)
-            render(__pbar)
-            stop!(__pbar)
-
-        catch  err
-            stop!(__pbar)
-            rethrow()
-            quit()
         end
-        nothing
     end
 end
 

@@ -70,6 +70,7 @@ TermLogger(io::IO, theme::Theme) = TermLogger(
 
 # set logger beavior
 Logging.min_enabled_level(logger::TermLogger) = Logging.Info
+
 function Logging.shouldlog(logger::TermLogger, level, _module, group, id)
     return true
 end
