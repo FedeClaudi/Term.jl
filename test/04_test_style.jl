@@ -15,6 +15,9 @@ import Term: tprint, tprintln
     fdsf[/red] [bold] sfsdfp[green] sdfsdp[/green]sdsdfs
     pdfsdp[/bold]""") ==  "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[32m sdfsdp\e[39m\e[1msdsdfs\npdfsdp\e[22m\e[39m"
 
+
+    # check that parentheses are escaped correctly
+    @test apply_style("This and that [[something]] for") == "This and that [[something]] for"
 end
 
 
@@ -40,5 +43,6 @@ end
     fdsf[/red] [bold] sfsdfp[green] sdfsdp[/green]sdsdfs
     pdfsdp[/bold]""") == "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[32m sdfsdp\e[39m\e[1msdsdfs\npdfsdp\e[22m\e[39m"
 
+    @test stprint("This and that [[something]] for") == "This and that [something] for"
 
 end
