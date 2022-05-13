@@ -68,7 +68,7 @@ with(pbar) do
 end
 ```
 
-!!!info `println` vs `print`
+!!! info "`println` vs `print`"
     You'll notice we've used `println` in the example above. Currently, using `print` will break the layout and the text won't be printed correctly. Please use `println` while using `ProgressBar`!
 
 `with` takes care of it all. It starts the progress bar and stops it too! No matter what happens in the code inside the `do` block, `with` will stop the progress bar so we can use it with no fear. It also removes the need to explicitly call `start!/stop!`, which helps. We recomend that you always use `with`. 
