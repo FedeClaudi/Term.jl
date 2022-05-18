@@ -195,6 +195,8 @@ function get_title_row(
     boxline = getfield(box, row)
 
     open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
+    
+    topen, tclose = "", open
     if !isnothing(title_style)
         if style == "hidden"
             topen =  "\e[28m"* topen
@@ -202,8 +204,6 @@ function get_title_row(
         else
             topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]" * open
         end
-    else
-        topen, tclose = "", open
     end
     title = space * topen * title * tclose * space
     if justify == :left

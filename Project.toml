@@ -1,7 +1,7 @@
 name = "Term"
 uuid = "22787eb5-b846-44ae-b979-8e399b8463ab"
 authors = ["FedeClaudi <federicoclaudi@protonmail.com> and contributors"]
-version = "0.3.1"
+version = "0.3.2"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
@@ -12,7 +12,6 @@ MyterialColors = "1c23619d-4212-4747-83aa-717207fae70f"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 ProgressLogging = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
-TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]

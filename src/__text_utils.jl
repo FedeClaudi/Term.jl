@@ -390,7 +390,7 @@ function reshape_text(text, width::Int)
         # @warn "processing cut $n: $cut"
 
         for i in 1:4
-            if spaces[cut-i] == true
+            if spaces[max(1, cut-i)] == true
                 # get width of text excluded by new cut position
                 if n < ncuts
                     # adjust cuts poisitions
