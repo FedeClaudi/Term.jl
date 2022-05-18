@@ -336,6 +336,7 @@ end
 
 function update!(col::SpinnerColumn, args...)::String
     col.job.started || return " "^(col.measure.w)
+    col.job.finished && return "[green bold]✔[/green bold]"
 
     t = (now() - col.job.startime).value
 

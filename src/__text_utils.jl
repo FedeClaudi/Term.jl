@@ -319,9 +319,11 @@ Shorten a string of text to a target width
 """
 function truncate(text::AbstractString, width::Int)
     width < 0 && return text
-    # textlen(text) <= width && return text
-    Measure(text).w <= width && return text
-    return text[1:prevind(text, width - 2)] * "..."
+    # # textlen(text) <= width && return text
+    # Measure(text).w <= width && return text
+    # return text[1:prevind(text, width - 2)] * "..."
+    trunc = reshape_text(text, width-3)
+    return split_lines(trunc)[1] * "..."
 end
 
 # ---------------------------------------------------------------------------- #

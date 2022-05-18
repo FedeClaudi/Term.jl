@@ -157,6 +157,19 @@ end
 end
 
 
+@testset "PANEL - centered title style" begin
+    @test string(Panel(; title="test", title_justify=:left, title_style="italic red")) == "\e[22m╭──── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────────────────────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
+    @test string(Panel(; title="test", title_justify=:center, title_style="italic red")) == "\e[22m╭────────────────────────────────────────\e[22m \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────────────────╮\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
+    @test string(Panel(; title="test", title_justify=:right, title_style="italic red")) == "\e[22m╭───────────────────────────────────────────────────────────────────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ───╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
+
+    @test string(Panel(; title="test", title_justify=:left)) == "\e[22m╭──── test\e[22m ────────────────────────────────────────────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
+    @test string(Panel(; title="test", title_justify=:center)) == "\e[22m╭────────────────────────────────────────\e[22m test\e[22m ────────────────────────────────────────╮\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
+    @test string(Panel(; title="test", title_justify=:right)) == "\e[22m╭───────────────────────────────────────────────────────────────────────────── test\e[22m ───╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
+
+    p = Panel(; title="test", title_justify=:left, subtitle="aaaaa", subtitle_justify=:right, width=22)
+    @test string(p) == "\e[22m╭──── test\e[22m ──────────╮\e[22m\e[0m\e[22m\n\e[22m╰────────── aaaaa\e[22m ───╯\e[22m\e[0m\e[22m"
+end
+
 @testset "PANEL - compare to string" begin
     pts = """
 Lorem[red] ipsum dolor s[/red]it amet, consectetur adipiscing elit,

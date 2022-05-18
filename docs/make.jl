@@ -35,6 +35,7 @@ makedocs(;
         ],
         "Advanced" => Any[
             "adv/adv.md",    
+            "adv/repr.md",    
             "adv/progressbars.md",
             "adv/logging.md",
             "adv/errors_tracebacks.md",

@@ -196,13 +196,14 @@ function get_title_row(
 
     open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
     if !isnothing(title_style)
-        topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]" * open
         if style == "hidden"
             topen =  "\e[28m"* topen
             tclose = tclose * "\e[8m"
+        else
+            topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]" * open
         end
     else
-        topen, tclose = "", ""
+        topen, tclose = "", open
     end
     title = space * topen * title * tclose * space
     if justify == :left

@@ -6,18 +6,14 @@ version = "0.3.1"
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Highlights = "eafb193a-b7ab-5a9e-9068-77385905fa72"
-ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
-ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 MyterialColors = "1c23619d-4212-4747-83aa-717207fae70f"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 ProgressLogging = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
-Sixel = "45858cf5-a6b0-47a3-bbea-62219f50df47"
 TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
-UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [compat]
 Highlights = "0.5"

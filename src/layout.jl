@@ -13,6 +13,8 @@ import ..console: console_width, console_height
 
 export Padding, vstack, hstack, pad
 export Spacer, vLine, hLine
+export ⊏, ⊐, ⊔
+export leftalign, center, rightalign
 
 # ---------------------------------------------------------------------------- #
 #                                    PADDING                                   #
@@ -67,6 +69,144 @@ function pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segme
         segments
     )
 end
+
+function pad(ren::AbstractRenderable, left::Int=0, right::Int=0)::Renderable
+    l = Spacer(left, ren.measure.h)
+    r = Spacer(right, ren.measure.h)
+
+    return l * ren * r
+end
+
+function pad(ren::AbstractRenderable, width::Int)::Renderable
+    npads = width - ren.measure.w
+    nl, nr = get_lr_widths(npads)
+    return pad(ren, nl, nr)
+end
+
+
+# ---------------------------------------------------------------------------- #
+#                                    JUSTIFY                                   #
+# ---------------------------------------------------------------------------- #
+"""
+    leftalign(r1::RenderablesUnion, r2::RenderablesUnion)
+
+Pad two renderables so that they have the same width and they
+are left-aligned.
+
+NOTE: the renderables returned  have different type and potentially different size
+    from the inputs
+
+# Examples
+```julia
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+p1, p2 = leftalign(p1, p2)
+print(p1/p2)
+
+
+╭───────────────────────╮                         
+╰───────────────────────╯                         
+╭────────────────────────────────────────────────╮
+╰────────────────────────────────────────────────╯
+```
+"""
+function leftalign(r1::RenderablesUnion, r2::RenderablesUnion)
+    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
+    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
+    
+    width = max(r1.measure.w, r2.measure.w)
+  
+    r1 = pad(r1, 0, width - r1.measure.w)
+    r2 = pad(r2, 0, width - r2.measure.w)
+  
+    return r1, r2
+  end
+  
+  
+"""
+    center(r1::RenderablesUnion, r2::RenderablesUnion)
+
+Pad two renderables so that they have the same width and they
+are centered.
+
+NOTE: the renderables returned  have different type and potentially different size
+    from the inputs
+
+# Examples
+```julia
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+p1, p2 = center(p1, p2)
+print(p1/p2)
+
+             ╭───────────────────────╮             
+             ╰───────────────────────╯             
+╭────────────────────────────────────────────────╮
+╰────────────────────────────────────────────────╯
+```
+"""
+function center(r1::RenderablesUnion, r2::RenderablesUnion)
+    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
+    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
+
+    width = max(r1.measure.w, r2.measure.w)
+
+    r1 = pad(r1, width)
+    r2 = pad(r2, width)
+
+    return r1, r2
+end
+
+"""
+    rightalign(r1::RenderablesUnion, r2::RenderablesUnion)
+
+Pad two renderables so that they have the same width and they
+are right aligned.
+
+NOTE: the renderables returned  have different type and potentially different size
+    from the inputs
+
+# Examples
+```julia
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+p1, p2 = rightalign(p1, p2)
+print(p1/p2)
+
+                         ╭───────────────────────╮
+                         ╰───────────────────────╯
+╭────────────────────────────────────────────────╮
+╰────────────────────────────────────────────────╯
+```
+"""
+function rightalign(r1::RenderablesUnion, r2::RenderablesUnion)
+    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
+    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
+
+    width = max(r1.measure.w, r2.measure.w)
+
+    r1 = pad(r1, width - r1.measure.w, 0)
+    r2 = pad(r2, width - r2.measure.w, 0)
+
+    return r1, r2
+end
+
+
+# --------------------------------- operators -------------------------------- #
+"""
+⊏ (sqsubset) -  alias for leftalignt
+"""
+⊏(r1::RenderablesUnion, r2::RenderablesUnion) = leftalign(r1, r2)
+
+"""
+⊐ (sqsupset) -  alias for rightalign
+"""
+⊐(r1::RenderablesUnion, r2::RenderablesUnion) = rightalign(r1, r2)
+
+"""
+⊔ (sqcup) - alias for center
+"""
+⊔(r1::RenderablesUnion, r2::RenderablesUnion) = center(r1, r2)
 
 # ---------------------------------------------------------------------------- #
 #                                   STACKING                                   #
@@ -175,8 +315,10 @@ end
 """
 
 Base.:/(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(r1, r2)
+Base.:/(rr::Tuple{RenderablesUnion, RenderablesUnion}) = vstack(rr...)
 
-Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
+
+Base.:*(r1::RenderablesUnion, r2::RenderablesUnion) = hstack(r1, r2)
 Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
 
@@ -224,7 +366,7 @@ Create a `vLine` given a height and, optionally, style information.
 function vLine(
     height::Int; style::String = "default", box::Symbol = :ROUNDED
 )   
-    line = apply_style("["*style*"]" * eval(box).head.left * "[/"*style*"]")
+    line = apply_style("["*style*"]" * eval(box).head.left * "[/"*style*"]\e[0m")
     segments = repeat([Segment(line)], height)
     return vLine(segments, Measure(1, height))
 end
@@ -285,8 +427,8 @@ function hLine(
     lw, rw = get_lr_widths(width)
 
     open, close, space =  "[" * style * "]",  "[/" * style * "]\e[0m", " "
-    line = open * get_lrow(box, lw-tl, :top; with_left=false) * 
-                space * text * space * open *  get_rrow(box, rw-tr, :top; with_right=false) * close
+    line = open * get_lrow(box, lw-tl, :top; with_left=false) *
+                space * text * space * get_rrow(box, rw-tr, :top; with_right=false) * close
 
     return hLine([Segment(line, style)], Measure(width, 1))
 end
