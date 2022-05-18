@@ -194,7 +194,7 @@ end
 
 # --------------------------------- operators -------------------------------- #
 """
-⊏ (sqsubset) -  alias for leftalignt
+⊏ (sqsubset) -  alias for leftalign
 """
 ⊏(r1::RenderablesUnion, r2::RenderablesUnion) = leftalign(r1, r2)
 
@@ -318,7 +318,7 @@ Base.:/(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(r1, r2)
 Base.:/(rr::Tuple{RenderablesUnion, RenderablesUnion}) = vstack(rr...)
 
 
-Base.:*(r1::RenderablesUnion, r2::RenderablesUnion) = hstack(r1, r2)
+Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
 

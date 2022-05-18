@@ -102,6 +102,47 @@ println("/ stacked measure: ", v.measure)
 This is important, because often you want to know a `Renderable`'s size when creating a layout, as we'll see next.
 
 
+## Justify
+When dealing with renderables width different widths, you can "justify" them: create renderables with the same width and with the content aligned to the left or right or to the center. 
+It's easiest to see what we're talking about with an example:
+
+
+```@example justify
+using Term # hide
+
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+print(p1/p2)
+```
+
+They have different widths, no good. Let's say we want to justify towards the right (e.g., as you would do in Powerpoint), no problem:
+```@example justify
+p1_right, p2_right = rightalign(p1, p2)
+print(p1_right/p2_right)
+```
+
+Nice! And of course we can center them too (or `leftalign`, but that's the same as just stacking them in this case):
+
+```@example justify
+p1_center, p2_center = center(p1, p2)
+print(p1_center/p2_center)
+```
+
+Woop. Combining `vstack` with our justificatino methods gives you more control over the layout you want to produce. Similarly to the stacking function, there's "shorthand" notation functions for this too:
+* ⊏ (\sqsubset) -  alias for leftalign
+* ⊐ (\sqsupset) -  alias for rightalign
+* ⊔ (\sqcup) - alias for center
+
+And you can use Julia's pipe operator to combine the two:
+```@example justify
+print(
+    ⊐(p1,  p2) |> /
+  )
+```
+
+Pretty nifty huh?
+
+
 ## Spacer
 Okay, we can stack two `Panel`s side by side. It looks like this:
 
