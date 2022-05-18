@@ -51,10 +51,8 @@ function Base.show(io::IO, seg::Segment)
         print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
     else
         print(io, unescape_brackets(seg.text))
-
     end
 end
-
 
 
 # ---------------------------------------------------------------------------- #
