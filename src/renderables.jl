@@ -28,16 +28,21 @@ function Base.string(r::AbstractRenderable)::String
     return join(lines, "\n")
 end
 
+
+"""print renderable"""
 function Base.show(io::IO, renderable::AbstractRenderable)
-    if io isa IOContext{Base.TTY}
-        print(
-            io,
-            "$(typeof(renderable)) <: AbstractRenderable \e[2msize: $(renderable.measure)\e[0m"
-        )
-    else
-        map(s -> println(io, s), renderable.segments)
-    end
+    print(io, string(renderable))
 end
+
+
+"""print concise info in repl"""
+function Base.show(io::IO, mime::MIME"text/plain", renderable::AbstractRenderable)
+    print(
+        io,
+        "$(typeof(renderable)) <: AbstractRenderable \e[2msize: $(renderable.measure)\e[0m"
+    )
+end
+
 
 # ------------------------- generic renderable object ------------------------ #
 

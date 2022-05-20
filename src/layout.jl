@@ -13,7 +13,7 @@ import ..console: console_width, console_height
 
 export Padding, vstack, hstack, pad
 export Spacer, vLine, hLine
-export ⊏, ⊐, ⊔
+export ⊏, ⊐, ⊔, ←, ↓, →
 export leftalign, center, rightalign
 
 # ---------------------------------------------------------------------------- #
@@ -59,7 +59,7 @@ end
 
 Pad a string by a fixed ammount.
 """
-function pad(text, left::Int=0, right::Int=0)::String
+function pad(text::AbstractString, left::Int=0, right::Int=0)::String
     return " "^left * text * " "^right
 end
 
@@ -321,6 +321,31 @@ Base.:/(rr::Tuple{RenderablesUnion, RenderablesUnion}) = vstack(rr...)
 Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
+
+
+# ------------------------------ more operators ------------------------------ #
+"""
+    ←(r1::RenderablesUnion, r2::RenderablesUnion)
+
+(leftarrow) - left align and vertical stack.
+"""
+←(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(leftalign(r1, r2)...)
+
+"""
+    →(r1::RenderablesUnion, r2::RenderablesUnion)
+
+(rightarrow) - right align and vertical stack.
+"""
+→(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(rightalign(r1, r2)...)
+
+"""
+    ↓(r1::RenderablesUnion, r2::RenderablesUnion)
+
+(downarrow) - center align and vertical stack.
+"""
+↓(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(center(r1, r2)...)
+
+
 
 # ---------------------------------------------------------------------------- #
 #                                LINES & SPACER                                #

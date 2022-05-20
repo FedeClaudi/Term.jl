@@ -45,13 +45,14 @@ Segment(seg::Segment) = seg
 
 
 # --------------------------------- printing --------------------------------- #
-"""print styled in stdout, info otherwise"""
+"""print styled in stdout"""
 function Base.show(io::IO, seg::Segment)
-    if io isa IOContext{Base.TTY}
-        print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
-    else
-        print(io, unescape_brackets(seg.text))
-    end
+    print(io, unescape_brackets(seg.text))
+end
+
+"""print concise info in repl"""
+function Base.show(io::IO, ::MIME"text/plain",  seg::Segment)
+    print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
 end
 
 

@@ -42,7 +42,7 @@ export install_term_logger, uninstall_term_logger
 export track
 export Tree
 export Dendogram
-export ⊏, ⊐, ⊔, leftalign, center, rightalign
+export ⊏, ⊐, ⊔, leftalign, center, rightalign, ←, ↓, →
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -82,7 +82,7 @@ using .console: console_height, console_width
 
 using .renderables: AbstractRenderable, Renderable, RenderableText
 
-using .layout: Padding, vstack, hstack, Spacer, vLine, hLine, pad,  ⊏, ⊐, ⊔, leftalign, center, rightalign
+using .layout: Padding, vstack, hstack, Spacer, vLine, hLine, pad,  ⊏, ⊐, ⊔, leftalign, center, rightalign, ←, ↓, →
 
 using .panel: Panel, TextBox
 
