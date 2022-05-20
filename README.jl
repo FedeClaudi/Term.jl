@@ -141,16 +141,38 @@ renderables_info = TextBox(
 [bold bright_blue]✔[/bold bright_blue] Dendogram
 
 
-[bold bright_cyan]Renderables layout[/bold bright_cyan]
-[bold bright_cyan]✔[/bold bright_cyan] Horizontal stacking
-[bold bright_cyan]✔[/bold bright_cyan] Vertical stacking
-[bold bright_cyan]✔[/bold bright_cyan] Shorthand syntax: [bold bright_red]* /[/bold bright_red]
-
 """; width=28, padding=(0, 0, 0, 0)
 )
 
 line = hLine(140; style="bold dim grey35", box=:HEAVY)
 
+
+
+layout_text = TextBox(
+"""[bold bright_cyan]Renderables layout[/bold bright_cyan]
+[bold bright_cyan]✔[/bold bright_cyan] Horizontal stacking
+[bold bright_cyan]✔[/bold bright_cyan] Vertical stacking
+[bold bright_cyan]✔[/bold bright_cyan] Left justify
+[bold bright_cyan]✔[/bold bright_cyan] Center justify
+[bold bright_cyan]✔[/bold bright_cyan] Right justify
+[bold bright_cyan]✔[/bold bright_cyan] Shorthands: [bold bright_red]*,/[/bold bright_red], [white]←, ↓, →[/white]
+"""; width=28, padding=(0, 0, 0, 0)
+)
+
+p1 = Panel(; width=20, style="#80bbe8")
+p1b = Panel(; width=34, style="#80bbe8")
+p2 = Panel(; width=28, style="#5692bf")
+p3 = Panel(; width=34, style="#316c99 bold")
+p3b = Panel(; width=20, style="#316c99 bold")
+_space = Spacer(3, layout_text.measure.h)
+
+layout_example = (
+    lvstack(p1, p2, p3) * _space * cvstack(p1b, p2, p3b) * _space * rvstack(p1, p2, p3))
+
+layout_example = cvstack(
+    "" / RenderableText("[bold #81bae6] Left/center/right justify and stack renderables to create layouts"),
+    layout_example
+)
 
 
 # ----------------------------------- print ---------------------------------- #
@@ -163,7 +185,11 @@ readme = (Spacer(10, circles.measure.h ) * circles * Spacer(8, circles.measure.h
 line /
 (Spacer(3, lorem_description.measure.h ) * lorem_description * lorem1 * lorem2 ) /
 line /
-(Spacer(3, tree.measure.h) * renderables_info * tree * Spacer(5, tree.measure.h) * dendo)
+(Spacer(3, tree.measure.h) * renderables_info * tree * Spacer(5, tree.measure.h) * dendo) / 
+line /
+(Spacer(3, layout_text.measure.h) * layout_text * layout_example) / 
+line /
+
 
 print(Spacer(10, readme.measure.h) * readme)
 

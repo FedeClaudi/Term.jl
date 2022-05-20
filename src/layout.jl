@@ -11,10 +11,12 @@ using ..box
 import ..box: get_lrow, get_rrow
 import ..console: console_width, console_height
 
-export Padding, vstack, hstack, pad
+export Padding, vstack, hstack, pad, pad!
 export Spacer, vLine, hLine
-export ⊏, ⊐, ⊔, ←, ↓, →
+export leftalign!, center!, rightalign!
 export leftalign, center, rightalign
+export lvstack, cvstack, rvstack
+export ←, ↓, →   
 
 # ---------------------------------------------------------------------------- #
 #                                    PADDING                                   #
@@ -57,12 +59,18 @@ end
 """
     pad(text::AbstractString, left::Int=0, right::Int=0)::String
 
-Pad a string by a fixed ammount.
+Pad a string by a fixed ammount to the left and to the right.
 """
 function pad(text::AbstractString, left::Int=0, right::Int=0)::String
     return " "^left * text * " "^right
 end
 
+
+"""
+    pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
+
+Pad a renderable's segments to the left and the right
+"""
 function pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
     return map(
         (s)->Segment(" "^left * s.text * " "^right),
@@ -70,17 +78,47 @@ function pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segme
     )
 end
 
-function pad(ren::AbstractRenderable, left::Int=0, right::Int=0)::Renderable
-    l = Spacer(left, ren.measure.h)
-    r = Spacer(right, ren.measure.h)
+"""
+    pad(ren::AbstractRenderable, left::Int, right::Int)
 
-    return l * ren * r
+Pad a renderable.
+"""
+function pad(ren::AbstractRenderable, left::Int, right::Int)
+    segments = pad(ren.segments, left, right)
+    measure = Measure(segments)
+    return Renderable(segments, measure)
 end
 
-function pad(ren::AbstractRenderable, width::Int)::Renderable
+"""
+    pad(ren::AbstractRenderable; width::Int)
+
+Pad a renderable to achieve a target width
+"""
+function pad(ren::AbstractRenderable; width::Int)
     npads = width - ren.measure.w
     nl, nr = get_lr_widths(npads)
     return pad(ren, nl, nr)
+end
+
+"""
+    pad!(ren::AbstractRenderable, left::Int, right::Int)
+
+In place version for padding a renderable
+"""
+function pad!(ren::AbstractRenderable, left::Int, right::Int)
+    ren.segments = pad(ren.segments, left, right)
+    ren.measure = Measure(ren.segments)
+end
+
+"""
+    pad!(ren::AbstractRenderable; width::Int)
+
+In place version for padding a renderable to achieve a given width.
+"""
+function pad!(ren::AbstractRenderable; width::Int)
+    npads = width - ren.measure.w
+    nl, nr = get_lr_widths(npads)
+    return pad!(ren, nl, nr)
 end
 
 
@@ -88,9 +126,9 @@ end
 #                                    JUSTIFY                                   #
 # ---------------------------------------------------------------------------- #
 """
-    leftalign(r1::RenderablesUnion, r2::RenderablesUnion)
+    leftalign(renderables::RenderablesUnion...)
 
-Pad two renderables so that they have the same width and they
+Pad two (or more) renderables so that they have the same width and they
 are left-aligned.
 
 NOTE: the renderables returned  have different type and potentially different size
@@ -110,23 +148,48 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function leftalign(r1::RenderablesUnion, r2::RenderablesUnion)
-    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
-    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
-    
-    width = max(r1.measure.w, r2.measure.w)
-  
-    r1 = pad(r1, 0, width - r1.measure.w)
-    r2 = pad(r2, 0, width - r2.measure.w)
-  
-    return r1, r2
-  end
+function leftalign(renderables::RenderablesUnion... )
+    renderables = Renderable.(renderables)
+    width = max(map(r -> r.measure.w, renderables)...)
+    renderables = map(r->pad(r, 0, width - r.measure.w), renderables)
+    return renderables
+end
+
+
+"""
+    leftalign!(renderables::RenderablesUnion...)
+
+In place version of leftalign. 
+
+# Examples
+```julia
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+leftalign!(p1, p2)
+print(p1/p2)
+
+
+╭───────────────────────╮                         
+╰───────────────────────╯                         
+╭────────────────────────────────────────────────╮
+╰────────────────────────────────────────────────╯
+"""
+function leftalign!(renderables::RenderablesUnion... )
+    renderables = Renderable.(renderables)
+    width = max(map(r -> r.measure.w, renderables)...)
+    for ren in renderables
+        pad!(ren, 0, width - ren.measure.w)
+    end
+end
+
+
+
   
   
 """
-    center(r1::RenderablesUnion, r2::RenderablesUnion)
+    center(renderables::RenderablesUnion... )
 
-Pad two renderables so that they have the same width and they
+Pad two (or more) renderables so that they have the same width and they
 are centered.
 
 NOTE: the renderables returned  have different type and potentially different size
@@ -145,22 +208,47 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function center(r1::RenderablesUnion, r2::RenderablesUnion)
-    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
-    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
-
-    width = max(r1.measure.w, r2.measure.w)
-
-    r1 = pad(r1, width)
-    r2 = pad(r2, width)
-
-    return r1, r2
+function center(renderables::RenderablesUnion... )
+    renderables = Renderable.(renderables)
+    width = max(map(r -> r.measure.w, renderables)...)
+    renderables = map(r->pad(r;  width=width), renderables)
+    return renderables
 end
 
-"""
-    rightalign(r1::RenderablesUnion, r2::RenderablesUnion)
 
-Pad two renderables so that they have the same width and they
+"""
+    center!(renderables::RenderablesUnion... )
+
+In place version of `center`.
+
+
+# Examples
+```julia
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+center!(p1, p2)
+print(p1/p2)
+
+             ╭───────────────────────╮             
+             ╰───────────────────────╯             
+╭────────────────────────────────────────────────╮
+╰────────────────────────────────────────────────╯
+```
+"""
+function center!(renderables::RenderablesUnion... )
+    renderables = Renderable.(renderables)
+    width = max(map(r -> r.measure.w, renderables)...)
+    for ren in renderables
+        pad!(ren; width=width)
+    end
+end
+
+
+
+"""
+    rightalign(renderables::RenderablesUnion... )
+
+Pad two (or more) renderables so that they have the same width and they
 are right aligned.
 
 NOTE: the renderables returned  have different type and potentially different size
@@ -179,34 +267,41 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function rightalign(r1::RenderablesUnion, r2::RenderablesUnion)
-    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
-    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
-
-    width = max(r1.measure.w, r2.measure.w)
-
-    r1 = pad(r1, width - r1.measure.w, 0)
-    r2 = pad(r2, width - r2.measure.w, 0)
-
-    return r1, r2
+function rightalign(renderables::RenderablesUnion... )
+    renderables = Renderable.(renderables)
+    width = max(map(r -> r.measure.w, renderables)...)
+    renderables = map(r->pad(r, width - r.measure.w, 0), renderables)
+    return renderables
 end
 
 
-# --------------------------------- operators -------------------------------- #
 """
-⊏ (sqsubset) -  alias for leftalign
-"""
-⊏(r1::RenderablesUnion, r2::RenderablesUnion) = leftalign(r1, r2)
+    rightalign!(renderables::RenderablesUnion... )
 
-"""
-⊐ (sqsupset) -  alias for rightalign
-"""
-⊐(r1::RenderablesUnion, r2::RenderablesUnion) = rightalign(r1, r2)
+In place version of `rightalign`.
+# Examples
+```julia
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+rightalign!(p1, p2)
+print(p1/p2)
 
+                         ╭───────────────────────╮
+                         ╰───────────────────────╯
+╭────────────────────────────────────────────────╮
+╰────────────────────────────────────────────────╯
+```
 """
-⊔ (sqcup) - alias for center
-"""
-⊔(r1::RenderablesUnion, r2::RenderablesUnion) = center(r1, r2)
+function rightalign!(renderables::RenderablesUnion... )
+    renderables = Renderable.(renderables)
+    width = max(map(r -> r.measure.w, renderables)...)
+
+    for ren in renderables
+        pad!(ren, width - ren.measure.w, 0)
+    end
+end
+
+
 
 # ---------------------------------------------------------------------------- #
 #                                   STACKING                                   #
@@ -214,54 +309,20 @@ end
 
 vstack(s1::String, s2::String) = s1 * "\n" * s2
 
-"""
-    vstack(r1::RenderablesUnion, r2::RenderablesUnion)
-
-Vertically stack two renderables to give a new renderable.
-"""
-function vstack(r1::RenderablesUnion, r2::RenderablesUnion)
-    r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
-    r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
-
-    # get dimensions of final renderable
-    w1 = length(r1.segments) > 1 ? max([s.measure.w for s in r1.segments]...) : r1.measure.w
-    w2 = length(r2.segments) > 1 ? max([s.measure.w for s in r2.segments]...) : r2.measure.w
-    if w1 > w2
-        s1 = r1.segments
-
-        s2 = map(
-            (s)->Segment(s.text * " ".^(w1-s.measure.w)),
-            r2.segments
-        )
-    elseif w1 < w2
-        s1 = map(
-            (s)->Segment(s.text * " ".^(w2-s.measure.w)),
-            r1.segments
-        )
-        s2 = r2.segments
-    else
-        s1, s2 = r1.segments, r2.segments
-    end
-
-    # create segments stack
-    segments::Vector{Segment} = vcat(s1, s2)
-    measure = Measure(max(w1, w2), length(segments))
-    return Renderable(segments, measure)
-end
-
 """ 
     vstack(renderables...)
 
-Vertically stack a variable number of renderables
+Vertically stack a variable number of renderables to give a new renderable
 """
 function vstack(renderables...)
-    renderable = Renderable()
+    renderables = leftalign(renderables...)
 
-    for ren in renderables
-        renderable = vstack(renderable, ren)
-    end
-    return renderable
+    segments::Vector{Segment} = vcat(getfield.(renderables, :segments)...)
+    measure = Measure(segments)
+
+    return Renderable(segments, measure)
 end
+
 
 """
     hstack(r1::RenderablesUnion, r2::RenderablesUnion)
@@ -323,27 +384,41 @@ Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
 
 
-# ------------------------------ more operators ------------------------------ #
-"""
-    ←(r1::RenderablesUnion, r2::RenderablesUnion)
-
-(leftarrow) - left align and vertical stack.
-"""
-←(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(leftalign(r1, r2)...)
+# --------------------------- convenience functions -------------------------- #
 
 """
-    →(r1::RenderablesUnion, r2::RenderablesUnion)
+    lvstack(renderables::RenderablesUnion...)
 
-(rightarrow) - right align and vertical stack.
+Left align renderables and then vertically stack
 """
-→(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(rightalign(r1, r2)...)
+function lvstack(renderables::RenderablesUnion...)::Renderable
+    renderables = leftalign(renderables...)
+    return vstack(renderables...)
+end
 
 """
-    ↓(r1::RenderablesUnion, r2::RenderablesUnion)
+    lvstack(renderables::RenderablesUnion...)
 
-(downarrow) - center align and vertical stack.
+Center align renderables and then vertically stack
 """
-↓(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(center(r1, r2)...)
+function cvstack(renderables::RenderablesUnion...)::Renderable
+    renderables = center(renderables...)
+    return vstack(renderables...)
+end
+
+"""
+    lvstack(renderables::RenderablesUnion...)
+
+Right align renderables and then vertically stack
+"""
+function rvstack(renderables::RenderablesUnion...)::Renderable
+    renderables = rightalign(renderables...)
+    return vstack(renderables...)
+end
+
+← = lvstack
+↓ = cvstack
+→ = rvstack
 
 
 

@@ -334,7 +334,7 @@ function TextBox(
     subtitle_style::Union{String,Nothing} = "default",
     subtitle_justify::Symbol = :left,
     justify::Symbol = :left,
-    fit::Symbol = :nofit,
+    fit::Union{Bool, Symbol} = :nofit,
     padding::Union{Padding, NTuple} = Padding(2, 2, 0, 0),
 )
     padding = padding isa Padding ? padding : Padding(padding...)
@@ -343,9 +343,11 @@ function TextBox(
     text = apply_style(text)
 
     # fit text or get width
+    fit = fit == true ? :fit : (fit == false ? :nofit : fit)
+        
     if fit==:fit
         # the box's size depends on the text's size
-        width = Measure(text).w + Δw
+        width = Measure(text).w + Δw + 2
 
         # too large, fit to console
         if width > console_width(stdout)
@@ -360,8 +362,8 @@ function TextBox(
     if fit == :truncate
         # truncate the text to fit the given width
         text = do_by_line(ln -> truncate(ln, width - 7), apply_style(text))
-    else
-        text = reshape_text(text, width-Δw-2)
+    # else
+    #     text = reshape_text(text, width-Δw-2)
     end
     
     # create panel with text inside

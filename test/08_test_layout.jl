@@ -6,9 +6,19 @@ import Term.layout: pad
     @test pad("aaa", 20, :right) == "                 aaa"
     @test pad("aaa", 20, :center) == "        aaa         "
     @test pad("aaa", 10, 20) == "          aaa                    "
+    
+    
     p = Panel(; width=20, height=10)
-    padded = pad(p.segments, 10, 10)
-    @test padded[1].measure.w == 40
+    pad!(p, 20, 20)   
+    @test p isa Panel
+    @test p.width == 60
+    @test p.height == 10
+
+    p = Panel(; width=20, height=10)
+    pad!(p; width=30)
+    @test p isa Panel
+    @test p.width == 30
+    @test p.height == 10
 end
 
 @testset "\e[34mlayout - spacer" begin
@@ -22,26 +32,59 @@ end
 
 
 @testset  "\e[34mlayout - justification" begin
-    p1 = Panel(; width=25)
-    p2 = Panel(; width=50)
+    make_panels() = begin
+        return(
+            Panel(; width=5),
+            Panel(; width=10),
+            Panel(; width=15),
+        )
+    end
 
     # right justify
-    r = ⊐(p1,  p2) |> /
-    # r2 = vstack(rightalign(p1, p2)...)
-    # @test r == r2
-    @test string(r) == "                         \e[22m╭───────────────────────╮\e[22m\n                         \e[22m╰───────────────────────╯\e[22m\n\e[22m╭────────────────────────────────────────────────╮\e[22m\n\e[22m╰────────────────────────────────────────────────╯\e[22m"
+    p1, p2, p3 = make_panels()
 
-    # center
-    c = ⊔(p1,  p2) |> /
-    # c2 = vstack(center(p1, p2)...)
-    # @test c == c2
-    @test string(c) == "            \e[22m╭───────────────────────╮\e[22m             \n            \e[22m╰───────────────────────╯\e[22m             \n\e[22m╭────────────────────────────────────────────────╮\e[22m\n\e[22m╰────────────────────────────────────────────────╯\e[22m"
+    rightalign!(p1, p2, p3)
+    @test p1 isa Panel
+    @test p1.measure.w == p2.measure.w == p3.measure.w
 
-    # left justify
-    l = ⊏(p1,  p2) |> /
-    # l2 = vstack(leftalign(p1, p2)...)
-    # @test l == l2
-    @test string(l) == "\e[22m╭───────────────────────╮\e[22m                         \n\e[22m╰───────────────────────╯\e[22m                         \n\e[22m╭────────────────────────────────────────────────╮\e[22m\n\e[22m╰────────────────────────────────────────────────╯\e[22m"
+    # right justify
+    p1, p2, p3 = make_panels()
+
+    centeralign!(p1, p2, p3)
+    @test p1 isa Panel
+    @test p1.measure.w == p2.measure.w == p3.measure.w
+
+
+    # right justify
+    p1, p2, p3 = make_panels()
+    leftalign!(p1, p2, p3)
+    @test p1 isa Panel
+    @test p1.measure.w == p2.measure.w == p3.measure.w
+
+    # convenience functions
+    p1, p2, p3 = make_panels()
+    pp = lvstack(p1, p2, p3)
+    @test pp isa Renderable
+    @test pp.measure.w == 15
+    @test string(pp) == "\e[22m╭───╮\e[22m          \n\e[22m╰───╯\e[22m          \n\e[22m╭────────╮\e[22m     \n\e[22m╰────────╯\e[22m     \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m"
+    @test p1 isa Panel
+    @test p1.measure.w  == 5
+
+    p1, p2, p3 = make_panels()
+    pp = cvstack(p1, p2, p3)
+    @test pp isa Renderable
+    @test pp.measure.w == 15
+    @test string(pp) == "     \e[22m╭───╮\e[22m     \n     \e[22m╰───╯\e[22m     \n  \e[22m╭────────╮\e[22m   \n  \e[22m╰────────╯\e[22m   \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m"
+    @test p1 isa Panel
+    @test p1.measure.w  == 5
+
+    p1, p2, p3 = make_panels()
+    pp = rvstack(p1, p2, p3)
+    @test pp isa Renderable
+    @test pp.measure.w == 15
+    @test string(pp) == "          \e[22m╭───╮\e[22m\n          \e[22m╰───╯\e[22m\n     \e[22m╭────────╮\e[22m\n     \e[22m╰────────╯\e[22m\n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m"
+    @test p1 isa Panel
+    @test p1.measure.w  == 5
 end
 
 @testset "\e[34mlayout - vLine " begin

@@ -30,16 +30,28 @@ end
 
 
 """print renderable"""
-function Base.show(io::IO, renderable::AbstractRenderable)
+function Base.print(io::IO, renderable::AbstractRenderable)
     print(io, string(renderable))
+end
+
+
+function Base.show(io::IO, renderable::AbstractRenderable)
+    w, h = renderable.measure.w, renderable.measure.h
+    print(
+        io,
+        "\e[38;5;117m$(typeof(renderable)) <: AbstractRenderable\e[0m \e[2m(w:$(w), h:$(h))\e[0m"
+    )
 end
 
 
 """print concise info in repl"""
 function Base.show(io::IO, mime::MIME"text/plain", renderable::AbstractRenderable)
+    w, h = renderable.measure.w, renderable.measure.h
+    println(io, string(renderable))
+    # println("\e[2m"*"─"^w*"\e[0m")
     print(
         io,
-        "$(typeof(renderable)) <: AbstractRenderable \e[2msize: $(renderable.measure)\e[0m"
+        "\e[38;5;117m$(typeof(renderable)) <: AbstractRenderable\e[0m \e[2m(w:$(w), h:$(h))\e[0m"
     )
 end
 
@@ -52,7 +64,7 @@ end
 Generic `Renderable` object.
 """
 
-struct Renderable <: AbstractRenderable
+mutable struct Renderable <: AbstractRenderable
     segments::Vector{Segment}
     measure::Measure
 end
@@ -86,7 +98,7 @@ Renderable() = Renderable(Vector{Segment}[], Measure(0, 0))
 See also [`Renderable`](@ref), [`TextBox`](@ref)
 """
 
-struct RenderableText <: AbstractRenderable
+mutable struct RenderableText <: AbstractRenderable
     segments::Vector
     measure::Measure
     style::Union{Nothing, String}

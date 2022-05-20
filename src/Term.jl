@@ -31,7 +31,7 @@ include("logo.jl")
 include("inspect.jl")
 
 export RenderableText, Panel, TextBox
-export Spacer, vLine, hLine
+export Spacer, vLine, hLine, pad, pad!, vstack, hstack
 export theme, highlight
 export inspect, typestree, expressiontree
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
@@ -42,7 +42,7 @@ export install_term_logger, uninstall_term_logger
 export track
 export Tree
 export Dendogram
-export ⊏, ⊐, ⊔, leftalign, center, rightalign, ←, ↓, →
+export rightalign!, leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -82,7 +82,25 @@ using .console: console_height, console_width
 
 using .renderables: AbstractRenderable, Renderable, RenderableText
 
-using .layout: Padding, vstack, hstack, Spacer, vLine, hLine, pad,  ⊏, ⊐, ⊔, leftalign, center, rightalign, ←, ↓, →
+using .layout: Padding,
+            vstack,
+            hstack,
+            Spacer,
+            vLine,
+            hLine,
+            pad,
+            pad!,
+            rightalign!,
+            leftalign!,
+            center!,
+            leftalign,
+            center,
+            rightalign,
+            lvstack,
+            cvstack,
+            rvstack,
+            ←, ↓, → 
+
 
 using .panel: Panel, TextBox
 
