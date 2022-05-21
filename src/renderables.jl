@@ -4,7 +4,7 @@ import ..measure: Measure
 import ..segment: Segment
 import ..console: console_width
 import ..style: get_style_codes, MarkupStyle, apply_style
-import Term: split_lines, reshape_text, fillin, join_lines
+import Term: split_lines, reshape_text, fillin, join_lines, unescape_brackets_with_space
 
 export AbstractRenderable, Renderable, RenderableText
 
@@ -25,7 +25,7 @@ Creates a string representation of a renderable
 """
 function Base.string(r::AbstractRenderable)::String
     lines = [seg.text for seg in r.segments]
-    return join(lines, "\n")
+    return unescape_brackets_with_space(join(lines, "\n"))
 end
 
 
@@ -35,7 +35,7 @@ end
 Print a renderable to an IO
 """
 function Base.print(io::IO, renderable::AbstractRenderable)
-    print(io, string(renderable))
+    print(io, unescape_brackets_with_space(string(renderable)))
 end
 
 """
@@ -60,7 +60,7 @@ Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, mime::MIME"text/plain", renderable::AbstractRenderable)
     w, h = renderable.measure.w, renderable.measure.h
-    println(io, string(renderable))
+    println(io, unescape_brackets_with_space(string(renderable)))
     # println("\e[2m"*"─"^w*"\e[0m")
     print(
         io,
@@ -167,7 +167,6 @@ Construct a RenderableText out a vector of objects.
 function RenderableText(text::Vector; style::Union{Nothing, String}=nothing, width::Union{Nothing,Int} = nothing)
     return RenderableText(join(string(text), "\n"); style=style, width = width)
 end
-
 
 
 # -------------------------------- union type -------------------------------- #

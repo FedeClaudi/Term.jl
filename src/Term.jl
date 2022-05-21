@@ -29,7 +29,6 @@ include("tree.jl")
 include("dendogram.jl")
 include("logo.jl")
 include("inspect.jl")
-
 include("repr.jl")
 
 export RenderableText, Panel, TextBox

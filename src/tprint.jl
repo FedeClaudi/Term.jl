@@ -1,6 +1,6 @@
 module Tprint
 
-import Term: highlight, theme, unescape_brackets
+import Term: highlight, theme, unescape_brackets, escape_brackets
 import ..renderables: AbstractRenderable
 import ..style: apply_style
 import ..layout: hstack
@@ -14,7 +14,7 @@ styling functionality
 """
 function tprint end
 tprint(x) = tprint(stdout, x)
-tprint(io::IO, x) = tprint(io, string(x))
+tprint(io::IO, x) = tprint(io, escape_brackets(string(x)))
 tprint(io::IO, ::MIME"text/html", x) = tprint(io, x)
 
 """
