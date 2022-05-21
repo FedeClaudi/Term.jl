@@ -1,5 +1,5 @@
 # [TextBox](@id TBoxDoc)
-`TextBox`es are a very simple but very useful renderable. They bring together the functionality of `RenderableText` with that of `Panel`.
+`TextBox`es are a very simple but very useful renderable. They bring together the functionality of `RenderableText` with that of [`PanelDocs`](@ref).
 In fact you can think of  just a panel with a some text inside and with its box hidden. 
 Why do we need them, you say? Well because now you can have a piece of text, with a nice title and sub title.
 

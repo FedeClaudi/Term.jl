@@ -1,4 +1,5 @@
 import Term: RenderableText, Spacer, vLine, hLine, cleantext, textlen, chars, Panel, vstack
+import Term: center!, leftalign!, rightalign!, leftalign, center, rightalign, lvstack, cvstack, rvstack
 import Term.layout: pad
 
 @testset "Layout - pad" begin
@@ -11,14 +12,14 @@ import Term.layout: pad
     p = Panel(; width=20, height=10)
     pad!(p, 20, 20)   
     @test p isa Panel
-    @test p.width == 60
-    @test p.height == 10
+    @test p.measure.w == 60
+    @test p.measure.h == 10
 
     p = Panel(; width=20, height=10)
     pad!(p; width=30)
     @test p isa Panel
-    @test p.width == 30
-    @test p.height == 10
+    @test p.measure.w == 30
+    @test p.measure.h == 10
 end
 
 @testset "\e[34mlayout - spacer" begin
@@ -50,7 +51,7 @@ end
     # right justify
     p1, p2, p3 = make_panels()
 
-    centeralign!(p1, p2, p3)
+    center!(p1, p2, p3)
     @test p1 isa Panel
     @test p1.measure.w == p2.measure.w == p3.measure.w
 

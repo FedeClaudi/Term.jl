@@ -19,33 +19,38 @@ end
 obj = myType("Rocket", 10, 10, 99.9)
 ```
 
-as you can see the default way to represent your object in the console is not very exciting. So what you can do is define a `Base.show` method for your type and use Term to make it fancy!
+as you can see the default way to represent your object in the console is not very exciting. So what you can do is define a `Base.show` method for your type and use Term to make it fancy! 
 
-First, you'll probably want a way to create a string representation of your type (possibly with markdown styling, go crazy with it!)
 
-```@example repr
-""" get string representation """
-Base.string(obj::myType) = """
-[bold]height:[/bold] [bright_blue]$(obj.height)[/bright_blue]
-[bold]width:[/bold]  [bright_blue]$(obj.width)[/bright_blue]
-[bold]mass:[/bold]   [green]$(obj.mass)[/green]"""
-
-tprint(string(obj))
-```
-
-and then, you can use this string and create other stuff around it!
+For this example, we will have it so that showing `obj` in the REPR will create a  [`PanelDocs`](@ref) using `name` as the title and showing the other fields and values inside. 
 ```@example repr
 
-Base.show(io::IO, ::MIME"text/plain", obj::myType) =
-    print(io, string(
-        Panel(string(obj); 
+""" Custom show method """
+function Base.show(io::IO, ::MIME"text/plain", obj::myType)
+    # fields to be shown inside the panel
+    fields = (:height, :width, :mass)
+
+    # get fields and values as `RenderableText` objects
+    info = map(
+        f -> RenderableText(string(f); style="bold"), fields
+    )
+    vals = map(
+        f -> RenderableText(" "*string(getfield(obj, f)); style="bright_blue"), fields
+    )
+
+    # right justify and vertical stack info, left justify and stack values
+    obj_details = rvstack(info...) * vLine(3; style="dim") * lvstack(vals...)
+
+    # print the panel!
+    print(io, 
+        Panel(obj_details; 
         title=obj.name,
         style="red dim",
         title_style="default bright_red bold",
         fit=true, padding=(2, 2, 1, 1)
         )
     )
-)
+end
 
 obj
 ```

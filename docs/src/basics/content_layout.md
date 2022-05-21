@@ -115,29 +115,68 @@ p2 = Panel(; width=50)
 print(p1/p2)
 ```
 
-They have different widths, no good. Let's say we want to justify towards the right (e.g., as you would do in Powerpoint), no problem:
+What's happening is that the two panels have different sizes:
 ```@example justify
-p1_right, p2_right = rightalign(p1, p2)
-print(p1_right/p2_right)
+p1
 ```
 
-Nice! And of course we can center them too (or `leftalign`, but that's the same as just stacking them in this case):
-
 ```@example justify
-p1_center, p2_center = center(p1, p2)
-print(p1_center/p2_center)
+p2
 ```
 
-Woop. Combining `vstack` with our justificatino methods gives you more control over the layout you want to produce. Similarly to the stacking function, there's "shorthand" notation functions for this too:
-* ⊏ (\sqsubset) -  alias for leftalign
-* ⊐ (\sqsupset) -  alias for rightalign
-* ⊔ (\sqcup) - alias for center
-
-And you can use Julia's pipe operator to combine the two:
+And when they get stacked together they form a single `Renderable` object with the right size by padding the smaller renderable on the right:
 ```@example justify
-print(
-    ⊐(p1,  p2) |> /
-  )
+p1/p2
+```
+
+That's okay if we want our conent to be left-aligned, but if we want it to be center- or right- aligned we need to first justify our content and then stack:
+```@example justify
+center!(p1, p2)
+
+p1
+```
+As you can see, calling `center!` modified our panel so that it has the same width as `p2`. The crucial point is that when using `center!` the panel
+is padded on both the left and the right, look what happens when we stack the panels now:
+```@example justify
+p1/p2
+```
+
+Eureka!
+
+`Term` offers three "justification" functions: `leftalign!, center!, rightalign!` and their non-modifying counterparts: `leftalign, center, rightalign`.
+The difference is that `center!(p1, p2)` modifies the two panels directly, `center(p1, p2)` returns two new panels.
+
+Very frequently justification is done before stacking the panels. You could do:
+```@example justify
+using Term # hide
+
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+print(p1/p2)
+```
+
+but you can also use the convenience functions offered by Term:
+```@example justify3
+using Term # hide
+
+p1 = Panel(; width=25)
+p2 = Panel(; width=50)
+
+cvstack(p1, p2)
+```
+
+`lvstack`, `cvstack` and `rvstack` do left/center/right justification first and then vertically stack the panels. They use the non-modifying version of the
+justification functions so your original panels are not modified. Finally, you can also use `←, ↓, →` (using \leftarrow, \downarrow and \centerarrow) as shorthand for 
+l/c/r-stack functions:
+
+```@example justify3
+using Term # hide
+
+p1 = Panel(; width=5; style="green")
+p2 = Panel(; width=10; style="white")
+p2 = Panel(; width=15; style="red")
+
+→(p1, p2, p3)
 ```
 
 Pretty nifty huh?

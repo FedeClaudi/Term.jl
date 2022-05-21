@@ -310,27 +310,27 @@ end
                 "truncate"^8;
                 fit=:fit,
                 justify=justify
-            ), 68, 4)
+            ), 70, 3)
 
-        # testpanel(
-        #     TextBox(
-        #         "[red]truncate[/red]"^8;
-        #         fit=:fit,
-        #         justify=justify
-        #     ), 68, 4)
+        testpanel(
+            TextBox(
+            "[red]truncate[/red]"^8;
+            fit=:fit,
+            justify=justify
+        ), 70, 3)
 
-        # testpanel(
-        #     TextBox(
-        #         "[red]truncate[/red]test"^8;
-        #         fit=:fit,
-        #         justify=justify
-        #     ), 100, 4)
+        testpanel(
+            TextBox(
+                "[red]truncate[/red]test"^8;
+                fit=:fit,
+                justify=justify
+            ), 102, 3)
 
-        # testpanel(TextBox(
-        #         "[red]tru\nncate[/red]test"^1;
-        #         fit=:fit,
-        #         justify=justify
-        #     ), 13, 6)
+        testpanel(TextBox(
+                "[red]tru\nncate[/red]test"^1;
+                fit=:fit,
+                justify=justify
+            ), 15, 4)
     end
 end
 
