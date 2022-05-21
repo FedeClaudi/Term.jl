@@ -29,12 +29,20 @@ function Base.string(r::AbstractRenderable)::String
 end
 
 
-"""print renderable"""
+"""
+    print(io::IO, renderable::AbstractRenderable)
+
+Print a renderable to an IO
+"""
 function Base.print(io::IO, renderable::AbstractRenderable)
     print(io, string(renderable))
 end
 
+"""
+    show(io::IO, renderable::AbstractRenderable)
 
+Show a renderable's shape.
+"""
 function Base.show(io::IO, renderable::AbstractRenderable)
     w, h = renderable.measure.w, renderable.measure.h
     print(
@@ -44,7 +52,12 @@ function Base.show(io::IO, renderable::AbstractRenderable)
 end
 
 
-"""print concise info in repl"""
+
+"""
+    show(io::IO, mime::MIME"text/plain", renderable::AbstractRenderable)
+
+Show a renderable and some information about its shape.
+"""
 function Base.show(io::IO, mime::MIME"text/plain", renderable::AbstractRenderable)
     w, h = renderable.measure.w, renderable.measure.h
     println(io, string(renderable))

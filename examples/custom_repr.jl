@@ -38,3 +38,16 @@ end
 
 
 obj = myType("Rocket", 10, 10, 99.9)
+
+
+# or just use our macro!
+
+@with_repr struct Rocket
+    width::Int
+    height::Int
+    mass::Float64
+    
+    manufacturer::String
+end
+
+obj = Rocket(10, 50, 5000, "NASA")

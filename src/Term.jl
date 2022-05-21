@@ -30,6 +30,8 @@ include("dendogram.jl")
 include("logo.jl")
 include("inspect.jl")
 
+include("repr.jl")
+
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine, pad, pad!, vstack, hstack
 export theme, highlight
@@ -43,6 +45,7 @@ export track
 export Tree
 export Dendogram
 export rightalign!, leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign
+export @with_repr
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -128,5 +131,6 @@ using .dendogram: Dendogram
 
 using .introspection: inspect, typestree, expressiontree
 
+using .Repr: @with_repr
 
 end

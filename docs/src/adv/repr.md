@@ -56,4 +56,23 @@ obj
 ```
 
 
-That's it! Enjoy
+### @with_repr
+
+Maybe you don't want to go through all that for each type you define...
+Fear not! Term has a macro for you:
+
+```@example
+using Term
+
+@with_repr struct Rocket
+    width::Int
+    height::Int
+    mass::Float64
+    
+    manufacturer::String
+end
+
+obj = Rocket(10, 50, 5000, "NASA")
+```
+
+All done!
