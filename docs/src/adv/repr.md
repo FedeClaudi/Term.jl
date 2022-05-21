@@ -56,7 +56,7 @@ obj
 ```
 
 
-### @with_repr
+## @with_repr
 
 Maybe you don't want to go through all that for each type you define...
 Fear not! Term has a macro for you:
@@ -75,4 +75,29 @@ end
 obj = Rocket(10, 50, 5000, "NASA")
 ```
 
-All done!
+
+## `termshow`
+The examples above work when you're the one createing a new type, but how about when you're dealing with types defined in someone else's code?
+
+For that you can use `termshow`: `termshow(x)` returns a `string` or `Panel` with the same kind of visualization you'd get from `@with_repr` - but for any type!
+
+In fact, you can do more, overwrite the default `show` method like so:
+```@example repr
+Base.show(io::IO, ::MIME"text/plain", obj) = print(io, termshow(obj))
+```
+
+And now the REPL will print fancy info for any object!
+```@example repr
+:(x + y)
+```
+
+```@example repr
+struct Engine
+    id::Int
+    throttle::Throttle
+end
+
+e = (1, 100)
+```
+
+And so on.... enjoy!

@@ -1,7 +1,7 @@
 module errors
 include("_errors.jl")
 
-import Base: InterpreterIP, show_method_candidates, ExceptionStack
+import Base: show_method_candidates, ExceptionStack
 
 import Term:
     theme, highlight, reshape_text, read_file_lines, load_code_and_highlight, split_lines

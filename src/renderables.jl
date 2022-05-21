@@ -58,7 +58,7 @@ end
 
 Show a renderable and some information about its shape.
 """
-function Base.show(io::IO, mime::MIME"text/plain", renderable::AbstractRenderable)
+function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
     w, h = renderable.measure.w, renderable.measure.h
     println(io, unescape_brackets_with_space(string(renderable)))
     # println("\e[2m"*"─"^w*"\e[0m")

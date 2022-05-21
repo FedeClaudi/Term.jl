@@ -149,6 +149,7 @@ print(p1/p2)
 ```
 """
 function leftalign(renderables::RenderablesUnion... )
+    length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
     renderables = map(r->pad(r, 0, width - r.measure.w), renderables)
@@ -175,6 +176,7 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 """
 function leftalign!(renderables::RenderablesUnion... )
+    length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
     for ren in renderables
@@ -209,6 +211,7 @@ print(p1/p2)
 ```
 """
 function center(renderables::RenderablesUnion... )
+    length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
     renderables = map(r->pad(r;  width=width), renderables)
@@ -236,6 +239,7 @@ print(p1/p2)
 ```
 """
 function center!(renderables::RenderablesUnion... )
+    length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
     for ren in renderables
@@ -268,6 +272,7 @@ print(p1/p2)
 ```
 """
 function rightalign(renderables::RenderablesUnion... )
+    length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
     renderables = map(r->pad(r, width - r.measure.w, 0), renderables)
@@ -293,6 +298,7 @@ print(p1/p2)
 ```
 """
 function rightalign!(renderables::RenderablesUnion... )
+    length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
 

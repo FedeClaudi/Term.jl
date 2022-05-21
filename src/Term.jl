@@ -44,7 +44,7 @@ export track
 export Tree
 export Dendogram
 export rightalign!, leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign
-export @with_repr
+export @with_repr, termshow
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -130,6 +130,6 @@ using .dendogram: Dendogram
 
 using .introspection: inspect, typestree, expressiontree
 
-using .Repr: @with_repr
+using .Repr: @with_repr, termshow
 
 end
