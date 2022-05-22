@@ -1,21 +1,20 @@
 using Highlights.Format
 import Highlights: Lexers
 import Highlights
+import OrderedCollections: OrderedDict
 
 # ------------------------------- highlighting ------------------------------- #
-highlight_regexes = Dict(
-    :multiline_code => [
-        r"\`\`\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \# \s \? \{ \}  \_ \- \: \!\ \" \> \'\s]*\`\`\`",
-    ],
-    :code => [
-        r"\`[a-zA-Z0-9 \( \) \+ \= \; \. \, \/ \@ \#\s \_ \- \: \!\ \? \{ \} \" \> \'\s]*\`",
-    ],
-    :type => [r"\:\:+[a-zA-Z0-9\.\,]*", r"\{+[a-zA-Z0-9 \,\.. ]*\}"],
-    # :number => [
-    #     r"[+-]?\d+[\.\,]?\d",
-        # r" [0-9] ",
-        # r"[ \+-\-][0-9]* ",
-    # ]
+highlight_regexes = OrderedDict(
+    :number => (
+        r"(?<group>(?<![a-zA-Z0-9_])\d+(\.\d*)?+([eE][+-]?\d*)?)", 
+        ),
+    :operator => (r"(?<group> \/)", r"(?<group>[\+\-\*\%\^\&\|\!\=\>\<\~])"),
+
+    :string => (r"(?<group>[\"\'](\n|.)*?[\"\'])", ),
+    :code => (r"(?<group> ([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))", ),
+    # :code => (r"(?<group> [\`]{1}(\n|.)+?[\`]{1})", ),
+    :expression => (r"(?<group>\:\(+.+[\)])", ),
+    :symbol => (r"(?<group>\:\w+)", ),
 )
 
 
@@ -26,17 +25,20 @@ highlight_regexes = Dict(
 Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object
 """
-function highlight(text::AbstractString; theme::Theme=theme)    
-    for (like, regexes) in highlight_regexes
-        markup = getfield(theme, like)
-
-        prev_match = ""
-        for regex in regexes
-            text = replace(text, regex => s"[markup]\g<0>[/markup]")
-            text = replace(text, "[markup]"=> "[$markup]")
-            text = replace(text, "[/markup]"=> "[/$markup]")
+function highlight(text::AbstractString; theme::Theme=theme)   
+    # highlight with regexes 
+    for (symb, rxs) in pairs(highlight_regexes)
+        markup = getfield(theme, symb)
+        open, close = "[$markup]", "[/$markup]"
+        for rx in rxs
+            text = replace(
+                text, 
+                rx => SubstitutionString(open * s"\g<0>" * close)
+                )
         end
     end
+
+
     return text
 end
 
@@ -57,12 +59,16 @@ highlight(x::Number; theme::Theme=theme) = highlight(string(x), :number; theme=t
 highlight(x::Function; theme::Theme=theme) = highlight(string(x), :func; theme=theme)
 highlight(x::Symbol; theme::Theme=theme) = highlight(string(x), :symbol; theme=theme)
 highlight(x::Expr; theme::Theme=theme) = highlight(string(x), :expression; theme=theme)
-highlight(x::AbstractVector; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
 highlight(x; theme=theme) = string(x)  # capture all other cases
 
 
 
+function highlight(x::AbstractVector; theme::Theme=theme) 
+    txt = string(x)[2:end-1]
+    markup = getfield(theme, :number)
 
+    return "["*markup*"]"*txt*"[/"*markup*"]"
+end
 
 # ------------------------------ Highlighters.jl ----------------------------- #
 

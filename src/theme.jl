@@ -6,6 +6,7 @@ import MyterialColors: green,
                 blue,
                 red,
                 green_light,
+                green,
                 blue_light,
                 orange_light,
                 pink_light,
@@ -13,7 +14,10 @@ import MyterialColors: green,
                 yellow,
                 yellow_light,
                 white,
-                green
+                green,
+                amber,
+                green_dark,
+                orange
 
 import Parameters: @with_kw
 
@@ -24,16 +28,16 @@ Stores colors for different semantically relevant items, used to
 style outputs to terminal.
 """
 @with_kw mutable struct Theme
-    docstring::String           = green
-    string::String              = green_light
+    docstring::String           = green_dark
+    string::String              = green
     type::String                = purple_light
     emphasis::String            = "$blue  bold"
     emphasis_light::String      = green_light
-    code::String                = blue_light
-    multiline_code::String      = blue_light
-    symbol::String              = orange_light
-    expression::String          = pink_light
-    number::String              = blue
+    code::String                = "$(yellow) italic"
+    multiline_code::String      = "$(yellow) italic"
+    symbol::String              = orange
+    expression::String          = amber
+    number::String              = blue_light
     operator::String            = "$red bold"
     func::String                = yellow
 

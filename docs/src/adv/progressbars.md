@@ -1,4 +1,10 @@
 # Progress bars
+
+
+!!! warning
+    Progress bars displays are updated in the background while your code executes. This is done by having the display rendering code run on a separate thread. If you're using a single thread (see: https://docs.julialang.org/en/v1/manual/multi-threading/) you'll need to add a `sleep(0.001)` or `yield()` command inside your code whose progress you're monitoring to ensure that the display is updated correctly.
+
+
 ## Overview
 Progress bars! We all love progress bars, and julia has some great [progress bars](https://juliapackages.com/p/progressbars) packages. 
 But this is `Term`, and `Term` too has its own progress bars API. We think you'll like it. If not, worry not! `Term`'s progress bars play well `ProgressLogging.jl`, scroll to the bottomof this page!
@@ -83,6 +89,7 @@ end
 ```
 
 As simple as that!
+
 
 
 ### ProgressJob

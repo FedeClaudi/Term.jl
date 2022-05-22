@@ -5,6 +5,7 @@ import ..segment: Segment
 import ..console: console_width
 import ..style: get_style_codes, MarkupStyle, apply_style
 import Term: split_lines, reshape_text, fillin, join_lines, unescape_brackets_with_space
+import Term: highlight as highlighter
 
 export AbstractRenderable, Renderable, RenderableText
 
@@ -34,8 +35,10 @@ end
 
 Print a renderable to an IO
 """
-function Base.print(io::IO, renderable::AbstractRenderable)
-    print(io, unescape_brackets_with_space(string(renderable)))
+function Base.print(io::IO, renderable::AbstractRenderable; highlight=true)
+    ren = unescape_brackets_with_space(string(renderable))
+    print(io, ren)
+
 end
 
 """

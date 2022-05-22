@@ -4,7 +4,7 @@
 Showing how to use Term.jl to create styled console representation for your types.
 """
 
-using Term: Panel, vLine, rvstack, lvstack, RenderableText
+using Term: Panel, vLine, rvstack, lvstack, RenderableText, @with_repr, termshow
 
 struct myType
     name::String
@@ -46,8 +46,9 @@ obj = myType("Rocket", 10, 10, 99.9)
     width::Int
     height::Int
     mass::Float64
+    engines_activity::Vector
     
     manufacturer::String
 end
 
-obj = Rocket(10, 50, 5000, "NASA")
+obj = Rocket(10, 50, 5000, [1.1, 123123, 1], "NASA")
