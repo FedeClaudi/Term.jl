@@ -194,7 +194,7 @@ function get_title_row(
     # compose title line 
     boxline = getfield(box, row)
 
-    open, close, space =  "[" * style * "]",  "[/" * style * "]", " "
+    open, close, space =  "{" * style * "}",  "{/" * style * "}", " "
     
     topen, tclose = "", open
     if !isnothing(title_style)
@@ -202,7 +202,7 @@ function get_title_row(
             topen =  "\e[28m"* topen
             tclose = tclose * "\e[8m"
         else
-            topen, tclose  = "[" * title_style * "]", "[/" * title_style * "]" * open
+            topen, tclose  = "{" * title_style * "}", "{/" * title_style * "}" * open
         end
     end
     title = space * topen * title * tclose * space

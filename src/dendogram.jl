@@ -116,7 +116,7 @@ function Dendogram(head, args::Vector; first_arg=nothing, pretitle=nothing)
         title = pad(apply_style("$(head)", salmon_light), width, :center)
 
     else 
-        _title = ": [bold default underline $salmon_light]$first_arg[/bold default underline $salmon_light]"
+        _title = ": {bold default underline $salmon_light}$first_arg{/bold default underline $salmon_light}"
         title = pad(apply_style("$(head)$_title", salmon_light * " dim"), width-4, :center) * " "^4
     end
 
@@ -174,7 +174,7 @@ function Dendogram(e::Expr; pretitle=nothing)
     )
 
     # make dendogram by linking individual elements
-    title = apply_style("$(e.head): [bold underline default $salmon_light]$(e.args[1])[/bold underline default $salmon_light]", salmon_light)
+    title = apply_style("$(e.head): {bold underline default $salmon_light}$(e.args[1]){/bold underline default $salmon_light}", salmon_light)
     return link(leaves...; title=title, shifttitle=true, pretitle=pretitle)
 end
 

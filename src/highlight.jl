@@ -29,7 +29,7 @@ function highlight(text::AbstractString; theme::Theme=theme)
     # highlight with regexes 
     for (symb, rxs) in pairs(highlight_regexes)
         markup = getfield(theme, symb)
-        open, close = "[$markup]", "[/$markup]"
+        open, close = "{$markup}", "{/$markup}"
         for rx in rxs
             text = replace(
                 text, 
@@ -50,7 +50,7 @@ relevant text of type :like.
 """
 function highlight(text::AbstractString, like::Symbol; theme::Theme=theme)
     markup = getfield(theme, like)
-    return do_by_line((x)->"["*markup*"]"*x*"[/"*markup*"]", chomp(text))
+    return do_by_line((x)->"{"*markup*"}"*x*"{/"*markup*"}", chomp(text))
 end
 
 # shorthand to highlight objects based on type
@@ -59,16 +59,10 @@ highlight(x::Number; theme::Theme=theme) = highlight(string(x), :number; theme=t
 highlight(x::Function; theme::Theme=theme) = highlight(string(x), :func; theme=theme)
 highlight(x::Symbol; theme::Theme=theme) = highlight(string(x), :symbol; theme=theme)
 highlight(x::Expr; theme::Theme=theme) = highlight(string(x), :expression; theme=theme)
+highlight(x::AbstractVector; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
+
 highlight(x; theme=theme) = string(x)  # capture all other cases
 
-
-
-function highlight(x::AbstractVector; theme::Theme=theme) 
-    txt = string(x)[2:end-1]
-    markup = getfield(theme, :number)
-
-    return "["*markup*"]"*txt*"[/"*markup*"]"
-end
 
 # ------------------------------ Highlighters.jl ----------------------------- #
 
@@ -88,7 +82,7 @@ function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
         bg = isnothing(bg) ? "" : "on_$(bg)"
         markup = "$fg $(bg) $(bold) $(italic) $(underline)"
         if length(strip(markup)) > 0
-            print(io, "[$markup]$str[/$markup]")
+            print(io, "{$markup}$str{/$markup}")
         else
             print(io, str)
         end
@@ -133,7 +127,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     code = split(highlight_syntax(join(lines); style = false), "\n")
 
     # clean
-    clean(line) = replace(line, "    [/    ]" => "")
+    clean(line) = replace(line, "    {/    }" => "")
     codelines = clean.(code)  # [10-δ:10+δ]
     linenos = linenos  # [10-δ:10+δ]
 
@@ -163,7 +157,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     for (n, line) in zip(linenos, codelines)
         # style
         if n == lineno
-            symb = "[red bold]❯[/red bold]"
+            symb = "{red bold}❯{/red bold}"
             color = "white"
         else
             symb = " "
@@ -172,7 +166,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
 
         # end
         line = textlen(line) > 1 ? lpad(line[dedent:end], 8) : line
-        line = symb * " [$color]$n[/$color] " * line
+        line = symb * " {$color}$n{/$color} " * line
         push!(cleaned_lines, line)
     end
 

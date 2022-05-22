@@ -24,7 +24,7 @@ export apply_style
 
 
 apply_style(text::String, style::String) = apply_style(
-    "["*style*"]"*text*"[/"*style*"]"
+    "{"*style*"}"*text*"{/"*style*"}"
 )
 
 """
@@ -150,10 +150,10 @@ function apply_style(text)::String
         text = replace_text(text, max(open_match.offset-1, 0), open_match.offset + length(markup)+1, ansi_open)
 
         # get closing tag (including [/] or missing close)
-        close_rx = r"(?<!\[)\[(?!\[)\/" * markup * r"\]"
+        close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
 
         if !occursin(close_rx, text)
-            text = text * "[/" * markup * "]"
+            text = text * "{/" * markup * "}"
         end
         close_match = match(close_rx, text)
 

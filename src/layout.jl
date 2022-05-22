@@ -472,7 +472,7 @@ Create a `vLine` given a height and, optionally, style information.
 function vLine(
     height::Int; style::String = "default", box::Symbol = :ROUNDED
 )   
-    line = apply_style("["*style*"]" * eval(box).head.left * "[/"*style*"]\e[0m")
+    line = apply_style("{"*style*"}" * eval(box).head.left * "{/"*style*"}\e[0m")
     segments = repeat([Segment(line)], height)
     return vLine(segments, Measure(1, height))
 end
@@ -532,7 +532,7 @@ function hLine(
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
 
-    open, close, space =  "[" * style * "]",  "[/" * style * "]\e[0m", " "
+    open, close, space =  "{" * style * "}",  "{/" * style * "}\e[0m", " "
     line = open * get_lrow(box, lw-tl, :top; with_left=false) *
                 space * text * space * get_rrow(box, rw-tr, :top; with_right=false) * close
 

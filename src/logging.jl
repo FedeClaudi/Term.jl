@@ -85,15 +85,15 @@ Print the final line of a log message with style and date info
 """
 function print_closing_line(color::String, width::Int = 48)
     tprintln(
-        "  [$color bold dim]$(ROUNDED.bottom.left)" *
+        "  {$color bold dim}$(ROUNDED.bottom.left)" *
         "$(ROUNDED.row.mid)"^(width) *
-        "[/$color bold dim]",
+        "{/$color bold dim}",
     )
     _date = Dates.format(Dates.now(), "e, dd u yyyy")
     _time = Dates.format(Dates.now(), "HH:MM:SS")
     pad = width - textlen(_date * _time) - 2
     return tprintln(
-        " "^pad * "[dim]$_date[/dim] [bold dim underline]$_time[/bold dim underline]"
+        " "^pad * "{dim}$_date{/dim} {bold dim underline}$_time{/bold dim underline}"
     )
 end
 
@@ -161,7 +161,7 @@ function Logging.handle_message(
     fname = ""
     for frame in stacktrace()
         if "$(frame.file)" == file && frame.line == line
-            fname = ".[$(logger.theme.func) underline]$(frame.func)[/$(logger.theme.func) underline]"
+            fname = ".{$(logger.theme.func) underline}$(frame.func){/$(logger.theme.func) underline}"
         end
     end
 
@@ -179,24 +179,24 @@ function Logging.handle_message(
     end
 
     outline_markup = "$color dim"
-    hor = "[$outline_markup]▶[/$outline_markup]"
-    vert = "[$outline_markup]" * ROUNDED.mid.left * "[/$outline_markup]"
+    hor = "{$outline_markup}▶{/$outline_markup}"
+    vert = "{$outline_markup}" * ROUNDED.mid.left * "{/$outline_markup}"
 
     # style message
     if msg isa AbstractString
-        msg = has_markup(msg) ? msg : "[#8abeff]$msg[/#8abeff]"
+        msg = has_markup(msg) ? msg : "{#8abeff}$msg{/#8abeff}"
         msg = reshape_text(msg, 64)
     else
         msg = string(msg)
     end
 
     # get the first line of information
-    content = "[$color underline bold]@$(string(lvl))[/$color underline bold] [#edb46f ]($(_mod)$fname):[/#edb46f ]"
+    content = "{$color underline bold}@$(string(lvl)){/$color underline bold} {#edb46f }($(_mod)$fname):{/#edb46f }"
 
     # for multi-lines message, print each line separately.
     msg_lines::Vector{AbstractString} = split(msg, "\n")
     for n in 2:length(msg_lines)
-        msg_lines[n] = "  $vert   " * " "^textlen(content) * "[#8abeff]" * msg_lines[n]
+        msg_lines[n] = "  $vert   " * " "^textlen(content) * "{#8abeff}" * msg_lines[n]
     end
     content *= "  " * msg_lines[1]
     tprintln(content)
@@ -225,13 +225,13 @@ function Logging.handle_message(
         # get line stub
         pad = wpad - textlen(_type)
         line =
-            "  $vert [$(theme.type) dim]($(_type))[/$(theme.type) dim]" *
+            "  $vert {$(theme.type) dim}($(_type)){/$(theme.type) dim}" *
             " "^pad *
             hor *
-            "  [bold #ff9959]$k[/bold #ff9959]"
+            "  {bold #ff9959}$k{/bold #ff9959}"
 
         epad = namepad - textlen(string(k))
-        line *= " "^epad * " [bold red]=[/bold red] "
+        line *= " "^epad * " {bold red}={/bold red} "
         lpad = textlen(line) - 4
 
         # get value style
@@ -246,12 +246,12 @@ function Logging.handle_message(
             _size = size(v)
             v = escape_brackets(string(v))
             v = textlen(v) > 33 ? v[1:30] * "..." : v
-            v *= "\n [dim]size: $(_size)[/dim]"
+            v *= "\n {dim}size: $(_size){/dim}"
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
             v =
-                "$(typeof(v)) [dim]<: $(supertypes(typeof(v))[end-1])[/dim]" *
-                "\n [dim]size: $(size(v))[/dim]"
+                "$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}" *
+                "\n {dim}size: $(size(v)){/dim}"
         elseif v isa Function
             _style = logger.theme.func
         elseif v isa AbstractRenderable
@@ -266,7 +266,7 @@ function Logging.handle_message(
 
         if !isnothing(_style)
             vlines = map(
-                ln -> "["*_style*"]"*ln*"[/"*_style*"]", vlines
+                ln -> "{"*_style*"}"*ln*"{/"*_style*"}", vlines
             )
         end
 

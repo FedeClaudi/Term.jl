@@ -14,4 +14,3 @@ p3 = Panel("test[red]aajjaja[/red]"^5, width=12)
 # pprint(p1 / p2)
 
 a = p1 / p2
-a.segments

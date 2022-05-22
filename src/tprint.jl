@@ -19,14 +19,9 @@ tprint(x; highlight=true) = tprint(stdout, x; highlight=highlight)
 
 tprint(io::IO, x; highlight=true) = tprint(
     io, 
-    escape_brackets(string(x));
+    string(x);
     highlight=highlight
 )
-
-            
-tprint(io::IO, x::AbstractVector; highlight=true) = highlight ?
-    print(io, "[" * (apply_style ∘ highlighter)(x) * "]") :
-    tprint(io, escape_brackets(string(x)); highlight=false)
 
 
 tprint(io::IO, ::MIME"text/html", x; highlight=true) = tprint(io, x; highlight=highlight)
@@ -38,9 +33,8 @@ tprint(x::AbstractString)
 Apply style to a string and print it
 """
 tprint(io::IO, x::AbstractString; highlight=true) = highlight ?
-        print(io, (apply_style ∘ highlighter ∘ unescape_brackets)(x)) :
-        # print(io, (apply_style ∘ highlighter ∘  unescape_brackets)(x)) :
-        print(io, (unescape_brackets ∘  apply_style)(x))
+        print(io, (apply_style ∘ highlighter)(x)) :
+        print(io, (apply_style)(x))
 
 """
 tprint(x::AbstractRenderable)
@@ -50,35 +44,6 @@ Print an `AbstractRenderable`.
 Equivalent to `println(x)`
 """
 tprint(io::IO, x::AbstractRenderable; highlight=true) =  print(io, x; highlight=highlight)
-
-
-# tprint(x::Symbol)
-
-# Print highlighted as a Symbol
-# """
-# tprint(io::IO, x::Symbol; highlight=true) = tprint(io, highlight(":" * string(x), :symbol))
-
-# """
-# tprint(x::Number)
-
-# Print highlighted as a Number
-# """
-# tprint(io::IO, x::Number) = tprint(io, highlight(string(x), :number))
-
-# """
-# tprint(x::Function)
-
-# Print highlighted as a Function
-# """
-# tprint(io::IO, x::Function) = tprint(io, highlight(string(x), :func))
-
-# """
-# tprint(x::DataType)
-
-# Print highlighted as a DataType
-# """
-# tprint(io::IO, x::DataType) = tprint(io, highlight(string(x), :type))
-
 
 
 function tprint(io::IO, args...)

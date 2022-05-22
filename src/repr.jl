@@ -1,5 +1,5 @@
 module Repr
-import Term: escape_brackets, truncate
+import Term: truncate
 import ..panel: Panel
 import ..renderables: RenderableText
 import ..layout: vLine, rvstack, lvstack, Spacer
@@ -42,7 +42,7 @@ function termshow(io::IO, obj)
          
     values = []
     for val in _values
-        val = truncate((escape_brackets ∘ string)(val), 45)
+        val = truncate(string(val), 45)
         push!(values, RenderableText.(val; style="#b3d4ff"))
     end
 

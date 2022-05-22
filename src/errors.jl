@@ -1,7 +1,7 @@
 module errors
 include("_errors.jl")
 
-import Base: show_method_candidates, ExceptionStack
+import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
 import Term:
     theme, highlight, reshape_text, read_file_lines, load_code_and_highlight, split_lines
@@ -19,10 +19,10 @@ const ErrorsExplanations = Dict(
     AssertionError => "comes up when an assertion's check fails (e.g., `@assert 1==2`)",
     BoundsError => "comes up when trying to acces a container at invalid position (e.g., a string a='abcd' with 4 characters cannot be accessed as a[5]).",
     DimensionMismatch => "comes up when trying to perform an operation on objects which don't have matching dimensionality (e.g., summing matrixes of different size).",
-    DivideError => "comes up when attempting integer division with 0 as denominator. [blue]2/0=Inf[/blue] is okay, but [orange1]div(2, )[/orange1] will give an error",
+    DivideError => "comes up when attempting integer division with 0 as denominator. {blue}2/0=Inf{/blue} is okay, but {orange1}div(2, ){/orange1} will give an error",
     DomainError => "comes up when the argument to a function is outside its domain (e.g., √(-1))",
     ErrorException => "is a generic error type",
-    KeyError => "comes up when attempting to access a non-existing [blue]Dict[/blue] key.",
+    KeyError => "comes up when attempting to access a non-existing {blue}Dict{/blue} key.",
     InexactError => "comes up when a type cannot exactly be converted to another (e.g. Int(2.5) cannot convert Float64 to Int64, but Int(round(2.5)) will work)",
     LoadError => "occurs when another comes up while evaluating 'include', 'require' or 'using' statements",
     MethodError => "comes up when to method can be found with a given name and for a given set of argument types.",
@@ -59,7 +59,7 @@ function error_message(io::IO, er::BoundsError)
             additional_msg = "S\ntring has $nunits codeunits, $(length(er.a)) characters."
         end
     else
-        additional_msg = "\n[red]Variable is not defined!.[/red]"
+        additional_msg = "\n{red}Variable is not defined!.{/red}"
     end
     return main_msg, additional_msg
 end
@@ -78,7 +78,7 @@ end
 
 # ! DivideError
 function error_message(io::IO, er::DivideError)
-    return "Attempted integer division by [blue]0[/blue]", ""
+    return "Attempted integer division by {blue}0{/blue}", ""
 end
 
 # ! EXCEPTION ERROR
@@ -98,7 +98,7 @@ end
 # ! InexactError
 function error_message(io::IO, er::InexactError)
     # @info "load error message"  fieldnames(InexactError)
-    msg = "Cannot convert $(_highlight_with_type(er.val)) to type [$(theme.type)]$(er.T)[/$(theme.type)]"
+    msg = "Cannot convert $(_highlight_with_type(er.val)) to type {$(theme.type)}$(er.T){/$(theme.type)}"
     subm = "\nConversion error in function: $(_highlight(er.func))"
     return msg, subm
 end
@@ -106,8 +106,8 @@ end
 # ! LoadError
 function error_message(io::IO, er::LoadError)
     # @info "load error message"  fieldnames(LoadError)
-    msg = "At [grey62 underline]$(er.file)[/grey62 underline] line [bold]$(er.line)"
-    subm = "The cause is an error of type: [bright_red]$(string(typeof(er.error)))"
+    msg = "At {grey62 underline}$(er.file){/grey62 underline} line {bold}$(er.line)"
+    subm = "The cause is an error of type: {bright_red}$(string(typeof(er.error)))"
     return msg, subm
 end
 
@@ -126,12 +126,12 @@ function error_message(io::IO, er::MethodError; kwargs...)
     for can in _candidates[3:(end - 1)]
         fun, file = split(can, " at ")
         name, args = split(fun, "("; limit = 2)
-        # name = "[red]$name[/red]"
+        # name = "[red]$name[/red}"
 
         for regex in _method_regexes
             for match in collect(eachmatch(regex, args))
                 args = replace(
-                    args, match.match => "[dim red]$(match.match[9:end])[/dim red]"
+                    args, match.match => "{dim red}$(match.match[9:end]){/dim red}"
                 )
             end
         end
@@ -140,10 +140,10 @@ function error_message(io::IO, er::MethodError; kwargs...)
 
         # println(RenderableText(name, "red"))
         push!(candidates, fn_name * "(" * args)
-        push!(candidates, "[dim]$file [bold dim](line: $lineno)[/bold dim][/dim]\n")
+        push!(candidates, "{dim}$file {bold dim}(line: $lineno){/bold dim}{/dim}\n")
     end
     candidates =
-        length(candidates) == 0 ? ["[dim]no candidate method found[/dim]"] : candidates
+        length(candidates) == 0 ? ["{dim}no candidate method found{/dim}"] : candidates
 
     return main_line * "\n",
     Panel(
@@ -164,9 +164,9 @@ end
 function error_message(io::IO, er::TypeError)
     # @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
     # var = string(er.var)
-    msg = "In `[$(theme.emphasis_light) italic]$(er.func)` > `$(er.context)[/$(theme.emphasis_light) italic]` got"
-    msg *= " [orange1 bold]$(er.got)[/orange1 bold][$(theme.type)](::$(typeof(er.got)))[/$(theme.type)] but expected argument of type"
-    msg *= " [$(theme.type)]::$(er.expected)[/$(theme.type)]"
+    msg = "In `{$(theme.emphasis_light) italic}$(er.func)` > `$(er.context){/$(theme.emphasis_light) italic}` got"
+    msg *= " {orange1 bold}$(er.got){/orange1 bold}{$(theme.type)}(::$(typeof(er.got))){/$(theme.type)} but expected argument of type"
+    msg *= " {$(theme.type)}::$(er.expected){/$(theme.type)}"
     return msg, ""
 end
 
@@ -199,7 +199,7 @@ function error_message(io::IO, er)
     if hasfield(typeof(er), :error)
         # @info "nested error" typeof(er.error)
         m1, m2 = error_message(io, er.error)
-        msg = "\n[bold red]LoadError:[/bold red]\n" * m1
+        msg = "\n{bold red}LoadError:{/bold red}\n" * m1
     else
         msg = if hasfield(typeof(er), :msg)
             er.msg
@@ -221,7 +221,7 @@ function install_stacktrace()
 
         function Base.showerror(io::IO, er::LoadError, bt; backtrace = true)
             print("\n")
-            println(hLine(_width(), "[default bold red]LoadError[/default bold red]"; style = "dim red"))
+            println(hLine(_width(), "{default bold red}LoadError{/default bold red}"; style = "dim red"))
             Base.display_error(io, er, bt)
 
             return Base.showerror(io, er.error, bt; backtrace = true)
@@ -234,7 +234,7 @@ function install_stacktrace()
 
         function Base.showerror(io::IO, er, bt; backtrace = true)
             ename = string(typeof(er))
-            print("\n"*hLine(_width(), "[default bold red]$ename[/default bold red]"; style = "dim red"))
+            print("\n"*hLine(_width(), "{default bold red}$ename{/default bold red}"; style = "dim red"))
 
             try
                 stack = style_backtrace(io, bt)
@@ -257,7 +257,7 @@ function install_stacktrace()
             catch styling_error
                 @error "Failed to generate styled error message" styling_error stacktrace()
 
-                println(apply_style("Original error: [bright_red]$(string(er))"))
+                println(apply_style("Original error: {bright_red}$(string(er))"))
             end
         end
     end

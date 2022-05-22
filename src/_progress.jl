@@ -78,7 +78,7 @@ struct CompletedColumn <: AbstractColumn
         else
             width = length(string(job.N))*2+1
             seg = Segment(" "^width)
-            text = apply_style("[white bold]/[/white bold][(.1, .8, .4) underline]$(job.N)[/(.1, .8, .4) underline]")
+            text = apply_style("{white bold}/{/white bold}{(.1, .8, .4) underline}$(job.N){/(.1, .8, .4) underline}")
             return new(job, [seg], seg.measure, text, length(digits(job.N)), style)
         end
     end
@@ -240,7 +240,7 @@ end
 function update!(col::ProgressColumn, color::String, args...)::String
     completed = int(col.nsegs * col.job.i/col.job.N)
     remaining = col.nsegs - completed
-    return apply_style("[" *color*" bold]" * '━'^(completed) * "[/"*color*" bold]"* " "^(remaining))
+    return apply_style("{" *color*" bold}" * '━'^(completed) * "{/"*color*" bold}"* " "^(remaining))
 end
 
 # ------------------------------ spinner columns ----------------------------- #
@@ -336,7 +336,7 @@ end
 
 function update!(col::SpinnerColumn, args...)::String
     col.job.started || return " "^(col.measure.w)
-    col.job.finished && return "[green bold]✔[/green bold]"
+    col.job.finished && return "{green bold}✔{/green bold}"
 
     t = (now() - col.job.startime).value
 

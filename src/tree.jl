@@ -53,7 +53,7 @@ Get tree guides with style information applied
 """
 TreeGuides(guides_type::Symbol, style::String) = TreeGuides(
     map(
-        (g)->apply_style("[$style]$g[/$style]"), 
+        (g)->apply_style("{$style}$g{/$style}"), 
         treeguides[guides_type]
     )...
 )
@@ -226,7 +226,7 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
     # ------------------------------ render in parts ----------------------------- #
     # render initial part
     if tree.level == 0
-        header_text = "[$(tree.title_style)]$(tree.name)[/$(tree.title_style)]"
+        header_text = "{$(tree.title_style)}$(tree.name){/$(tree.title_style)}"
         header = (" " * header_text * " ") / hLine(textlen(tree.name)+2; style="$(tree.title_style) dim", box=:HEAVY)
 
         append!(segments, header.segments)
@@ -244,7 +244,7 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
             end
         end
 
-        _add(_pre_guides * "[$(tree.node_style)]$(tree.name)[/$(tree.node_style)]")
+        _add(_pre_guides * "{$(tree.node_style)}$(tree.name){/$(tree.node_style)}")
     end
     tree.level == 0 && _add(prevguides * guides.vline)
 
@@ -279,7 +279,7 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
                 k = isnothing(leaf.name) ? "" : highlight(leaf.name)
                 v = ""
             else
-                k = isnothing(leaf.name) ? "" : "[$(tree.leaf_style)]$(leaf.name)[/$(tree.leaf_style)]: "
+                k = isnothing(leaf.name) ? "" : "{$(tree.leaf_style)}$(leaf.name){/$(tree.leaf_style)}: "
                 v = leaf.text
             end
             _add(prevguides * seg * k * v)
@@ -306,7 +306,7 @@ end
 """
 Apply style for the type whose hierarchy Tree we are making
 """
-style_T(T) = "[orange1 italic underline]$T[/orange1 italic underline]"
+style_T(T) = "{orange1 italic underline}$T{/orange1 italic underline}"
 
 """
     make_hierarchy_dict(x::Vector{DataType}, T::DataType, Tsubs::Dict)::Dict
@@ -365,7 +365,7 @@ function Tree(T::DataType)::Tree
 end
 
 
-_key(e::Expr) = length(e.args) > 1 ? "$(expr2string(e))  [dim blue]($(e.head): [/dim blue][red bold default]$(e.args[1])[/red bold default][dim blue])[/dim blue]" : string(e.head)
+_key(e::Expr) = length(e.args) > 1 ? "$(expr2string(e))  {dim blue}($(e.head): {/dim blue}{red bold default}$(e.args[1]){/red bold default}{dim blue}){/dim blue}" : string(e.head)
 _values(e::Expr) = length(e.args) > 1 ? e.args[2:end] : e.args
 
 _pair(x) = nothing => x

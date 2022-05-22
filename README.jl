@@ -3,6 +3,8 @@ import Term.renderables: Renderable
 import Term: int
 import Term.color: hsl2rgb
 
+import MyterialColors: orange_light, blue_light, green_light
+
 function make_julia_circles()
     circle = """
     oooo    
@@ -60,8 +62,8 @@ function make_rgb_colors(; max_width=88)
             color = hsl2rgb(h*360, .9, l)
             bg = hsl2rgb(h*360, .9, l + 0.7/10)
 
-            colors *= "[$color on_$bg]▄[/$color on_$bg]"
-            # colors *= "[$color on_$bg]▬▄x[/$color on_$bg]"
+            colors *= "{$color on_$bg}▄{/$color on_$bg}"
+            # colors *= "{$color on_$bg}▬▄x{/$color on_$bg}"
         end
         colors *= "\n"
     end
@@ -89,17 +91,17 @@ _code_style = "yellow italic bold"
 
 bfc = rainbow_maker(9)
 basic_features = Panel("""
-    [bright_red bold underline]Features[/bright_red bold underline]
+    {bright_red bold underline}Features{/bright_red bold underline}
 
-[bold $(bfc[1])]✔[/bold $(bfc[1])][white] [blue]Colored text[/blue][/white]
-[bold $(bfc[2])]✔[/bold $(bfc[2])][white] [italic]italic[/italic], [bold]bold[/bold], [underline]underline[/underline], [striked]striked[/striked], [inverse]inverse[/inverse][/white]
-[bold $(bfc[3])]✔[/bold $(bfc[3])][white] styling [$_code_style]@macros[/$_code_style][/white]
-[bold $(bfc[4])]✔[/bold $(bfc[4])][white] [italic white]markup[/italic white] style syntax[/white]
-[bold $(bfc[5])]✔[/bold $(bfc[5])][white] progress bars[/white]
-[bold $(bfc[6])]✔[/bold $(bfc[6])][white] [$_code_style]`Expr`[/$_code_style] and [$_code_style]`Type`[/$_code_style] introspection[/white]
-[bold $(bfc[7])]✔[/bold $(bfc[7])][white] logging[/white]
-[bold $(bfc[8])]✔[/bold $(bfc[8])][white] stacktraces[/white]
-[bold $(bfc[9])]✔[/bold $(bfc[9])][white] syntax highlighting[/white]
+{bold $(bfc[1])}✔{/bold $(bfc[1])}{white} {blue}Colored text{/blue}{/white}
+{bold $(bfc[2])}✔{/bold $(bfc[2])}{white} {italic}italic{/italic}, {bold}bold{/bold}, {underline}underline{/underline}, {striked}striked{/striked}, {inverse}inverse{/inverse}{/white}
+{bold $(bfc[3])}✔{/bold $(bfc[3])}{white} styling {$_code_style}@macros{/$_code_style}{/white}
+{bold $(bfc[4])}✔{/bold $(bfc[4])}{white} {italic white}markup{/italic white} style syntax{/white}
+{bold $(bfc[5])}✔{/bold $(bfc[5])}{white} progress bars{/white}
+{bold $(bfc[6])}✔{/bold $(bfc[6])}{white} {$_code_style}`Expr`{/$_code_style} and {$_code_style}`Type`{/$_code_style} introspection{/white}
+{bold $(bfc[7])}✔{/bold $(bfc[7])}{white} logging{/white}
+{bold $(bfc[8])}✔{/bold $(bfc[8])}{white} stacktraces{/white}
+{bold $(bfc[9])}✔{/bold $(bfc[9])}{white} syntax highlighting{/white}
 """; width=70, padding=(2, 2, 1, 2), justify=:center, style="default blue dim",
 title="Term.jl", title_style="bright_blue bold", 
 subtitle="https://github.com/FedeClaudi/Term.jl", subtitle_style="default dim", subtitle_justify=:right
@@ -107,23 +109,23 @@ subtitle="https://github.com/FedeClaudi/Term.jl", subtitle_style="default dim", 
 
 
 colors_info = TextBox(
-"""[bold bright_green]Colors[/bold bright_green]
-[bright_green bold]✔[/bright_green bold] 8-bit colors
-[bright_green bold]✔[/bright_green bold] 16-bit colors
-[bright_green bold]✔[/bright_green bold] hex colors
-[bright_green bold]✔[/bright_green bold] rgb colors
-[bright_green bold]✔[/bright_green bold] colors conversion
+"""{bold bright_green}Colors{/bold bright_green}
+  {$(green_light) bold}✔{/$(green_light) bold} 8-bit colors
+  {$(green_light) bold}✔{/$(green_light) bold} 16-bit colors
+  {$(green_light) bold}✔{/$(green_light) bold} hex colors
+  {$(green_light) bold}✔{/$(green_light) bold} rgb colors
+  {$(green_light) bold}✔{/$(green_light) bold} colors conversion
 """; width=25, padding=(0, 0, 0, 0))
 colors = make_rgb_colors(;max_width=103)
 
 _lorem = """朗眠裕安無際集正聞進士健音社野件草売規作独特認権価官家複入豚末告設悟自職遠氷育教載最週場仕踪持白炎組特曲強真雅立覧自価宰身訴側善論住理案者券真犯著避銀楽験館稿告
 """
 lorem_description = TextBox(
-"""[bold bright_yellow]Text reshaping[/bold bright_yellow]
-[bright_yellow bold]✔[/bright_yellow bold] reshaping.
-[bright_yellow bold]✔[/bright_yellow bold] justification
-[bright_yellow bold]✔[/bright_yellow bold] Asian languages support
-"""; width=28, padding=(0, 0, 0, 0))
+"""{bold bright_yellow}Text reshaping{/bold bright_yellow}
+  {$(orange_light) bold}✔{/$(orange_light) bold} reshaping.
+  {$(orange_light) bold}✔{/$(orange_light) bold} justification
+  {$(orange_light) bold}✔{/$(orange_light) bold} Asian languages support
+"""; width=30, padding=(0, 0, 0, 0))
 lorem1 = TextBox(_lorem; width=62, padding=(0, 0, 0, 0))
 lorem2 = TextBox(_lorem; width=42, padding=(0, 0, 0, 0))
 
@@ -132,16 +134,16 @@ expr = :(2x + 2π/θ)
 tree = Renderable(sprint(typestree, Float64))
 dendo = Renderable(sprint(inspect, expr))
 renderables_info = TextBox(
-"""[bold bright_blue]Renderables types[/bold bright_blue]
-[bold bright_blue]✔[/bold bright_blue] Panel
-[bold bright_blue]✔[/bold bright_blue] TextBox
-[bold bright_blue]✔[/bold bright_blue] hLine
-[bold bright_blue]✔[/bold bright_blue] vLine
-[bold bright_blue]✔[/bold bright_blue] Tree
-[bold bright_blue]✔[/bold bright_blue] Dendogram
+"""{bold bright_blue}Renderables types{/bold bright_blue}
+  {bold $(blue_light)}✔{/bold $(blue_light)} Panel
+  {bold $(blue_light)}✔{/bold $(blue_light)} TextBox
+  {bold $(blue_light)}✔{/bold $(blue_light)} hLine
+  {bold $(blue_light)}✔{/bold $(blue_light)} vLine
+  {bold $(blue_light)}✔{/bold $(blue_light)} Tree
+  {bold $(blue_light)}✔{/bold $(blue_light)} Dendogram
 
 
-"""; width=28, padding=(0, 0, 0, 0)
+"""; width=30, padding=(0, 0, 0, 0)
 )
 
 line = hLine(140; style="bold dim grey35", box=:HEAVY)
@@ -149,14 +151,14 @@ line = hLine(140; style="bold dim grey35", box=:HEAVY)
 
 
 layout_text = TextBox(
-"""[bold bright_cyan]Renderables layout[/bold bright_cyan]
-[bold bright_cyan]✔[/bold bright_cyan] Horizontal stacking
-[bold bright_cyan]✔[/bold bright_cyan] Vertical stacking
-[bold bright_cyan]✔[/bold bright_cyan] Left justify
-[bold bright_cyan]✔[/bold bright_cyan] Center justify
-[bold bright_cyan]✔[/bold bright_cyan] Right justify
-[bold bright_cyan]✔[/bold bright_cyan] Shorthands: [bold bright_red]*,/[/bold bright_red], [white]←, ↓, →[/white]
-"""; width=28, padding=(0, 0, 0, 0)
+"""{bold bright_cyan}Renderables layout{/bold bright_cyan}
+  {bold bright_cyan}✔{/bold bright_cyan} Horizontal stacking
+  {bold bright_cyan}✔{/bold bright_cyan} Vertical stacking
+  {bold bright_cyan}✔{/bold bright_cyan} Left justify
+  {bold bright_cyan}✔{/bold bright_cyan} Center justify
+  {bold bright_cyan}✔{/bold bright_cyan} Right justify
+  {bold bright_cyan}✔{/bold bright_cyan} Shorthands {bold bright_blue}*,/,←,↓,→{/bold bright_blue}
+"""; width=30, padding=(0, 0, 0, 0)
 )
 
 p1 = Panel(; width=20, style="#80bbe8")
@@ -170,7 +172,7 @@ layout_example = (
     lvstack(p1, p2, p3) * _space * cvstack(p1b, p2, p3b) * _space * rvstack(p1, p2, p3))
 
 layout_example = cvstack(
-    "" / RenderableText("[bold #81bae6] Left/center/right justify and stack renderables to create layouts"),
+    "" / RenderableText("{bold #81bae6} Left/center/right justify and stack renderables to create layouts"),
     layout_example
 )
 
@@ -180,15 +182,15 @@ layout_example = cvstack(
 print("\n"^3)
 
 readme = (Spacer(10, circles.measure.h ) * circles * Spacer(8, circles.measure.h ) * basic_features) / 
-(Spacer(140, 2) / line) /
-(Spacer(3, colors_info.measure.h ) * colors_info * Spacer(3, colors_info.measure.h ) * (Spacer(100, 1 ) / colors)) /
-line /
-(Spacer(3, lorem_description.measure.h ) * lorem_description * lorem1 * lorem2 ) /
-line /
-(Spacer(3, tree.measure.h) * renderables_info * tree * Spacer(5, tree.measure.h) * dendo) / 
-line /
-(Spacer(3, layout_text.measure.h) * layout_text * layout_example) / 
-line /
+    (Spacer(140, 2) / line) /
+    (Spacer(3, colors_info.measure.h ) * colors_info * Spacer(3, colors_info.measure.h ) * (Spacer(100, 1 ) / colors)) /
+    line /
+    (Spacer(3, lorem_description.measure.h ) * lorem_description * lorem1 * lorem2 ) /
+    line /
+    (Spacer(3, tree.measure.h) * renderables_info * tree * Spacer(5, tree.measure.h) * dendo) / 
+    line /
+    (Spacer(3, layout_text.measure.h) * layout_text * layout_example)
+
 
 
 print(Spacer(10, readme.measure.h) * readme)

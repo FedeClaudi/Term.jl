@@ -4,7 +4,7 @@ import ..measure: Measure
 import ..segment: Segment
 import ..console: console_width
 import ..style: get_style_codes, MarkupStyle, apply_style
-import Term: split_lines, reshape_text, fillin, join_lines, unescape_brackets_with_space
+import Term: split_lines, reshape_text, fillin, join_lines
 import Term: highlight as highlighter
 
 export AbstractRenderable, Renderable, RenderableText
@@ -26,7 +26,7 @@ Creates a string representation of a renderable
 """
 function Base.string(r::AbstractRenderable)::String
     lines = [seg.text for seg in r.segments]
-    return unescape_brackets_with_space(join(lines, "\n"))
+    return join(lines, "\n")
 end
 
 
@@ -36,8 +36,8 @@ end
 Print a renderable to an IO
 """
 function Base.print(io::IO, renderable::AbstractRenderable; highlight=true)
-    ren = unescape_brackets_with_space(string(renderable))
-    print(io, ren)
+    ren = string(renderable)
+    println(io, ren)
 
 end
 
@@ -63,7 +63,7 @@ Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
     w, h = renderable.measure.w, renderable.measure.h
-    println(io, unescape_brackets_with_space(string(renderable)))
+    println(io, string(renderable))
     # println("\e[2m"*"─"^w*"\e[0m")
     print(
         io,

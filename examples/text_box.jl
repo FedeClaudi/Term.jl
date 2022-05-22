@@ -42,7 +42,7 @@ print(
 And of course it works well with markup styles too
 """
 another_long_one =
-    "This is a [red bold]long[/red bold] piece of [green italic]content[/green italic]. But TextBox can handle [underline]anything[/underline]!! "^5
+    "This is a {red bold}long{/red bold} piece of {green italic}content{/green italic}. But TextBox can handle {underline}anything{/underline}!! "^5
 
 print(TextBox(another_long_one; width = 44))
 

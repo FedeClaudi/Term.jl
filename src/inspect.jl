@@ -209,14 +209,14 @@ function inspect(
             for (name, type) in zip(info.fields["names"], info.fields["types"])
                 push!(
                     formatted_fields,
-                    "[bold white]$(string(name))[/bold white]" *
+                    "{bold white}$(string(name)){/bold white}" *
                     highlight("::$(type)", :type),
                 )
             end
         end
 
         fields_panel = Panel(
-            isnothing(formatted_fields) ? "[dim]No arguments[/dim]" : formatted_fields;
+            isnothing(formatted_fields) ? "{dim}No arguments{/dim}" : formatted_fields;
             title = "Arguments",
             title_style = "bold yellow",
             style = "dim yellow",
@@ -239,14 +239,14 @@ function inspect(
     if n_constructors > max_n_methods
         constructors =
             join_lines(split_lines(constructors)[1:(max_n_methods * 2)]) *
-            "\n\n[grey53]( additional constructors not shown... )[/grey53]"
+            "\n\n{grey53}( additional constructors not shown... ){/grey53}"
     end
     constructors =
-        n_constructors > 1 ? constructors : "[dim]No constructors          [/dim]"
+        n_constructors > 1 ? constructors : "{dim}No constructors          {/dim}"
 
     constructors_panel = TextBox(
         constructors;
-        title = "Constructors[dim]($n_constructors)",
+        title = "Constructors{dim}($n_constructors)",
         title_style = "bold underline yellow",
         width = width-4
     )
@@ -260,22 +260,22 @@ function inspect(
         if n_methods > max_n_methods
             methods =
                 join_lines(split_lines(methods)[1:(max_n_methods * 2)]) *
-                "\n\n[grey53]( additional methods not shown... )[/grey53]"
+                "\n\n[grey53]( additional methods not shown... ){/grey53}"
         end
     else
-        methods = "[dim]No methods          [/dim]"
+        methods = "{dim}No methods          {/dim}"
         n_methods = 0
     end
 
     methods_panel = TextBox(
         methods;
-        title = "Methods[dim]($n_methods)",
+        title = "Methods{dim}($n_methods)",
         title_style = "bold underline yellow",
         width = width-4,
     )
 
     # ------------------------------- CREATE PANEL ------------------------------- #
-    _title = isabstracttype(type) ? " [dim](Abstract)[/dim]" : ""
+    _title = isabstracttype(type) ? " {dim}(Abstract){/dim}" : ""
     panel = Panel(
         Spacer(width - 2, 1),
         hierarchy,
@@ -321,16 +321,16 @@ function inspect(io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max
         if n_methods > max_n_methods
             methods =
                 join_lines(split_lines(methods)[1:(max_n_methods * 2)]) *
-                "\n\n[grey53]( additional methods not shown... )[/grey53]"
+                "\n\n{grey53}( additional methods not shown... ){/grey53}"
         end
     else
-        methods = "[dim]No methods          [/dim]"
+        methods = "{dim}No methods          {/dim}"
         n_methods = 0
     end
 
     methods_panel = TextBox(
         methods;
-        title = "Methods[dim]($n_methods)",
+        title = "Methods{dim}($n_methods)",
         title_style = "bold underline yellow",
         width = width - 6,
     )
@@ -343,7 +343,7 @@ function inspect(io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max
             docs,
             hLine(width - 6; style = "blue dim"),
             methods_panel;
-            title = "Function: [bold red]$(info.name)[/bold red]",
+            title = "Function: {bold red}$(info.name){/bold red}",
             title_style = "red",
             style = "blue",
             width = width,

@@ -134,7 +134,7 @@ for spinner in keys(SPINNERS)
 
     pbar = ProgressBar(; columns=:spinner, columns_kwargs=columns_kwargs)
     with(pbar) do
-        job = addjob!(pbar; description="[orange1]$spinner...")
+        job = addjob!(pbar; description="{orange1}$spinner...")
         for i in 1:250
             update!(job)
             sleep(.0025)

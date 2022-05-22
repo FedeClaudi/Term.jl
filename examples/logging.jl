@@ -29,11 +29,11 @@ Term's logger prints them with additional information, and some style of course.
 
 x = collect(1:2:20)
 y = x * x'
-name = "the name is [bold blue]Term[/bold blue]"
+name = "the name is {bold blue}Term{/bold blue}"
 p1 = Panel("text")
 
 print("\n"^3)
-@error "[italic green bold]fancy logs![/italic green bold]" x y name √9 install_term_logger p1
+@error "{italic green bold}fancy logs!{/italic green bold}" x y name √9 install_term_logger p1
 
 
 """
@@ -41,4 +41,4 @@ You can reset Julia's default logger like this:
 """
 
 uninstall_term_logger()
-@error "[italic green bold]fancy logs![/italic green bold]" x y name √9 install_term_logger p1
+@error "{italic green bold}fancy logs!{/italic green bold}" x y name √9 install_term_logger p1

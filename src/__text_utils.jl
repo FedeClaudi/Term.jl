@@ -17,11 +17,11 @@ end
 """
 This regex uses lookahead and lookbehind to exclude [[
 at the beginning of a tag, with this:
-    (?<!\\[)\\[(?!\\[)
+    (?<!\\{)\\[(?!\\{)
 """
-const OPEN_TAG_REGEX = r"(?<!\[)\[(?!\[)[a-zA-Z _0-9. ,()#]*\]"
-const CLOSE_TAG_REGEX = r"(?<!\[)\[(?!\[)\/[a-zA-Z _0-9. ,()#]+[^/\[]\]"
-const GENERIC_CLOSER_REGEX = r"(?<!\[)\[(?!\[)\/\]"
+const OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#]*\}"
+const CLOSE_TAG_REGEX = r"(?<!\{)\{(?!\{)\/[a-zA-Z _0-9. ,()#]+[^/\{]\}"
+const GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 """
     remove_markup(input_text::AbstractString)::AbstractString
@@ -132,8 +132,8 @@ textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 
 # --------------------------------- brackets --------------------------------- #
 const brackets_regexes = [
-    r"(?<!\[)\[(?!\[)",
-    r"(?<!\])\](?!\])",
+    r"(?<!\{)\[(?!\{)",
+    r"(?<!\})\}(?!\})",
 ]
 
 """
@@ -143,12 +143,12 @@ Replace each squared bracket with a double copy of itself
 """
 escape_brackets(text)::String = replace_multi(text, 
         brackets_regexes[1]=>"[[",
-        brackets_regexes[2]=>"]]",
+        brackets_regexes[2]=>"]}",
 )
 
 const remove_brackets_regexes = [
     r"\[\[",
-    r"\]\]",
+    r"\}\}",
 ]
 
 """
@@ -157,8 +157,8 @@ const remove_brackets_regexes = [
 Replece every double squared parenthesis with a single copy of itself
 """
 unescape_brackets(text)::String = replace_multi(text, 
-    remove_brackets_regexes[1]=>"[",
-    remove_brackets_regexes[2]=>"]",
+    remove_brackets_regexes[1]=>"{",
+    remove_brackets_regexes[2]=>"}",
 )
 
 unescape_brackets_with_space(text)::String = replace_multi(text, 

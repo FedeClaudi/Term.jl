@@ -5,14 +5,14 @@ Apply style to `x` based on its type.
 """
 function _highlight end
 
-_highlight(x::Union{Symbol,AbstractString}) = "[$(theme.symbol)]$x[/$(theme.symbol)]"
-_highlight(x::Number) = "[$(theme.number)]$x[/$(theme.number)]"
-_highlight(x::DataType) = "[$(theme.type) dim]::$(x)[/$(theme.type) dim]"
+_highlight(x::Union{Symbol,AbstractString}) = "{$(theme.symbol)}$x{/$(theme.symbol)}"
+_highlight(x::Number) = "{$(theme.number)}$x{/$(theme.number)}"
+_highlight(x::DataType) = "{$(theme.type) dim}::$(x){/$(theme.type) dim}"
 _highlight(x::UnitRange) = _highlight(string(x))
 function _highlight(x::Union{AbstractArray,AbstractVector,AbstractMatrix})
-    return "[$(theme.number)]$x[/$(theme.number)]"
+    return "{$(theme.number)}$x{/$(theme.number)}"
 end
-_highlight(x::Function) = "[$(theme.function)]$x[/$(theme.function)]"
+_highlight(x::Function) = "{$(theme.function)}$x{/$(theme.function)}"
 
 function _highlight(x)
     return _highlight(string(x))
@@ -32,7 +32,7 @@ Add style to each number in a string
 """
 function _highlight_numbers(x::AbstractString)
     for match in collect(eachmatch(r"[0-9]", x))
-        x = replace(x, match.match => "[blue]$(match.match)[/blue]")
+        x = replace(x, match.match => "{blue}$(match.match){/blue}")
     end
     return x
 end
@@ -61,11 +61,11 @@ function style_error(io::IO, er)
             main_message / message,
             hLine(WIDTH - 8; style = "red dim"),
             RenderableText(
-                "[bold yellow italic underline]hint:[/bold yellow italic underline] [bright_red]$(typeof(er))[/bright_red] " *
+                "{bold yellow italic underline}hint:{/bold yellow italic underline} {bright_red}$(typeof(er)){/bright_red} " *
                 info_msg;
                 width = WIDTH - 4,
             );
-            title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
+            title = "ERROR: {bold indian_red}$(typeof(er)){/bold indian_red}",
             title_style = "default red",
             style = "dim red",
             width = WIDTH,
@@ -74,7 +74,7 @@ function style_error(io::IO, er)
     else
         panel = Panel(
             main_message;
-            title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
+            title = "ERROR: {bold indian_red}$(typeof(er)){/bold indian_red}",
             title_style = "default red",
             style = "dim red",
             width = WIDTH,
@@ -82,7 +82,7 @@ function style_error(io::IO, er)
         )
     end
     text = RenderableText(
-        "\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message"
+        "\n{bold indian_red}$(typeof(er)):{/bold indian_red} $main_message"
     )
 
     return panel, text
@@ -96,7 +96,7 @@ Create a subpanel for stacktrace, showing source code.
 function backtrace_subpanel(line::String, WIDTH::Int, title::String)
     # @info "getting subpanel"
     # get path to file and line number
-    file = split(split_lines(line)[2], " [bold dim]")[1][13:end]
+    file = split(split_lines(line)[2], " {bold dim}")[1][13:end]
     file, lineno = split(file, ":")
     lineno = parse(Int, lineno)
     # @info "got file and lines" file lineno
@@ -141,8 +141,8 @@ function style_backtrace(io::IO, t::Vector)
     stack_lines::Vector{String} = []
     for (n, frame) in enumerate(t)
         if typeof(frame) ∉ (Ptr, InterpreterIP)
-            func_line = "[light_yellow3]($n)[/light_yellow3] [sky_blue3]$(frame.func)[/sky_blue3]"
-            file_line = "       [dim]$(frame.file):$(frame.line) [bold dim](line: $(frame.line))[/bold dim][/dim]"
+            func_line = "{light_yellow3}($n){/light_yellow3} {sky_blue3}$(frame.func){/sky_blue3}"
+            file_line = "       {dim}$(frame.file):$(frame.line) {bold dim}(line: $(frame.line)){/bold dim}{/dim}"
             push!(stack_lines, func_line * "\n" * file_line)
         end
     end
@@ -151,7 +151,7 @@ function style_backtrace(io::IO, t::Vector)
     if length(stack_lines) > 10
         stack_lines = vcat(
             stack_lines[1:5],
-            "\n[dim bright_blue]        ... skipped $(length(stack_lines)-11) levels in stack trace ...\n",
+            "\n{dim bright_blue}        ... skipped $(length(stack_lines)-11) levels in stack trace ...\n",
             stack_lines[(end - 5):end],
         )
     end
@@ -180,7 +180,7 @@ function style_backtrace(io::IO, t::Vector)
         stack = error_line / above / offending
         # @info "stacked" stack
     else
-        stack = "[dim]No stack trace[/dim]"
+        stack = "{dim}No stack trace{/dim}"
     end
 
     # create output
@@ -215,7 +215,7 @@ function style_stacktrace_simple(stack::Vector)
             push!(
                 lines,
                 apply_style(
-                    "[bright_blue dim]($n)[/bright_blue dim] [yellow]$(frame.func)[/yellow] - [dim]$(line.file):$(line.line)[/dim]",
+                    "{bright_blue dim}($n){/bright_blue dim} {yellow}$(frame.func){/yellow} - {dim}$(line.file):$(line.line){/dim}",
                 ),
             )
         end

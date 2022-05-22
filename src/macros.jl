@@ -10,7 +10,7 @@ will print `my text` as bold, green and underlined
 macro style(text, styles...)
     markup = join(styles, " ")
     quote
-        with_markup = "[$($markup)]$($text)[/$($markup)]"
+        with_markup = "{$($markup)}$($text){/$($markup)}"
         apply_style(with_markup)
     end
 end

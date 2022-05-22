@@ -36,8 +36,8 @@ Of course you can use markup styled text in your panel.
 print("\n\n")
 print(
     Panel(
-        "[red]This is the panel's first line.[/red]",
-        "[bold green]and this is another, panel just stacks all inputs into one piece of content[/bold green]";
+        "{red}This is the panel's first line.{/red}",
+        "{bold green}and this is another, panel just stacks all inputs into one piece of content{/bold green}";
         fit = true,
     ),
 )
@@ -74,7 +74,7 @@ Finally, you can layout panels to create structured content
 print("\n\n")
 pleft = Panel("content "^30; box = :DOUBLE, style = "blue", width = 66)
 pright = Panel(
-    "content [red]with style[/red] "^26;
+    "content {red}with style{/red} "^26;
     title = "My Panel",
     title_style = "bold red",
     width = 44,
