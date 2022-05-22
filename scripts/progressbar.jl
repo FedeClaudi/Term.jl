@@ -19,6 +19,26 @@ function simple(; kwargs...)
     end
 end
 
+
+function simple_slow(; kwargs...)
+    pbar = ProgressBar(; refresh_rate=60, expand=false, columns=:detailed, width=150, kwargs...)
+    j1 = addjob!(pbar; N=5, description="First")
+
+    with(pbar) do
+        for i in 1:5
+            for k in 1:10000
+                x = rand(100, 100)
+                y = x.^2 .- rand(100, 100)
+                # yield()
+            end
+           
+            update!(j1)
+            # println(i)
+            # sleep(.001)
+        end
+    end
+end
+
 function multi_nested()
     pbar = ProgressBar(; refresh_rate=60, expand=false, width=150)
     with(pbar) do
@@ -164,6 +184,17 @@ function _track()
     end
 end
 
+
+function _track_slow()
+    @track for i in 1:10
+        for k in 1:10000
+            x = rand(100, 100)
+            y = x.^2 .- rand(100, 100)
+        end
+    end
+end
+
+
 clear()
 println("starting")
 print("_"^150)
@@ -176,7 +207,11 @@ print("_"^150)
 # mixed()
 # transientjobs()
 # progresslogging()
-_track()
+# _track()
+
+simple_slow()
+# _track_slow()
+
 
 println("done")
 

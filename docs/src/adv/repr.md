@@ -79,10 +79,15 @@ obj = Rocket(10, 50, 5000, "NASA")
 ## `termshow`
 The examples above work when you're the one createing a new type, but how about when you're dealing with types defined in someone else's code?
 
-For that you can use `termshow`: `termshow(x)` returns a `string` or `Panel` with the same kind of visualization you'd get from `@with_repr` - but for any type!
+For that you can use `termshow`: `termshow(x)` prints a `string` or `Panel` with the same kind of visualization you'd get from `@with_repr` - but for any type!
+```@example
+using Term
+termshow(:(x+y))
+```
 
-In fact, you can do more, overwrite the default `show` method like so:
+In fact, you can do more, overwrite the default `show` method (at your own risk!) like so:
 ```@example repr
+using Term
 Base.show(io::IO, ::MIME"text/plain", obj) = print(io, termshow(obj))
 ```
 

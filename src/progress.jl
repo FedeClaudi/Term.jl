@@ -365,6 +365,7 @@ function getjob(pbar::ProgressBar, id)
     return pbar.jobs[idx]
 end
 
+
 """
     start!(pbar::ProgressBar)
 
@@ -380,16 +381,9 @@ function start!(pbar::ProgressBar)
     pbar.running = true
     
     print("\n"^(length(pbar.jobs)))
-
-    pbar.task = @task begin
-        while pbar.running
-            pbar.paused || render(pbar)
-            sleep(pbar.Δt)
-        end
-    end
-    schedule(pbar.task)
     return nothing
 end
+
 
 """
     stop!(pbar::ProgressBar)
@@ -512,7 +506,9 @@ function render(pbar::ProgressBar)
 
     # restore position and write
     move_to_line(iob, pbar.renderstatus.scrollline)
-    write(stdout, take!(iob))
+    # write(stdout, take!(iob))
+
+    print(String(take!(iob)))
 end
 
 
@@ -542,12 +538,20 @@ end
 ```
 """
 function with(expr, pbar::ProgressBar)
+    # @info expr expr.args
+    
     val = nothing
     try
         start!(pbar)
-        render(pbar)
-        val = expr()
-        render(pbar)
+
+
+        task = Threads.@spawn expr()
+        while !istaskdone(task) && pbar.running
+            pbar.paused || render(pbar)
+            sleep(pbar.Δt)
+        end
+        stop!(pbar)
+        var = fetch(task)
     catch  err
         stop!(pbar)
         rethrow()
