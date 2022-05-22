@@ -4,7 +4,7 @@ Okay, time to move beyond simple text. It's time for:
 import Term: Panel # hide
 print(# hide
     Panel(# hide
-        "[red]awesome[/red]", # hide
+        "{red}awesome{/red}", # hide
         title="Term's", # hide
         title_style="bold green", # hide
         style="gold1 bold", # hide
@@ -22,7 +22,7 @@ Simply put, a `Panel` shows a piece of content (generally a styled string, but i
 Well not that simple actually because [`Term.panel.Panel`](@ref) is the first renderable that allows you lots of options to personalize its appearance. For instance the panel printed above is given by:
 ```julia
     Panel(
-        "[red]awesome[/red]",
+        "{red}awesome{/red}",
         title="Term's",
         title_style="bold green",
         style="gold1 bold",

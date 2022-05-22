@@ -11,7 +11,7 @@ function rainbow_maker() # hide
     out = ""  # hide
     for n in 1:length(text)  # hide
         r, g, b = R[n], G[n], B[n]  # hide
-        out *= "[($r, $g, $b)]$(text[n])[/($r, $g, $b)]"  # hide
+        out *= "{($r, $g, $b)}$(text[n]){/($r, $g, $b)}"  # hide
     end # hide
     return out  # hide
 end # hide
@@ -23,7 +23,7 @@ so how can we use different kinds of colors?
 It's all done through `Term`'s markup syntax of course. Look:
 ```@example
 using Term: tprint # hide
-tprint("[(255, 50, 100)]colors![/(255, 50, 100)]")
+tprint("{(255, 50, 100)}colors!{/(255, 50, 100)}")
 ```
 
 yep, you can pass a set of `(r, g, b)` values and that'll do it. Personally, I prefer working with hex codes, and so `Term` can accept them too:
@@ -31,11 +31,11 @@ yep, you can pass a set of `(r, g, b)` values and that'll do it. Personally, I p
 using Term: tprint # hide
 indigo = "#42A5F5"
 
-tprint("Some [$indigo]color![/$indigo]")
+tprint("Some {$indigo}color!{/$indigo}")
 ```
 
 ## Under the hood
-What `Term` is doing here is taking each bit of style information in the markup tag (each word or each `(...)` within `[...]`) and constructing style codes with an `ANSICode` object.
+What `Term` is doing here is taking each bit of style information in the markup tag (each word or each `(...)` within `{...}`) and constructing style codes with an `ANSICode` object.
 
 If the style informaton represents a color, `Term` first represents it as a `AbstractColor` type: `NamedColor` or `BitColor` or `RGBColor`.  
 
@@ -57,7 +57,7 @@ function make_named_colors()
     cnames = collect(keys(CODES_16BIT_COLORS))[sort_idx][1:9]
     colors = ""
     colors = join(map(
-        (c)->"[on_$c] [/on_$c]", cnames
+        (c)->"{on_$c} {/on_$c}", cnames
     ))
     return colors
 end
@@ -68,7 +68,7 @@ function make_16bit_colors()
     cnames = collect(keys(CODES_16BIT_COLORS))[sort_idx][9:end]
     colors = ""
     colors = join(map(
-        (c)->c[1] %  20 == 0 ? "[on_$(c[2])] [/on_$(c[2])]\n" : "[on_$(c[2])] [/on_$(c[2])]", enumerate(cnames)
+        (c)->c[1] %  20 == 0 ? "{on_$(c[2])} {/on_$(c[2])}\n" : "{on_$(c[2]} {/on_$(c[2])}", enumerate(cnames)
     ))
     return colors
 end
@@ -83,7 +83,7 @@ function make_rgb_colors(; max_width=88)
             color = hsl2rgb(h*360, .9, l)
             bg = hsl2rgb(h*360, .9, l + 0.7/10)
 
-            colors *= "[$color on_$bg]▄[/$color on_$bg]"
+            colors *= "{$color on_$bg}▄{/$color on_$bg}"
         end
         colors *= "\n"
     end
