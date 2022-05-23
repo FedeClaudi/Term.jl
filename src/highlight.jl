@@ -8,7 +8,7 @@ highlight_regexes = OrderedDict(
     :number => (
         r"(?<group>(?<![a-zA-Z0-9_])\d+(\.\d*)?+([eE][+-]?\d*)?)", 
         ),
-    :operator => (r"(?<group> \/)", r"(?<group>[\+\-\*\%\^\&\|\!\=\>\<\~])"),
+    :operator => (r"(?<group>(?<!\{)\/)", r"(?<group>[\+\-\*\%\^\&\|\!\=\>\<\~])"),
 
     :string => (r"(?<group>[\"\'](\n|.)*?[\"\'])", ),
     :code => (r"(?<group> ([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))", ),
