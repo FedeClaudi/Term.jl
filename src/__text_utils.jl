@@ -132,22 +132,22 @@ textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 
 # --------------------------------- brackets --------------------------------- #
 const brackets_regexes = [
-    r"(?<!\{)\[(?!\{)",
+    r"(?<!\{)\{(?!\{)",
     r"(?<!\})\}(?!\})",
 ]
 
 """
     remove_ansi(str)::String
 
-Replace each squared bracket with a double copy of itself
+Replace each cirly bracket with a double copy of itself
 """
 escape_brackets(text)::String = replace_multi(text, 
-        brackets_regexes[1]=>"[[",
-        brackets_regexes[2]=>"]}",
+        brackets_regexes[1]=>"{{",
+        brackets_regexes[2]=>"}}",
 )
 
 const remove_brackets_regexes = [
-    r"\[\[",
+    r"\{\{",
     r"\}\}",
 ]
 
@@ -162,8 +162,8 @@ unescape_brackets(text)::String = replace_multi(text,
 )
 
 unescape_brackets_with_space(text)::String = replace_multi(text, 
-    remove_brackets_regexes[1]=>" [",
-    remove_brackets_regexes[2]=>"] ",
+    remove_brackets_regexes[1]=>" {",
+    remove_brackets_regexes[2]=>"} ",
 )
 
 # ---------------------------------------------------------------------------- #

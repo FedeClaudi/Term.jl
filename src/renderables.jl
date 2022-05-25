@@ -4,7 +4,7 @@ import ..measure: Measure
 import ..segment: Segment
 import ..console: console_width
 import ..style: get_style_codes, MarkupStyle, apply_style
-import Term: split_lines, reshape_text, fillin, join_lines
+import Term: split_lines, reshape_text, fillin, join_lines, unescape_brackets_with_space
 import Term: highlight as highlighter
 
 export AbstractRenderable, Renderable, RenderableText
@@ -36,7 +36,7 @@ end
 Print a renderable to an IO
 """
 function Base.print(io::IO, renderable::AbstractRenderable; highlight=true)
-    ren = string(renderable)
+    ren = unescape_brackets_with_space(string(renderable))
     println(io, ren)
 
 end
@@ -44,7 +44,7 @@ end
 """
     show(io::IO, renderable::AbstractRenderable)
 
-Show a renderable's shape.
+Show a renderable.
 """
 function Base.show(io::IO, renderable::AbstractRenderable)
     w, h = renderable.measure.w, renderable.measure.h

@@ -217,7 +217,7 @@ function Panel(
         kwargs...
     )
 
-    content = content isa RenderableText ? string(content) : content
+    content = content isa RenderableText ? apply_style(string(content)) : content
 
     # get measure
     WIDTH = console_width(stdout)
@@ -285,6 +285,8 @@ end
 Panel(renderables::Vector{RenderablesUnion}; kwargs...) = Panel(vstack(renderables...); kwargs...)
 Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
 Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
+
+
 # ---------------------------------------------------------------------------- #
 #                                    TextBox                                   #
 # ---------------------------------------------------------------------------- #

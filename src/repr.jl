@@ -1,11 +1,20 @@
 module Repr
-import Term: truncate
+import Term: truncate, escape_brackets, theme, tprint
 import ..panel: Panel
 import ..renderables: RenderableText
-import ..layout: vLine, rvstack, lvstack, Spacer
+import ..layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack
 import ..style: apply_style
 
-export @with_repr, termshow
+export @with_repr, termshow, install_term_repr
+
+
+
+accent_style = "bold #e0db79"
+name_style = "#e3ac8d"
+type_style = "#bb86db"
+values_style = "#b3d4ff"
+line_style = "dim #7e9dd9"
+panel_style = "#9bb3e0"
 
 """
     typename(typedef::Expr)
@@ -28,7 +37,9 @@ end
 function termshow(io::IO, obj)
     field_names = fieldnames(typeof(obj))
     if length(field_names) == 0
-        print(io, apply_style(string(typeof(obj)), "#e3ac8d"))
+        print(io, 
+            RenderableText("$obj{$type_style}::$(typeof(obj)){/$type_style}")
+        )
         return
     end
     field_types = map(f -> "::" * string(f), typeof(obj).types)
@@ -36,27 +47,95 @@ function termshow(io::IO, obj)
 
     fields = map(
         ft -> RenderableText(
-            apply_style(string(ft[1]), "bold #e0db79") * apply_style(string(ft[2]), "#bb86db")
+            apply_style(string(ft[1]), accent_style) * apply_style(string(ft[2]), type_style)
         ), zip(field_names, field_types)
     ) 
          
     values = []
     for val in _values
         val = truncate(string(val), 45)
-        push!(values, RenderableText.(val; style="#b3d4ff"))
+        push!(values, RenderableText.(val; style=values_style))
     end
 
-    line = vLine(length(fields); style="dim #7e9dd9")
+    line = vLine(length(fields); style=line_style)
     space = Spacer(1, length(fields))
  
     print(io, Panel(
             rvstack(fields...) * line * space * lvstack(values...);
             fit=false, subtitle=string(typeof(obj)), subtitle_justify=:right, width=40,
-            justify=:center, style="#9bb3e0", subtitle_style="#e3ac8d"
+            justify=:center, style=panel_style, subtitle_style=name_style
         )
     )
 end
+
 termshow(obj) = termshow(stdout, obj)
+
+
+
+function termshow(io::IO, obj::AbstractDict)
+    # prepare text renderables
+    k = RenderableText.(string.(keys(obj)); style=accent_style * " bold")
+    ktypes = RenderableText.(
+        map(k -> "{{" * string(typeof(k)) * "}}", collect(keys(obj)));
+        style=type_style * " dim"
+        )
+    vals = RenderableText.(string.(values(obj)); style=values_style * " bold")
+    vtypes = RenderableText.(
+        map(k -> "{{" * string(typeof(k)) * "}}", collect(values(obj)));
+        style=type_style * " dim"
+        )
+
+    # trim if too many
+    if length(k) > 10
+        k, ktypes, vals, vtypes = k[1:10], ktypes[1:10], vals[1:10], vtypes[1:10]
+
+        push!(k, RenderableText("⋮"; style=accent_style))
+        push!(ktypes, RenderableText("⋮"; style=type_style * " dim"))
+        push!(vals, RenderableText("⋮"; style=values_style))
+        push!(vtypes, RenderableText("⋮"; style=type_style * " dim"))
+
+        arrows = vstack(RenderableText.(repeat(["=>"], length(k)-1); style="red bold")...)
+    else
+        arrows = vstack(RenderableText.(repeat(["=>"], length(k)); style="red bold")...)
+
+    end
+
+    # prepare other renderables
+    space = Spacer(1, length(k))
+    line = vLine(length(k); style="dim #7e9dd9")
+
+
+    _keys_renderables = cvstack(ktypes...) * line * space * cvstack(k...)
+    _values_renderables = cvstack(vals...) * space *  line * cvstack(vtypes...);
+
+    print(io, Panel(
+        _keys_renderables * space*arrows*space *  _values_renderables;
+            fit=false, title=escape_brackets(string(typeof(obj))), title_justify=:left, width=40,
+            justify=:center, style=panel_style, title_style=name_style,
+            padding=(2, 2, 1, 1), 
+            subtitle = "{bold white}$(length(keys(obj))){/bold white}{default} items{/default}",
+            subtitle_justify=:right
+        )
+    )
+end
+
+function install_term_repr()
+    @eval begin
+
+        function Base.show(io::IO, ::MIME"text/plain", text::AbstractString)
+            tprint(io, text; highlight=true)
+        end
+
+        function Base.show(io::IO, ::MIME"text/plain", obj)
+            termshow(io, obj)
+        end
+
+        function Base.show(io::IO, ::MIME"text/plain", obj::AbstractDict)
+            termshow(io, obj)
+        end
+    end
+end
+
 
 
 """

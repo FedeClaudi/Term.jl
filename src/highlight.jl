@@ -11,10 +11,11 @@ highlight_regexes = OrderedDict(
     :operator => (r"(?<group>(?<!\{)\/)", r"(?<group>[\+\-\*\%\^\&\|\!\=\>\<\~])"),
 
     :string => (r"(?<group>[\"\'](\n|.)*?[\"\'])", ),
-    :code => (r"(?<group> ([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))", ),
+    :code => (r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))", ),
     # :code => (r"(?<group> [\`]{1}(\n|.)+?[\`]{1})", ),
     :expression => (r"(?<group>\:\(+.+[\)])", ),
     :symbol => (r"(?<group>\:\w+)", ),
+    :emphasis_light => (r"(?<group>[\,\[\]])", ),
 )
 
 
@@ -39,7 +40,7 @@ function highlight(text::AbstractString; theme::Theme=theme)
     end
 
 
-    return text
+    return apply_style(text)
 end
 
 """
@@ -50,7 +51,7 @@ relevant text of type :like.
 """
 function highlight(text::AbstractString, like::Symbol; theme::Theme=theme)
     markup = getfield(theme, like)
-    return do_by_line((x)->"{"*markup*"}"*x*"{/"*markup*"}", chomp(text))
+    return apply_style(do_by_line((x)->"{"*markup*"}"*x*"{/"*markup*"}", chomp(text)))
 end
 
 # shorthand to highlight objects based on type

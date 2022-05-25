@@ -32,7 +32,7 @@ style outputs to terminal.
     string::String              = green
     type::String                = purple_light
     emphasis::String            = "$blue  bold"
-    emphasis_light::String      = green_light
+    emphasis_light::String      = yellow_light
     code::String                = "$(yellow) italic"
     multiline_code::String      = "$(yellow) italic"
     symbol::String              = orange
