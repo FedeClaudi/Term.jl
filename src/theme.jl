@@ -29,7 +29,7 @@ style outputs to terminal.
 """
 @with_kw mutable struct Theme
     docstring::String           = green_dark
-    string::String              = green
+    string::String              = "#64b565"
     type::String                = purple_light
     emphasis::String            = "$blue  bold"
     emphasis_light::String      = yellow_light

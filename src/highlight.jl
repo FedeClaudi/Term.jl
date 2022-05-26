@@ -27,6 +27,8 @@ Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object
 """
 function highlight(text::AbstractString; theme::Theme=theme)   
+    has_markup(text) && return text
+    
     # highlight with regexes 
     for (symb, rxs) in pairs(highlight_regexes)
         markup = getfield(theme, symb)

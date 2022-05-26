@@ -1,5 +1,8 @@
 module Repr
-import Term: truncate, escape_brackets, theme, tprint
+
+
+import Term: truncate, escape_brackets, theme, highlight
+import ..Tprint: tprint
 import ..panel: Panel
 import ..renderables: RenderableText
 import ..layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack
@@ -62,8 +65,13 @@ function termshow(io::IO, obj)
  
     print(io, Panel(
             rvstack(fields...) * line * space * lvstack(values...);
-            fit=false, subtitle=string(typeof(obj)), subtitle_justify=:right, width=40,
-            justify=:center, style=panel_style, subtitle_style=name_style
+            fit=false, 
+            subtitle=escape_brackets(string(typeof(obj))), 
+            subtitle_justify=:right, 
+            width=40,
+            justify=:center, 
+            style=panel_style, 
+            subtitle_style=name_style
         )
     )
 end
@@ -73,15 +81,16 @@ termshow(obj) = termshow(stdout, obj)
 
 
 function termshow(io::IO, obj::AbstractDict)
+    short_string(x) = truncate(string(x), 30)
     # prepare text renderables
-    k = RenderableText.(string.(keys(obj)); style=accent_style * " bold")
+    k = RenderableText.(short_string.(keys(obj)); style=accent_style * " bold")
     ktypes = RenderableText.(
-        map(k -> "{{" * string(typeof(k)) * "}}", collect(keys(obj)));
+        map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
         style=type_style * " dim"
         )
-    vals = RenderableText.(string.(values(obj)); style=values_style * " bold")
+    vals = RenderableText.(short_string.(values(obj)); style=values_style * " bold")
     vtypes = RenderableText.(
-        map(k -> "{{" * string(typeof(k)) * "}}", collect(values(obj)));
+        map(k -> "{{" * short_string(typeof(k)) * "}}", collect(values(obj)));
         style=type_style * " dim"
         )
 
@@ -104,7 +113,6 @@ function termshow(io::IO, obj::AbstractDict)
     space = Spacer(1, length(k))
     line = vLine(length(k); style="dim #7e9dd9")
 
-
     _keys_renderables = cvstack(ktypes...) * line * space * cvstack(k...)
     _values_renderables = cvstack(vals...) * space *  line * cvstack(vtypes...);
 
@@ -119,18 +127,156 @@ function termshow(io::IO, obj::AbstractDict)
     )
 end
 
+
+
+function vec_elems2renderables(v::Union{Tuple, AbstractVector}, N, max_w)
+    shortsting(x) = truncate(string(x), max_w)
+    out = RenderableText.(
+        highlight.(
+            shortsting.(
+            v[1:N]
+        ))
+    )
+
+    length(v) > N && push!(
+        out,
+        RenderableText("⋮";)
+    )
+    return cvstack(out...)
+end
+
+function repr_panel(obj, content, subtitle)
+    return  Panel(
+        content;
+        fit=false, 
+        title=escape_brackets(string(
+            typeof(obj)
+            )), 
+        title_justify=:left, 
+        width=40,
+        justify=:center, 
+        style=panel_style, 
+        title_style=name_style,
+        padding=(2, 2, 1, 1), 
+        subtitle = subtitle,
+        subtitle_justify=:right
+    )
+end
+
+function matrix2content(mtx::AbstractMatrix; max_w=12, max_items=100, max_D=10)
+    N = min(max_items, size(mtx, 1))
+    D = min(max_D, size(mtx, 2))
+
+    columns = [
+        vec_elems2renderables(mtx[:, i], N, max_w)
+        for i in 1:D
+    ]
+    counts = RenderableText.("(" .* string.(1:N) .* ")"; style="dim")
+    top_counts = RenderableText.("(" .* string.(1:D) .* ")"; style="dim white bold")
+
+    space1, space2 = Spacer(3, length(counts)), Spacer(2, length(counts))
+
+    content = ("" / ""/ rvstack(counts...)) * space1 
+    for i in 1:D-1
+        content *= cvstack(top_counts[i], "", lvstack(columns[i])) * space2
+    end
+    content *= cvstack(top_counts[end], "", lvstack(columns[end]))
+
+    if D < size(mtx, 2)
+        content *= ""/ ""/  vstack((" {bold}⋯{/bold}" for i in 1:N)...)
+    end
+    return content
+end
+
+function vec2content(vec::Union{Tuple, AbstractVector})
+    max_w = 88
+    max_items = 100
+    N = min(max_items, length(vec))
+
+    if N == 0
+        return "{bright_blue}empty vector{/bright_blue}"
+    end
+
+    vec_items = vec_elems2renderables(vec, N, max_w)
+    counts = RenderableText.("(" .* string.(1:N) .* ")"; style="dim")
+
+    content = rvstack(counts...) * Spacer(3, length(counts)) * cvstack(
+        vec_items
+    )
+    return content
+end
+
+
+function termshow(io::IO, mtx::AbstractMatrix)
+
+    print(io, repr_panel(
+        mtx, matrix2content(mtx), "{bold white}$(size(mtx, 1)) × $(size(mtx, 2)){/bold white}{default} {/default}",
+    ))
+
+
+end
+
+function termshow(io::IO, vec::Union{Tuple, AbstractVector})
+    print(io, 
+        repr_panel(
+            vec, vec2content(vec),
+                "{bold white}$(length(vec)){/bold white}{default} items{/default}",
+            )
+    )
+end
+
+
+function termshow(io::IO, arr::AbstractArray)
+    I = CartesianIndices(size(arr)[3:end])
+    I = I[1:min(10, length(I))]
+
+    panels::Vector{Union{Panel, Spacer}} = []
+    for (n, i) in enumerate(I)
+        i_string = join([string(i) for i in Tuple(i)], ", ")
+        push!(
+            panels, Panel(
+                matrix2content(arr[:, :, i]; max_w=60, max_items=25, max_D=5),
+                subtitle="[:, :, $i_string]",
+                subtitle_justify=:right,
+                width=22, style="dim yellow",
+                subtitle_style="default",
+                title="($n)", title_style="dim bright_blue"
+                )
+        )
+        push!(panels, Spacer(1, 2))
+    end
+    print(io, repr_panel(
+        arr, vstack(panels...),
+        "{white}" * join(string.(size(arr)), " × ") * "{/white}"
+    ))
+
+end
+
+
 function install_term_repr()
     @eval begin
-
         function Base.show(io::IO, ::MIME"text/plain", text::AbstractString)
-            tprint(io, text; highlight=true)
+            tprint(io, "{$(theme.string)}" * text * "{/$(theme.string)}"; highlight=true)
         end
+
+        function Base.show(io::IO, ::MIME"text/plain", num::Number)
+            tprint(io, string(num); highlight=true)
+        end
+
+        function Base.show(io::IO,  num::Number)
+            tprint(io, string(num); highlight=true)
+        end
+
 
         function Base.show(io::IO, ::MIME"text/plain", obj)
             termshow(io, obj)
         end
 
         function Base.show(io::IO, ::MIME"text/plain", obj::AbstractDict)
+            termshow(io, obj)
+        end
+
+        function Base.show(io::IO, ::MIME"text/plain", obj::Union{AbstractArray, AbstractMatrix})
             termshow(io, obj)
         end
     end

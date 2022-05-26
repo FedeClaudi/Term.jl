@@ -1,6 +1,6 @@
 module Tprint
 
-import Term: theme, unescape_brackets, escape_brackets
+import Term: theme, unescape_brackets, escape_brackets, has_markup
 import Term: highlight as highlighter
 import ..renderables: AbstractRenderable
 import ..style: apply_style
