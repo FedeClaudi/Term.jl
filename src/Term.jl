@@ -38,7 +38,7 @@ export inspect, typestree, expressiontree
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
-export install_stacktrace
+export install_term_stacktrace
 export install_term_logger, uninstall_term_logger
 export track
 export Tree
@@ -116,7 +116,7 @@ measure.height(seg::Segment) = seg.measure.h
 measure.height(ren::AbstractRenderable) = ren.measure.h
 
 # ---------------------------------- others ---------------------------------- #
-using .errors: install_stacktrace
+using .errors: install_term_stacktrace
 
 using .logging: install_term_logger, uninstall_term_logger, TermLogger
 

@@ -1,6 +1,6 @@
-import Term: install_stacktrace
+import Term: install_term_stacktrace
 
-install_stacktrace()
+install_term_stacktrace()
 
 """
 The logic behind these tests is that if something goes

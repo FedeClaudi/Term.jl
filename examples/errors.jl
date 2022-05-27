@@ -13,10 +13,10 @@ to hold back on this feature for code that needs to reliably print acurate
 error information.
 """
 
-import Term: install_stacktrace
+import Term: install_term_stacktrace
 import Term: hLine
 
-install_stacktrace()
+install_term_stacktrace()
 
 print(hLine("Fancy Errors"; style = "bold blue"))
 

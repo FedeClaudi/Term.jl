@@ -12,7 +12,7 @@ import ..layout: hLine, Spacer
 import ..console: console_width
 import ..measure: Measure
 
-export install_stacktrace
+export install_term_stacktrace
 
 const ErrorsExplanations = Dict(
     ArgumentError => "The parameters to a function call do not match a valid signature.",
@@ -214,7 +214,7 @@ end
 # ---------------------------------------------------------------------------- #
 #                              INSTALL STACKTRACE                              #
 # ---------------------------------------------------------------------------- #
-function install_stacktrace()
+function install_term_stacktrace()
     @eval begin
 
         # ---------------------------- handle load errors ---------------------------- #

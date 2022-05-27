@@ -42,10 +42,10 @@ style outputs to terminal.
     func::String                = yellow
 
     # loggin levels
-    info::String                = blue
-    debug::String               = blue
-    warn::String                = orange
-    error::String               = "bold $red"
+    info::String                = "#7cb0cf"
+    debug::String               = "#197fbd"
+    warn::String                = "#d1923f"
+    error::String               = "bold #d13f3f"
 
     # Tree objects
     tree_title_style::String    = "$orange italic"

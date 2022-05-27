@@ -12,7 +12,8 @@ import Term: Theme,
             unescape_brackets,
             reshape_text,
             has_markup,
-            int
+            int,
+            highlight
 
 
 import ..box: ROUNDED
@@ -93,7 +94,7 @@ function print_closing_line(color::String, width::Int = 48)
     _time = Dates.format(Dates.now(), "HH:MM:SS")
     pad = width - textlen(_date * _time) - 2
     return tprintln(
-        " "^pad * "{dim}$_date{/dim} {bold dim underline}$_time{/bold dim underline}"
+        " "^pad * "{dim}$_date{/dim} {bold dim underline}$_time{/bold dim underline}"; highlight=false
     )
 end
 
@@ -161,7 +162,7 @@ function Logging.handle_message(
     fname = ""
     for frame in stacktrace()
         if "$(frame.file)" == file && frame.line == line
-            fname = ".{$(logger.theme.func) underline}$(frame.func){/$(logger.theme.func) underline}"
+            fname = ".{underline}$(frame.func){/underline}"
         end
     end
 
@@ -179,7 +180,6 @@ function Logging.handle_message(
     end
 
     outline_markup = "$color dim"
-    hor = "{$outline_markup}▶{/$outline_markup}"
     vert = "{$outline_markup}" * ROUNDED.mid.left * "{/$outline_markup}"
 
     # style message
@@ -198,12 +198,14 @@ function Logging.handle_message(
     for n in 2:length(msg_lines)
         msg_lines[n] = "  $vert   " * " "^textlen(content) * "{#8abeff}" * msg_lines[n]
     end
-    content *= "  " * msg_lines[1]
-    tprintln(content)
-    tprintln.(msg_lines[2:end])
+    if length(msg_lines) > 0
+        content *= "  " * highlight(msg_lines[1])
+    end
+    tprintln(content; highlight=false)
+    tprintln.(msg_lines[2:end]; highlight=false)
 
     # if no kwargs we can just quit
-    if length(kwargs) == 0
+    if length(kwargs) == 0 || length(msg_lines) == 0
         print_closing_line(color)
         return nothing
     end
@@ -220,15 +222,13 @@ function Logging.handle_message(
     namepad = max(textlen.(string.([v for v in keys(kwargs)]))...)
 
     # print all kwargs
-    tprintln("  $vert")
+    tprintln("  $vert"; highlight=false)
     for ((k, v), _type) in zip(kwargs, _types)
         # get line stub
-        pad = wpad - textlen(_type)
+        pad = wpad - textlen(_type) - 1
         line =
-            "  $vert {$(theme.type) dim}($(_type)){/$(theme.type) dim}" *
-            " "^pad *
-            hor *
-            "  {bold #ff9959}$k{/bold #ff9959}"
+            "  $vert" * " "^pad * " {$(theme.type) dim}($(_type)){/$(theme.type) dim}" *
+            " {bold #e0e0e0}$k{/bold #e0e0e0}"
 
         epad = namepad - textlen(string(k))
         line *= " "^epad * " {bold red}={/bold red} "
@@ -243,15 +243,16 @@ function Logging.handle_message(
             _style = logger.theme.string
         elseif v isa AbstractVector
             _style = logger.theme.number
-            _size = size(v)
             v = escape_brackets(string(v))
             v = textlen(v) > 33 ? v[1:30] * "..." : v
-            v *= "\n {dim}size: $(_size){/dim}"
+            v *= "\n {dim}{bold}$(length(v)) items {/bold}{/dim}"
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
+            _size = size(v)
             v =
-                "$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}" *
-                "\n {dim}size: $(size(v)){/dim}"
+                "$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}"
+            v *= "\n {dim}shape: " * join(string.(_size), " × ") * "{/dim}"
+
         elseif v isa Function
             _style = logger.theme.func
         elseif v isa AbstractRenderable
@@ -268,14 +269,14 @@ function Logging.handle_message(
             vlines = map(
                 ln -> "{"*_style*"}"*ln*"{/"*_style*"}", vlines
             )
+        else
+            vlines = highlight.(vlines)
         end
 
-        if length(vlines) == 1
-            tprintln(line * vlines[1])
-        else
-            tprintln(line * vlines[1])
+        tprintln(line * vlines[1]; highlight=false)
+        if length(vlines) >= 1
             for ln in vlines[2:end]
-                tprintln("  $vert " * " "^lpad * ln)
+                tprintln("  $vert " * " "^lpad * ln; highlight=false)
             end
         end
     end
