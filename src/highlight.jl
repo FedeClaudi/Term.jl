@@ -6,16 +6,21 @@ import OrderedCollections: OrderedDict
 # ------------------------------- highlighting ------------------------------- #
 highlight_regexes = OrderedDict(
     :number => (
-        r"(?<group>(?<![a-zA-Z0-9_])\d+(\.\d*)?+([eE][+-]?\d*)?)", 
-        ),
-    :operator => (r"(?<group>(?<!\{)\/)", r"(?<group>[\+\-\*\%\^\&\|\!\=\>\<\~])"),
-
-    :string => (r"(?<group>[\"\'](\n|.)*?[\"\'])", ),
-    :code => (r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))", ),
-    # :code => (r"(?<group> [\`]{1}(\n|.)+?[\`]{1})", ),
+        r"(?<group>(?<![a-zA-Z0-9_#])\d+(\.\d*)?+([eE][+-]?\d*)?)", ),
+    :operator => (
+        r"(?<group>(?<!\{)\/)", 
+        r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~])"
+    ),
+    :string => (
+        r"(?<group>[\"\']{3}|[\'\"]{1}(\n|.)*?[\"\']{3}|[\'\"]{1})", ),
+    :code => (
+        r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))", ),
     :expression => (r"(?<group>\:\(+.+[\)])", ),
-    :symbol => (r"(?<group>\:\w+)", ),
-    :emphasis_light => (r"(?<group>[\,\[\]])", ),
+    :symbol => (r"(?<group>(?<!\:)(?<!\:)\:\w+)", ),
+    :emphasis_light => (r"(?<group>[\[\]\(\)])", r"(?<group>@\w+)"),
+    :type => (
+        r"(?<group>\:\:[\w\.]*)",
+        r"(?<group>\<\:\w+)"),
 )
 
 
@@ -27,7 +32,7 @@ Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object
 """
 function highlight(text::AbstractString; theme::Theme=theme)   
-    has_markup(text) && return text
+    # has_markup(text) && return text
     
     # highlight with regexes 
     for (symb, rxs) in pairs(highlight_regexes)

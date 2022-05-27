@@ -38,7 +38,7 @@ style outputs to terminal.
     symbol::String              = orange
     expression::String          = amber
     number::String              = blue_light
-    operator::String            = "$red bold"
+    operator::String            = "$red"
     func::String                = yellow
 
     # loggin levels

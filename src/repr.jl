@@ -1,15 +1,15 @@
 module Repr
 
 
-import Term: truncate, escape_brackets, theme, highlight
+import Term: truncate, escape_brackets, theme, highlight, do_by_line, unescape_brackets, split_lines
 import ..Tprint: tprint
-import ..panel: Panel
+import ..panel: Panel, TextBox
 import ..renderables: RenderableText
 import ..layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack
 import ..style: apply_style
+import ..console: console_width
 
 export @with_repr, termshow, install_term_repr
-
 
 
 accent_style = "bold #e0db79"
@@ -19,22 +19,9 @@ values_style = "#b3d4ff"
 line_style = "dim #7e9dd9"
 panel_style = "#9bb3e0"
 
-"""
-    typename(typedef::Expr)
+include("_repr.jl")
+include("_inspect.jl")
 
-Get the name of a type as an expression
-"""
-function typename(typedef::Expr)
-    if typedef.args[2] isa Symbol
-        return typedef.args[2]
-    elseif typedef.args[2].args[1] isa Symbol
-        return typedef.args[2].args[1]
-    elseif typedef.args[2].args[1].args[1] isa Symbol
-        return typedef.args[2].args[1].args[1]
-    else
-        error("Could not parse type-head from: $typedef")
-    end
-end
 
 
 function termshow(io::IO, obj)
@@ -76,10 +63,13 @@ function termshow(io::IO, obj)
     )
 end
 
+
 termshow(obj) = termshow(stdout, obj)
 
 
-
+# ---------------------------------------------------------------------------- #
+#                                  DICTIONARY                                  #
+# ---------------------------------------------------------------------------- #
 function termshow(io::IO, obj::AbstractDict)
     short_string(x) = truncate(string(x), 30)
     # prepare text renderables
@@ -128,92 +118,13 @@ function termshow(io::IO, obj::AbstractDict)
 end
 
 
-
-function vec_elems2renderables(v::Union{Tuple, AbstractVector}, N, max_w)
-    shortsting(x) = truncate(string(x), max_w)
-    out = RenderableText.(
-        highlight.(
-            shortsting.(
-            v[1:N]
-        ))
-    )
-
-    length(v) > N && push!(
-        out,
-        RenderableText("⋮";)
-    )
-    return cvstack(out...)
-end
-
-function repr_panel(obj, content, subtitle)
-    return  Panel(
-        content;
-        fit=false, 
-        title=escape_brackets(string(
-            typeof(obj)
-            )), 
-        title_justify=:left, 
-        width=40,
-        justify=:center, 
-        style=panel_style, 
-        title_style=name_style,
-        padding=(2, 2, 1, 1), 
-        subtitle = subtitle,
-        subtitle_justify=:right
-    )
-end
-
-function matrix2content(mtx::AbstractMatrix; max_w=12, max_items=100, max_D=10)
-    N = min(max_items, size(mtx, 1))
-    D = min(max_D, size(mtx, 2))
-
-    columns = [
-        vec_elems2renderables(mtx[:, i], N, max_w)
-        for i in 1:D
-    ]
-    counts = RenderableText.("(" .* string.(1:N) .* ")"; style="dim")
-    top_counts = RenderableText.("(" .* string.(1:D) .* ")"; style="dim white bold")
-
-    space1, space2 = Spacer(3, length(counts)), Spacer(2, length(counts))
-
-    content = ("" / ""/ rvstack(counts...)) * space1 
-    for i in 1:D-1
-        content *= cvstack(top_counts[i], "", lvstack(columns[i])) * space2
-    end
-    content *= cvstack(top_counts[end], "", lvstack(columns[end]))
-
-    if D < size(mtx, 2)
-        content *= ""/ ""/  vstack((" {bold}⋯{/bold}" for i in 1:N)...)
-    end
-    return content
-end
-
-function vec2content(vec::Union{Tuple, AbstractVector})
-    max_w = 88
-    max_items = 100
-    N = min(max_items, length(vec))
-
-    if N == 0
-        return "{bright_blue}empty vector{/bright_blue}"
-    end
-
-    vec_items = vec_elems2renderables(vec, N, max_w)
-    counts = RenderableText.("(" .* string.(1:N) .* ")"; style="dim")
-
-    content = rvstack(counts...) * Spacer(3, length(counts)) * cvstack(
-        vec_items
-    )
-    return content
-end
-
-
+# ---------------------------------------------------------------------------- #
+#                                ABSTRACT ARRAYS                               #
+# ---------------------------------------------------------------------------- #
 function termshow(io::IO, mtx::AbstractMatrix)
-
     print(io, repr_panel(
         mtx, matrix2content(mtx), "{bold white}$(size(mtx, 1)) × $(size(mtx, 2)){/bold white}{default} {/default}",
     ))
-
-
 end
 
 function termshow(io::IO, vec::Union{Tuple, AbstractVector})
@@ -225,10 +136,9 @@ function termshow(io::IO, vec::Union{Tuple, AbstractVector})
     )
 end
 
-
 function termshow(io::IO, arr::AbstractArray)
-    I = CartesianIndices(size(arr)[3:end])
-    I = I[1:min(10, length(I))]
+    I0 = CartesianIndices(size(arr)[3:end])
+    I = I0[1:min(10, length(I0))]
 
     panels::Vector{Union{Panel, Spacer}} = []
     for (n, i) in enumerate(I)
@@ -245,6 +155,16 @@ function termshow(io::IO, arr::AbstractArray)
         )
         push!(panels, Spacer(1, 2))
     end
+
+    if length(I0) > length(I)
+        push!(
+            panels, Panel(
+                "{dim bright_blue bold underline}$(length(I0) - length(I)){/dim bright_blue bold underline}{dim bright_blue} frames omitted{/dim bright_blue}",
+                width=panels[end-1].measure.w, style="dim yellow",
+                )
+        )
+    end
+
     print(io, repr_panel(
         arr, vstack(panels...),
         "{white}" * join(string.(size(arr)), " × ") * "{/white}"
@@ -253,12 +173,52 @@ function termshow(io::IO, arr::AbstractArray)
 end
 
 
+function termshow(io::IO, fun::Function)
+    # get docstring 
+    doc, docstring = get_docstring(fun)
+    doc = highlight("{#8dbd86}" * string(doc) * "{/#8dbd86}")
+    doc = split_lines(doc)
+    if length(doc) > 5
+        doc = [doc[1:min(5, length(doc))]..., 
+            "{dim bright_blue}$(length(doc)-5) lines omitted...{/dim bright_blue}"
+        ]
+    end
+
+    # get methods
+    _methods = split_lines(string(methods(fun)))
+    N = length(_methods)
+    _methods = length(_methods) > 1 ? _methods[2:min(11, N)] : []
+    _methods = map(
+        m -> join(split(join(split(m, "]")[2:end]), " in ")[1]),
+        _methods
+    )
+    _methods = map(
+        m -> replace(m, string(fun)=>"{bold #a5c6d9}$(string(fun)){/bold #a5c6d9}", count=1), 
+        _methods
+    )
+    counts = RenderableText.("(" .* string.(1:length(_methods)) .* ") "; style="bold dim")
+    length(_methods) < N-1 && push!(
+        _methods,
+        "\n{bold dim bright_blue}$(N - length(_methods)-1){/bold dim bright_blue}{dim bright_blue} methods omitted...{/dim bright_blue}"
+    )
+
+    panel = repr_panel(
+        nothing, 
+        rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...), 
+        "{white bold}$(N-1){/white bold} methods")
+    print(io, cvstack(
+        panel, 
+        TextBox(doc; width=panel.measure.w)
+        )
+    )
+
+end
+
+# ---------------------------------------------------------------------------- #
+#                                 INSTALL REPR                                 #
+# ---------------------------------------------------------------------------- #
 function install_term_repr()
     @eval begin
-        function Base.show(io::IO, ::MIME"text/plain", text::AbstractString)
-            tprint(io, "{$(theme.string)}" * text * "{/$(theme.string)}"; highlight=true)
-        end
-
         function Base.show(io::IO, ::MIME"text/plain", num::Number)
             tprint(io, string(num); highlight=true)
         end
@@ -279,10 +239,17 @@ function install_term_repr()
         function Base.show(io::IO, ::MIME"text/plain", obj::Union{AbstractArray, AbstractMatrix})
             termshow(io, obj)
         end
+
+        function Base.show(io::IO, ::MIME"text/plain", fun::Function)
+            termshow(io, fun)
+        end
     end
 end
 
 
+# ---------------------------------------------------------------------------- #
+#                                   WITH REPR                                  #
+# ---------------------------------------------------------------------------- #
 
 """
     with_repr(typedef::Expr)

@@ -321,11 +321,11 @@ end
 
 Shorten a string of text to a target width
 """
-function truncate(text::AbstractString, width::Int)
+function truncate(text::AbstractString, width::Int; trailing_dots="...")
     width < 0 && return text
     textlen(text) <= width && return text
     trunc = reshape_text(text, width-3)
-    return split_lines(trunc)[1] * "..."
+    return split_lines(trunc)[1] * trailing_dots
 end
 
 # ---------------------------------------------------------------------------- #
