@@ -243,9 +243,10 @@ function Logging.handle_message(
             _style = logger.theme.string
         elseif v isa AbstractVector
             _style = logger.theme.number
+            _size = length(v)
             v = escape_brackets(string(v))
             v = textlen(v) > 33 ? v[1:30] * "..." : v
-            v *= "\n {dim}{bold}$(length(v)) items {/bold}{/dim}"
+            v *= "\n {dim}{bold}$(_size) items {/bold}{/dim}"
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
             _size = size(v)

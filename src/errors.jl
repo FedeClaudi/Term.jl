@@ -1,18 +1,14 @@
 module errors
-include("_errors.jl")
-
 import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
-import Term:
-    theme, highlight, reshape_text, read_file_lines, load_code_and_highlight, split_lines
-import Term.style: apply_style
-import ..panel: Panel, TextBox
-import ..renderables: RenderableText
-import ..layout: hLine, Spacer
-import ..console: console_width
-import ..measure: Measure
+import ..layout: hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack
+import ..renderables: RenderableText, AbstractRenderable
+import ..panel: Panel
+import Term: highlight
 
 export install_term_stacktrace
+
+include("_errors.jl")
 
 const ErrorsExplanations = Dict(
     ArgumentError => "The parameters to a function call do not match a valid signature.",
@@ -37,19 +33,19 @@ _width() = min(console_width(stderr), 100)
 # ----------------------- error type specific messages ----------------------- #
 
 # ! ARGUMENT ERROR
-function error_message(io::IO, er::ArgumentError)
+function error_message(er::ArgumentError)
     return er.msg, ""
 end
 
 # ! ASSERTION ERROR
-function error_message(io::IO, er::AssertionError)
+function error_message(er::AssertionError)
     return er.msg, ""
 end
 
 # ! BOUNDS ERROR
-function error_message(io::IO, er::BoundsError)
+function error_message(er::BoundsError)
     # @info "bounds error" er fieldnames(typeof(er))
-    main_msg = "Attempted to access $(_highlight_with_type(er.a)) at index $(_highlight_with_type(er.i))"
+    main_msg = "Attempted to access $(er.a) at index $(er.i)"
 
     additional_msg = ""
 
@@ -65,46 +61,46 @@ function error_message(io::IO, er::BoundsError)
 end
 
 # ! Domain ERROR
-function error_message(io::IO, er::DomainError)
+function error_message(er::DomainError)
     # @info "err exceprion" er fieldnames(DomainError) er.val
     # msg = split(er.msg, " around ")[1]
-    return er.msg, "\nThe invalid value is: $(_highlight_with_type(er.val))."
+    return er.msg, "\nThe invalid value is: $(er.val)."
 end
 
 # ! DimensionMismatch
-function error_message(io::IO, er::DimensionMismatch)
-    return _highlight_numbers(er.msg), ""
+function error_message(er::DimensionMismatch)
+    return er.msg, ""
 end
 
 # ! DivideError
-function error_message(io::IO, er::DivideError)
+function error_message(er::DivideError)
     return "Attempted integer division by {blue}0{/blue}", ""
 end
 
 # ! EXCEPTION ERROR
-function error_message(io::IO, er::ErrorException)
+function error_message(er::ErrorException)
     # @info "err exceprion" er fieldnames(ErrorException) er.msg
     msg = split(er.msg, " around ")[1]
     return msg, ""
 end
 
 # !  KeyError
-function error_message(io::IO, er::KeyError)
+function error_message(er::KeyError)
     # @info "err KeyError" er fieldnames(KeyError)
-    msg = "Key $(_highlight_with_type(er.key)) not found!"
+    msg = "Key $(er.key) not found!"
     return msg, ""
 end
 
 # ! InexactError
-function error_message(io::IO, er::InexactError)
+function error_message(er::InexactError)
     # @info "load error message"  fieldnames(InexactError)
-    msg = "Cannot convert $(_highlight_with_type(er.val)) to type {$(theme.type)}$(er.T){/$(theme.type)}"
-    subm = "\nConversion error in function: $(_highlight(er.func))"
+    msg = "Cannot convert $(er.val) to type {$(theme.type)}$(er.T){/$(theme.type)}"
+    subm = "\nConversion error in function: $(er.func)"
     return msg, subm
 end
 
 # ! LoadError
-function error_message(io::IO, er::LoadError)
+function error_message(er::LoadError)
     # @info "load error message"  fieldnames(LoadError)
     msg = "At {grey62 underline}$(er.file){/grey62 underline} line {bold}$(er.line)"
     subm = "The cause is an error of type: {bright_red}$(string(typeof(er.error)))"
@@ -113,10 +109,10 @@ end
 
 # ! METHOD ERROR
 _method_regexes = [r"!Matched+[:a-zA-Z]*\{+[a-zA-Z\s \,]*\}", r"!Matched+[:a-zA-Z]*"]
-function error_message(io::IO, er::MethodError; kwargs...)
+function error_message(er::MethodError; kwargs...)
     # get main error message
-    _args = join([string(ar) * _highlight(typeof(ar)) for ar in er.args], "\n      ")
-    fn_name = "$(_highlight(string(er.f)))"
+    _args = join([string(ar) * typeof(ar) for ar in er.args], "\n      ")
+    fn_name = "$(string(er.f))"
     main_line = "No method matching $fn_name with arguments:\n      " * _args
 
     # get recomended candidates
@@ -126,7 +122,6 @@ function error_message(io::IO, er::MethodError; kwargs...)
     for can in _candidates[3:(end - 1)]
         fun, file = split(can, " at ")
         name, args = split(fun, "("; limit = 2)
-        # name = "[red]$name[/red}"
 
         for regex in _method_regexes
             for match in collect(eachmatch(regex, args))
@@ -156,12 +151,12 @@ function error_message(io::IO, er::MethodError; kwargs...)
 end
 
 # ! StackOverflowError
-function error_message(io::IO, er::StackOverflowError)
+function error_message(er::StackOverflowError)
     return "Stack overflow error: too many function calls.", ""
 end
 
 # ! TYPE ERROR
-function error_message(io::IO, er::TypeError)
+function error_message(er::TypeError)
     # @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
     # var = string(er.var)
     msg = "In `{$(theme.emphasis_light) italic}$(er.func)` > `$(er.context){/$(theme.emphasis_light) italic}` got"
@@ -171,34 +166,34 @@ function error_message(io::IO, er::TypeError)
 end
 
 # ! UndefKeywordError
-function error_message(io::IO, er::UndefKeywordError)
+function error_message(er::UndefKeywordError)
     # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
     var = string(er.var)
-    return "Undefined function keyword argument: '$(_highlight(er.var))'.", ""
+    return "Undefined function keyword argument: `$(er.var)`.", ""
 end
 
 # ! UNDEFVAR ERROR
-function error_message(io::IO, er::UndefVarError)
+function error_message(er::UndefVarError)
     # @info "undef var error" er er.var typeof(er.var)
     var = string(er.var)
-    return "Undefined variable '$(_highlight(er.var))'.", ""
+    return "Undefined variable `$(er.var)`.", ""
 end
 
 # ! STRING INDEX ERROR
-function error_message(io::IO, er::StringIndexError)
+function error_message(er::StringIndexError)
     # @info er typeof(er) fieldnames(typeof(er)) 
     m1 = "attempted to access a String at index $(er.index)\n"
     return m1, ""
 end
 
 # ! catch all other errors
-function error_message(io::IO, er)
+function error_message(er)
     @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(
         typeof(er)
     )
     if hasfield(typeof(er), :error)
         # @info "nested error" typeof(er.error)
-        m1, m2 = error_message(io, er.error)
+        m1, m2 = error_message(er.error)
         msg = "\n{bold red}LoadError:{/bold red}\n" * m1
     else
         msg = if hasfield(typeof(er), :msg)
@@ -216,49 +211,22 @@ end
 # ---------------------------------------------------------------------------- #
 function install_term_stacktrace()
     @eval begin
-
-        # ---------------------------- handle load errors ---------------------------- #
-
-        function Base.showerror(io::IO, er::LoadError, bt; backtrace = true)
-            print("\n")
-            println(hLine(_width(), "{default bold red}LoadError{/default bold red}"; style = "dim red"))
-            Base.display_error(io, er, bt)
-
-            return Base.showerror(io, er.error, bt; backtrace = true)
-        end
-
-        """
-        prints a line to mark te start of the error followed
-        by the error's stack trace
-        """
-
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            ename = string(typeof(er))
-            print("\n"*hLine(_width(), "{default bold red}$ename{/default bold red}"; style = "dim red"))
-
-            try
-                stack = style_backtrace(io, bt)
-                print(stack)
-            catch stack_error
-                @warn "failed to generate stack trace" er stack_error
-                println.(style_stacktrace_simple(bt))
-            end
-        end
-
-        # # ------------------ handle all other errors (no backtrace) ------------------ #
-        """
-        Re-define Base module function. Prints a nicely formatted error message.
-        """
+            println("\n")
+            ename = string(typeof(er))        
+            error = hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
+            rendered_bt = render_backtrace(bt)
+            error /= rendered_bt
         
-        function Base.display_error(io::IO, er, bt)
-            try
-                err, err_msg = style_error(io, er)
-                println(err / err_msg)
-            catch styling_error
-                @error "Failed to generate styled error message" styling_error stacktrace()
-
-                println(apply_style("Original error: {bright_red}$(string(er))"))
-            end
+            err, _ = error_message(er)
+            msg = "" / Panel(
+                "{#aec2e8}$(highlight(err)){/#aec2e8}"; 
+                width=rendered_bt.measure.w,
+                title="{bold red default underline}$(typeof(er)){/bold red default underline}",
+                padding=(2, 2, 1, 1), style="dim red", title_justify=:center
+            )
+            error /= msg
+            print(error)
         end
     end
 end

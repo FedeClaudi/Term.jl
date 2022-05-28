@@ -422,6 +422,10 @@ function rvstack(renderables::RenderablesUnion...)::Renderable
     return vstack(renderables...)
 end
 
+rvstack(renderables::Vector) = rvstack(renderables...)
+cvstack(renderables::Vector) = cvstack(renderables...)
+lvstack(renderables::Vector) = lvstack(renderables...)
+
 ← = lvstack
 ↓ = cvstack
 → = rvstack
@@ -532,9 +536,9 @@ function hLine(
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
 
-    open, close, space =  "{" * style * "}",  "{/" * style * "}\e[0m", " "
-    line = open * get_lrow(box, lw-tl, :top; with_left=false) *
-                space * text * space * get_rrow(box, rw-tr, :top; with_right=false) * close
+    line =  get_lrow(box, lw-tl, :top; with_left=false) *
+            " " * text * " " * 
+            "{$style}" * get_rrow(box, rw-tr, :top; with_right=false)
 
     return hLine([Segment(line, style)], Measure(width, 1))
 end

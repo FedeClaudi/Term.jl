@@ -141,7 +141,7 @@ function render(
     final_segments::Vector{Segment} = [
         repeat(empty, n_extra)...,                  # lines to reach target height
         repeat(empty, padding.bottom)...,           # bottom padding
-        bottom,                                     # bottom border
+        bottom * "\e[0m",                                     # bottom border
     ]
 
     segments = vcat(initial_segments, content_sgs, final_segments)
