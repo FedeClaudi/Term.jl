@@ -45,7 +45,7 @@ end
 # ! BOUNDS ERROR
 function error_message(er::BoundsError)
     # @info "bounds error" er fieldnames(typeof(er))
-    main_msg = "Attempted to access $(er.a) at index $(er.i)"
+    main_msg = "Attempted to access `$(er.a)` at index $(er.i)"
 
     additional_msg = ""
 
@@ -74,7 +74,7 @@ end
 
 # ! DivideError
 function error_message(er::DivideError)
-    return "Attempted integer division by {blue}0{/blue}", ""
+    return "Attempted integer division by {bold}0{/bold}", ""
 end
 
 # ! EXCEPTION ERROR
@@ -87,14 +87,14 @@ end
 # !  KeyError
 function error_message(er::KeyError)
     # @info "err KeyError" er fieldnames(KeyError)
-    msg = "Key $(er.key) not found!"
+    msg = "Key `$(er.key)` not found!"
     return msg, ""
 end
 
 # ! InexactError
 function error_message(er::InexactError)
     # @info "load error message"  fieldnames(InexactError)
-    msg = "Cannot convert $(er.val) to type {$(theme.type)}$(er.T){/$(theme.type)}"
+    msg = "Cannot convert $(er.val) to type ::$(er.T)"
     subm = "\nConversion error in function: $(er.func)"
     return msg, subm
 end
@@ -102,52 +102,29 @@ end
 # ! LoadError
 function error_message(er::LoadError)
     # @info "load error message"  fieldnames(LoadError)
-    msg = "At {grey62 underline}$(er.file){/grey62 underline} line {bold}$(er.line)"
+    msg = "At {grey62 underline}$(er.file){/grey62 underline} line {bold}$(er.line){/bold}"
     subm = "The cause is an error of type: {bright_red}$(string(typeof(er.error)))"
     return msg, subm
 end
 
 # ! METHOD ERROR
-_method_regexes = [r"!Matched+[:a-zA-Z]*\{+[a-zA-Z\s \,]*\}", r"!Matched+[:a-zA-Z]*"]
 function error_message(er::MethodError; kwargs...)
+
     # get main error message
-    _args = join([string(ar) * typeof(ar) for ar in er.args], "\n      ")
-    fn_name = "$(string(er.f))"
-    main_line = "No method matching $fn_name with arguments:\n      " * _args
-
-    # get recomended candidates
-    _candidates = split(sprint(show_method_candidates, er; context = io), "\n")
-    candidates::Vector{String} = []
-
-    for can in _candidates[3:(end - 1)]
-        fun, file = split(can, " at ")
-        name, args = split(fun, "("; limit = 2)
-
-        for regex in _method_regexes
-            for match in collect(eachmatch(regex, args))
-                args = replace(
-                    args, match.match => "{dim red}$(match.match[9:end]){/dim red}"
-                )
-            end
-        end
-
-        file, lineno = split(file, ":")
-
-        # println(RenderableText(name, "red"))
-        push!(candidates, fn_name * "(" * args)
-        push!(candidates, "{dim}$file {bold dim}(line: $lineno){/bold dim}{/dim}\n")
-    end
-    candidates =
-        length(candidates) == 0 ? ["{dim}no candidate method found{/dim}"] : candidates
-
-    return main_line * "\n",
-    Panel(
-        "\n" * join(candidates, "\n");
-        width = _width() - 10,
-        title = "closest candidates",
-        title_style = "yellow",
-        style = "blue dim",
+    _args = RenderableText.(
+        map(a -> "    $a::$(typeof(a))", er.args)
     )
+    # _args = join([string(ar) * typeof(ar) for ar in er.args], "\n      ")
+    fn_name = "$(string(er.f))"
+    main_line = "No method matching `$fn_name` with arguments:" /  lvstack(_args...)
+    
+    # get recomended candidates
+    _candidates = split(sprint(show_method_candidates, er), "\n")[3:end-1]
+    _candidates = map(c -> split(c, " at ")[1], _candidates)
+
+    candidates = RenderableText.(_candidates)
+    
+    return string(main_line / "" / "Alternative candidates:" / lvstack(candidates)), ""
 end
 
 # ! StackOverflowError
@@ -159,9 +136,8 @@ end
 function error_message(er::TypeError)
     # @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
     # var = string(er.var)
-    msg = "In `{$(theme.emphasis_light) italic}$(er.func)` > `$(er.context){/$(theme.emphasis_light) italic}` got"
-    msg *= " {orange1 bold}$(er.got){/orange1 bold}{$(theme.type)}(::$(typeof(er.got))){/$(theme.type)} but expected argument of type"
-    msg *= " {$(theme.type)}::$(er.expected){/$(theme.type)}"
+    msg = "In `$(er.func)` > `$(er.context)` got"
+    msg *= " {orange1 bold}$(er.got){/orange1 bold}(::$(typeof(er.got))) but expected argument of type ::$(er.expected)"
     return msg, ""
 end
 
@@ -188,9 +164,9 @@ end
 
 # ! catch all other errors
 function error_message(er)
-    @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(
-        typeof(er)
-    )
+    # @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(
+    #     typeof(er)
+    # )
     if hasfield(typeof(er), :error)
         # @info "nested error" typeof(er.error)
         m1, m2 = error_message(er.error)
