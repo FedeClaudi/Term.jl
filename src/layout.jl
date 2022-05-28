@@ -65,7 +65,6 @@ function pad(text::AbstractString, left::Int=0, right::Int=0)::String
     return " "^left * text * " "^right
 end
 
-
 """
     pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
 
@@ -569,4 +568,36 @@ end
 Construct an hLine with same width as a renderable
 """
 hLine(ren::AbstractRenderable; kwargs...) = hLine(ren.measure.w; kwargs...)
+
+"""
+    grid(rens::AbstractVector{<:AbstractRenderable}, layout::Union{Nothing,Tuple} = nothing, placeholder = nothing)
+
+Construct a square grid from a `AbsractVector` of `AbstractRenderable`
+"""
+function grid(
+    rens::AbstractVector{<:AbstractRenderable};
+    layout::Union{Nothing,Tuple} = nothing, placeholder = nothing
+)
+    num = length(rens)
+    if layout === nothing
+        m = ceil(Int, √(num))
+        n, r = divrem(num, m)
+        r == 0 || (n += 1)
+    else
+        m, n = layout
+    end
+    fill_in = placeholder === nothing ? eltype(rens)() : placeholder
+    return grid(reshape(append!(copy(rens), [fill_in for _ in 1:(m * n - num)]), m, n))
+end
+
+"""
+    grid(rens::AbstractMatrix{<:AbstractRenderable})
+
+Construct a grid from a `AbstractMatrix` of `AbstractRenderable`
+"""
+function grid(rens::AbstractMatrix{<:AbstractRenderable})
+    rows = collect(foldl(*, col[2:end], init = first(col)) for col in eachrow(rens))
+    return foldl(/, rows[2:end], init = first(rows))
+end
+
 end

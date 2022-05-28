@@ -44,7 +44,7 @@ export track
 export Tree
 export Dendogram
 export rightalign!, leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign
-export @with_repr, termshow, install_term_repr
+export @with_repr, termshow, install_term_repr, grid
 
 # ----------------------------------- base ----------------------------------- #
 using .measure: measure
@@ -101,7 +101,8 @@ using .layout: Padding,
             lvstack,
             cvstack,
             rvstack,
-            ←, ↓, → 
+            ←, ↓, →,
+            grid
 
 
 using .panel: Panel, TextBox
