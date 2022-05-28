@@ -11,8 +11,8 @@ import Term: int,
             truncate
 
 export get_row, get_title_row
-export ASCII,
-    ASCII2, ASCII_DOUBLE_HEAD, SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
+export NONE, ASCII, ASCII2, ASCII_DOUBLE_HEAD
+export SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
 export MINIMAL_DOUBLE_HEAD, SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, HORIZONTALS, ROUNDED, HEAVY
 export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
 
@@ -250,6 +250,20 @@ end
 # ---------------------------------------------------------------------------- #
 #                                   Box types                                  #
 # ---------------------------------------------------------------------------- #
+
+NONE = Box(
+    "NONE",
+    """
+        
+        
+        
+        
+        
+        
+        
+        
+    """,
+)
 
 ASCII = Box(
     "ASCII",
