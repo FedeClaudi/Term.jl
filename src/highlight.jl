@@ -31,7 +31,7 @@ highlight_regexes = OrderedDict(
 Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object
 """
-function highlight(text::AbstractString; theme::Theme=theme)   
+function highlight(text::AbstractString; theme::Theme=term_theme)   
     # has_markup(text) && return text
     
     # highlight with regexes 
@@ -56,20 +56,20 @@ end
 Hilights an entire text as if it was a type of semantically
 relevant text of type :like.
 """
-function highlight(text::AbstractString, like::Symbol; theme::Theme=theme)
+function highlight(text::AbstractString, like::Symbol; theme::Theme=term_theme)
     markup = getfield(theme, like)
     return apply_style(do_by_line((x)->"{"*markup*"}"*x*"{/"*markup*"}", chomp(text)))
 end
 
 # shorthand to highlight objects based on type
-highlight(x::Union{UnionAll, DataType}; theme::Theme=theme) = highlight(string(x), :type; theme=theme)
-highlight(x::Number; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
-highlight(x::Function; theme::Theme=theme) = highlight(string(x), :func; theme=theme)
-highlight(x::Symbol; theme::Theme=theme) = highlight(string(x), :symbol; theme=theme)
-highlight(x::Expr; theme::Theme=theme) = highlight(string(x), :expression; theme=theme)
-highlight(x::AbstractVector; theme::Theme=theme) = highlight(string(x), :number; theme=theme)
+highlight(x::Union{UnionAll, DataType}; theme::Theme=term_theme) = highlight(string(x), :type; theme=theme)
+highlight(x::Number; theme::Theme=term_theme) = highlight(string(x), :number; theme=theme)
+highlight(x::Function; theme::Theme=term_theme) = highlight(string(x), :func; theme=theme)
+highlight(x::Symbol; theme::Theme=term_theme) = highlight(string(x), :symbol; theme=theme)
+highlight(x::Expr; theme::Theme=term_theme) = highlight(string(x), :expression; theme=theme)
+highlight(x::AbstractVector; theme::Theme=term_theme) = highlight(string(x), :number; theme=theme)
 
-highlight(x; theme=theme) = string(x)  # capture all other cases
+highlight(x; theme=term_theme) = string(x)  # capture all other cases
 
 
 # ------------------------------ Highlighters.jl ----------------------------- #

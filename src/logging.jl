@@ -6,14 +6,14 @@ using InteractiveUtils
 using ProgressLogging: asprogress
 
 import Term: Theme,
-            theme,
             textlen,
             escape_brackets,
             unescape_brackets,
             reshape_text,
             has_markup,
             int,
-            highlight
+            highlight,
+            term_theme
 
 
 import ..box: ROUNDED
@@ -37,6 +37,7 @@ import ..progress: ProgressBar,
 import ..console: console_width, console_height, change_scroll_region, move_to_line
 
 export TermLogger, install_term_logger
+
 
 
 DEFAULT_LOGGER = global_logger()
@@ -199,7 +200,7 @@ function Logging.handle_message(
         msg_lines[n] = "  $vert   " * " "^textlen(content) * "{#8abeff}" * msg_lines[n]
     end
     if length(msg_lines) > 0
-        content *= "  " * highlight(msg_lines[1])
+        content *= "  " * msg_lines[1]
     end
     tprintln(content; highlight=false)
     tprintln.(msg_lines[2:end]; highlight=false)
@@ -293,10 +294,11 @@ Install `TermLogger` as the global logging system.
 
 `theme::Theme` can be passed to specify the theme to use for styling objects.
 """
-function install_term_logger(theme::Theme = theme)
+function install_term_logger(theme::Theme = term_theme)
     _logger = TermLogger(theme)
     return global_logger(_logger)
 end
+
 
 function uninstall_term_logger()
     _lg = global_logger(DEFAULT_LOGGER)

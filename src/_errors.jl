@@ -50,16 +50,16 @@ function render_backtrace(bt::Vector{StackFrame})
     
     N = length(frame_numbers)
     if N > 3
-        if N > 10
+        if N > 20
             skipped_line = hLine(
-                content[1].measure.w, "{blue dim bold}$(N - 12){/blue dim bold}{blue dim} frames skipped{/blue dim}";
+                content[1].measure.w, "{blue dim bold}$(N - 22){/blue dim bold}{blue dim} frames skipped{/blue dim}";
                 style="blue dim"
             )
 
-            frames = cvstack(
+            frames = lvstack(
                 vstack(
                     map(x->"   " * hstack(x...), 
-                        zip(frame_numbers, frame_info, frame_inlined, frame_from_c))[2:7]...
+                        zip(frame_numbers, frame_info, frame_inlined, frame_from_c))[2:17]...
                 ), 
                 "", 
                 skipped_line, 

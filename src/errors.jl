@@ -196,7 +196,7 @@ function install_term_stacktrace()
         
             err, _ = error_message(er)
             msg = "" / Panel(
-                "{#aec2e8}$(highlight(err)){/#aec2e8}"; 
+                "{#aec2e8}$(err){/#aec2e8}"; 
                 width=rendered_bt.measure.w,
                 title="{bold red default underline}$(typeof(er)){/bold red default underline}",
                 padding=(2, 2, 1, 1), style="dim red", title_justify=:center

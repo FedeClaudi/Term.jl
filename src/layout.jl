@@ -422,9 +422,9 @@ function rvstack(renderables::RenderablesUnion...)::Renderable
     return vstack(renderables...)
 end
 
-rvstack(renderables::Vector) = rvstack(renderables...)
-cvstack(renderables::Vector) = cvstack(renderables...)
-lvstack(renderables::Vector) = lvstack(renderables...)
+rvstack(renderables::Union{Tuple, Vector}) = rvstack(renderables...)
+cvstack(renderables::Union{Tuple, Vector}) = cvstack(renderables...)
+lvstack(renderables::Union{Tuple, Vector}) = lvstack(renderables...)
 
 ← = lvstack
 ↓ = cvstack

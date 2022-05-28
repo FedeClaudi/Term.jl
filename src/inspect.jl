@@ -6,7 +6,6 @@ import MyterialColors: orange, grey_dark, light_green
 
 import Term:
     highlight,
-    theme,
     escape_brackets,
     join_lines,
     unescape_brackets,
