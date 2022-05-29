@@ -10,6 +10,10 @@ include("color.jl")
 include("theme.jl")
 include("highlight.jl")
 
+
+const DEBUG = Ref(false)
+const term_theme = Ref(Theme())
+
 # rely on other modules
 include("style.jl")
 include("segment.jl")
@@ -76,6 +80,8 @@ function measure.Measure(segments::Vector{Segment})
         sum([seg.measure.h for seg in segments]),
     )
 end
+
+
 
 # -------------------------------- renderables ------------------------------- #
 using .box

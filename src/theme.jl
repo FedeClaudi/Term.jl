@@ -98,10 +98,8 @@ function Base.show(io::IO, ::MIME"text/plain", theme::Theme)
     )
 end
 
-global term_theme = Theme() # default theme
-
 function set_theme(theme::Theme)
-    global term_theme = theme
+    term_theme[] = theme
 end
 
 # ------------------------------ Highlighters.jl ----------------------------- #

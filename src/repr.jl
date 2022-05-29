@@ -1,7 +1,14 @@
 module Repr
 
 
-import Term: truncate, escape_brackets, highlight, do_by_line, unescape_brackets, split_lines, term_theme
+import Term: truncate,
+            escape_brackets,
+            highlight,
+            do_by_line,
+            unescape_brackets,
+            split_lines,
+            term_theme            
+
 import ..Tprint: tprint
 import ..panel: Panel, TextBox
 import ..renderables: RenderableText
@@ -12,16 +19,15 @@ import ..console: console_width
 export @with_repr, termshow, install_term_repr
 
 
+
 include("_repr.jl")
 include("_inspect.jl")
-
-
 
 function termshow(io::IO, obj)
     field_names = fieldnames(typeof(obj))
     if length(field_names) == 0
         print(io, 
-            RenderableText("$obj{$term_teme.repr_type_style}::$(typeof(obj)){/$term_teme.repr_type_style}")
+            RenderableText("$obj{$theme.repr_type_style}::$(typeof(obj)){/$theme.repr_type_style}")
         )
         return
     end
@@ -30,17 +36,17 @@ function termshow(io::IO, obj)
 
     fields = map(
         ft -> RenderableText(
-            apply_style(string(ft[1]), term_theme.repr_accent_style) * apply_style(string(ft[2]), term_teme.repr_type_style)
+            apply_style(string(ft[1]), term_theme[].repr_accent_style) * apply_style(string(ft[2]), term_theme[].repr_type_style)
         ), zip(field_names, field_types)
     ) 
          
     values = []
     for val in _values
         val = truncate(string(val), 45)
-        push!(values, RenderableText.(val; style=term_theme.repr_values_style))
+        push!(values, RenderableText.(val; style=term_theme[].repr_values_style))
     end
 
-    line = vLine(length(fields); style=term_theme.repr_line_style)
+    line = vLine(length(fields); style=term_theme[].repr_line_style)
     space = Spacer(1, length(fields))
  
     print(io, Panel(
@@ -50,8 +56,8 @@ function termshow(io::IO, obj)
             subtitle_justify=:right, 
             width=40,
             justify=:center, 
-            style=term_theme.repr_panel_style, 
-            subtitle_style=term_theme.repr_name_style
+            style=term_theme[].repr_panel_style, 
+            subtitle_style=term_theme[].repr_name_style
         )
     )
 end
@@ -66,25 +72,25 @@ termshow(obj) = termshow(stdout, obj)
 function termshow(io::IO, obj::AbstractDict)
     short_string(x) = truncate(string(x), 30)
     # prepare text renderables
-    k = RenderableText.(short_string.(keys(obj)); style=term_theme.repr_accent_style * " bold")
+    k = RenderableText.(short_string.(keys(obj)); style=term_theme[].repr_accent_style * " bold")
     ktypes = RenderableText.(
         map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
-        style=term_teme.repr_type_style * " dim"
+        style=term_theme[].repr_type_style * " dim"
         )
-    vals = RenderableText.(short_string.(values(obj)); style=term_theme.repr_values_style * " bold")
+    vals = RenderableText.(short_string.(values(obj)); style=term_theme[].repr_values_style * " bold")
     vtypes = RenderableText.(
         map(k -> "{{" * short_string(typeof(k)) * "}}", collect(values(obj)));
-        style=term_teme.repr_type_style * " dim"
+        style=term_theme[].repr_type_style * " dim"
         )
 
     # trim if too many
     if length(k) > 10
         k, ktypes, vals, vtypes = k[1:10], ktypes[1:10], vals[1:10], vtypes[1:10]
 
-        push!(k, RenderableText("⋮"; style=term_theme.repr_accent_style))
-        push!(ktypes, RenderableText("⋮"; style=term_teme.repr_type_style * " dim"))
-        push!(vals, RenderableText("⋮"; style=term_theme.repr_values_style))
-        push!(vtypes, RenderableText("⋮"; style=term_teme.repr_type_style * " dim"))
+        push!(k, RenderableText("⋮"; style=term_theme[].repr_accent_style))
+        push!(ktypes, RenderableText("⋮"; style=term_theme[].repr_type_style * " dim"))
+        push!(vals, RenderableText("⋮"; style=term_theme[].repr_values_style))
+        push!(vtypes, RenderableText("⋮"; style=term_theme[].repr_type_style * " dim"))
 
         arrows = vstack(RenderableText.(repeat(["=>"], length(k)-1); style="red bold")...)
     else
@@ -102,7 +108,7 @@ function termshow(io::IO, obj::AbstractDict)
     print(io, Panel(
         _keys_renderables * space*arrows*space *  _values_renderables;
             fit=false, title=escape_brackets(string(typeof(obj))), title_justify=:left, width=40,
-            justify=:center, style=term_theme.repr_panel_style, title_style=term_theme.repr_name_style,
+            justify=:center, style=term_theme[].repr_panel_style, title_style=term_theme[].repr_name_style,
             padding=(2, 2, 1, 1), 
             subtitle = "{bold white}$(length(keys(obj))){/bold white}{default} items{/default}",
             subtitle_justify=:right
