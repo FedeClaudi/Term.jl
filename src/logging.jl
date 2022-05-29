@@ -13,7 +13,8 @@ import Term: Theme,
             has_markup,
             int,
             highlight,
-            term_theme
+            term_theme,
+            truncate
 
 
 import ..box: ROUNDED
@@ -265,7 +266,8 @@ function Logging.handle_message(
         end
 
         # print value lines
-        vlines = split(string(v), "\n")
+        v = reshape_text(truncate(string(v), 177), 60)
+        vlines = split(v, "\n")
 
         if !isnothing(_style)
             vlines = map(

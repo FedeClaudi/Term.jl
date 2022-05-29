@@ -109,22 +109,25 @@ end
 
 # ! METHOD ERROR
 function error_message(er::MethodError; kwargs...)
-
+    # @info "method error" er fieldnames(MethodError) er.f er.args er.world
     # get main error message
-    _args = RenderableText.(
-        map(a -> "    $(truncate(string(a), 22))::$(truncate(string(typeof(a)), 22))", er.args)
+    _args = join(
+        map(a -> highlight("    ::$(truncate(string(typeof(a)), 22))"), er.args), ", "
     )
-    # _args = join([string(ar) * typeof(ar) for ar in er.args], "\n      ")
     fn_name = "$(string(er.f))"
-    main_line = "No method matching `$fn_name` with arguments:" /  lvstack(_args...)
+    main_line = "No method matching `$fn_name` with arguments types:" /  _args
     
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:end-1]
-    _candidates = map(c -> split(c, " at ")[1], _candidates)
-
-    candidates = RenderableText.(_candidates)
+    if length(_candidates) > 0
+        _candidates = map(c -> split(c, " at ")[1], _candidates)
+        candidates = RenderableText.(_candidates)
+        main_line = main_line / "" / "Alternative candidates:" / lvstack(candidates)
+    else
+        main_line = main_line / " " / "{dim}No alternative candidates found"
+    end
     
-    return string(main_line / "" / "Alternative candidates:" / lvstack(candidates)), ""
+    return string(main_line), ""
 end
 
 # ! StackOverflowError
@@ -187,9 +190,9 @@ end
 # ---------------------------------------------------------------------------- #
 function install_term_stacktrace()
     @eval begin
-        base_show_error = Base.showerror
 
         function Base.showerror(io::IO, er, bt; backtrace = true)
+            # @info "Rendering error" er bt
             length(bt) == 0 && return
             try
                 println("\n")
@@ -202,6 +205,7 @@ function install_term_stacktrace()
                 else
                     W = 88
                 end
+                W = 88
             
                 err, _ = error_message(er)
                 msg = "" / Panel(
