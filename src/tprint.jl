@@ -74,11 +74,10 @@ end
 Similar to standard lib's `println` function but with added
 styling functionality.
 """
-tprintln(x; highlight=true) = tprint(x, "\n"; highlight=highlight)
+# tprintln(x; highlight=true) = tprintln(stdout, x; highlight=true)
+# tprintln(io::IO, x; highlight=true) = tprint(io, x, "\n"; highlight=highlight)
+# tprintln(io::IO, args...; highlight=true) = tprint(io, args..., "\n"; highlight=highlight)
 tprintln(args...; highlight=true) = tprint(args..., "\n"; highlight=highlight)
-
-tprintln(io::IO, x; highlight=true) = tprint(io, x, "\n"; highlight=highlight)
-tprintln(io::IO, args...; highlight=true) = tprint(io, args..., "\n"; highlight=highlight)
 
 
 end

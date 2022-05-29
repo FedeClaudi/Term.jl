@@ -13,7 +13,7 @@ import Term: fillin
     @test seg.text == "\e[31mtest\e[39m"
     @test seg.measure.w == 4
 
-    seg = Segment("aa\n[blue]123[/blue]")
+    seg = Segment("aa\n{blue}123{/blue}")
     @test seg.measure.w == 3
     @test seg.measure.h == 2
 
