@@ -111,7 +111,7 @@ Renderable() = Renderable(Vector{Segment}[], Measure(0, 0))
 """
     RenderableText
 
-`Renderable` represnting a text.
+`Renderable` representing a text.
 
 See also [`Renderable`](@ref), [`TextBox`](@ref)
 """
