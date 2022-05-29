@@ -1,5 +1,6 @@
 module renderables
 
+import Term: TERM_DEBUG_ON
 import ..measure: Measure
 import ..segment: Segment
 import ..console: console_width
@@ -63,11 +64,13 @@ Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
     w, h = renderable.measure.w, renderable.measure.h
-    println(io, string(renderable))
-    print(
-        io,
-        "\e[38;5;117m$(typeof(renderable)) <: AbstractRenderable\e[0m \e[2m(w:$(w), h:$(h))\e[0m"
-    )
+    print(io, string(renderable))
+    if TERM_DEBUG_ON[]
+        print(
+            io,
+            "\n\e[38;5;117m$(typeof(renderable)) <: AbstractRenderable\e[0m \e[2m(w:$(w), h:$(h))\e[0m"
+        )
+    end
 end
 
 
