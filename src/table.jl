@@ -169,8 +169,11 @@ module table
     Table(data::AbstractMatrix; kwargs...) = Table(Tables.table(data); kwargs...)
 
     function Table(data::AbstractDict; kwargs...)
+        kwargs = Dict(kwargs...)
         header = pop!(kwargs, :header, collect(keys(data)))
-        data = hstack(values(data))
+        
+        data = hcat(values(data))
+        @info "dict2table" kwargs header data
         return Table(data; header=header, kwargs...)
     end
 

@@ -449,7 +449,7 @@ function reshape_text(text, width::Int)
     end
 
     # check that the last line has the right width
-    if sum(widths[cuts[end]:end]) > width
+    if sum(widths[max(cuts[end]):end]) > width
         _chars = chars[cuts[end]+1:end]
         chars = chars[1:cuts[end]]
         append!(chars, collect(

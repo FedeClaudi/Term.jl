@@ -14,7 +14,8 @@ import Term: Theme,
             int,
             highlight,
             term_theme,
-            truncate
+            truncate,
+            ltrim_str
 
 
 import ..box: ROUNDED
@@ -213,19 +214,21 @@ function Logging.handle_message(
     end
 
     # get padding width
-    _types = string.(typeof.([v for v in values(kwargs)]))
+    _types = string.(typeof.(collect(values(kwargs))))
+    _types = map(t -> ltrim_str(t, 22), _types)
     for (i, _type) in enumerate(values(kwargs))
         if typeof(_type) <: Function
             _types[i] = string(Function)
         end
     end
 
-    wpad = max(textlen.(_types)...) + 2
-    namepad = max(textlen.(string.([v for v in keys(kwargs)]))...)
+    wpad = max(textlen.((_types))...) + 2
+    ks = truncate.(string.(keys(kwargs)), 12)
+    namepad = max(textlen.(ks)...)
 
     # print all kwargs
     tprintln("  $vert"; highlight=false)
-    for ((k, v), _type) in zip(kwargs, _types)
+    for (k, v, _type) in zip(ks, values(kwargs), _types)
         # get line stub
         pad = wpad - textlen(_type) - 1
         line =
@@ -266,7 +269,11 @@ function Logging.handle_message(
         end
 
         # print value lines
-        v = reshape_text(truncate(string(v), 177), 60)
+        try
+            v = reshape_text(ltrim_str(string(v), 177), 60)
+        catch
+            v = ltrim_str(string(v), 60)
+        end
         vlines = split(v, "\n")
 
         if !isnothing(_style)

@@ -209,8 +209,7 @@ function install_term_stacktrace()
     @eval begin
 
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            # @info "Rendering error" er bt
-            length(bt) == 0 && return
+            (length(bt) == 0 && !isa(er, StackOverflowError)) && return
             try
                 println("\n")
                 ename = string(typeof(er))        
