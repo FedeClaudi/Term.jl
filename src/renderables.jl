@@ -64,7 +64,6 @@ Show a renderable and some information about its shape.
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
     w, h = renderable.measure.w, renderable.measure.h
     println(io, string(renderable))
-    # println("\e[2m"*"─"^w*"\e[0m")
     print(
         io,
         "\e[38;5;117m$(typeof(renderable)) <: AbstractRenderable\e[0m \e[2m(w:$(w), h:$(h))\e[0m"
