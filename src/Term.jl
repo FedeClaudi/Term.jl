@@ -34,6 +34,7 @@ include("dendogram.jl")
 include("logo.jl")
 include("inspect.jl")
 include("repr.jl")
+include("table.jl")
 
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine, pad, pad!, vstack, hstack
@@ -137,4 +138,6 @@ using .introspection: inspect, typestree, expressiontree
 
 using .Repr: @with_repr, termshow, install_term_repr
 
+
+using .table: Table
 end

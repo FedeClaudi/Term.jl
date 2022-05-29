@@ -39,7 +39,8 @@ Base.:+(m1::Measure, m2::Measure)::Measure = Measure(max(m1.w, m2.w), m1.h + m2.
 Measure the width of renderable objects (text, AbsstractRenderable)
 """
 function width end
-
+width(x) = width(string(x))
+width(x::AbstractString) = Measure(x).w
 
 """
     height
@@ -47,7 +48,8 @@ function width end
 Measure the height of renderable objects (text, AbsstractRenderable)
 """
 function height end
-
+height(x) = height(string(x))
+height(x::AbstractString) = Measure(x).h
 
 
 
