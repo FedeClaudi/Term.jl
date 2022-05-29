@@ -7,7 +7,8 @@ module table
     import ..layout: cvstack, hstack, vstack, pad
     using ..box
     import ..style: apply_style
-    import Term: fillin
+    import ..Tprint: tprintln
+    import Term: fillin, term_theme
 
     export Table
 
@@ -29,10 +30,16 @@ module table
             enumerate(cells)
         )
 
+    
+
         # create row
-        mid = l * join(
-            cells[1:end-1], m
-        ) * m * cells[end] * r
+        if length(widths) > 1
+            mid = l * join(
+                cells[1:end-1], m
+            ) * m * cells[end] * r
+        else
+            mid = l * cells[1] * r
+        end
         bottom = apply_style(get_row(box, widths, bottom_level), box_style)
 
         if !isnothing(top_level)
@@ -55,7 +62,7 @@ module table
 
         cells = map(
             i -> apply_style(
-                pad(entries[i], widths[i],justify[i]),style[i]
+                pad(entries[i], widths[i], justify[i]),style[i]
             ), 1:N
         )
         return cells
@@ -67,6 +74,34 @@ module table
         return style, justify
     end
 
+    function assert_table_arguments(N, header, header_style, header_justify, columns_style, columns_justify, footer, footer_style, footer_justify)
+        # check header
+        problems = []
+        if !isnothing(header)
+            length(header) != N && push!(problems, "Got header with length $(length(header)), expected $N")
+            (!isa(header_style, String) && length(header_style) != N) && push!(problems, "Got header_style with length $(length(header_style)), expected $N")
+            (!isa(header_justify, Symbol) && length(header_justify) != N) && push!(problems, "Got header_justify with length $(length(header_justify)), expected $N")
+        end
+
+        # check columns
+        (!isa(columns_style, String) && length(columns_style) != N) && push!(problems, "Got columns_style with length $(length(columns_style)), expected $N")
+        (!isa(columns_justify, Symbol) && length(columns_justify) != N) && push!(problems, "Got columns_justify with length $(length(columns_justify)), expected $N")
+
+
+        # check footer
+        if !isnothing(footer)
+            isa(footer, Function) || (length(footer)) != N && push!(problems, "Got footer with length $(length(footer)), expected $N")
+            (!isa(footer_style, String) && length(footer_style) != N) && push!(problems, "Got footer_style with length $(length(footer_style)), expected $N")
+            (!isa(footer_justify, Symbol) && length(footer_justify) != N) && push!(problems, "Got footer_justify with length $(length(footer_justify)), expected $N")
+        end
+
+        if length(problems) > 0
+            @warn "Failed to create Term.Table"
+            warn_color = term_theme[].warn
+            tprintln.("  {$warn_color}" .* problems .* "{/$warn_color}"; highlight=true)
+        end
+        return length(problems) == 0
+    end
 
     function Table(
             tb::Tables.AbstractColumns;
@@ -85,6 +120,7 @@ module table
             footer_style::Union{String, Vector, Tuple} = "default",
             footer_justify::Union{Nothing, Symbol, Vector, Tuple} = :left
         )
+        # @info "GENERATING TABLE" tb box header footer make_cells_entries
         # prepare some variables
         header_justify = isnothing(header_justify) ? columns_justify : header_justify
         box = eval(box)
@@ -92,9 +128,13 @@ module table
         # table info
         rows = Tables.rows(tb) 
         sch = Tables.schema(rows)
+        N_cols = length(sch.names)
+
+        # make sure arguemnts combination is valud
+        valid = assert_table_arguments(N_cols, header, header_style, header_justify, columns_style, columns_justify, footer, footer_style, footer_justify)
+        valid || return
 
         # columns style
-        N_cols = length(sch.names)
         columns_style, columns_justify = expand_styles(N_cols, columns_style, columns_justify)
 
         # headers and headers style
@@ -110,10 +150,11 @@ module table
         headers_widths = collect(width.(header))
         data_widths = collect(map(c -> max(width.(tb[c])...), sch.names))
         footers_widths = isnothing(footer) ? zeros(N_cols) : collect(width.(footer))
+        # @info "widths" headers_widths data_widths footers_widths sch.names
 
         widths = hcat(headers_widths, data_widths, footers_widths)
-        widths = [mapslices(x -> max(x...), widths, dims=2)...] .+ padding * 2
-        # @info "widths" headers_widths data_widths footers_widths widths sch.names
+        widths = Int.([mapslices(x -> max(x...), widths, dims=2)...] .+ padding * 2)
+        @info "widths" widths
 
         # get the table values as vectors of strings
         rows_values = collect(map(
@@ -167,13 +208,14 @@ module table
     end
 
     Table(data::AbstractMatrix; kwargs...) = Table(Tables.table(data); kwargs...)
+    Table(data::AbstractVector; kwargs...) = Table(Tables.table(data); kwargs...)
 
     function Table(data::AbstractDict; kwargs...)
         kwargs = Dict(kwargs...)
-        header = pop!(kwargs, :header, collect(keys(data)))
+        header = pop!(kwargs, :header, string.(collect(keys(data))))
         
-        data = hcat(values(data))
-        @info "dict2table" kwargs header data
+        data = hcat(values(data)...)
+        # @info "dict2table" kwargs header data
         return Table(data; header=header, kwargs...)
     end
 

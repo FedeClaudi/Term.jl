@@ -45,7 +45,7 @@ style outputs to terminal.
     # loggin levels
     info::String                = "#7cb0cf"
     debug::String               = "#197fbd"
-    warn::String                = "#d1923f"
+    warn::String                = "#e37b19"
     error::String               = "bold #d13f3f"
 
     # Tree objects
