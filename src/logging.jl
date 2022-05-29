@@ -251,13 +251,13 @@ function Logging.handle_message(
             _size = length(v)
             v = escape_brackets(string(v))
             v = textlen(v) > 33 ? v[1:30] * "..." : v
-            v *= "\n {dim}{bold}$(_size) items {/bold}{/dim}"
+            v *= "\n {white}$(_size) {/white}{dim}items{/dim}"
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
             _size = size(v)
             v =
-                "$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}"
-            v *= "\n {dim}shape: " * join(string.(_size), " × ") * "{/dim}"
+                ltrim_str("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 30)
+            v *= "\n {dim}shape: {default white}" * join(string.(_size), " × ") * "{/default white}{/dim}"
 
         elseif v isa Function
             _style = logger.theme.func
