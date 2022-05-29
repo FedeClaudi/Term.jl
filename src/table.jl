@@ -7,6 +7,7 @@ module table
     import ..layout: cvstack, hstack, vstack, pad
     using ..box
     import ..style: apply_style
+    import Term: fillin
 
     export Table
 
@@ -112,7 +113,7 @@ module table
 
         widths = hcat(headers_widths, data_widths, footers_widths)
         widths = [mapslices(x -> max(x...), widths, dims=2)...] .+ padding * 2
-        @info "widths" headers_widths data_widths footers_widths widths sch.names
+        # @info "widths" headers_widths data_widths footers_widths widths sch.names
 
         # get the table values as vectors of strings
         rows_values = collect(map(
@@ -158,6 +159,8 @@ module table
                     widths, box, nothing, :foot, :bottom, style)
             )
         end
+
+        lines = split(fillin(join(lines, "\n")), "\n")
 
         segments = Segment.(lines)
         return Table(segments, Measure(segments))

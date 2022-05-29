@@ -629,6 +629,8 @@ function PlaceHolder(w::Int, h::Int)
     return PlaceHolder(lines, Measure(lines))
 end
 
+PlaceHolder(ren::AbstractRenderable) = PlaceHolder(ren.measure.w, ren.measure.h)
+
 # ---------------------------------------------------------------------------- #
 #                                     GRID                                     #
 # ---------------------------------------------------------------------------- #

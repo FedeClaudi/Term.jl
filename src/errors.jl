@@ -4,7 +4,7 @@ import Base: show_method_candidates, ExceptionStack, InterpreterIP
 import ..layout: hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack
 import ..renderables: RenderableText, AbstractRenderable
 import ..panel: Panel
-import Term: highlight
+import Term: highlight, truncate
 
 export install_term_stacktrace
 
@@ -112,7 +112,7 @@ function error_message(er::MethodError; kwargs...)
 
     # get main error message
     _args = RenderableText.(
-        map(a -> "    $a::$(typeof(a))", er.args)
+        map(a -> "    $(truncate(string(a), 22))::$(truncate(string(typeof(a)), 22))", er.args)
     )
     # _args = join([string(ar) * typeof(ar) for ar in er.args], "\n      ")
     fn_name = "$(string(er.f))"
@@ -187,22 +187,36 @@ end
 # ---------------------------------------------------------------------------- #
 function install_term_stacktrace()
     @eval begin
+        base_show_error = Base.showerror
+
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            println("\n")
-            ename = string(typeof(er))        
-            error = hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
-            rendered_bt = render_backtrace(bt)
-            error /= rendered_bt
-        
-            err, _ = error_message(er)
-            msg = "" / Panel(
-                "{#aec2e8}$(err){/#aec2e8}"; 
-                width=rendered_bt.measure.w,
-                title="{bold red default underline}$(typeof(er)){/bold red default underline}",
-                padding=(2, 2, 1, 1), style="dim red", title_justify=:center
-            )
-            error /= msg
-            print(error)
+            length(bt) == 0 && return
+            try
+                println("\n")
+                ename = string(typeof(er))        
+                error = hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
+                if length(bt) > 0
+                    rendered_bt = render_backtrace(bt)
+                    error /= rendered_bt
+                    W = rendered_bt.measure.w
+                else
+                    W = 88
+                end
+            
+                err, _ = error_message(er)
+                msg = "" / Panel(
+                    "{#aec2e8}$(err){/#aec2e8}"; 
+                    width=W,
+                    title="{bold red default underline}$(typeof(er)){/bold red default underline}",
+                    padding=(2, 2, 1, 1), style="dim red", title_justify=:center
+                )
+                error /= msg
+                print(error)
+            catch err
+                @error "ERROR: " exception=err
+                # @warn "Term.jl: failed to render error message" err
+                # Base.showerror(io, er)
+            end
         end
     end
 end

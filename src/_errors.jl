@@ -17,7 +17,7 @@ function render_frame_info(frame::StackFrame)::RenderableText
 end
 
 
-function render_backtrace(bt::Vector{StackFrame})
+function render_backtrace(bt::Vector)
     length(bt) == 0 && return RenderableText("")
 
     frame_numbers::Vector{RenderableText} = []
