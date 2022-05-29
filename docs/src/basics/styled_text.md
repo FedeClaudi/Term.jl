@@ -95,9 +95,10 @@ If you just want to **use** `Term.jl`'s style functionality, just make sure to r
     The style tags used by `Term.jl` have an opening `"[style]"` and closing `"[/style]"` syntax. The style is applied to everything inbetween. For `"[/style]"` to close `"[style]"` the text in the parentheses must match exactly (excuding `/`), up to the number and position of spaces and the words order. So:
     ```julia
     "[red] wohoo [/red]"  # works
-    "[red] wohoo [/red ]" # doesn't
+    "[red] wohoo [/red ]" # doesn't -- no extra spaces
     "[bold blue] wohoo [/bold blue]" # works
-    "[bold blue] wohoo [/blue bold]" # doesn't
+    "[bold blue] wohoo [/blue bold]" # doesn't -- should match the first style tag "bold"
+    "[bold blue] wohoo [/bold /blue]" # doesn't -- one single / only
     ```
 
 !!! tip
