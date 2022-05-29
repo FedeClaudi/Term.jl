@@ -228,7 +228,7 @@ function Logging.handle_message(
         # get line stub
         pad = wpad - textlen(_type) - 1
         line =
-            "  $vert" * " "^pad * " {$(theme.type) dim}($(_type)){/$(theme.type) dim}" *
+            "  $vert" * " "^pad * " {$(logger.theme.type) dim}($(_type)){/$(logger.theme.type) dim}" *
             " {bold #e0e0e0}$k{/bold #e0e0e0}"
 
         epad = namepad - textlen(string(k))

@@ -2,7 +2,7 @@ module layout
 
 import Parameters: @with_kw
 
-import Term: int, get_lr_widths, textlen
+import Term: int, get_lr_widths, textlen, cint, rtrim_str, ltrim_str
 import ..renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..style: apply_style
 import ..measure: Measure
@@ -16,7 +16,6 @@ export Spacer, vLine, hLine
 export leftalign!, center!, rightalign!
 export leftalign, center, rightalign
 export lvstack, cvstack, rvstack
-export ←, ↓, →   
 
 # ---------------------------------------------------------------------------- #
 #                                    PADDING                                   #
@@ -64,7 +63,6 @@ Pad a string by a fixed ammount to the left and to the right.
 function pad(text::AbstractString, left::Int=0, right::Int=0)::String
     return " "^left * text * " "^right
 end
-
 
 """
     pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
@@ -329,6 +327,7 @@ function vstack(renderables...)
     return Renderable(segments, measure)
 end
 
+vstack(renderables::Union{Vector, Tuple}) = vstack(renderables...)
 
 """
     hstack(r1::RenderablesUnion, r2::RenderablesUnion)
@@ -374,6 +373,8 @@ function hstack(renderables...)
     end
     return renderable
 end
+
+hstack(renderables::Union{Vector, Tuple}) = hstack(renderables...)
 
 # --------------------------------- operators -------------------------------- #
 
@@ -425,10 +426,6 @@ end
 rvstack(renderables::Union{Tuple, Vector}) = rvstack(renderables...)
 cvstack(renderables::Union{Tuple, Vector}) = cvstack(renderables...)
 lvstack(renderables::Union{Tuple, Vector}) = lvstack(renderables...)
-
-← = lvstack
-↓ = cvstack
-→ = rvstack
 
 
 
@@ -496,6 +493,9 @@ Create a `vLine` as tall as the `stdout` console
 function vLine(; style::String = "default", box::Symbol = :ROUNDED)
     return vLine(console_height(stdout); style = style, box = box)
 end
+
+
+# ----------------------------------- hLine ---------------------------------- #
 
 """
     hLine
@@ -569,4 +569,100 @@ end
 Construct an hLine with same width as a renderable
 """
 hLine(ren::AbstractRenderable; kwargs...) = hLine(ren.measure.w; kwargs...)
+
+
+# -------------------------------- PlaceHolder ------------------------------- #
+
+"""
+    PlaceHolder
+
+A renderable used as a place holder when creating layouts (e.g. with `grid`).
+
+# Examples
+```julia
+
+println(PlaceHolder(25, 10))
+
+
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+ ╲ ╲ ╲ (25 × 10) ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+````
+"""
+mutable struct PlaceHolder <: AbstractLayoutElement
+    segments::Vector{Segment}
+    measure::Measure
+end
+
+function PlaceHolder(w::Int, h::Int)
+    # create lines of renderable
+    b1 = "╲ "^(w÷2)
+    b2 = " ╲"^(w÷2)
+    lines::Vector{Segment} = map(
+        i -> Segment(i%2 == 0 ? b1 : b2, "dim"), 1:h
+    )
+
+    # insert renderable size at center
+    txt = "($w × $h)"
+    txt = length(txt) % 2 == 0 ? " " * txt : txt
+    l = textwidth(txt)
+
+    if l < (w/2)
+        _w = cint(w / 2)
+        _l = cint(l / 2)
+        
+
+        original = lines[cint(h/2)].text
+        lines[cint(h/2)] = Segment(
+            ltrim_str(original, _w-_l+3) * "{default bold white}" * txt * "{/default bold white}" * rtrim_str(original, _w+_l+3),
+        )
+    end
+
+    # return renderable
+    return PlaceHolder(lines, Measure(lines))
+end
+
+# ---------------------------------------------------------------------------- #
+#                                     GRID                                     #
+# ---------------------------------------------------------------------------- #
+
+"""
+    grid(rens::AbstractVector{<:AbstractRenderable}, layout::Union{Nothing,Tuple} = nothing, placeholder = nothing)
+
+Construct a square grid from a `AbsractVector` of `AbstractRenderable`
+"""
+function grid(
+    rens::AbstractVector{<:AbstractRenderable};
+    layout::Union{Nothing,Tuple} = nothing, 
+    placeholder = nothing
+)
+    num = length(rens)
+    if layout === nothing
+        m = ceil(Int, √(num))
+        n, r = divrem(num, m)
+        r == 0 || (n += 1)
+    else
+        m, n = layout
+    end
+    fill_in = placeholder === nothing ? eltype(rens)() : placeholder
+    return grid(reshape(append!(copy(rens), [fill_in for _ in 1:(m * n - num)]), m, n))
+end
+
+"""
+    grid(rens::AbstractMatrix{<:AbstractRenderable})
+
+Construct a grid from a `AbstractMatrix` of `AbstractRenderable`
+"""
+function grid(rens::AbstractMatrix{<:AbstractRenderable})
+    rows = collect(foldl(*, col[2:end], init = first(col)) for col in eachrow(rens))
+    return foldl(/, rows[2:end], init = first(rows))
+end
+
 end

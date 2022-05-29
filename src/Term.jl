@@ -100,8 +100,7 @@ using .layout: Padding,
             rightalign,
             lvstack,
             cvstack,
-            rvstack,
-            ←, ↓, → 
+            rvstack
 
 
 using .panel: Panel, TextBox

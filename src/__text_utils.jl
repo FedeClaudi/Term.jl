@@ -224,6 +224,32 @@ function replace_text(text, start::Int, stop::Int, char::Char = '_')::String
     return replace_text(text, start, stop, replacement)
 end
 
+
+"""
+    ltrim_str(str, width)
+
+Cut a chunk of width `width` form the left of a string
+"""
+function ltrim_str(str, width)
+    edge = nextind(str, 0, width)
+    if edge >= ncodeunits(str)
+        str
+    else
+        str[1:edge]
+    end
+end
+
+"""
+    rtrim_str(str, width)
+
+Cut a chunk of width `width` form the right of a string
+"""
+function rtrim_str(str, width)
+    edge = nextind(str, 0, width)
+    str[edge:end]
+end
+
+
 """
     nospaces(text::AbstractString)
 

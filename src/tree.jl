@@ -12,8 +12,7 @@ import Term: loop_last,
         term_theme,
         textlen,
         truncate,
-        expr2string,
-        term_teme
+        expr2string
         
 import ..segment: Segment
 import ..measure: Measure
