@@ -108,11 +108,26 @@ function error_message(er::LoadError)
 end
 
 # ! METHOD ERROR
+method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
+function method_error_candidate(fun, candidate)
+    # highlight non-matched types
+    candidate = replace(
+        candidate, 
+        method_error_regex => SubstitutionString("{red}" * s"\g<0>" * "{/red}")
+    )
+    # remove
+    candidate = replace(candidate, "!Matched" => "")
+
+    # highlight fun
+    candidate = replace(candidate, fun => "{bold yellow}$(fun){/bold yellow}")
+    return candidate
+end
+
 function error_message(er::MethodError; kwargs...)
     # @info "method error" er fieldnames(MethodError) er.f er.args er.world
     # get main error message
     _args = join(
-        map(a -> highlight("    ::$(truncate(string(typeof(a)), 22))"), er.args), ", "
+        map(a -> "   {dim bold}($(a[1])){/dim bold} $(truncate(highlight("::"*string(typeof(a[2]))), 30))", enumerate(er.args)), "\n"
     )
     fn_name = "$(string(er.f))"
     main_line = "No method matching `$fn_name` with arguments types:" /  _args
@@ -121,8 +136,10 @@ function error_message(er::MethodError; kwargs...)
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:end-1]
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
-        candidates = RenderableText.(_candidates)
-        main_line = main_line / "" / "Alternative candidates:" / lvstack(candidates)
+        candidates = map(
+            c -> method_error_candidate(fn_name, c), _candidates
+        )
+        main_line = main_line / "" / "Alternative candidates:" / lvstack(RenderableText.(candidates))
     else
         main_line = main_line / " " / "{dim}No alternative candidates found"
     end

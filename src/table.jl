@@ -168,4 +168,10 @@ module table
 
     Table(data::AbstractMatrix; kwargs...) = Table(Tables.table(data); kwargs...)
 
+    function Table(data::AbstractDict; kwargs...)
+        header = pop!(kwargs, :header, collect(keys(data)))
+        data = hstack(values(data))
+        return Table(data; header=header, kwargs...)
+    end
+
 end
