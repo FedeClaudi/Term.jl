@@ -50,7 +50,7 @@ export Tree
 export Dendogram
 export rightalign!,
     leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign
-export @with_repr, termshow, install_term_repr, grid, PlaceHolder
+export @with_repr, termshow, install_term_repr, PlaceHolder
 
 # ----------------------------------- base ----------------------------------- #
 using .Measures
@@ -107,8 +107,7 @@ using .Layout:
     lvstack,
     cvstack,
     rvstack,
-    PlaceHolder,
-    grid
+    PlaceHolder
 
 using .Panels: Panel, TextBox
 
