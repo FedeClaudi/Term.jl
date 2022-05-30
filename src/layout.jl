@@ -183,9 +183,6 @@ function leftalign!(renderables::RenderablesUnion... )
 end
 
 
-
-  
-  
 """
     center(renderables::RenderablesUnion... )
 
@@ -655,6 +652,7 @@ function calc_nrows_ncols(n, aspect=(16, 9))
     end
     return rows, cols
 end
+
 """
     grid(rens::AbstractVector{<:AbstractRenderable}, layout::Union{Nothing,Tuple} = nothing, placeholder = nothing)
 
@@ -665,6 +663,8 @@ function grid(
     layout::Union{Nothing,Tuple} = nothing, 
     placeholder = nothing,
     aspect = (16, 9),
+    hspacer = "",
+    vspacer = hspacer,
 )
     num = length(rens)
     m, n = layout === nothing ? calc_nrows_ncols(num, aspect) : layout
@@ -676,7 +676,11 @@ function grid(
         r == 0 || (n += 1)
     end
     fill_in = placeholder === nothing ? PlaceHolder(first(rens)) : placeholder
-    return grid(reshape(append!(copy(rens), [fill_in for _ in 1:(m * n - num)]), m, n))
+    return grid(
+        reshape(append!(copy(rens), [fill_in for _ in 1:(m * n - num)]), m, n);
+        hspacer = hspacer,
+        vspacer = vspacer,
+    )
 end
 
 """
@@ -684,9 +688,9 @@ end
 
 Construct a grid from a `AbstractMatrix` of `AbstractRenderable`.
 """
-function grid(rens::AbstractMatrix{<:AbstractRenderable})
-    rows = collect(foldl(*, col[2:end], init = first(col)) for col in eachrow(rens))
-    return foldl(/, rows[2:end], init = first(rows))
+function grid(rens::AbstractMatrix{<:AbstractRenderable}; hspacer = "", vspacer = hspacer)
+    rows = collect(foldl((a, b) -> a * hspacer * b, col[2:end], init = first(col)) for col in eachrow(rens))
+    return foldl((a, b) -> a * vspacer * b, rows[2:end], init = first(rows))
 end
 
 end
