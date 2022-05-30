@@ -18,5 +18,7 @@
         include("../examples/text_style.jl")
         # @test_nothrow include("../examples/tree.jl")
         include("../examples/tree.jl")
+
+        include("../examples/tables.jl")
     end
 end

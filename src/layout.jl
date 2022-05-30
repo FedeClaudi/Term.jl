@@ -7,11 +7,11 @@ import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, Renderab
 import ..Console: console_width, console_height
 import ..Boxes: get_lrow, get_rrow
 import ..Style: apply_style
-import ..Measures: Measure
+import ..Measures: Measure, height, width
 import ..Segments: Segment
 using ..Boxes
 
-export Padding, vstack, hstack, pad, pad!
+export Padding, vstack, hstack, pad, pad!, vertical_pad, vertical_pad!
 export Spacer, vLine, hLine
 export leftalign!, center!, rightalign!
 export leftalign, center, rightalign
@@ -40,7 +40,7 @@ Where the spaces are added depends on the justification `method` ∈ (:left, :ce
 """
 function pad(text, target_width::Int, method::Symbol)::String
     # get total padding size
-    lw = textlen(text)
+    lw = width(text)
     lw >= target_width && return text
 
     npads = target_width - lw
@@ -112,6 +112,100 @@ function pad!(ren::AbstractRenderable; width::Int)
     nl, nr = get_lr_widths(npads)
     return pad!(ren, nl, nr)
 end
+
+
+# ------------------------------- vertical pad ------------------------------- #
+
+
+"""
+vertical_pad(text, target_height::Int, method::Symbol)::String
+
+Vertically pad a string to height: `target_height` by adding empty strings above/below " ".
+Where the spaces are added depends on the justification `method` ∈ (:top, :center, :bottom).
+"""
+function vertical_pad(text::AbstractString, target_height::Int, method::Symbol)::String
+    # get total padding size
+    h = height(text)
+    h >= target_height && return text
+
+    space = " "^(width(text))
+    npads = target_height - h
+    if method == :bottom
+        return vertical_pad(text, npads, 0)
+    elseif method == :top
+        return vertical_pad(text, 0, npads)
+    else
+        above, below = get_lr_widths(npads)
+        return vertical_pad(text, above, below)
+    end
+end
+
+
+"""
+    vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
+
+Vertical pad a string by a fixed ammount to above and below.
+"""
+function vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
+    space = " "^(width(text))
+    string(vstack(repeat([space], above)..., text, repeat([space], below)...))
+end
+
+"""
+    vertical_pad(segments::AbstractVector{Segment}, above::Int = 0, below::Int = 0)
+
+Pad a renderable's segments to the above and the below.
+"""
+function vertical_pad(segments::AbstractVector{Segment}, above::Int = 0, below::Int = 0)
+    space = " "^(segments[1].measure.w)
+    above::Vector{Segment} = repeat([Segment(space)], above)
+    below::Vector{Segment} = repeat([Segment(space)], below)
+    return [above..., segments..., below...]
+end
+
+"""
+    vertical_pad(ren::AbstractRenderable, above::Int, below::Int)
+
+Pad a renderable, vertically.
+"""
+function vertical_pad(ren::AbstractRenderable, above::Int, below::Int)
+    segments = vertical_pad(ren.segments, above, below)
+    measure = Measure(segments)
+    return Renderable(segments, measure)
+end
+
+"""
+vertical_pad(ren::AbstractRenderable; height::Int)
+
+Vertical pad a renderable to achieve a target height.
+"""
+function vertical_pad(ren::AbstractRenderable; height::Int)
+    npads = height - ren.measure.h
+    nl, nr = get_lr_widths(npads)
+    return vertical_pad(ren, nl, nr)
+end
+
+"""
+    verti0cal_pad!(ren::AbstractRenderable, above::Int, below::Int)
+
+In place version for vertically padding a renderable.
+"""
+function vertical_pad!(ren::AbstractRenderable, above::Int, below::Int)
+    ren.segments = vertical_pad(ren.segments, above, below)
+    ren.measure = Measure(ren.segments)
+end
+
+"""
+    pad!(ren::AbstractRenderable; width::Int)
+
+In place version for padding a renderable to achieve a given width.
+"""
+function vertical_pad!(ren::AbstractRenderable; height::Int)
+    npads = height - ren.measure.h
+    nl, nr = get_lr_widths(npads)
+    return vertical_pad!(ren, nl, nr)
+end
+
 
 # ---------------------------------------------------------------------------- #
 #                                    JUSTIFY                                   #
@@ -453,7 +547,7 @@ end
 Create a `vLine` given a height and, optionally, style information.
 """
 function vLine(height::Int; style::String = "default", box::Symbol = :ROUNDED, char::Union{Char, Nothing}=nothing)
-    char = isnothing(char) ? getfiled(Boxes, box).head.left : char
+    char = isnothing(char) ? getfield(Boxes, box).head.left : char
     line = apply_style("{" * style * "}" * char * "{/" * style * "}\e[0m")
     segments = repeat([Segment(line)], height)
     return vLine(segments, Measure(1, height))

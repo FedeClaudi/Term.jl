@@ -49,7 +49,8 @@ export track
 export Tree
 export Dendogram
 export rightalign!,
-    leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign
+    leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign,
+    vertical_pad!, vertical_pad
 export @with_repr, termshow, install_term_repr, PlaceHolder
 
 # ----------------------------------- base ----------------------------------- #
@@ -107,7 +108,9 @@ using .Layout:
     lvstack,
     cvstack,
     rvstack,
-    PlaceHolder
+    PlaceHolder,
+    vertical_pad!,
+    vertical_pad
 
 using .Panels: Panel, TextBox
 
