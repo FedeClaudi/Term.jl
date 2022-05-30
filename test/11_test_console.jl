@@ -1,4 +1,4 @@
-using Term.console
+using Term.Console
 import Term: tprint, tprintln
 
 println("\nTesting tprint, stdout temporarily disabled")
@@ -18,11 +18,12 @@ println("\nTesting tprint, stdout temporarily disabled")
         @test_nothrow tprintln(Panel("test"))
         @test_nothrow tprintln(1, Panel("test"), "test")
 
-
         @test_nothrow tprint(stdout, "string")
         @test_nothrow tprint(stdout, "{red}adasd{/red}")
         @test_nothrow tprint(stdout, "{blue on_green}adasda")
-        @test_nothrow tprint(stdout, "{red}dadas{green}insdai{/green}outssdrse{blue}fsfsf{/blue}")
+        @test_nothrow tprint(
+            stdout, "{red}dadas{green}insdai{/green}outssdrse{blue}fsfsf{/blue}"
+        )
         @test_nothrow tprint(stdout, Panel("test"))
         @test_nothrow tprint(stdout, TextBox("test"))
         @test_nothrow tprint(stdout, 1)
@@ -55,5 +56,4 @@ end
     @test sprint(change_scroll_region) == "\e[1;1r\e[1B"
     @test sprint(savecursor) == "\e[s"
     @test sprint(restorecursor) == "\e[u"
-
 end

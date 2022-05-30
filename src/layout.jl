@@ -1,15 +1,15 @@
-module layout
+module Layout
 
 import Parameters: @with_kw
 
-import Term: int, get_lr_widths, textlen, cint, rtrim_str, ltrim_str
-import ..renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
-import ..style: apply_style
-import ..measure: Measure
-import ..segment: Segment
-using ..box
-import ..box: get_lrow, get_rrow
-import ..console: console_width, console_height
+import Term: int, get_lr_widths, textlen, cint, rtrim_str, ltrim_str, calc_nrows_ncols
+import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
+import ..Console: console_width, console_height
+import ..Boxes: get_lrow, get_rrow
+import ..Style: apply_style
+import ..Measures: Measure
+import ..Segments: Segment
+using ..Boxes
 
 export Padding, vstack, hstack, pad, pad!
 export Spacer, vLine, hLine
@@ -31,7 +31,6 @@ Stores information about ammount of padding.
     top::Int
     bottom::Int
 end
-
 
 """
     pad(text::AbstractString, target_width::Int, method::Symbol)::String
@@ -56,24 +55,19 @@ function pad(text, target_width::Int, method::Symbol)::String
 end
 
 """
-    pad(text::AbstractString, left::Int=0, right::Int=0)::String
+    pad(text::AbstractString, left::Int=0, right::Int=0)
 
 Pad a string by a fixed ammount to the left and to the right.
 """
-function pad(text::AbstractString, left::Int=0, right::Int=0)::String
-    return " "^left * text * " "^right
-end
+pad(text::AbstractString, left::Int = 0, right::Int = 0) = " "^left * text * " "^right
 
 """
-    pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
+    pad(segments::AbstractVector{Segment}, left::Int=0, right::Int=0)
 
-Pad a renderable's segments to the left and the right
+Pad a renderable's segments to the left and the right.
 """
-function pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
-    return map(
-        (s)->Segment(" "^left * s.text * " "^right),
-        segments
-    )
+function pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0)
+    return map((s) -> Segment(pad(s.text, left, right)), segments)
 end
 
 """
@@ -90,7 +84,7 @@ end
 """
     pad(ren::AbstractRenderable; width::Int)
 
-Pad a renderable to achieve a target width
+Pad a renderable to achieve a target width.
 """
 function pad(ren::AbstractRenderable; width::Int)
     npads = width - ren.measure.w
@@ -101,11 +95,11 @@ end
 """
     pad!(ren::AbstractRenderable, left::Int, right::Int)
 
-In place version for padding a renderable
+In place version for padding a renderable.
 """
 function pad!(ren::AbstractRenderable, left::Int, right::Int)
     ren.segments = pad(ren.segments, left, right)
-    ren.measure = Measure(ren.segments)
+    return ren.measure = Measure(ren.segments)
 end
 
 """
@@ -118,7 +112,6 @@ function pad!(ren::AbstractRenderable; width::Int)
     nl, nr = get_lr_widths(npads)
     return pad!(ren, nl, nr)
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                                    JUSTIFY                                   #
@@ -146,14 +139,13 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function leftalign(renderables::RenderablesUnion... )
+function leftalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
-    renderables = map(r->pad(r, 0, width - r.measure.w), renderables)
+    renderables = map(r -> pad(r, 0, width - r.measure.w), renderables)
     return renderables
 end
-
 
 """
     leftalign!(renderables::RenderablesUnion...)
@@ -173,7 +165,7 @@ print(p1/p2)
 ╭────────────────────────────────────────────────╮
 ╰────────────────────────────────────────────────╯
 """
-function leftalign!(renderables::RenderablesUnion... )
+function leftalign!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
@@ -182,10 +174,6 @@ function leftalign!(renderables::RenderablesUnion... )
     end
 end
 
-
-
-  
-  
 """
     center(renderables::RenderablesUnion... )
 
@@ -208,14 +196,13 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function center(renderables::RenderablesUnion... )
+function center(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
-    renderables = map(r->pad(r;  width=width), renderables)
+    renderables = map(r -> pad(r; width = width), renderables)
     return renderables
 end
-
 
 """
     center!(renderables::RenderablesUnion... )
@@ -236,16 +223,14 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function center!(renderables::RenderablesUnion... )
+function center!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
     for ren in renderables
-        pad!(ren; width=width)
+        pad!(ren; width = width)
     end
 end
-
-
 
 """
     rightalign(renderables::RenderablesUnion... )
@@ -269,14 +254,13 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function rightalign(renderables::RenderablesUnion... )
+function rightalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
-    renderables = map(r->pad(r, width - r.measure.w, 0), renderables)
+    renderables = map(r -> pad(r, width - r.measure.w, 0), renderables)
     return renderables
 end
-
 
 """
     rightalign!(renderables::RenderablesUnion... )
@@ -295,7 +279,7 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function rightalign!(renderables::RenderablesUnion... )
+function rightalign!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
@@ -304,8 +288,6 @@ function rightalign!(renderables::RenderablesUnion... )
         pad!(ren, width - ren.measure.w, 0)
     end
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                   STACKING                                   #
@@ -327,7 +309,7 @@ function vstack(renderables...)
     return Renderable(segments, measure)
 end
 
-vstack(renderables::Union{Vector, Tuple}) = vstack(renderables...)
+vstack(renderables::Union{Vector,Tuple}) = vstack(renderables...)
 
 """
     hstack(r1::RenderablesUnion, r2::RenderablesUnion)
@@ -357,13 +339,15 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
     # combine segments
     segments = [Segment(s1.text * s2.text) for (s1, s2) in zip(s1, s2)]
 
-    return Renderable(segments, Measure(r1.measure.w+r2.measure.w, max(r1.measure.h, r2.measure.h)))
+    return Renderable(
+        segments, Measure(r1.measure.w + r2.measure.w, max(r1.measure.h, r2.measure.h))
+    )
 end
 
 """ 
     hstack(renderables...)
 
-Horizonatlly stack a variable number of renderables
+Horizonatlly stack a variable number of renderables.
 """
 function hstack(renderables...)
     renderable = Renderable()
@@ -374,7 +358,7 @@ function hstack(renderables...)
     return renderable
 end
 
-hstack(renderables::Union{Vector, Tuple}) = hstack(renderables...)
+hstack(renderables::Union{Vector,Tuple}) = hstack(renderables...)
 
 # --------------------------------- operators -------------------------------- #
 
@@ -383,20 +367,18 @@ hstack(renderables::Union{Vector, Tuple}) = hstack(renderables...)
 """
 
 Base.:/(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(r1, r2)
-Base.:/(rr::Tuple{RenderablesUnion, RenderablesUnion}) = vstack(rr...)
-
+Base.:/(rr::Tuple{RenderablesUnion,RenderablesUnion}) = vstack(rr...)
 
 Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
-
 
 # --------------------------- convenience functions -------------------------- #
 
 """
     lvstack(renderables::RenderablesUnion...)
 
-Left align renderables and then vertically stack
+Left align renderables and then vertically stack.
 """
 function lvstack(renderables::RenderablesUnion...)::Renderable
     renderables = leftalign(renderables...)
@@ -406,7 +388,7 @@ end
 """
     lvstack(renderables::RenderablesUnion...)
 
-Center align renderables and then vertically stack
+Center align renderables and then vertically stack.
 """
 function cvstack(renderables::RenderablesUnion...)::Renderable
     renderables = center(renderables...)
@@ -416,18 +398,16 @@ end
 """
     lvstack(renderables::RenderablesUnion...)
 
-Right align renderables and then vertically stack
+Right align renderables and then vertically stack.
 """
 function rvstack(renderables::RenderablesUnion...)::Renderable
     renderables = rightalign(renderables...)
     return vstack(renderables...)
 end
 
-rvstack(renderables::Union{Tuple, Vector}) = rvstack(renderables...)
-cvstack(renderables::Union{Tuple, Vector}) = cvstack(renderables...)
-lvstack(renderables::Union{Tuple, Vector}) = lvstack(renderables...)
-
-
+rvstack(renderables::Union{Tuple,Vector}) = rvstack(renderables...)
+cvstack(renderables::Union{Tuple,Vector}) = cvstack(renderables...)
+lvstack(renderables::Union{Tuple,Vector}) = lvstack(renderables...)
 
 # ---------------------------------------------------------------------------- #
 #                                LINES & SPACER                                #
@@ -452,13 +432,15 @@ function Spacer(width::Int, height::Int; char::Char = ' ')
     return Spacer(segments, Measure(seg.measure.w, height))
 end
 
-Spacer(width::Number, height::Number; char::Char = ' ') = Spacer(int(width), int(height); char=char)
+function Spacer(width::Number, height::Number; char::Char = ' ')
+    return Spacer(int(width), int(height); char = char)
+end
 
 # ----------------------------------- vline ---------------------------------- #
 """
     vLine
 
-A multi-line renderable with each line made of a | to create a vertical line
+A multi-line renderable with each line made of a | to create a vertical line.
 """
 mutable struct vLine <: AbstractLayoutElement
     segments::Vector{Segment}
@@ -470,10 +452,8 @@ end
 
 Create a `vLine` given a height and, optionally, style information.
 """
-function vLine(
-    height::Int; style::String = "default", box::Symbol = :ROUNDED
-)   
-    line = apply_style("{"*style*"}" * eval(box).head.left * "{/"*style*"}\e[0m")
+function vLine(height::Int; style::String = "default", box::Symbol = :ROUNDED)
+    line = apply_style("{" * style * "}" * eval(box).head.left * "{/" * style * "}\e[0m")
     segments = repeat([Segment(line)], height)
     return vLine(segments, Measure(1, height))
 end
@@ -481,14 +461,14 @@ end
 """
     vLine(ren::AbstractRenderable; kwargs...)
 
-Construct a vLine with the same height as a renderable
+Construct a vLine with the same height as a renderable.
 """
 vLine(ren::AbstractRenderable; kwargs...) = vLine(ren.measure.h; kwargs...)
 
 """
     vLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
 
-Create a `vLine` as tall as the `stdout` console
+Create a `vLine` as tall as the `stdout` console.
 """
 function vLine(; style::String = "default", box::Symbol = :ROUNDED)
     return vLine(console_height(stdout); style = style, box = box)
@@ -517,9 +497,7 @@ end
 
 Create a styled `hLine` of given width.
 """
-function hLine(
-    width::Int; style::String = "default", box::Symbol = :ROUNDED
-)
+function hLine(width::Int; style::String = "default", box::Symbol = :ROUNDED)
     char = eval(box).row.mid
     segments = [Segment(char^width, style)]
     return hLine(segments, Measure(width, 1))
@@ -531,19 +509,20 @@ end
 Creates an hLine object with texte centered horizontally.
 """
 function hLine(
-    width::Number,
-    text::String;
-    style::String = "default",
-    box::Symbol = :ROUNDED,
+    width::Number, text::String; style::String = "default", box::Symbol = :ROUNDED
 )
     box = eval(box)
     text = apply_style(text)
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
 
-    line =  get_lrow(box, lw-tl, :top; with_left=false) *
-            " " * text * " " * 
-            "{$style}" * get_rrow(box, rw-tr, :top; with_right=false)
+    line =
+        get_lrow(box, lw - tl, :top; with_left = false) *
+        " " *
+        text *
+        " " *
+        "{$style}" *
+        get_rrow(box, rw - tr, :top; with_right = false)
 
     return hLine([Segment(line, style)], Measure(width, 1))
 end
@@ -551,9 +530,9 @@ end
 """
     hLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
 
-Construct an `hLine` as wide as the `stdout`
+Construct an `hLine` as wide as the `stdout`.
 """
-function hLine(; style::String="default", box::Symbol = :ROUNDED)
+function hLine(; style::String = "default", box::Symbol = :ROUNDED)
     return hLine(console_width(stdout); style = style, box = box)
 end
 
@@ -562,19 +541,16 @@ end
 
 Construct an `hLine` as wide as the `stdout` with centered text.
 """
-function hLine(
-    text::AbstractString; style::String="default", box::Symbol = :ROUNDED
-)
+function hLine(text::AbstractString; style::String = "default", box::Symbol = :ROUNDED)
     return hLine(console_width(stdout), text; style = style, box = box)
 end
 
 """
     hLine(ren::AbstractRenderable; kwargs)
 
-Construct an hLine with same width as a renderable
+Construct an hLine with same width as a renderable.
 """
 hLine(ren::AbstractRenderable; kwargs...) = hLine(ren.measure.w; kwargs...)
-
 
 # -------------------------------- PlaceHolder ------------------------------- #
 
@@ -608,68 +584,32 @@ end
 
 function PlaceHolder(w::Int, h::Int)
     # create lines of renderable
-    b1 = "╲ "^(w÷2)
-    b2 = " ╲"^(w÷2)
-    lines::Vector{Segment} = map(
-        i -> Segment(i%2 == 0 ? b1 : b2, "dim"), 1:h
-    )
+    b1 = "╲ "^(w ÷ 2)
+    b2 = " ╲"^(w ÷ 2)
+    lines::Vector{Segment} = map(i -> Segment(i % 2 == 0 ? b1 : b2, "dim"), 1:h)
 
     # insert renderable size at center
     txt = "($w × $h)"
     txt = length(txt) % 2 == 0 ? " " * txt : txt
     l = textwidth(txt)
 
-    if l < (w/2)
+    if l < (w / 2)
         _w = cint(w / 2)
         _l = cint(l / 2)
-        
 
-        original = lines[cint(h/2)].text
-        lines[cint(h/2)] = Segment(
-            ltrim_str(original, _w-_l+3) * "{default bold white}" * txt * "{/default bold white}" * rtrim_str(original, _w+_l+3),
+        original = lines[cint(h / 2)].text
+        lines[cint(h / 2)] = Segment(
+            ltrim_str(original, _w - _l + 3) *
+            "{default bold white}" *
+            txt *
+            "{/default bold white}" *
+            rtrim_str(original, _w + _l + 3),
         )
     end
 
-    # return renderable
     return PlaceHolder(lines, Measure(lines))
 end
 
 PlaceHolder(ren::AbstractRenderable) = PlaceHolder(ren.measure.w, ren.measure.h)
-
-# ---------------------------------------------------------------------------- #
-#                                     GRID                                     #
-# ---------------------------------------------------------------------------- #
-
-"""
-    grid(rens::AbstractVector{<:AbstractRenderable}, layout::Union{Nothing,Tuple} = nothing, placeholder = nothing)
-
-Construct a square grid from a `AbsractVector` of `AbstractRenderable`
-"""
-function grid(
-    rens::AbstractVector{<:AbstractRenderable};
-    layout::Union{Nothing,Tuple} = nothing, 
-    placeholder = nothing
-)
-    num = length(rens)
-    if layout === nothing
-        m = ceil(Int, √(num))
-        n, r = divrem(num, m)
-        r == 0 || (n += 1)
-    else
-        m, n = layout
-    end
-    fill_in = placeholder === nothing ? eltype(rens)() : placeholder
-    return grid(reshape(append!(copy(rens), [fill_in for _ in 1:(m * n - num)]), m, n))
-end
-
-"""
-    grid(rens::AbstractMatrix{<:AbstractRenderable})
-
-Construct a grid from a `AbstractMatrix` of `AbstractRenderable`
-"""
-function grid(rens::AbstractMatrix{<:AbstractRenderable})
-    rows = collect(foldl(*, col[2:end], init = first(col)) for col in eachrow(rens))
-    return foldl(/, rows[2:end], init = first(rows))
-end
 
 end

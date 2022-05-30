@@ -1,5 +1,5 @@
+module Introspection
 
-module introspection
 using InteractiveUtils
 
 import MyterialColors: orange, grey_dark, light_green
@@ -13,34 +13,32 @@ import Term:
     do_by_line,
     expr2string
 
-import ..console: console_width
-import ..panel: Panel, TextBox
-import ..layout: Spacer, hLine
-import ..tree: Tree
-import ..dendogram: Dendogram
+import ..Console: console_width
+import ..Panels: Panel, TextBox
+import ..Layout: Spacer, hLine
+import ..Dendograms: Dendogram
+import ..Trees: Tree
 
 include("_inspect.jl")
 
 export inspect, typestree, expressiontree
-
 
 # ---------------------------------------------------------------------------- #
 #                                TYPES HIERARCHY                               #
 # ---------------------------------------------------------------------------- #
 
 function typestree(io::IO, T::DataType)
-    print(
+    return print(
         io,
         Panel(
             Tree(T);
-            title="Types hierarchy",
-            style="blue dim",
-            title_style=orange * " default",
-            title_justify=:right,
-            fit=true,
-            padding=(1, 4, 1, 1)
-            
-        )
+            title = "Types hierarchy",
+            style = "blue dim",
+            title_style = orange * " default",
+            title_justify = :right,
+            fit = true,
+            padding = (1, 4, 1, 1),
+        ),
     )
 end
 typestree(T::DataType) = typestree(stdout, T)
@@ -49,21 +47,21 @@ function expressiontree(io::IO, e::Expr)
     _expr = expr2string(e)
     tree = Tree(e)
 
-    print(
+    return print(
         io,
         Panel(
-            tree,
-            title=_expr,
+            tree;
+            title = _expr,
             title_style = "$light_green default bold",
             title_justify = :center,
-            style=grey_dark,
-            fit=tree.measure.w > 88,
-            width=max(tree.measure.w, 88),
-            subtitle="inspect",
-            subtitle_justify=:right,
-            justify=:center,
-            padding=(1, 1, 1, 1)
-        )
+            style = grey_dark,
+            fit = tree.measure.w > 88,
+            width = max(tree.measure.w, 88),
+            subtitle = "inspect",
+            subtitle_justify = :right,
+            justify = :center,
+            padding = (1, 1, 1, 1),
+        ),
     )
 end
 expressiontree(e::Expr) = expressiontree(stdout, e)
@@ -76,25 +74,23 @@ function inspect(io::IO, expr::Expr)
     _expr = expr2string(expr)
     dendo = Dendogram(expr)
 
-    print(
-        io, 
+    return print(
+        io,
         Panel(
-            dendo,
-            title=_expr,
+            dendo;
+            title = _expr,
             title_style = "$light_green default bold",
             title_justify = :center,
-            style=grey_dark,
-            fit=true,
+            style = grey_dark,
+            fit = true,
             # width=dendo.measure.w,
-            subtitle="inspect",
-            subtitle_justify=:right,
-            justify=:center,
-            padding=(1, 1, 1, 1)
-        )
+            subtitle = "inspect",
+            subtitle_justify = :right,
+            justify = :center,
+            padding = (1, 1, 1, 1),
+        ),
     )
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                   TYPEINFO                                   #
@@ -141,9 +137,7 @@ function TypeInfo(type::DataType)
 
     _methods = methodswith(type)
 
-    return TypeInfo(
-        string(type), super, sub, fields, constructors, _methods, docstring
-    )
+    return TypeInfo(string(type), super, sub, fields, constructors, _methods, docstring)
 end
 
 """
@@ -159,7 +153,7 @@ function TypeInfo(fun::Function)
     _methods = split_lines(string(methods(fun)))
     _methods = length(_methods) > 1 ? _methods[2:end] : []
 
-    return TypeInfo(string(fun), nothing, nothing, nothing, [], _methods,  docstring)
+    return TypeInfo(string(fun), nothing, nothing, nothing, [], _methods, docstring)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -197,9 +191,8 @@ function inspect(
         info.docstring;
         title = "Docstring",
         title_style = "bold underline yellow",
-        width = width-4,
+        width = width - 4,
     )
-
 
     # ---------------------------------- fields ---------------------------------- #
     if !isnothing(info.fields)
@@ -220,7 +213,7 @@ function inspect(
             title_style = "bold yellow",
             style = "dim yellow",
             width = width - 6,
-            fit=false
+            fit = false,
         )
 
         insights_panel = (docs / Spacer(width - 2, 2) / fields_panel)
@@ -247,7 +240,7 @@ function inspect(
         constructors;
         title = "Constructors{dim}($n_constructors)",
         title_style = "bold underline yellow",
-        width = width-4
+        width = width - 4,
     )
 
     # ---------------------------------- methods --------------------------------- #
@@ -270,7 +263,7 @@ function inspect(
         methods;
         title = "Methods{dim}($n_methods)",
         title_style = "bold underline yellow",
-        width = width-4,
+        width = width - 4,
     )
 
     # ------------------------------- CREATE PANEL ------------------------------- #
@@ -288,7 +281,7 @@ function inspect(
         title_style = "red",
         style = "blue",
         width = width,
-        fit=true
+        fit = true,
     )
 
     return println(io, panel)
@@ -299,7 +292,9 @@ end
 
 Inspects `Function` objects providing docstrings, and methods signatures.
 """
-function inspect(io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 7)
+function inspect(
+    io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 7
+)
     width = isnothing(width) ? min(console_width(stdout), 88) : width
 
     info = TypeInfo(fun)
@@ -336,7 +331,7 @@ function inspect(io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max
 
     # -------------------------------- print panel ------------------------------- #
     return println(
-        io, 
+        io,
         Panel(
             Spacer(width - 4, 1),
             docs,
@@ -346,7 +341,7 @@ function inspect(io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max
             title_style = "red",
             style = "blue",
             width = width,
-            fit=true
+            fit = true,
         ),
     )
 end
@@ -363,7 +358,6 @@ function inspect(io::IO, obj; kwargs...)
         throw("Cannot inspect $obj ($(typeof(obj)))")
     end
 end
-
 
 inspect(obj) = inspect(stdout, obj)
 

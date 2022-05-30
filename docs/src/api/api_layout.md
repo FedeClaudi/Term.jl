@@ -1,6 +1,6 @@
 # Layout
 ```@meta
-CurrentModule = Term.layout
+CurrentModule = Term.Layout
 ```
 
 
@@ -9,5 +9,5 @@ Pages   = ["api_layout.md"]
 ```
 
 ```@autodocs
-Modules = [layout]
+Modules = [Layout]
 ```

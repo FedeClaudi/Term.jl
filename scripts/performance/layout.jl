@@ -1,4 +1,4 @@
-import Term.layout: pad, vLine, hLine
+import Term.Layout: pad, vLine, hLine
 import Term: Panel
 
 println("pad")

@@ -1,7 +1,7 @@
 using Term
-import Term.renderables: Renderable
+import Term.Renderables: Renderable
+import Term.Colors: hsl2rgb
 import Term: int
-import Term.color: hsl2rgb
 
 import MyterialColors: orange_light, blue_light, green_light
 

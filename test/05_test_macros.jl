@@ -1,4 +1,4 @@
-import Term.style: apply_style
+import Term.Style: apply_style
 
 @testset "\e[34mMACROS" begin
     @test (@green "string") == apply_style("{green}string{/green}")
@@ -15,7 +15,6 @@ import Term.style: apply_style
     @test (@style "string" red on_blue underline) ==
         apply_style("{red on_blue underline}string{/red on_blue underline}")
     @test (@style "string" bold italic) == apply_style("{bold italic}string{/bold italic}")
-
 
     # test with interpolations
     x = "test"
