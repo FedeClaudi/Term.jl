@@ -668,6 +668,13 @@ function grid(
 )
     num = length(rens)
     m, n = layout === nothing ? calc_nrows_ncols(num, aspect) : layout
+    if m === nothing
+        m, r = divrem(num, n)
+        r == 0 || (m += 1)
+    elseif n === nothing
+        n, r = divrem(num, m)
+        r == 0 || (n += 1)
+    end
     fill_in = placeholder === nothing ? PlaceHolder(first(rens)) : placeholder
     return grid(reshape(append!(copy(rens), [fill_in for _ in 1:(m * n - num)]), m, n))
 end
