@@ -165,19 +165,8 @@ p2 = Panel(; width=50)
 cvstack(p1, p2)
 ```
 
-`lvstack`, `cvstack` and `rvstack` do left/center/right justification first and then vertically stack the panels. They use the non-modifying version of the
-justification functions so your original panels are not modified. Finally, you can also use `←, ↓, →` (using \leftarrow, \downarrow and \centerarrow) as shorthand for 
-l/c/r-stack functions:
-
-```@example justify3
-using Term # hide
-
-p1 = Panel(; width=5; style="green")
-p2 = Panel(; width=10; style="white")
-p2 = Panel(; width=15; style="red")
-
-→(p1, p2, p3)
-```
+`lvstack`, `cvstack` and `rvstack` do left/center/right justification first and then vertically stack the panels.
+They use the non-modifying version of the justification functions so your original panels are not modified.
 
 Pretty nifty huh?
 
