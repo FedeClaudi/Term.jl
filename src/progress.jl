@@ -1,4 +1,4 @@
-module progress
+module Progress
 
 using Dates
 import Parameters: @with_kw
@@ -6,8 +6,8 @@ import UUIDs: UUID
 
 import Term: int, textlen, truncate, loop_last, get_file_format
 import ..Tprint: tprint, tprintln
-import ..style: apply_style
-import ..console:
+import ..Style: apply_style
+import ..Console:
     console_width,
     hide_cursor,
     show_cursor,
@@ -21,11 +21,11 @@ import ..console:
     savecursor,
     restorecursor
 
-import ..renderables: AbstractRenderable
-import ..measure: Measure
-import ..segment: Segment
-import ..color: RGBColor
-import ..layout: hLine
+import ..Renderables: AbstractRenderable
+import ..Measures: Measure
+import ..Segments: Segment
+import ..Colors: RGBColor
+import ..Layout: hLine
 
 export ProgressBar, ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track
 
@@ -393,7 +393,6 @@ See also [`stop!`](@ref)
 """
 function start!(pbar::ProgressBar)
     pbar.running = true
-
     print("\n"^(length(pbar.jobs)))
     return nothing
 end

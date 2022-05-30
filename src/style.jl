@@ -1,4 +1,5 @@
-module style
+module Style
+
 import Parameters: @with_kw
 
 import Term:
@@ -12,7 +13,7 @@ import Term:
     ANSICode,
     tview
 
-import ..color:
+import ..Colors:
     AbstractColor, NamedColor, is_color, is_background, get_color, is_hex_color, hex2rgb
 
 export apply_style

@@ -1,5 +1,5 @@
-using Term.progress
-import Term.progress: AbstractColumn, getjob, get_columns
+using Term.Progress
+import Term.Progress: AbstractColumn, getjob, get_columns
 import Term: install_term_logger, uninstall_term_logger
 
 using ProgressLogging

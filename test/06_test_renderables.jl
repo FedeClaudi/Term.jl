@@ -1,5 +1,5 @@
-import Term.renderables: Renderable, RenderableText, AbstractRenderable
-import Term.segment: Segment
+import Term.Renderables: Renderable, RenderableText, AbstractRenderable
+import Term.Segments: Segment
 import Term: fillin
 
 @testset "\e[34mSegment" begin

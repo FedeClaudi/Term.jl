@@ -19,7 +19,7 @@ import Term:
     fillin,
     truncate,
     reshape_text
-import Term.style: apply_style
+import Term.Style: apply_style
 
 @testset "TU_markup" begin
     strings = [

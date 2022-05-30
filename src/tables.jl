@@ -1,14 +1,16 @@
-module table
-using Tables
+module Tables
 
-import ..measure: Measure, width, height
-import ..segment: Segment
-import ..renderables: AbstractRenderable, RenderableText
-import ..layout: cvstack, hstack, vstack, pad
-using ..box
-import ..style: apply_style
-import ..Tprint: tprintln
+import Tables as TablesPkg
+
 import Term: fillin, term_theme
+
+import ..Renderables: AbstractRenderable, RenderableText
+import ..Layout: cvstack, hstack, vstack, pad
+import ..Measures: Measure, width, height
+import ..Style: apply_style
+import ..Segments: Segment
+import ..Tprint: tprintln
+using ..Boxes
 
 export Table
 
@@ -121,7 +123,7 @@ function assert_table_arguments(
 end
 
 function Table(
-    tb::Tables.AbstractColumns;
+    tb::TablesPkg.AbstractColumns;
     box::Symbol = :SQUARE,
     style::String = "default",
     padding::Int = 2,
@@ -140,8 +142,8 @@ function Table(
     box = eval(box)
 
     # table info
-    rows = Tables.rows(tb)
-    sch = Tables.schema(rows)
+    rows = TablesPkg.rows(tb)
+    sch = TablesPkg.schema(rows)
     N_cols = length(sch.names)
 
     # make sure arguemnts combination is valud
@@ -251,8 +253,8 @@ function Table(
     return Table(segments, Measure(segments))
 end
 
-Table(data::AbstractMatrix; kwargs...) = Table(Tables.table(data); kwargs...)
-Table(data::AbstractVector; kwargs...) = Table(Tables.table(data); kwargs...)
+Table(data::AbstractMatrix; kwargs...) = Table(TablesPkg.table(data); kwargs...)
+Table(data::AbstractVector; kwargs...) = Table(TablesPkg.table(data); kwargs...)
 
 function Table(data::AbstractDict; kwargs...)
     kwargs = Dict(kwargs...)

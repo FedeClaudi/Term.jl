@@ -1,4 +1,4 @@
-import Term.dendogram: link, Dendogram
+import Term.Dendograms: link, Dendogram
 
 @testset "DENDOGRAM" begin
     mydendo = Dendogram("awesome", "this", :is, "a", "dendogram!")

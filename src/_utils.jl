@@ -63,3 +63,30 @@ function get_file_format(nbytes; suffix = "B")
     end
     return "cacca"
 end
+
+"""
+    calc_nrows_ncols(n, aspect=(16, 9))
+
+Computes the number of rows and columns to fit a given number `n` of subplots in a figure with aspect `aspect`.
+Adapted from: stackoverflow.com/a/43366784
+"""
+function calc_nrows_ncols(n, aspect::Union{Number,NTuple} = (16, 9))
+    w, h = if aspect isa Number
+        (aspect, one(aspect))
+    else
+        aspect
+    end
+    factor = √(n / (w * h))
+    cols = floor(Int, w * factor)
+    rows = floor(Int, h * factor)
+    rowFirst = w < h
+    while rows * cols < n
+        if rowFirst
+            rows += 1
+        else
+            cols += 1
+        end
+        rowFirst = !rowFirst
+    end
+    return rows, cols
+end

@@ -1,6 +1,6 @@
 using Term
-import Term.progress: ProgressBar, start!, update!, stop!, with, @track, addjob!
-import Term.console: clear
+import Term.Progress: ProgressBar, start!, update!, stop!, with, @track, addjob!
+import Term.Console: clear
 
 
 tprint(hLine("progress bars"; style="blue"))
@@ -101,7 +101,7 @@ end
 Or you can create your choice of columns
 """
 
-import Term.progress: CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn
+import Term.Progress: CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn
 
 mycols = [DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn]
 cols_kwargs = Dict(
@@ -124,7 +124,7 @@ Sometimes you are not sure how many iterations your loop should run for.
 In that case you can use spinners!
 """
 
-import Term.progress: SPINNERS
+import Term.Progress: SPINNERS
 
 for spinner in keys(SPINNERS)
     columns_kwargs = Dict(
@@ -150,11 +150,10 @@ You can make your own column too! You just need to define a type and an update! 
 
 using Random
 
-import Term.progress
-using Term.progress
-import Term.progress: AbstractColumn, DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn
-import Term.segment: Segment
-import Term.measure: Measure
+using Term.Progress
+import Term.Progress: AbstractColumn, DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn
+import Term.Segments: Segment
+import Term.Measures: Measure
 
 struct RandomColumn <: AbstractColumn
     job::ProgressJob
@@ -169,11 +168,10 @@ struct RandomColumn <: AbstractColumn
 end
 
 
-function progress.update!(col::RandomColumn, color::String, args...)::String
+function Progress.update!(col::RandomColumn, color::String, args...)::String
     txt = Segment(randstring(6), col.style)
     return txt.text
 end
-
 
 
 mycols = [DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn, RandomColumn]
@@ -191,13 +189,12 @@ with(pbar) do
 end
 
 
-
 """
 This is an example of how to use a progress bar to show file
 downloading/loading progress.
 """
 
-import Term.progress: SeparatorColumn, ProgressColumn, DescriptionColumn, DownloadedColumn
+import Term.Progress: SeparatorColumn, ProgressColumn, DescriptionColumn, DownloadedColumn
 
 
 FILESIZE = 2342341

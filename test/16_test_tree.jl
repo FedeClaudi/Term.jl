@@ -1,4 +1,4 @@
-import Term.tree: Tree
+import Term: Tree
 
 tree_dict = Dict(
     "nestedasdasdsadasdasdsadsadasdasdasdsadasasdasdassfsdfdsfdsfdsfsdfsdfdsfsdfd" =>

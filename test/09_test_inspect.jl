@@ -1,5 +1,5 @@
 import Term: inspect, expressiontree, typestree, Dendogram, Tree
-import Term.console: console_width
+import Term.Console: console_width
 
 println("\nTesting logging, stdout temporarily disabled")
 # @suppress_out begin

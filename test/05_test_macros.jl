@@ -1,4 +1,4 @@
-import Term.style: apply_style
+import Term.Style: apply_style
 
 @testset "\e[34mMACROS" begin
     @test (@green "string") == apply_style("{green}string{/green}")

@@ -1,9 +1,9 @@
+module Logs
 
-module logging
+using ProgressLogging: asprogress
+using InteractiveUtils
 using Dates: Dates
 using Logging
-using InteractiveUtils
-using ProgressLogging: asprogress
 
 import Term:
     Theme,
@@ -18,11 +18,12 @@ import Term:
     truncate,
     ltrim_str
 
-import ..box: ROUNDED
-import ..style: apply_style
-import ..renderables: AbstractRenderable
+import ..Console: console_width, console_height, change_scroll_region, move_to_line
+import ..Renderables: AbstractRenderable
+import ..Style: apply_style
 import ..Tprint: tprintln
-import ..progress:
+import ..Boxes: ROUNDED
+import ..Progress:
     ProgressBar,
     ProgressJob,
     DescriptionColumn,
@@ -37,8 +38,6 @@ import ..progress:
     SeparatorColumn,
     PercentageColumn
 
-import ..console: console_width, console_height, change_scroll_region, move_to_line
-
 export TermLogger, install_term_logger
 
 DEFAULT_LOGGER = global_logger()
@@ -49,7 +48,7 @@ DEFAULT_LOGGER = global_logger()
 
 Custom logger type.
 """
-struct TermLogger <: Logging.AbstractLogger
+struct TermLogger <: AbstractLogger
     io::IO
     theme::Theme
     pbar::ProgressBar
@@ -76,9 +75,7 @@ end
 # set logger beavior
 Logging.min_enabled_level(logger::TermLogger) = Logging.Info
 
-function Logging.shouldlog(logger::TermLogger, level, _module, group, id)
-    return true
-end
+Logging.shouldlog(logger::TermLogger, level, _module, group, id) = true
 Logging.catch_exceptions(logger::TermLogger) = true
 
 # --------------------------- handle logger message -------------------------- #
@@ -152,7 +149,7 @@ function handle_progress(logger::TermLogger, prog)
 end
 
 """
-    Logging.handle_message(logger::TermLogger,
+    handle_message(logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...)
 
 Handle printing of log messages, with style!.
 
@@ -319,4 +316,5 @@ function uninstall_term_logger()
     logger = global_logger(DEFAULT_LOGGER)
     return logger
 end
+
 end

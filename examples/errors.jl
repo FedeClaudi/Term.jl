@@ -13,8 +13,7 @@ to hold back on this feature for code that needs to reliably print acurate
 error information.
 """
 
-import Term: install_term_stacktrace
-import Term: hLine
+import Term: install_term_stacktrace, hLine
 
 install_term_stacktrace()
 

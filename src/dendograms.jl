@@ -1,13 +1,13 @@
-module dendogram
+module Dendograms
 
 import Term: fint, int, cint, truncate, loop_firstlast, highlight, textlen
 
-import ..box: get_rrow, get_lrow, get_row, SQUARE
-import ..layout: pad
-import ..segment: Segment
-import ..measure: Measure
-import ..renderables: AbstractRenderable
-import ..style: apply_style
+import ..Renderables: AbstractRenderable
+import ..Boxes: get_rrow, get_lrow, get_row, SQUARE
+import ..Style: apply_style
+import ..Segments: Segment
+import ..Measures: Measure
+import ..Layout: pad
 
 import MyterialColors: yellow, blue_light, green_light, salmon_light, blue_grey_light
 

@@ -1,5 +1,5 @@
+module Introspection
 
-module introspection
 using InteractiveUtils
 
 import MyterialColors: orange, grey_dark, light_green
@@ -13,11 +13,11 @@ import Term:
     do_by_line,
     expr2string
 
-import ..console: console_width
-import ..panel: Panel, TextBox
-import ..layout: Spacer, hLine
-import ..tree: Tree
-import ..dendogram: Dendogram
+import ..Console: console_width
+import ..Panels: Panel, TextBox
+import ..Layout: Spacer, hLine
+import ..Dendograms: Dendogram
+import ..Trees: Tree
 
 include("_inspect.jl")
 

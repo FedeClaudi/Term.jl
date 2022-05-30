@@ -1,10 +1,12 @@
-module errors
+module Errors
+
 import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
-import ..layout: hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack
-import ..renderables: RenderableText, AbstractRenderable
-import ..panel: Panel
 import Term: highlight, truncate
+
+import ..Layout: hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack
+import ..Renderables: RenderableText, AbstractRenderable
+import ..Panels: Panel
 
 export install_term_stacktrace
 
@@ -33,14 +35,10 @@ _width() = min(console_width(stderr), 100)
 # ----------------------- error type specific messages ----------------------- #
 
 # ! ARGUMENT ERROR
-function error_message(er::ArgumentError)
-    return er.msg, ""
-end
+error_message(er::ArgumentError) = er.msg, ""
 
 # ! ASSERTION ERROR
-function error_message(er::AssertionError)
-    return er.msg, ""
-end
+error_message(er::AssertionError) = return er.msg, ""
 
 # ! BOUNDS ERROR
 function error_message(er::BoundsError)
@@ -68,14 +66,10 @@ function error_message(er::DomainError)
 end
 
 # ! DimensionMismatch
-function error_message(er::DimensionMismatch)
-    return er.msg, ""
-end
+error_message(er::DimensionMismatch) = er.msg, ""
 
 # ! DivideError
-function error_message(er::DivideError)
-    return "Attempted integer division by {bold}0{/bold}", ""
-end
+error_message(er::DivideError) = "Attempted integer division by {bold}0{/bold}", ""
 
 # ! EXCEPTION ERROR
 function error_message(er::ErrorException)
@@ -152,9 +146,7 @@ function error_message(er::MethodError; kwargs...)
 end
 
 # ! StackOverflowError
-function error_message(er::StackOverflowError)
-    return "Stack overflow error: too many function calls.", ""
-end
+error_message(er::StackOverflowError) = "Stack overflow error: too many function calls.", ""
 
 # ! TYPE ERROR
 function error_message(er::TypeError)
@@ -248,4 +240,5 @@ function install_term_stacktrace()
         end
     end
 end
+
 end

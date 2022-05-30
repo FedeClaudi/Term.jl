@@ -2,9 +2,10 @@ module Tprint
 
 import Term: unescape_brackets, escape_brackets, has_markup
 import Term: highlight as highlighter
-import ..renderables: AbstractRenderable
-import ..style: apply_style
-import ..layout: hstack
+
+import ..Renderables: AbstractRenderable
+import ..Style: apply_style
+import ..Layout: hstack
 
 export tprint, tprintln
 """

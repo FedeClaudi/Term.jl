@@ -9,12 +9,12 @@ import Term:
     split_lines,
     term_theme
 
+import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack
+import ..Renderables: RenderableText
+import ..Console: console_width
+import ..Panels: Panel, TextBox
+import ..Style: apply_style
 import ..Tprint: tprint
-import ..panel: Panel, TextBox
-import ..renderables: RenderableText
-import ..layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack
-import ..style: apply_style
-import ..console: console_width
 
 export @with_repr, termshow, install_term_repr
 
@@ -323,4 +323,5 @@ end
 macro with_repr(typedef)
     return esc(with_repr(typedef))
 end
+
 end

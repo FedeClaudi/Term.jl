@@ -25,7 +25,7 @@ Let's say you want to create a hierarchical structure in your dendogram,
 just link individual elements together.
 """
 
-import Term.dendogram: link
+import Term.Dendograms: link
 print("\n"^2)
 print(link(mydendo, otherdendo; title="[red]superdendo[/red]"))
 

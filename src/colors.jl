@@ -1,4 +1,4 @@
-module color
+module Colors
 
 import Term:
     NAMED_COLORS,
@@ -133,9 +133,7 @@ end
 Extract a color type from a string with color information.
 """
 function get_color(string; bg = false)::AbstractColor
-    if bg
-        string = nospaces(string)[4:end]
-    end
+    bg && (string = nospaces(string)[4:end])
 
     if is_named_color(string)
         if string ∈ COLORS_16b
@@ -181,4 +179,5 @@ function hsl2rgb(h, s, l)
 
     return "($r, $g, $b)"
 end
+
 end

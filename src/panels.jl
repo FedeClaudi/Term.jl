@@ -1,14 +1,15 @@
-module panel
+module Panels
+
 import Term:
     split_lines, reshape_text, do_by_line, join_lines, truncate, textlen, fillin, do_by_line
 
-import ..console: console_width, console_height
-import ..measure: Measure
-import ..renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
-import ..segment: Segment
-using ..box
-import ..layout: pad, vstack, Padding
-import ..style: apply_style
+import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
+import ..Console: console_width, console_height
+import ..Layout: pad, vstack, Padding
+import ..Style: apply_style
+import ..Segments: Segment
+import ..Measures: Measure
+using ..Boxes
 
 export Panel, TextBox
 

@@ -1,4 +1,4 @@
-module console
+module Console
 
 export console_height,
     console_width,

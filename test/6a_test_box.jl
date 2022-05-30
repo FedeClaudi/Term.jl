@@ -1,8 +1,8 @@
-using Term.box
+using Term.Boxes
 import Term: Segment
 
 @testset "\e34mBOX" begin
-    testbox = Term.box.Box(
+    testbox = Term.Boxes.Box(
         "ASCII",
         """
         +--+
@@ -22,7 +22,7 @@ import Term: Segment
         @test_nothrow println(stdout, testbox)
     end
 
-    _bstring = Term.box.fit(Term.box.ASCII, [1, 1, 1, 1, 1, 1, 1, 1])
+    _bstring = Term.Boxes.fit(Term.Boxes.ASCII, [1, 1, 1, 1, 1, 1, 1, 1])
     @test _bstring ==
         "+---------------+\n| | | | | | | | |\n|-+-+-+-+-+-+-+-|\n| | | | | | | | |\n|-+-+-+-+-+-+-+-|\n|-+-+-+-+-+-+-+-|\n| | | | | | | | |\n+---------------+"
 
@@ -32,14 +32,14 @@ import Term: Segment
     @test get_row(ROUNDED, [3, 5], :top) == "╭───┬─────╮"
 
     # test get title row with no justification
-    tr = get_title_row(:top, Term.box.ROUNDED, nothing; width = 22, style = "red")
+    tr = get_title_row(:top, Term.Boxes.ROUNDED, nothing; width = 22, style = "red")
     @test typeof(tr) == Segment
     @test tr.measure.w == 22
 
     # test title row with justification
     left = get_title_row(
         :top,
-        Term.box.ROUNDED,
+        Term.Boxes.ROUNDED,
         "test";
         width = 22,
         justify = :left,
@@ -52,7 +52,7 @@ import Term: Segment
 
     right = get_title_row(
         :top,
-        Term.box.ROUNDED,
+        Term.Boxes.ROUNDED,
         "test";
         width = 22,
         justify = :right,
@@ -65,7 +65,7 @@ import Term: Segment
 
     center = get_title_row(
         :top,
-        Term.box.ROUNDED,
+        Term.Boxes.ROUNDED,
         "test";
         width = 22,
         justify = :center,
@@ -78,7 +78,7 @@ import Term: Segment
     for width in (15, 21, 33, 58), justify in (:left, :center, :right)
         line = get_title_row(
             :top,
-            Term.box.DOUBLE,
+            Term.Boxes.DOUBLE,
             "test";
             width = width,
             justify = justify,

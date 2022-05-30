@@ -1,12 +1,17 @@
-module renderables
+module Renderables
 
-import Term: TERM_DEBUG_ON
-import ..measure: Measure
-import ..segment: Segment
-import ..console: console_width
-import ..style: get_style_codes, MarkupStyle, apply_style
-import Term: split_lines, reshape_text, fillin, join_lines, unescape_brackets_with_space
+import Term:
+    split_lines,
+    reshape_text,
+    fillin,
+    join_lines,
+    unescape_brackets_with_space,
+    TERM_DEBUG_ON
+import ..Style: get_style_codes, MarkupStyle, apply_style
 import Term: highlight as highlighter
+import ..Console: console_width
+import ..Measures: Measure
+import ..Segments: Segment
 
 export AbstractRenderable, Renderable, RenderableText
 

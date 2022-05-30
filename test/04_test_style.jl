@@ -1,4 +1,4 @@
-import Term.style: apply_style
+import Term.Style: apply_style
 import Term: tprint, tprintln
 
 @testset "\e[34mStyle\e[0m" begin

@@ -1,4 +1,4 @@
-module measure
+module Measures
 
 import Term: remove_ansi, remove_markup
 

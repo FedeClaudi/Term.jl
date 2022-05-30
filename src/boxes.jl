@@ -1,8 +1,9 @@
-module box
+module Boxes
 
-import ..segment: Segment
-import ..style: apply_style
 import Term: int, chars, join_lines, loop_last, textlen, get_lr_widths, truncate
+
+import ..Style: apply_style
+import ..Segments: Segment
 
 export get_row, get_title_row
 export NONE, ASCII, ASCII2, ASCII_DOUBLE_HEAD

@@ -1,8 +1,10 @@
-module tree
-import Base: @kwdef
+module Trees
+
 import MyterialColors: yellow, orange, red, blue
-using InteractiveUtils
 import OrderedCollections: OrderedDict
+import Base: @kwdef
+
+using InteractiveUtils
 
 import Term:
     loop_last,
@@ -15,12 +17,12 @@ import Term:
     truncate,
     expr2string
 
-import ..segment: Segment
-import ..measure: Measure
-import ..renderables: AbstractRenderable
-import ..style: apply_style
-import ..layout: vstack, pad, hLine
-import ..panel: Panel
+import ..Renderables: AbstractRenderable
+import ..Layout: vstack, pad, hLine
+import ..Style: apply_style
+import ..Segments: Segment
+import ..Measures: Measure
+import ..Panels: Panel
 
 export Tree
 
@@ -372,7 +374,7 @@ function Tree(T::DataType)::Tree
 end
 
 function _key(e::Expr)
-    return if length(e.args) > 1
+    if length(e.args) > 1
         "$(expr2string(e))  {dim blue}($(e.head): {/dim blue}{red bold default}$(e.args[1]){/red bold default}{dim blue}){/dim blue}"
     else
         string(e.head)
@@ -381,13 +383,12 @@ end
 _values(e::Expr) = length(e.args) > 1 ? e.args[2:end] : e.args
 
 _pair(x) = nothing => x
-function _pair(e::Expr)
-    return Dict(_key(e) => _pair.(_values(e)))
-end
+_pair(e::Expr) = Dict(_key(e) => _pair.(_values(e)))
 
 function Tree(expr::Expr; kwargs...)
     parsed = _pair(expr)
     parsed = Dict(collect(keys(parsed))[1] => parsed)
     return Tree(parsed; title = expr2string(expr))
 end
+
 end

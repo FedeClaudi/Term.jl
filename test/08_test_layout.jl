@@ -1,6 +1,16 @@
-import Term: RenderableText, Spacer, vLine, hLine, cleantext, textlen, chars, Panel, vstack
-import Term.renderables: Renderable
+import Term.Renderables: Renderable
+import Term.Layout: pad
+
 import Term:
+    RenderableText,
+    Spacer,
+    vLine,
+    hLine,
+    cleantext,
+    textlen,
+    chars,
+    Panel,
+    vstack,
     center!,
     leftalign!,
     rightalign!,
@@ -10,7 +20,6 @@ import Term:
     lvstack,
     cvstack,
     rvstack
-import Term.layout: pad
 
 @testset "Layout - pad" begin
     @test pad("aaa", 20, :left) == "aaa                 "

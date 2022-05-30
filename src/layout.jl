@@ -1,15 +1,15 @@
-module layout
+module Layout
 
 import Parameters: @with_kw
 
 import Term: int, get_lr_widths, textlen, cint, rtrim_str, ltrim_str
-import ..renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
-import ..style: apply_style
-import ..measure: Measure
-import ..segment: Segment
-using ..box
-import ..box: get_lrow, get_rrow
-import ..console: console_width, console_height
+import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
+import ..Console: console_width, console_height
+import ..Boxes: get_lrow, get_rrow
+import ..Style: apply_style
+import ..Measures: Measure
+import ..Segments: Segment
+using ..Boxes
 
 export Padding, vstack, hstack, pad, pad!
 export Spacer, vLine, hLine
@@ -55,21 +55,19 @@ function pad(text, target_width::Int, method::Symbol)::String
 end
 
 """
-    pad(text::AbstractString, left::Int=0, right::Int=0)::String
+    pad(text::AbstractString, left::Int=0, right::Int=0)
 
 Pad a string by a fixed ammount to the left and to the right.
 """
-function pad(text::AbstractString, left::Int = 0, right::Int = 0)::String
-    return " "^left * text * " "^right
-end
+pad(text::AbstractString, left::Int = 0, right::Int = 0) = " "^left * text * " "^right
 
 """
-    pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
+    pad(segments::AbstractVector{Segment}, left::Int=0, right::Int=0)
 
 Pad a renderable's segments to the left and the right.
 """
-function pad(segments::Vector{Segment}, left::Int = 0, right::Int = 0)::Vector{Segment}
-    return map((s) -> Segment(" "^left * s.text * " "^right), segments)
+function pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0)
+    return map((s) -> Segment(pad(s.text, left, right)), segments)
 end
 
 """
@@ -613,33 +611,6 @@ PlaceHolder(ren::AbstractRenderable) = PlaceHolder(ren.measure.w, ren.measure.h)
 # ---------------------------------------------------------------------------- #
 
 """
-    calc_nrows_ncols(n, aspect=(16, 9))
-
-Computes the number of rows and columns to fit a given number `n` of subplots in a figure with aspect `aspect`.
-Adapted from: stackoverflow.com/a/43366784
-"""
-function calc_nrows_ncols(n, aspect::Union{Number,NTuple} = (16, 9))
-    w, h = if aspect isa Number
-        (aspect, one(aspect))
-    else
-        aspect
-    end
-    factor = √(n / (w * h * 1.0))
-    cols = floor(Int, w * factor)
-    rows = floor(Int, h * factor)
-    rowFirst = w < h
-    while rows * cols < n
-        if rowFirst
-            rows += 1
-        else
-            cols += 1
-        end
-        rowFirst = !rowFirst
-    end
-    return rows, cols
-end
-
-"""
     grid(
         rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
         placeholder::Union{Nothing,AbstractRenderable} = nothing,
@@ -659,7 +630,8 @@ function grid(
 )
     nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
     if isnothing(rens)
-        isnothing(layout) && throw(ArgumentError("`layout` must be given"))
+        isnothing(layout) &&
+            throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s"))
         rens = fill(PlaceHolder(aspect...), prod(layout))
     else
         if isnothing(nrows)

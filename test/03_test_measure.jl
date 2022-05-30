@@ -1,5 +1,4 @@
-import Term: Measure
-import Term.measure: width, height
+import Term.Measures: Measure, width, height
 import Term: remove_markup, Panel
 
 @testset "\e[34mMeasure - str" begin
