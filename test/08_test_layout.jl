@@ -208,3 +208,19 @@ end
     testlayout(p3 * p1 * p2, 124, 11)
     testlayout(p3 / p1 / p2, 88, 16)     
 end
+
+@testset "\e[34mlayout - placeholder" begin
+    ph = PlaceHolder(4, 2)
+    @test length(ph.segments) == 2
+    @test ph.measure.w == 4
+    @test ph.measure.h == 2
+
+    p = Panel(; width=8, height=4)
+    ph = PlaceHolder(p)
+    @test ph.measure.w == p.measure.w
+    @test ph.measure.h == p.measure.h
+end
+
+@testset "\e[34mlayout - grid" begin
+    # p = grid
+end

@@ -67,7 +67,7 @@ end
 """
     pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
 
-Pad a renderable's segments to the left and the right
+Pad a renderable's segments to the left and the right.
 """
 function pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
     return map(
@@ -90,7 +90,7 @@ end
 """
     pad(ren::AbstractRenderable; width::Int)
 
-Pad a renderable to achieve a target width
+Pad a renderable to achieve a target width.
 """
 function pad(ren::AbstractRenderable; width::Int)
     npads = width - ren.measure.w
@@ -101,7 +101,7 @@ end
 """
     pad!(ren::AbstractRenderable, left::Int, right::Int)
 
-In place version for padding a renderable
+In place version for padding a renderable.
 """
 function pad!(ren::AbstractRenderable, left::Int, right::Int)
     ren.segments = pad(ren.segments, left, right)
@@ -363,7 +363,7 @@ end
 """ 
     hstack(renderables...)
 
-Horizonatlly stack a variable number of renderables
+Horizonatlly stack a variable number of renderables.
 """
 function hstack(renderables...)
     renderable = Renderable()
@@ -396,7 +396,7 @@ Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
 """
     lvstack(renderables::RenderablesUnion...)
 
-Left align renderables and then vertically stack
+Left align renderables and then vertically stack.
 """
 function lvstack(renderables::RenderablesUnion...)::Renderable
     renderables = leftalign(renderables...)
@@ -406,7 +406,7 @@ end
 """
     lvstack(renderables::RenderablesUnion...)
 
-Center align renderables and then vertically stack
+Center align renderables and then vertically stack.
 """
 function cvstack(renderables::RenderablesUnion...)::Renderable
     renderables = center(renderables...)
@@ -416,7 +416,7 @@ end
 """
     lvstack(renderables::RenderablesUnion...)
 
-Right align renderables and then vertically stack
+Right align renderables and then vertically stack.
 """
 function rvstack(renderables::RenderablesUnion...)::Renderable
     renderables = rightalign(renderables...)
@@ -458,7 +458,7 @@ Spacer(width::Number, height::Number; char::Char = ' ') = Spacer(int(width), int
 """
     vLine
 
-A multi-line renderable with each line made of a | to create a vertical line
+A multi-line renderable with each line made of a | to create a vertical line.
 """
 mutable struct vLine <: AbstractLayoutElement
     segments::Vector{Segment}
@@ -481,14 +481,14 @@ end
 """
     vLine(ren::AbstractRenderable; kwargs...)
 
-Construct a vLine with the same height as a renderable
+Construct a vLine with the same height as a renderable.
 """
 vLine(ren::AbstractRenderable; kwargs...) = vLine(ren.measure.h; kwargs...)
 
 """
     vLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
 
-Create a `vLine` as tall as the `stdout` console
+Create a `vLine` as tall as the `stdout` console.
 """
 function vLine(; style::String = "default", box::Symbol = :ROUNDED)
     return vLine(console_height(stdout); style = style, box = box)
@@ -546,7 +546,7 @@ end
 """
     hLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
 
-Construct an `hLine` as wide as the `stdout`
+Construct an `hLine` as wide as the `stdout`.
 """
 function hLine(; style::String="default", box::Symbol = :ROUNDED)
     return hLine(console_width(stdout); style = style, box = box)
@@ -566,7 +566,7 @@ end
 """
     hLine(ren::AbstractRenderable; kwargs)
 
-Construct an hLine with same width as a renderable
+Construct an hLine with same width as a renderable.
 """
 hLine(ren::AbstractRenderable; kwargs...) = hLine(ren.measure.w; kwargs...)
 
@@ -624,7 +624,6 @@ function PlaceHolder(w::Int, h::Int)
         )
     end
 
-    # return renderable
     return PlaceHolder(lines, Measure(lines))
 end
 
@@ -635,31 +634,48 @@ PlaceHolder(ren::AbstractRenderable) = PlaceHolder(ren.measure.w, ren.measure.h)
 # ---------------------------------------------------------------------------- #
 
 """
+    calc_nrows_ncols(n, aspect=(16, 9))
+
+Computes the number of rows and columns to fit a given number `n` of subplots in a figure with aspect `aspect`.
+Adapted from: stackoverflow.com/a/43366784
+"""
+function calc_nrows_ncols(n, aspect=(16, 9))
+    w, h = aspect
+    factor = √(n / (w * h * 1.0))
+    cols = floor(Int, w * factor)
+    rows = floor(Int, h * factor)
+    rowFirst = w < h
+    while rows * cols < n
+        if rowFirst
+            rows += 1
+        else
+            cols += 1
+        end
+        rowFirst = !rowFirst
+    end
+    return rows, cols
+end
+"""
     grid(rens::AbstractVector{<:AbstractRenderable}, layout::Union{Nothing,Tuple} = nothing, placeholder = nothing)
 
-Construct a square grid from a `AbsractVector` of `AbstractRenderable`
+Construct a square grid from a `AbsractVector` of `AbstractRenderable`.
 """
 function grid(
     rens::AbstractVector{<:AbstractRenderable};
     layout::Union{Nothing,Tuple} = nothing, 
-    placeholder = nothing
+    placeholder = nothing,
+    aspect = (16, 9),
 )
     num = length(rens)
-    if layout === nothing
-        m = ceil(Int, √(num))
-        n, r = divrem(num, m)
-        r == 0 || (n += 1)
-    else
-        m, n = layout
-    end
-    fill_in = placeholder === nothing ? eltype(rens)() : placeholder
+    m, n = layout === nothing ? calc_nrows_ncols(num, aspect) : layout
+    fill_in = placeholder === nothing ? PlaceHolder(first(rens)) : placeholder
     return grid(reshape(append!(copy(rens), [fill_in for _ in 1:(m * n - num)]), m, n))
 end
 
 """
     grid(rens::AbstractMatrix{<:AbstractRenderable})
 
-Construct a grid from a `AbstractMatrix` of `AbstractRenderable`
+Construct a grid from a `AbstractMatrix` of `AbstractRenderable`.
 """
 function grid(rens::AbstractMatrix{<:AbstractRenderable})
     rows = collect(foldl(*, col[2:end], init = first(col)) for col in eachrow(rens))
