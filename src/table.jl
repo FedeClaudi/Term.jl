@@ -1,5 +1,6 @@
 module table
     using Tables
+    import MyterialColors: orange
 
     import ..measure: Measure, width, height
     import ..segment: Segment
@@ -29,8 +30,6 @@ module table
             c -> pad(c[2], widths[c[1]], :center),
             enumerate(cells)
         )
-
-    
 
         # create row
         if length(widths) > 1
@@ -97,7 +96,7 @@ module table
 
         if length(problems) > 0
             @warn "Failed to create Term.Table"
-            warn_color = term_theme[].warn
+            warn_color = orange
             tprintln.("  {$warn_color}" .* problems .* "{/$warn_color}"; highlight=true)
         end
         return length(problems) == 0
