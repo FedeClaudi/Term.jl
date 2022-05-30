@@ -45,7 +45,7 @@ style outputs to terminal.
     # loggin levels
     info::String                = "#7cb0cf"
     debug::String               = "#197fbd"
-    warn::String                = "#d1923f"
+    warn::String                = "#e37b19"
     error::String               = "bold #d13f3f"
 
     # Tree objects
@@ -98,10 +98,8 @@ function Base.show(io::IO, ::MIME"text/plain", theme::Theme)
     )
 end
 
-global term_theme = Theme() # default theme
-
 function set_theme(theme::Theme)
-    global term_theme = theme
+    term_theme[] = theme
 end
 
 # ------------------------------ Highlighters.jl ----------------------------- #

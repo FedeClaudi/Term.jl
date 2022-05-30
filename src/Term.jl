@@ -10,6 +10,9 @@ include("color.jl")
 include("theme.jl")
 include("highlight.jl")
 
+const TERM_DEBUG_ON = Ref(false)
+const term_theme = Ref(Theme())
+
 # rely on other modules
 include("style.jl")
 include("segment.jl")
@@ -30,6 +33,7 @@ include("dendogram.jl")
 include("logo.jl")
 include("inspect.jl")
 include("repr.jl")
+include("table.jl")
 
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine, pad, pad!, vstack, hstack
@@ -77,6 +81,8 @@ function measure.Measure(segments::Vector{Segment})
     )
 end
 
+
+
 # -------------------------------- renderables ------------------------------- #
 using .box
 
@@ -101,18 +107,15 @@ using .layout: Padding,
             lvstack,
             cvstack,
             rvstack,
-            ←, ↓, →,
             grid
 
 
 using .panel: Panel, TextBox
 
 # define additional methods for measure functions
-measure.width(text::AbstractString) = Measure(text).w
 measure.width(seg::Segment) = seg.measure.w
 measure.width(ren::AbstractRenderable) = ren.measure.w
 
-measure.height(text::AbstractString) = Measure(text).h
 measure.height(seg::Segment) = seg.measure.h
 measure.height(ren::AbstractRenderable) = ren.measure.h
 
@@ -132,5 +135,7 @@ using .dendogram: Dendogram
 using .introspection: inspect, typestree, expressiontree
 
 using .Repr: @with_repr, termshow, install_term_repr
+
+using .table: Table
 
 end

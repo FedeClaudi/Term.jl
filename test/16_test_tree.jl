@@ -79,19 +79,19 @@ tree_dict_4 = Dict(
 
 
     testtree(
-        Tree(tree_dict_1), 21, 9
+        Tree(tree_dict_1), 15, 9
     )
 
     testtree(
-        Tree(tree_dict_2), 24, 11
+        Tree(tree_dict_2), 18, 11
     )
 
     testtree(
-        Tree(tree_dict_3), 39, 13
+        Tree(tree_dict_3), 33, 13
     )
 
     testtree(
-        Tree(tree_dict_4), 39, 19
+        Tree(tree_dict_4), 33, 19
     )
 
     # styling

@@ -1,13 +1,14 @@
 *.jl.*.cov
 *.jl.cov
 *.jl.mem
+
 /Manifest.toml
 /docs/Manifest.toml
 /docs/build/
-
 
 workspace.jl
 test.jl
 
 progress copy.jl
 .vscode
+.DS_Store

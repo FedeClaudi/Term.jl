@@ -13,7 +13,9 @@ import Term: Theme,
             has_markup,
             int,
             highlight,
-            term_theme
+            term_theme,
+            truncate,
+            ltrim_str
 
 
 import ..box: ROUNDED
@@ -212,23 +214,25 @@ function Logging.handle_message(
     end
 
     # get padding width
-    _types = string.(typeof.([v for v in values(kwargs)]))
+    _types = string.(typeof.(collect(values(kwargs))))
+    _types = map(t -> ltrim_str(t, 22), _types)
     for (i, _type) in enumerate(values(kwargs))
         if typeof(_type) <: Function
             _types[i] = string(Function)
         end
     end
 
-    wpad = max(textlen.(_types)...) + 2
-    namepad = max(textlen.(string.([v for v in keys(kwargs)]))...)
+    wpad = max(textlen.((_types))...) + 2
+    ks = truncate.(string.(keys(kwargs)), 12)
+    namepad = max(textlen.(ks)...)
 
     # print all kwargs
     tprintln("  $vert"; highlight=false)
-    for ((k, v), _type) in zip(kwargs, _types)
+    for (k, v, _type) in zip(ks, values(kwargs), _types)
         # get line stub
         pad = wpad - textlen(_type) - 1
         line =
-            "  $vert" * " "^pad * " {$(theme.type) dim}($(_type)){/$(theme.type) dim}" *
+            "  $vert" * " "^pad * " {$(logger.theme.type) dim}($(_type)){/$(logger.theme.type) dim}" *
             " {bold #e0e0e0}$k{/bold #e0e0e0}"
 
         epad = namepad - textlen(string(k))
@@ -247,13 +251,13 @@ function Logging.handle_message(
             _size = length(v)
             v = escape_brackets(string(v))
             v = textlen(v) > 33 ? v[1:30] * "..." : v
-            v *= "\n {dim}{bold}$(_size) items {/bold}{/dim}"
+            v *= "\n {white}$(_size) {/white}{dim}items{/dim}"
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
             _size = size(v)
             v =
-                "$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}"
-            v *= "\n {dim}shape: " * join(string.(_size), " × ") * "{/dim}"
+                ltrim_str("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 30)
+            v *= "\n {dim}shape: {default white}" * join(string.(_size), " × ") * "{/default white}{/dim}"
 
         elseif v isa Function
             _style = logger.theme.func
@@ -265,7 +269,12 @@ function Logging.handle_message(
         end
 
         # print value lines
-        vlines = split(string(v), "\n")
+        try
+            v = reshape_text(ltrim_str(string(v), 177), 60)
+        catch
+            v = ltrim_str(string(v), 60)
+        end
+        vlines = split(v, "\n")
 
         if !isnothing(_style)
             vlines = map(
@@ -294,7 +303,7 @@ Install `TermLogger` as the global logging system.
 
 `theme::Theme` can be passed to specify the theme to use for styling objects.
 """
-function install_term_logger(theme::Theme = term_theme)
+function install_term_logger(theme::Theme = term_theme[])
     _logger = TermLogger(theme)
     return global_logger(_logger)
 end

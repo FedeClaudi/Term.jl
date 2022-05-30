@@ -1,4 +1,5 @@
 import Term: RenderableText, Spacer, vLine, hLine, cleantext, textlen, chars, Panel, vstack
+import Term.renderables: Renderable
 import Term: center!, leftalign!, rightalign!, leftalign, center, rightalign, lvstack, cvstack, rvstack
 import Term.layout: pad
 
@@ -67,7 +68,7 @@ end
     pp = lvstack(p1, p2, p3)
     @test pp isa Renderable
     @test pp.measure.w == 15
-    @test string(pp) == "\e[22m╭───╮\e[22m          \n\e[22m╰───╯\e[22m          \n\e[22m╭────────╮\e[22m     \n\e[22m╰────────╯\e[22m     \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m"
+    @test string(pp) == "\e[22m╭───╮\e[22m          \n\e[22m╰───╯\e[22m\e[0m          \n\e[22m╭────────╮\e[22m     \n\e[22m╰────────╯\e[22m\e[0m     \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w  == 5
 
@@ -75,7 +76,7 @@ end
     pp = cvstack(p1, p2, p3)
     @test pp isa Renderable
     @test pp.measure.w == 15
-    @test string(pp) == "     \e[22m╭───╮\e[22m     \n     \e[22m╰───╯\e[22m     \n  \e[22m╭────────╮\e[22m   \n  \e[22m╰────────╯\e[22m   \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m"
+    @test string(pp) == "     \e[22m╭───╮\e[22m     \n     \e[22m╰───╯\e[22m\e[0m     \n  \e[22m╭────────╮\e[22m   \n  \e[22m╰────────╯\e[22m\e[0m   \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w  == 5
 
@@ -83,7 +84,7 @@ end
     pp = rvstack(p1, p2, p3)
     @test pp isa Renderable
     @test pp.measure.w == 15
-    @test string(pp) == "          \e[22m╭───╮\e[22m\n          \e[22m╰───╯\e[22m\n     \e[22m╭────────╮\e[22m\n     \e[22m╰────────╯\e[22m\n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m"
+    @test string(pp) == "          \e[22m╭───╮\e[22m\n          \e[22m╰───╯\e[22m\e[0m\n     \e[22m╭────────╮\e[22m\n     \e[22m╰────────╯\e[22m\e[0m\n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w  == 5
 end
@@ -190,14 +191,14 @@ end
 @testset "\e[34mlayout - panels" begin
     p1 = Panel()
     p2 = Panel(; width=24, height=3)
-    p3 = Panel("this [red]panel[/red]"^5, width=12)
+    p3 = Panel("this {red}panel{/red}"^5, width=12)
     
     testlayout(p1 * p2, 112, 3)
-    @test string(p1 * p2) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[22m╭──────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[22m│\e[22m                      \e[0m\e[22m│\e[22m\e[0m\n                                                                                        \e[22m╰──────────────────────╯\e[22m"
+    @test string(p1 * p2) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[22m╭──────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\e[22m│\e[22m                      \e[22m│\e[22m\n                                                                                        \e[22m╰──────────────────────╯\e[22m\e[0m"
 
 
     testlayout(p1 / p2, 88, 5)
-    @test string(p1 / p2) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\n\e[22m╭──────────────────────╮\e[22m                                                                \n\e[22m│\e[22m                      \e[0m\e[22m│\e[22m\e[0m                                                                \n\e[22m╰──────────────────────╯\e[22m                                                                "
+    @test string(p1 / p2) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\n\e[22m╭──────────────────────╮\e[22m                                                                \n\e[22m│\e[22m                      \e[22m│\e[22m                                                                \n\e[22m╰──────────────────────╯\e[22m\e[0m                                                                "
 
     testlayout(p2 * p1, 112, 3)
     testlayout(p2 / p1, 88, 5)

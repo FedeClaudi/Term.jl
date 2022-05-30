@@ -4,7 +4,7 @@ import Base: show_method_candidates, ExceptionStack, InterpreterIP
 import ..layout: hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack
 import ..renderables: RenderableText, AbstractRenderable
 import ..panel: Panel
-import Term: highlight
+import Term: highlight, truncate
 
 export install_term_stacktrace
 
@@ -108,23 +108,43 @@ function error_message(er::LoadError)
 end
 
 # ! METHOD ERROR
-function error_message(er::MethodError; kwargs...)
-
-    # get main error message
-    _args = RenderableText.(
-        map(a -> "    $a::$(typeof(a))", er.args)
+method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
+function method_error_candidate(fun, candidate)
+    # highlight non-matched types
+    candidate = replace(
+        candidate, 
+        method_error_regex => SubstitutionString("{red}" * s"\g<0>" * "{/red}")
     )
-    # _args = join([string(ar) * typeof(ar) for ar in er.args], "\n      ")
+    # remove
+    candidate = replace(candidate, "!Matched" => "")
+
+    # highlight fun
+    candidate = replace(candidate, fun => "{bold yellow}$(fun){/bold yellow}")
+    return candidate
+end
+
+function error_message(er::MethodError; kwargs...)
+    # @info "method error" er fieldnames(MethodError) er.f er.args er.world
+    # get main error message
+    _args = join(
+        map(a -> "   {dim bold}($(a[1])){/dim bold} $(truncate(highlight("::"*string(typeof(a[2]))), 30))", enumerate(er.args)), "\n"
+    )
     fn_name = "$(string(er.f))"
-    main_line = "No method matching `$fn_name` with arguments:" /  lvstack(_args...)
+    main_line = "No method matching `$fn_name` with arguments types:" /  _args
     
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:end-1]
-    _candidates = map(c -> split(c, " at ")[1], _candidates)
-
-    candidates = RenderableText.(_candidates)
+    if length(_candidates) > 0
+        _candidates = map(c -> split(c, " at ")[1], _candidates)
+        candidates = map(
+            c -> method_error_candidate(fn_name, c), _candidates
+        )
+        main_line = main_line / "" / "Alternative candidates:" / lvstack(RenderableText.(candidates))
+    else
+        main_line = main_line / " " / "{dim}No alternative candidates found"
+    end
     
-    return string(main_line / "" / "Alternative candidates:" / lvstack(candidates)), ""
+    return string(main_line), ""
 end
 
 # ! StackOverflowError
@@ -187,22 +207,36 @@ end
 # ---------------------------------------------------------------------------- #
 function install_term_stacktrace()
     @eval begin
+
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            println("\n")
-            ename = string(typeof(er))        
-            error = hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
-            rendered_bt = render_backtrace(bt)
-            error /= rendered_bt
-        
-            err, _ = error_message(er)
-            msg = "" / Panel(
-                "{#aec2e8}$(err){/#aec2e8}"; 
-                width=rendered_bt.measure.w,
-                title="{bold red default underline}$(typeof(er)){/bold red default underline}",
-                padding=(2, 2, 1, 1), style="dim red", title_justify=:center
-            )
-            error /= msg
-            print(error)
+            (length(bt) == 0 && !isa(er, StackOverflowError)) && return
+            try
+                println("\n")
+                ename = string(typeof(er))        
+                error = hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
+                if length(bt) > 0
+                    rendered_bt = render_backtrace(bt)
+                    error /= rendered_bt
+                    W = rendered_bt.measure.w
+                else
+                    W = 88
+                end
+                W = 88
+            
+                err, _ = error_message(er)
+                msg = "" / Panel(
+                    "{#aec2e8}$(err){/#aec2e8}"; 
+                    width=W,
+                    title="{bold red default underline}$(typeof(er)){/bold red default underline}",
+                    padding=(2, 2, 1, 1), style="dim red", title_justify=:center
+                )
+                error /= msg
+                print(error)
+            catch err
+                @error "ERROR: " exception=err
+                # @warn "Term.jl: failed to render error message" err
+                # Base.showerror(io, er)
+            end
         end
     end
 end
