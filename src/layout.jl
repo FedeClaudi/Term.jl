@@ -452,11 +452,13 @@ end
 
 Create a `vLine` given a height and, optionally, style information.
 """
-function vLine(height::Int; style::String = "default", box::Symbol = :ROUNDED)
-    line = apply_style("{" * style * "}" * eval(box).head.left * "{/" * style * "}\e[0m")
+function vLine(height::Int; style::String = "default", box::Symbol = :ROUNDED, char::Union{Char, Nothing}=nothing)
+    char = isnothing(char) ? getfiled(Boxes, box).head.left : char
+    line = apply_style("{" * style * "}" * char * "{/" * style * "}\e[0m")
     segments = repeat([Segment(line)], height)
     return vLine(segments, Measure(1, height))
 end
+
 
 """
     vLine(ren::AbstractRenderable; kwargs...)
@@ -474,11 +476,7 @@ function vLine(; style::String = "default", box::Symbol = :ROUNDED)
     return vLine(console_height(stdout); style = style, box = box)
 end
 
-function vLine(height::Int; style::String="default", char::Char='|')
-    line = apply_style("{"*style*"}" * char * "{/"*style*"}\e[0m")
-    segments = repeat([Segment(line)], height)
-    return vLine(segments, Measure(1, height))
-end
+
 
 # ----------------------------------- hLine ---------------------------------- #
 
