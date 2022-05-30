@@ -44,7 +44,12 @@ Get a clean string representation of an expression
 """
 function expr2string(e::Expr)
     return replace_multi(
-        string(e), '\n' => "", ' ' => "", r"#=.*=#" => "", "begin" => "", "end" => ""
+        string(e),
+        '\n' => "",
+        ' ' => "",
+        r"#=.*=#" => "",
+        "begin" => "",
+        "end" => "",
     )
 end
 

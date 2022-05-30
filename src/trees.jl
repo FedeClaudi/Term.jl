@@ -55,7 +55,7 @@ Get tree guides with style information applied
 """
 function TreeGuides(guides_type::Symbol, style::String)
     return TreeGuides(
-        map((g) -> apply_style("{$style}$g{/$style}"), treeguides[guides_type])...
+        map((g) -> apply_style("{$style}$g{/$style}"), treeguides[guides_type])...,
     )
 end
 
@@ -132,7 +132,9 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Abstra
     return push!(
         nodes,
         Tree(
-            v; level = level + 1, title = truncate(string(k), term_theme[].tree_max_width)
+            v;
+            level = level + 1,
+            title = truncate(string(k), term_theme[].tree_max_width),
         ),
     )
 end
@@ -164,7 +166,10 @@ end
 Construct a `Tree` out of a `Dict`. Recursively handle nested `Dict`s.
 """
 function Tree(
-    data::Union{AbstractDict,Pair,Vector}; level = 0, title::String = "tree", kwargs...
+    data::Union{AbstractDict,Pair,Vector};
+    level = 0,
+    title::String = "tree",
+    kwargs...,
 )
 
     # initialize
@@ -180,12 +185,16 @@ function Tree(
     if level > 0
         # we don't need to render
         return Tree(;
-            name = title, level = level, nodes = nodes, leaves = leaves, kwargs...
+            name = title,
+            level = level,
+            nodes = nodes,
+            leaves = leaves,
+            kwargs...,
         )
     else
         # render and get measure
         segments = render(
-            Tree(; name = title, level = level, nodes = nodes, leaves = leaves, kwargs...)
+            Tree(; name = title, level = level, nodes = nodes, leaves = leaves, kwargs...),
         )
         measure = Measure(segments)
 
@@ -211,7 +220,11 @@ Render a `Tree` into segments. Recursively handle nested trees.
 
 """
 function render(
-    tree::Tree; prevguides::String = "", lasttree = false, waslast = [], guides = nothing
+    tree::Tree;
+    prevguides::String = "",
+    lasttree = false,
+    waslast = [],
+    guides = nothing,
 )::Vector{Segment}
     guides = isnothing(guides) ? TreeGuides(tree.guides_type, tree.guides_style) : guides
     hasleaves = length(tree.leaves) > 0

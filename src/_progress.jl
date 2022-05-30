@@ -229,7 +229,14 @@ function update!(col::ProgressColumn, color::String, args...)::String
     completed = int(col.nsegs * col.job.i / col.job.N)
     remaining = col.nsegs - completed
     return apply_style(
-        "{" * color * " bold}" * '━'^(completed) * "{/" * color * " bold}" * " "^(remaining)
+        "{" *
+        color *
+        " bold}" *
+        '━'^(completed) *
+        "{/" *
+        color *
+        " bold}" *
+        " "^(remaining),
     )
 end
 
@@ -287,13 +294,14 @@ mutable struct SpinnerColumn <: AbstractColumn
     lasttext::String
 
     function SpinnerColumn(
-        job::ProgressJob; spinnertype::Symbol = :dot, style = "bold blue"
+        job::ProgressJob;
+        spinnertype::Symbol = :dot,
+        style = "bold blue",
     )
         spinnerdata = copy(SPINNERS[spinnertype])
 
-        spinnerdata["frames"] = map(
-            frame -> apply_style(frame, style), spinnerdata["frames"]
-        )
+        spinnerdata["frames"] =
+            map(frame -> apply_style(frame, style), spinnerdata["frames"])
 
         seg = Segment(spinnerdata["frames"][1])
 

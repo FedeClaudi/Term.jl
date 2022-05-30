@@ -430,7 +430,8 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
     segments = [Segment(s1.text * s2.text) for (s1, s2) in zip(s1, s2)]
 
     return Renderable(
-        segments, Measure(r1.measure.w + r2.measure.w, max(r1.measure.h, r2.measure.h))
+        segments,
+        Measure(r1.measure.w + r2.measure.w, max(r1.measure.h, r2.measure.h)),
     )
 end
 
@@ -599,7 +600,10 @@ end
 Creates an hLine object with texte centered horizontally.
 """
 function hLine(
-    width::Number, text::String; style::String = "default", box::Symbol = :ROUNDED
+    width::Number,
+    text::String;
+    style::String = "default",
+    box::Symbol = :ROUNDED,
 )
     box = eval(box)
     text = apply_style(text)

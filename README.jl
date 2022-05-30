@@ -179,13 +179,12 @@ p3 = Panel(; width = 34, style = "#316c99 bold")
 p3b = Panel(; width = 20, style = "#316c99 bold")
 _space = Spacer(3, layout_text.measure.h)
 
-layout_example = (
-    lvstack(p1, p2, p3) * _space * cvstack(p1b, p2, p3b) * _space * rvstack(p1, p2, p3)
-)
+layout_example =
+    (lvstack(p1, p2, p3) * _space * cvstack(p1b, p2, p3b) * _space * rvstack(p1, p2, p3))
 
 layout_example = cvstack(
     "" / RenderableText(
-        "{bold #81bae6} Left/center/right justify and stack renderables to create layouts"
+        "{bold #81bae6} Left/center/right justify and stack renderables to create layouts",
     ),
     layout_example,
 )

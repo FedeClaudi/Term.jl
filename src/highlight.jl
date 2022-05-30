@@ -47,7 +47,7 @@ relevant text of type :like.
 function highlight(text::AbstractString, like::Symbol; theme::Theme = term_theme[])
     markup = getfield(theme, like)
     return apply_style(
-        do_by_line((x) -> "{" * markup * "}" * x * "{/" * markup * "}", chomp(text))
+        do_by_line((x) -> "{" * markup * "}" * x * "{/" * markup * "}", chomp(text)),
     )
 end
 

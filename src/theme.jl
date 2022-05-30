@@ -70,13 +70,11 @@ function Base.show(io::IO, ::MIME"text/plain", theme::Theme)
     N = length(fields)
     values = map(f -> getfield(theme, f), fields)
 
-    fields = map(
-        v -> if v[2] isa String
-            RenderableText(string(v[1]); style = v[2])
-        else
-            RenderableText(string(v[1]))
-        end, zip(fields, values)
-    )
+    fields = map(v -> if v[2] isa String
+        RenderableText(string(v[1]); style = v[2])
+    else
+        RenderableText(string(v[1]))
+    end, zip(fields, values))
 
     values = map(
         v -> v isa String ? RenderableText("■■"; style = v) : RenderableText(string(v)),

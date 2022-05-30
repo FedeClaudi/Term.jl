@@ -91,9 +91,8 @@ three `Segment`s (a string and an upward arrow) before the head of the dendogram
 function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
     # get leaves
     leaves = Leaf.(args)
-    leaves_line = join(
-        map(nl -> string(nl[3], nl[1], nl[2], SPACING), loop_firstlast(leaves))
-    )
+    leaves_line =
+        join(map(nl -> string(nl[3], nl[1], nl[2], SPACING), loop_firstlast(leaves)))
     width = textlen(leaves_line)
 
     # get tree structure line
@@ -119,9 +118,8 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
     end
 
     # put together
-    segments = [
-        Segment(title), Segment(line, LINES_STYLE), Segment(leaves_line, LEAVES_STYLE)
-    ]
+    segments =
+        [Segment(title), Segment(line, LINES_STYLE), Segment(leaves_line, LEAVES_STYLE)]
 
     # add 'pretitle' lines (for expressions only)
     if !isnothing(pretitle)
@@ -241,7 +239,9 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
 
     # create dendogram's segments
     segments::Vector{Segment} = [
-        Segment(space * title), Segment(space * line, LINES_STYLE), *(dendos...).segments...
+        Segment(space * title),
+        Segment(space * line, LINES_STYLE),
+        *(dendos...).segments...,
     ]
 
     # add 'pretitle' lines (for expressions only)

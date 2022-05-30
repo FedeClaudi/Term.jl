@@ -12,9 +12,8 @@ tree_dict = Dict(
         Dict("n1" => 1, "n2" => 2),
 )
 
-tree_dict_1 = Dict(
-    "nested" => Dict("n1" => 1, "n2" => 2), "nested2" => Dict("n1" => "a", "n2" => 2)
-)
+tree_dict_1 =
+    Dict("nested" => Dict("n1" => 1, "n2" => 2), "nested2" => Dict("n1" => "a", "n2" => 2))
 
 tree_dict_2 = Dict(
     "nested" => Dict("n1" => 1, "n2" => 2),

@@ -169,7 +169,10 @@ Extract  info like docstring, fields, types etc. and show it in a structured
 terminal output.
 """
 function inspect(
-    io::IO, type::DataType; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 3
+    io::IO,
+    type::DataType;
+    width::Union{Nothing,Int} = nothing,
+    max_n_methods::Int = 3,
 )
     width = isnothing(width) ? min(console_width(stdout), 88) - 4 : width - 4
     # extract type info
@@ -293,7 +296,10 @@ end
 Inspects `Function` objects providing docstrings, and methods signatures.
 """
 function inspect(
-    io::IO, fun::Function; width::Union{Nothing,Int} = nothing, max_n_methods::Int = 7
+    io::IO,
+    fun::Function;
+    width::Union{Nothing,Int} = nothing,
+    max_n_methods::Int = 7,
 )
     width = isnothing(width) ? min(console_width(stdout), 88) : width
 

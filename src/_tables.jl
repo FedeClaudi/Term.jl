@@ -85,7 +85,8 @@ function assert_table_arguments(
     if !isnothing(footer)
         isa(footer, Function) ||
             (length(footer)) != N_cols && push!(
-                problems, "Got footer with length $(length(footer)), expected $N_cols"
+                problems,
+                "Got footer with length $(length(footer)), expected $N_cols",
             )
         (!isa(footer_style, String) && length(footer_style) != N_cols) && push!(
             problems,

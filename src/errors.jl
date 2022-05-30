@@ -106,7 +106,8 @@ method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
 function method_error_candidate(fun, candidate)
     # highlight non-matched types
     candidate = replace(
-        candidate, method_error_regex => SubstitutionString("{red}" * s"\g<0>" * "{/red}")
+        candidate,
+        method_error_regex => SubstitutionString("{red}" * s"\g<0>" * "{/red}"),
     )
     # remove
     candidate = replace(candidate, "!Matched" => "")
@@ -208,9 +209,8 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
             try
                 println("\n")
                 ename = string(typeof(er))
-                error = hLine(
-                    "{default bold red}$ename{/default bold red}"; style = "dim red"
-                )
+                error =
+                    hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
                 if length(bt) > 0
                     rendered_bt = render_backtrace(
                         bt;

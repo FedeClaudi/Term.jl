@@ -101,7 +101,13 @@ end
 @time pprint(Panel(Panel("[red].[/red]"^50; title = "test", subtitle = "subtest")))
 
 @time pprint(
-    Panel("."^50; title = "test", subtitle = "subtest", subtitle_style = "red", fit = false)
+    Panel(
+        "."^50;
+        title = "test",
+        subtitle = "subtest",
+        subtitle_style = "red",
+        fit = false,
+    ),
 )
 
 # ---------------------------------------------------------------------------- #

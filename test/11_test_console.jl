@@ -22,7 +22,8 @@ println("\nTesting tprint, stdout temporarily disabled")
         @test_nothrow tprint(stdout, "{red}adasd{/red}")
         @test_nothrow tprint(stdout, "{blue on_green}adasda")
         @test_nothrow tprint(
-            stdout, "{red}dadas{green}insdai{/green}outssdrse{blue}fsfsf{/blue}"
+            stdout,
+            "{red}dadas{green}insdai{/green}outssdrse{blue}fsfsf{/blue}",
         )
         @test_nothrow tprint(stdout, Panel("test"))
         @test_nothrow tprint(stdout, TextBox("test"))

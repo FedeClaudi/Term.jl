@@ -27,7 +27,7 @@ function termshow(io::IO, obj)
         print(
             io,
             RenderableText(
-                "$obj{$theme.repr_type_style}::$(typeof(obj)){/$theme.repr_type_style}"
+                "$obj{$theme.repr_type_style}::$(typeof(obj)){/$theme.repr_type_style}",
             ),
         )
         return nothing
@@ -77,7 +77,8 @@ function termshow(io::IO, obj::AbstractDict)
     # prepare text renderables
     k =
         RenderableText.(
-            short_string.(keys(obj)); style = term_theme[].repr_accent_style * " bold"
+            short_string.(keys(obj));
+            style = term_theme[].repr_accent_style * " bold",
         )
     ktypes =
         RenderableText.(
@@ -86,7 +87,8 @@ function termshow(io::IO, obj::AbstractDict)
         )
     vals =
         RenderableText.(
-            short_string.(values(obj)); style = term_theme[].repr_values_style * " bold"
+            short_string.(values(obj));
+            style = term_theme[].repr_values_style * " bold",
         )
     vtypes =
         RenderableText.(
@@ -103,9 +105,8 @@ function termshow(io::IO, obj::AbstractDict)
         push!(vals, RenderableText("⋮"; style = term_theme[].repr_values_style))
         push!(vtypes, RenderableText("⋮"; style = term_theme[].repr_type_style * " dim"))
 
-        arrows = vstack(
-            RenderableText.(repeat(["=>"], length(k) - 1); style = "red bold")...
-        )
+        arrows =
+            vstack(RenderableText.(repeat(["=>"], length(k) - 1); style = "red bold")...)
     else
         arrows = vstack(RenderableText.(repeat(["=>"], length(k)); style = "red bold")...)
     end
@@ -197,7 +198,9 @@ function termshow(io::IO, arr::AbstractArray)
     return print(
         io,
         repr_panel(
-            arr, vstack(panels...), "{white}" * join(string.(size(arr)), " × ") * "{/white}"
+            arr,
+            vstack(panels...),
+            "{white}" * join(string.(size(arr)), " × ") * "{/white}",
         ),
     )
 end
@@ -221,7 +224,9 @@ function termshow(io::IO, fun::Function)
     _methods = map(m -> join(split(join(split(m, "]")[2:end]), " in ")[1]), _methods)
     _methods = map(
         m -> replace(
-            m, string(fun) => "{bold #a5c6d9}$(string(fun)){/bold #a5c6d9}"; count = 1
+            m,
+            string(fun) => "{bold #a5c6d9}$(string(fun)){/bold #a5c6d9}";
+            count = 1,
         ),
         _methods,
     )
@@ -257,7 +262,9 @@ function install_term_repr()
         end
 
         function Base.show(
-            io::IO, ::MIME"text/plain", obj::Union{AbstractArray,AbstractMatrix}
+            io::IO,
+            ::MIME"text/plain",
+            obj::Union{AbstractArray,AbstractMatrix},
         )
             return termshow(io, obj)
         end

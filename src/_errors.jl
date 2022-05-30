@@ -87,7 +87,8 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         push!(content, Spacer(frames.measure.w, 1) / frames)
     elseif N == 3
         push!(
-            content, frame_numbers[2] * frame_info[2] * frame_inlined[2] * frame_from_c[2]
+            content,
+            frame_numbers[2] * frame_info[2] * frame_inlined[2] * frame_from_c[2],
         )
     end
 

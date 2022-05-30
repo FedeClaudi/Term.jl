@@ -29,7 +29,10 @@ const GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 Remove all markup tags from a string of text.
 """
 remove_markup(input_text)::String = replace_multi(
-    input_text, OPEN_TAG_REGEX => "", GENERIC_CLOSER_REGEX => "", CLOSE_TAG_REGEX => ""
+    input_text,
+    OPEN_TAG_REGEX => "",
+    GENERIC_CLOSER_REGEX => "",
+    CLOSE_TAG_REGEX => "",
 )
 
 """ 
@@ -92,7 +95,10 @@ function replace_ansi(input_text)
     while occursin(rx, input_text)
         mtch = match(ANSI_REGEXE, input_text)
         input_text = replace_text(
-            input_text, mtch.offset - 1, mtch.offset + length(mtch.match) - 1, '¦'
+            input_text,
+            mtch.offset - 1,
+            mtch.offset + length(mtch.match) - 1,
+            '¦',
         )
     end
     return input_text
@@ -142,11 +148,15 @@ const remove_brackets_regexes = [r"\{\{", r"\}\}"]
 Replece every double squared parenthesis with a single copy of itself
 """
 unescape_brackets(text)::String = replace_multi(
-    text, remove_brackets_regexes[1] => "{", remove_brackets_regexes[2] => "}"
+    text,
+    remove_brackets_regexes[1] => "{",
+    remove_brackets_regexes[2] => "}",
 )
 
 unescape_brackets_with_space(text)::String = replace_multi(
-    text, remove_brackets_regexes[1] => " {", remove_brackets_regexes[2] => "} "
+    text,
+    remove_brackets_regexes[1] => " {",
+    remove_brackets_regexes[2] => "} ",
 )
 
 # ---------------------------------------------------------------------------- #
@@ -395,9 +405,8 @@ function reshape_text(text, width::Int)
                 if n < ncuts
                     # adjust cuts poisitions
                     Δw = cumwidths[cut] - cumwidths[cut - i]
-                    newcuts = findall(
-                        diff(mod.(cumwidths .- cumwidths[cut] .+ Δw, width)) .< 0
-                    )
+                    newcuts =
+                        findall(diff(mod.(cumwidths .- cumwidths[cut] .+ Δw, width)) .< 0)
 
                     newcuts = newcuts[newcuts .> cut]
                     cuts = [cuts[1:n]..., newcuts...]

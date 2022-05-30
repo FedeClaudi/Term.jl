@@ -157,7 +157,15 @@ In addition to the log message and info such as file/line and time of log,
 it prints kwargs styled by their type.
 """
 function Logging.handle_message(
-    logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...
+    logger::TermLogger,
+    lvl,
+    msg,
+    _mod,
+    group,
+    id,
+    file,
+    line;
+    kwargs...,
 )
     _progress = asprogress(lvl, msg, _mod, group, id, file, line; kwargs...)
     isnothing(_progress) || return handle_progress(logger, _progress)

@@ -181,7 +181,12 @@ function Table(
     for (l, row) in enumerate(rows_values)
         I = l + 1
         row = make_row_cells(
-            row, columns_style, columns_justify, widths, heights[I], vertical_justify
+            row,
+            columns_style,
+            columns_justify,
+            widths,
+            heights[I],
+            vertical_justify,
         )
         if l == 1
             bottom = if nrows < 2
@@ -220,7 +225,8 @@ function Table(
             )
         else
             push!(
-                lines, table_row(row, widths, box, nothing, :mid, :row, style, heights[I])
+                lines,
+                table_row(row, widths, box, nothing, :mid, :row, style, heights[I]),
             )
         end
     end
@@ -291,7 +297,14 @@ upper and bottom sections are created by rows of the `Box` type.
 The mid section is made up of the row's cells and dividing lines.
 """
 function table_row(
-    cells, widths, box, top_level, mid_level, bottom_level, box_style, row_height
+    cells,
+    widths,
+    box,
+    top_level,
+    mid_level,
+    bottom_level,
+    box_style,
+    row_height,
 )
     # get box characters
     mid_level = getfield(box, mid_level)
@@ -334,7 +347,9 @@ function cell(
     vertical_justify::Symbol,
 )
     return vertical_pad(
-        do_by_line(y -> apply_style(pad(y, w, justify), style), x), h, vertical_justify
+        do_by_line(y -> apply_style(pad(y, w, justify), style), x),
+        h,
+        vertical_justify,
     )
 end
 
@@ -376,7 +391,8 @@ function make_row_cells(
 )
     N = length(entries)
     cells = map(
-        i -> cell(entries[i], widths[i], height, justify[i], style[i], vertical_justify),
+        i ->
+            cell(entries[i], widths[i], height, justify[i], style[i], vertical_justify),
         1:N,
     )
     return cells

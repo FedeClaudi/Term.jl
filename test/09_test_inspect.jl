@@ -94,7 +94,7 @@ expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
             @test fromfile("./txtfiles/tree_expr_$i.txt") == cleanstring(tree)
 
             @test fromfile("./txtfiles/exptree_expr_$i.txt") ==
-                cleansprint(expressiontree, e)
+                  cleansprint(expressiontree, e)
         end
     end
 end

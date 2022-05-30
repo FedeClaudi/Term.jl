@@ -21,7 +21,11 @@ end
 
 function simple_slow(; kwargs...)
     pbar = ProgressBar(;
-        refresh_rate = 60, expand = false, columns = :detailed, width = 150, kwargs...
+        refresh_rate = 60,
+        expand = false,
+        columns = :detailed,
+        width = 150,
+        kwargs...,
     )
     j1 = addjob!(pbar; N = 5, description = "First")
 

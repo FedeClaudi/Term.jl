@@ -18,7 +18,8 @@ function Base.show(io::IO, ::MIME"text/plain", obj::myType)
 
     info = map(f -> RenderableText(string(f); style = "bold"), fields)
     vals = map(
-        f -> RenderableText(" " * string(getfield(obj, f)); style = "bright_blue"), fields
+        f -> RenderableText(" " * string(getfield(obj, f)); style = "bright_blue"),
+        fields,
     )
     obj_details = rvstack(info...) * vLine(3; style = "dim") * lvstack(vals...)
 

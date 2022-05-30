@@ -284,7 +284,9 @@ function ProgressBar(;
     expand::Bool = false,
     transient::Bool = false,
     colors::Vector{RGBColor} = [
-        RGBColor("(1, .05, .05)"), RGBColor("(.05, .05, 1)"), RGBColor("(.05, 1, .05)")
+        RGBColor("(1, .05, .05)"),
+        RGBColor("(.05, .05, 1)"),
+        RGBColor("(.05, 1, .05)"),
     ],
     refresh_rate::Int = 60,  # FPS of rendering
 )
@@ -345,7 +347,13 @@ function addjob!(
     pbar.paused = true
     id = isnothing(id) ? length(pbar.jobs) + 1 : id
     job = ProgressJob(
-        id, N, description, pbar.columns, pbar.width, pbar.columns_kwargs, transient
+        id,
+        N,
+        description,
+        pbar.columns,
+        pbar.width,
+        pbar.columns_kwargs,
+        transient,
     )
 
     # start job
