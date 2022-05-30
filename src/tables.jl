@@ -3,6 +3,7 @@ module Tables
 import Tables as TablesPkg
 
 import Term: fillin, term_theme
+import MyterialColors: orange
 
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Layout: cvstack, hstack, vstack, pad
@@ -116,7 +117,7 @@ function assert_table_arguments(
 
     if length(problems) > 0
         @warn "Failed to create Term.Table"
-        warn_color = term_theme[].warn
+        warn_color = orange
         tprintln.("  {$warn_color}" .* problems .* "{/$warn_color}"; highlight = true)
     end
     return length(problems) == 0

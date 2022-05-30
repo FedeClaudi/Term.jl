@@ -201,7 +201,7 @@ end
 # ---------------------------------------------------------------------------- #
 #                              INSTALL STACKTRACE                              #
 # ---------------------------------------------------------------------------- #
-function install_term_stacktrace()
+function install_term_stacktrace(; reverse_backtrace::Bool=true, max_n_frames::Int=30)
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
@@ -212,24 +212,20 @@ function install_term_stacktrace()
                     "{default bold red}$ename{/default bold red}"; style = "dim red"
                 )
                 if length(bt) > 0
-                    rendered_bt = render_backtrace(bt)
+                    rendered_bt = render_backtrace(bt; reverse_backtrace = $(reverse_backtrace), max_n_frames = $(max_n_frames))
                     error /= rendered_bt
                     W = rendered_bt.measure.w
                 else
                     W = 88
                 end
-                W = 88
-
                 err, _ = error_message(er)
-                msg =
-                    "" / Panel(
-                        "{#aec2e8}$(err){/#aec2e8}";
-                        width = W,
-                        title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
-                        padding = (2, 2, 1, 1),
-                        style = "dim red",
-                        title_justify = :center,
-                    )
+                msg = "" / Panel(
+                    "{#aec2e8}$(err){/#aec2e8}"; 
+                    width=W,
+                    title="{bold red default underline}$(typeof(er)){/bold red default underline}",
+                    padding=(2, 2, 1, 1), style="dim red", 
+                    title_justify=:center
+                )
                 error /= msg
                 print(error)
             catch err

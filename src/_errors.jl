@@ -14,7 +14,7 @@ function render_frame_info(frame::StackFrame)::RenderableText
     end
 end
 
-function render_backtrace(bt::Vector)
+function render_backtrace(bt::Vector;  reverse_backtrace = true, max_n_frames = 30)
     length(bt) == 0 && return RenderableText("")
 
     frame_numbers::Vector{RenderableText} = []
@@ -26,6 +26,10 @@ function render_backtrace(bt::Vector)
     inlinedren = RenderableText("   inlined"; style = "bold blue")
     fromcren = RenderableText("   from C"; style = "bold blue")
 
+    if reverse_backtrace
+        bt = reverse(bt)
+    end
+
     for (num, frame) in enumerate(bt)
         push!(frame_numbers, RenderableText("($(num))"; style = "#52c4ff bold dim"))
         push!(frame_info, render_frame_info(frame))
@@ -36,41 +40,34 @@ function render_backtrace(bt::Vector)
 
     content::Vector{AbstractRenderable} = [
         Panel(
-            frame_numbers[1] * frame_info[1] * frame_inlined[1] * frame_from_c[1];
-            padding = (2, 2, 1, 1),
-            subtitle = "ERROR LINE",
-            style = "#9bb3e0",
-            subtitle_style = "bold white",
-            subtitle_justify = :right,
-            width = 88,
-        ),
-    ]
-
+        frame_numbers[1] * frame_info[1] * frame_inlined[1] * frame_from_c[1];
+        padding=(2, 2, 1, 1), 
+        subtitle=reverse_backtrace ? "TOP LEVEL" :  "ERROR LINE", 
+        subtitle_style=reverse_backtrace ? "white" : "bold white",
+        style="#9bb3e0", 
+        subtitle_justify=:right, width=88
+    )]
+    
     N = length(frame_numbers)
     if N > 3
-        if N > 20
+        if N > max_n_frames
             skipped_line = hLine(
-                content[1].measure.w,
-                "{blue dim bold}$(N - 22){/blue dim bold}{blue dim} frames skipped{/blue dim}";
-                style = "blue dim",
+                content[1].measure.w, "{blue dim bold}$(N - max_n_frames - 2){/blue dim bold}{blue dim} frames skipped{/blue dim}";
+                style="blue dim"
             )
 
             frames = lvstack(
                 vstack(
-                    map(
-                        x -> "   " * hstack(x...),
-                        zip(frame_numbers, frame_info, frame_inlined, frame_from_c),
-                    )[2:17]...,
-                ),
-                "",
-                skipped_line,
-                "",
+                    map(x->"   " * hstack(x...), 
+                        zip(frame_numbers, frame_info, frame_inlined, frame_from_c))[2:max_n_frames-5]...
+                ), 
+                "", 
+                skipped_line, 
+                "", 
                 vstack(
-                    map(
-                        x -> "   " * hstack(x...),
-                        zip(frame_numbers, frame_info, frame_inlined, frame_from_c),
-                    )[(end - 3):(end - 1)]...,
-                ),
+                    map(x->"   " * hstack(x...), 
+                        zip(frame_numbers, frame_info, frame_inlined, frame_from_c))[end-5:end-1]...
+                ) 
             )
         else
             frames = vstack(
@@ -88,21 +85,14 @@ function render_backtrace(bt::Vector)
     end
 
     if N > 1
-        push!(
-            content,
-            Panel(
-                frame_numbers[end] *
-                frame_info[end] *
-                frame_inlined[end] *
-                frame_from_c[end];
-                padding = (2, 2, 1, 1),
-                subtitle = "TOP LEVEL",
-                style = "#9bb3e0",
-                subtitle_style = "white",
-                subtitle_justify = :right,
-                width = 88,
-            ),
-        )
+        push!(content, Panel(
+            frame_numbers[end] * frame_info[end] * frame_inlined[end] * frame_from_c[end];
+            padding=(2, 2, 1, 1), 
+            subtitle=reverse_backtrace ? "ERROR LINE" : "TOP LEVEL", 
+            subtitle_style=reverse_backtrace ? "bold white" : "white",
+            style="#9bb3e0", 
+            subtitle_justify=:right, width=88
+        ))
     end
 
     return Panel(
