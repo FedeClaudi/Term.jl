@@ -494,6 +494,11 @@ function vLine(; style::String = "default", box::Symbol = :ROUNDED)
     return vLine(console_height(stdout); style = style, box = box)
 end
 
+function vLine(height::Int; style::String="default", char::Char='|')
+    line = apply_style("{"*style*"}" * char * "{/"*style*"}\e[0m")
+    segments = repeat([Segment(line)], height)
+    return vLine(segments, Measure(1, height))
+end
 
 # ----------------------------------- hLine ---------------------------------- #
 
