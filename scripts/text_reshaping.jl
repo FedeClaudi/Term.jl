@@ -1,7 +1,6 @@
 import Term: reshape_text
 import Term.Console: clear
 
-
 strings = [
     # latin alphabet
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -23,12 +22,11 @@ strings = [
     "┌──────────[red]────[/red]──┬[blue bold]────────────────┬[/blue bold]──────────────┬────────────────┬──────────────end",
 
     # nospaces
-    "."^100  ,
+    "."^100,
     ".[red]|||[/red]...."^10,
-    ".|||...."^10, 
-
-
-    replace("""
+    ".|||...."^10,
+    replace(
+        """
 Lorem ipsum [bold]dolor sit[/bold] amet, consectetur adipiscing elit,
 ed do e[red]iusmod tempor incididunt[/red] ut [bold]labore et [underline]dolore[/underline] magna aliqua.[/bold] Ut enim ad minim
 veniam, quis[green] nostrud exercitation [on_black]ullamco laboris nisi ut aliquip ex [/on_black]
@@ -36,7 +34,9 @@ ea commodo consequat.[blue] Duis aute irure dolor in[/blue] reprehenderit
 in voluptate velit[/green] esse [italic]cillum dolore[/italic][red] eu[/red][italic green] fugiat [/italic green]nulla 
 pariatur. Excepteur[red] sint[/red][blue] occaecat cupidatat [/blue]non proident, 
 sunt in culpa qui [italic]officia[/italic] deserunt mollit anim 
-id est laborum.""", "\n"=>""),
+id est laborum.""",
+        "\n" => "",
+    ),
 ]
 
 print("\n"^3)
@@ -45,11 +45,10 @@ for text in strings
     # println('_'^width)
     # println(reshape_text(text, width))
     # println('_'^width)
-        
+
     show(reshape_text(text, width))
     print("\n\n")
 end
-
 
 # text = strings[end-1]
 # println('_'^width)

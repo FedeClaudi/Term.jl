@@ -20,10 +20,9 @@ You can use different options to change this beahavior.
 
 print("\n\n")
 print(
-    Panel("this panel has fixed width, text on the left"; width = 66, justify = :left),    
+    Panel("this panel has fixed width, text on the left"; width = 66, justify = :left),
     Panel("this one too, but the text is at the center!"; width = 66, justify = :center),
     Panel("the text is here!"; width = 66, justify = :right),
-
     Panel("this one fits its content"; fit = true),
     Panel("this one fits the terminal window size!"; width = 30),
 )
@@ -60,12 +59,10 @@ print(
     ),
     Panel("content "^10; box = :ASCII_DOUBLE_HEAD, style = "red", width = 44),
     Panel("content "^10; box = :DOUBLE, style = "blue", width = 44),
-    Panel("content "^10; fit=true, padding=(0, 0, 0, 0)),
-    Panel("content "^10; fit=true, padding=(4, 4, 0, 0)),
-    Panel("content "^10; fit=true, padding=(2, 2, 2, 2)),
+    Panel("content "^10; fit = true, padding = (0, 0, 0, 0)),
+    Panel("content "^10; fit = true, padding = (4, 4, 0, 0)),
+    Panel("content "^10; fit = true, padding = (2, 2, 2, 2)),
 )
-
-
 
 """
 Finally, you can layout panels to create structured content

@@ -82,7 +82,6 @@ If you just want to see the type's hierarchy for a type, you can use typestree
 
 typestree(AbstractFloat)
 
-
 """
 You can also use Tree to visualize `Expr` objects
 """
@@ -95,5 +94,3 @@ or, if you prefer, you can visualize it as a Dendogram
 """
 
 inspect(e)
-
-

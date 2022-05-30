@@ -35,7 +35,6 @@ p1 = Panel("text")
 print("\n"^3)
 @error "{italic green bold}fancy logs!{/italic green bold}" x y name √9 install_term_logger p1
 
-
 """
 You can reset Julia's default logger like this:
 """

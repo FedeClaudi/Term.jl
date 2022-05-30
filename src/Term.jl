@@ -49,8 +49,19 @@ export track
 export Tree
 export Dendogram
 export rightalign!,
-    leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign,
-    vertical_pad!, vertical_pad
+    leftalign!,
+    center!,
+    lvstack,
+    cvstack,
+    rvstack,
+    ←,
+    ↓,
+    →,
+    leftalign,
+    center,
+    rightalign,
+    vertical_pad!,
+    vertical_pad
 export @with_repr, termshow, install_term_repr, PlaceHolder
 
 # ----------------------------------- base ----------------------------------- #

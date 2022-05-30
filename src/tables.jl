@@ -45,7 +45,6 @@ mutable struct Table <: AbstractRenderable
     measure::Measure
 end
 
-
 """
     Table(
         tb::TablesPkg.AbstractColumns;
@@ -74,134 +73,189 @@ function Table(
     tb::TablesPkg.AbstractColumns;
     box::Symbol = :SQUARE,
     style::String = "default",
-    hpad::Union{Vector, Int}=2,
-    vpad::Union{Vector, Int}=0,
-    vertical_justify::Symbol=:center,
-
+    hpad::Union{Vector,Int} = 2,
+    vpad::Union{Vector,Int} = 0,
+    vertical_justify::Symbol = :center,
     show_header::Bool = true,
-    header::Union{Nothing, Vector, Tuple}=nothing,
-    header_style::Union{String, Vector, Tuple} = "default",
-    header_justify::Union{Nothing, Symbol, Vector, Tuple} = nothing,
-    
-    columns_style::Union{String, Vector, Tuple} = "default",
-    columns_justify::Union{Symbol, Vector, Tuple} = :center,
-
-    footer::Union{Function, Nothing, Vector, Tuple}=nothing,
-    footer_style::Union{String, Vector, Tuple} = "default",
-    footer_justify::Union{Nothing, Symbol, Vector, Tuple} = :center
+    header::Union{Nothing,Vector,Tuple} = nothing,
+    header_style::Union{String,Vector,Tuple} = "default",
+    header_justify::Union{Nothing,Symbol,Vector,Tuple} = nothing,
+    columns_style::Union{String,Vector,Tuple} = "default",
+    columns_justify::Union{Symbol,Vector,Tuple} = :center,
+    footer::Union{Function,Nothing,Vector,Tuple} = nothing,
+    footer_style::Union{String,Vector,Tuple} = "default",
+    footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
 )
 
-# prepare some variables
-header_justify = isnothing(header_justify) ? columns_justify : header_justify
-box = eval(box)
+    # prepare some variables
+    header_justify = isnothing(header_justify) ? columns_justify : header_justify
+    box = eval(box)
 
-# table info
-rows = TablesPkg.rows(tb) 
-sch = TablesPkg.schema(rows)
-N_cols = length(sch.names)
-N_rows = length(rows) + 2
+    # table info
+    rows = TablesPkg.rows(tb)
+    sch = TablesPkg.schema(rows)
+    N_cols = length(sch.names)
+    N_rows = length(rows) + 2
 
-# make sure arguemnts combination is valud
-valid = assert_table_arguments(
-    N_cols,
-    N_rows,
-    show_header,
-    header,
-    header_style,
-    header_justify,
-    columns_style,
-    columns_justify,
-    footer,
-    footer_style,
-    footer_justify,
-    hpad,
-    vpad
-)
-valid || return
-
-# columns style
-columns_style, columns_justify, hpad = expand.([columns_style, columns_justify, hpad], N_cols)
-vpad = expand(vpad, N_rows)
-
-# headers and headers style
-if show_header
-    header = isnothing(header) ? string.(sch.names) : header
-    header_style, header_justify = expand.([header_style, header_justify], N_cols)
-end
-
-# get footer (if it's a function)
-if footer isa Function
-    try
-        footer_entries = footer.(map(c -> tb[c], sch.names))
-        footer = string(footer) * ": " .* string.(footer_entries)
-    catch
-        @warn "Could not apply function $footer to table - types mismatch?"
-        footer = repeat(["couldn't apply"], N_cols)
-    end
-end
-
-# get the max-width of each column
-widths = columns_widths(N_cols, N_rows, show_header, header, tb, sch, footer, hpad)
-
-# get the table values as vectors of strings
-rows_values = []
-for row in rows
-    _row::Vector = []
-    TablesPkg.eachcolumn(sch, row) do val, i, nm
-        push!(_row, val isa AbstractRenderable ? val : string(val))
-    end
-    push!(rows_values, _row)
-end
-
-# get the height of each row
-heights = rows_heights(N_rows, show_header, header, rows_values, footer, vpad)
-# @info "sizes" widths heights    
-
-# create table lines
-nrows = length(rows_values)
-lines::Vector{String} = []
-show_header && push!(lines, 
-    table_row(
-        make_row_cells(header, header_style, header_justify, widths, heights[1], vertical_justify), 
-        widths, box, :top, :head, :head_row, style, heights[1]
+    # make sure arguemnts combination is valud
+    valid = assert_table_arguments(
+        N_cols,
+        N_rows,
+        show_header,
+        header,
+        header_style,
+        header_justify,
+        columns_style,
+        columns_justify,
+        footer,
+        footer_style,
+        footer_justify,
+        hpad,
+        vpad,
     )
-)
+    valid || return nothing
 
-for (l, row) in enumerate(rows_values)
-    I = l+1
-    row = make_row_cells(row, columns_style, columns_justify, widths, heights[I], vertical_justify)
-    if l == 1
-        bottom = nrows < 2 ? :bottom : nrows > 2 ? :row : :foot_row
-        push!(lines,
-            table_row(row, widths, box, show_header ? nothing : :top, :mid, bottom, style, heights[I])
-        )
-    elseif l == nrows
-        push!(lines, 
-            table_row(row, widths, box, nothing, :mid, isnothing(footer) ? :bottom : :foot_row, style, heights[I])
-        )
-    else
-        push!(lines, 
-            table_row(row, widths, box, nothing, :mid, :row, style, heights[I])
-        )
+    # columns style
+    columns_style, columns_justify, hpad =
+        expand.([columns_style, columns_justify, hpad], N_cols)
+    vpad = expand(vpad, N_rows)
+
+    # headers and headers style
+    if show_header
+        header = isnothing(header) ? string.(sch.names) : header
+        header_style, header_justify = expand.([header_style, header_justify], N_cols)
     end
-end
 
-if !isnothing(footer)
-    # get footer style
-    footer_justify = isnothing(footer_justify) ? columns_justify : footer_justify
-    footer_style, footer_justify = expand.([footer_style, footer_justify], N_cols)
+    # get footer (if it's a function)
+    if footer isa Function
+        try
+            footer_entries = footer.(map(c -> tb[c], sch.names))
+            footer = string(footer) * ": " .* string.(footer_entries)
+        catch
+            @warn "Could not apply function $footer to table - types mismatch?"
+            footer = repeat(["couldn't apply"], N_cols)
+        end
+    end
 
-    push!(lines,
+    # get the max-width of each column
+    widths = columns_widths(N_cols, N_rows, show_header, header, tb, sch, footer, hpad)
+
+    # get the table values as vectors of strings
+    rows_values = []
+    for row in rows
+        _row::Vector = []
+        TablesPkg.eachcolumn(sch, row) do val, i, nm
+            push!(_row, val isa AbstractRenderable ? val : string(val))
+        end
+        push!(rows_values, _row)
+    end
+
+    # get the height of each row
+    heights = rows_heights(N_rows, show_header, header, rows_values, footer, vpad)
+    # @info "sizes" widths heights    
+
+    # create table lines
+    nrows = length(rows_values)
+    lines::Vector{String} = []
+    show_header && push!(
+        lines,
         table_row(
-            make_row_cells(footer, footer_style, footer_justify, widths, heights[end], vertical_justify),
-            widths, box, nothing, :foot, :bottom, style, heights[end])
+            make_row_cells(
+                header,
+                header_style,
+                header_justify,
+                widths,
+                heights[1],
+                vertical_justify,
+            ),
+            widths,
+            box,
+            :top,
+            :head,
+            :head_row,
+            style,
+            heights[1],
+        ),
     )
-end
 
-lines = split(fillin(join(lines, "\n")), "\n")
+    for (l, row) in enumerate(rows_values)
+        I = l + 1
+        row = make_row_cells(
+            row, columns_style, columns_justify, widths, heights[I], vertical_justify
+        )
+        if l == 1
+            bottom = if nrows < 2
+                :bottom
+            elseif nrows > 2
+                :row
+            else
+                :foot_row
+            end
+            push!(
+                lines,
+                table_row(
+                    row,
+                    widths,
+                    box,
+                    show_header ? nothing : :top,
+                    :mid,
+                    bottom,
+                    style,
+                    heights[I],
+                ),
+            )
+        elseif l == nrows
+            push!(
+                lines,
+                table_row(
+                    row,
+                    widths,
+                    box,
+                    nothing,
+                    :mid,
+                    isnothing(footer) ? :bottom : :foot_row,
+                    style,
+                    heights[I],
+                ),
+            )
+        else
+            push!(
+                lines, table_row(row, widths, box, nothing, :mid, :row, style, heights[I])
+            )
+        end
+    end
 
-segments = Segment.(lines)
-return Table(segments, Measure(segments))
+    if !isnothing(footer)
+        # get footer style
+        footer_justify = isnothing(footer_justify) ? columns_justify : footer_justify
+        footer_style, footer_justify = expand.([footer_style, footer_justify], N_cols)
+
+        push!(
+            lines,
+            table_row(
+                make_row_cells(
+                    footer,
+                    footer_style,
+                    footer_justify,
+                    widths,
+                    heights[end],
+                    vertical_justify,
+                ),
+                widths,
+                box,
+                nothing,
+                :foot,
+                :bottom,
+                style,
+                heights[end],
+            ),
+        )
+    end
+
+    lines = split(fillin(join(lines, "\n")), "\n")
+
+    segments = Segment.(lines)
+    return Table(segments, Measure(segments))
 end
 
 """ 
@@ -209,7 +263,9 @@ end
 
 Construct `Table` from `Vector` and `Matrix`
 """
-Table(data::Union{AbstractVector, AbstractMatrix}; kwargs...) = Table(TablesPkg.table(data); kwargs...)
+function Table(data::Union{AbstractVector,AbstractMatrix}; kwargs...)
+    return Table(TablesPkg.table(data); kwargs...)
+end
 
 """ 
 Table(data::AbstractDict; kwargs...)
@@ -222,9 +278,8 @@ function Table(data::AbstractDict; kwargs...)
     header = pop!(kwargs, :header, string.(collect(keys(data))))
 
     data = hcat(values(data)...)
-    return Table(data; header=header, kwargs...)
+    return Table(data; header = header, kwargs...)
 end
-
 
 """
     table_row(cells, widths, box, top_level, mid_level, bottom_level, box_style, row_height)
@@ -235,13 +290,15 @@ Each row is made up of an upper, mid and bottom section. The
 upper and bottom sections are created by rows of the `Box` type.
 The mid section is made up of the row's cells and dividing lines.
 """
-function table_row(cells, widths, box, top_level, mid_level, bottom_level, box_style, row_height)
+function table_row(
+    cells, widths, box, top_level, mid_level, bottom_level, box_style, row_height
+)
     # get box characters
     mid_level = getfield(box, mid_level)
 
-    l = vLine(row_height; style=box_style, char=mid_level.left)
-    m = vLine(row_height; style=box_style, char=mid_level.vertical)
-    r = vLine(row_height; style=box_style, char=mid_level.right)
+    l = vLine(row_height; style = box_style, char = mid_level.left)
+    m = vLine(row_height; style = box_style, char = mid_level.vertical)
+    r = vLine(row_height; style = box_style, char = mid_level.right)
 
     if row_height == 1
         l, m, r = string(l), string(m), string(r)
@@ -268,13 +325,17 @@ end
 
 Create a Table's row's cell from a string - apply styling and vertical/horizontal justification.
 """
-function cell(x::AbstractString, w::Int, h::Int, justify::Symbol, style::String, vertical_justify::Symbol)
+function cell(
+    x::AbstractString,
+    w::Int,
+    h::Int,
+    justify::Symbol,
+    style::String,
+    vertical_justify::Symbol,
+)
     return vertical_pad(
-        do_by_line(
-            y -> apply_style(
-                pad(y, w, justify), style
-            ), x
-    ), h, vertical_justify)
+        do_by_line(y -> apply_style(pad(y, w, justify), style), x), h, vertical_justify
+    )
 end
 
 """
@@ -282,14 +343,16 @@ end
 
 Create a Table's row's cell from a renderable - apply styling and vertical/horizontal justification.
 """
-function cell(x::AbstractRenderable, w::Int, h::Int, justify::Symbol, style::String, vertical_justify::Symbol)
-    return vertical_pad(
-        do_by_line(
-            y -> pad(y, w, justify), string(x)
-        ), h, vertical_justify
-    )
+function cell(
+    x::AbstractRenderable,
+    w::Int,
+    h::Int,
+    justify::Symbol,
+    style::String,
+    vertical_justify::Symbol,
+)
+    return vertical_pad(do_by_line(y -> pad(y, w, justify), string(x)), h, vertical_justify)
 end
-
 
 """
     make_row_cells(
@@ -304,18 +367,17 @@ end
 Create a row's cell from a vector of 'entries' (renderables or strings).
 """
 function make_row_cells(
-        entries::Union{Tuple, Vector}, 
-        style::Vector{String}, 
-        justify::Vector{Symbol},
-        widths::Vector{Int},
-        height::Int, 
-        vertical_justify::Symbol,
-    )
+    entries::Union{Tuple,Vector},
+    style::Vector{String},
+    justify::Vector{Symbol},
+    widths::Vector{Int},
+    height::Int,
+    vertical_justify::Symbol,
+)
     N = length(entries)
     cells = map(
-        i -> cell(
-            entries[i], widths[i], height, justify[i], style[i], vertical_justify
-        ), 1:N
+        i -> cell(entries[i], widths[i], height, justify[i], style[i], vertical_justify),
+        1:N,
     )
     return cells
 end

@@ -8,11 +8,7 @@ to show in the tree
 
 import Term: Tree
 
-data = Dict(
-    "a" => 1,
-    "b" => Int64,
-    "c" => [1, 2, 3],
-)
+data = Dict("a" => 1, "b" => Int64, "c" => [1, 2, 3])
 
 print(Tree(data))
 
@@ -22,35 +18,31 @@ print(Tree(data))
 
 print("\n\n")
 for guides_type in (:standardtree, :boldtree, :asciitree)
-    print(Tree(data; title=string(guides_type), guides_type=guides_type))
+    print(Tree(data; title = string(guides_type), guides_type = guides_type))
 end
 
 # set the colors!
 print("\n\n")
 print(
     Tree(
-        data,
-        title="my colors",
-        title_style="bold red",
-        node_style="blue underline",
-        leaf_style="green",
-        guides_style="red dim"
-    )
+        data;
+        title = "my colors",
+        title_style = "bold red",
+        node_style = "blue underline",
+        leaf_style = "green",
+        guides_style = "red dim",
+    ),
 )
-
 
 """
 Tree can handle nested data too!
 """
 data = Dict(
     "lvl1" => Dict(
-        "lvl2" => Dict(
-            "a" => 1,
-            "b" => 3,
-        ),
+        "lvl2" => Dict("a" => 1, "b" => 3),
         "l2a" => "nested dicts rule!",
-        "l2b" => "wohoo"
-    )
+        "l2b" => "wohoo",
+    ),
 )
 
 print(Tree(data))

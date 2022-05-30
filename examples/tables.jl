@@ -12,7 +12,6 @@ for more info.
 t = 1:5
 data = hcat(t, ones(length(t)), rand(Int8, length(t)))
 
-
 """
 You can create data from `Matrix` and `Vector` objects
 """
@@ -24,11 +23,12 @@ You can justify the table headers
 """
 
 print(
-    Table(data;
+    Table(
+        data;
         header = ["Num", "Const.", "Values"],
         header_style = "bold white",
-        columns_style = ["dim", "bold", "red"]
-    )
+        columns_style = ["dim", "bold", "red"],
+    ),
 )
 
 """
@@ -40,39 +40,28 @@ You can use vertical/horizontal padding to space out the table.
 """
 
 print(
-    Table(data;
+    Table(
+        data;
         header = ["Num", "Const.", "Values"],
         header_style = "bold white",
         columns_style = ["dim", "bold", "red"],
         hpad = [1, 2, 5],
-        columns_justify=[:center, :right, :left],
+        columns_justify = [:center, :right, :left],
         vpad = 1,
-    )
+    ),
 )
 
 """
 You can also specify footers
 """
 
-
-print(
-    Table(data;
-        footer = ["get", "a", "footer"],
-        footer_justify = :center,
-    )
-)
+print(Table(data; footer = ["get", "a", "footer"], footer_justify = :center))
 
 """
     Or even use a function that gets applied column wise
 """
 
-print(
-    Table(data;
-        footer = sum,
-        footer_justify = :center,
-        footer_style = "dim bold"
-    )
-)
+print(Table(data; footer = sum, footer_justify = :center, footer_style = "dim bold"))
 
 """
 You can use different `Box` types to change the table style.
@@ -81,10 +70,9 @@ other renderables.
 """
 
 print(
-    (Table(data; box=:ROUNDED, style="red") * " " * Table(data; box=:HEAVY)) / 
-    Table(data; box=:SIMPLE_HEAVY, style="dim blue")
+    (Table(data; box = :ROUNDED, style = "red") * " " * Table(data; box = :HEAVY)) /
+    Table(data; box = :SIMPLE_HEAVY, style = "dim blue"),
 )
-
 
 """
 Tables can also be created from `Dict` objects and can include other

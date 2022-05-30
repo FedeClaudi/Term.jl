@@ -13,16 +13,16 @@ makedocs(;
         assets = String[],
         collapselevel = 1,
     ),
-    strict=false,
+    strict = false,
     pages = [
         "Home" => "index.md",
         "Basics" => Any[
-            "basics/basics.md",    
+            "basics/basics.md",
             "basics/styled_text.md",
             "basics/colors.md",
             "basics/renderables.md",
             "basics/content_layout.md",
-            "basics/tprint.md"
+            "basics/tprint.md",
         ],
         "Renderables" => Any[
             "ren/intro.md",
@@ -34,15 +34,15 @@ makedocs(;
             "ren/tree.md",
         ],
         "Advanced" => Any[
-            "adv/adv.md",    
-            "adv/repr.md",    
+            "adv/adv.md",
+            "adv/repr.md",
             "adv/progressbars.md",
             "adv/logging.md",
             "adv/errors_tracebacks.md",
             "adv/introspection.md",
         ],
         "API" => Any[
-            "api/api_term.md",    
+            "api/api_term.md",
             "api/api_boxes.md",
             "api/api_colors.md",
             "api/api_console.md",
@@ -62,6 +62,4 @@ makedocs(;
     ],
 )
 
-
-
-deploydocs(; repo = "github.com/FedeClaudi/Term.jl",)
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl")

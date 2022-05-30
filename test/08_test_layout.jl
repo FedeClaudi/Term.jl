@@ -48,13 +48,13 @@ end
     @test vertical_pad("ab", 5, 5) == "  \n  \n  \n  \n  \nab\n  \n  \n  \n  \n  "
 
     p = Panel(; width = 20, height = 10)
-    @test string(vertical_pad(p, 4, 4)) == "                    \n                    \n                    \n                    \n\e[22m╭──────────────────╮\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m╰──────────────────╯\e[22m\e[0m\n                    \n                    \n                    \n                    "
+    @test string(vertical_pad(p, 4, 4)) ==
+        "                    \n                    \n                    \n                    \n\e[22m╭──────────────────╮\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m│\e[22m                  \e[22m│\e[22m\n\e[22m╰──────────────────╯\e[22m\e[0m\n                    \n                    \n                    \n                    "
 
     vertical_pad!(p, 4, 4)
     @test p isa Panel
     @test p.measure.w == 20
     @test p.measure.h == 18
-
 
     p = Panel(; width = 20, height = 10)
     vertical_pad!(p; height = 30)
@@ -251,11 +251,11 @@ end
     @test ph.measure.h == 2
     @test string(ph) == "\e[2m ╲ ╲\e[22m\n\e[2m╲ ╲ \e[22m"
 
-    @test string(PlaceHolder(25, 12)) == "\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲\e[22m\e[1m\e[37m(25 × 12)\e[22m\e[22m\e[39m\e[2m╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m"
+    @test string(PlaceHolder(25, 12)) ==
+        "\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲\e[22m\e[1m\e[37m(25 × 12)\e[22m\e[22m\e[39m\e[2m╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m"
 
     p = Panel(; width = 8, height = 4)
     ph = PlaceHolder(p)
     @test ph.measure.w == p.measure.w
     @test ph.measure.h == p.measure.h
 end
-

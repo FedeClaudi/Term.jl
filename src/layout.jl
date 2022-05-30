@@ -113,9 +113,7 @@ function pad!(ren::AbstractRenderable; width::Int)
     return pad!(ren, nl, nr)
 end
 
-
 # ------------------------------- vertical pad ------------------------------- #
-
 
 """
 vertical_pad(text, target_height::Int, method::Symbol)::String
@@ -140,7 +138,6 @@ function vertical_pad(text::AbstractString, target_height::Int, method::Symbol):
     end
 end
 
-
 """
     vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
 
@@ -148,7 +145,7 @@ Vertical pad a string by a fixed ammount to above and below.
 """
 function vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
     space = " "^(width(text))
-    string(vstack(repeat([space], above)..., text, repeat([space], below)...))
+    return string(vstack(repeat([space], above)..., text, repeat([space], below)...))
 end
 
 """
@@ -192,7 +189,7 @@ In place version for vertically padding a renderable.
 """
 function vertical_pad!(ren::AbstractRenderable, above::Int, below::Int)
     ren.segments = vertical_pad(ren.segments, above, below)
-    ren.measure = Measure(ren.segments)
+    return ren.measure = Measure(ren.segments)
 end
 
 """
@@ -205,7 +202,6 @@ function vertical_pad!(ren::AbstractRenderable; height::Int)
     nl, nr = get_lr_widths(npads)
     return vertical_pad!(ren, nl, nr)
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                                    JUSTIFY                                   #
@@ -546,13 +542,17 @@ end
 
 Create a `vLine` given a height and, optionally, style information.
 """
-function vLine(height::Int; style::String = "default", box::Symbol = :ROUNDED, char::Union{Char, Nothing}=nothing)
+function vLine(
+    height::Int;
+    style::String = "default",
+    box::Symbol = :ROUNDED,
+    char::Union{Char,Nothing} = nothing,
+)
     char = isnothing(char) ? getfield(Boxes, box).head.left : char
     line = apply_style("{" * style * "}" * char * "{/" * style * "}\e[0m")
     segments = repeat([Segment(line)], height)
     return vLine(segments, Measure(1, height))
 end
-
 
 """
     vLine(ren::AbstractRenderable; kwargs...)
@@ -569,8 +569,6 @@ Create a `vLine` as tall as the `stdout` console.
 function vLine(; style::String = "default", box::Symbol = :ROUNDED)
     return vLine(console_height(stdout); style = style, box = box)
 end
-
-
 
 # ----------------------------------- hLine ---------------------------------- #
 

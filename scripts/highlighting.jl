@@ -1,6 +1,4 @@
 
-
-
 import Term: tprint, highlight, tprintln
 
 print("\n\n"^10)
@@ -20,19 +18,11 @@ And you can highlight expression like :(x + y) too.
 """
 tprintln(txt)
 
-
-
-
-
 # tprintln("1, 2, 3")
-
 
 # tprintln(zeros(4); highlight=true)
 
-
 # tprintln(Dict(:name=>"test", 1=>:v, :k=>[1, 2, 3]))
-
-
 
 # x, y = :z, :(x+Y)
 # tprintln("These are the results: x = $(highlight(x)), y = $(highlight(y))")src/layout.jl
@@ -43,5 +33,3 @@ tprintln(txt)
 
 # tprintln("ok")
 # """))
-
-

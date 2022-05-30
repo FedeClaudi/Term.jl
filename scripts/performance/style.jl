@@ -14,4 +14,4 @@ print(apply_style(pts))
 @time apply_style(pts);
 
 p2 = apply_style(pts)
-@time print(Panel(pts; style="red"))
+@time print(Panel(pts; style = "red"))

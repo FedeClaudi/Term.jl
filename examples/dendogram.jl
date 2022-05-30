@@ -16,7 +16,7 @@ print(mydendo)
 The first argument si the "head" (or trunk) and all the others are leaves
 """
 
-otherdendo = Dendogram("head", "these", "are", "colorful",  "leaves")
+otherdendo = Dendogram("head", "these", "are", "colorful", "leaves")
 print("\n"^2)
 print(otherdendo)
 
@@ -27,7 +27,7 @@ just link individual elements together.
 
 import Term.Dendograms: link
 print("\n"^2)
-print(link(mydendo, otherdendo; title="[red]superdendo[/red]"))
+print(link(mydendo, otherdendo; title = "[red]superdendo[/red]"))
 
 """
 and so on...
@@ -35,5 +35,14 @@ and so on...
 smalldendo = Dendogram("head", [1, 2])
 
 print("\n"^2)
-print(link(smalldendo, link(smalldendo, link(smalldendo, smalldendo; title="a level"); title="another level"); title="first level"))
-
+print(
+    link(
+        smalldendo,
+        link(
+            smalldendo,
+            link(smalldendo, smalldendo; title = "a level");
+            title = "another level",
+        );
+        title = "first level",
+    ),
+)
