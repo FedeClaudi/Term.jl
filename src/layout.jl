@@ -637,7 +637,11 @@ Computes the number of rows and columns to fit a given number `n` of subplots in
 Adapted from: stackoverflow.com/a/43366784
 """
 function calc_nrows_ncols(n, aspect=(16, 9))
-    w, h = aspect
+    w, h = if aspect isa Number
+        (aspect, 1)
+    else
+        aspect
+    end
     factor = √(n / (w * h * 1.0))
     cols = floor(Int, w * factor)
     rows = floor(Int, h * factor)
@@ -659,28 +663,29 @@ end
 Construct a square grid from a `AbsractVector` of `AbstractRenderable`.
 """
 function grid(
-    rens::AbstractVector{<:AbstractRenderable};
+    rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
     layout::Union{Nothing,Tuple} = nothing, 
     placeholder = nothing,
     aspect = (16, 9),
-    hspacer = "",
-    vspacer = hspacer,
+    hpad = "",
+    vpad = hpad,
 )
-    num = length(rens)
-    m, n = layout === nothing ? calc_nrows_ncols(num, aspect) : layout
-    if m === nothing
-        m, r = divrem(num, n)
-        r == 0 || (m += 1)
-    elseif n === nothing
-        n, r = divrem(num, m)
-        r == 0 || (n += 1)
+    m, n = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
+    if isnothing(rens)
+        isnothing(layout) && throw(ArgumentError("`layout` must be given"))
+        rens = fill(PlaceHolder(aspect...), prod(layout))
+    else
+        if isnothing(m)
+            m, r = divrem(length(rens), n)
+            r == 0 || (m += 1)
+        elseif isnothing(n)
+            n, r = divrem(length(rens), m)
+            r == 0 || (n += 1)
+        end
+        fill_in = isnothing(placeholder) ? PlaceHolder(first(rens)) : placeholder
+        rens = append!(copy(rens), [fill_in for _ in 1:(m * n - length(rens))])
     end
-    fill_in = placeholder === nothing ? PlaceHolder(first(rens)) : placeholder
-    return grid(
-        reshape(append!(copy(rens), [fill_in for _ in 1:(m * n - num)]), m, n);
-        hspacer = hspacer,
-        vspacer = vspacer,
-    )
+    return grid(reshape(rens, m, n); hpad = hpad, vpad = vpad)
 end
 
 """
@@ -688,9 +693,9 @@ end
 
 Construct a grid from a `AbstractMatrix` of `AbstractRenderable`.
 """
-function grid(rens::AbstractMatrix{<:AbstractRenderable}; hspacer = "", vspacer = hspacer)
-    rows = collect(foldl((a, b) -> a * hspacer * b, col[2:end], init = first(col)) for col in eachrow(rens))
-    return foldl((a, b) -> a * vspacer * b, rows[2:end], init = first(rows))
+function grid(rens::AbstractMatrix{<:AbstractRenderable}; hpad = "", vpad = hpad)
+    rows = collect(foldl((a, b) -> a * hpad * b, col[2:end], init = first(col)) for col in eachrow(rens))
+    return foldl((a, b) -> a / vpad / b, rows[2:end], init = first(rows))
 end
 
 end
