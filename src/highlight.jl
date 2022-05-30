@@ -1,7 +1,8 @@
-using Highlights.Format
-import Highlights: Lexers
-using Highlights: Highlights
 import OrderedCollections: OrderedDict
+import Highlights: Lexers
+
+using Highlights: Highlights
+using Highlights.Format
 
 # ------------------------------- highlighting ------------------------------- #
 highlight_regexes = OrderedDict(

@@ -1,4 +1,4 @@
-import Term.box: ROUNDED, get_row, get_title_row, fit
+import Term.Boxes: ROUNDED, get_row, get_title_row, fit
 import Term
 println("get row")
 @time get_row(ROUNDED, [3], :top)

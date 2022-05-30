@@ -2,7 +2,7 @@ module Layout
 
 import Parameters: @with_kw
 
-import Term: int, get_lr_widths, textlen, cint, rtrim_str, ltrim_str
+import Term: int, get_lr_widths, textlen, cint, rtrim_str, ltrim_str, calc_nrows_ncols
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..Console: console_width, console_height
 import ..Boxes: get_lrow, get_rrow

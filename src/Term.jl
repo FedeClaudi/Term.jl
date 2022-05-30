@@ -38,7 +38,7 @@ include("tables.jl")
 
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine, pad, pad!, vstack, hstack
-export theme, highlight
+export term_theme, highlight
 export inspect, typestree, expressiontree
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style

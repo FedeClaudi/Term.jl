@@ -107,9 +107,7 @@ function Base.show(io::IO, ::MIME"text/plain", theme::Theme)
     )
 end
 
-function set_theme(theme::Theme)
-    return term_theme[] = theme
-end
+set_theme(theme::Theme) = (term_theme[] = theme)
 
 # ------------------------------ Highlighters.jl ----------------------------- #
 

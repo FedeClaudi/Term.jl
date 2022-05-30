@@ -1,4 +1,4 @@
-import Term.style: apply_style
+import Term.Style: apply_style
 import Term: Panel
 
 pts = """Lorem[red] ipsum dolor s[/red]it amet, consectetur adipiscing elit,
