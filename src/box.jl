@@ -2,21 +2,13 @@ module box
 
 import ..segment: Segment
 import ..style: apply_style
-import Term: int,
-            chars,
-            join_lines,
-            loop_last,
-            textlen,
-            get_lr_widths,
-            truncate
+import Term: int, chars, join_lines, loop_last, textlen, get_lr_widths, truncate
 
 export get_row, get_title_row
 export NONE, ASCII, ASCII2, ASCII_DOUBLE_HEAD
 export SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
 export MINIMAL_DOUBLE_HEAD, SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, HORIZONTALS, ROUNDED, HEAVY
 export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                      BOX                                     #
@@ -120,7 +112,7 @@ Get a box's row of given width.
 function get_row(box::Box, width::Int, level::Symbol)::String
     level = getfield(box, level)
 
-    return level.left * level.mid^(width-2) * level.right
+    return level.left * level.mid^(width - 2) * level.right
 end
 
 """
@@ -131,13 +123,13 @@ Get a box's row's left part (no righ char)
 Get a box's row's right part (no left char)
 See also [`get_row`](@ref), [`get_rrow`](@ref).
 """
-function get_lrow(box::Box, width::Int, level::Symbol; with_left=true)::String
+function get_lrow(box::Box, width::Int, level::Symbol; with_left = true)::String
     level = getfield(box, level)
 
     if with_left
-        return level.left * level.mid^(width-1)
+        return level.left * level.mid^(width - 1)
     else
-        return level.mid^(width-1)
+        return level.mid^(width - 1)
     end
 end
 
@@ -147,16 +139,15 @@ get_rrow(box::Box, width::Int, level::Symbol)::String
 Get a box's row's right part (no left char)
 See also [`get_row`](@ref), [`get_lrow`](@ref).
 """
-function get_rrow(box::Box, width::Int, level::Symbol; with_right=true)::String
+function get_rrow(box::Box, width::Int, level::Symbol; with_right = true)::String
     level = getfield(box, level)
 
     if with_right
-        return level.mid^(width-1) * level.right
+        return level.mid^(width - 1) * level.right
     else
-        return level.mid^(width-1)
+        return level.mid^(width - 1)
     end
 end
-
 
 """
   get_title_row(row::Symbol, box::Box, title::Union{Nothing, AbstractString}; <keyword arguments>)
@@ -176,38 +167,38 @@ See also [`get_row`](@ref).
 function get_title_row(
     row::Symbol,
     box,  # ::Box,
-    title::Union{Nothing, String};
-    width::Int=88,
-    style::String="default",
-    title_style::Union{Nothing, String} = nothing,
+    title::Union{Nothing,String};
+    width::Int = 88,
+    style::String = "default",
+    title_style::Union{Nothing,String} = nothing,
     justify::Symbol = :left,
 )::Segment
 
     # if no title just return a r ow
     if isnothing(title)
-        return Segment(get_row(box, width, row), style)    
+        return Segment(get_row(box, width, row), style)
     else
         title = apply_style(title)
-        title = textlen(title) < width - 8 ? title : truncate(title, width-8)
-    end 
+        title = textlen(title) < width - 8 ? title : truncate(title, width - 8)
+    end
 
     # compose title line 
     boxline = getfield(box, row)
 
-    open, close, space =  "{" * style * "}",  "{/" * style * "}", " "
-    
+    open, close, space = "{" * style * "}", "{/" * style * "}", " "
+
     topen, tclose = "", open
     if !isnothing(title_style)
         if style == "hidden"
-            topen =  "\e[28m"* topen
+            topen = "\e[28m" * topen
             tclose = tclose * "\e[8m"
         else
-            topen, tclose  = "{" * title_style * "}", "{/" * title_style * "}" * open
+            topen, tclose = "{" * title_style * "}", "{/" * title_style * "}" * open
         end
     end
     title = space * topen * title * tclose * space
     if justify == :left
-        line = open * boxline.left * boxline.mid^4 * title 
+        line = open * boxline.left * boxline.mid^4 * title
         line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
         return Segment(line * "\e[0m")
 
@@ -220,7 +211,13 @@ function get_title_row(
     else  # justify :center
         tl, tr = get_lr_widths(textlen(title))
         lw, rw = get_lr_widths(width)
-        line = open * get_lrow(box, lw-tl, row) * close * title * get_rrow(box, rw-tr, row) * close
+        line =
+            open *
+            get_lrow(box, lw - tl, row) *
+            close *
+            title *
+            get_rrow(box, rw - tr, row) *
+            close
         return Segment(line * "\e[0m")
     end
 end

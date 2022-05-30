@@ -32,7 +32,6 @@ Stores information about ammount of padding.
     bottom::Int
 end
 
-
 """
     pad(text::AbstractString, target_width::Int, method::Symbol)::String
 
@@ -60,7 +59,7 @@ end
 
 Pad a string by a fixed ammount to the left and to the right.
 """
-function pad(text::AbstractString, left::Int=0, right::Int=0)::String
+function pad(text::AbstractString, left::Int = 0, right::Int = 0)::String
     return " "^left * text * " "^right
 end
 
@@ -69,11 +68,8 @@ end
 
 Pad a renderable's segments to the left and the right.
 """
-function pad(segments::Vector{Segment}, left::Int=0, right::Int=0)::Vector{Segment}
-    return map(
-        (s)->Segment(" "^left * s.text * " "^right),
-        segments
-    )
+function pad(segments::Vector{Segment}, left::Int = 0, right::Int = 0)::Vector{Segment}
+    return map((s) -> Segment(" "^left * s.text * " "^right), segments)
 end
 
 """
@@ -105,7 +101,7 @@ In place version for padding a renderable.
 """
 function pad!(ren::AbstractRenderable, left::Int, right::Int)
     ren.segments = pad(ren.segments, left, right)
-    ren.measure = Measure(ren.segments)
+    return ren.measure = Measure(ren.segments)
 end
 
 """
@@ -118,7 +114,6 @@ function pad!(ren::AbstractRenderable; width::Int)
     nl, nr = get_lr_widths(npads)
     return pad!(ren, nl, nr)
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                                    JUSTIFY                                   #
@@ -146,14 +141,13 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function leftalign(renderables::RenderablesUnion... )
+function leftalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
-    renderables = map(r->pad(r, 0, width - r.measure.w), renderables)
+    renderables = map(r -> pad(r, 0, width - r.measure.w), renderables)
     return renderables
 end
-
 
 """
     leftalign!(renderables::RenderablesUnion...)
@@ -173,7 +167,7 @@ print(p1/p2)
 ╭────────────────────────────────────────────────╮
 ╰────────────────────────────────────────────────╯
 """
-function leftalign!(renderables::RenderablesUnion... )
+function leftalign!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
@@ -181,7 +175,6 @@ function leftalign!(renderables::RenderablesUnion... )
         pad!(ren, 0, width - ren.measure.w)
     end
 end
-
 
 """
     center(renderables::RenderablesUnion... )
@@ -205,14 +198,13 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function center(renderables::RenderablesUnion... )
+function center(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
-    renderables = map(r->pad(r;  width=width), renderables)
+    renderables = map(r -> pad(r; width = width), renderables)
     return renderables
 end
-
 
 """
     center!(renderables::RenderablesUnion... )
@@ -233,16 +225,14 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function center!(renderables::RenderablesUnion... )
+function center!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
     for ren in renderables
-        pad!(ren; width=width)
+        pad!(ren; width = width)
     end
 end
-
-
 
 """
     rightalign(renderables::RenderablesUnion... )
@@ -266,14 +256,13 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function rightalign(renderables::RenderablesUnion... )
+function rightalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
-    renderables = map(r->pad(r, width - r.measure.w, 0), renderables)
+    renderables = map(r -> pad(r, width - r.measure.w, 0), renderables)
     return renderables
 end
-
 
 """
     rightalign!(renderables::RenderablesUnion... )
@@ -292,7 +281,7 @@ print(p1/p2)
 ╰────────────────────────────────────────────────╯
 ```
 """
-function rightalign!(renderables::RenderablesUnion... )
+function rightalign!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = max(map(r -> r.measure.w, renderables)...)
@@ -301,8 +290,6 @@ function rightalign!(renderables::RenderablesUnion... )
         pad!(ren, width - ren.measure.w, 0)
     end
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                   STACKING                                   #
@@ -324,7 +311,7 @@ function vstack(renderables...)
     return Renderable(segments, measure)
 end
 
-vstack(renderables::Union{Vector, Tuple}) = vstack(renderables...)
+vstack(renderables::Union{Vector,Tuple}) = vstack(renderables...)
 
 """
     hstack(r1::RenderablesUnion, r2::RenderablesUnion)
@@ -354,7 +341,9 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
     # combine segments
     segments = [Segment(s1.text * s2.text) for (s1, s2) in zip(s1, s2)]
 
-    return Renderable(segments, Measure(r1.measure.w+r2.measure.w, max(r1.measure.h, r2.measure.h)))
+    return Renderable(
+        segments, Measure(r1.measure.w + r2.measure.w, max(r1.measure.h, r2.measure.h))
+    )
 end
 
 """ 
@@ -371,7 +360,7 @@ function hstack(renderables...)
     return renderable
 end
 
-hstack(renderables::Union{Vector, Tuple}) = hstack(renderables...)
+hstack(renderables::Union{Vector,Tuple}) = hstack(renderables...)
 
 # --------------------------------- operators -------------------------------- #
 
@@ -380,13 +369,11 @@ hstack(renderables::Union{Vector, Tuple}) = hstack(renderables...)
 """
 
 Base.:/(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(r1, r2)
-Base.:/(rr::Tuple{RenderablesUnion, RenderablesUnion}) = vstack(rr...)
-
+Base.:/(rr::Tuple{RenderablesUnion,RenderablesUnion}) = vstack(rr...)
 
 Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
-
 
 # --------------------------- convenience functions -------------------------- #
 
@@ -420,11 +407,9 @@ function rvstack(renderables::RenderablesUnion...)::Renderable
     return vstack(renderables...)
 end
 
-rvstack(renderables::Union{Tuple, Vector}) = rvstack(renderables...)
-cvstack(renderables::Union{Tuple, Vector}) = cvstack(renderables...)
-lvstack(renderables::Union{Tuple, Vector}) = lvstack(renderables...)
-
-
+rvstack(renderables::Union{Tuple,Vector}) = rvstack(renderables...)
+cvstack(renderables::Union{Tuple,Vector}) = cvstack(renderables...)
+lvstack(renderables::Union{Tuple,Vector}) = lvstack(renderables...)
 
 # ---------------------------------------------------------------------------- #
 #                                LINES & SPACER                                #
@@ -449,7 +434,9 @@ function Spacer(width::Int, height::Int; char::Char = ' ')
     return Spacer(segments, Measure(seg.measure.w, height))
 end
 
-Spacer(width::Number, height::Number; char::Char = ' ') = Spacer(int(width), int(height); char=char)
+function Spacer(width::Number, height::Number; char::Char = ' ')
+    return Spacer(int(width), int(height); char = char)
+end
 
 # ----------------------------------- vline ---------------------------------- #
 """
@@ -467,10 +454,8 @@ end
 
 Create a `vLine` given a height and, optionally, style information.
 """
-function vLine(
-    height::Int; style::String = "default", box::Symbol = :ROUNDED
-)   
-    line = apply_style("{"*style*"}" * eval(box).head.left * "{/"*style*"}\e[0m")
+function vLine(height::Int; style::String = "default", box::Symbol = :ROUNDED)
+    line = apply_style("{" * style * "}" * eval(box).head.left * "{/" * style * "}\e[0m")
     segments = repeat([Segment(line)], height)
     return vLine(segments, Measure(1, height))
 end
@@ -491,7 +476,6 @@ function vLine(; style::String = "default", box::Symbol = :ROUNDED)
     return vLine(console_height(stdout); style = style, box = box)
 end
 
-
 # ----------------------------------- hLine ---------------------------------- #
 
 """
@@ -509,9 +493,7 @@ end
 
 Create a styled `hLine` of given width.
 """
-function hLine(
-    width::Int; style::String = "default", box::Symbol = :ROUNDED
-)
+function hLine(width::Int; style::String = "default", box::Symbol = :ROUNDED)
     char = eval(box).row.mid
     segments = [Segment(char^width, style)]
     return hLine(segments, Measure(width, 1))
@@ -523,19 +505,20 @@ end
 Creates an hLine object with texte centered horizontally.
 """
 function hLine(
-    width::Number,
-    text::String;
-    style::String = "default",
-    box::Symbol = :ROUNDED,
+    width::Number, text::String; style::String = "default", box::Symbol = :ROUNDED
 )
     box = eval(box)
     text = apply_style(text)
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
 
-    line =  get_lrow(box, lw-tl, :top; with_left=false) *
-            " " * text * " " * 
-            "{$style}" * get_rrow(box, rw-tr, :top; with_right=false)
+    line =
+        get_lrow(box, lw - tl, :top; with_left = false) *
+        " " *
+        text *
+        " " *
+        "{$style}" *
+        get_rrow(box, rw - tr, :top; with_right = false)
 
     return hLine([Segment(line, style)], Measure(width, 1))
 end
@@ -545,7 +528,7 @@ end
 
 Construct an `hLine` as wide as the `stdout`.
 """
-function hLine(; style::String="default", box::Symbol = :ROUNDED)
+function hLine(; style::String = "default", box::Symbol = :ROUNDED)
     return hLine(console_width(stdout); style = style, box = box)
 end
 
@@ -554,9 +537,7 @@ end
 
 Construct an `hLine` as wide as the `stdout` with centered text.
 """
-function hLine(
-    text::AbstractString; style::String="default", box::Symbol = :ROUNDED
-)
+function hLine(text::AbstractString; style::String = "default", box::Symbol = :ROUNDED)
     return hLine(console_width(stdout), text; style = style, box = box)
 end
 
@@ -599,25 +580,26 @@ end
 
 function PlaceHolder(w::Int, h::Int)
     # create lines of renderable
-    b1 = "╲ "^(w÷2)
-    b2 = " ╲"^(w÷2)
-    lines::Vector{Segment} = map(
-        i -> Segment(i%2 == 0 ? b1 : b2, "dim"), 1:h
-    )
+    b1 = "╲ "^(w ÷ 2)
+    b2 = " ╲"^(w ÷ 2)
+    lines::Vector{Segment} = map(i -> Segment(i % 2 == 0 ? b1 : b2, "dim"), 1:h)
 
     # insert renderable size at center
     txt = "($w × $h)"
     txt = length(txt) % 2 == 0 ? " " * txt : txt
     l = textwidth(txt)
 
-    if l < (w/2)
+    if l < (w / 2)
         _w = cint(w / 2)
         _l = cint(l / 2)
-        
 
-        original = lines[cint(h/2)].text
-        lines[cint(h/2)] = Segment(
-            ltrim_str(original, _w-_l+3) * "{default bold white}" * txt * "{/default bold white}" * rtrim_str(original, _w+_l+3),
+        original = lines[cint(h / 2)].text
+        lines[cint(h / 2)] = Segment(
+            ltrim_str(original, _w - _l + 3) *
+            "{default bold white}" *
+            txt *
+            "{/default bold white}" *
+            rtrim_str(original, _w + _l + 3),
         )
     end
 
@@ -636,7 +618,7 @@ PlaceHolder(ren::AbstractRenderable) = PlaceHolder(ren.measure.w, ren.measure.h)
 Computes the number of rows and columns to fit a given number `n` of subplots in a figure with aspect `aspect`.
 Adapted from: stackoverflow.com/a/43366784
 """
-function calc_nrows_ncols(n, aspect::Union{Number,NTuple}=(16, 9))
+function calc_nrows_ncols(n, aspect::Union{Number,NTuple} = (16, 9))
     w, h = if aspect isa Number
         (aspect, one(aspect))
     else
@@ -672,29 +654,29 @@ function grid(
     rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
     aspect::Union{Number,NTuple} = (16, 9),
-    layout::Union{Nothing,Tuple} = nothing, 
+    layout::Union{Nothing,Tuple} = nothing,
     pad::Union{Nothing,Integer} = 0,
 )
-    m, n = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
+    nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
     if isnothing(rens)
         isnothing(layout) && throw(ArgumentError("`layout` must be given"))
         rens = fill(PlaceHolder(aspect...), prod(layout))
     else
-        if isnothing(m)
-            m, r = divrem(length(rens), n)
-            r == 0 || (m += 1)
-        elseif isnothing(n)
-            n, r = divrem(length(rens), m)
-            r == 0 || (n += 1)
+        if isnothing(nrows)
+            nrows, r = divrem(length(rens), ncols)
+            r == 0 || (nrows += 1)
+        elseif isnothing(ncols)
+            ncols, r = divrem(length(rens), nrows)
+            r == 0 || (ncols += 1)
         end
         fill_in = isnothing(placeholder) ? PlaceHolder(first(rens)) : placeholder
-        rens = append!(copy(rens), [fill_in for _ in 1:(m * n - length(rens))])
+        rens = append!(copy(rens), [fill_in for _ in 1:(nrows * ncols - length(rens))])
     end
-    return grid(reshape(rens, m, n); pad = pad)
+    return grid(reshape(rens, nrows, ncols); pad = pad)
 end
 
 """
-    grid(rens::AbstractMatrix{<:AbstractRenderable})
+    grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Nothing,Integer} = 0))
 
 Construct a grid from a `AbstractMatrix` of `AbstractRenderable`.
 """
@@ -704,8 +686,11 @@ function grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Nothing,Int
     else
         pad
     end
-    rows = collect(foldl((a, b) -> a * ' '^hpad * b, col[2:end], init = first(col)) for col in eachrow(rens))
-    return foldl((a, b) -> a / ' '^vpad / b, rows[2:end], init = first(rows))
+    rows = collect(
+        foldl((a, b) -> a * ' '^hpad * b, col[2:end]; init = first(col)) for
+        col in eachrow(rens)
+    )
+    return foldl((a, b) -> a / ' '^vpad / b, rows[2:end]; init = first(rows))
 end
 
 end

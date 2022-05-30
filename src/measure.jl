@@ -51,6 +51,4 @@ function height end
 height(x) = height(string(x))
 height(x::AbstractString) = Measure(x).h
 
-
-
 end

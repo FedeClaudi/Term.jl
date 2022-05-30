@@ -1,6 +1,6 @@
 
 module segment
-import Term
+using Term: Term
 import Term: remove_markup, remove_ansi, unescape_brackets
 import ..style: apply_style, MarkupStyle
 import ..measure: Measure
@@ -37,24 +37,20 @@ end
 Construct a Segment out of a plain string and a markup string with style info
 """
 function Segment(text, markup::String)
-    Segment("{$markup}" * text * "{/$markup}")
+    return Segment("{$markup}" * text * "{/$markup}")
 end
 
 Segment(seg::Segment) = seg
 
-
-
 # --------------------------------- printing --------------------------------- #
 
 function Base.show(io::IO, seg::Segment)
-    print(io, unescape_brackets(seg.text))
+    return print(io, unescape_brackets(seg.text))
 end
 
-
-function Base.show(io::IO, ::MIME"text/plain",  seg::Segment)
-    print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
+function Base.show(io::IO, ::MIME"text/plain", seg::Segment)
+    return print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                                    LAYOUT                                    #
@@ -71,7 +67,7 @@ function Term.fillin(segments::Vector{Segment})::Vector{Segment}
 
     filled::Vector{Segment} = []
     for seg in segments
-        push!(filled, Segment(seg.text * " "^(w-seg.measure.w)))
+        push!(filled, Segment(seg.text * " "^(w - seg.measure.w)))
     end
     return filled
 end

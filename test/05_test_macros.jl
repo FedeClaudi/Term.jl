@@ -16,7 +16,6 @@ import Term.style: apply_style
         apply_style("{red on_blue underline}string{/red on_blue underline}")
     @test (@style "string" bold italic) == apply_style("{bold italic}string{/bold italic}")
 
-
     # test with interpolations
     x = "test"
     @test (@red "aa $x aa") == "\e[31maa test aa\e[39m"

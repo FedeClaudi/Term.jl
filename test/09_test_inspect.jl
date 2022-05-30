@@ -4,7 +4,6 @@ import Term.console: console_width
 println("\nTesting logging, stdout temporarily disabled")
 # @suppress_out begin
 @testset "\e[34mINSPECT test" begin
-    
 
     # define some types
     abstract type T1 end
@@ -30,7 +29,6 @@ println("\nTesting logging, stdout temporarily disabled")
     else
         @test_nothrow inspect(MyType)
     end
-    
 
     # Let's define some constructors and methods using MyType
 
@@ -45,12 +43,11 @@ println("\nTesting logging, stdout temporarily disabled")
     useless_method(m::MyType) = m
     another_method(m1::MyType, m2::MyType) = print(m1, m2)
 
-
     tofile(cleansprint(inspect, MyType), "./txtfiles/inspect_02.txt")
     tofile(cleansprint(inspect, 1), "./txtfiles/inspect_03.txt")
     tofile(cleansprint(inspect, T2), "./txtfiles/inspect_04.txt")
     tofile(cleansprint(inspect, inspect), "./txtfiles/inspect_05.txt")
-    
+
     if dotest
         @test cleansprint(inspect, MyType) == fromfile("./txtfiles/inspect_02.txt")
         @test cleansprint(inspect, 1) == fromfile("./txtfiles/inspect_03.txt")
@@ -65,14 +62,13 @@ println("\nTesting logging, stdout temporarily disabled")
 end
 # end
 
-
 # define expressions
 e1 = :(2x + 3y + 2)
 e2 = :(2x + 3 + 2 + 2y)
-e3 = :(2x^(3+y))
+e3 = :(2x^(3 + y))
 e4 = :(1 + 1 - 2x^2)
 e5 = :(mod(22, 6))
-e6 = :(2x^(3+y) + 2z)
+e6 = :(2x^(3 + y) + 2z)
 e7 = :(2x + 3 * √(3x^2))
 e8 = :(print(lstrip("test")))
 expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
@@ -83,8 +79,6 @@ expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
 #     tofile(string(Tree(e)), "./txtfiles/tree_expr_$i.txt")
 #     tofile(sprint(expressiontree, e), "./txtfiles/exptree_expr_$i.txt")
 # end
-
-
 
 @testset "Inspect: expressions" begin
     if !Sys.iswindows()
@@ -99,12 +93,11 @@ expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
             @test tree isa Tree
             @test fromfile("./txtfiles/tree_expr_$i.txt") == cleanstring(tree)
 
-            @test fromfile("./txtfiles/exptree_expr_$i.txt") == cleansprint(expressiontree, e)
+            @test fromfile("./txtfiles/exptree_expr_$i.txt") ==
+                cleansprint(expressiontree, e)
         end
     end
 end
-
-
 
 # @testset "Inspect: typestree" begin
 #     if console_width() >= 88

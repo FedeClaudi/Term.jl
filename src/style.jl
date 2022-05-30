@@ -1,31 +1,25 @@
 module style
 import Parameters: @with_kw
 
-import Term: unspace_commas,
-            NAMED_MODES,
-            has_markup,
-            OPEN_TAG_REGEX,
-            replace_text,
-            get_last_ANSI_code,
-            CODES,
-            ANSICode,
-            tview
+import Term:
+    unspace_commas,
+    NAMED_MODES,
+    has_markup,
+    OPEN_TAG_REGEX,
+    replace_text,
+    get_last_ANSI_code,
+    CODES,
+    ANSICode,
+    tview
 
-
-import ..color: AbstractColor,
-            NamedColor,
-            is_color,
-            is_background,
-            get_color,
-            is_hex_color,
-            hex2rgb
+import ..color:
+    AbstractColor, NamedColor, is_color, is_background, get_color, is_hex_color, hex2rgb
 
 export apply_style
 
-
-apply_style(text::String, style::String) = apply_style(
-    "{"*style*"}"*text*"{/"*style*"}"
-)
+function apply_style(text::String, style::String)
+    return apply_style("{" * style * "}" * text * "{/" * style * "}")
+end
 
 apply_style(c::Char, style::String) = apply_style(string(c), style)
 
@@ -43,17 +37,17 @@ is_mode(string) = string ∈ NAMED_MODES
 Holds information about the style specification set out by a `MarkupTag`.
 """
 @with_kw mutable struct MarkupStyle
-    default::Bool                               = false
-    bold::Bool                                  = false
-    dim::Bool                                   = false
-    italic::Bool                                = false
-    underline::Bool                             = false
-    blink::Bool                                 = false
-    inverse::Bool                               = false
-    hidden::Bool                                = false
-    striked::Bool                               = false
-    color::Union{Nothing,AbstractColor}         = nothing
-    background::Union{Nothing,AbstractColor}    = nothing
+    default::Bool = false
+    bold::Bool = false
+    dim::Bool = false
+    italic::Bool = false
+    underline::Bool = false
+    blink::Bool = false
+    inverse::Bool = false
+    hidden::Bool = false
+    striked::Bool = false
+    color::Union{Nothing,AbstractColor} = nothing
+    background::Union{Nothing,AbstractColor} = nothing
 end
 
 """
@@ -80,7 +74,6 @@ function MarkupStyle(markup)
 end
 
 # -------------------------------- apply style ------------------------------- #
-
 
 """
     get_style_codes(style::MarkupStyle)
@@ -143,13 +136,18 @@ function apply_style(text)::String
     while has_markup(text)
         # get opening markup tag
         open_match = match(OPEN_TAG_REGEX, text)
-        markup = open_match.match[2:end-1]
+        markup = open_match.match[2:(end - 1)]
 
         # get style codes
         ansi_open, ansi_close = get_style_codes(MarkupStyle(markup))
 
         # replace markup with ANSI codes
-        text = replace_text(text, max(open_match.offset-1, 0), open_match.offset + length(markup)+1, ansi_open)
+        text = replace_text(
+            text,
+            max(open_match.offset - 1, 0),
+            open_match.offset + length(markup) + 1,
+            ansi_open,
+        )
 
         # get closing tag (including [/] or missing close)
         close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
@@ -160,14 +158,15 @@ function apply_style(text)::String
         close_match = match(close_rx, text)
 
         # check if there was previous ansi style info
-        prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset-1))
+        prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset - 1))
         prev_style = occursin(prev_style, ansi_close) ? "" : prev_style
 
         # replace close tag
-        text = replace_text(text, 
-                    close_match.offset-1, 
-                    close_match.offset + length(markup)+2, 
-                    ansi_close * prev_style
+        text = replace_text(
+            text,
+            close_match.offset - 1,
+            close_match.offset + length(markup) + 2,
+            ansi_close * prev_style,
         )
     end
     return text

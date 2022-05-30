@@ -47,7 +47,8 @@ export install_term_logger, uninstall_term_logger
 export track
 export Tree
 export Dendogram
-export rightalign!, leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign
+export rightalign!,
+    leftalign!, center!, lvstack, cvstack, rvstack, ←, ↓, →, leftalign, center, rightalign
 export @with_repr, termshow, install_term_repr, grid, PlaceHolder
 
 # ----------------------------------- base ----------------------------------- #
@@ -81,8 +82,6 @@ function measure.Measure(segments::Vector{Segment})
     )
 end
 
-
-
 # -------------------------------- renderables ------------------------------- #
 using .box
 
@@ -90,26 +89,26 @@ using .console: console_height, console_width
 
 using .renderables: AbstractRenderable, Renderable, RenderableText
 
-using .layout: Padding,
-            vstack,
-            hstack,
-            Spacer,
-            vLine,
-            hLine,
-            pad,
-            pad!,
-            rightalign!,
-            leftalign!,
-            center!,
-            leftalign,
-            center,
-            rightalign,
-            lvstack,
-            cvstack,
-            rvstack,
-            PlaceHolder,
-            grid
-
+using .layout:
+    Padding,
+    vstack,
+    hstack,
+    Spacer,
+    vLine,
+    hLine,
+    pad,
+    pad!,
+    rightalign!,
+    leftalign!,
+    center!,
+    leftalign,
+    center,
+    rightalign,
+    lvstack,
+    cvstack,
+    rvstack,
+    PlaceHolder,
+    grid
 
 using .panel: Panel, TextBox
 

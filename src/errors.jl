@@ -112,8 +112,7 @@ method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
 function method_error_candidate(fun, candidate)
     # highlight non-matched types
     candidate = replace(
-        candidate, 
-        method_error_regex => SubstitutionString("{red}" * s"\g<0>" * "{/red}")
+        candidate, method_error_regex => SubstitutionString("{red}" * s"\g<0>" * "{/red}")
     )
     # remove
     candidate = replace(candidate, "!Matched" => "")
@@ -127,23 +126,28 @@ function error_message(er::MethodError; kwargs...)
     # @info "method error" er fieldnames(MethodError) er.f er.args er.world
     # get main error message
     _args = join(
-        map(a -> "   {dim bold}($(a[1])){/dim bold} $(truncate(highlight("::"*string(typeof(a[2]))), 30))", enumerate(er.args)), "\n"
+        map(
+            a ->
+                "   {dim bold}($(a[1])){/dim bold} $(truncate(highlight("::"*string(typeof(a[2]))), 30))",
+            enumerate(er.args),
+        ),
+        "\n",
     )
     fn_name = "$(string(er.f))"
-    main_line = "No method matching `$fn_name` with arguments types:" /  _args
-    
+    main_line = "No method matching `$fn_name` with arguments types:" / _args
+
     # get recomended candidates
-    _candidates = split(sprint(show_method_candidates, er), "\n")[3:end-1]
+    _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
-        candidates = map(
-            c -> method_error_candidate(fn_name, c), _candidates
-        )
-        main_line = main_line / "" / "Alternative candidates:" / lvstack(RenderableText.(candidates))
+        candidates = map(c -> method_error_candidate(fn_name, c), _candidates)
+        main_line =
+            main_line / "" / "Alternative candidates:" /
+            lvstack(RenderableText.(candidates))
     else
         main_line = main_line / " " / "{dim}No alternative candidates found"
     end
-    
+
     return string(main_line), ""
 end
 
@@ -207,13 +211,14 @@ end
 # ---------------------------------------------------------------------------- #
 function install_term_stacktrace()
     @eval begin
-
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            (length(bt) == 0 && !isa(er, StackOverflowError)) && return
+            (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             try
                 println("\n")
-                ename = string(typeof(er))        
-                error = hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
+                ename = string(typeof(er))
+                error = hLine(
+                    "{default bold red}$ename{/default bold red}"; style = "dim red"
+                )
                 if length(bt) > 0
                     rendered_bt = render_backtrace(bt)
                     error /= rendered_bt
@@ -222,18 +227,21 @@ function install_term_stacktrace()
                     W = 88
                 end
                 W = 88
-            
+
                 err, _ = error_message(er)
-                msg = "" / Panel(
-                    "{#aec2e8}$(err){/#aec2e8}"; 
-                    width=W,
-                    title="{bold red default underline}$(typeof(er)){/bold red default underline}",
-                    padding=(2, 2, 1, 1), style="dim red", title_justify=:center
-                )
+                msg =
+                    "" / Panel(
+                        "{#aec2e8}$(err){/#aec2e8}";
+                        width = W,
+                        title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
+                        padding = (2, 2, 1, 1),
+                        style = "dim red",
+                        title_justify = :center,
+                    )
                 error /= msg
                 print(error)
             catch err
-                @error "ERROR: " exception=err
+                @error "ERROR: " exception = err
                 # @warn "Term.jl: failed to render error message" err
                 # Base.showerror(io, er)
             end

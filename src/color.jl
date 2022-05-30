@@ -1,9 +1,16 @@
 module color
 
-import Term: NAMED_COLORS, nospaces, COLORS_16b, remove_brackets, ANSICode, int, CODES, CODES_16BIT_COLORS
+import Term:
+    NAMED_COLORS,
+    nospaces,
+    COLORS_16b,
+    remove_brackets,
+    ANSICode,
+    int,
+    CODES,
+    CODES_16BIT_COLORS
 
 export NamedColor, BitColor, RGBColor, get_color
-
 
 # ----------------------------- types definition ----------------------------- #
 """
@@ -28,8 +35,6 @@ struct RGBColor <: AbstractColor
     g::Int
     b::Int
 end
-
-
 
 function RGBColor(s)
     to_number(x) = '.' ∈ x ? parse(Float64, x) : parse(Int, x)
@@ -60,12 +65,10 @@ function ANSICode(color::BitColor; bg::Bool = false)
 end
 
 function ANSICode(color::RGBColor; bg::Bool = false)
-        Δ = bg ? 48 : 38
-        rgb = "$(color.r);$(color.g);$(color.b)"
-        return ANSICode("\e[$Δ;2;$(rgb)m", "\e[$(Δ+1)m")
+    Δ = bg ? 48 : 38
+    rgb = "$(color.r);$(color.g);$(color.b)"
+    return ANSICode("\e[$Δ;2;$(rgb)m", "\e[$(Δ+1)m")
 end
-
-
 
 # --------------------------------- is color? -------------------------------- #
 
@@ -78,7 +81,6 @@ HEX_REGEX = r"#(?:[0-9a-fA-F]{3}){1,2}$"
 Check if a string represents a named color.
 """
 is_named_color(string)::Bool = string ∈ NAMED_COLORS || string ∈ COLORS_16b
-
 
 """
     is_rgb_color(string::String)::Bool
@@ -99,8 +101,8 @@ is_hex_color(string)::Bool = !occursin("on_", string) && occursin(HEX_REGEX, str
 
 Check if a string represents color information, of any type.
 """
-is_color(string)::Bool = is_named_color(string) || is_rgb_color(string) || is_hex_color(string)
-
+is_color(string)::Bool =
+    is_named_color(string) || is_rgb_color(string) || is_hex_color(string)
 
 """
     is_background(string::String)::Bool
@@ -151,17 +153,13 @@ function get_color(string; bg = false)::AbstractColor
     end
 end
 
-
-
-
 """
 Convert HSL values to RGB values, return a markup color string.
 """
 function hsl2rgb(h, s, l)
-    C = (1 - abs(2*l - 1)) * s
-    X = C * (1 - abs(mod(h/60, 2) - 1))
-    M = l - C/2
-
+    C = (1 - abs(2 * l - 1)) * s
+    X = C * (1 - abs(mod(h / 60, 2) - 1))
+    M = l - C / 2
 
     if 0 ≤ h < 60
         r, g, b = C, X, 0
@@ -177,9 +175,9 @@ function hsl2rgb(h, s, l)
         r, g, b = C, 0, X
     end
 
-    r = (Int ∘ round)((r+M) * 255)
-    g = (Int ∘ round)((g+M) * 255)
-    b = (Int ∘ round)((b+M) * 255)
+    r = (Int ∘ round)((r + M) * 255)
+    g = (Int ∘ round)((g + M) * 255)
+    b = (Int ∘ round)((b + M) * 255)
 
     return "($r, $g, $b)"
 end

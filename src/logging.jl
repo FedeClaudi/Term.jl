@@ -5,42 +5,41 @@ using Logging
 using InteractiveUtils
 using ProgressLogging: asprogress
 
-import Term: Theme,
-            textlen,
-            escape_brackets,
-            unescape_brackets,
-            reshape_text,
-            has_markup,
-            int,
-            highlight,
-            term_theme,
-            truncate,
-            ltrim_str
-
+import Term:
+    Theme,
+    textlen,
+    escape_brackets,
+    unescape_brackets,
+    reshape_text,
+    has_markup,
+    int,
+    highlight,
+    term_theme,
+    truncate,
+    ltrim_str
 
 import ..box: ROUNDED
 import ..style: apply_style
 import ..renderables: AbstractRenderable
 import ..Tprint: tprintln
-import ..progress: ProgressBar,
-                ProgressJob,
-                DescriptionColumn,
-                ProgressColumn,
-                render,
-                start!,
-                stop!,
-                addjob!,
-                removejob!,
-                update!,
-                getjob,
-                SeparatorColumn,
-                PercentageColumn
+import ..progress:
+    ProgressBar,
+    ProgressJob,
+    DescriptionColumn,
+    ProgressColumn,
+    render,
+    start!,
+    stop!,
+    addjob!,
+    removejob!,
+    update!,
+    getjob,
+    SeparatorColumn,
+    PercentageColumn
 
 import ..console: console_width, console_height, change_scroll_region, move_to_line
 
 export TermLogger, install_term_logger
-
-
 
 DEFAULT_LOGGER = global_logger()
 
@@ -54,23 +53,25 @@ struct TermLogger <: Logging.AbstractLogger
     io::IO
     theme::Theme
     pbar::ProgressBar
-
 end
 TermLogger(theme::Theme) = TermLogger(stderr, theme)
 
-TermLogger(io::IO, theme::Theme) = TermLogger(
-    io,     
-    theme,
-    ProgressBar(; 
-        transient=true, 
-        columns=[DescriptionColumn,
-        SeparatorColumn,
-        ProgressColumn,
-        SeparatorColumn,
-        PercentageColumn
-        ])
-)
-
+function TermLogger(io::IO, theme::Theme)
+    return TermLogger(
+        io,
+        theme,
+        ProgressBar(;
+            transient = true,
+            columns = [
+                DescriptionColumn,
+                SeparatorColumn,
+                ProgressColumn,
+                SeparatorColumn,
+                PercentageColumn,
+            ],
+        ),
+    )
+end
 
 # set logger beavior
 Logging.min_enabled_level(logger::TermLogger) = Logging.Info
@@ -97,7 +98,8 @@ function print_closing_line(color::String, width::Int = 48)
     _time = Dates.format(Dates.now(), "HH:MM:SS")
     pad = width - textlen(_date * _time) - 2
     return tprintln(
-        " "^pad * "{dim}$_date{/dim} {bold dim underline}$_time{/bold dim underline}"; highlight=false
+        " "^pad * "{dim}$_date{/dim} {bold dim underline}$_time{/bold dim underline}";
+        highlight = false,
     )
 end
 
@@ -112,22 +114,25 @@ It creates/adds/removes `ProgressJob`s to the logger's
 function handle_progress(logger::TermLogger, prog)
     pbar = logger.pbar
     pbar.running || start!(pbar)
-    
 
     # if progress not started yet, ignore
     if isnothing(prog.fraction) || prog.fraction == 0
-        return
+        return nothing
     end
 
     # check if a job exists for this progress, or add one
     job = getjob(pbar, prog.id)
-    job = isnothing(job) ? addjob!(
-                pbar; 
-                description=length(prog.name) > 0 ? prog.name : "running...", 
-                N = 100,
-                transient=false,
-                id = prog.id
-            ) : job
+    job = if isnothing(job)
+        addjob!(
+            pbar;
+            description = length(prog.name) > 0 ? prog.name : "running...",
+            N = 100,
+            transient = false,
+            id = prog.id,
+        )
+    else
+        job
+    end
 
     # if done, remove job.
     if prog.done || prog.fraction == 1.0
@@ -146,7 +151,6 @@ function handle_progress(logger::TermLogger, prog)
     end
 end
 
-
 """
     Logging.handle_message(logger::TermLogger,
 
@@ -157,7 +161,7 @@ it prints kwargs styled by their type.
 """
 function Logging.handle_message(
     logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...
-)       
+)
     _progress = asprogress(lvl, msg, _mod, group, id, file, line; kwargs...)
     isnothing(_progress) || return handle_progress(logger, _progress)
 
@@ -204,8 +208,8 @@ function Logging.handle_message(
     if length(msg_lines) > 0
         content *= "  " * msg_lines[1]
     end
-    tprintln(content; highlight=false)
-    tprintln.(msg_lines[2:end]; highlight=false)
+    tprintln(content; highlight = false)
+    tprintln.(msg_lines[2:end]; highlight = false)
 
     # if no kwargs we can just quit
     if length(kwargs) == 0 || length(msg_lines) == 0
@@ -227,12 +231,14 @@ function Logging.handle_message(
     namepad = max(textlen.(ks)...)
 
     # print all kwargs
-    tprintln("  $vert"; highlight=false)
+    tprintln("  $vert"; highlight = false)
     for (k, v, _type) in zip(ks, values(kwargs), _types)
         # get line stub
         pad = wpad - textlen(_type) - 1
         line =
-            "  $vert" * " "^pad * " {$(logger.theme.type) dim}($(_type)){/$(logger.theme.type) dim}" *
+            "  $vert" *
+            " "^pad *
+            " {$(logger.theme.type) dim}($(_type)){/$(logger.theme.type) dim}" *
             " {bold #e0e0e0}$k{/bold #e0e0e0}"
 
         epad = namepad - textlen(string(k))
@@ -255,9 +261,11 @@ function Logging.handle_message(
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
             _size = size(v)
-            v =
-                ltrim_str("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 30)
-            v *= "\n {dim}shape: {default white}" * join(string.(_size), " × ") * "{/default white}{/dim}"
+            v = ltrim_str("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 30)
+            v *=
+                "\n {dim}shape: {default white}" *
+                join(string.(_size), " × ") *
+                "{/default white}{/dim}"
 
         elseif v isa Function
             _style = logger.theme.func
@@ -277,17 +285,15 @@ function Logging.handle_message(
         vlines = split(v, "\n")
 
         if !isnothing(_style)
-            vlines = map(
-                ln -> "{"*_style*"}"*ln*"{/"*_style*"}", vlines
-            )
+            vlines = map(ln -> "{" * _style * "}" * ln * "{/" * _style * "}", vlines)
         else
             vlines = highlight.(vlines)
         end
 
-        tprintln(line * vlines[1]; highlight=false)
+        tprintln(line * vlines[1]; highlight = false)
         if length(vlines) >= 1
             for ln in vlines[2:end]
-                tprintln("  $vert " * " "^lpad * ln; highlight=false)
+                tprintln("  $vert " * " "^lpad * ln; highlight = false)
             end
         end
     end
@@ -307,7 +313,6 @@ function install_term_logger(theme::Theme = term_theme[])
     _logger = TermLogger(theme)
     return global_logger(_logger)
 end
-
 
 function uninstall_term_logger()
     _lg = global_logger(DEFAULT_LOGGER)

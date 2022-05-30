@@ -1,38 +1,38 @@
 function make_logo()
-circle = """
-    oooo    
- oooooooooo 
-oooooooooooo
-oooooooooooo
- oooooooooo 
-    oooo    """
+    circle = """
+        oooo    
+     oooooooooo 
+    oooooooooooo
+    oooooooooooo
+     oooooooooo 
+        oooo    """
 
     # create circles
     green = Panel(
-        RenderableText(circle; style="#389826 bold");
-        fit=true,
+        RenderableText(circle; style = "#389826 bold");
+        fit = true,
         style = "dim #389826",
         justify = :center,
-        padding=(2, 2, 0, 0),
+        padding = (2, 2, 0, 0),
         title = "{italic default}Made",
         title_style = "bold red",
     )
     red = Panel(
-        RenderableText(circle; style="#CB3C33 bold");
-        fit=true,
+        RenderableText(circle; style = "#CB3C33 bold");
+        fit = true,
         style = "dim #CB3C33",
         justify = :center,
-        padding=(2, 2, 0, 0),
+        padding = (2, 2, 0, 0),
         subtitle = "{italic default}with",
         subtitle_style = "bold #b656e3",
         subtitle_justify = :right,
     )
     purple = Panel(
-        RenderableText(circle; style="#9558B2 bold");
-        fit=true,
+        RenderableText(circle; style = "#9558B2 bold");
+        fit = true,
         style = "dim #9558B2",
         justify = :center,
-        padding=(2, 2, 0, 0),
+        padding = (2, 2, 0, 0),
         subtitle = "{italic default}Term",
         subtitle_style = "bold #389826",
     )
@@ -54,13 +54,10 @@ oooooooooooo
     # create "spacers" and stack renderables
     hspacer = Spacer(green.measure.w / 2 + 1, green.measure.h)
     line = Spacer(green.measure.w * 2 + 6, 1)
-    circles =  line / (hspacer * green * hspacer) / (red * Spacer(2, purple.measure.h) * purple)
+    circles =
+        line / (hspacer * green * hspacer) / (red * Spacer(2, purple.measure.h) * purple)
 
-
-    content =
-        circles *
-        vLine(main.measure.h; style = indigo * " dim") *
-        main
+    content = circles * vLine(main.measure.h; style = indigo * " dim") * main
 
     # add second message
     second_message = RenderableText(

@@ -36,8 +36,6 @@ end
     @test width("test") == 4
     @test height("test") == 1
 
-    @test width(Panel(;width=5, height=5)) == 5
-    @test height(Panel(;width=5, height=5)) == 5
+    @test width(Panel(; width = 5, height = 5)) == 5
+    @test height(Panel(; width = 5, height = 5)) == 5
 end
-
-

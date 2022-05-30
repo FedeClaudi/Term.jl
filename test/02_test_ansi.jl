@@ -86,9 +86,7 @@ end
     end
 end
 
-
 @testset "\e[34mHSL to RGB" begin
     @test hsl2rgb(0, 0, 0) == "(0, 0, 0)"
     @test hsl2rgb(0, 0, 1) == "(255, 255, 255)"
-
 end

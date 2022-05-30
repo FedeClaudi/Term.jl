@@ -1,29 +1,20 @@
 using Highlights.Format
 import Highlights: Lexers
-import Highlights
+using Highlights: Highlights
 import OrderedCollections: OrderedDict
 
 # ------------------------------- highlighting ------------------------------- #
 highlight_regexes = OrderedDict(
-    :number => (
-        r"(?<group>(?<![a-zA-Z0-9_#])\d+(\.\d*)?+([eE][+-]?\d*)?)", ),
-    :operator => (
-        r"(?<group>(?<!\{)\/)", 
-        r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~])"
-    ),
-    :string => (
-        r"(?<group>[\"\']{3}|[\'\"]{1}(\n|.)*?[\"\']{3}|[\'\"]{1})", ),
-    :code => (
-        r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))", ),
-    :expression => (r"(?<group>\:\(+.+[\)])", ),
-    :symbol => (r"(?<group>(?<!\:)(?<!\:)\:\w+)", ),
+    :number => (r"(?<group>(?<![a-zA-Z0-9_#])\d+(\.\d*)?+([eE][+-]?\d*)?)",),
+    :operator =>
+        (r"(?<group>(?<!\{)\/)", r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~])"),
+    :string => (r"(?<group>[\"\']{3}|[\'\"]{1}(\n|.)*?[\"\']{3}|[\'\"]{1})",),
+    :code => (r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))",),
+    :expression => (r"(?<group>\:\(+.+[\)])",),
+    :symbol => (r"(?<group>(?<!\:)(?<!\:)\:\w+)",),
     :emphasis_light => (r"(?<group>[\[\]\(\)])", r"(?<group>@\w+)"),
-    :type => (
-        r"(?<group>\:\:[\w\.]*)",
-        r"(?<group>\<\:\w+)"),
+    :type => (r"(?<group>\:\:[\w\.]*)", r"(?<group>\<\:\w+)"),
 )
-
-
 
 """
     highlight(text::AbstractString, theme::Theme)
@@ -31,21 +22,17 @@ highlight_regexes = OrderedDict(
 Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object
 """
-function highlight(text::AbstractString; theme::Theme=term_theme[])   
+function highlight(text::AbstractString; theme::Theme = term_theme[])
     has_ansi(text) && return text
-    
+
     # highlight with regexes 
     for (symb, rxs) in pairs(highlight_regexes)
         markup = getfield(theme, symb)
         open, close = "{$markup}", "{/$markup}"
         for rx in rxs
-            text = replace(
-                text, 
-                rx => SubstitutionString(open * s"\g<0>" * close)
-                )
+            text = replace(text, rx => SubstitutionString(open * s"\g<0>" * close))
         end
     end
-
 
     return apply_style(text)
 end
@@ -56,21 +43,34 @@ end
 Hilights an entire text as if it was a type of semantically
 relevant text of type :like.
 """
-function highlight(text::AbstractString, like::Symbol; theme::Theme=term_theme[])
+function highlight(text::AbstractString, like::Symbol; theme::Theme = term_theme[])
     markup = getfield(theme, like)
-    return apply_style(do_by_line((x)->"{"*markup*"}"*x*"{/"*markup*"}", chomp(text)))
+    return apply_style(
+        do_by_line((x) -> "{" * markup * "}" * x * "{/" * markup * "}", chomp(text))
+    )
 end
 
 # shorthand to highlight objects based on type
-highlight(x::Union{UnionAll, DataType}; theme::Theme=term_theme[]) = highlight(string(x), :type; theme=theme)
-highlight(x::Number; theme::Theme=term_theme[]) = highlight(string(x), :number; theme=theme)
-highlight(x::Function; theme::Theme=term_theme[]) = highlight(string(x), :func; theme=theme)
-highlight(x::Symbol; theme::Theme=term_theme[]) = highlight(string(x), :symbol; theme=theme)
-highlight(x::Expr; theme::Theme=term_theme[]) = highlight(string(x), :expression; theme=theme)
-highlight(x::AbstractVector; theme::Theme=term_theme[]) = highlight(string(x), :number; theme=theme)
+function highlight(x::Union{UnionAll,DataType}; theme::Theme = term_theme[])
+    return highlight(string(x), :type; theme = theme)
+end
+function highlight(x::Number; theme::Theme = term_theme[])
+    return highlight(string(x), :number; theme = theme)
+end
+function highlight(x::Function; theme::Theme = term_theme[])
+    return highlight(string(x), :func; theme = theme)
+end
+function highlight(x::Symbol; theme::Theme = term_theme[])
+    return highlight(string(x), :symbol; theme = theme)
+end
+function highlight(x::Expr; theme::Theme = term_theme[])
+    return highlight(string(x), :expression; theme = theme)
+end
+function highlight(x::AbstractVector; theme::Theme = term_theme[])
+    return highlight(string(x), :number; theme = theme)
+end
 
-highlight(x; theme=term_theme[]) = string(x)  # capture all other cases
-
+highlight(x; theme = term_theme[]) = string(x)  # capture all other cases
 
 # ------------------------------ Highlighters.jl ----------------------------- #
 
