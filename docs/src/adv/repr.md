@@ -22,7 +22,7 @@ obj = myType("Rocket", 10, 10, 99.9)
 as you can see the default way to represent your object in the console is not very exciting. So what you can do is define a `Base.show` method for your type and use Term to make it fancy! 
 
 
-For this example, we will have it so that showing `obj` in the REPR will create a  [`PanelDocs`](@ref) using `name` as the title and showing the other fields and values inside. 
+For this example, we will have it so that showing `obj` in the REPR will create a  [`PanelDocs`](@ref PanelDocs) using `name` as the title and showing the other fields and values inside. 
 ```@example repr
 
 """ Custom show method """
@@ -77,7 +77,7 @@ obj = Rocket(10, 50, 5000, "NASA")
 
 
 ## `termshow`
-The examples above work when you're the one createing a new type, but how about when you're dealing with types defined in someone else's code?
+The examples above work when you're the one creating a new type, but how about when you're dealing with types defined in someone else's code?
 
 For that you can use `termshow`: `termshow(x)` prints a `string` or `Panel` with the same kind of visualization you'd get from `@with_repr` - but for any type!
 ```@example
@@ -97,12 +97,14 @@ And now the REPL will print fancy info for any object!
 ```
 
 ```@example repr
+struct Throttle end
+
 struct Engine
     id::Int
     throttle::Throttle
 end
 
-e = (1, 100)
+e = Engine(1, Throttle())
 ```
 
 And so on.... enjoy!

@@ -1,5 +1,5 @@
 import Term: reshape_text
-import Term.console: clear
+import Term.Console: clear
 
 
 strings = [

@@ -1,5 +1,4 @@
-import Term: Measure
-import Term.measure: width, height
+import Term.Measures: Measure, width, height
 import Term: remove_markup, Panel
 
 @testset "\e[34mMeasure - str" begin
@@ -36,8 +35,6 @@ end
     @test width("test") == 4
     @test height("test") == 1
 
-    @test width(Panel(;width=5, height=5)) == 5
-    @test height(Panel(;width=5, height=5)) == 5
+    @test width(Panel(; width = 5, height = 5)) == 5
+    @test height(Panel(; width = 5, height = 5)) == 5
 end
-
-

@@ -1,4 +1,4 @@
-import Term.tree: Tree
+import Term.Trees: Tree
 import Term: hLine, vLine
 
 function pprint(tree::Tree)

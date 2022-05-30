@@ -1,6 +1,6 @@
 # Introspection
 ```@meta
-CurrentModule = Term.introspection
+CurrentModule = Term.Introspection
 ```
 
 
@@ -11,5 +11,5 @@ Pages   = ["api_introspection.md"]
 
 
 ```@autodocs
-Modules = [introspection]
+Modules = [Introspection]
 ```

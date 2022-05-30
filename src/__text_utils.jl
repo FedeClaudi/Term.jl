@@ -1,5 +1,5 @@
 """ multiple strings replacement, for multiple on Julia version """
-function replace_multi(text, pairs...) ::String
+function replace_multi(text, pairs...)::String
     VERSION >= v"1.7" && return replace(text, pairs...)
     VERSION < v"1.7" && begin
         for pair in pairs
@@ -28,11 +28,9 @@ const GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 Remove all markup tags from a string of text.
 """
-remove_markup(input_text)::String = replace_multi(input_text, 
-                                        OPEN_TAG_REGEX => "", 
-                                        GENERIC_CLOSER_REGEX => "", 
-                                        CLOSE_TAG_REGEX => ""
-                                            )
+remove_markup(input_text)::String = replace_multi(
+    input_text, OPEN_TAG_REGEX => "", GENERIC_CLOSER_REGEX => "", CLOSE_TAG_REGEX => ""
+)
 
 """ 
     has_markup(text::String)
@@ -40,7 +38,6 @@ remove_markup(input_text)::String = replace_multi(input_text,
 Returns `true` if `text` includes a `MarkupTag`
 """
 has_markup(text)::Bool = occursin(OPEN_TAG_REGEX, text)
-                                        
 
 # ----------------------------------- ansi ----------------------------------- #
 const ANSI_REGEXE = r"\e\[[0-9;]*m"
@@ -50,8 +47,7 @@ const ANSI_REGEXE = r"\e\[[0-9;]*m"
 
 Remove all ANSI tags from a string of text
 """
-remove_ansi(input_text)::String = replace(input_text, ANSI_REGEXE => "", )
-
+remove_ansi(input_text)::String = replace(input_text, ANSI_REGEXE => "")
 
 """ 
     has_ansi(text::String)
@@ -81,9 +77,8 @@ Returns a string with all ANSI codes in the input.
 function get_ANSI_codes(text)::String
     has_ansi(text) || return ""
     matches = collect((eachmatch(ANSI_REGEXE, text)))
-    return *(map(m->m.match, matches)...)
+    return *(map(m -> m.match, matches)...)
 end
-
 
 """
     replace_ansi(input_text)
@@ -96,21 +91,21 @@ Used when we want to hide ANSI tags but keep the string length intact.
 function replace_ansi(input_text)
     while occursin(rx, input_text)
         mtch = match(ANSI_REGEXE, input_text)
-        input_text = replace_text(input_text, mtch.offset-1, mtch.offset+length(mtch.match)-1, '¦')
+        input_text = replace_text(
+            input_text, mtch.offset - 1, mtch.offset + length(mtch.match) - 1, '¦'
+        )
     end
     return input_text
 end
 
-
 ANSI_CLEANUP_REGEXES = [
-    r"\e\[[0-9][0-9]m\e\[39m"=>"",
-    r"\e\[[0-9][0-9]m\e\[49m"=>"",
-    r"\e\[[0-9]m\e\[2[0-9]m"=>"",
-    r"\e\[22m\e\[22m"=>"",
+    r"\e\[[0-9][0-9]m\e\[39m" => "",
+    r"\e\[[0-9][0-9]m\e\[49m" => "",
+    r"\e\[[0-9]m\e\[2[0-9]m" => "",
+    r"\e\[22m\e\[22m" => "",
 ]
 
 cleanup_ansi(text) = replace_multi(text, ANSI_CLEANUP_REGEXES...)
-
 
 # --------------------------- clean text / text len -------------------------- #
 """
@@ -128,42 +123,30 @@ Get length of text after all style information is removed.
 textlen(x::String)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 
-
-
 # --------------------------------- brackets --------------------------------- #
-const brackets_regexes = [
-    r"(?<!\{)\{(?!\{)",
-    r"(?<!\})\}(?!\})",
-]
+const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
 
 """
     remove_ansi(str)::String
 
 Replace each cirly bracket with a double copy of itself
 """
-escape_brackets(text)::String = replace_multi(text, 
-        brackets_regexes[1]=>"{{",
-        brackets_regexes[2]=>"}}",
-)
+escape_brackets(text)::String =
+    replace_multi(text, brackets_regexes[1] => "{{", brackets_regexes[2] => "}}")
 
-const remove_brackets_regexes = [
-    r"\{\{",
-    r"\}\}",
-]
+const remove_brackets_regexes = [r"\{\{", r"\}\}"]
 
 """
     unescape_brackets(text)::String
 
 Replece every double squared parenthesis with a single copy of itself
 """
-unescape_brackets(text)::String = replace_multi(text, 
-    remove_brackets_regexes[1]=>"{",
-    remove_brackets_regexes[2]=>"}",
+unescape_brackets(text)::String = replace_multi(
+    text, remove_brackets_regexes[1] => "{", remove_brackets_regexes[2] => "}"
 )
 
-unescape_brackets_with_space(text)::String = replace_multi(text, 
-    remove_brackets_regexes[1]=>" {",
-    remove_brackets_regexes[2]=>"} ",
+unescape_brackets_with_space(text)::String = replace_multi(
+    text, remove_brackets_regexes[1] => " {", remove_brackets_regexes[2] => "} "
 )
 
 # ---------------------------------------------------------------------------- #
@@ -191,7 +174,7 @@ end
 
 Get a view object with appropriate indices
 """
-tview(text, start::Int, stop::Int) = view(text,thisind(text, start):thisind(text, stop))
+tview(text, start::Int, stop::Int) = view(text, thisind(text, start):thisind(text, stop))
 tview(text, start::Int, stop::Int, simple::Symbol) = view(text, start:stop)
 
 """
@@ -201,16 +184,16 @@ Replace a section of a `text` between `start` and `stop` with `replace`.
 """
 function replace_text(text, start::Int, stop::Int, replace::String)::String
     if start == 0
-        return  replace * text[stop+1:end]
+        return replace * text[(stop + 1):end]
     end
-    
+
     start = isvalid(text, start) ? start : max(prevind(text, start), 1)
     if start == 1
-        return text[1] * replace * text[stop+1:end]
+        return text[1] * replace * text[(stop + 1):end]
     elseif stop == ncodeunits(text)
         return text[1:start] * replace
     else
-        return text[1:start] * replace * text[stop+1:end]
+        return text[1:start] * replace * text[(stop + 1):end]
     end
 end
 
@@ -223,7 +206,6 @@ function replace_text(text, start::Int, stop::Int, char::Char = '_')::String
     replacement = char^(stop - start)
     return replace_text(text, start, stop, replacement)
 end
-
 
 """
     ltrim_str(str, width)
@@ -246,9 +228,8 @@ Cut a chunk of width `width` form the right of a string
 """
 function rtrim_str(str, width)
     edge = nextind(str, 0, width)
-    str[edge:end]
+    return str[edge:end]
 end
-
 
 """
     nospaces(text::AbstractString)
@@ -263,7 +244,6 @@ nospaces(text::AbstractString) = replace(text, " " => "")
 Remove all () brackets from a string.
 """
 remove_brackets(text)::String = replace_multi(text, "(" => "", ")" => "")
-
 
 """
     unspace_commas(text::AbstractString)
@@ -294,7 +274,6 @@ Split a string into its composing lines.
 split_lines(text::String)::Vector{String} = split(text, "\n")
 split_lines(text::SubString)::Vector{String} = String.(split(text, "\n"))
 
-
 """
     split_lines(renderable)
 
@@ -303,7 +282,6 @@ Split a renderable's text.
 function split_lines(renderable)
     string(typeof(renderable)) == "Segment" && return split_lines(renderable.text)
     return [s.text for s in renderable.segments]
-
 end
 
 """
@@ -323,7 +301,6 @@ end
 
 do_by_line(fn::Function, text::Vector)::String = join_lines(fn.(text))
 
-
 # ------------------------------- reshape text ------------------------------- #
 """
     fillin(text::String)::String
@@ -335,31 +312,25 @@ function fillin(text)::String
     length(lines) == 1 && return text
 
     w = max(map(textlen, lines)...)
-    return join_lines(map(
-        (ln) -> ln * " "^(w - textlen(ln)),
-        lines
-    ))
+    return join_lines(map((ln) -> ln * " "^(w - textlen(ln)), lines))
 end
-
 
 """
     truncate(text::AbstractString, width::Int)
 
 Shorten a string of text to a target width
 """
-function truncate(text::AbstractString, width::Int; trailing_dots="...")
+function truncate(text::AbstractString, width::Int; trailing_dots = "...")
     width < 0 && return text
     textlen(text) <= width && return text
-    
-    trunc = reshape_text(text, width-3)
+
+    trunc = reshape_text(text, width - 3)
     return split_lines(trunc)[1] * trailing_dots
 end
 
 # ---------------------------------------------------------------------------- #
 #                                 RESHAPE TEXT                                 #
 # ---------------------------------------------------------------------------- #
-
-
 
 """
     reshape_text(text, width::Int)
@@ -383,7 +354,7 @@ function reshape_text(text, width::Int)
     has_special = length(text) != ncodeunits(text)
     text = apply_style(text)
 
-    chars::Vector{Union{Char, String}} = collect(text)
+    chars::Vector{Union{Char,String}} = collect(text)
     L = length(chars)
     spaces::Vector{Bool} = Bool.(chars .== ' ')
 
@@ -395,14 +366,14 @@ function reshape_text(text, width::Int)
         for mtch in eachmatch(ANSI_REGEXE, text)
             if has_special
                 # tag position in code units
-                _i0 = mtch.offset 
+                _i0 = mtch.offset
                 _i1 = mtch.offset + ncodeunits(mtch.match) - 1
 
                 # tag position in characters
                 i0 = length(text[1:_i0])
                 i1 = length(text[_i0:_i1]) + i0 - 1
             else
-                i0 = mtch.offset 
+                i0 = mtch.offset
                 i1 = mtch.offset + length(mtch.match) - 1
             end
 
@@ -419,17 +390,15 @@ function reshape_text(text, width::Int)
         # @warn "processing cut $n: $cut"
 
         for i in 1:4
-            if spaces[max(1, cut-i)] == true
+            if spaces[max(1, cut - i)] == true
                 # get width of text excluded by new cut position
                 if n < ncuts
                     # adjust cuts poisitions
-                    Δw = cumwidths[cut] - cumwidths[cut-i]
+                    Δw = cumwidths[cut] - cumwidths[cut - i]
                     newcuts = findall(
-                        diff(
-                            mod.(cumwidths .- cumwidths[cut] .+ Δw, width)
-                            ) .< 0
+                        diff(mod.(cumwidths .- cumwidths[cut] .+ Δw, width)) .< 0
                     )
-                    
+
                     newcuts = newcuts[newcuts .> cut]
                     cuts = [cuts[1:n]..., newcuts...]
                 end
@@ -440,7 +409,7 @@ function reshape_text(text, width::Int)
         end
 
         # make sure cut is at the end of an ANSI tag
-        while cut < L && widths[cut+1] == 0
+        while cut < L && widths[cut + 1] == 0
             cut -= 1
             cuts .-= 1
         end
@@ -451,14 +420,11 @@ function reshape_text(text, width::Int)
 
     # check that the last line has the right width
     if sum(widths[max(cuts[end]):end]) > width
-        _chars = chars[cuts[end]+1:end]
+        _chars = chars[(cuts[end] + 1):end]
         chars = chars[1:cuts[end]]
-        append!(chars, collect(
-                reshape_text(join(_chars), width)
-                )
-        )
+        append!(chars, collect(reshape_text(join(_chars), width)))
     end
-  
+
     # stitch it back together
     text = join(chars)
     lines = strip.(split(text, "\n"))
@@ -468,10 +434,9 @@ function reshape_text(text, width::Int)
         styles = map(l -> get_ANSI_codes(l), lines)
         lines[1] *= "\e[0m"
         for i in 2:length(lines)
-            lines[i] = cleanup_ansi(*(styles[1:i-1]...)) * lines[i] * "\e[0m"
+            lines[i] = cleanup_ansi(*(styles[1:(i - 1)]...)) * lines[i] * "\e[0m"
         end
     end
 
     return chomp(cleanup_ansi(join(lines, "\n")))
 end
-

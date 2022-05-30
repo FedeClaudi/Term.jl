@@ -1,4 +1,4 @@
-module measure
+module Measures
 
 import Term: remove_ansi, remove_markup
 
@@ -50,7 +50,5 @@ Measure the height of renderable objects (text, AbsstractRenderable)
 function height end
 height(x) = height(string(x))
 height(x::AbstractString) = Measure(x).h
-
-
 
 end

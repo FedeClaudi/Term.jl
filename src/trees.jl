@@ -1,37 +1,39 @@
-module tree
-import Base: @kwdef
-import MyterialColors: yellow, orange, red, blue
-using InteractiveUtils
-import OrderedCollections: OrderedDict
+module Trees
 
-import Term: loop_last,
-        escape_brackets,
-        fillin,
-        highlight, 
-        int,
-        term_theme,
-        textlen,
-        truncate,
-        expr2string
-        
-import ..segment: Segment
-import ..measure: Measure
-import ..renderables: AbstractRenderable
-import ..style: apply_style
-import ..layout: vstack, pad, hLine
-import ..panel: Panel
+import MyterialColors: yellow, orange, red, blue
+import OrderedCollections: OrderedDict
+import Base: @kwdef
+
+using InteractiveUtils
+
+import Term:
+    loop_last,
+    escape_brackets,
+    fillin,
+    highlight,
+    int,
+    term_theme,
+    textlen,
+    truncate,
+    expr2string
+
+import ..Renderables: AbstractRenderable
+import ..Layout: vstack, pad, hLine
+import ..Style: apply_style
+import ..Segments: Segment
+import ..Measures: Measure
+import ..Panels: Panel
 
 export Tree
-
 
 # ---------------------------------------------------------------------------- #
 #                                    GUIDES                                    #
 # ---------------------------------------------------------------------------- #
 
 treeguides = Dict(
-    :standardtree =>("    ", "│   ", "├── ", "└── "),
-    :boldtree     =>("    ", "┃   ", "┣━━ ", "┗━━ "),
-    :asciitree    =>("    ", "|   ", "+-- ", "`-- "),
+    :standardtree => ("    ", "│   ", "├── ", "└── "),
+    :boldtree => ("    ", "┃   ", "┣━━ ", "┗━━ "),
+    :asciitree => ("    ", "|   ", "+-- ", "`-- "),
 )
 
 """
@@ -51,13 +53,11 @@ end
 
 Get tree guides with style information applied
 """
-TreeGuides(guides_type::Symbol, style::String) = TreeGuides(
-    map(
-        (g)->apply_style("{$style}$g{/$style}"), 
-        treeguides[guides_type]
-    )...
-)
-
+function TreeGuides(guides_type::Symbol, style::String)
+    return TreeGuides(
+        map((g) -> apply_style("{$style}$g{/$style}"), treeguides[guides_type])...
+    )
+end
 
 # ---------------------------------------------------------------------------- #
 #                                     TREE                                     #
@@ -74,7 +74,9 @@ function asleaf end
 
 asleaf(x) = truncate(highlight(string(x)), term_theme[].tree_max_width)
 asleaf(x::Nothing) = nothing
-asleaf(x::AbstractVector) = truncate((escape_brackets ∘ string)(x), term_theme[].tree_max_width)
+function asleaf(x::AbstractVector)
+    return truncate((escape_brackets ∘ string)(x), term_theme[].tree_max_width)
+end
 asleaf(x::AbstractString) = truncate(highlight(x, :string), term_theme[].tree_max_width)
 
 """
@@ -83,8 +85,8 @@ asleaf(x::AbstractString) = truncate(highlight(x, :string), term_theme[].tree_ma
 End items in a `Tree`. No sub-trees.
 """
 struct Leaf
-    name::Union{Nothing, String}
-    text::Union{Nothing, String}
+    name::Union{Nothing,String}
+    text::Union{Nothing,String}
 end
 
 # ----------------------------------- tree ----------------------------------- #
@@ -95,8 +97,8 @@ A tree is composed of nodes (other trees) and leaves (end items).
 It renders as a hierarchical structure with lines (guides) connecting the various elements
 """
 @kwdef struct Tree <: AbstractRenderable
-    segments::Union{Nothing, Vector{Segment}} = nothing
-    measure::Union{Nothing, Measure} = nothing
+    segments::Union{Nothing,Vector{Segment}} = nothing
+    measure::Union{Nothing,Measure} = nothing
 
     name::String
     level::Int
@@ -110,11 +112,10 @@ It renders as a hierarchical structure with lines (guides) connecting the variou
     guides_type::Symbol = :standardtree
 end
 
-
 """
 Show/render a `Tree`
 """
-function Base.show(io::IO, tree::Tree) 
+function Base.show(io::IO, tree::Tree)
     if io != stdout
         print(io, "Tree: $(length(tree.nodes)) nodes, $(length(tree.leaves)) leaves")
     else
@@ -124,31 +125,38 @@ function Base.show(io::IO, tree::Tree)
     end
 end
 
-
 """
 Add a new node to an existing tree's nodes or levaes.
 """
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::AbstractDict)
-    push!(nodes, Tree(v; level=level+1, title=truncate(string(k), term_theme[].tree_max_width)))
+    return push!(
+        nodes,
+        Tree(
+            v; level = level + 1, title = truncate(string(k), term_theme[].tree_max_width)
+        ),
+    )
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Pair)
-    k = isnothing(v.first) ? nothing : truncate(string(v.first), term_theme[].tree_max_width)
-    push!(leaves, Leaf(k, asleaf(v.second)))
+    k = if isnothing(v.first)
+        nothing
+    else
+        truncate(string(v.first), term_theme[].tree_max_width)
+    end
+    return push!(leaves, Leaf(k, asleaf(v.second)))
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Any)
     k = isnothing(k) ? nothing : truncate(string(k), term_theme[].tree_max_width)
-    push!(leaves, Leaf(k, asleaf(v)))
+    return push!(leaves, Leaf(k, asleaf(v)))
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Vector)
     for _v in v
         _k = _v isa Dict ? collect(keys(_v))[1] : (v isa Pair ? _v.first : v)
-        addnode!(nodes, leaves, level+1, _k, _v)
+        addnode!(nodes, leaves, level + 1, _k, _v)
     end
 end
-
 
 """
     Tree(data::Union{Dict, Pair}; level=0, title::String="tree", kwargs...)
@@ -156,11 +164,8 @@ end
 Construct a `Tree` out of a `Dict`. Recursively handle nested `Dict`s.
 """
 function Tree(
-        data::Union{AbstractDict, Pair, Vector};
-        level=0,
-        title::String="tree",
-        kwargs...
-    )
+    data::Union{AbstractDict,Pair,Vector}; level = 0, title::String = "tree", kwargs...
+)
 
     # initialize
     nodes::Vector{Tree} = []
@@ -174,28 +179,24 @@ function Tree(
     # if we're handling the first tree, render it. Otherwise parse nested trees.
     if level > 0
         # we don't need to render
-        return Tree(; name=title, level=level, nodes=nodes, leaves=leaves, kwargs...)
+        return Tree(;
+            name = title, level = level, nodes = nodes, leaves = leaves, kwargs...
+        )
     else
         # render and get measure
         segments = render(
-                Tree(;
-                    name=title,
-                    level=level,
-                    nodes=nodes,
-                    leaves=leaves,
-                    kwargs...
-            )        
+            Tree(; name = title, level = level, nodes = nodes, leaves = leaves, kwargs...)
         )
         measure = Measure(segments)
 
         return Tree(;
-            segments=segments, 
-            measure=measure, 
-            name=truncate(title, term_theme[].tree_max_width), 
-            level=level, 
-            nodes=nodes, 
-            leaves=leaves,
-            kwargs...
+            segments = segments,
+            measure = measure,
+            name = truncate(title, term_theme[].tree_max_width),
+            level = level,
+            nodes = nodes,
+            leaves = leaves,
+            kwargs...,
         )
     end
 end
@@ -209,17 +210,19 @@ Render a `Tree` into segments. Recursively handle nested trees.
 
 
 """
-function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], guides=nothing)::Vector{Segment}
+function render(
+    tree::Tree; prevguides::String = "", lasttree = false, waslast = [], guides = nothing
+)::Vector{Segment}
     guides = isnothing(guides) ? TreeGuides(tree.guides_type, tree.guides_style) : guides
     hasleaves = length(tree.leaves) > 0
 
-    segments::Vector{Segment}=[]
+    segments::Vector{Segment} = []
 
     """
         Add a segment to the segments vector
     """
     function _add(x::String, style)
-        push!(segments, Segment(x, style))
+        return push!(segments, Segment(x, style))
     end
     _add(x::String) = _add(x, "default")
 
@@ -227,7 +230,9 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
     # render initial part
     if tree.level == 0
         header_text = "{$(tree.title_style)}$(tree.name){/$(tree.title_style)}"
-        header = (" " * header_text * " ") / hLine(textlen(tree.name)+2; style="$(tree.title_style) dim", box=:HEAVY)
+        header =
+            (" " * header_text * " ") /
+            hLine(textlen(tree.name) + 2; style = "$(tree.title_style) dim", box = :HEAVY)
 
         append!(segments, header.segments)
     else
@@ -252,7 +257,7 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
     for (last, node) in loop_last(tree.nodes)
         # check if it's the last entry in the tree
         lasttree = last && !hasleaves
-        
+
         # get the appropriate guides
         if lasttree
             prev = prevguides * guides.space
@@ -260,13 +265,15 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
             prev = prevguides * guides.vline
         end
 
-        append!(segments, render(
-            node; 
-            prevguides=prev, 
-            lasttree=lasttree,
-            waslast=vcat(waslast, lasttree),
-            guides=guides
-            )
+        append!(
+            segments,
+            render(
+                node;
+                prevguides = prev,
+                lasttree = lasttree,
+                waslast = vcat(waslast, lasttree),
+                guides = guides,
+            ),
         )
         hasleaves && length(node.leaves) > 0 && _add(prevguides * guides.vline)
     end
@@ -279,7 +286,11 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
                 k = isnothing(leaf.name) ? "" : highlight(leaf.name)
                 v = ""
             else
-                k = isnothing(leaf.name) ? "" : "{$(tree.leaf_style)}$(leaf.name){/$(tree.leaf_style)}: "
+                k = if isnothing(leaf.name)
+                    ""
+                else
+                    "{$(tree.leaf_style)}$(leaf.name){/$(tree.leaf_style)}: "
+                end
                 v = leaf.text
             end
             _add(prevguides * seg * k * v)
@@ -291,13 +302,12 @@ function render(tree::Tree; prevguides::String="", lasttree=false, waslast=[], g
         header_length = length(header.segments)
         padded_segments = vcat(
             header.segments...,
-            pad(segments[header_length+1:end], int(header.measure.w/2 - 1))...
+            pad(segments[(header_length + 1):end], int(header.measure.w / 2 - 1))...,
         )
         return fillin(padded_segments)
     else
         return segments
     end
-    
 end
 
 # ---------------------------------------------------------------------------- #
@@ -330,7 +340,7 @@ function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::Dict)::Dict
                     subs[string(s)] = nothing
                 end
             end
-            
+
             if n == 2
                 data = subs
             else
@@ -338,7 +348,7 @@ function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::Dict)::Dict
                 data = subs
             end
 
-            prev = string(y)            
+            prev = string(y)
         end
     end
     return data
@@ -351,34 +361,34 @@ Construct a `Tree` visualization of `T`'s types hierarchy
 """
 function Tree(T::DataType)::Tree
     # create a dictionary of types hierarchy
-    subs = Dict(string(s)=>nothing for s in subtypes(T))
+    subs = Dict(string(s) => nothing for s in subtypes(T))
     data = make_hierarchy_dict(supertypes(T), T, subs)
 
-
     return Tree(
-            data; 
-            # title=string(supertypes(T)[end]),
-            title="Any",
-            title_style="bright_green italic",
-            guides_style="green dim",
-        )
+        data;
+        # title=string(supertypes(T)[end]),
+        title = "Any",
+        title_style = "bright_green italic",
+        guides_style = "green dim",
+    )
 end
 
-
-_key(e::Expr) = length(e.args) > 1 ? "$(expr2string(e))  {dim blue}($(e.head): {/dim blue}{red bold default}$(e.args[1]){/red bold default}{dim blue}){/dim blue}" : string(e.head)
+function _key(e::Expr)
+    if length(e.args) > 1
+        "$(expr2string(e))  {dim blue}($(e.head): {/dim blue}{red bold default}$(e.args[1]){/red bold default}{dim blue}){/dim blue}"
+    else
+        string(e.head)
+    end
+end
 _values(e::Expr) = length(e.args) > 1 ? e.args[2:end] : e.args
 
 _pair(x) = nothing => x
-function _pair(e::Expr)
-    return Dict(
-                _key(e) => 
-                _pair.(_values(e))
-            )
-end
+_pair(e::Expr) = Dict(_key(e) => _pair.(_values(e)))
 
 function Tree(expr::Expr; kwargs...)
     parsed = _pair(expr)
     parsed = Dict(collect(keys(parsed))[1] => parsed)
-    Tree(parsed; title=expr2string(expr))
+    return Tree(parsed; title = expr2string(expr))
 end
+
 end

@@ -15,7 +15,7 @@ function rainbow_maker() # hide
     end # hide
     return out  # hide
 end # hide
-import Term: tprint  # hide
+import Term: tprint # hide
 tprint(rainbow_maker()) # hide
 ```
 
@@ -48,14 +48,12 @@ The distinction between `NamedColor`, `BitColor` and `RGBColor` is necessary bec
 Below all named colors, 16bit colors and (many) RGB colors are printed for display.
 
 ```@example
-import Term: CODES_16BIT_COLORS
-import Term: Panel
-import Term.color: hsl2rgb
+import Term: CODES_16BIT_COLORS, Panel
+import Term.Colors: hsl2rgb
 
 function make_named_colors()
     sort_idx = sortperm(collect(values(CODES_16BIT_COLORS)))
     cnames = collect(keys(CODES_16BIT_COLORS))[sort_idx][1:9]
-    colors = ""
     colors = join(map(
         (c)->"{on_$c} {/on_$c}", cnames
     ))
@@ -66,12 +64,12 @@ end
 function make_16bit_colors()
     sort_idx = sortperm(collect(values(CODES_16BIT_COLORS)))
     cnames = collect(keys(CODES_16BIT_COLORS))[sort_idx][9:end]
-    colors = ""
     colors = join(map(
-        (c)->c[1] %  20 == 0 ? "{on_$(c[2])} {/on_$(c[2])}\n" : "{on_$(c[2]} {/on_$(c[2])}", enumerate(cnames)
+        (c)->c[1] %  20 == 0 ? "{on_$(c[2])} {/on_$(c[2])}\n" : "{on_$(c[2])} {/on_$(c[2])}", enumerate(cnames)
     ))
     return colors
 end
+
 
 function make_rgb_colors(; max_width=88)
     colors = ""
@@ -90,8 +88,6 @@ function make_rgb_colors(; max_width=88)
 
     return colors
 end
-
-
 
 
 print(

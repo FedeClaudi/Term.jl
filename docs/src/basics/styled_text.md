@@ -132,10 +132,10 @@ somehow.
 ```
 
 ```@meta
-CurrentModule = Term.style
+CurrentModule = Term.Style
 ```
 
-All of this is taken care of by `Term.style.apply_style` which extracts markup style information from your strings and replaces them with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text bewteen `{...}`) into a `Term.style.MarkupStyle` object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
+All of this is taken care of by `Term.Style.apply_style` which extracts markup style information from your strings and replaces them with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text bewteen `{...}`) into a `Term.Style.MarkupStyle` object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
 So in summary:
 
 ```julia
@@ -144,13 +144,13 @@ apply_style("{red}text{/red}")
 will return a string with style information
 
 ```@example
-import Term.style: apply_style  # hide
+import Term.Style: apply_style  # hide
 apply_style("{red}text{/red}") # hide
 ```
 
 which printed to the console looks like:
 ```@example
-import Term.style: apply_style  # hide
+import Term.Style: apply_style  # hide
 print(apply_style("{red}text{/red}")) # hide
 ```
 

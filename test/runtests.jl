@@ -18,27 +18,27 @@ tprint("{bold green}Running: '00_misc.jl' {/bold green}")
 tprint("{bold green}Running: '01_test_text_utils.jl' {/bold green}")
 @time @timeit_include("01_test_text_utils.jl")
 
- # ? 2 ansi
+# ? 2 ansi
 tprint("\n\n{bold green}Running: '02_test_ansi.jl' {/bold green}")  # ansi & col' {/bold green}")
-@time @timeit_include("02_test_ansi.jl")  
+@time @timeit_include("02_test_ansi.jl")
 
- # ? 3 measure
+# ? 3 measure
 tprint("\n\n{bold green}Running: '03_test_measure.jl' {/bold green}")
 @time @timeit_include("03_test_measure.jl")
 
- # ? 4 style
+# ? 4 style
 tprint("\n\n{bold green}Running: '04_test_style.jl' {/bold green}")
 @time @timeit_include("04_test_style.jl")
 
- # ? 5 macros
+# ? 5 macros
 tprint("\n\n{bold green}Running: '05_test_macros.jl' {/bold green}")
 @time @timeit_include("05_test_macros.jl")
 
- # ? 6a box
+# ? 6a box
 tprint("\n\n{bold green}Running: '6a_test_box.jl' {/bold green}")
 @time @timeit_include("6a_test_box.jl")
 
- # ? 6 renderables
+# ? 6 renderables
 tprint("\n\n{bold green}Running: '06_test_renderables.jl' {/bold green}")
 @time @timeit_include("06_test_renderables.jl")
 

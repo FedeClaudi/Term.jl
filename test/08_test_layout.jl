@@ -1,23 +1,40 @@
-import Term: RenderableText, Spacer, vLine, hLine, cleantext, textlen, chars, Panel, vstack
-import Term.renderables: Renderable
-import Term: center!, leftalign!, rightalign!, leftalign, center, rightalign, lvstack, cvstack, rvstack
-import Term.layout: pad
+import Term.Renderables: Renderable
+import Term.Layout: pad
+
+import Term:
+    RenderableText,
+    Spacer,
+    vLine,
+    hLine,
+    cleantext,
+    textlen,
+    chars,
+    Panel,
+    vstack,
+    center!,
+    leftalign!,
+    rightalign!,
+    leftalign,
+    center,
+    rightalign,
+    lvstack,
+    cvstack,
+    rvstack
 
 @testset "Layout - pad" begin
     @test pad("aaa", 20, :left) == "aaa                 "
     @test pad("aaa", 20, :right) == "                 aaa"
     @test pad("aaa", 20, :center) == "        aaa         "
     @test pad("aaa", 10, 20) == "          aaa                    "
-    
-    
-    p = Panel(; width=20, height=10)
-    pad!(p, 20, 20)   
+
+    p = Panel(; width = 20, height = 10)
+    pad!(p, 20, 20)
     @test p isa Panel
     @test p.measure.w == 60
     @test p.measure.h == 10
 
-    p = Panel(; width=20, height=10)
-    pad!(p; width=30)
+    p = Panel(; width = 20, height = 10)
+    pad!(p; width = 30)
     @test p isa Panel
     @test p.measure.w == 30
     @test p.measure.h == 10
@@ -32,14 +49,11 @@ end
     end
 end
 
-
-@testset  "\e[34mlayout - justification" begin
-    make_panels() = begin
-        return(
-            Panel(; width=5),
-            Panel(; width=10),
-            Panel(; width=15),
-        )
+@testset "\e[34mlayout - justification" begin
+    function make_panels()
+        begin
+            return (Panel(; width = 5), Panel(; width = 10), Panel(; width = 15))
+        end
     end
 
     # right justify
@@ -56,7 +70,6 @@ end
     @test p1 isa Panel
     @test p1.measure.w == p2.measure.w == p3.measure.w
 
-
     # right justify
     p1, p2, p3 = make_panels()
     leftalign!(p1, p2, p3)
@@ -68,25 +81,28 @@ end
     pp = lvstack(p1, p2, p3)
     @test pp isa Renderable
     @test pp.measure.w == 15
-    @test string(pp) == "\e[22m╭───╮\e[22m          \n\e[22m╰───╯\e[22m\e[0m          \n\e[22m╭────────╮\e[22m     \n\e[22m╰────────╯\e[22m\e[0m     \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
+    @test string(pp) ==
+        "\e[22m╭───╮\e[22m          \n\e[22m╰───╯\e[22m\e[0m          \n\e[22m╭────────╮\e[22m     \n\e[22m╰────────╯\e[22m\e[0m     \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
-    @test p1.measure.w  == 5
+    @test p1.measure.w == 5
 
     p1, p2, p3 = make_panels()
     pp = cvstack(p1, p2, p3)
     @test pp isa Renderable
     @test pp.measure.w == 15
-    @test string(pp) == "     \e[22m╭───╮\e[22m     \n     \e[22m╰───╯\e[22m\e[0m     \n  \e[22m╭────────╮\e[22m   \n  \e[22m╰────────╯\e[22m\e[0m   \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
+    @test string(pp) ==
+        "     \e[22m╭───╮\e[22m     \n     \e[22m╰───╯\e[22m\e[0m     \n  \e[22m╭────────╮\e[22m   \n  \e[22m╰────────╯\e[22m\e[0m   \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
-    @test p1.measure.w  == 5
+    @test p1.measure.w == 5
 
     p1, p2, p3 = make_panels()
     pp = rvstack(p1, p2, p3)
     @test pp isa Renderable
     @test pp.measure.w == 15
-    @test string(pp) == "          \e[22m╭───╮\e[22m\n          \e[22m╰───╯\e[22m\e[0m\n     \e[22m╭────────╮\e[22m\n     \e[22m╰────────╯\e[22m\e[0m\n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
+    @test string(pp) ==
+        "          \e[22m╭───╮\e[22m\n          \e[22m╰───╯\e[22m\e[0m\n     \e[22m╭────────╮\e[22m\n     \e[22m╰────────╯\e[22m\e[0m\n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
-    @test p1.measure.w  == 5
+    @test p1.measure.w == 5
 end
 
 @testset "\e[34mlayout - vLine " begin
@@ -102,14 +118,14 @@ end
         @test length(line.segments) == h
         @test line.measure.h == h
     end
-    line = vLine(5; style="red")
+    line = vLine(5; style = "red")
     @test line.segments[1].text == "\e[31m│\e[39m\e[0m"
 
     for box in (:MINIMAL_DOUBLE_HEAD, :DOUBLE, :ASCII, :DOUBLE_EDGE)
         @test vLine(22; box = box).measure.h == 22
     end
 
-    panel = Panel(; width=20, height=5)
+    panel = Panel(; width = 20, height = 5)
     @test length(vLine(panel).segments) == 5
     @test vLine().measure.h == displaysize(stdout)[1]
 end
@@ -132,18 +148,16 @@ end
         @test textlen(hLine(11, "ttl"; style = style).segments[1].text) == 11
     end
 
-    panel = Panel(; width=20, height=5)
+    panel = Panel(; width = 20, height = 5)
     @test hLine().measure.w == displaysize(stdout)[2]
     @test textlen(hLine(panel).segments[1].text) == 20
 end
-
 
 @testset "\e[34mlayout - stack strings" begin
     s1 = "."^50
     s2 = ".\n"^5 * "."
     @test s1 / s2 isa String
 end
-
 
 function testlayout(p, w, h)
     _p = string(p)
@@ -183,22 +197,20 @@ end
     h2 = vLine(33)
     @test (h1 * h2).measure.w == 2
     @test (h1 * h2).measure.h == 33
-
-
 end
-
 
 @testset "\e[34mlayout - panels" begin
     p1 = Panel()
-    p2 = Panel(; width=24, height=3)
-    p3 = Panel("this {red}panel{/red}"^5, width=12)
-    
-    testlayout(p1 * p2, 112, 3)
-    @test string(p1 * p2) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[22m╭──────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\e[22m│\e[22m                      \e[22m│\e[22m\n                                                                                        \e[22m╰──────────────────────╯\e[22m\e[0m"
+    p2 = Panel(; width = 24, height = 3)
+    p3 = Panel("this {red}panel{/red}"^5; width = 12)
 
+    testlayout(p1 * p2, 112, 3)
+    @test string(p1 * p2) ==
+        "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[22m╭──────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\e[22m│\e[22m                      \e[22m│\e[22m\n                                                                                        \e[22m╰──────────────────────╯\e[22m\e[0m"
 
     testlayout(p1 / p2, 88, 5)
-    @test string(p1 / p2) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\n\e[22m╭──────────────────────╮\e[22m                                                                \n\e[22m│\e[22m                      \e[22m│\e[22m                                                                \n\e[22m╰──────────────────────╯\e[22m\e[0m                                                                "
+    @test string(p1 / p2) ==
+        "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\n\e[22m╭──────────────────────╮\e[22m                                                                \n\e[22m│\e[22m                      \e[22m│\e[22m                                                                \n\e[22m╰──────────────────────╯\e[22m\e[0m                                                                "
 
     testlayout(p2 * p1, 112, 3)
     testlayout(p2 / p1, 88, 5)
@@ -206,5 +218,17 @@ end
     testlayout(p1 * p2 * p3, 124, 11)
     testlayout(p1 / p2 / p3, 88, 16)
     testlayout(p3 * p1 * p2, 124, 11)
-    testlayout(p3 / p1 / p2, 88, 16)     
+    testlayout(p3 / p1 / p2, 88, 16)
+end
+
+@testset "\e[34mlayout - placeholder" begin
+    ph = PlaceHolder(4, 2)
+    @test length(ph.segments) == 2
+    @test ph.measure.w == 4
+    @test ph.measure.h == 2
+
+    p = Panel(; width = 8, height = 4)
+    ph = PlaceHolder(p)
+    @test ph.measure.w == p.measure.w
+    @test ph.measure.h == p.measure.h
 end

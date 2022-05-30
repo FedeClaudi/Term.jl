@@ -6,7 +6,7 @@ The easiest starting point is a `Dict` object with the info we want
 to show in the tree
 """
 
-import Term.tree: Tree
+import Term: Tree
 
 data = Dict(
     "a" => 1,
