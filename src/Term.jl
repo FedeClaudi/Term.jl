@@ -35,6 +35,7 @@ include("logo.jl")
 include("introspection.jl")
 include("tables.jl")
 include("repr.jl")
+include("compositor.jl")
 
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine, pad, pad!, vstack, hstack
@@ -147,5 +148,7 @@ using .Introspection: inspect, typestree, expressiontree
 using .Repr: @with_repr, termshow, install_term_repr
 
 using .Tables: Table
+
+using .Compositors: Compositor
 
 end

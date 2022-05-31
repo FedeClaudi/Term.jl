@@ -383,30 +383,35 @@ end
 #                                   STACKING                                   #
 # ---------------------------------------------------------------------------- #
 
-vstack(s1::String, s2::String) = s1 * "\n" * s2
+vstack(s1::String, s2::String; pad::Int=0) = s1 * "\n"^(pad+1) * s2
 
 """ 
     vstack(renderables...)
 
 Vertically stack a variable number of renderables to give a new renderable
 """
-function vstack(renderables...)
+function vstack(renderables...; pad::Int=0)
     renderables = leftalign(renderables...)
 
-    segments::Vector{Segment} = vcat(getfield.(renderables, :segments)...)
+    segments::Vector{Segment} = []
+    if pad > 0
+        renderables  = foldl((a, b) -> a / ("\n"^pad) / b, renderables)
+        segments = renderables.segments
+    else
+        segments = vcat(getfield.(renderables, :segments)...)
+    end
     measure = Measure(segments)
-
     return Renderable(segments, measure)
 end
 
-vstack(renderables::Union{Vector,Tuple}) = vstack(renderables...)
+vstack(renderables::Union{Vector,Tuple}; kwargs...) = vstack(renderables...; kwargs...)
 
 """
     hstack(r1::RenderablesUnion, r2::RenderablesUnion)
 
 Horizontally stack two renderables to give a new renderable.
 """
-function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
+function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int=0)
     r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
     r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
 
@@ -418,16 +423,16 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion)
     # make sure both renderables have the same number of segments
     if h1 > h2
         s1 = r1.segments
-        s2 = vcat(r2.segments, [Segment(" "^(r2.measure.w)) for i in 1:(Δh)])
+        s2 = vcat(r2.segments, [Segment(" "^(r2.measure.w+pad)) for i in 1:(Δh)])
     elseif h1 < h2
-        s1 = vcat(r1.segments, [Segment(" "^(r1.measure.w)) for i in 1:(Δh)])
+        s1 = vcat(r1.segments, [Segment(" "^(r1.measure.w+pad)) for i in 1:(Δh)])
         s2 = r2.segments
     else
         s1, s2, = r1.segments, r2.segments
     end
 
     # combine segments
-    segments = [Segment(s1.text * s2.text) for (s1, s2) in zip(s1, s2)]
+    segments = [Segment(s1.text * " "^pad * s2.text) for (s1, s2) in zip(s1, s2)]
 
     return Renderable(
         segments,
@@ -440,16 +445,17 @@ end
 
 Horizonatlly stack a variable number of renderables.
 """
-function hstack(renderables...)
+function hstack(renderables...; pad::Int=0)
     renderable = Renderable()
 
-    for ren in renderables
-        renderable = hstack(renderable, ren)
+    for (i, ren) in enumerate(renderables)
+        _pad = i == 1 ? 0 : pad
+        renderable = hstack(renderable, ren; pad=_pad)
     end
     return renderable
 end
 
-hstack(renderables::Union{Vector,Tuple}) = hstack(renderables...)
+hstack(renderables::Union{Vector,Tuple}; kwargs...) = hstack(renderables...; kwargs...)
 
 # --------------------------------- operators -------------------------------- #
 
@@ -471,9 +477,9 @@ Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
 
 Left align renderables and then vertically stack.
 """
-function lvstack(renderables::RenderablesUnion...)::Renderable
+function lvstack(renderables::RenderablesUnion...; kwargs...)::Renderable
     renderables = leftalign(renderables...)
-    return vstack(renderables...)
+    return vstack(renderables...; kwargs...)
 end
 
 """
@@ -481,9 +487,9 @@ end
 
 Center align renderables and then vertically stack.
 """
-function cvstack(renderables::RenderablesUnion...)::Renderable
+function cvstack(renderables::RenderablesUnion...; kwargs...)::Renderable
     renderables = center(renderables...)
-    return vstack(renderables...)
+    return vstack(renderables...; kwargs...)
 end
 
 """
@@ -491,14 +497,14 @@ end
 
 Right align renderables and then vertically stack.
 """
-function rvstack(renderables::RenderablesUnion...)::Renderable
+function rvstack(renderables::RenderablesUnion...; kwargs...)::Renderable
     renderables = rightalign(renderables...)
-    return vstack(renderables...)
+    return vstack(renderables...; kwargs...)
 end
 
-rvstack(renderables::Union{Tuple,Vector}) = rvstack(renderables...)
-cvstack(renderables::Union{Tuple,Vector}) = cvstack(renderables...)
-lvstack(renderables::Union{Tuple,Vector}) = lvstack(renderables...)
+rvstack(renderables::Union{Tuple,Vector}; kwargs...) = rvstack(renderables...; kwargs...)
+cvstack(renderables::Union{Tuple,Vector}; kwargs...) = cvstack(renderables...; kwargs...)
+lvstack(renderables::Union{Tuple,Vector}; kwargs...) = lvstack(renderables...; kwargs...)
 
 # ---------------------------------------------------------------------------- #
 #                                LINES & SPACER                                #
