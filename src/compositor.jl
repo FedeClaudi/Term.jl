@@ -24,21 +24,9 @@ end
     elements::Dict{Symbol, LayoutElement}
 end
 
-function renderable_or_placeholder(s, w, h, c; kwargs...)
-    ren = get(kwargs, s, nothing)
-    if isnothing(ren)
-        ren = PlaceHolder(
-            w, h; style=c, text=string(s), 
-        ) 
-    else
-        ren = ren isa AbstractRenderable ? ren : RenderableText(ren)
-        msg = "While creating a Compository layout, the layout element"
 
-        @assert ren.measure.w == w highlight(msg * " :$s has width $w but the renderable passed has width $(ren.measure.w)")
-        @assert ren.measure.h == h highlight(msg * " :$s has height $h but the renderable passed has height $(ren.measure.h)")
-    end
-    return ren
-end
+
+
 
 function Compositor(layout::Expr; hpad::Int=0, vpad::Int=0, kwargs...)
     # get elements names and sizes
@@ -72,6 +60,11 @@ function Compositor(layout::Expr; hpad::Int=0, vpad::Int=0, kwargs...)
 end
 
 
+
+
+# ---------------------------------------------------------------------------- #
+#                                   rendering                                  #
+# ---------------------------------------------------------------------------- #
 function render(compositor::Compositor)
     # evaluate compositor
     elements = getfield.(values(compositor.elements), :id)
