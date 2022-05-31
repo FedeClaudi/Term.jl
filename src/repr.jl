@@ -251,7 +251,7 @@ end
 function install_term_repr()
     @eval begin
         import Term: termshow
-        
+
         function Base.show(io::IO, ::MIME"text/plain", num::Number)
             return tprint(io, string(num); highlight = true)
         end

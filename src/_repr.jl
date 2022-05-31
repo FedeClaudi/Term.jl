@@ -81,13 +81,12 @@ function vec2content(vec::Union{Tuple,AbstractVector})
     vec_items = vec_elems2renderables(vec, N, max_w)
     counts = "(" .* string.(1:N) .* ")"
 
-
     content = Table(
-        [counts vec_items]; 
-        show_header=false, 
-        columns_justify=[:right, :left], 
-        columns_style=["dim", "default"], 
-        box=:NONE
+        [counts vec_items];
+        show_header = false,
+        columns_justify = [:right, :left],
+        columns_style = ["dim", "default"],
+        box = :NONE,
     )
 
     # content = rvstack(counts...) * Spacer(3, length(counts)) * cvstack(vec_items)

@@ -251,7 +251,8 @@ end
     @test ph.measure.h == 2
     @test string(ph) == "\e[2m╲ ╲ \e[22m\n\e[2m ╲ ╲\e[22m"
 
-    @test string(PlaceHolder(25, 12)) == "\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m"
+    @test string(PlaceHolder(25, 12)) ==
+          "\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m"
 
     p = Panel(; width = 8, height = 4)
     ph = PlaceHolder(p)
@@ -259,14 +260,24 @@ end
     @test ph.measure.h == p.measure.h
 end
 
-
 @testset "Layout - h/vstack with pad" begin
     p1, p2, p3 = PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6)
 
-    @test string(hstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad=10)) == "\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m          \e[2m ╲ ╲ \e[22m          \e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m          \e[2m ╲ ╲ \e[22m          \e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n                              \e[2m ╲ \e[22m"
-    @test string(hstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad=0)) == "\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\e[2m ╲ ╲ \e[22m\e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\e[2m ╲ ╲ \e[22m\e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n          \e[2m ╲ \e[22m"
+    @test string(
+        hstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad = 10),
+    ) ==
+          "\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m          \e[2m ╲ ╲ \e[22m          \e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m          \e[2m ╲ ╲ \e[22m          \e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n                              \e[2m ╲ \e[22m"
+    @test string(
+        hstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad = 0),
+    ) ==
+          "\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\e[2m ╲ ╲ \e[22m\e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\e[2m ╲ ╲ \e[22m\e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n          \e[2m ╲ \e[22m"
 
-    @test string(vstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad=0)) == "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
-    @test string(vstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad=3)) == "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
-    
+    @test string(
+        vstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad = 0),
+    ) ==
+          "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
+    @test string(
+        vstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad = 3),
+    ) ==
+          "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
 end

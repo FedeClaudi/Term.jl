@@ -24,13 +24,13 @@ abstract type AbstractRenderable end
 
 Measure(renderable::AbstractRenderable) = renderable.measure
 
-info(r::AbstractRenderable)::String = "\e[38;5;117m$(typeof(r)) <: AbstractRenderable\e[0m \e[2m(w:$(r.measure.w), h:$(r.measure.h))\e[0m",
+info(r::AbstractRenderable)::String =
+    "\e[38;5;117m$(typeof(r)) <: AbstractRenderable\e[0m \e[2m(w:$(r.measure.w), h:$(r.measure.h))\e[0m",
+    """
+        Base.string(r::AbstractRenderable)::String
 
-"""
-    Base.string(r::AbstractRenderable)::String
-
-Creates a string representation of a renderable
-"""
+    Creates a string representation of a renderable
+    """
 function Base.string(r::AbstractRenderable)::String
     lines = [seg.text for seg in r.segments]
     return join(lines, "\n")

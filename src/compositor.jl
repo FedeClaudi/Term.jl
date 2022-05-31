@@ -3,6 +3,7 @@ module Compositors
 import MyterialColors: Palette, blue, pink
 
 using ..Layout
+import ..Layout: PlaceHolder
 import ..Measures: width, height
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Repr: @with_repr, termshow
@@ -10,57 +11,97 @@ import Term: highlight
 
 export Compositor
 
-
 include("_compositor.jl")
 
 @with_repr mutable struct LayoutElement
     id::Symbol
     w::Int
     h::Int
-    renderable::Union{String, AbstractRenderable}
+    renderable::Union{String,AbstractRenderable}
 end
 @with_repr mutable struct Compositor
     layout::Expr
-    elements::Dict{Symbol, LayoutElement}
+    elements::Dict{Symbol,LayoutElement}
 end
 
+function parse_single_element_layout(expr::Expr)
+    s, w, h = expr.args
+    [:($s($w, $h))]
+end
 
-
-
-
-function Compositor(layout::Expr; hpad::Int=0, vpad::Int=0, kwargs...)
+function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     # get elements names and sizes
     elements = collect_elements(layout)
+    elements = elements isa Expr ? parse_single_element_layout(elements) : elements
 
     # create renderables
     if length(elements) > 1
-        colors = getfield.(Palette(blue, pink; N=length(elements)).colors, :string)
+        colors = getfield.(Palette(blue, pink; N = length(elements)).colors, :string)
     else
         colors = [pink]
     end
     renderables = Dict(
-            s.args[1]=>renderable_or_placeholder(s.args..., c; kwargs...)
-            for (c,s) in zip(colors, elements)
+        s.args[1] => renderable_or_placeholder(s.args..., c; kwargs...) for
+        (c, s) in zip(colors, elements)
     )
 
     # craete layout elements
     layout_elements = Dict(
-        s.args[1] => LayoutElement(
-            s.args[1], s.args[2], s.args[3], renderables[s.args[1]],
-        ) for s in elements
+        s.args[1] =>
+            LayoutElement(s.args[1], s.args[2], s.args[3], renderables[s.args[1]]) for
+        s in elements
     )
 
     # edit layout expression to add padding and remove size info
     expr = string(clean_layout_expr(layout))
-    expr = replace(expr, "*" => "* Spacer($hpad, 1) * ")
-    expr = replace(expr, "/" => "/ Spacer(1, $vpad) / ")
+
+    if hpad > 0
+        expr = replace(expr, "*" => "* Spacer($hpad, 1) * ")
+    end
+
+    if vpad > 0
+        expr = replace(expr, "/" => "/ Spacer(1, $vpad) / ")
+    end
     expr = Meta.parse(expr)
+
+    # handle the edge case with a single element
+    expr = expr isa Expr ? expr : Expr(:call, expr)
 
     return Compositor(expr, layout_elements)
 end
 
+# ---------------------------------- update ---------------------------------- #
+function update!(
+    compositor::Compositor,
+    id::Symbol,
+    content::Union{String,AbstractRenderable},
+)
+    # check that the id is valid
+    haskey(compositor.elements, id) || begin
+        @warn highlight("Could not update compsitor - id: `$id` is not in the layout")
+        return
+    end
 
+    # check that the shapes match
+    elem = compositor.elements[id]
 
+    elem.w == width(content) || begin
+        @warn highlight(
+            "Could not update compositor element `$id` - width mismatch $(width(content)) instead of $(elem.w)",
+        )
+        return
+    end
+
+    elem.h == height(content) || begin
+        @warn highlight(
+            "Could not update compositor element `$id` - height mismatch $(height(content)) instead of $(elem.h)",
+        )
+        return
+    end
+
+    # update content
+    compositor.elements[id].renderable = content
+end
 
 # ---------------------------------------------------------------------------- #
 #                                   rendering                                  #
@@ -69,8 +110,9 @@ function render(compositor::Compositor)
     # evaluate compositor
     elements = getfield.(values(compositor.elements), :id)
     renderables = getfield.(values(compositor.elements), :renderable)
+    length(renderables) == 1 && return renderables[1]
 
-    components = Dict(e => r for (e,r) in zip(elements, renderables))
+    components = Dict(e => r for (e, r) in zip(elements, renderables))
     ex = interpolate_from_dict(compositor.layout, components)
 
     # insert padding
@@ -82,9 +124,5 @@ Base.string(compositor::Compositor) = string(render(compositor))
 function Base.print(io::IO, compositor::Compositor; highlight = true)
     return println(io, string(compositor))
 end
-
-
-
-
 
 end

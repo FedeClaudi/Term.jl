@@ -383,19 +383,19 @@ end
 #                                   STACKING                                   #
 # ---------------------------------------------------------------------------- #
 
-vstack(s1::String, s2::String; pad::Int=0) = s1 * "\n"^(pad+1) * s2
+vstack(s1::String, s2::String; pad::Int = 0) = s1 * "\n"^(pad + 1) * s2
 
 """ 
     vstack(renderables...)
 
 Vertically stack a variable number of renderables to give a new renderable
 """
-function vstack(renderables...; pad::Int=0)
+function vstack(renderables...; pad::Int = 0)
     renderables = leftalign(renderables...)
 
     segments::Vector{Segment} = []
     if pad > 0
-        renderables  = foldl((a, b) -> a / ("\n"^pad) / b, renderables)
+        renderables = foldl((a, b) -> a / ("\n"^pad) / b, renderables)
         segments = renderables.segments
     else
         segments = vcat(getfield.(renderables, :segments)...)
@@ -411,7 +411,7 @@ vstack(renderables::Union{Vector,Tuple}; kwargs...) = vstack(renderables...; kwa
 
 Horizontally stack two renderables to give a new renderable.
 """
-function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int=0)
+function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     r1 = r1 isa AbstractRenderable ? r1 : Renderable(r1)
     r2 = r2 isa AbstractRenderable ? r2 : Renderable(r2)
 
@@ -423,9 +423,9 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int=0)
     # make sure both renderables have the same number of segments
     if h1 > h2
         s1 = r1.segments
-        s2 = vcat(r2.segments, [Segment(" "^(r2.measure.w+pad)) for i in 1:(Δh)])
+        s2 = vcat(r2.segments, [Segment(" "^(r2.measure.w + pad)) for i in 1:(Δh)])
     elseif h1 < h2
-        s1 = vcat(r1.segments, [Segment(" "^(r1.measure.w+pad)) for i in 1:(Δh)])
+        s1 = vcat(r1.segments, [Segment(" "^(r1.measure.w + pad)) for i in 1:(Δh)])
         s2 = r2.segments
     else
         s1, s2, = r1.segments, r2.segments
@@ -445,12 +445,12 @@ end
 
 Horizonatlly stack a variable number of renderables.
 """
-function hstack(renderables...; pad::Int=0)
+function hstack(renderables...; pad::Int = 0)
     renderable = Renderable()
 
     for (i, ren) in enumerate(renderables)
         _pad = i == 1 ? 0 : pad
-        renderable = hstack(renderable, ren; pad=_pad)
+        renderable = hstack(renderable, ren; pad = _pad)
     end
     return renderable
 end
@@ -682,39 +682,43 @@ mutable struct PlaceHolder <: AbstractLayoutElement
     measure::Measure
 end
 
-
 function place_holder_line(w, i)
     if w > 1
         if w % 2 == 0
             left, right = w ÷ 2, w ÷ 2
-            line = i == 0 ? "╲ "^(left) : " ╲"^(right)   
+            line = i == 0 ? "╲ "^(left) : " ╲"^(right)
         else
-            left = cint(w/2)
-            line = i == 0 ? "╲ "^(left) : " ╲"^(left)  
+            left = cint(w / 2)
+            line = i == 0 ? "╲ "^(left) : " ╲"^(left)
             line = ltrim_str(line, w)
         end
 
     else
-        line = i == 0 ? "╲" : " "  
+        line = i == 0 ? "╲" : " "
     end
     return line
 end
 
-function PlaceHolder(w::Int, h::Int; style::String="dim", text::Union{Nothing, String} = nothing)
+function PlaceHolder(
+    w::Int,
+    h::Int;
+    style::String = "dim",
+    text::Union{Nothing,String} = nothing,
+)
     # create lines of renderable
     b1 = place_holder_line(w, 0)
     b2 = place_holder_line(w, 1)
     lines::Vector{Segment} = map(i -> Segment(i % 2 != 0 ? b1 : b2, style), 1:h)
 
     # insert renderable size at center
-    text = isnothing(text) ?  "($w × $h)" : text
+    text = isnothing(text) ? "($w × $h)" : text
     text = "  " * text * "  "
     text = width(text) % 2 == 0 ? " " * text : text
     l = width(text)
 
     if l < (w / 2) && w > 13
         f = w < 30 ? 2.5 : 3
-        _w = cint(ncodeunits(lines[1].text)/f) 
+        _w = cint(ncodeunits(lines[1].text) / f)
         _l = cint(l / 2)
 
         original = lines[cint(h / 2)].text
