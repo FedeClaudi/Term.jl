@@ -10,11 +10,12 @@ import Term:
     term_theme
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack
-import ..Renderables: RenderableText
+import ..Renderables: RenderableText, info, AbstractRenderable
 import ..Console: console_width
 import ..Panels: Panel, TextBox
 import ..Style: apply_style
 import ..Tprint: tprint
+import ..Tables: Table
 
 export @with_repr, termshow, install_term_repr
 
@@ -271,6 +272,10 @@ function install_term_repr()
 
         function Base.show(io::IO, ::MIME"text/plain", fun::Function)
             return termshow(io, fun)
+        end
+
+        function Base.show(io::IO, ::MIME"text/plain", expr::Expr)
+            return termshow(io, expr)
         end
     end
 end

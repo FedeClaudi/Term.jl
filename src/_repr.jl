@@ -39,11 +39,11 @@ function repr_panel(obj, content, subtitle; width = 40, kwargs...)
 end
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w)
-    shortsting(x) = truncate(string(x), max_w)
-    out = RenderableText.(highlight.(shortsting.(v[1:N])))
+    shortsting(x) = x isa AbstractRenderable ? info(x) : truncate(string(x), max_w)
+    out = highlight.(shortsting.(v[1:N]))
 
-    length(v) > N && push!(out, RenderableText("⋮";))
-    return cvstack(out...)
+    length(v) > N && push!(out, "⋮";)
+    return out
 end
 
 function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 100, max_D = 10)
@@ -79,8 +79,17 @@ function vec2content(vec::Union{Tuple,AbstractVector})
     end
 
     vec_items = vec_elems2renderables(vec, N, max_w)
-    counts = RenderableText.("(" .* string.(1:N) .* ")"; style = "dim")
+    counts = "(" .* string.(1:N) .* ")"
 
-    content = rvstack(counts...) * Spacer(3, length(counts)) * cvstack(vec_items)
+
+    content = Table(
+        [counts vec_items]; 
+        show_header=false, 
+        columns_justify=[:right, :left], 
+        columns_style=["dim", "default"], 
+        box=:NONE
+    )
+
+    # content = rvstack(counts...) * Spacer(3, length(counts)) * cvstack(vec_items)
     return content
 end

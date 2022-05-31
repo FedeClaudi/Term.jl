@@ -33,8 +33,8 @@ include("trees.jl")
 include("dendograms.jl")
 include("logo.jl")
 include("introspection.jl")
-include("repr.jl")
 include("tables.jl")
+include("repr.jl")
 
 export RenderableText, Panel, TextBox
 export Spacer, vLine, hLine, pad, pad!, vstack, hstack
@@ -54,9 +54,6 @@ export rightalign!,
     lvstack,
     cvstack,
     rvstack,
-    ←,
-    ↓,
-    →,
     leftalign,
     center,
     rightalign,

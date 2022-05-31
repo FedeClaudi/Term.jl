@@ -280,7 +280,7 @@ function inspect(
         constructors_panel,
         hLine(width; style = "blue dim"),
         methods_panel;
-        title = "$(typeof(type)): [bold]$(info.name)" * _title,
+        title = "$(typeof(type)): {bold}$(info.name){/bold}" * _title,
         title_style = "red",
         style = "blue",
         width = width,

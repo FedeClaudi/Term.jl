@@ -2,7 +2,7 @@ module Layout
 
 import Parameters: @with_kw
 
-import Term: int, get_lr_widths, textlen, cint, rtrim_str, ltrim_str, calc_nrows_ncols
+import Term: int, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, calc_nrows_ncols
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..Console: console_width, console_height
 import ..Boxes: get_lrow, get_rrow
@@ -676,28 +676,48 @@ mutable struct PlaceHolder <: AbstractLayoutElement
     measure::Measure
 end
 
-function PlaceHolder(w::Int, h::Int)
+
+function place_holder_line(w, i)
+    if w > 1
+        if w % 2 == 0
+            left, right = w ÷ 2, w ÷ 2
+            line = i == 0 ? "╲ "^(left) : " ╲"^(right)   
+        else
+            left = cint(w/2)
+            line = i == 0 ? "╲ "^(left) : " ╲"^(left)  
+            line = ltrim_str(line, w)
+        end
+
+    else
+        line = i == 0 ? "╲" : " "  
+    end
+    return line
+end
+
+function PlaceHolder(w::Int, h::Int; style::String="dim", text::Union{Nothing, String} = nothing)
     # create lines of renderable
-    b1 = "╲ "^(w ÷ 2)
-    b2 = " ╲"^(w ÷ 2)
-    lines::Vector{Segment} = map(i -> Segment(i % 2 == 0 ? b1 : b2, "dim"), 1:h)
+    b1 = place_holder_line(w, 0)
+    b2 = place_holder_line(w, 1)
+    lines::Vector{Segment} = map(i -> Segment(i % 2 != 0 ? b1 : b2, style), 1:h)
 
     # insert renderable size at center
-    txt = "($w × $h)"
-    txt = length(txt) % 2 == 0 ? " " * txt : txt
-    l = textwidth(txt)
+    text = isnothing(text) ?  "($w × $h)" : text
+    text = "  " * text * "  "
+    text = width(text) % 2 == 0 ? " " * text : text
+    l = width(text)
 
-    if l < (w / 2)
-        _w = cint(w / 2)
+    if l < (w / 2) && w > 13
+        f = w < 30 ? 2.5 : 3
+        _w = cint(ncodeunits(lines[1].text)/f) 
         _l = cint(l / 2)
 
         original = lines[cint(h / 2)].text
         lines[cint(h / 2)] = Segment(
-            ltrim_str(original, _w - _l + 3) *
+            ltrim_str(original, _w - _l) *
             "{default bold white}" *
-            txt *
+            text *
             "{/default bold white}" *
-            rtrim_str(original, _w + _l + 3),
+            rtrim_str(original, _w + _l),
         )
     end
 
