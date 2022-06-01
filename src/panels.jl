@@ -1,14 +1,16 @@
 module Panels
 
 import Term:
-    split_lines, reshape_text, do_by_line, join_lines, truncate, textlen, fillin, do_by_line
+    split_lines, reshape_text, do_by_line, join_lines, truncate, textlen, fillin, do_by_line, ltrim_str
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Console: console_width, console_height
-import ..Layout: pad, vstack, Padding
+import ..Layout: pad, vstack, Padding, lvstack
 import ..Style: apply_style
 import ..Segments: Segment
 import ..Measures: Measure
+import ..Measures: height as get_height
+import ..Measures: width as get_width
 using ..Boxes
 
 export Panel, TextBox
@@ -29,8 +31,10 @@ abstract type AbstractPanel <: AbstractRenderable end
 mutable struct Panel <: AbstractPanel
     segments::Vector
     measure::Measure
+
     function Panel(x1, x2; kwargs...)
         # this is necessary to handle the special case in which 2 objs are passed
+        # but they are not segments/measure
         if x1 isa Vector
             return new(x1, x2)
         else
@@ -39,22 +43,217 @@ mutable struct Panel <: AbstractPanel
     end
 end
 
+
+
+
+"""
+    Panel(; 
+        fit::Symbol=:nofit,
+        width::Int = 88,
+        height::Union{Nothing,Int} = nothing, 
+        kwargs...
+    )
+
+Construct a `Panel` with no content.
+
+# Examples
+julia> Panel(; width=10, height=5)
+╭────────╮
+│        │
+│        │
+│        │
+╰────────╯
+"""
+function Panel(;
+    fit::Bool = false,
+    width::Int = 88,
+    height::Int = 2,
+    padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
+    kwargs...,
+)
+    # get panel measure
+    if fit
+        # hardcoded size of empty 'fitted' panel
+        panel_measure = Measure(3, 2)
+    else
+        panel_measure = Measure(width, height)
+    end
+
+    # get empty content measure
+    content = ""
+    content_measure = Measure(0, 0)
+
+    # get padding
+    padding = padding isa Padding ? padding : Padding(padding...)
+
+    # make panel
+    return Panel(
+        content;
+        panel_measure = panel_measure,
+        content_measure = content_measure,
+        Δw = padding.left + padding.right + 2,
+        Δh = padding.top + padding.bottom,
+        height=height, width=width,
+        padding = padding,
+        kwargs...,
+    )
+end
+
 """
     Panel(
-            style::String,
-            title_style::String,
-            title_justify::Symbol,
-            subtitle::String,
-            subtitle_style::String,
-            subtitle_justify::String,
-            panel_measure::Measure,
-            content_measure::Measure,
-            Δw::Int,
-            Δh::Int,
-            padding::Padding
+        content::Union{AbstractString,AbstractRenderable},
+        ::Val{true},
+        padding::Padding;
+        kwargs...
         )
 
-Construct a `Panel` given all required info.
+Construct a `Panel` fitting with content.
+"""
+function Panel(
+    content::Union{AbstractString,AbstractRenderable},
+    ::Val{true},
+    padding::Padding;
+    kwargs...
+    )
+    content = content isa AbstractRenderable ? content : RenderableText(content)
+
+    content_measure = content.measure
+    panel_measure = Measure(
+        content_measure.w + padding.left + padding.right + 2,
+        content_measure.h + padding.top + padding.bottom
+    )
+    Δw = padding.left + padding.right + 2
+    Δh = padding.top + padding.bottom
+
+    return render(content;
+        panel_measure=panel_measure,
+        content_measure=content_measure,
+        Δw=Δw, 
+        Δh=Δh, 
+        padding=padding,
+        kwargs...
+    )
+
+end
+
+function Panel(
+    content::Union{AbstractString,AbstractRenderable},
+    ::Val{false},
+    padding::Padding;
+    width::Int = 88,
+    height::Union{Nothing,Int} = nothing,
+    kwargs...
+    )
+    
+    Δw = padding.left + padding.right + 2
+    Δh = padding.top + padding.bottom + 1
+
+    height = isnothing(height) ? get_height(content) + Δh  : height
+    panel_measure = Measure(width, height)
+
+    # if the content is too large, resize it to fit the panel's width.
+    if get_width(content) > width - Δw + 1
+        if content isa AbstractString
+            # @info "reshaping" content
+            content = reshape_text(content, width - Δw)
+        else
+            segments = lvstack(map(s -> 
+            ltrim_str(s.text, width - Δw), 
+            content.segments)).segments
+            # @info "RESHAPEEEE"
+            
+            content = Renderable(segments, Measure(segments))
+        end
+    end
+    content = content isa AbstractRenderable ? content : RenderableText(content)
+
+    # if the content is too tall, exclude some lines
+    if content.measure.h > height - Δh - 1
+        # @info "truncating" content.measure  height - Δh - 1
+        segments = [
+            content.segments[1:height-Δh-3]...
+            Segment("... content omitted ...", "dim")
+        ]
+
+        content = Renderable(
+            segments, Measure(segments)
+        )
+    end
+    return render(content;
+        panel_measure=panel_measure, 
+        content_measure=content.measure,
+        Δw=Δw, 
+        Δh=Δh, 
+        padding=padding,
+        kwargs...
+    )
+end
+
+
+"""
+    Panel(
+        content::Union{AbstractString,AbstractRenderable};
+        width::Int = 88,
+        height::Union{Nothing,Int} = nothing,
+        fit::Bool=false,
+        padding::Union{Padding, NTuple} = Padding(2, 2, 0, 0),
+        kwargs...
+    )
+
+Construct a `Panel` around of a `AbstractRenderable`
+"""
+function Panel(
+    content::Union{AbstractString,AbstractRenderable};
+    fit::Bool = false,
+    padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+    kwargs...,
+) 
+    padding = padding isa Padding ? padding : Padding(padding...)
+    isfit = fit ? Val(true) : Val(false)
+    return Panel(content, isfit, padding; kwargs...)
+end
+
+
+
+"""
+    Panel(renderables; kwargs...)
+
+`Panel` constructor for creating a panel out of multiple renderables at once.
+"""
+function Panel(renderables::Vector{RenderablesUnion}; kwargs...)
+    return Panel(vstack(renderables...); kwargs...)
+end
+
+Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
+
+Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
+
+
+
+
+
+# ---------------------------------- render ---------------------------------- #
+
+"""
+    render(
+        content;
+        box::Symbol = :ROUNDED,
+        style::String = "default",
+        title::Union{String,Nothing} = nothing,
+        title_style::Union{Nothing,String} = nothing,
+        title_justify::Symbol = :left,
+        subtitle::Union{String,Nothing} = nothing,
+        subtitle_style::Union{Nothing,String} = nothing,
+        subtitle_justify::Symbol = :left,
+        justify::Symbol = :left,
+        panel_measure::Measure,
+        content_measure::Measure,
+        Δw::Int,
+        Δh::Int,
+        padding::Padding,
+    )::Panel
+
+Construct a `Panel`'s content.
 """
 function render(
     content;
@@ -72,6 +271,7 @@ function render(
     Δw::Int,
     Δh::Int,
     padding::Padding,
+    kwargs...
 )::Panel
 
     # create top/bottom rows with titles
@@ -113,8 +313,8 @@ function render(
     end
 
     # check if we need extra lines at the bottom to reach target height
-    if content_measure.h < panel_measure.h - 2 - Δh
-        n_extra = panel_measure.h - 2 - content_measure.h
+    if content_measure.h < panel_measure.h - Δh - 2
+        n_extra = panel_measure.h - content_measure.h - Δh - 2
     else
         n_extra = 0
     end
@@ -140,242 +340,13 @@ function render(
     return Panel(segments, panel_measure)
 end
 
-"""
-    Panel(; 
-        fit::Symbol=:nofit,
-        width::Int = 88,
-        height::Union{Nothing,Int} = nothing, 
-        kwargs...
-    )
-
-Construct a `Panel` with no content
-"""
-function Panel(;
-    fit::Bool = false,
-    width::Int = 88,
-    height::Int = 2,
-    padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
-    kwargs...,
-)
-    # get panel measure
-    if fit
-        # hardcoded size of empty 'fitted' panel
-        panel_measure = Measure(3, 2)
-    else
-        panel_measure = Measure(width, height)
-    end
-
-    # get empty content measure
-    content = ""
-    content_measure = Measure(0, 0)
-
-    # get padding
-    padding = padding isa Padding ? padding : Padding(padding...)
-
-    # make panel
-    return Panel(
-        content;
-        panel_measure = panel_measure,
-        content_measure = content_measure,
-        Δw = padding.left + padding.right + 2,
-        Δh = padding.top + padding.bottom,
-        padding = padding,
-        kwargs...,
-    )
-end
-
-"""
-    Panel(
-        content::AbstractRenderable;
-        width::Int = 88,
-        height::Union{Nothing,Int} = nothing,
-        fit::Bool=false,
-        padding::Union{Padding, NTuple} = Padding(2, 2, 0, 0),
-        kwargs...
-    )
-
-Construct a `Panel` around of a `AbstractRenderable`
-"""
-function Panel(
-    content::Union{AbstractString,AbstractRenderable};
-    width::Int = 88,
-    height::Union{Nothing,Int} = nothing,
-    fit::Bool = false,
-    padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
-    kwargs...,
-)
-    content = content isa RenderableText ? apply_style(string(content)) : content
-
-    # get measure
-    WIDTH = console_width(stdout)
-    padding = padding isa Padding ? padding : Padding(padding...)
-    Δw = padding.left + padding.right + 2
-    Δh = padding.top + padding.bottom
-
-    # define convenience function
-    function resize_content(content, _width)
-        if content isa AbstractString
-            content = reshape_text(content, _width)
-        end
-        return content, Measure(content)
-    end
-
-    # get measure of panel's box and optionally resize text.
-    content_measure = Measure(content)
-    if fit
-        # if content width too large, resize content if its text renderable
-        if content_measure.w > WIDTH - Δw
-            content, content_measure = resize_content(content, WIDTH - Δw)
-            panel_measure = Measure(WIDTH, content_measure.h + Δh + 2)
-        else
-            panel_measure = Measure(content_measure.w + Δw, content_measure.h + Δh + 2)
-        end
-    end
-
-    if !fit
-        # check that the content fits within the given width
-        if content isa AbstractString
-            width = min(width, WIDTH)
-            if content_measure.w > width - Δw
-                content, content_measure = resize_content(content, width - Δw)
-            end
-        else
-            # if width too small for content, try to enlarge
-            width = if width < content_measure.w + Δw
-                min(content_measure.w + Δw, WIDTH - Δw)
-            else
-                width
-            end
-        end
-
-        # get target height
-        _h = content_measure.h + Δh + 2
-        height = isnothing(height) ? _h : max(height, _h)
-        panel_measure = Measure(width, height)
-    end
-
-    return render(
-        Renderable(content);
-        panel_measure = panel_measure,
-        content_measure = content_measure,
-        Δw = Δw,
-        Δh = Δh,
-        padding = padding,
-        kwargs...,
-    )
-end
-
-"""
-    Panel(renderables; kwargs...)
-
-`Panel` constructor for creating a panel out of multiple renderables at once.
-"""
-function Panel(renderables::Vector{RenderablesUnion}; kwargs...)
-    return Panel(vstack(renderables...); kwargs...)
-end
-Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
-Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
-
 # ---------------------------------------------------------------------------- #
 #                                    TextBox                                   #
 # ---------------------------------------------------------------------------- #
 
-"""
-    TextBox
-
-Creates a `Panel` and fits input text to it.
-The pannel is hidden so that the result is just a text box.
-"""
-mutable struct TextBox <: AbstractPanel
-    segments::Vector
-    measure::Measure
+function TextBox(args...; kwargs...)
+    box = get(kwargs, :box, :NONE)
+    return Panel(args...; box=box, kwargs...)
 end
-
-"""
-    TextBox(
-        text::Union{Vector, AbstractString};
-        width::Union{Nothing, Int}=nothing,
-        title::Union{Nothing, String}=nothing,
-        title_style::Union{String, Nothing}="default",
-        title_justify::Symbol=:left,
-        subtitle::Union{String, Nothing}=nothing,
-        subtitle_style::Union{String, Nothing}="default",
-        subtitle_justify::Symbol=:left,
-        justify::Symbol=:left,
-        fit::Symbol=:fit,
-        )
-
-Creates an hidden `Panel` with `text` in it.
-
-If a `width` is passed, the input `text` is reshaped to have
-that size, unless `fit=:truncate` in which case it's cut to size.
-If no `width` is passed and `fit=true` the `TextBox`'s size
-matches the size of the input `text`.
-Other arguments behave like `Panel`.
-
-See also [`Panel`](@ref).
-"""
-function TextBox(
-    text::Union{AbstractString};
-    width::Int = 88,
-    title::Union{Nothing,String} = nothing,
-    title_style::Union{String,Nothing} = "default",
-    title_justify::Symbol = :left,
-    subtitle::Union{String,Nothing} = nothing,
-    subtitle_style::Union{String,Nothing} = "default",
-    subtitle_justify::Symbol = :left,
-    justify::Symbol = :left,
-    fit::Union{Bool,Symbol} = :nofit,
-    padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
-)
-    padding = padding isa Padding ? padding : Padding(padding...)
-    Δw = padding.left + padding.right
-
-    text = apply_style(text)
-
-    # fit text or get width
-    fit = fit == true ? :fit : (fit == false ? :nofit : fit)
-
-    if fit == :fit
-        # the box's size depends on the text's size
-        width = Measure(text).w + Δw + 2
-
-        # too large, fit to console
-        if width > console_width(stdout)
-            width = console_width(stdout)
-            fit = true
-        end
-    else
-        width = width > console_width(stdout) ? console_width(stdout) - Δw : width
-    end
-
-    # truncate or reshape text
-    if fit == :truncate
-        # truncate the text to fit the given width
-        text = do_by_line(ln -> truncate(ln, width - 7), apply_style(text))
-        # else
-        #     text = reshape_text(text, width-Δw-2)
-    end
-
-    # create panel with text inside
-    panel = Panel(
-        text;
-        style = "hidden",
-        title = title,
-        title_style = title_style,
-        title_justify = title_justify,
-        subtitle = subtitle,
-        subtitle_style = subtitle_style,
-        subtitle_justify = subtitle_justify,
-        justify = justify,
-        width = width,
-        fit = false,
-        padding = padding,
-    )
-
-    return TextBox(panel.segments, Measure(panel.measure.w, panel.measure.h))
-end
-
-TextBox(texts...; kwargs...) = TextBox(join_lines(texts...); kwargs...)
 
 end
