@@ -17,7 +17,8 @@ include("_compositor.jl")
     id::Symbol
     w::Int
     h::Int
-    renderable::Union{String,AbstractRenderable}
+    renderable::Union{Nothing, String, AbstractRenderable}
+    placeholder::PlaceHolder
 end
 @with_repr mutable struct Compositor
     layout::Expr
@@ -41,14 +42,19 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
         colors = [pink]
     end
     renderables = Dict(
-        s.args[1] => renderable_or_placeholder(s.args..., c; kwargs...) for
+        s.args[1] => extract_renderable_from_kwargs(s.args...; kwargs...) for
+        s in elements
+    )
+
+    placeholders = Dict(
+        s.args[1] => placeholder(s.args..., c) for
         (c, s) in zip(colors, elements)
     )
 
     # craete layout elements
     layout_elements = Dict(
         s.args[1] =>
-            LayoutElement(s.args[1], s.args[2], s.args[3], renderables[s.args[1]]) for
+            LayoutElement(s.args[1], s.args[2], s.args[3], renderables[s.args[1]], placeholders[s.args[1]]) for
         s in elements
     )
 
@@ -84,19 +90,10 @@ function update!(
 
     # check that the shapes match
     elem = compositor.elements[id]
-
-    elem.w == width(content) || begin
-        @warn highlight(
-            "Could not update compositor element `$id` - width mismatch $(width(content)) instead of $(elem.w)",
-        )
-        return
-    end
-
-    elem.h == height(content) || begin
-        @warn highlight(
-            "Could not update compositor element `$id` - height mismatch $(height(content)) instead of $(elem.h)",
-        )
-        return
+    if elem.w != width(content) || elem.h != height(content)
+        content_shape = "{red}$(width(content)) × $(height(content)){/red}"
+        target_shape = "{bright_blue}$(elem.w) × $(elem.h){/bright_blue}"
+        @warn "Shape mismatch while updating compositor element {yellow}`$id`{/yellow}.\nGot $content_shape, expected $target_shape"
     end
 
     # update content
@@ -106,23 +103,29 @@ end
 # ---------------------------------------------------------------------------- #
 #                                   rendering                                  #
 # ---------------------------------------------------------------------------- #
-function render(compositor::Compositor)
+function render(compositor::Compositor; show_placeholders=false)
     # evaluate compositor
     elements = getfield.(values(compositor.elements), :id)
     renderables = getfield.(values(compositor.elements), :renderable)
-    length(renderables) == 1 && return renderables[1]
+    placeholders = getfield.(values(compositor.elements), :placeholder)
+    length(renderables) == 1 && return isnothing(renderables[1]) ? placeholders[1] : renderables[1]
 
-    components = Dict(e => r for (e, r) in zip(elements, renderables))
+    if show_placeholders
+        components = Dict(e => p for (e, p) in zip(elements, placeholders))
+    else
+        components = Dict(e => isnothing(r) ? p : r for (e, r, p) in zip(elements, renderables, placeholders))
+    end
     ex = interpolate_from_dict(compositor.layout, components)
 
     # insert padding
     return eval(:(a = $ex))
 end
 
-Base.string(compositor::Compositor) = string(render(compositor))
+Base.string(compositor::Compositor; kwargs...) = string(render(compositor; kwargs...))
 
-function Base.print(io::IO, compositor::Compositor; highlight = true)
-    return println(io, string(compositor))
+function Base.print(io::IO, compositor::Compositor; highlight = true, kwargs...)
+    return println(io, string(compositor; kwargs...))
 end
+Base.print(compositor::Compositor; kwargs...) = Base.print(stdout, compositor; kwargs...)
 
 end

@@ -43,16 +43,18 @@ function clean_layout_expr(exp::Expr)
     return exp
 end
 
-function renderable_or_placeholder(s, w, h, c; kwargs...)
+
+placeholder(s, w, h, c) = PlaceHolder(
+    w,
+    h;
+    style = c,
+    text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($w × $h){/white}",
+)
+
+
+function extract_renderable_from_kwargs(s, w, h; kwargs...)
     ren = get(kwargs, s, nothing)
-    if isnothing(ren)
-        ren = PlaceHolder(
-            w,
-            h;
-            style = c,
-            text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($w × $h){/white}",
-        )
-    else
+    if !isnothing(ren)
         ren = ren isa AbstractRenderable ? ren : RenderableText(ren)
         msg = "While creating a Compository layout, the layout element"
 
