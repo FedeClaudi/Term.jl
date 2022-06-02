@@ -106,7 +106,7 @@ basic_features = Panel(
     justify = :center,
     style = "default blue dim",
     title = "Term.jl",
-    title_style = "bright_blue bold",
+    title_style = "default bright_blue bold",
     subtitle = "https://github.com/FedeClaudi/Term.jl",
     subtitle_style = "default dim",
     subtitle_justify = :right,
@@ -177,10 +177,10 @@ p1b = Panel(; width = 34, style = "#80bbe8")
 p2 = Panel(; width = 28, style = "#5692bf")
 p3 = Panel(; width = 34, style = "#316c99 bold")
 p3b = Panel(; width = 20, style = "#316c99 bold")
-_space = Spacer(3, layout_text.measure.h)
+_space = Spacer(1, layout_text.measure.h)
 
 layout_example =
-    (lvstack(p1, p2, p3) * _space * cvstack(p1b, p2, p3b) * _space * rvstack(p1, p2, p3))
+    hstack(lvstack(p1, p2, p3), cvstack(p1b, p2, p3b), rvstack(p1, p2, p3); pad = 1)
 
 layout_example = cvstack(
     "" / RenderableText(

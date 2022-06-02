@@ -4,7 +4,7 @@ import Parameters: @with_kw
 
 import Term: int, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, calc_nrows_ncols
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
-import ..Console: console_width, console_height
+import ..Consoles: console_width, console_height
 import ..Boxes: get_lrow, get_rrow
 import ..Style: apply_style
 import ..Measures: Measure, height, width

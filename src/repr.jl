@@ -11,7 +11,7 @@ import Term:
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack
 import ..Renderables: RenderableText, info, AbstractRenderable
-import ..Console: console_width
+import ..Consoles: console_width
 import ..Panels: Panel, TextBox
 import ..Style: apply_style
 import ..Tprint: tprint

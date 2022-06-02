@@ -7,7 +7,7 @@ import UUIDs: UUID
 import Term: int, textlen, truncate, loop_last, get_file_format
 import ..Tprint: tprint, tprintln
 import ..Style: apply_style
-import ..Console:
+import ..Consoles:
     console_width,
     hide_cursor,
     show_cursor,

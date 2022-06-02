@@ -1,5 +1,5 @@
 import Term: reshape_text
-import Term.Console: clear
+import Term.Consoles: clear
 
 strings = [
     # latin alphabet

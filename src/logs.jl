@@ -18,7 +18,7 @@ import Term:
     truncate,
     ltrim_str
 
-import ..Console: console_width, console_height, change_scroll_region, move_to_line
+import ..Consoles: console_width, console_height, change_scroll_region, move_to_line
 import ..Renderables: AbstractRenderable
 import ..Style: apply_style
 import ..Tprint: tprintln

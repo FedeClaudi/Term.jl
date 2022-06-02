@@ -41,6 +41,12 @@ function make_logo()
 
     as_code(x) = "{orange1 italic}`$x`{/orange1 italic}"
 
+    # create "spacers" and stack renderables
+    hspacer = Spacer(green.measure.w / 2 + 1, green.measure.h)
+    line = Spacer(green.measure.w * 2 + 6, 1)
+    circles =
+        line / (hspacer * green * hspacer) / (red * Spacer(2, purple.measure.h) * purple)
+
     main = TextBox(
         """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
 
@@ -49,14 +55,8 @@ function make_logo()
         as $(as_code("Panel")) and $(as_code("TextBox")).
         These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code""";
         width = 35,
+        height = circles.measure.h,
     )
-
-    # create "spacers" and stack renderables
-    hspacer = Spacer(green.measure.w / 2 + 1, green.measure.h)
-    line = Spacer(green.measure.w * 2 + 6, 1)
-    circles =
-        line / (hspacer * green * hspacer) / (red * Spacer(2, purple.measure.h) * purple)
-
     content = circles * vLine(main.measure.h; style = indigo * " dim") * main
 
     # add second message

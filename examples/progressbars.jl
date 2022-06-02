@@ -1,6 +1,6 @@
 using Term
 import Term.Progress: ProgressBar, start!, update!, stop!, with, @track, addjob!
-import Term.Console: clear
+import Term.Consoles: clear
 
 tprint(hLine("progress bars"; style = "blue"))
 

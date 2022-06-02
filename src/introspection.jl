@@ -13,7 +13,7 @@ import Term:
     do_by_line,
     expr2string
 
-import ..Console: console_width
+import ..Consoles: console_width
 import ..Panels: Panel, TextBox
 import ..Layout: Spacer, hLine
 import ..Dendograms: Dendogram

@@ -1,5 +1,5 @@
 using Term
-import Term.Console: clear
+import Term.Consoles: clear
 import Term: chars
 install_term_logger()
 

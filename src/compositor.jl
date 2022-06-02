@@ -17,7 +17,7 @@ include("_compositor.jl")
     id::Symbol
     w::Int
     h::Int
-    renderable::Union{Nothing, String, AbstractRenderable}
+    renderable::Union{Nothing,String,AbstractRenderable}
     placeholder::PlaceHolder
 end
 @with_repr mutable struct Compositor
@@ -42,20 +42,21 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
         colors = [pink]
     end
     renderables = Dict(
-        s.args[1] => extract_renderable_from_kwargs(s.args...; kwargs...) for
-        s in elements
+        s.args[1] => extract_renderable_from_kwargs(s.args...; kwargs...) for s in elements
     )
 
-    placeholders = Dict(
-        s.args[1] => placeholder(s.args..., c) for
-        (c, s) in zip(colors, elements)
-    )
+    placeholders =
+        Dict(s.args[1] => placeholder(s.args..., c) for (c, s) in zip(colors, elements))
 
     # craete layout elements
     layout_elements = Dict(
-        s.args[1] =>
-            LayoutElement(s.args[1], s.args[2], s.args[3], renderables[s.args[1]], placeholders[s.args[1]]) for
-        s in elements
+        s.args[1] => LayoutElement(
+            s.args[1],
+            s.args[2],
+            s.args[3],
+            renderables[s.args[1]],
+            placeholders[s.args[1]],
+        ) for s in elements
     )
 
     # edit layout expression to add padding and remove size info
@@ -103,17 +104,21 @@ end
 # ---------------------------------------------------------------------------- #
 #                                   rendering                                  #
 # ---------------------------------------------------------------------------- #
-function render(compositor::Compositor; show_placeholders=false)
+function render(compositor::Compositor; show_placeholders = false)
     # evaluate compositor
     elements = getfield.(values(compositor.elements), :id)
     renderables = getfield.(values(compositor.elements), :renderable)
     placeholders = getfield.(values(compositor.elements), :placeholder)
-    length(renderables) == 1 && return isnothing(renderables[1]) ? placeholders[1] : renderables[1]
+    length(renderables) == 1 &&
+        return isnothing(renderables[1]) ? placeholders[1] : renderables[1]
 
     if show_placeholders
         components = Dict(e => p for (e, p) in zip(elements, placeholders))
     else
-        components = Dict(e => isnothing(r) ? p : r for (e, r, p) in zip(elements, renderables, placeholders))
+        components = Dict(
+            e => isnothing(r) ? p : r for
+            (e, r, p) in zip(elements, renderables, placeholders)
+        )
     end
     ex = interpolate_from_dict(compositor.layout, components)
 

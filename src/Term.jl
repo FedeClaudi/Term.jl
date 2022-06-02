@@ -11,7 +11,7 @@ include("colors.jl")
 include("theme.jl")
 include("highlight.jl")
 
-const TERM_DEBUG_ON = Ref(false)
+const TERM_DEBUG_ON = Ref(true)
 const term_theme = Ref(Theme())
 
 # rely on other modules
@@ -95,7 +95,7 @@ end
 # -------------------------------- renderables ------------------------------- #
 using .Boxes
 
-using .Console: console_height, console_width
+using .Consoles: console_height, console_width
 
 using .Renderables: AbstractRenderable, Renderable, RenderableText
 

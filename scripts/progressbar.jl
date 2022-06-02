@@ -1,7 +1,7 @@
 using ProgressLogging
 
 using Term.progress
-import Term.Console: clear, cursor_position
+import Term.Consoles: clear, cursor_position
 import Term.Progress: SPINNERS
 import Term: tprintln, Panel, install_term_logger
 

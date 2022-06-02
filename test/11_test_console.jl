@@ -1,4 +1,4 @@
-using Term.Console
+using Term.Consoles
 import Term: tprint, tprintln
 
 println("\nTesting tprint, stdout temporarily disabled")

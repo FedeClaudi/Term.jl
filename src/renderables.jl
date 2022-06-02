@@ -9,7 +9,7 @@ import Term:
     TERM_DEBUG_ON
 import ..Style: get_style_codes, MarkupStyle, apply_style
 import Term: highlight as highlighter
-import ..Console: console_width
+import ..Consoles: console_width
 import ..Measures: Measure
 import ..Segments: Segment
 
@@ -87,6 +87,8 @@ mutable struct Renderable <: AbstractRenderable
     segments::Vector{Segment}
     measure::Measure
 end
+
+Base.convert(::Renderable, x) = Renderable(x)
 
 """
     Renderable(

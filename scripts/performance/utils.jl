@@ -13,7 +13,7 @@ import Term:
     split_lines,
     reshape_text
 
-import Term.Console: clear
+import Term.Consoles: clear
 
 # clear()
 print("\n"^3)

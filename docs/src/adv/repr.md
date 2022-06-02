@@ -1,4 +1,4 @@
-# Console type display
+# Consoles type display
 
 You can use `Term.jl` to create a styled type display in your console. 
 The easiest way to explain it is by way of example.

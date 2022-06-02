@@ -43,14 +43,12 @@ function clean_layout_expr(exp::Expr)
     return exp
 end
 
-
 placeholder(s, w, h, c) = PlaceHolder(
     w,
     h;
     style = c,
     text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($w × $h){/white}",
 )
-
 
 function extract_renderable_from_kwargs(s, w, h; kwargs...)
     ren = get(kwargs, s, nothing)
