@@ -57,7 +57,7 @@ function termshow(io::IO, obj)
         io,
         Panel(
             rvstack(fields...) * line * space * lvstack(values...);
-            fit = false,
+            fit = true,
             subtitle = escape_brackets(string(typeof(obj))),
             subtitle_justify = :right,
             width = 40,
@@ -123,7 +123,7 @@ function termshow(io::IO, obj::AbstractDict)
         io,
         Panel(
             _keys_renderables * space * arrows * space * _values_renderables;
-            fit = false,
+            fit = true,
             title = escape_brackets(string(typeof(obj))),
             title_justify = :left,
             width = 40,
@@ -211,10 +211,10 @@ function termshow(io::IO, fun::Function)
     doc, docstring = get_docstring(fun)
     doc = highlight("{#8dbd86}" * string(doc) * "{/#8dbd86}")
     doc = split_lines(doc)
-    if length(doc) > 5
+    if length(doc) > 10
         doc = [
-            doc[1:min(5, length(doc))]...,
-            "{dim bright_blue}$(length(doc)-5) lines omitted...{/dim bright_blue}",
+            doc[1:min(10, length(doc))]...,
+            "{dim bright_blue}$(length(doc)-10) lines omitted...{/dim bright_blue}",
         ]
     end
 
@@ -241,8 +241,9 @@ function termshow(io::IO, fun::Function)
         nothing,
         rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...),
         "{white bold}$(N-1){/white bold} methods",
+        title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
     )
-    return print(io, cvstack(panel, TextBox(doc; width = panel.measure.w)))
+    return print(io, lvstack(panel, TextBox(doc; width = panel.measure.w * 2, fit = true)))
 end
 
 # ---------------------------------------------------------------------------- #

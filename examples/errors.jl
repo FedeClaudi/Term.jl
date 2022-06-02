@@ -34,8 +34,7 @@ corresponding error message
 # ------------  DomainError
 # sqrt(-1)
 
-# ------------  AssertionError
-# @assert 1 == 2
+
 
 # ------------  UndefVarError
 # println(x)
@@ -57,7 +56,7 @@ corresponding error message
 # mydict["a"]
 
 # ------------  InexactError
-Int(2.5)
+# Int(2.5)
 
 # ------------  UndefKeywordError
 # function my_func(;my_arg::Int)
@@ -69,3 +68,16 @@ Int(2.5)
 # m = zeros(20, 20)
 # n = zeros(5, 4)
 # m .+ n
+
+# ------------  Errors with type creation
+
+struct MyType
+    x::Int
+    y
+    z::String
+end
+
+MyType(x::Int, y::Int) = MyType(x, y, "" + string(1 + "o"))
+MyType(x::Int) = MyType(x, 0)
+
+MyType(1)

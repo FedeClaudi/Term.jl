@@ -18,7 +18,7 @@ end
 function repr_panel(obj, content, subtitle; width = 40, kwargs...)
     p = Panel(
         content;
-        fit = false,
+        fit = true,
         title = isnothing(obj) ? obj : escape_brackets(string(typeof(obj))),
         title_justify = :left,
         width = width,

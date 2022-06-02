@@ -112,7 +112,7 @@ function Panel(
     padding::Padding;
     kwargs...,
 )
-    content = content isa AbstractRenderable ? content : RenderableText(content)
+    content = content isa AbstractRenderable ? content : RenderableText(fillin(content))
 
     content_measure = content.measure
     panel_measure = Measure(
@@ -172,7 +172,7 @@ function Panel(
     end
 
     # get panel height
-    content = content isa AbstractRenderable ? content : RenderableText(content)
+    content = content isa AbstractRenderable ? content : RenderableText(fillin(content))
     height = isnothing(height) ? content.measure.h + Δh + 2 : height
     panel_measure = Measure(width, height)
 
@@ -354,9 +354,6 @@ function TextBox(args...; kwargs...)
     return Panel(args...; box = box, kwargs...)
 end
 
-
-
-
 # ---------------------------------------------------------------------------- #
 #                                     MISC.                                    #
 # ---------------------------------------------------------------------------- #
@@ -366,18 +363,14 @@ end
 
 Trim a string or renderable to a max width.
 """
-function trim_renderable(ren::Union{AbstractString, AbstractRenderable}, width::Int)
+function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::Int)
     if ren isa AbstractString || ren isa RenderableText
-        ren =
-            ren isa RenderableText ?
-            join(getfield.(ren.segments, :text), "\n") : ren
+        ren = ren isa RenderableText ? join(getfield.(ren.segments, :text), "\n") : ren
         ren = reshape_text(ren, width)
     else
         ren = lvstack(
             map(
-                s ->
-                    get_width(s.text) > width ? ltrim_str(s.text, width) :
-                    s.text,
+                s -> get_width(s.text) > width ? ltrim_str(s.text, width) : s.text,
                 ren.segments,
             ),
         )

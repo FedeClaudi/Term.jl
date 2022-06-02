@@ -59,7 +59,8 @@ end
 
 Pad a string by a fixed ammount to the left and to the right.
 """
-pad(text::AbstractString, left::Int = 0, right::Int = 0) = " "^left * text * " "^right
+pad(text::AbstractString, left::Int = 0, right::Int = 0) =
+    " "^max(0, left) * text * " "^max(0, right)
 
 """
     pad(segments::AbstractVector{Segment}, left::Int=0, right::Int=0)
@@ -434,10 +435,7 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     # combine segments
     segments = [Segment(s1.text * " "^pad * s2.text) for (s1, s2) in zip(s1, s2)]
 
-    return Renderable(
-        segments,
-        Measure(r1.measure.w + r2.measure.w, max(r1.measure.h, r2.measure.h)),
-    )
+    return Renderable(segments, Measure(segments))
 end
 
 """ 

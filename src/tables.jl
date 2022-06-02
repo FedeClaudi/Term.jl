@@ -82,7 +82,7 @@ function Table(
     header_justify::Union{Nothing,Symbol,Vector,Tuple} = nothing,
     columns_style::Union{String,Vector,Tuple} = "default",
     columns_justify::Union{Symbol,Vector,Tuple} = :center,
-    columns_widths::Union{Nothing, Int, Vector} = nothing,
+    columns_widths::Union{Nothing,Int,Vector} = nothing,
     footer::Union{Function,Nothing,Vector,Tuple} = nothing,
     footer_style::Union{String,Vector,Tuple} = "default",
     footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
@@ -141,7 +141,15 @@ function Table(
 
     # get the max-width of each column
     widths = calc_columns_widths(
-        N_cols, N_rows, columns_widths, show_header, header, tb, sch, footer, hpad
+        N_cols,
+        N_rows,
+        columns_widths,
+        show_header,
+        header,
+        tb,
+        sch,
+        footer,
+        hpad,
     )
 
     # get the table values as vectors of strings
@@ -351,8 +359,7 @@ function cell(
     vertical_justify::Symbol,
 )
     return vertical_pad(
-        do_by_line(
-            y -> apply_style(pad(y, w, justify), style), truncate(x, w)),
+        do_by_line(y -> apply_style(pad(y, w, justify), style), truncate(x, w)),
         h,
         vertical_justify,
     )

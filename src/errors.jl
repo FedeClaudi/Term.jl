@@ -4,7 +4,8 @@ import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
 import Term: highlight, truncate
 
-import ..Layout: hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack
+import ..Layout:
+    hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
 import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
 
@@ -113,12 +114,24 @@ function method_error_candidate(fun, candidate)
     candidate = replace(candidate, "!Matched" => "")
 
     # highlight fun
-    candidate = replace(candidate, fun => "{bold yellow}$(fun){/bold yellow}")
+    candidate = replace(candidate, string(fun) => "{bold yellow}$(fun){/bold yellow}")
     return candidate
 end
 
 function error_message(er::MethodError; kwargs...)
-    # @info "method error" er fieldnames(MethodError) er.f er.args er.world
+    f = er.f
+    ft = typeof(f)
+    name = ft.name.mt.name
+    kwargs = ()
+    if endswith(string(ft.name.name), "##kw")
+        f = er.args[2]
+        ft = typeof(f)
+        name = ft.name.mt.name
+        arg_types_param = arg_types_param[3:end]
+        kwargs = pairs(er.args[1])
+        # er = MethodError(f, er.args[3:end::Int])
+    end
+
     # get main error message
     _args = join(
         map(
@@ -128,21 +141,20 @@ function error_message(er::MethodError; kwargs...)
         ),
         "\n",
     )
-    fn_name = "$(string(er.f))"
-    main_line = "No method matching `$fn_name` with arguments types:" / _args
+    main_line = "No method matching `$name` with arguments types:" / _args
 
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
+
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
-        candidates = map(c -> method_error_candidate(fn_name, c), _candidates)
+        candidates = map(c -> method_error_candidate(name, c), _candidates)
         main_line =
-            main_line / "" / "Alternative candidates:" /
-            lvstack(RenderableText.(candidates))
+            main_line /
+            lvstack("" / "Alternative candidates:", RenderableText.(candidates)...;)
     else
         main_line = main_line / " " / "{dim}No alternative candidates found"
     end
-
     return string(main_line), ""
 end
 
@@ -231,13 +243,15 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                         padding = (2, 2, 1, 1),
                         style = "dim red",
                         title_justify = :center,
+                        # fit = true,
+                        # width=W
                     )
                 error /= msg
                 print(error)
             catch err
                 @error "ERROR: " exception = err
-                # @warn "Term.jl: failed to render error message" err
-                # Base.showerror(io, er)
+                @warn "Term.jl: failed to render error message" err
+                Base.showerror(io, er)
             end
         end
     end

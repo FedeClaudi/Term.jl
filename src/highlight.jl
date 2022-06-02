@@ -35,7 +35,7 @@ function highlight(text::AbstractString; theme::Theme = term_theme[])
         end
     end
 
-    return apply_style(text)
+    return remove_markup(apply_style(text))
 end
 
 """

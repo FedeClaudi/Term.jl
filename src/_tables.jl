@@ -8,12 +8,16 @@ compute the width of each column based on the size of its contents
 including the header and footer.
 """
 function calc_columns_widths(
-            N_cols::Int, 
-            N_rows::Int, 
-            columns_widths::Union{Nothing, Vector, Int}, 
-            show_header::Bool, 
-            header, tb, sch, footer, hpad)
-
+    N_cols::Int,
+    N_rows::Int,
+    columns_widths::Union{Nothing,Vector,Int},
+    show_header::Bool,
+    header,
+    tb,
+    sch,
+    footer,
+    hpad,
+)
     if !isnothing(columns_widths)
         columns_widths = expand(columns_widths, N_cols)
         return columns_widths
@@ -33,8 +37,7 @@ end
 
 Get the height of each row in a `Table`
 """
-function rows_heights(
-    N_rows::Int, show_header::Bool, header, rows_values, footer, vpad)
+function rows_heights(N_rows::Int, show_header::Bool, header, rows_values, footer, vpad)
     headers_height = show_header ? max(height.(header)...) : 0
     data_heights = collect(map(r -> max(height.(r)...), rows_values))
     footers_height = isnothing(footer) ? 0 : max(height.(footer)...)
@@ -97,10 +100,12 @@ function assert_table_arguments(
         problems,
         "Got columns_justify with length $(length(columns_justify)), expected $N_cols",
     )
-    columns_widths isa Vector && length(columns_widths) != N_cols && push!(
-        problems,
-        "Got columns_widths with length $(length(columns_widths)), expected $N_cols",
-    )
+    columns_widths isa Vector &&
+        length(columns_widths) != N_cols &&
+        push!(
+            problems,
+            "Got columns_widths with length $(length(columns_widths)), expected $N_cols",
+        )
 
     # check footer
     if !isnothing(footer)

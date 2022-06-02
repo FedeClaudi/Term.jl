@@ -40,7 +40,7 @@ obj = myType("Rocket", 10, 10, 99.9)
 
 # or just use our macro!
 
-mutable struct Rocket
+@with_repr mutable struct Rocket
     width::Int
     height::Int
     mass::Float64
