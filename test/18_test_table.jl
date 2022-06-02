@@ -24,6 +24,9 @@ t4 = Table(data; footer = ["get", "a", "footer"], footer_justify = :center)
 
 t5 = Table(data; footer = sum, footer_justify = :center, footer_style = "dim bold")
 
+t7 = Table(data; columns_widths=[25, 7, 15], footer=sum, box=:SIMPLE)
+
+
 ph1 = PlaceHolder(25, 5)
 ph2 = PlaceHolder(23, 9)
 ph3 = PlaceHolder(22, 11)
@@ -36,8 +39,10 @@ data = Dict(
 
 t6 = Table(data)
 
+
+
 # save tables as strings to files
-tbls = [t1, t2, t3, t4, t5, t6]
+tbls = [t1, t2, t3, t4, t5, t6, t7]
 # for (i, t) in enumerate(tbls)
 #     tofile(string(t), "./txtfiles/table_$i.txt")
 # end

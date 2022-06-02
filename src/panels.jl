@@ -168,21 +168,7 @@ function Panel(
 
     # if the content is too large, resize it to fit the panel's width.
     if get_width(content) > width - Δw + 1
-        if content isa AbstractString || content isa RenderableText
-            content =
-                content isa RenderableText ?
-                join(getfield.(content.segments, :text), "\n") : content
-            content = reshape_text(content, width - Δw)
-        else
-            content = lvstack(
-                map(
-                    s ->
-                        get_width(s.text) > width - Δw ? ltrim_str(s.text, width - Δw) :
-                        s.text,
-                    content.segments,
-                ),
-            )
-        end
+        content = trim_renderable(content, width - Δw)
     end
 
     # get panel height
@@ -366,6 +352,37 @@ end
 function TextBox(args...; kwargs...)
     box = get(kwargs, :box, :NONE)
     return Panel(args...; box = box, kwargs...)
+end
+
+
+
+
+# ---------------------------------------------------------------------------- #
+#                                     MISC.                                    #
+# ---------------------------------------------------------------------------- #
+
+"""
+    trim_renderable(ren::Union{String, AbstractRenderable}, width::Int)
+
+Trim a string or renderable to a max width.
+"""
+function trim_renderable(ren::Union{AbstractString, AbstractRenderable}, width::Int)
+    if ren isa AbstractString || ren isa RenderableText
+        ren =
+            ren isa RenderableText ?
+            join(getfield.(ren.segments, :text), "\n") : ren
+        ren = reshape_text(ren, width)
+    else
+        ren = lvstack(
+            map(
+                s ->
+                    get_width(s.text) > width ? ltrim_str(s.text, width) :
+                    s.text,
+                ren.segments,
+            ),
+        )
+    end
+    return ren
 end
 
 end

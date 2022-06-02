@@ -10,7 +10,7 @@ function render_frame_info(frame::StackFrame)::RenderableText
             width = 88,
         )
     else
-        return RenderableText("   " * func)
+        return RenderableText("   " * func; width=88)
     end
 end
 
@@ -47,6 +47,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
             style = "#9bb3e0",
             subtitle_justify = :right,
             width = 88,
+            fit=true,
         ),
     ]
 
@@ -106,13 +107,13 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
                 style = "#9bb3e0",
                 subtitle_justify = :right,
                 width = 88,
+                fit=true
             ),
         )
     end
 
     return Panel(
         lvstack(content...);
-        fit = false,
         padding = (2, 2, 0, 1),
         subtitle = "Error Stack",
         style = "#ff8a4f dim",
@@ -120,5 +121,6 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         title = "Error Stack",
         title_style = "bold #ff8a4f default",
         width = 40,
+        fit=true,
     )
 end

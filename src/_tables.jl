@@ -1,9 +1,24 @@
 """
     columns_widths
 
-Get the width of each column in a `Table`
+Get the width of each column in a `Table`.
+
+If user passed a `columns_widths` argument use that, otherwise
+compute the width of each column based on the size of its contents
+including the header and footer.
 """
-function columns_widths(N_cols, N_rows, show_header, header, tb, sch, footer, hpad)
+function calc_columns_widths(
+            N_cols::Int, 
+            N_rows::Int, 
+            columns_widths::Union{Nothing, Vector, Int}, 
+            show_header::Bool, 
+            header, tb, sch, footer, hpad)
+
+    if !isnothing(columns_widths)
+        columns_widths = expand(columns_widths, N_cols)
+        return columns_widths
+    end
+
     headers_widths = show_header ? collect(width.(header)) : zeros(N_cols)
     data_widths = collect(map(c -> max(width.(tb[c])...), sch.names))
     footers_widths = isnothing(footer) ? zeros(N_cols) : collect(width.(footer))
@@ -18,7 +33,8 @@ end
 
 Get the height of each row in a `Table`
 """
-function rows_heights(N_rows, show_header, header, rows_values, footer, vpad)
+function rows_heights(
+    N_rows::Int, show_header::Bool, header, rows_values, footer, vpad)
     headers_height = show_header ? max(height.(header)...) : 0
     data_heights = collect(map(r -> max(height.(r)...), rows_values))
     footers_height = isnothing(footer) ? 0 : max(height.(footer)...)
@@ -50,6 +66,7 @@ function assert_table_arguments(
     header_justify,
     columns_style,
     columns_justify,
+    columns_widths,
     footer,
     footer_style,
     footer_justify,
@@ -79,6 +96,10 @@ function assert_table_arguments(
     (!isa(columns_justify, Symbol) && length(columns_justify) != N_cols) && push!(
         problems,
         "Got columns_justify with length $(length(columns_justify)), expected $N_cols",
+    )
+    columns_widths isa Vector && length(columns_widths) != N_cols && push!(
+        problems,
+        "Got columns_widths with length $(length(columns_widths)), expected $N_cols",
     )
 
     # check footer
