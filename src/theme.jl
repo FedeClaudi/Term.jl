@@ -40,7 +40,7 @@ style outputs to terminal.
     symbol::String = orange
     expression::String = amber
     number::String = blue_light
-    operator::String = "$red"
+    operator::String = red
     func::String = yellow
 
     # loggin levels
@@ -118,14 +118,15 @@ abstract type CodeTheme <: AbstractTheme end
 @theme CodeTheme Dict(
     :style => S"",
     :tokens => Dict(
-        # TEXT    => S"fg: e6e8e6",
+        TEXT    => S"fg: e6e8e6",
+        
         # yellow
-        NAME_FUNCTION => S"fg: FFF59D; bold",
-        NAME_OTHER => S"fg: FFF59D; bold",
+        NAME_FUNCTION => S"fg: FFF59D;",
+        NAME_OTHER => S"fg: FFF59D;",
 
         # red
-        KEYWORD => S"fg: fc6262; bold",
-        OPERATOR => S"fg: fc6262; bold",
+        KEYWORD => S"fg: fc6262;",
+        OPERATOR => S"fg: fc6262;",
         PUNCTUATION => S"fg: fc7474",
 
         # green

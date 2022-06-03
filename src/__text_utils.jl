@@ -170,6 +170,8 @@ Read a file and select only lines in range `start` -> `stop`.
 Returns a vector of tuples with the line number and line content.
 """
 function read_file_lines(path::AbstractString, start::Int, stop::Int)
+    !isfile(path) && return nothing
+
     start = start < 1 ? 1 : start
     stop = stop >= countlines(path) ? countlines(path) : stop
     lines = readlines(path; keep = true)

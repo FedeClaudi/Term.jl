@@ -177,6 +177,7 @@ function Table(
                 header_style,
                 header_justify,
                 widths,
+                hpad,
                 heights[1],
                 vertical_justify,
             ),
@@ -197,6 +198,7 @@ function Table(
             columns_style,
             columns_justify,
             widths,
+            hpad,
             heights[I],
             vertical_justify,
         )
@@ -256,6 +258,7 @@ function Table(
                     footer_style,
                     footer_justify,
                     widths,
+                    hpad,
                     heights[end],
                     vertical_justify,
                 ),
@@ -353,13 +356,14 @@ Create a Table's row's cell from a string - apply styling and vertical/horizonta
 function cell(
     x::AbstractString,
     w::Int,
+    hor_pad::Int,
     h::Int,
     justify::Symbol,
     style::String,
     vertical_justify::Symbol,
 )
     return vertical_pad(
-        do_by_line(y -> apply_style(pad(y, w, justify), style), truncate(x, w)),
+        do_by_line(y -> apply_style(" " * pad(y, w-2, justify) * " ", style), truncate(x, w-hor_pad)),
         h,
         vertical_justify,
     )
@@ -373,6 +377,7 @@ Create a Table's row's cell from a renderable - apply styling and vertical/horiz
 function cell(
     x::AbstractRenderable,
     w::Int,
+    hor_pad::Int,
     h::Int,
     justify::Symbol,
     style::String,
@@ -398,13 +403,14 @@ function make_row_cells(
     style::Vector{String},
     justify::Vector{Symbol},
     widths::Vector{Int},
+    hor_pad::Vector{Int},
     height::Int,
     vertical_justify::Symbol,
 )
     N = length(entries)
     cells = map(
         i ->
-            cell(entries[i], widths[i], height, justify[i], style[i], vertical_justify),
+            cell(entries[i], widths[i], hor_pad[i], height, justify[i], style[i], vertical_justify),
         1:N,
     )
     return cells

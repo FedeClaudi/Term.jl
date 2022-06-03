@@ -131,6 +131,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     @assert lineno ≤ η "lineno $lineno too high for file with $(η) lines"
 
     lines = read_file_lines(path, lineno - 9, lineno + 10)
+
     linenos = [ln[1] for ln in lines]
     lines = [ln[2] for ln in lines]
     code = split(highlight_syntax(join(lines); style = false), "\n")

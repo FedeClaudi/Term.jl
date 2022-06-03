@@ -44,17 +44,23 @@ function render_frame_info(frame::StackFrame; show_source = true)
         out = func_line / file_line
         if show_source
             error_source = load_code_and_highlight(string(frame.file), frame.line)
-            out = lvstack(
-                out,
-                Panel(
-                    error_source;
-                    fit = true,
-                    subtitle = "error line",
-                    style = "dim",
-                    subtitle_style = "default bold",
-                );
-                pad = 1,
-            )
+            @info "cc" error_source typeof(error_source)
+            out = if isnothing(error_source) || length(error_source) == 0
+                out
+            else
+                lvstack(
+                    out,
+                    Panel(
+                        error_source;
+                        fit = true,
+                        width=44,
+                        subtitle = "error line",
+                        style = "dim",
+                        subtitle_style = "default bold",
+                    );
+                    pad = 1,
+                )
+            end
         end
         return out
     else

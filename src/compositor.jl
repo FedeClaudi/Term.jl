@@ -5,7 +5,7 @@ import MyterialColors: Palette, blue, pink
 using ..Layout
 import ..Layout: PlaceHolder
 import ..Measures: width, height
-import ..Renderables: AbstractRenderable, RenderableText
+import ..Renderables: AbstractRenderable, RenderableText, Renderable
 import ..Repr: @with_repr, termshow
 import Term: highlight
 
@@ -77,6 +77,9 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     return Compositor(expr, layout_elements)
 end
 
+
+Renderable(compositor::Compositor) = Renderable(string(compositor))
+
 # ---------------------------------- update ---------------------------------- #
 function update!(
     compositor::Compositor,
@@ -131,6 +134,20 @@ Base.string(compositor::Compositor; kwargs...) = string(render(compositor; kwarg
 function Base.print(io::IO, compositor::Compositor; highlight = true, kwargs...)
     return println(io, string(compositor; kwargs...))
 end
+
 Base.print(compositor::Compositor; kwargs...) = Base.print(stdout, compositor; kwargs...)
+
+
+"""
+Base.show(io::IO, ::MIME"text/plain", compositor::Compositor)
+
+Show a compositor.
+"""
+function Base.show(io::IO, ::MIME"text/plain", compositor::Compositor)
+    println(io, string(compositor))
+end
+
+
+
 
 end

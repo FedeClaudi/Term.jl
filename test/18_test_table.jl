@@ -38,8 +38,16 @@ data = Dict(
 
 t6 = Table(data)
 
+X = rand(5, 3)
+t8 = Table(X;
+    columns_widths=[12, 10, 22],
+    hpad=2,
+    columns_justify=[:left, :center, :left]
+
+)
+
 # save tables as strings to files
-tbls = [t1, t2, t3, t4, t5, t6, t7]
+tbls = [t1, t2, t3, t4, t5, t6, t7, t8]
 for (i, t) in enumerate(tbls)
     tofile(string(t), "./txtfiles/table_$i.txt")
 end

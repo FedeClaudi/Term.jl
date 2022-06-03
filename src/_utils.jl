@@ -2,12 +2,6 @@ int(x) = (Int ∘ round)(x)
 fint(x) = (Int ∘ floor)(x)
 cint(x) = (Int ∘ ceil)(x)
 
-"""
-  or(x, y)
-
-Return `y` if `x` is `Nothing`
-"""
-or(x, y) = isnothing(x) ? y : x
 
 """
   loop_last(v)
@@ -66,7 +60,6 @@ function get_file_format(nbytes; suffix = "B")
         end
         nbytes = nbytes / 1024.0
     end
-    return "cacca"
 end
 
 """
