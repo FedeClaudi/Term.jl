@@ -43,8 +43,13 @@ function render_frame_info(frame::StackFrame; show_source = true)
         )
         out = func_line / file_line
         if show_source
-            error_source = load_code_and_highlight(string(frame.file), frame.line)
-            @info "cc" error_source typeof(error_source)
+            error_source = nothing
+            try
+                error_source = load_code_and_highlight(string(frame.file), frame.line)
+            catch
+                error_source = nothing
+            end
+
             out = if isnothing(error_source) || length(error_source) == 0
                 out
             else

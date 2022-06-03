@@ -25,10 +25,11 @@ include("_inspect.jl")
 function termshow(io::IO, obj)
     field_names = fieldnames(typeof(obj))
     if length(field_names) == 0
+        theme = term_theme[]
         print(
             io,
             RenderableText(
-                "$obj{$theme.repr_type_style}::$(typeof(obj)){/$theme.repr_type_style}",
+                "$obj{$(theme.repr_type_style)}::$(typeof(obj)){/$(theme.repr_type_style)}",
             ),
         )
         return nothing

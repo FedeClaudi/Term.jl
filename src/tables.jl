@@ -86,6 +86,7 @@ function Table(
     footer::Union{Function,Nothing,Vector,Tuple} = nothing,
     footer_style::Union{String,Vector,Tuple} = "default",
     footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
+    compact::Bool = false,
 )
 
     # prepare some variables
@@ -220,7 +221,8 @@ function Table(
                     :mid,
                     bottom,
                     style,
-                    heights[I],
+                    heights[I];
+                    compact = show_header ? false : compact,
                 ),
             )
         elseif l == nrows
@@ -240,7 +242,17 @@ function Table(
         else
             push!(
                 lines,
-                table_row(row, widths, box, nothing, :mid, :row, style, heights[I]),
+                table_row(
+                    row,
+                    widths,
+                    box,
+                    nothing,
+                    :mid,
+                    :row,
+                    style,
+                    heights[I];
+                    compact = compact,
+                ),
             )
         end
     end
@@ -319,7 +331,8 @@ function table_row(
     mid_level,
     bottom_level,
     box_style,
-    row_height,
+    row_height;
+    compact = false,
 )
     # get box characters
     mid_level = getfield(box, mid_level)
@@ -344,7 +357,7 @@ function table_row(
         top = apply_style(get_row(box, widths, top_level), box_style)
         return string(vstack(top, mid, bottom))
     else
-        return string(vstack(mid, bottom))
+        return compact ? string(mid) : string(vstack(mid, bottom))
     end
 end
 

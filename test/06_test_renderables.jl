@@ -44,4 +44,7 @@ end
     @test string(r) ==
           "\e[31mLorem ipsum dolor    \e[39m\n\e[31msit amet, consectetur\e[39m\n\e[31madipiscing elit,     \e[39m\n\e[31msed do eiusmod tempor\e[39m\n\e[31mincididunt ut labore \e[39m"
     @test r.measure.w == 21
+
+    @test string(RenderableText("a string")) == "a string"
+    @test string(RenderableText("a\nstring")) == "a     \nstring"
 end

@@ -26,12 +26,13 @@ abstract type AbstractRenderable end
 Measure(renderable::AbstractRenderable) = renderable.measure
 
 info(r::AbstractRenderable)::String =
-    "\e[38;5;117m$(typeof(r)) <: AbstractRenderable\e[0m \e[2m(w:$(r.measure.w), h:$(r.measure.h))\e[0m",
-    """
-        Base.string(r::AbstractRenderable)::String
+    "\e[38;5;117m$(typeof(r)) <: AbstractRenderable\e[0m \e[2m(w:$(r.measure.w), h:$(r.measure.h))\e[0m"
 
-    Creates a string representation of a renderable
-    """
+"""
+    Base.string(r::AbstractRenderable)::String
+
+Creates a string representation of a renderable
+"""
 function Base.string(r::AbstractRenderable)::String
     lines = [seg.text for seg in r.segments]
     return join(lines, "\n")
@@ -52,13 +53,7 @@ end
 
 Show a renderable.
 """
-function Base.show(io::IO, renderable::AbstractRenderable)
-    w, h = renderable.measure.w, renderable.measure.h
-    return print(
-        io,
-        "\e[38;5;117m$(typeof(renderable)) <: AbstractRenderable\e[0m \e[2m(w:$(w), h:$(h))\e[0m",
-    )
-end
+Base.show(io::IO, renderable::AbstractRenderable) = print(io, info(renderable))
 
 """
     show(io::IO, mime::MIME"text/plain", renderable::AbstractRenderable)
@@ -66,13 +61,11 @@ end
 Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
-    w, h = renderable.measure.w, renderable.measure.h
-    print(io, string(renderable))
     if TERM_DEBUG_ON[]
-        print(
-            io,
-            "\n\e[38;5;117m$(typeof(renderable)) <: AbstractRenderable\e[0m \e[2m(w:$(w), h:$(h))\e[0m",
-        )
+        println(io, string(renderable))
+        println(io, info(renderable))
+    else
+        print(io, string(renderable))
     end
 end
 
@@ -173,24 +166,7 @@ function RenderableText(
     end
 end
 
-"""
-    RenderableText(text::Vector; width::Union{Nothing,Int} = nothing)
-
-Construct a RenderableText out a vector of objects.
-"""
-function RenderableText(
-    text::Vector;
-    style::Union{Nothing,String} = nothing,
-    width::Union{Nothing,Int} = nothing,
-)
-    return RenderableText(join(string(text), "\n"); style = style, width = width)
-end
-
 # -------------------------------- union type -------------------------------- #
 RenderablesUnion = Union{AbstractString,AbstractRenderable}
-
-# ---------------------------------------------------------------------------- #
-#                                     MISC                                     #
-# ---------------------------------------------------------------------------- #
 
 end

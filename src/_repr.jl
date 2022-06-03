@@ -79,13 +79,16 @@ function vec2content(vec::Union{Tuple,AbstractVector})
     end
 
     vec_items = vec_elems2renderables(vec, N, max_w)
-    counts = "(" .* string.(1:N) .* ")"
+    counts = "(" .* string.(1:length(vec_items)) .* ")"
 
     content = Table(
         [counts vec_items];
         show_header = false,
         columns_justify = [:right, :left],
         columns_style = ["dim", "default"],
+        vpad = 0,
+        hpad = 2,
+        compact = true,
         box = :NONE,
     )
 

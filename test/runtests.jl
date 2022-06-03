@@ -82,6 +82,10 @@ tprint("\n\n{bold green}Running: '17_test_dendogram.jl' {/bold green}")
 tprint("\n\n{bold green}Running: '18_test_table.jl' {/bold green}")
 @time @timeit_include("18_test_table.jl")
 
+# ? 18 Dendogram
+tprint("\n\n{bold green}Running: '19_test_repr.jl' {/bold green}")
+@time @timeit_include("19_test_repr.jl")
+
 # ? 999 EXAMPLES
 tprint("\n\n{bold green}Running: '999_test_examples.jl' {/bold green}")
 @time @timeit_include("999_test_examples.jl")
