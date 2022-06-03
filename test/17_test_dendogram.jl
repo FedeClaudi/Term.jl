@@ -14,4 +14,8 @@ import Term.Dendograms: link, Dendogram
 
     # nested = link(smalldendo, link(smalldendo, link(smalldendo, smalldendo; title="a level"); title="another level"); title="first level")
     # @test string(nested) == fromfile("./txtfiles/dendogram_nested.txt")
+
+
+    D = link(mydendo,mydendo, mydendo)
+    @test D.measure.w == 150
 end
