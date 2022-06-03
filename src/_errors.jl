@@ -1,18 +1,19 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 
-function render_frame_info(frame::StackFrame)::RenderableText
+function render_frame_info(frame::StackFrame; show_source=true)
     func = sprint(StackTraces.show_spec_linfo, frame)
     func = replace(
         func,
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{#ffc44f}" * s"\g<0>" * "{/#ffc44f}"),
     )
-    func = highlight(func)
+    # func = highlight(reshape_text(func, 70))
+    func = reshape_text(highlight(func), 70)
 
     # get other information about the function 
-    inline = frame.inlined ? RenderableText("   inlined"; style = "bold dim $indigo_light") : ""
-    c = frame.from_c ? RenderableText("   from C"; style = "bold dim $indigo_light") : ""
+    inline = frame.inlined ? RenderableText("   inlined"; style = "bold dim white") : ""
+    c = frame.from_c ? RenderableText("   from C"; style = "bold dim white") : ""
 
     # get name of module
     m = Base.parentmodule(frame)
@@ -29,16 +30,20 @@ function render_frame_info(frame::StackFrame)::RenderableText
     file = Base.fixup_stdlib_path(string(frame.file))
 
     # create text
-    func_line = hstack(rpad(func, 25), inline, c; pad=1)
+    func_line = hstack(func, inline, c; pad=1)
+    
     if !isnothing(m)
-        func_line /= "  {#9bb3e0}  in module {$pink bold}$(m){/$pink bold}{/#9bb3e0}"
+        func_line /= " {$pink dim}────{/$pink dim} {#9bb3e0}In module {$pink bold}$(m){/$pink bold}  {$pink dim}────{/$pink dim}{/#9bb3e0}"
     end
 
     if length(string(frame.file)) > 0
-        return RenderableText(
-            string(func_line / "    {dim}$(file):{bold white}$(frame.line){/bold white}{/dim}");
-            width = 88,
-        )
+        file_line = RenderableText("    {dim}$(file):{bold white}$(frame.line){/bold white}{/dim}"; width=88)
+        out =  func_line / file_line
+        if show_source
+            error_source = load_code_and_highlight(string(frame.file), frame.line)
+            out = lvstack(out, Panel(error_source; fit=true, subtitle="error line", style="dim", subtitle_style="default bold"); pad=1)
+        end
+        return out
     else
         return RenderableText("   " * func; width = 88)
     end
@@ -46,7 +51,7 @@ end
 
 function render_backtrace_frame(
     num::RenderableText,
-    info::RenderableText;
+    info::AbstractRenderable;
     as_panel = true,
     kwargs...,
 )
@@ -71,7 +76,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
     added_skipped_message = false
     for (num, frame) in enumerate(bt)
         numren = RenderableText("($(num))"; style = "#52c4ff bold dim")
-        info = render_frame_info(frame)
+        info = render_frame_info(frame; show_source = num in (1, length(bt)))
 
         if num == 1
             push!(

@@ -2,7 +2,7 @@ module Errors
 
 import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
-import Term: highlight, truncate
+import Term: highlight, truncate, reshape_text, load_code_and_highlight
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
