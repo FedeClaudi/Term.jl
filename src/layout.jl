@@ -424,9 +424,9 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     # make sure both renderables have the same number of segments
     if h1 > h2
         s1 = r1.segments
-        s2 = vcat(r2.segments, [Segment(" "^(r2.measure.w + pad)) for i in 1:(Δh)])
+        s2 = vcat(r2.segments, [Segment(" "^(r2.measure.w)) for i in 1:(Δh)])
     elseif h1 < h2
-        s1 = vcat(r1.segments, [Segment(" "^(r1.measure.w + pad)) for i in 1:(Δh)])
+        s1 = vcat(r1.segments, [Segment(" "^(r1.measure.w)) for i in 1:(Δh)])
         s2 = r2.segments
     else
         s1, s2, = r1.segments, r2.segments

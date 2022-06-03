@@ -40,9 +40,9 @@ t6 = Table(data)
 
 # save tables as strings to files
 tbls = [t1, t2, t3, t4, t5, t6, t7]
-# for (i, t) in enumerate(tbls)
-#     tofile(string(t), "./txtfiles/table_$i.txt")
-# end
+for (i, t) in enumerate(tbls)
+    tofile(string(t), "./txtfiles/table_$i.txt")
+end
 
 @testset "TABLE" begin
     for (i, t) in enumerate(tbls)
