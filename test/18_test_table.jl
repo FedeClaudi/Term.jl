@@ -39,11 +39,11 @@ data = Dict(
 t6 = Table(data)
 
 X = rand(5, 3)
-t8 = Table(X;
-    columns_widths=[12, 10, 22],
-    hpad=2,
-    columns_justify=[:left, :center, :left]
-
+t8 = Table(
+    X;
+    columns_widths = [12, 10, 22],
+    hpad = 2,
+    columns_justify = [:left, :center, :left],
 )
 
 # save tables as strings to files

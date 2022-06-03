@@ -234,7 +234,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                 else
                     W = 88
                 end
-                 err, _ = error_message(er)
+                err, _ = error_message(er)
                 msg =
                     "" / Panel(
                         "{#aec2e8}$(err){/#aec2e8}";

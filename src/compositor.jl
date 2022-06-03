@@ -77,7 +77,6 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     return Compositor(expr, layout_elements)
 end
 
-
 Renderable(compositor::Compositor) = Renderable(string(compositor))
 
 # ---------------------------------- update ---------------------------------- #
@@ -137,7 +136,6 @@ end
 
 Base.print(compositor::Compositor; kwargs...) = Base.print(stdout, compositor; kwargs...)
 
-
 """
 Base.show(io::IO, ::MIME"text/plain", compositor::Compositor)
 
@@ -146,8 +144,5 @@ Show a compositor.
 function Base.show(io::IO, ::MIME"text/plain", compositor::Compositor)
     println(io, string(compositor))
 end
-
-
-
 
 end

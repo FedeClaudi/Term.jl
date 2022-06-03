@@ -363,7 +363,10 @@ function cell(
     vertical_justify::Symbol,
 )
     return vertical_pad(
-        do_by_line(y -> apply_style(" " * pad(y, w-2, justify) * " ", style), truncate(x, w-hor_pad)),
+        do_by_line(
+            y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
+            truncate(x, w - hor_pad),
+        ),
         h,
         vertical_justify,
     )
@@ -409,8 +412,15 @@ function make_row_cells(
 )
     N = length(entries)
     cells = map(
-        i ->
-            cell(entries[i], widths[i], hor_pad[i], height, justify[i], style[i], vertical_justify),
+        i -> cell(
+            entries[i],
+            widths[i],
+            hor_pad[i],
+            height,
+            justify[i],
+            style[i],
+            vertical_justify,
+        ),
         1:N,
     )
     return cells

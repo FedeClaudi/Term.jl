@@ -53,7 +53,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
                     Panel(
                         error_source;
                         fit = true,
-                        width=44,
+                        width = 44,
                         subtitle = "error line",
                         style = "dim",
                         subtitle_style = "default bold",

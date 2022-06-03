@@ -118,8 +118,8 @@ abstract type CodeTheme <: AbstractTheme end
 @theme CodeTheme Dict(
     :style => S"",
     :tokens => Dict(
-        TEXT    => S"fg: e6e8e6",
-        
+        TEXT => S"fg: e6e8e6",
+
         # yellow
         NAME_FUNCTION => S"fg: FFF59D;",
         NAME_OTHER => S"fg: FFF59D;",

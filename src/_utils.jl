@@ -2,7 +2,6 @@ int(x) = (Int ∘ round)(x)
 fint(x) = (Int ∘ floor)(x)
 cint(x) = (Int ∘ ceil)(x)
 
-
 """
   loop_last(v)
 
