@@ -34,8 +34,6 @@ corresponding error message
 # ------------  DomainError
 # sqrt(-1)
 
-
-
 # ------------  UndefVarError
 # println(x)
 

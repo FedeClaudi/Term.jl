@@ -1,7 +1,7 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 
-function render_frame_info(frame::StackFrame; show_source=true)
+function render_frame_info(frame::StackFrame; show_source = true)
     func = sprint(StackTraces.show_spec_linfo, frame)
     func = replace(
         func,
@@ -30,18 +30,31 @@ function render_frame_info(frame::StackFrame; show_source=true)
     file = Base.fixup_stdlib_path(string(frame.file))
 
     # create text
-    func_line = hstack(func, inline, c; pad=1)
-    
+    func_line = hstack(func, inline, c; pad = 1)
+
     if !isnothing(m)
         func_line /= " {$pink dim}────{/$pink dim} {#9bb3e0}In module {$pink bold}$(m){/$pink bold}  {$pink dim}────{/$pink dim}{/#9bb3e0}"
     end
 
     if length(string(frame.file)) > 0
-        file_line = RenderableText("    {dim}$(file):{bold white}$(frame.line){/bold white}{/dim}"; width=88)
-        out =  func_line / file_line
+        file_line = RenderableText(
+            "    {dim}$(file):{bold white}$(frame.line){/bold white}{/dim}";
+            width = 88,
+        )
+        out = func_line / file_line
         if show_source
             error_source = load_code_and_highlight(string(frame.file), frame.line)
-            out = lvstack(out, Panel(error_source; fit=true, subtitle="error line", style="dim", subtitle_style="default bold"); pad=1)
+            out = lvstack(
+                out,
+                Panel(
+                    error_source;
+                    fit = true,
+                    subtitle = "error line",
+                    style = "dim",
+                    subtitle_style = "default bold",
+                );
+                pad = 1,
+            )
         end
         return out
     else
