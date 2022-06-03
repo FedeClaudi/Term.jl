@@ -1,6 +1,6 @@
 module Panels
 
-import Term: reshape_text, join_lines, fillin, ltrim_str
+import Term: reshape_text, join_lines, fillin, truncate
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
@@ -110,20 +110,24 @@ function Panel(
     content::Union{AbstractString,AbstractRenderable},
     ::Val{true},
     padding::Padding;
+    width::Union{Nothing,Int} = nothing,
+    height::Union{Nothing,Int} = nothing,
     kwargs...,
 )
-    content = content isa AbstractRenderable ? content : RenderableText(fillin(content))
+    content = content isa AbstractRenderable ? content : RenderableText(content)
 
     content_measure = content.measure
+    width = isnothing(width) ? 0 : width
+    height = isnothing(height) ? 0 : height
     panel_measure = Measure(
-        content_measure.w + padding.left + padding.right + 2,
-        content_measure.h + padding.top + padding.bottom + 2,
+        max(width, content_measure.w + padding.left + padding.right + 2),
+        max(height, content_measure.h + padding.top + padding.bottom + 2),
     )
 
     # if panel is larger than console, fit content to panel
     if panel_measure.w > console_width() || panel_measure.h > console_height()
         return Panel(
-            content isa RenderableText ? string(content) : content,
+            content,
             Val(false),
             padding;
             width = min(panel_measure.w, console_width()),
@@ -180,7 +184,7 @@ function Panel(
     if content.measure.h > height - Δh - 1
         if content.measure.h - height - Δh - 2 > 0
             segments = [
-                content.segments[1:(height - Δh - 2)]...
+                content.segments[1:(height - Δh - 3)]...
                 Segment("... content omitted ...", "dim")
             ]
 
@@ -215,7 +219,7 @@ Construct a `Panel` around of a `AbstractRenderable`
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable};
-    fit::Bool = false,
+    fit::Bool = true,
     padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
     kwargs...,
 )
@@ -370,7 +374,8 @@ function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::I
     else
         ren = lvstack(
             map(
-                s -> get_width(s.text) > width ? ltrim_str(s.text, width) : s.text,
+                s ->
+                    get_width(s.text) > width ? truncate(rstrip(s.text), width) : s.text,
                 ren.segments,
             ),
         )

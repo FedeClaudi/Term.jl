@@ -232,7 +232,7 @@ function Logging.handle_message(
     end
 
     wpad = max(textlen.((_types))...) + 2
-    ks = truncate.(string.(keys(kwargs)), 12)
+    ks = truncate.(string.(keys(kwargs)), 28)
     namepad = max(textlen.(ks)...)
 
     # print all kwargs

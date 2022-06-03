@@ -225,7 +225,7 @@ end
 @testset "\e[34mlayout - panels" begin
     p1 = Panel()
     p2 = Panel(; width = 24, height = 3)
-    p3 = Panel("this {red}panel{/red}"^5; width = 12)
+    p3 = Panel("this {red}panel{/red}"^5; width = 12, fit = false)
 
     testlayout(p1 * p2, 112, 3)
     @test string(p1 * p2) ==

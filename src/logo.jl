@@ -56,6 +56,7 @@ function make_logo()
         These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code""";
         width = 35,
         height = circles.measure.h,
+        fit = false,
     )
     content = circles * vLine(main.measure.h; style = indigo * " dim") * main
 

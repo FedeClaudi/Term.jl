@@ -136,8 +136,8 @@ lorem_description = TextBox(
     width = 30,
     padding = (0, 0, 0, 0),
 )
-lorem1 = TextBox(_lorem; width = 62, padding = (0, 0, 0, 0))
-lorem2 = TextBox(_lorem; width = 42, padding = (0, 0, 0, 0))
+lorem1 = TextBox(_lorem; width = 62, fit = false, padding = (0, 0, 0, 0))
+lorem2 = TextBox(_lorem; width = 42, fit = false, padding = (0, 0, 0, 0))
 
 expr = :(2x + 2π / θ)
 tree = Renderable(sprint(typestree, Float64))

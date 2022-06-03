@@ -54,6 +54,7 @@ Extensively test a panel making sure it has
 the right size and Measure
 """
 function testpanel(p, w, h)
+    # isnothing(h) || println(vLine(h) * p)
     # check all lines have the same length
     _p = string(p)
 

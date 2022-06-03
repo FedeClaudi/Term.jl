@@ -331,6 +331,7 @@ end
 Shorten a string of text to a target width
 """
 function truncate(text::AbstractString, width::Int; trailing_dots = "...")
+    # occursin('\n', text) &&  do_by_line(ln -> truncate(ln, width; trailing_dots=trailing_dots), text)
     width < 0 && return text
     textlen(text) <= width && return text
 

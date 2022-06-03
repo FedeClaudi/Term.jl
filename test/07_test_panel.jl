@@ -11,6 +11,27 @@ import Term.Layout: PlaceHolder
     end
 end
 
+@testset "\e[34mPanel - fit basic shape" begin
+    testpanel(Panel("MYTEXT"; width = 60, height = 10), 60, 10)
+    testpanel(Panel("MYTEXT"; width = 60), 60, 3)
+    testpanel(Panel("MYTEXT"), 12, 3)
+
+    testpanel(Panel("MYTEXT"; width = 60, height = 10, padding = (4, 4, 2, 2)), 60, 10)
+    testpanel(Panel("MYTEXT"; width = 60, padding = (4, 4, 2, 2)), 60, 7)
+    testpanel(Panel("MYTEXT"; padding = (4, 4, 2, 2)), 16, 7)
+end
+
+@testset "\e[34mPanel - fit overflow" begin
+    testpanel(
+        Panel(
+            Panel("MYTEXT"^50; width = 60, height = 10) /
+            Panel("MYTEXT"^50; width = 60, height = 10),
+        ),
+        console_width(),
+        nothing,
+    )
+end
+
 @testset "\e[34mPANEL - fit - measure" begin
     for style in ("default", "red", "on_blue")
         for justify in (:left, :center, :right)
@@ -67,41 +88,172 @@ end
                 88,
                 4,
             )
-            testpanel(Panel("."^1500; style = style, fit = false), 88, 21)
+            testpanel(
+                Panel("."^1500; justify = justify, style = style, fit = false),
+                88,
+                21,
+            )
 
             # ------------------------------- nested panels ------------------------------ #
-            testpanel(Panel(Panel("test"); fit = true, style = style), 94, 5)
+            testpanel(
+                Panel(Panel("test"); fit = true, justify = justify, style = style),
+                16,
+                5,
+            )
 
             testpanel(
                 Panel(
-                    Panel(Panel("."); fit = true, style = style);
-                    fit = true,
+                    Panel(Panel("."); fit = false, justify = justify, style = style);
+                    fit = false,
+                    justify = justify,
                     style = style,
                 ),
-                100,
+                88,
                 7,
             )
 
-            testpanel(Panel(Panel("."^250); fit = true, style = style), 94, 8)
+            testpanel(
+                Panel(Panel("."^250); fit = false, justify = justify, style = style),
+                88,
+                6,
+            )
 
-            # testpanel(Panel(Panel("test"; style = style);), 88, 5)
+            testpanel(
+                Panel(Panel("test"; justify = justify, style = style); fit = false),
+                88,
+                5,
+            )
 
-            # testpanel(Panel(Panel(Panel("."; style = style); style = style);), 88, 7)
+            testpanel(
+                Panel(
+                    Panel(
+                        Panel("."; justify = justify, style = style);
+                        justify = justify,
+                        style = style,
+                    );
+                    fit = false,
+                ),
+                88,
+                7,
+            )
 
-            # testpanel(Panel(Panel("."^250; style = style);), 88, 8)
+            testpanel(
+                Panel(Panel("."^250; justify = justify, style = style); fit = false),
+                88,
+                6,
+            )
 
-            # testpanel(Panel(Panel("t1"; style = style), Panel("t2"; style = style)), 88, 8)
+            testpanel(
+                Panel(
+                    Panel("t1"; justify = justify, style = style),
+                    Panel("t2"; justify = justify, style = style);
+                    fit = false,
+                ),
+                88,
+                8,
+            )
 
-            # testpanel(Panel(Panel("test"; width = 22); width = 30, height = 8), 30, 8)
+            testpanel(
+                Panel(Panel("test"; width = 22); fit = false, width = 30, height = 8),
+                30,
+                8,
+            )
 
-            # testpanel(Panel(Panel("test"; width = 42); width = 30, height = 8), 30, 8)
+            testpanel(
+                Panel(Panel("test"; width = 42); fit = false, width = 30, height = 8),
+                30,
+                8,
+            )
 
-            # testpanel(
-            #     Panel(Panel("test"; width = 42, height = 12); width = 30, height = 8),
-            #     30,
-            #     8,
-            # )
+            testpanel(
+                Panel(
+                    Panel("test"; width = 42, height = 12);
+                    fit = false,
+                    width = 30,
+                    height = 8,
+                ),
+                30,
+                8,
+            )
         end
+    end
+end
+
+@testset "\e[34mPANEL - FIT - measure" begin
+    for justify in (:left, :center, :right)
+        # ----------------------------- text only content ---------------------------- #
+        testpanel(Panel("t"; fit = true), 7, 3)
+        testpanel(Panel("test"; fit = true), 10, 3)
+        testpanel(Panel("1234\n123456789012"; fit = true), 18, 4)
+        testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true), 28, 3)
+        testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true), 28, 4)
+        testpanel(Panel("."^1500; justify = justify, fit = true), console_width(), nothing)
+
+        # ------------------------------- nested panels ------------------------------ #
+        testpanel(Panel(Panel("test"); fit = true, justify = justify), 16, 5)
+
+        testpanel(
+            Panel(
+                Panel(Panel("."); fit = true, justify = justify);
+                fit = true,
+                justify = justify,
+            ),
+            19,
+            7,
+        )
+
+        testpanel(
+            Panel(Panel("."^250); fit = true, justify = justify),
+            console_width(),
+            nothing,
+        )
+
+        testpanel(Panel(Panel("test"; justify = justify); fit = true), 16, 5)
+
+        testpanel(
+            Panel(Panel(Panel("."; justify = justify); justify = justify); fit = true),
+            19,
+            7,
+        )
+
+        testpanel(
+            Panel(Panel("."^250; justify = justify); fit = true),
+            console_width(),
+            nothing,
+        )
+
+        testpanel(
+            Panel(
+                Panel("t1"; justify = justify),
+                Panel("t2"; justify = justify);
+                fit = true,
+            ),
+            14,
+            8,
+        )
+
+        testpanel(
+            Panel(Panel("test"; width = 22); fit = true, width = 30, height = 8),
+            30,
+            8,
+        )
+
+        testpanel(
+            Panel(Panel("test"; width = 42); fit = true, width = 30, height = 8),
+            48,
+            8,
+        )
+
+        testpanel(
+            Panel(
+                Panel("test"; width = 42, height = 12);
+                fit = true,
+                width = 30,
+                height = 8,
+            ),
+            48,
+            14,
+        )
     end
 end
 
@@ -164,20 +316,20 @@ id est laborum.""",
     )
 
     if dotest
-        @test string(Panel(pts; style = "red", width = 44)) ==
+        @test string(Panel(pts; style = "red", fit = false, width = 44)) ==
               "\e[31m╭──────────────────────────────────────────╮\e[39m\n\e[0m\e[31m│\e[39m\e[0m  Lorem\e[31m ipsum dolor s\e[39mit amet, consectetu\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  r adipiscing elit,ed do eiusmod tempor\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34mincididu\e[4mnt ut labore et dolore magna\e[0m    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[4maliqua. Ut enim ad minimveniam, quis\e[0m    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[4mnos\e[24m\e[34mtrud exercitation ullamco laboris\e[0m    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34mnisi ut aliquip ex ea commodo consequa\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34mt. Duis aute \e[31m\e[40mirure dolor in reprehende\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40mrit in voluptate velit esse cillum\e[0m      \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40mdolore eu fugiat nulla pariatur.\e[0m        \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40mExcepteur sint occaecat cupidatat\e[0m       \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34mnon proident, sunt in \e[32mculpa qui offic\e[0m   \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[32mia deserunt mollit anim id est laborum\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[49m.\e[0m                                       \e[0m\e[31m│\e[39m\e[0m\n\e[31m╰──────────────────────────────────────────╯\e[39m\e[0m"
 
-        @test string(Panel(pts; width = 60)) ==
+        @test string(Panel(pts; fit = false, width = 60)) ==
               "\e[22m╭──────────────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem\e[31m ipsum dolor s\e[39mit amet, consectetur adipiscing\e[0m      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  elit,ed do eiusmod tempor \e[1m\e[34mincididu\e[4mnt ut labore et\e[0m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[4mdolore magna aliqua. Ut enim ad minimveniam, quis nos\e[24m\e[34m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34mtrud exercitation ullamco laboris nisi ut aliquip ex\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34mea commodo consequat. Duis aute \e[31m\e[40mirure dolor in repreh\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40menderit in voluptate velit esse cillum dolore eu fugia\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40mt nulla pariatur. Excepteur sint occaecat cupidatat\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34mnon proident, sunt in \e[32mculpa qui officia deserunt\e[0m        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34m\e[49mmollit anim id est laborum.\e[0m                             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────╯\e[22m\e[0m"
     end
 
-    @test string(Panel(pts2; width = 44)) ==
+    @test string(Panel(pts2; fit = false, width = 44)) ==
           "\e[22m╭──────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet, consectetu\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  r adipiscing elit,ed do e\e[31miusmod tempor\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[31mincididunt\e[39m\e[22m ut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[1maliqua.\e[22m Ut enim ad minimveniam, quis\e[32m\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32mnostrud exercitation \e[40mullamco laboris\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[40mnisi ut aliquip ex \e[49m\e[32mea commodo consequa\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32mt.\e[34m Duis aute irure dolor in\e[39m\e[32m reprehende\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[32mrit in voluptate velit\e[39m\e[22m esse \e[3mcillum\e[0m      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3mdolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[22mnulla pariatur.\e[0m        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[22mExcepteur\e[31m sint\e[39m\e[22m\e[34m occaecat cupidatat \e[39m\e[22mnon\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[22mproident, sunt in culpa qui \e[3mofficia\e[23m\e[22m\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32mdeserunt mollit anim id est laborum.\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────╯\e[22m\e[0m"
 
-    @test string(Panel(pts2; width = 51)) ==
+    @test string(Panel(pts2; fit = false, width = 51)) ==
           "\e[22m╭─────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet, consectetur adipi\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  scing elit,ed do e\e[31miusmod tempor incididunt\e[39m\e[22m\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22mut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna aliqua.\e[22m Ut enim\e[0m      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1mad minimveniam, quis\e[32m nostrud exercitation \e[40mul\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[40mlamco laboris nisi ut aliquip ex \e[49m\e[32mea commodo\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32mconsequat.\e[34m Duis aute irure dolor in\e[39m\e[32m reprehen\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[32mderit in voluptate velit\e[39m\e[22m esse \e[3mcillum dolore\e[23m\e[22m\e[31m\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[31meu\e[39m\e[22m\e[3m\e[32m fugiat \e[22mnulla pariatur. Excepteur\e[31m sint\e[39m\e[22m\e[34m\e[0m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[34moccaecat cupidatat \e[39m\e[22mnon proident, sunt in\e[0m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[22mculpa qui \e[3mofficia\e[23m\e[22m deserunt mollit anim id est\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32mlaborum.\e[0m                                       \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────────────────────────────────────────╯\e[22m\e[0m"
 
-    @test string(Panel(pts2; width = 67)) ==
+    @test string(Panel(pts2; fit = false, width = 67)) ==
           "\e[22m╭─────────────────────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet, consectetur adipiscing elit,ed\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  do e\e[31miusmod tempor incididunt\e[39m\e[22m ut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna aliqu\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[1ma.\e[22m Ut enim ad minimveniam, quis\e[32m nostrud exercitation \e[40mullamco\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[40mlaboris nisi ut aliquip ex \e[49m\e[32mea commodo consequat.\e[34m Duis aute\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[34mirure dolor in\e[39m\e[32m reprehenderit in voluptate velit\e[39m\e[22m esse \e[3mcillum\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3mdolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[22mnulla pariatur. Excepteur\e[31m sint\e[39m\e[22m\e[34m occaecat\e[0m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[34mcupidatat \e[39m\e[22mnon proident, sunt in culpa qui \e[3mofficia\e[23m\e[22m deserunt\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32mmollit anim id est laborum.\e[0m                                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
 
     circle = """
@@ -242,9 +394,9 @@ id est laborum.""",
 end
 
 @testset "\e[34mPanel + renderables" begin
-    testpanel(Panel(RenderableText("x" .^ 5)), 88, 3)
+    testpanel(Panel(RenderableText("x" .^ 5)), 11, 3)
 
-    testpanel(Panel(RenderableText("x" .^ 500)), 88, nothing)
+    testpanel(Panel(RenderableText("x" .^ 500); fit = false), 88, 9)
 
     testpanel(Panel(RenderableText("x" .^ 5); fit = true), 11, 3)
 
@@ -285,7 +437,8 @@ end
                             subtitle_style = style,
                             subtitle_justify = justify,
                             fit = fit,
-                        ),
+                        );
+                        fit = fit,
                     ),
                     fit ? nothing : 88,
                     nothing,
