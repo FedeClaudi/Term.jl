@@ -1,3 +1,37 @@
+
+function repr_get_obj_fields_display(obj)
+    field_names = fieldnames(typeof(obj))
+    if length(field_names) == 0
+        theme = term_theme[]
+        return RenderableText(
+            "$obj{$(theme.repr_type_style)}::$(typeof(obj)){/$(theme.repr_type_style)}",
+        )
+        return nothing
+    end
+    field_types = map(f -> "::" * string(f), typeof(obj).types)
+    _values = map(f -> getfield(obj, f), field_names)
+
+    fields = map(
+        ft -> RenderableText(
+            apply_style(string(ft[1]), term_theme[].repr_accent_style) *
+            apply_style(string(ft[2]), term_theme[].repr_type_style),
+        ),
+        zip(field_names, field_types),
+    )
+
+    values = []
+    for val in _values
+        val = truncate(string(val), 45)
+        push!(values, RenderableText.(val; style = term_theme[].repr_values_style))
+    end
+
+    line = vLine(length(fields); style = term_theme[].repr_line_style)
+    space = Spacer(1, length(fields))
+
+    content = rvstack(fields...) * line * space * lvstack(values...)
+    return content
+end
+
 """
     typename(typedef::Expr)
 

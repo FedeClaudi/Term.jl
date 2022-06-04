@@ -12,7 +12,7 @@ import ..Segments: Segment
 using ..Boxes
 
 export Padding, vstack, hstack, pad, pad!, vertical_pad, vertical_pad!
-export Spacer, vLine, hLine
+export Spacer, vLine, hLine, PlaceHolder
 export leftalign!, center!, rightalign!
 export leftalign, center, rightalign
 export lvstack, cvstack, rvstack

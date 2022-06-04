@@ -9,7 +9,7 @@ import Term:
     split_lines,
     term_theme
 
-import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack
+import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine
 import ..Renderables: RenderableText, info, AbstractRenderable
 import ..Consoles: console_width
 import ..Panels: Panel, TextBox
@@ -23,41 +23,10 @@ include("_repr.jl")
 include("_inspect.jl")
 
 function termshow(io::IO, obj)
-    field_names = fieldnames(typeof(obj))
-    if length(field_names) == 0
-        theme = term_theme[]
-        print(
-            io,
-            RenderableText(
-                "$obj{$(theme.repr_type_style)}::$(typeof(obj)){/$(theme.repr_type_style)}",
-            ),
-        )
-        return nothing
-    end
-    field_types = map(f -> "::" * string(f), typeof(obj).types)
-    _values = map(f -> getfield(obj, f), field_names)
-
-    fields = map(
-        ft -> RenderableText(
-            apply_style(string(ft[1]), term_theme[].repr_accent_style) *
-            apply_style(string(ft[2]), term_theme[].repr_type_style),
-        ),
-        zip(field_names, field_types),
-    )
-
-    values = []
-    for val in _values
-        val = truncate(string(val), 45)
-        push!(values, RenderableText.(val; style = term_theme[].repr_values_style))
-    end
-
-    line = vLine(length(fields); style = term_theme[].repr_line_style)
-    space = Spacer(1, length(fields))
-
     return print(
         io,
         Panel(
-            rvstack(fields...) * line * space * lvstack(values...);
+            repr_get_obj_fields_display(obj);
             fit = true,
             subtitle = escape_brackets(string(typeof(obj))),
             subtitle_justify = :right,
@@ -70,6 +39,28 @@ function termshow(io::IO, obj)
 end
 
 termshow(obj) = termshow(stdout, obj)
+
+# ---------------------------------------------------------------------------- #
+#                                     EXPR                                     #
+# ---------------------------------------------------------------------------- #
+function termshow(io::IO, e::Expr)
+    content = repr_get_obj_fields_display(e)
+    content =
+        cvstack("{green}$(highlight(string(e))){/green}", hLine(content.measure.w), content)
+    return print(
+        io,
+        Panel(
+            content;
+            fit = true,
+            subtitle = escape_brackets(string(typeof(e))),
+            subtitle_justify = :right,
+            width = 40,
+            justify = :center,
+            style = term_theme[].repr_panel_style,
+            subtitle_style = term_theme[].repr_name_style,
+        ),
+    )
+end
 
 # ---------------------------------------------------------------------------- #
 #                                  DICTIONARY                                  #

@@ -10,11 +10,16 @@ layout_simbols = (
     :vstack,
     :lvstack,
     :leftalign,
+    :hstack,
     :center,
     :rightalign,
     :lvstack,
     :rvstack,
     :cvstack,
+    :pad,
+    :pad!,
+    :vertical_pad,
+    :vertical_pad!,
 )
 
 function collect_elements(exp::Expr)
@@ -54,8 +59,9 @@ function extract_renderable_from_kwargs(s, w, h; kwargs...)
     ren = get(kwargs, s, nothing)
     if !isnothing(ren)
         ren = ren isa AbstractRenderable ? ren : RenderableText(ren)
-        msg = "While creating a Compository layout, the layout element"
 
+        # check renderable has the right size
+        msg = "While creating a Compository layout, the layout element"
         @assert ren.measure.w == w highlight(
             msg * " :$s has width $w but the renderable passed has width $(ren.measure.w)",
         )

@@ -11,8 +11,10 @@ include("colors.jl")
 include("theme.jl")
 include("highlight.jl")
 
-const TERM_DEBUG_ON = Ref(true)
+const TERM_DEBUG_ON = Ref(false)
 const term_theme = Ref(Theme())
+
+function update! end
 
 # rely on other modules
 include("style.jl")
@@ -35,32 +37,18 @@ include("logo.jl")
 include("introspection.jl")
 include("tables.jl")
 include("repr.jl")
-include("compositor.jl")
+include("compositors.jl")
 
 export RenderableText, Panel, TextBox
-export Spacer, vLine, hLine, pad, pad!, vstack, hstack
 export term_theme, highlight
-export inspect, typestree, expressiontree
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
-export install_term_stacktrace
-export install_term_logger, uninstall_term_logger
-export track
-export Tree
-export Dendogram
-export rightalign!,
-    leftalign!,
-    center!,
-    lvstack,
-    cvstack,
-    rvstack,
-    leftalign,
-    center,
-    rightalign,
-    vertical_pad!,
-    vertical_pad
-export @with_repr, termshow, install_term_repr, PlaceHolder
+export install_term_stacktrace,
+    install_term_logger, uninstall_term_logger, install_term_repr
+export vLine, hLine
+export @with_repr, termshow
+export Compositor, update!
 
 # ----------------------------------- base ----------------------------------- #
 using .Measures
@@ -149,6 +137,6 @@ using .Repr: @with_repr, termshow, install_term_repr
 
 using .Tables: Table
 
-using .Compositors: Compositor
+using .Compositors: Compositor, update!
 
 end

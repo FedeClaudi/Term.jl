@@ -78,13 +78,17 @@ tprint("\n\n{bold green}Running: '16_test_tree.jl' {/bold green}")
 tprint("\n\n{bold green}Running: '17_test_dendogram.jl' {/bold green}")
 @time @timeit_include("17_test_dendogram.jl")
 
-# ? 18 Dendogram
+# ? 18 Table
 tprint("\n\n{bold green}Running: '18_test_table.jl' {/bold green}")
 @time @timeit_include("18_test_table.jl")
 
-# ? 18 Dendogram
+# ? 19 Repr
 tprint("\n\n{bold green}Running: '19_test_repr.jl' {/bold green}")
 @time @timeit_include("19_test_repr.jl")
+
+# ? 20 Compositor
+tprint("\n\n{bold green}Running: '20_test_compositor.jl' {/bold green}")
+@time @timeit_include("20_test_compositor.jl")
 
 # ? 999 EXAMPLES
 tprint("\n\n{bold green}Running: '999_test_examples.jl' {/bold green}")

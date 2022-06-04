@@ -7,7 +7,7 @@ import ..Layout: PlaceHolder
 import ..Measures: width, height
 import ..Renderables: AbstractRenderable, RenderableText, Renderable
 import ..Repr: @with_repr, termshow
-import Term: highlight
+import Term: highlight, update!
 
 export Compositor
 
@@ -20,14 +20,15 @@ include("_compositor.jl")
     renderable::Union{Nothing,String,AbstractRenderable}
     placeholder::PlaceHolder
 end
-@with_repr mutable struct Compositor
+
+mutable struct Compositor
     layout::Expr
     elements::Dict{Symbol,LayoutElement}
 end
 
 function parse_single_element_layout(expr::Expr)
     s, w, h = expr.args
-    [:($s($w, $h))]
+    return [:($s($w, $h))]
 end
 
 function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
@@ -41,6 +42,7 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     else
         colors = [pink]
     end
+
     renderables = Dict(
         s.args[1] => extract_renderable_from_kwargs(s.args...; kwargs...) for s in elements
     )
@@ -60,10 +62,10 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     )
 
     # edit layout expression to add padding and remove size info
-    expr = string(clean_layout_expr(layout))
+    expr = string(clean_layout_expr(copy(layout)))
 
     if hpad > 0
-        expr = replace(expr, "*" => "* Spacer($hpad, 1) * ")
+        expr = replace(expr, "* " => "* Spacer($hpad, 1) * ")
     end
 
     if vpad > 0

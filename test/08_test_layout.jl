@@ -1,5 +1,5 @@
 import Term.Renderables: Renderable
-import Term.Layout: pad, PlaceHolder
+using Term.Layout
 
 import Term:
     RenderableText,
