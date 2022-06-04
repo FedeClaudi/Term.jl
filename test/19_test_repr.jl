@@ -33,27 +33,24 @@ end
           "\e[38;2;155;179;224m╭──────────────────────────────────────╮\e[39m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m                T()\e[38;2;187;134;219m::T\e[39m                \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[38;2;155;179;224m╰──────────────────────────────── \e[38;2;227;172;141mT\e[39m\e[38;2;155;179;224m\e[38;2;155;179;224m ───╯\e[39m\e[0m\e[39m\e[38;2;155;179;224m\e[0m\n"
 end
 
-objs =  if VERSION >= v"1.7.1"
+objs = if VERSION >= v"1.7.1"
     (
-    [1, 2, 3],
-    Dict(:x => [1, 2, 3], "a" => Dict(:z => "a")),
-    Dict(i => i for i in 1:100),
-    zeros(120, 300),
-    zeros(200),
-    zeros(3, 3, 3),
-    termshow,
-    :(x / y + √9),
-)
+        [1, 2, 3],
+        Dict(:x => [1, 2, 3], "a" => Dict(:z => "a")),
+        Dict(i => i for i in 1:100),
+        zeros(120, 300),
+        zeros(200),
+        zeros(3, 3, 3),
+        termshow,
+        :(x / y + √9),
+    )
 else
     (
-    [1, 2, 3],
-    Dict(:x => [1, 2, 3], "a" => Dict(:z => "a")),
-    Dict(i => i for i in 1:100),
-    zeros(120, 300),
-    zeros(200),
-    termshow,
-    :(x / y + √9),
-)
+        [1, 2, 3],
+        Dict(:x => [1, 2, 3], "a" => Dict(:z => "a")),
+        Dict(i => i for i in 1:100),
+        termshow,
+    )
 end
 
 # for (i, t) in enumerate(objs)
@@ -61,7 +58,6 @@ end
 # end
 
 @testset "TERMSHOW for types" begin
-    
     for (i, t) in enumerate(objs)
         @test fromfile("./txtfiles/termshow_$i.txt") == cleanstring(t)
     end
