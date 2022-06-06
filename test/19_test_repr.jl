@@ -35,30 +35,30 @@ end
 
 objs = if VERSION >= v"1.7.1"
     (
-        [1, 2, 3],
-        Dict(:x => [1, 2, 3], "a" => Dict(:z => "a")),
-        Dict(i => i for i in 1:100),
-        zeros(120, 300),
-        zeros(200),
-        zeros(3, 3, 3),
-        termshow,
-        :(x / y + √9),
+        (1, [1, 2, 3]),
+        (2, Dict(:x => [1, 2, 3], "a" => Dict(:z => "a"))),
+        (3, Dict(i => i for i in 1:100)),
+        (4, zeros(120, 300)),
+        (5, zeros(200)),
+        (6, zeros(3, 3, 3)),
+        (7, termshow),
+        (8, :(x / y + √9)),
     )
 else
     (
-        [1, 2, 3],
-        Dict(:x => [1, 2, 3], "a" => Dict(:z => "a")),
-        Dict(i => i for i in 1:100),
-        termshow,
+        (1, [1, 2, 3]),
+        (2, Dict(:x => [1, 2, 3], "a" => Dict(:z => "a"))),
+        (3, Dict(i => i for i in 1:100)),
+        (7, termshow),
     )
 end
 
-# for (i, t) in enumerate(objs)
-#     tofile(string(t), "./txtfiles/termshow_$i.txt")
-# end
+for (i, t) in objs
+    tofile(string(t), "./txtfiles/termshow_$i.txt")
+end
 
 @testset "TERMSHOW for types" begin
-    for (i, t) in enumerate(objs)
+    for (i, t) in objs
         @test fromfile("./txtfiles/termshow_$i.txt") == cleanstring(t)
     end
 end
