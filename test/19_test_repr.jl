@@ -53,9 +53,9 @@ else
     )
 end
 
-for (i, t) in objs
-    tofile(string(t), "./txtfiles/termshow_$i.txt")
-end
+# for (i, t) in objs
+#     tofile(string(t), "./txtfiles/termshow_$i.txt")
+# end
 
 @testset "TERMSHOW for types" begin
     for (i, t) in objs
