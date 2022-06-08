@@ -49,7 +49,6 @@ for text in strings
     tprint(reshape_text(text, width))
     println('_'^width)
     tprint(text)
-    
 end
 
 # text = strings[end-1]

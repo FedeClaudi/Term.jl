@@ -9,7 +9,6 @@ import Term:
     unescape_brackets_with_space,
     TERM_DEBUG_ON
 
-
 import ..Style: get_style_codes, MarkupStyle, apply_style
 import Term: highlight as highlighter
 import ..Consoles: console_width
@@ -142,13 +141,8 @@ function RenderableText(
     # create renderable
     if isnothing(style)
         if !isnothing(width)
-            segments = Segment.(
-                map(
-                    ln -> rpad(ln, width-textwidth(ln)+1),
-                    split_lines(text)
-                )
-            )
-
+            segments =
+                Segment.(map(ln -> rpad(ln, width - textwidth(ln) + 1), split_lines(text)))
 
         else
             segments = Segment.(split_lines(text))

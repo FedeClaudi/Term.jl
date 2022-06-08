@@ -372,10 +372,8 @@ function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::I
         ren = ren isa RenderableText ? join(getfield.(ren.segments, :text), "\n") : ren
         ren = reshape_text(ren, width)
     else
-        segs = map(
-            s->pad(ltrim_str(s.text, width), width, :left), ren.segments
-        )
-    
+        segs = map(s -> pad(ltrim_str(s.text, width), width, :left), ren.segments)
+
         ren = lvstack(segs)
     end
     return ren

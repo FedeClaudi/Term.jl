@@ -11,7 +11,7 @@ include("measures.jl")
 include("colors.jl")
 include("theme.jl")
 include("highlight.jl")
- 
+
 const TERM_DEBUG_ON = Ref(true)
 const term_theme = Ref(Theme())
 

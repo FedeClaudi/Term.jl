@@ -22,8 +22,6 @@ import Term:
 import Term.Style: apply_style
 import Term.Measures: width as get_width
 
-
-
 @testset "TU_markup" begin
     strings = [
         (
@@ -138,8 +136,8 @@ id est laborum."""
     Term provides a simple {italic green4 bold}markup language{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline} to your text.
     More complicated text layout can be created using {red}"Renderable"{/red} objects such 
     as {red}"Panel"{/red} and {red}"TextBox"{/red}.
-    These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code""";
-    
+    These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code"""
+
     logo_str_reshaped = "Term.jl is a \e[38;2;149;88;178mJulia\e[39m package for \ncreating styled terminal \noutputs.\n\nTerm provides a simple \n\e[3m\e[38;5;28m\e[1mmarkup language\e[23m\e[39m\e[39m\e[3m\e[22m\e[38;5;28m to add \e[1m\e[38;5;12mcolor\e[22m\e[38;5;28m\e[39m\e[1m \nand \e[1m\e[4mstyles\e[22m\e[1m\e[24m\e[1m to your text.\nMore \ncomplicated text layout can be \ncreated using \e[31m\"Renderable\"\e[39m\e[1m \nobjects such \nas \e[31m\"Panel\"\e[39m\e[1m and \n\e[31m\"TextBox\"\e[39m\e[1m.\nThese can also be \nnested and stacked to create \n\e[3m\e[38;5;175mfancy\e[23m\e[1m\e[39m\e[3m and \e[4minformative\e[24m\e[3m terminal \nouputs for your Julia code"
 
     strings = [
@@ -161,7 +159,7 @@ id est laborum."""
         ),
         (
             "ต้าอ่วยวาท{red}กรรมอาว์เซี้ยว กระดี๊กระด๊า {/red}ช็อปซาดิสต์โมจิดีพาร์ตเม{blue underline}นต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต{/blue underline}อร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
-            "ต้าอ่วยวาท\e[31mกรรมอาว์เซี้ยว กระดี๊กระด๊า \n\e[39mช็อปซาดิสต์โมจิดีพาร์ตเม\e[34m\e[4mต์ อินดอร์วิว \nสี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต\e[39m\e[24m\e[34m}อร์ฮันนีมูน \nยาวีแพลนหงวนสคริปต์ \nแจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า \nบอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ \nบอยคอตต์เฟอร์รี่บึมมาราธอน "
+            "ต้าอ่วยวาท\e[31mกรรมอาว์เซี้ยว กระดี๊กระด๊า \n\e[39mช็อปซาดิสต์โมจิดีพาร์ตเม\e[34m\e[4mต์ อินดอร์วิว \nสี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต\e[39m\e[24m\e[34m}อร์ฮันนีมูน \nยาวีแพลนหงวนสคริปต์ \nแจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า \nบอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ \nบอยคอตต์เฟอร์รี่บึมมาราธอน ",
         ),
         (
             "국가유공자·상이군경 및 전몰군경의 유가족은 법률이 정하는 바에 의하여",
@@ -171,7 +169,7 @@ id est laborum."""
             "국{red}가유공자·상이군{bold}경 및 전{/bold}몰군경의 유{/red}가족은 법률이 정하는 바에 의하여",
             "국\e[31m가유공자·상이군\e[1m경 및 \n전\e[22m\e[31m몰군경의 유\e[39m가족은 법률이 \n정하는 바에 의하여",
         ),
-        (   
+        (
             "朗眠裕安無際集正聞進士健音社野件草売規作独特認権価官家複入豚末告設悟自職遠氷育教載最週場仕踪持白炎組特曲強真雅立覧自価宰身訴側善論住理案者券真犯著避銀楽験館稿告",
             "朗眠裕安無際集正聞進士健音社野件\n草売規作独特認権価官家複入豚末\n告設悟自職遠氷育教載最週場仕踪\n持白炎組特曲強真雅立覧自価宰身\n訴側善論住理案者券真犯著避銀\n楽験館稿告",
         ),
@@ -185,11 +183,11 @@ id est laborum."""
         ),
         (
             "┌─────────{red}───ab{/red}cde────┬──────{green}────── ────┬────────abcde fghi{/green}────────┬────────────────┬──────────────",
-            "┌─────────\e[31m───ab\e[39mcde────\n┬──────\e[32m────── \n────┬────────abcde \nfghi\e[39m────────┬───────────\n─────┬──────────────" ,
+            "┌─────────\e[31m───ab\e[39mcde────\n┬──────\e[32m────── \n────┬────────abcde \nfghi\e[39m────────┬───────────\n─────┬──────────────",
         ),
         (
             "┌──────────{red}────{/red}──┬{blue bold}────────────────┬──{/blue bold}──────────────┬────────────────┬──────────────end",
-            "┌──────────\e[31m────\e[39m──┬\e[1m───────────────┬──{/blue\n}\e[22m\e[39m}──────────────┬────────\n────────┬──────────────end\e[39m"
+            "┌──────────\e[31m────\e[39m──┬\e[1m───────────────┬──{/blue\n}\e[22m\e[39m}──────────────┬────────\n────────┬──────────────end\e[39m",
         ),
         (
             "."^100,
@@ -201,11 +199,10 @@ id est laborum."""
         ),
         (
             ".|||...."^10,
-            ".|||.....|||.....|||.....|||.....\n|||.....|||.....|||.....|||.....\n|||.....|||...."
+            ".|||.....|||.....|||.....|||.....\n|||.....|||.....|||.....|||.....\n|||.....|||....",
         ),
         (str, str_reshaped),
         (logo_str, logo_str_reshaped),
-
     ]
 
     for (s1, s2) in strings

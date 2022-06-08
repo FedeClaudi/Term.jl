@@ -37,12 +37,12 @@ end
 
     r = RenderableText(lorem; width = 22)
     @test string(r) ==
-    "Lorem ipsum dolor    \nsit amet,            \nconsectetur          \nadipiscing elit, sed \ndo eiusmod tempor    \nincididunt ut labore "
+          "Lorem ipsum dolor    \nsit amet,            \nconsectetur          \nadipiscing elit, sed \ndo eiusmod tempor    \nincididunt ut labore "
     @test r.measure.w == 21
 
     r = RenderableText(lorem; width = 22, style = "red")
     @test string(r) ==
-    "\e[31mLorem ipsum dolor    \e[39m\n\e[31msit amet,            \e[39m\n\e[31mconsectetur          \e[39m\n\e[31madipiscing elit, sed \e[39m\n\e[31mdo eiusmod tempor    \e[39m\n\e[31mincididunt ut labore \e[39m"
+          "\e[31mLorem ipsum dolor    \e[39m\n\e[31msit amet,            \e[39m\n\e[31mconsectetur          \e[39m\n\e[31madipiscing elit, sed \e[39m\n\e[31mdo eiusmod tempor    \e[39m\n\e[31mincididunt ut labore \e[39m"
     @test r.measure.w == 21
 
     @test string(RenderableText("a string")) == "a string"

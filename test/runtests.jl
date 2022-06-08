@@ -10,7 +10,6 @@ const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
 dotest = console_width() >= 88
 
-
 # ? 1  - text utils
 tprint("{bold green}Running: '01_test_text_utils.jl' {/bold green}")
 @time @timeit_include("01_test_text_utils.jl")

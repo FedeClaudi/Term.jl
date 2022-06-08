@@ -340,4 +340,3 @@ function truncate(text::AbstractString, width::Int; trailing_dots = "...")
     trunc = reshape_text(text, width - 3)
     return split_lines(trunc)[1] * trailing_dots
 end
-
