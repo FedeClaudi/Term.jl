@@ -8,6 +8,8 @@ import Term:
     join_lines,
     unescape_brackets_with_space,
     TERM_DEBUG_ON
+
+
 import ..Style: get_style_codes, MarkupStyle, apply_style
 import Term: highlight as highlighter
 import ..Consoles: console_width
@@ -139,11 +141,24 @@ function RenderableText(
 
     # create renderable
     if isnothing(style)
-        segments = Segment.(split_lines(text))
+        if !isnothing(width)
+            segments = Segment.(
+                map(
+                    ln -> rpad(ln, width-textwidth(ln)+1),
+                    split_lines(text)
+                )
+            )
+
+
+        else
+            segments = Segment.(split_lines(text))
+        end
     else
         style_init, style_finish = get_style_codes(MarkupStyle(style))
         segments = map(ln -> Segment(style_init * ln * style_finish), split_lines(text))
     end
+
+    # @info "a" Measure(segments) segments[1]
 
     return RenderableText(segments, Measure(segments), style)
 end

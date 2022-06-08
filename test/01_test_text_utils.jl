@@ -20,6 +20,9 @@ import Term:
     truncate,
     reshape_text
 import Term.Style: apply_style
+import Term.Measures: width as get_width
+
+
 
 @testset "TU_markup" begin
     strings = [
@@ -128,67 +131,81 @@ in voluptate velit{/green} esse {italic}cillum dolore{/italic}{red} eu{/red}{ita
 pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident, 
 sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
 id est laborum."""
+    str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, \nconsectetur adipiscing elit,\ned \ndo e\e[31miusmod tempor incididunt\e[39m\e[22m ut \n\e[1mlabore et \e[4mdolore\e[24m\e[1m magna aliqua.\e[22m \nUt enim ad minim\nveniam, quis\e[32m \nnostrud exercitation \e[40mullamco \nlaboris nisi ut aliquip ex \e[49m\e[32m\nea \ncommodo consequat.\e[34m Duis aute \nirure dolor in\e[39m\e[32m reprehenderit \nin \nvoluptate velit\e[39m\e[22m esse \e[3mcillum \ndolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[23m\e[22m\e[39m\e[3mnulla \n\npariatur. Excepteur\e[31m sint\e[39m\e[3m\e[34m \noccaecat cupidatat \e[39m\e[3mnon \nproident, \nsunt in culpa qui \n\e[3mofficia\e[23m\e[3m deserunt mollit anim \nid \nest laborum."
 
-    str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, conse\e[0m\nctetur adipiscing elit,\e[0m\ned do e\e[31miusmod tempor incididunt\e[39m\e[0m\nut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna aliqua\e[0m\n\e[1m\e[1m. Ut enim ad minim\e[0m\nveniam, quis\e[32m nostrud exercitation\e[0m\n\e[32m\e[40mullamco laboris nisi ut aliquip\e[0m\n\e[32m\e[40mex \e[49m\e[0m\nea commodo consequat.\e[34m Duis aute\e[0m\n\e[34mirure dolor in\e[39m reprehenderit\e[0m\nin voluptate velit{/green} esse \e[3mc\e[0m\n\e[3millum dolore\e[23m\e[31m eu\e[39m\e[23m\e[3m\e[32m fugiat nulla\e[0m\npariatur. Excepteur\e[31m sint\e[39m\e[34m occaecat\e[0m\n\e[34mcupidatat \e[39mnon proident,\e[0m\nsunt in culpa qui \e[3mofficia\e[23m deserun\e[0m\nt mollit anim\e[0m\nid est laborum."
+    logo_str = """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
+
+    Term provides a simple {italic green4 bold}markup language{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline} to your text.
+    More complicated text layout can be created using {red}"Renderable"{/red} objects such 
+    as {red}"Panel"{/red} and {red}"TextBox"{/red}.
+    These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code""";
+    
+    logo_str_reshaped = "Term.jl is a \e[38;2;149;88;178mJulia\e[39m package for \ncreating styled terminal \noutputs.\n\nTerm provides a simple \n\e[3m\e[38;5;28m\e[1mmarkup language\e[23m\e[39m\e[39m\e[3m\e[22m\e[38;5;28m to add \e[1m\e[38;5;12mcolor\e[22m\e[38;5;28m\e[39m\e[1m \nand \e[1m\e[4mstyles\e[22m\e[1m\e[24m\e[1m to your text.\nMore \ncomplicated text layout can be \ncreated using \e[31m\"Renderable\"\e[39m\e[1m \nobjects such \nas \e[31m\"Panel\"\e[39m\e[1m and \n\e[31m\"TextBox\"\e[39m\e[1m.\nThese can also be \nnested and stacked to create \n\e[3m\e[38;5;175mfancy\e[23m\e[1m\e[39m\e[3m and \e[4minformative\e[24m\e[3m terminal \nouputs for your Julia code"
 
     strings = [
         (
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "Lorem ipsum dolor sit amet, conse\nctetur adipiscing elit, sed do\neiusmod tempor incididunt ut\nlabore et dolore magna aliqua.",
+            "Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit, \nsed do eiusmod tempor \nincididunt ut labore et dolore \nmagna aliqua.",
         ),
         (
             "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
-            "Lorem \e[31mipsum dolor sit \e[4mamet, conse\e[0m\n\e[31m\e[4mctetur\e[24m\e[31m adipiscing elit, \e[39m\e[34msed do\e[0m\n\e[31m\e[34meiusmod tempor incididunt\e[39m ut\e[0m\n\e[31mlabore et dolore magna aliqua.\e[0m",
+            "Lorem \e[31mipsum dolor sit \e[4mamet, \nconsectetur\e[24m\e[31m adipiscing elit, \n\e[39m\e[34msed do eiusmod tempor \nincididunt\e[39m ut labore et dolore \nmagna aliqua.",
         ),
         (
             "Lorem{red}ipsumdolorsit{underline}amet, consectetur{/underline} adipiscing elit, {/red}seddoeiusmo{blue}dtemporincididunt{/blue}ut labore et dolore magna aliqua.",
-            "Lorem\e[31mipsumdolorsit\e[4mamet, consectet\e[0m\n\e[31m\e[4mur\e[24m\e[31m adipiscing elit, \e[39mseddoeiusmo\e[34mdt\e[0m\n\e[31m\e[34memporincididunt\e[39mut labore et dolor\e[0m\n\e[31me magna aliqua.\e[0m",
+            "Lorem\e[31mipsumdolorsit\e[4mamet, \nconsectetur\e[24m\e[31m adipiscing elit, \n\e[39mseddoeiusmo\e[34mdtemporincididunt\e[39mut \nlabore et dolore magna aliqua.",
         ),
         (
             "ต้าอ่วยวาทกรรมอาว์เซี้ยว กระดี๊กระด๊า ช็อปซาดิสต์โมจิดีพาร์ตเมนต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
-            "ต้าอ่วยวาทกรรมอาว์เซี้ยว กระดี๊กระด๊า\nช็อปซาดิสต์โมจิดีพาร์ตเมนต์ อินดอร์วิว สี่แย\nกมาร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน ยาวีแพลนห\nงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุม\nบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เ\nฟอร์รี่บึมมาราธอน",
+            "ต้าอ่วยวาทกรรมอาว์เซี้ยว กระดี๊กระด๊า \nช็อปซาดิสต์โมจิดีพาร์ตเมนต์ อินดอร์วิว \nสี่แยกมาร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน \nยาวีแพลนหงวนสคริปต์ \nแจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า \nบอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ \nบอยคอตต์เฟอร์รี่บึมมาราธอน ",
         ),
         (
             "ต้าอ่วยวาท{red}กรรมอาว์เซี้ยว กระดี๊กระด๊า {/red}ช็อปซาดิสต์โมจิดีพาร์ตเม{blue underline}นต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต{/blue underline}อร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
-            "ต้าอ่วยวาท\e[31mกรรมอาว์เซี้ยว กระดี๊กระด๊า \e[39mช็อป\e[0m\nซาดิสต์โมจิดีพาร์ตเม\e[4m\e[34mนต์ อินดอร์วิว สี่แยกมา\e[0m\n\e[4m\e[34mร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน ยาวีแพลนหงวน\e[0m\n\e[4m\e[34mสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า\e[0m\n\e[4m\e[34mบอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์\e[0m\n\e[4m\e[34mรี่บึมมาราธอน\e[0m",
+            "ต้าอ่วยวาท\e[31mกรรมอาว์เซี้ยว กระดี๊กระด๊า \n\e[39mช็อปซาดิสต์โมจิดีพาร์ตเม\e[34m\e[4mต์ อินดอร์วิว \nสี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต\e[39m\e[24m\e[34m}อร์ฮันนีมูน \nยาวีแพลนหงวนสคริปต์ \nแจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า \nบอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ \nบอยคอตต์เฟอร์รี่บึมมาราธอน "
         ),
         (
             "국가유공자·상이군경 및 전몰군경의 유가족은 법률이 정하는 바에 의하여",
-            "국가유공자·상이군경 및 전몰군경의\n유가족은 법률이 정하는 바에\n의하여",
+            "국가유공자·상이군경 및 \n전몰군경의 유가족은 법률이 \n정하는 바에 의하여",
         ),
         (
             "국{red}가유공자·상이군{bold}경 및 전{/bold}몰군경의 유{/red}가족은 법률이 정하는 바에 의하여",
-            "국\e[31m가유공자·상이군\e[1m경 및 전\e[22m\e[31m몰군경의\e[0m\n\e[31m\e[31m유\e[39m가족은 법률이 정하는 바에\e[0m\n\e[31m의하여\e[0m",
+            "국\e[31m가유공자·상이군\e[1m경 및 \n전\e[22m\e[31m몰군경의 유\e[39m가족은 법률이 \n정하는 바에 의하여",
+        ),
+        (   
+            "朗眠裕安無際集正聞進士健音社野件草売規作独特認権価官家複入豚末告設悟自職遠氷育教載最週場仕踪持白炎組特曲強真雅立覧自価宰身訴側善論住理案者券真犯著避銀楽験館稿告",
+            "朗眠裕安無際集正聞進士健音社野件\n草売規作独特認権価官家複入豚末\n告設悟自職遠氷育教載最週場仕踪\n持白炎組特曲強真雅立覧自価宰身\n訴側善論住理案者券真犯著避銀\n楽験館稿告",
         ),
         (
             "┌────────────────┬────────────────┬────────────────┬────────────────┬──────────────",
-            "┌────────────────┬───────────────\n─┬────────────────┬──────────────\n──┬──────────────",
+            "┌────────────────┬───────────────\n─┬────────────────┬─────────────\n───┬──────────────",
         ),
         (
             "┌────────────abcde────┬──────────── ────┬────────abcde fghi────────┬────────────────┬──────────────",
-            "┌────────────abcde────┬──────────\n── ────┬────────abcde fghi───────\n─┬────────────────┬──────────────",
+            "┌────────────abcde────┬──────────\n── ────┬────────abcde \nfghi────────┬────────────────┬──\n────────────",
         ),
         (
             "┌─────────{red}───ab{/red}cde────┬──────{green}────── ────┬────────abcde fghi{/green}────────┬────────────────┬──────────────",
-            "┌─────────\e[31m───ab\e[39mcde────┬──────\e[32m────\e[0m\n\e[32m── ────┬────────abcde fghi\e[39m───────\e[0m\n─┬────────────────┬──────────────\e[0m\n\e[0m",
+            "┌─────────\e[31m───ab\e[39mcde────\n┬──────\e[32m────── \n────┬────────abcde \nfghi\e[39m────────┬───────────\n─────┬──────────────" ,
         ),
         (
             "┌──────────{red}────{/red}──┬{blue bold}────────────────┬──{/blue bold}──────────────┬────────────────┬──────────────end",
-            "┌──────────\e[31m────\e[39m──┬\e[1m\e[34m───────────────\e[0m\n\e[1m\e[34m─┬────────────────┬──────────────\e[0m\n\e[1m\e[34m──┬──────────────end\e[0m",
+            "┌──────────\e[31m────\e[39m──┬\e[1m───────────────┬──{/blue\n}\e[22m\e[39m}──────────────┬────────\n────────┬──────────────end\e[39m"
         ),
         (
             "."^100,
-            ".................................\n.................................\n.................................\n.",
+            ".................................\n................................\n................................\n...",
         ),
         (
             ".{red}|||{/red}...."^10,
-            ".\e[31m|||\e[39m.....\e[31m|||\e[39m.....\e[31m|||\e[39m.....\e[31m|||\e[39m....\e[0m\n.\e[31m|||\e[39m.....\e[31m|||\e[39m.....\e[31m|||\e[39m.....\e[31m|||\e[39m.....\e[31m\e[0m\n\e[31m|||\e[39m.....\e[31m|||\e[39m....\e[0m",
+            ".\e[31m|||\e[39m.....\e[31m|||{/red\n}.....\e[31m|||\e[39m.....\e[31m||\n|\e[39m\e[31m.....\e[31m|||\e[39m.....\e[31m|||\e[39m\e[31m.....\e[31m|||\e[39m\e[31m\n.....\e[31m|||\e[39m\e[31m.....\e[31m|||\n\e[39m\e[31m.....\e[31m|||\e[39m\e[31m....\e[39m",
         ),
         (
             ".|||...."^10,
-            ".|||.....|||.....|||.....|||.....\n|||.....|||.....|||.....|||.....|\n||.....|||....",
+            ".|||.....|||.....|||.....|||.....\n|||.....|||.....|||.....|||.....\n|||.....|||...."
         ),
         (str, str_reshaped),
+        (logo_str, logo_str_reshaped),
+
     ]
 
     for (s1, s2) in strings
@@ -196,7 +213,7 @@ id est laborum."""
         @test reshaped == s2
     end
 
-    for width in 33:100
+    for width in (40, 60, 99)
         rh = reshape_text(str, width)
         @test any(textlen.(split(rh, "\n")) .> width) == false
     end

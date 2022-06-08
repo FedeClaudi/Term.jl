@@ -79,3 +79,7 @@ MyType(x::Int, y::Int) = MyType(x, y, "" + string(1 + "o"))
 MyType(x::Int) = MyType(x, 0)
 
 MyType(1)
+
+
+
+

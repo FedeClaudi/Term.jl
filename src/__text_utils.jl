@@ -19,9 +19,9 @@ This regex uses lookahead and lookbehind to exclude [[
 at the beginning of a tag, with this:
     (?<!\\{)\\[(?!\\{)
 """
-const OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#]*\}"
-const CLOSE_TAG_REGEX = r"(?<!\{)\{(?!\{)\/[a-zA-Z _0-9. ,()#]+[^/\{]\}"
-const GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
+OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#\n]*\}"
+CLOSE_TAG_REGEX = r"(?<!\{)\{(?!\{)\/[a-zA-Z _0-9. ,()#\n]+[^/\{]\}"
+GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 """
     remove_markup(input_text::AbstractString)::AbstractString
@@ -341,114 +341,3 @@ function truncate(text::AbstractString, width::Int; trailing_dots = "...")
     return split_lines(trunc)[1] * trailing_dots
 end
 
-# ---------------------------------------------------------------------------- #
-#                                 RESHAPE TEXT                                 #
-# ---------------------------------------------------------------------------- #
-
-"""
-    reshape_text(text, width::Int)
-
-Reshape a string to have max width when printed out.
-
-Cut the string into multiple lines so that each line
-has at most `width` when printed to terminal: ignoring
-ANSI style but taking into account characters with
-widths > 1. Text is preferentially split at a space
-when possible to improve readability.
-"""
-function reshape_text(text, width::Int)
-    if occursin("\n", text)
-        return do_by_line(l -> reshape_text(l, width), text)
-    end
-
-    textlen(text) <= width && return text
-
-    has_style = has_ansi(text) || has_markup(text)
-    has_special = length(text) != ncodeunits(text)
-    text = apply_style(text)
-
-    chars::Vector{Union{Char,String}} = collect(text)
-    L = length(chars)
-    spaces::Vector{Bool} = Bool.(chars .== ' ')
-
-    # get width at each char (ignoring ANSI codes)
-    widths::Vector{Int} = textwidth.(chars)
-
-    # ensure ANSI tags don't affect width
-    if has_style
-        for mtch in eachmatch(ANSI_REGEXE, text)
-            if has_special
-                # tag position in code units
-                _i0 = mtch.offset
-                _i1 = mtch.offset + ncodeunits(mtch.match) - 1
-
-                # tag position in characters
-                i0 = length(text[1:_i0])
-                i1 = length(text[_i0:_i1]) + i0 - 1
-            else
-                i0 = mtch.offset
-                i1 = mtch.offset + length(mtch.match) - 1
-            end
-
-            widths[i0:i1] .= 0
-        end
-    end
-
-    cumwidths = cumsum(widths)
-    cuts = findall(diff(mod.(cumwidths, width)) .< 0) .+ 1
-    ncuts = length(cuts)
-    n = 1
-    while n <= length(cuts)
-        cut = cuts[n]
-        # @warn "processing cut $n: $cut"
-
-        for i in 1:4
-            if spaces[max(1, cut - i)] == true
-                # get width of text excluded by new cut position
-                if n < ncuts
-                    # adjust cuts poisitions
-                    Δw = cumwidths[cut] - cumwidths[cut - i]
-                    newcuts =
-                        findall(diff(mod.(cumwidths .- cumwidths[cut] .+ Δw, width)) .< 0)
-
-                    newcuts = newcuts[newcuts .> cut]
-                    cuts = [cuts[1:n]..., newcuts...]
-                end
-
-                cut -= i
-                break
-            end
-        end
-
-        # make sure cut is at the end of an ANSI tag
-        while cut < L && widths[cut + 1] == 0
-            cut -= 1
-            cuts .-= 1
-        end
-
-        chars[cut] *= '\n'
-        n += 1
-    end
-
-    # check that the last line has the right width
-    if sum(widths[max(cuts[end]):end]) > width
-        _chars = chars[(cuts[end] + 1):end]
-        chars = chars[1:cuts[end]]
-        append!(chars, collect(reshape_text(join(_chars), width)))
-    end
-
-    # stitch it back together
-    text = join(chars)
-    lines = strip.(split(text, "\n"))
-
-    # handle style
-    if has_style
-        styles = map(l -> get_ANSI_codes(l), lines)
-        lines[1] *= "\e[0m"
-        for i in 2:length(lines)
-            lines[i] = cleanup_ansi(*(styles[1:(i - 1)]...)) * lines[i] * "\e[0m"
-        end
-    end
-
-    return chomp(cleanup_ansi(join(lines, "\n")))
-end

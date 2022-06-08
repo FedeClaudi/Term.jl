@@ -315,22 +315,22 @@ id est laborum.""",
         "\n" => "",
     )
 
-    if dotest
-        @test string(Panel(pts; style = "red", fit = false, width = 44)) ==
-              "\e[31m╭──────────────────────────────────────────╮\e[39m\n\e[0m\e[31m│\e[39m\e[0m  Lorem\e[31m ipsum dolor s\e[39mit amet, consectetu\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  r adipiscing elit,ed do eiusmod tempor\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34mincididu\e[4mnt ut labore et dolore magna\e[0m    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[4maliqua. Ut enim ad minimveniam, quis\e[0m    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[4mnos\e[24m\e[34mtrud exercitation ullamco laboris\e[0m    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34mnisi ut aliquip ex ea commodo consequa\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34mt. Duis aute \e[31m\e[40mirure dolor in reprehende\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40mrit in voluptate velit esse cillum\e[0m      \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40mdolore eu fugiat nulla pariatur.\e[0m        \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40mExcepteur sint occaecat cupidatat\e[0m       \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34mnon proident, sunt in \e[32mculpa qui offic\e[0m   \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[32mia deserunt mollit anim id est laborum\e[0m  \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[1m\e[34m\e[34m\e[49m.\e[0m                                       \e[0m\e[31m│\e[39m\e[0m\n\e[31m╰──────────────────────────────────────────╯\e[39m\e[0m"
+    # if dotest
+    #     # @test string(Panel(pts; style = "red", fit = false, width = 44)) ==
+    #     # "\e[31m╭──────────────────────────────────────────╮\e[39m\n\e[0m\e[31m│\e[39m\e[0m  Lorem\e[31m ipsum dolor s\e[39mit amet,             \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  consectetur adipiscing elit,            \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  ed do                                   \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  eiusmod tempor \e[1m\e[34mincididu\e[4mnt ut labore     \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  et dolore magna aliqua. Ut enim ad      \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  minim                                   \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  veniam, quis nos\e[24m\e[34mtrud                    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  exercitation ullamco laboris nisi ut    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  aliquip ex                              \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│" ⋯ 266 bytes ⋯ "m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  in voluptate velit                      \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  esse cillum dolore eu fugiat nulla      \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m                                          \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  pariatur. Excepteur sint occaecat\e[39m\e[1m\e[49m\e[31m       \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  cupidatat non proident,                 \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  sunt in                                 \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[32mculpa qui officia\e[39m\e[31m deserunt mollit       \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  anim                                    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  id est laborum.                         \e[0m\e[31m│\e[39m\e[0m\n\e[31m╰──────────────────────────────────────────╯\e[39m\e[0m"
 
-        @test string(Panel(pts; fit = false, width = 60)) ==
-              "\e[22m╭──────────────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem\e[31m ipsum dolor s\e[39mit amet, consectetur adipiscing\e[0m      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  elit,ed do eiusmod tempor \e[1m\e[34mincididu\e[4mnt ut labore et\e[0m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[4mdolore magna aliqua. Ut enim ad minimveniam, quis nos\e[24m\e[34m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34mtrud exercitation ullamco laboris nisi ut aliquip ex\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34mea commodo consequat. Duis aute \e[31m\e[40mirure dolor in repreh\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40menderit in voluptate velit esse cillum dolore eu fugia\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34m\e[31m\e[40mt nulla pariatur. Excepteur sint occaecat cupidatat\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34mnon proident, sunt in \e[32mculpa qui officia deserunt\e[0m        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[1m\e[34m\e[34m\e[49mmollit anim id est laborum.\e[0m                             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────╯\e[22m\e[0m"
-    end
+    #     @test string(Panel(pts; fit = false, width = 60)) ==
+    #         "\e[22m╭──────────────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem\e[31m ipsum dolor s\e[39mit amet, consectetur adipiscing      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  elit,                                                   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  ed do eiusmod tempor \e[1m\e[34mincididu\e[4mnt ut labore et            \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  dolore magna aliqua. Ut enim ad minim                   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  veniam, quis                                            \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  nos\e[24m\e[34mtrud exercitation ullamco laboris nisi ut aliquip    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  ex                                                      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  ea commodo consequat. D" ⋯ 143 bytes ⋯ "                    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  in voluptate velit esse cillum dolore                   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  eu fugiat nulla                                         \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  pariatur. Excepteur sint occaecat\e[39m\e[1m\e[49m\e[31m                       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  cupidatat non proident,                                 \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  sunt in \e[32mculpa qui officia\e[39m\e[31m                               \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  deserunt mollit anim                                    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  id est laborum.                                         \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────╯\e[22m\e[0m"
+    # end
 
     @test string(Panel(pts2; fit = false, width = 44)) ==
-          "\e[22m╭──────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet, consectetu\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  r adipiscing elit,ed do e\e[31miusmod tempor\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[31mincididunt\e[39m\e[22m ut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[1maliqua.\e[22m Ut enim ad minimveniam, quis\e[32m\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32mnostrud exercitation \e[40mullamco laboris\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[40mnisi ut aliquip ex \e[49m\e[32mea commodo consequa\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32mt.\e[34m Duis aute irure dolor in\e[39m\e[32m reprehende\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[32mrit in voluptate velit\e[39m\e[22m esse \e[3mcillum\e[0m      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3mdolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[22mnulla pariatur.\e[0m        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[22mExcepteur\e[31m sint\e[39m\e[22m\e[34m occaecat cupidatat \e[39m\e[22mnon\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[22mproident, sunt in culpa qui \e[3mofficia\e[23m\e[22m\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32mdeserunt mollit anim id est laborum.\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────╯\e[22m\e[0m"
+    "\e[22m╭──────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet,             \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  consectetur adipiscing elit,ed do       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  e\e[31miusmod tempor incididunt\e[39m\e[22m ut \e[1mlabore     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  et \e[4mdolore\e[24m\e[1m magna aliqua.\e[22m Ut enim ad      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  minimveniam, quis\e[32m nostrud               \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  exercitation \e[40mullamco laboris nisi ut    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  aliquip ex \e[49m\e[32mea commodo consequat.\e[34m        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  Duis aute irure dolor in\e[39m\e[32m                \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  reprehenderit in voluptate velit\e[39m\e[22m        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  esse \e[3mcillum dolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[23m\e[22m\e[39m\e[3mnulla      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  pariatur. Excepteur\e[31m sint\e[39m\e[3m\e[34m occaecat       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  cupidatat \e[39m\e[3mnon proident, sunt in         \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  culpa qui \e[3mofficia\e[23m\e[3m deserunt mollit       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  anim id est laborum.                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────╯\e[22m\e[0m"
 
     @test string(Panel(pts2; fit = false, width = 51)) ==
-          "\e[22m╭─────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet, consectetur adipi\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  scing elit,ed do e\e[31miusmod tempor incididunt\e[39m\e[22m\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22mut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna aliqua.\e[22m Ut enim\e[0m      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1mad minimveniam, quis\e[32m nostrud exercitation \e[40mul\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[40mlamco laboris nisi ut aliquip ex \e[49m\e[32mea commodo\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32mconsequat.\e[34m Duis aute irure dolor in\e[39m\e[32m reprehen\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[32mderit in voluptate velit\e[39m\e[22m esse \e[3mcillum dolore\e[23m\e[22m\e[31m\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[31meu\e[39m\e[22m\e[3m\e[32m fugiat \e[22mnulla pariatur. Excepteur\e[31m sint\e[39m\e[22m\e[34m\e[0m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[34moccaecat cupidatat \e[39m\e[22mnon proident, sunt in\e[0m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[22mculpa qui \e[3mofficia\e[23m\e[22m deserunt mollit anim id est\e[0m  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32mlaborum.\e[0m                                       \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────────────────────────────────────────╯\e[22m\e[0m"
+    "\e[22m╭─────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet, consectetur        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  adipiscing elit,ed do e\e[31miusmod tempor           \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  incididunt\e[39m\e[22m ut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna           \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  aliqua.\e[22m Ut enim ad minimveniam, quis\e[32m           \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  nostrud exercitation \e[40mullamco laboris nisi      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  ut aliquip ex \e[49m\e[32mea commodo consequat.\e[34m Duis       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  aute irure dolor in\e[39m\e[32m reprehenderit in           \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  voluptate velit\e[39m\e[22m esse \e[3mcillum dolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m          \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  fugiat \e[23m\e[22m\e[39m\e[3mnulla pariatur. Excepteur\e[31m sint\e[39m\e[3m\e[34m          \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  occaecat cupidatat \e[39m\e[3mnon proident, sunt in       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  culpa qui \e[3mofficia\e[23m\e[3m deserunt mollit anim id      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  est laborum.                                   \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────────────────────────────────────────╯\e[22m\e[0m"
 
     @test string(Panel(pts2; fit = false, width = 67)) ==
-          "\e[22m╭─────────────────────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet, consectetur adipiscing elit,ed\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  do e\e[31miusmod tempor incididunt\e[39m\e[22m ut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna aliqu\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[1ma.\e[22m Ut enim ad minimveniam, quis\e[32m nostrud exercitation \e[40mullamco\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[40mlaboris nisi ut aliquip ex \e[49m\e[32mea commodo consequat.\e[34m Duis aute\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[34mirure dolor in\e[39m\e[32m reprehenderit in voluptate velit\e[39m\e[22m esse \e[3mcillum\e[0m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3mdolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[22mnulla pariatur. Excepteur\e[31m sint\e[39m\e[22m\e[34m occaecat\e[0m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32m\e[34mcupidatat \e[39m\e[22mnon proident, sunt in culpa qui \e[3mofficia\e[23m\e[22m deserunt\e[0m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[22m\e[1m\e[32m\e[32m\e[22m\e[3m\e[32mmollit anim id est laborum.\e[0m                                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
+    "\e[22m╭─────────────────────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet, consectetur adipiscing elit,ed     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  do e\e[31miusmod tempor incididunt\e[39m\e[22m ut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna         \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  aliqua.\e[22m Ut enim ad minimveniam, quis\e[32m nostrud exercitation      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  \e[40mullamco laboris nisi ut aliquip ex \e[49m\e[32mea commodo consequat.\e[34m       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  Duis aute irure dolor in\e[39m\e[32m reprehenderit in voluptate velit\e[39m\e[22m      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  esse \e[3mcillum dolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[23m\e[22m\e[39m\e[3mnulla pariatur. Excepteur\e[31m sint\e[39m\e[3m\e[34m    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  occaecat cupidatat \e[39m\e[3mnon proident, sunt in culpa qui \e[3mofficia\e[23m\e[3m     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  deserunt mollit anim id est laborum.                           \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
 
     circle = """
           oooo    
@@ -341,7 +341,7 @@ id est laborum.""",
           oooo    """
     p = Panel(circle; fit = true, padding = (0, 0, 0, 0))
     @test string(p) ==
-          "\e[22m╭────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m    oooo    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m oooooooooo \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0moooooooooooo\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0moooooooooooo\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m oooooooooo \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m    oooo    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────╯\e[22m\e[0m"
+    "\e[22m╭────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m    oooo    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m oooooooooo \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0moooooooooooo\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0moooooooooooo\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m oooooooooo \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m    oooo    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────╯\e[22m\e[0m"
 
     p = Panel(
         "test"^25;
@@ -408,10 +408,26 @@ end
 end
 
 @testset "\e[34mPANEL - titles" begin
+    style="red"
     for fit in (true, false)
         for justify in (:left, :center, :right)
-            for style in ("red", "bold", "on_green")
-                testpanel(
+            testpanel(
+                Panel(
+                    "."^50;
+                    title = "test",
+                    title_style = style,
+                    title_justify = justify,
+                    subtitle = "subtest",
+                    subtitle_style = style,
+                    subtitle_justify = justify,
+                    fit = fit,
+                ),
+                fit ? nothing : 88,
+                3,
+            )
+
+            testpanel(
+                Panel(
                     Panel(
                         "."^50;
                         title = "test",
@@ -421,29 +437,12 @@ end
                         subtitle_style = style,
                         subtitle_justify = justify,
                         fit = fit,
-                    ),
-                    fit ? nothing : 88,
-                    nothing,
-                )
-
-                testpanel(
-                    Panel(
-                        Panel(
-                            "."^50;
-                            title = "test",
-                            title_style = style,
-                            title_justify = justify,
-                            subtitle = "subtest",
-                            subtitle_style = style,
-                            subtitle_justify = justify,
-                            fit = fit,
-                        );
-                        fit = fit,
-                    ),
-                    fit ? nothing : 88,
-                    nothing,
-                )
-            end
+                    );
+                    fit = fit,
+                ),
+                fit ? nothing : 88,
+                5,
+            )
         end
     end
 end

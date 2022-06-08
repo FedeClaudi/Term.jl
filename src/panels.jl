@@ -1,6 +1,6 @@
 module Panels
 
-import Term: reshape_text, join_lines, fillin, truncate
+import Term: reshape_text, join_lines, fillin, truncate, ltrim_str
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
@@ -372,13 +372,11 @@ function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::I
         ren = ren isa RenderableText ? join(getfield.(ren.segments, :text), "\n") : ren
         ren = reshape_text(ren, width)
     else
-        ren = lvstack(
-            map(
-                s ->
-                    get_width(s.text) > width ? truncate(rstrip(s.text), width) : s.text,
-                ren.segments,
-            ),
+        segs = map(
+            s->pad(ltrim_str(s.text, width), width, :left), ren.segments
         )
+    
+        ren = lvstack(segs)
     end
     return ren
 end

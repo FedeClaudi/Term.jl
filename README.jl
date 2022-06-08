@@ -1,6 +1,8 @@
 using Term
 import Term.Renderables: Renderable
 import Term: int
+import Term: typestree, inspect
+using Term.Layout
 
 import MyterialColors: orange_light, blue_light, green_light
 

@@ -201,7 +201,7 @@ end
 
     r = r1 / r2
     @test r.measure.w == 50
-    @test r.measure.h == 6
+    @test r.measure.h == 8
 
     h1 = hLine(22)
     h2 = hLine(33)
@@ -213,7 +213,7 @@ end
 
     r = r1 * r2
     @test r.measure.w == 75
-    @test r.measure.h == 4
+    @test r.measure.h == 5
 
     # stack other renderables
     h1 = vLine(22)
@@ -225,7 +225,7 @@ end
 @testset "\e[34mlayout - panels" begin
     p1 = Panel()
     p2 = Panel(; width = 24, height = 3)
-    p3 = Panel("this {red}panel{/red}"^5; width = 12, fit = false)
+    p3 = Panel("this {red}panel{/red}"^5; width = 30, fit = false)
 
     testlayout(p1 * p2, 112, 3)
     @test string(p1 * p2) ==
@@ -238,10 +238,10 @@ end
     testlayout(p2 * p1, 112, 3)
     testlayout(p2 / p1, 88, 5)
 
-    testlayout(p1 * p2 * p3, 124, 11)
-    testlayout(p1 / p2 / p3, 88, 16)
-    testlayout(p3 * p1 * p2, 124, 11)
-    testlayout(p3 / p1 / p2, 88, 16)
+    testlayout(p1 * p2 * p3, 142, 5)
+    testlayout(p1 / p2 / p3, 88, 10)
+    testlayout(p3 * p1 * p2, 142, 5)
+    testlayout(p3 / p1 / p2, 88, 10)
 end
 
 @testset "\e[34mlayout - placeholder" begin

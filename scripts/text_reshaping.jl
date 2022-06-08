@@ -44,10 +44,12 @@ width = 33
 for text in strings
     # println('_'^width)
     # println(reshape_text(text, width))
-    # println('_'^width)
-
-    show(reshape_text(text, width))
     print("\n\n")
+    println('_'^width)
+    tprint(reshape_text(text, width))
+    println('_'^width)
+    tprint(text)
+    
 end
 
 # text = strings[end-1]

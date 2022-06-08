@@ -4,14 +4,15 @@ module Term
 include("__text_utils.jl")
 include("_ansi.jl")
 include("_utils.jl")
+include("_text_reshape.jl")
 
 # don't import other modules
 include("measures.jl")
 include("colors.jl")
 include("theme.jl")
 include("highlight.jl")
-
-const TERM_DEBUG_ON = Ref(false)
+ 
+const TERM_DEBUG_ON = Ref(true)
 const term_theme = Ref(Theme())
 
 function update! end
@@ -33,7 +34,6 @@ include("progress.jl")
 include("logs.jl")
 include("trees.jl")
 include("dendograms.jl")
-include("logo.jl")
 include("introspection.jl")
 include("tables.jl")
 include("repr.jl")
