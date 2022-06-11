@@ -86,6 +86,10 @@ tprint("\n\n{bold green}Running: '19_test_repr.jl' {/bold green}")
 tprint("\n\n{bold green}Running: '20_test_compositor.jl' {/bold green}")
 @time @timeit_include("20_test_compositor.jl")
 
+# ? 21 Compositor
+tprint("\n\n{bold green}Running: '21_test_markdown.jl' {/bold green}")
+@time @timeit_include("21_test_markdown.jl")
+
 # ? 999 EXAMPLES
 tprint("\n\n{bold green}Running: '999_test_examples.jl' {/bold green}")
 @time @timeit_include("999_test_examples.jl")
