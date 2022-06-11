@@ -281,3 +281,57 @@ end
     ) ==
           "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
 end
+
+@testset "Layout - GRID" begin
+    g = grid(; layout = (3, 3), pad = (0, 0))
+    @test g.measure.w == 48
+    @test g.measure.h == 27
+
+    g = grid(; layout = (3, 3))
+    @test g.measure.w == 48
+    @test g.measure.h == 27
+
+    g = grid(; layout = (3, 3), pad = 2)
+    @test g.measure.w == 52
+    @test g.measure.h == 31
+
+    g = grid(; layout = (3, 3), pad = (5, 1))
+    @test g.measure.w == 58
+    @test g.measure.h == 29
+
+    g = grid(; layout = (3, 3), pad = (5, 3))
+    @test g.measure.w == 58
+    @test g.measure.h == 33
+
+    # test passing renderables
+    rens = repeat([PlaceHolder(10, 5)], 9)
+
+    g = grid(rens; aspect = 1)
+    @test g.measure.w == 30
+    @test g.measure.h == 15
+
+    g = grid(rens;)
+    @test g.measure.w == 50
+    @test g.measure.h == 10
+
+    g = grid(rens; pad = (2, 1))
+    @test g.measure.w == 58
+    @test g.measure.h == 11
+
+    g = grid(rens; pad = (2, 1), aspect = 0.5)
+    @test g.measure.w == 22
+    @test g.measure.h == 29
+
+    g = grid(rens; pad = (2, 1), aspect = 1.5)
+    @test g.measure.w == 46
+    @test g.measure.h == 17
+
+    g = grid(
+        rens;
+        pad = (2, 1),
+        aspect = (12, 12),
+        placeholder = PlaceHolder(10, 5; style = "red"),
+    )
+    @test g.measure.w == 34
+    @test g.measure.h == 17
+end

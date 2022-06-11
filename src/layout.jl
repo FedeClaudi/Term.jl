@@ -25,6 +25,7 @@ export Spacer, vLine, hLine, PlaceHolder
 export leftalign!, center!, rightalign!
 export leftalign, center, rightalign
 export lvstack, cvstack, rvstack
+export grid
 
 # ---------------------------------------------------------------------------- #
 #                                    PADDING                                   #
@@ -705,27 +706,28 @@ hLine(ren::AbstractRenderable; kwargs...) = hLine(ren.measure.w; kwargs...)
 # -------------------------------- PlaceHolder ------------------------------- #
 
 """
-    PlaceHolder
-
-A renderable used as a place holder when creating layouts (e.g. with `grid`).
+    mutable struct PlaceHolder <: AbstractLayoutElement
+        segments::Vector{Segment}
+        measure::Measure
+    end
+A `renderable` used as a place holder when creating layouts (e.g. with `grid`).
 
 # Examples
 ```julia
 
 println(PlaceHolder(25, 10))
 
-
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
- ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
- ╲ ╲ ╲ (25 × 10) ╲ ╲ ╲ ╲
+╲ ╲ ╲ (25 × 10) ╲ ╲ ╲ ╲
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
- ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
- ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
-````
+```
 """
 mutable struct PlaceHolder <: AbstractLayoutElement
     segments::Vector{Segment}
@@ -749,6 +751,16 @@ function place_holder_line(w, i)
     return line
 end
 
+"""
+    function PlaceHolder(
+        w::Int,
+        h::Int;
+        style::String = "dim",
+        text::Union{Nothing,String} = nothing,
+    )
+
+Create a `PlaaceHolder` with additional style information.
+"""
 function PlaceHolder(
     w::Int,
     h::Int;
@@ -786,4 +798,66 @@ end
 
 PlaceHolder(ren::AbstractRenderable) = PlaceHolder(ren.measure.w, ren.measure.h)
 
+# ---------------------------------------------------------------------------- #
+#                                     GRID                                     #
+# ---------------------------------------------------------------------------- #
+
+"""
+    grid(
+        rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
+        placeholder::Union{Nothing,AbstractRenderable} = nothing,
+        aspect::Union{Number,NTuple} = (16, 9),
+        layout::Union{Nothing,Tuple} = nothing, 
+        pad::Union{Nothing,Integer} = 0,
+    )
+Construct a square grid from a `AbsractVector` of `AbstractRenderable`.
+"""
+function grid(
+    rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
+    placeholder::Union{Nothing,AbstractRenderable} = nothing,
+    aspect::Union{Number,NTuple} = (16, 9),
+    layout::Union{Nothing,Tuple} = nothing,
+    pad::Union{Tuple,Integer} = 0,
+)
+    nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
+    if isnothing(rens)
+        isnothing(layout) &&
+            throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s"))
+        rens = fill(PlaceHolder(aspect...), prod(layout))
+    else
+        if isnothing(nrows)
+            nrows, r = divrem(length(rens), ncols)
+            r == 0 || (nrows += 1)
+        elseif isnothing(ncols)
+            ncols, r = divrem(length(rens), nrows)
+            r == 0 || (ncols += 1)
+        end
+        fill_in = isnothing(placeholder) ? PlaceHolder(first(rens)) : placeholder
+        rens = append!(copy(rens), [fill_in for _ in 1:(nrows * ncols - length(rens))])
+    end
+    return grid(reshape(rens, nrows, ncols); pad = pad)
+end
+
+"""
+    grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Nothing,Integer} = 0))
+Construct a grid from a `AbstractMatrix` of `AbstractRenderable`.
+"""
+function grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Tuple,Integer} = 0)
+    hpad, vpad = if pad isa Integer
+        (pad, pad)
+    else
+        pad
+    end
+    @info hpad vpad
+    rows = collect(
+        foldl((a, b) -> a * ' '^hpad * b, col[2:end]; init = first(col)) for
+        col in eachrow(rens)
+    )
+    if vpad > 0
+        vspace = vpad > 1 ? vstack(repeat([" "], vpad)...) : " "
+        return foldl((a, b) -> a / vspace / b, rows[2:end]; init = first(rows))
+    else
+        return foldl((a, b) -> a / b, rows[2:end]; init = first(rows))
+    end
+end
 end
