@@ -98,6 +98,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
 
     content::Vector = []
     added_skipped_message = false
+    N = length(bt)
     for (num, frame) in enumerate(bt)
         numren = RenderableText("($(num))"; style = "#52c4ff bold dim")
         info = render_frame_info(frame; show_source = num in (1, length(bt)))

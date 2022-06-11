@@ -240,6 +240,7 @@ function termshow(io::IO, fun::Function)
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)
+
     _methods = length(_methods) > 1 ? _methods[2:min(11, N)] : []
     _methods = map(m -> join(split(join(split(m, "]")[2:end]), " in ")[1]), _methods)
     _methods = map(
@@ -255,12 +256,19 @@ function termshow(io::IO, fun::Function)
         _methods,
         "\n{bold dim bright_blue}$(N - length(_methods)-1){/bold dim bright_blue}{dim bright_blue} methods omitted...{/dim bright_blue}",
     )
+    if N > 1
+        methods_contents = rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...)
+    else
+        methods_contents = split_lines(string(methods(fun)))[1]
+    end
 
-    panel = repr_panel(
+
+    panel = "       " * repr_panel(
         nothing,
-        rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...),
+        methods_contents,
         "{white bold}$(N-1){/white bold} methods",
         title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
+        width=console_width() - 12,
     )
 
     # get docstring 

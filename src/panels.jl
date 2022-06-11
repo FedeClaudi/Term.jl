@@ -317,6 +317,7 @@ function render(
     Δw::Int,
     Δh::Int,
     padding::Padding,
+    background=nothing,
     kwargs...,
 )::Panel
 
@@ -351,8 +352,8 @@ function render(
 
     # add lines with content fn
     function makecontent_line(cline)::Segment
-        line = pad(apply_style(cline), panel_measure.w - Δw, justify)
-        line = pad(line, padding.left, padding.right)
+        line = pad(apply_style(cline), panel_measure.w - Δw, justify; bg=background)
+        line = pad(line, padding.left, padding.right; bg=background)
 
         # make line
         return Segment(left * line * right)

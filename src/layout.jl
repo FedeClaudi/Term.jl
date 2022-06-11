@@ -51,7 +51,7 @@ julia> pad("ciao", 10, :right)
 "      ciao"
 ```
 """
-function pad(text::AbstractString, target_width::Int, method::Symbol)::String
+function pad(text::AbstractString, target_width::Int, method::Symbol; bg=nothing)::String
     if occursin('\n', text)
         return do_by_line(ln -> pad(ln, target_width, method), text)
     end
@@ -62,12 +62,16 @@ function pad(text::AbstractString, target_width::Int, method::Symbol)::String
 
     npads = target_width - lw
     if method == :left
-        return text * " "^npads
+        p = isnothing(bg) ? " "^npads : "{$bg}" * " "^npads * "{/$bg}"
+        return text * p
     elseif method == :right
-        return " "^npads * text
+        p = isnothing(bg) ? " "^npads : "{$bg}" * " "^npads * "{/$bg}"
+        return p * text
     else
         nl, nr = get_lr_widths(npads)
-        return " "^nl * text * " "^nr
+        l = isnothing(bg) ? " "^nl : "{$bg}" * " "^nl * "{/$bg}"
+        r = isnothing(bg) ? " "^nr : "{$bg}" * " "^nr * "{/$bg}"
+        return l * text * r
     end
 end
 
@@ -77,9 +81,15 @@ end
 
 Pad a string by a fixed ammount to the left and to the right.
 """
-pad(text::AbstractString, left::Int = 0, right::Int = 0) =
-    " "^max(0, left) * text * " "^max(0, right)
-
+function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg=nothing)
+    if isnothing(bg)
+        return " "^max(0, left) * text * " "^max(0, right)
+    else
+        l = "{$bg}" * " "^max(0, left) * "{/$bg}"
+        r = "{$bg}" * " "^max(0, right) * "{/$bg}"
+        return l * text * r
+    end
+end
 """
 ---
     pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0)

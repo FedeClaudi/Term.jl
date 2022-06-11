@@ -4,8 +4,9 @@ using Markdown
 import OrderedCollections: OrderedDict
 import MyterialColors:
     yellow_light, indigo_light, blue, light_blue, cyan_light, cyan_lighter
+import UnicodeFun: to_latex
 
-import Term: reshape_text, highlight_syntax, do_by_line
+import Term: reshape_text, highlight_syntax, do_by_line, apply_style, fillin, apply_style, escape_brackets
 import ..Tables: Table
 import ..Layout: pad, hLine, vLine
 import ..Consoles: console_width
@@ -14,6 +15,7 @@ import ..Renderables
 import ..Tprint: tprint, tprintln
 import ..Tprint
 import ..Panels: Panel
+import ..Segments: Segment
 
 export parse_md
 
@@ -73,10 +75,17 @@ function parse_md(
     width = console_width(),
     kwargs...,
 )::String
+    formula = ""
+    try
+        formula = escape_brackets(to_latex(escape_string(string(ltx.formula))))
+    catch
+        formula = string(ltx.formula)
+    end
+
     if inline
-        return "{$yellow_light italic}" * ltx.formula * "{/$yellow_light italic}"
+        return "{$yellow_light italic}" * formula * "{/$yellow_light italic}"
     else
-        txt = "\n     {$yellow_light italic}" * ltx.formula * "{/$yellow_light italic}\n"
+        txt = "\n     {$yellow_light italic}" * formula * "{/$yellow_light italic}\n"
         return reshape_text(txt, width) * "\e[0m"
     end
 end
@@ -93,12 +102,17 @@ function parse_md(
                syntax *
                "{$yellow_light italic}`{/$yellow_light italic}"
     else
-        txt = reshape_text(syntax, width-20)
-        return string("    " * Panel(
+        txt = fillin(reshape_text(syntax, width-20))
+        txt = do_by_line(ln -> apply_style(ln, "on_#262626"), txt)
+        panel = Panel(
             txt;
-            style="dim", box=:SQUARE, subtitle=length(code.language) > 0 ? code.language : nothing,
-            width=width-4
-        ))
+            style="white dim on_#262626", box=:SQUARE, subtitle=length(code.language) > 0 ? code.language : nothing,
+            width=width-4,
+            background = "on_#262626",
+            subtitle_justify=:right
+        )
+
+        return string("    " * panel)
     end
 end
 
@@ -207,7 +221,7 @@ function parse_md(tb::Markdown.Table; width = console_width())::String
 end
 
 function parse_md(link::Markdown.Link; kwargs...)::String
-    "{white bold}$(parse_md(link.text)){/white bold} {dim}($(link.url)){/dim}"
+    "{white bold}$(parse_md(link.text; inline=true)){/white bold} {dim}($(link.url)){/dim}"
 end
 
 function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::String
@@ -221,13 +235,13 @@ function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::
     has_title = length(ad.title) > 0
     content = parse_md(ad.content)
     content = reshape_text(content, width - 10)
-
+    style = get(title_styles, ad.category, "white")
     return string(
         "    " * Panel(
             content;
             title = has_title ? parse_md(ad.title) : "",
-            title_style = has_title ? title_styles[ad.category] * " default" : "",
-            style = title_styles[ad.category] * " dim",
+            title_style = has_title ? style * " default" : "",
+            style = style * " dim",
             width=width-4,
         ),
     )
