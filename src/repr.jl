@@ -203,25 +203,29 @@ end
 
 function termshow(io::IO, obj::DataType)
     ts = term_theme[].repr_type_style
-    field_names = apply_style.(
-        string.(fieldnames(obj)), term_theme[].repr_accent_style
-        )
-    field_types = apply_style.(
-        map(f -> "::" * string(f), obj.types), ts
-    )
+    field_names = apply_style.(string.(fieldnames(obj)), term_theme[].repr_accent_style)
+    field_types = apply_style.(map(f -> "::" * string(f), obj.types), ts)
 
     line = vLine(length(field_names); style = term_theme[].repr_name_style)
     space = Spacer(1, length(field_names))
-    fields = rvstack(field_names...) * space *  lvstack(string.(field_types)...)
+    fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
 
     type_name = apply_style(string(obj), term_theme[].repr_name_style * " bold")
     sup = supertypes(obj)[2]
     type_name *= " {bright_blue dim}<: $sup{/bright_blue dim}"
-    content = "    " * repr_panel(nothing, string(type_name / ("  " * line * fields)), nothing; fit=false, width=min(console_width()-5, 80), justify=:center)
+    content =
+        "    " * repr_panel(
+            nothing,
+            string(type_name / ("  " * line * fields)),
+            nothing;
+            fit = false,
+            width = min(console_width() - 5, 80),
+            justify = :center,
+        )
 
     # get docstring
     doc, _ = get_docstring(obj)
-    doc = parse_md(doc; width= min(100, console_width()))
+    doc = parse_md(doc; width = min(100, console_width()))
     doc = split_lines(doc)
     if length(doc) > 100
         doc = [
@@ -232,8 +236,8 @@ function termshow(io::IO, obj::DataType)
     doc = join(doc, "\n")
 
     print(io, content)
-    print(io, hLine(console_width(), "Docstring"; style="green dim", box=:HEAVY))
-    tprint(io, doc )
+    print(io, hLine(console_width(), "Docstring"; style = "green dim", box = :HEAVY))
+    tprint(io, doc)
 end
 
 function termshow(io::IO, fun::Function)
@@ -257,23 +261,24 @@ function termshow(io::IO, fun::Function)
         "\n{bold dim bright_blue}$(N - length(_methods)-1){/bold dim bright_blue}{dim bright_blue} methods omitted...{/dim bright_blue}",
     )
     if N > 1
-        methods_contents = rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...)
+        methods_contents =
+            rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...)
     else
         methods_contents = split_lines(string(methods(fun)))[1]
     end
 
-
-    panel = "       " * repr_panel(
-        nothing,
-        methods_contents,
-        "{white bold}$(N-1){/white bold} methods",
-        title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
-        width=console_width() - 12,
-    )
+    panel =
+        "       " * repr_panel(
+            nothing,
+            methods_contents,
+            "{white bold}$(N-1){/white bold} methods",
+            title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
+            width = console_width() - 12,
+        )
 
     # get docstring 
     doc, _ = get_docstring(fun)
-    doc = parse_md(doc; width= console_width()-8)
+    doc = parse_md(doc; width = console_width() - 8)
     doc = split_lines(doc)
     if length(doc) > 100
         doc = [
@@ -282,8 +287,8 @@ function termshow(io::IO, fun::Function)
         ]
     end
     print(io, panel)
-    print(io, hLine(console_width(), "Docstring"; style="green dim", box=:HEAVY))
-    print(io, "   " * RenderableText(join(doc, "\n"); width = console_width()-8))
+    print(io, hLine(console_width(), "Docstring"; style = "green dim", box = :HEAVY))
+    print(io, "   " * RenderableText(join(doc, "\n"); width = console_width() - 8))
 end
 
 # ---------------------------------------------------------------------------- #

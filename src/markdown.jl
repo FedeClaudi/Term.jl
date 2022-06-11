@@ -6,8 +6,9 @@ import MyterialColors:
     yellow_light, indigo_light, blue, light_blue, cyan_light, cyan_lighter
 import UnicodeFun: to_latex
 
-import Term: reshape_text, highlight_syntax, do_by_line, apply_style, fillin, apply_style, escape_brackets
+import Term: reshape_text, highlight_syntax, do_by_line, fillin, escape_brackets
 import ..Tables: Table
+import ..Style: apply_style
 import ..Layout: pad, hLine, vLine
 import ..Consoles: console_width
 import ..Renderables: RenderableText
@@ -102,14 +103,16 @@ function parse_md(
                syntax *
                "{$yellow_light italic}`{/$yellow_light italic}"
     else
-        txt = fillin(reshape_text(syntax, width-20))
+        txt = fillin(reshape_text(syntax, width - 20))
         txt = do_by_line(ln -> apply_style(ln, "on_#262626"), txt)
         panel = Panel(
             txt;
-            style="white dim on_#262626", box=:SQUARE, subtitle=length(code.language) > 0 ? code.language : nothing,
-            width=width-4,
+            style = "white dim on_#262626",
+            box = :SQUARE,
+            subtitle = length(code.language) > 0 ? code.language : nothing,
+            width = width - 4,
             background = "on_#262626",
-            subtitle_justify=:right
+            subtitle_justify = :right,
         )
 
         return string("    " * panel)
@@ -242,7 +245,7 @@ function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::
             title = has_title ? parse_md(ad.title) : "",
             title_style = has_title ? style * " default" : "",
             style = style * " dim",
-            width=width-4,
+            width = width - 4,
         ),
     )
 end

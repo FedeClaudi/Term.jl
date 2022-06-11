@@ -9,7 +9,6 @@ import ..Layout: hstack
 
 export tprint, tprintln
 
-
 """
     tprint
 
@@ -76,7 +75,6 @@ function tprint(args...; highlight = true)
     end
     return nothing
 end
-
 
 """
 ---

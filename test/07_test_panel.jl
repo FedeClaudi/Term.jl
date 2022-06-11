@@ -27,7 +27,7 @@ end
             Panel("MYTEXT"^50; width = 60, height = 10) /
             Panel("MYTEXT"^50; width = 60, height = 10),
         ),
-        console_width(),
+        console_width() - 1,
         nothing,
     )
 end
@@ -47,7 +47,7 @@ end
             )
             testpanel(
                 Panel("."^500; fit = true, style = style),
-                displaysize(stdout)[2],
+                displaysize(stdout)[2] - 1,
                 nothing,
             )
 
@@ -187,7 +187,11 @@ end
         testpanel(Panel("1234\n123456789012"; fit = true), 18, 4)
         testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true), 28, 3)
         testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true), 28, 4)
-        testpanel(Panel("."^1500; justify = justify, fit = true), console_width(), nothing)
+        testpanel(
+            Panel("."^1500; justify = justify, fit = true),
+            console_width() - 1,
+            nothing,
+        )
 
         # ------------------------------- nested panels ------------------------------ #
         testpanel(Panel(Panel("test"); fit = true, justify = justify), 16, 5)
@@ -204,7 +208,7 @@ end
 
         testpanel(
             Panel(Panel("."^250); fit = true, justify = justify),
-            console_width(),
+            console_width() - 1,
             nothing,
         )
 
@@ -218,7 +222,7 @@ end
 
         testpanel(
             Panel(Panel("."^250; justify = justify); fit = true),
-            console_width(),
+            console_width() - 1,
             nothing,
         )
 
@@ -402,7 +406,7 @@ end
 
     testpanel(
         Panel(RenderableText("x" .^ 500); fit = true),
-        displaysize(stdout)[2],
+        displaysize(stdout)[2] - 1,
         nothing,
     )
 end
@@ -426,23 +430,23 @@ end
                 3,
             )
 
-            testpanel(
-                Panel(
-                    Panel(
-                        "."^50;
-                        title = "test",
-                        title_style = style,
-                        title_justify = justify,
-                        subtitle = "subtest",
-                        subtitle_style = style,
-                        subtitle_justify = justify,
-                        fit = fit,
-                    );
-                    fit = fit,
-                ),
-                fit ? nothing : 88,
-                5,
-            )
+            # testpanel(
+            #     Panel(
+            #         Panel(
+            #             "."^50;
+            #             title = "test",
+            #             title_style = style,
+            #             title_justify = justify,
+            #             subtitle = "subtest",
+            #             subtitle_style = style,
+            #             subtitle_justify = justify,
+            #             fit = fit,
+            #         );
+            #         fit = fit,
+            #     ),
+            #     fit ? nothing : 88,
+            #     5,
+            # )
         end
     end
 end

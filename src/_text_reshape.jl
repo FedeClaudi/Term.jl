@@ -130,5 +130,6 @@ function reshape_text(text::AbstractString, width::Int)
     for cut in cuts
         insert!(chars, cut, '\n')
     end
-    apply_style(style_at_each_line(join(chars)))
+    out = apply_style(style_at_each_line(join(chars)))
+    # do_by_line(ln -> ln * "\e[0m", out)
 end

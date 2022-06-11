@@ -129,7 +129,8 @@ in voluptate velit{/green} esse {italic}cillum dolore{/italic}{red} eu{/red}{ita
 pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident, 
 sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
 id est laborum."""
-    str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, \nconsectetur adipiscing elit,\ned \ndo e\e[31miusmod tempor incididunt\e[39m\e[22m ut \n\e[1mlabore et \e[4mdolore\e[24m\e[1m magna aliqua.\e[22m \nUt enim ad minim\nveniam, quis\e[32m \nnostrud exercitation \e[40mullamco \nlaboris nisi ut aliquip ex \e[49m\e[32m\nea \ncommodo consequat.\e[34m Duis aute \nirure dolor in\e[39m\e[32m reprehenderit \nin \nvoluptate velit\e[39m\e[22m esse \e[3mcillum \ndolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[23m\e[22m\e[39m\e[3mnulla \n\npariatur. Excepteur\e[31m sint\e[39m\e[3m\e[34m \noccaecat cupidatat \e[39m\e[3mnon \nproident, \nsunt in culpa qui \n\e[3mofficia\e[23m\e[3m deserunt mollit anim \nid \nest laborum."
+
+    str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, \nconsectetur adipiscing elit,\ned do e\e[31miusmod tempor incididunt\e[39m \nut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna \naliqua.\e[22m\e[39m Ut enim ad minim\nveniam, quis\e[32m nostrud \n\e[32mexercitation \e[40mullamco laboris \n\e[32mnisi ut aliquip ex \e[49m\e[32m\e[39m\e[39m\e[32m\e[39m\e[40m\nea commodo consequat.\e[34m Duis aute \nirure dolor in\e[39m reprehenderit \nin voluptate velit\e[39m\e[3m esse \e[3mcillum \ndolore\e[23m\e[31m eu\e[39m\e[23m\e[3m\e[32m fugiat \e[23m{/green}nulla \npariatur. Excepteur\e[31m sint\e[39m\e[34m \noccaecat cupidatat \e[39mnon \nproident, \nsunt in culpa qui \e[3mofficia\e[23m \ndeserunt mollit anim \nid est laborum."
 
     logo_str = """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
 
@@ -138,7 +139,7 @@ id est laborum."""
     as {red}"Panel"{/red} and {red}"TextBox"{/red}.
     These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code"""
 
-    logo_str_reshaped = "Term.jl is a \e[38;2;149;88;178mJulia\e[39m package for \ncreating styled terminal \noutputs.\n\nTerm provides a simple \n\e[3m\e[38;5;28m\e[1mmarkup language\e[23m\e[39m\e[39m\e[3m\e[22m\e[38;5;28m to add \e[1m\e[38;5;12mcolor\e[22m\e[38;5;28m\e[39m\e[1m \nand \e[1m\e[4mstyles\e[22m\e[1m\e[24m\e[1m to your text.\nMore \ncomplicated text layout can be \ncreated using \e[31m\"Renderable\"\e[39m\e[1m \nobjects such \nas \e[31m\"Panel\"\e[39m\e[1m and \n\e[31m\"TextBox\"\e[39m\e[1m.\nThese can also be \nnested and stacked to create \n\e[3m\e[38;5;175mfancy\e[23m\e[1m\e[39m\e[3m and \e[4minformative\e[24m\e[3m terminal \nouputs for your Julia code"
+    logo_str_reshaped = "Term.jl is a \e[38;2;149;88;178mJulia\e[39m package for \ncreating styled terminal \noutputs.\n\nTerm provides a simple \e[3m\e[38;5;28m\e[1mmarkup \nlanguage\e[23m\e[39m\e[3m\e[22m\e[38;5;28m to add \e[1m\e[38;5;12mcolor\e[22m\e[38;5;28m\e[39m\e[1m and \n\e[1m\e[4mstyles\e[22m\e[1m\e[24m\e[1m to your text.\nMore complicated text layout \ncan be created using \n\e[31m\"Renderable\"\e[39m objects such \nas {red}\"Panel\"{/red} and {red}\"TextBox\"{/red}.\nThese can also be nested and \nstacked to create \e[3m\e[38;5;175mfancy\e[23m\e[39m\e[3m and \n\e[4minformative\e[24m\e[3m terminal ouputs for \nyour Julia code"
 
     strings = [
         (

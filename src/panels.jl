@@ -110,7 +110,6 @@ function Panel(;
     )
 end
 
-
 """
 ---
     Panel(
@@ -138,7 +137,6 @@ function Panel(
     isfit = fit ? Val(true) : Val(false)
     return Panel(content, isfit, padding; kwargs...)
 end
-
 
 """
 ---
@@ -181,7 +179,7 @@ function Panel(
             content,
             Val(false),
             padding;
-            width = min(panel_measure.w, console_width()),
+            width = min(panel_measure.w, console_width() - 1),
             kwargs...,
         )
     end
@@ -264,7 +262,6 @@ function Panel(
     )
 end
 
-
 """
     Panel(renderables; kwargs...)
 
@@ -317,7 +314,7 @@ function render(
     Δw::Int,
     Δh::Int,
     padding::Padding,
-    background=nothing,
+    background = nothing,
     kwargs...,
 )::Panel
 
@@ -352,8 +349,8 @@ function render(
 
     # add lines with content fn
     function makecontent_line(cline)::Segment
-        line = pad(apply_style(cline), panel_measure.w - Δw, justify; bg=background)
-        line = pad(line, padding.left, padding.right; bg=background)
+        line = pad(apply_style(cline), panel_measure.w - Δw, justify; bg = background)
+        line = pad(line, padding.left, padding.right; bg = background)
 
         # make line
         return Segment(left * line * right)

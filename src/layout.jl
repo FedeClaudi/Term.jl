@@ -2,7 +2,16 @@ module Layout
 
 import Parameters: @with_kw
 
-import Term: int, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, calc_nrows_ncols, do_by_line
+import Term:
+    int,
+    get_lr_widths,
+    textlen,
+    cint,
+    fint,
+    rtrim_str,
+    ltrim_str,
+    calc_nrows_ncols,
+    do_by_line
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..Consoles: console_width, console_height
 import ..Boxes: get_lrow, get_rrow
@@ -51,7 +60,7 @@ julia> pad("ciao", 10, :right)
 "      ciao"
 ```
 """
-function pad(text::AbstractString, target_width::Int, method::Symbol; bg=nothing)::String
+function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothing)::String
     if occursin('\n', text)
         return do_by_line(ln -> pad(ln, target_width, method), text)
     end
@@ -81,7 +90,7 @@ end
 
 Pad a string by a fixed ammount to the left and to the right.
 """
-function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg=nothing)
+function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing)
     if isnothing(bg)
         return " "^max(0, left) * text * " "^max(0, right)
     else
@@ -652,7 +661,7 @@ function hLine(
     box::Symbol = :ROUNDED,
 )
     box = eval(box)
-    text = apply_style(text)*"\e[0m"
+    text = apply_style(text) * "\e[0m"
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
 
@@ -662,7 +671,8 @@ function hLine(
         text *
         " " *
         "{$style}" *
-        get_rrow(box, rw - tr, :top; with_right = false) * "\e[0m"
+        get_rrow(box, rw - tr, :top; with_right = false) *
+        "\e[0m"
 
     return hLine([Segment(line, style)], Measure(width, 1))
 end

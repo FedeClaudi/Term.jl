@@ -40,7 +40,6 @@ include("markdown.jl")
 include("repr.jl")
 include("compositors.jl")
 
-
 export RenderableText, Panel, TextBox
 export term_theme, highlight
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
@@ -142,6 +141,5 @@ using .Compositors: Compositor, update!
 using .TermMarkdown: parse_md
 
 using .Repr: @with_repr, termshow, install_term_repr
-
 
 end

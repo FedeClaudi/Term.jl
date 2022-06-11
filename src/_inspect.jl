@@ -55,25 +55,3 @@ function style_sub_types(info)::String
     end
     return subtypes
 end
-
-"""
-    style_method_line(method::AbstractString; trim::Bool=false)::String
-
-Style a string with method info (name, args, path...)
-"""
-function style_method_line(method::AbstractString; trim::Bool = false)::String
-    if length(method) == 0
-        return method
-    end
-
-    method = trim ? method[4:end] : method
-
-    def, file = split(method, " in ")
-    name, args = split(def, "(")
-    args = "(" * args
-    file = split(file, " at ")[end]
-
-    return highlight(name, :emphasis) *
-           highlight(highlight(args), :emphasis_light) *
-           "\n         {dim}$file{/dim}"
-end

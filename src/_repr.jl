@@ -49,7 +49,14 @@ function typename(typedef::Expr)
     end
 end
 
-function repr_panel(obj, content, subtitle; width = console_width() - 10, justify = :center, kwargs...)
+function repr_panel(
+    obj,
+    content,
+    subtitle;
+    width = console_width() - 10,
+    justify = :center,
+    kwargs...,
+)
     p = Panel(
         content;
         fit = true,
