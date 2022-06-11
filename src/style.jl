@@ -97,7 +97,11 @@ function get_style_codes(style::MarkupStyle)
             # COLOR
         elseif attr == :color
             if !isnothing(value)
-                code = ANSICode(value; bg = false)
+                try
+                    code = ANSICode(value; bg = false)
+                catch
+                    continue
+                end
             else
                 code = nothing
             end

@@ -1,4 +1,5 @@
 module Repr
+using InteractiveUtils
 
 import Term:
     truncate,
@@ -9,13 +10,14 @@ import Term:
     split_lines,
     term_theme
 
-import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine
+import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
 import ..Consoles: console_width
 import ..Panels: Panel, TextBox
 import ..Style: apply_style
 import ..Tprint: tprint
 import ..Tables: Table
+import ..TermMarkdown: parse_md
 
 export @with_repr, termshow, install_term_repr
 
@@ -149,7 +151,8 @@ function termshow(io::IO, vec::Union{Tuple,AbstractVector})
         repr_panel(
             vec,
             vec2content(vec),
-            "{bold white}$(length(vec)){/bold white}{default} items{/default}",
+            "{bold white}$(length(vec)){/bold white}{default} items{/default}";
+            justify = :left,
         ),
     )
 end
@@ -198,18 +201,42 @@ function termshow(io::IO, arr::AbstractArray)
     )
 end
 
-function termshow(io::IO, fun::Function)
-    # get docstring 
-    doc, docstring = get_docstring(fun)
-    doc = highlight("{#8dbd86}" * string(doc) * "{/#8dbd86}")
+function termshow(io::IO, obj::DataType)
+    ts = term_theme[].repr_type_style
+    field_names = apply_style.(
+        string.(fieldnames(obj)), term_theme[].repr_accent_style
+        )
+    field_types = apply_style.(
+        map(f -> "::" * string(f), obj.types), ts
+    )
+
+    line = vLine(length(field_names); style = term_theme[].repr_name_style)
+    space = Spacer(1, length(field_names))
+    fields = rvstack(field_names...) * space *  lvstack(string.(field_types)...)
+
+    type_name = apply_style(string(obj), term_theme[].repr_name_style * " bold")
+    sup = supertypes(obj)[2]
+    type_name *= " {bright_blue dim}<: $sup{/bright_blue dim}"
+    content = "    " * repr_panel(nothing, string(type_name / ("  " * line * fields)), nothing; fit=false, width=min(console_width()-5, 80), justify=:center)
+
+    # get docstring
+    doc, _ = get_docstring(obj)
+    doc = parse_md(doc; width= min(100, console_width()))
     doc = split_lines(doc)
-    if length(doc) > 10
+    if length(doc) > 100
         doc = [
-            doc[1:min(10, length(doc))]...,
-            "{dim bright_blue}$(length(doc)-10) lines omitted...{/dim bright_blue}",
+            doc[1:min(100, length(doc))]...,
+            "{dim bright_blue}$(length(doc)-100) lines omitted...{/dim bright_blue}",
         ]
     end
+    doc = join(doc, "\n")
 
+    print(io, content)
+    print(io, hLine(console_width(), "Docstring"; style="green dim", box=:HEAVY))
+    tprint(io, doc )
+end
+
+function termshow(io::IO, fun::Function)
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)
@@ -235,7 +262,20 @@ function termshow(io::IO, fun::Function)
         "{white bold}$(N-1){/white bold} methods",
         title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
     )
-    return print(io, lvstack(panel, TextBox(doc; width = panel.measure.w * 2, fit = true)))
+
+    # get docstring 
+    doc, _ = get_docstring(fun)
+    doc = parse_md(doc; width= console_width()-8)
+    doc = split_lines(doc)
+    if length(doc) > 100
+        doc = [
+            doc[1:min(100, length(doc))]...,
+            "{dim bright_blue}$(length(doc)-100) lines omitted...{/dim bright_blue}",
+        ]
+    end
+    print(io, panel)
+    print(io, hLine(console_width(), "Docstring"; style="green dim", box=:HEAVY))
+    print(io, "   " * RenderableText(join(doc, "\n"); width = console_width()-8))
 end
 
 # ---------------------------------------------------------------------------- #
@@ -267,6 +307,10 @@ function install_term_repr()
 
         function Base.show(io::IO, ::MIME"text/plain", fun::Function)
             return termshow(io, fun)
+        end
+
+        function Base.show(io::IO, ::MIME"text/plain", obj::DataType)
+            return termshow(io, obj)
         end
 
         function Base.show(io::IO, ::MIME"text/plain", expr::Expr)

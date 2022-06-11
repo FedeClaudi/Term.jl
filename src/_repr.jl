@@ -49,26 +49,22 @@ function typename(typedef::Expr)
     end
 end
 
-function repr_panel(obj, content, subtitle; width = 40, kwargs...)
+function repr_panel(obj, content, subtitle; width = console_width() - 10, justify = :center, kwargs...)
     p = Panel(
         content;
         fit = true,
         title = isnothing(obj) ? obj : escape_brackets(string(typeof(obj))),
         title_justify = :left,
         width = width,
-        justify = :center,
+        justify = justify,
         style = term_theme[].repr_panel_style,
         title_style = term_theme[].repr_name_style,
-        padding = (2, 2, 1, 1),
+        padding = (2, 1, 1, 1),
         subtitle = subtitle,
         subtitle_justify = :right,
         kwargs...,
     )
 
-    w = console_width() - 10
-    if p.measure.w > w
-        p = do_by_line(l -> truncate(l, w + 6; trailing_dots = ""), string(p))
-    end
     return p
 end
 
@@ -120,6 +116,7 @@ function vec2content(vec::Union{Tuple,AbstractVector})
         show_header = false,
         columns_justify = [:right, :left],
         columns_style = ["dim", "default"],
+        columns_widths = [12, 60],
         vpad = 0,
         hpad = 2,
         compact = true,

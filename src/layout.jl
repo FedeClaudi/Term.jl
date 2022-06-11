@@ -2,7 +2,7 @@ module Layout
 
 import Parameters: @with_kw
 
-import Term: int, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, calc_nrows_ncols
+import Term: int, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, calc_nrows_ncols, do_by_line
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..Consoles: console_width, console_height
 import ..Boxes: get_lrow, get_rrow
@@ -36,9 +36,26 @@ end
     pad(text::AbstractString, target_width::Int, method::Symbol)::String
 
 Pad a string to width: `target_width` by adding empty spaces strings " ".
-Where the spaces are added depends on the justification `method` ∈ (:left, :center, :right).
+Where the spaces are added depends on the justification `method` ∈ (`:left`, `:center`, `:right`).
+
+#### Examples
+
+``` julia
+julia> pad("ciao", 10, :left)
+"ciao      "
+
+julia> pad("ciao", 10, :center)
+"   ciao   "
+
+julia> pad("ciao", 10, :right)
+"      ciao"
+```
 """
-function pad(text, target_width::Int, method::Symbol)::String
+function pad(text::AbstractString, target_width::Int, method::Symbol)::String
+    if occursin('\n', text)
+        return do_by_line(ln -> pad(ln, target_width, method), text)
+    end
+
     # get total padding size
     lw = width(text)
     lw >= target_width && return text
@@ -55,7 +72,8 @@ function pad(text, target_width::Int, method::Symbol)::String
 end
 
 """
-    pad(text::AbstractString, left::Int=0, right::Int=0)
+---
+    pad(text::AbstractString, left::Int = 0, right::Int = 0)
 
 Pad a string by a fixed ammount to the left and to the right.
 """
@@ -63,7 +81,8 @@ pad(text::AbstractString, left::Int = 0, right::Int = 0) =
     " "^max(0, left) * text * " "^max(0, right)
 
 """
-    pad(segments::AbstractVector{Segment}, left::Int=0, right::Int=0)
+---
+    pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0)
 
 Pad a renderable's segments to the left and the right.
 """
@@ -72,9 +91,10 @@ function pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0)
 end
 
 """
+---
     pad(ren::AbstractRenderable, left::Int, right::Int)
 
-Pad a renderable.
+Pad an `AbstractRenderable` by padding each of its segments.
 """
 function pad(ren::AbstractRenderable, left::Int, right::Int)
     segments = pad(ren.segments, left, right)
@@ -83,9 +103,21 @@ function pad(ren::AbstractRenderable, left::Int, right::Int)
 end
 
 """
+---
     pad(ren::AbstractRenderable; width::Int)
 
+
 Pad a renderable to achieve a target width.
+
+!!! note
+    The padding is added to the left and to the right as needed to achieve the target width.
+    The resulting renderable object will be **center** in the target space.
+
+#### Example
+```
+julia> pad(RenderableText("ciao"); width=10)
+    ciao   
+```
 """
 function pad(ren::AbstractRenderable; width::Int)
     npads = width - ren.measure.w
@@ -594,7 +626,7 @@ Create a styled `hLine` of given width.
 """
 function hLine(width::Int; style::String = "default", box::Symbol = :ROUNDED)
     char = eval(box).row.mid
-    segments = [Segment(char^width, style)]
+    segments = [Segment(char^width * "\e[0m", style)]
     return hLine(segments, Measure(width, 1))
 end
 
@@ -610,7 +642,7 @@ function hLine(
     box::Symbol = :ROUNDED,
 )
     box = eval(box)
-    text = apply_style(text)
+    text = apply_style(text)*"\e[0m"
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
 
@@ -620,7 +652,7 @@ function hLine(
         text *
         " " *
         "{$style}" *
-        get_rrow(box, rw - tr, :top; with_right = false)
+        get_rrow(box, rw - tr, :top; with_right = false) * "\e[0m"
 
     return hLine([Segment(line, style)], Measure(width, 1))
 end

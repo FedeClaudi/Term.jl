@@ -20,7 +20,7 @@ at the beginning of a tag, with this:
     (?<!\\{)\\[(?!\\{)
 """
 OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#\n]*\}"
-CLOSE_TAG_REGEX = r"(?<!\{)\{(?!\{)\/[a-zA-Z _0-9. ,()#\n]+[^/\{]\}"
+CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#\n]+[^/\{]\}"
 GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 """

@@ -118,21 +118,21 @@ abstract type CodeTheme <: AbstractTheme end
 @theme CodeTheme Dict(
     :style => S"",
     :tokens => Dict(
-        TEXT => S"fg: e6e8e6",
+        TEXT => S"fg: dedede;",
 
         # yellow
-        NAME_FUNCTION => S"fg: FFF59D;",
-        NAME_OTHER => S"fg: FFF59D;",
+        NAME_FUNCTION => S"fg: e8d472;",
+        NAME_OTHER => S"fg: e8d472;",
 
         # red
-        KEYWORD => S"fg: fc6262;",
-        OPERATOR => S"fg: fc6262;",
-        PUNCTUATION => S"fg: fc7474",
+        KEYWORD => S"fg: 7a93f5;",
+        OPERATOR => S"fg: de6d59;",
+        PUNCTUATION => S"fg: e38864",
 
         # green
-        STRING => S"fg: A5D6A7",
-        COMMENT => S"fg: C5E1A5; italic",
-        STRING_DOC => S"fg: D4E157",
+        STRING => S"fg: 50ad5f",
+        COMMENT => S"fg: 287a36; italic",
+        STRING_DOC => S"fg: 50ad5f",
 
         # blue
         NUMBER => S"fg: 90CAF9",

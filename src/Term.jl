@@ -36,8 +36,10 @@ include("trees.jl")
 include("dendograms.jl")
 include("introspection.jl")
 include("tables.jl")
+include("markdown.jl")
 include("repr.jl")
 include("compositors.jl")
+
 
 export RenderableText, Panel, TextBox
 export term_theme, highlight
@@ -133,10 +135,13 @@ using .Dendograms: Dendogram
 
 using .Introspection: inspect, typestree, expressiontree
 
-using .Repr: @with_repr, termshow, install_term_repr
-
 using .Tables: Table
 
 using .Compositors: Compositor, update!
+
+using .TermMarkdown: parse_md
+
+using .Repr: @with_repr, termshow, install_term_repr
+
 
 end

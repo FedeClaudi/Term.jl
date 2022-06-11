@@ -23,9 +23,12 @@ abstract type AbstractPanel <: AbstractRenderable end
     Panel
 
 `Renderable` with a panel surrounding some content:
-        ╭──────────╮
-        │ my panel │
-        ╰──────────╯
+
+```
+    ╭──────────╮
+    │ my panel │
+    ╰──────────╯
+```
 """
 mutable struct Panel <: AbstractPanel
     segments::Vector
@@ -43,22 +46,33 @@ mutable struct Panel <: AbstractPanel
 end
 
 """
+---
+
     Panel(; 
-        fit::Symbol=:nofit,
+        fit::Bool = false,
         width::Int = 88,
-        height::Union{Nothing,Int} = nothing, 
-        kwargs...
+        height::Int = 2,
+        padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
+        kwargs...,  
     )
 
 Construct a `Panel` with no content.
 
-# Examples
+
+### Examples
+```
 julia> Panel(; width=10, height=5)
 ╭────────╮
 │        │
 │        │
 │        │
 ╰────────╯
+
+julia> Panel(; width=5, height=3)
+╭───╮
+│   │
+╰───╯
+```
 """
 function Panel(;
     fit::Bool = false,
@@ -96,15 +110,52 @@ function Panel(;
     )
 end
 
+
 """
+---
+    Panel(
+        content::Union{AbstractString,AbstractRenderable};
+        fit::Bool = true,
+        padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+        kwargs...,
+    )
+
+Construct a `Panel` around an `AbstractRenderable` or `AbstractString`.
+
+This is the main Panel-creating function, it dispatches to other methods based
+on the value of `fit` to either fith the `Panel` to its content or vice versa.
+
+`kwargs` can be used to set various aspects of the `Panel`'s appearance like
+the presence and style of titles, box type etc... see [render](@ref) below.
+"""
+function Panel(
+    content::Union{AbstractString,AbstractRenderable};
+    fit::Bool = true,
+    padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+    kwargs...,
+)
+    padding = padding isa Padding ? padding : Padding(padding...)
+    isfit = fit ? Val(true) : Val(false)
+    return Panel(content, isfit, padding; kwargs...)
+end
+
+
+"""
+---
+
     Panel(
         content::Union{AbstractString,AbstractRenderable},
         ::Val{true},
         padding::Padding;
-        kwargs...
+        width::Union{Nothing,Int} = nothing,
+        height::Union{Nothing,Int} = nothing,
+        kwargs...,
         )
 
-Construct a `Panel` fitting with content.
+Construct a `Panel` fitting the content's width.
+
+!!! warning
+    If the content is larger than the console terminal's width, it will get trimmed to avoid overflow.
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable},
@@ -125,7 +176,7 @@ function Panel(
     )
 
     # if panel is larger than console, fit content to panel
-    if panel_measure.w > console_width() || panel_measure.h > console_height()
+    if panel_measure.w > console_width()
         return Panel(
             content,
             Val(false),
@@ -150,14 +201,22 @@ function Panel(
 end
 
 """
+---
     Panel(
         content::Union{AbstractString,AbstractRenderable},
         ::Val{false},
         padding::Padding;
-        kwargs...
-        )
+        width::Int = 88,
+        height::Union{Nothing,Int} = nothing,
+        kwargs...,
+    )
 
 Construct a `Panel` fitting content to it.
+
+!!! tip
+    Content that is **too large** to fit in the given width will be trimmed. 
+    To avoid trimming, set ```fit=true``` when calling panel. 
+
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable},
@@ -205,28 +264,6 @@ function Panel(
     )
 end
 
-"""
-    Panel(
-        content::Union{AbstractString,AbstractRenderable};
-        width::Int = 88,
-        height::Union{Nothing,Int} = nothing,
-        fit::Bool=false,
-        padding::Union{Padding, NTuple} = Padding(2, 2, 0, 0),
-        kwargs...
-    )
-
-Construct a `Panel` around of a `AbstractRenderable`
-"""
-function Panel(
-    content::Union{AbstractString,AbstractRenderable};
-    fit::Bool = true,
-    padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
-    kwargs...,
-)
-    padding = padding isa Padding ? padding : Padding(padding...)
-    isfit = fit ? Val(true) : Val(false)
-    return Panel(content, isfit, padding; kwargs...)
-end
 
 """
     Panel(renderables; kwargs...)
@@ -372,7 +409,11 @@ function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::I
         ren = ren isa RenderableText ? join(getfield.(ren.segments, :text), "\n") : ren
         ren = reshape_text(ren, width)
     else
-        segs = map(s -> pad(ltrim_str(s.text, width), width, :left), ren.segments)
+        texts = rstrip.(getfield.(ren.segments, :text))
+        segs = map(
+            s -> get_width(s) > width ? pad(truncate(s, width), width, :left) : s,
+            texts,
+        )
 
         ren = lvstack(segs)
     end

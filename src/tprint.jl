@@ -8,11 +8,16 @@ import ..Style: apply_style
 import ..Layout: hstack
 
 export tprint, tprintln
+
+
 """
-tprint
+    tprint
 
 Similar to standard lib's `print` function but with added
-styling functionality
+**styling functionality**
+
+!!! tip "highlighting"
+    Set `highlight=true` to automatically highlight the output.
 """
 function tprint end
 
@@ -25,7 +30,8 @@ function tprint(io::IO, ::MIME"text/html", x; highlight = true)
 end
 
 """
-tprint(x::AbstractString)
+---
+    tprint(x::AbstractString)
 
 Apply style to a string and print it
 """
@@ -38,7 +44,8 @@ function tprint(io::IO, x::AbstractString; highlight = true)
 end
 
 """
-tprint(x::AbstractRenderable)
+---
+    tprint(x::AbstractRenderable)
 
 Print an `AbstractRenderable`.
 
@@ -70,15 +77,15 @@ function tprint(args...; highlight = true)
     return nothing
 end
 
+
 """
+---
     tprintln
 
 Similar to standard lib's `println` function but with added
 styling functionality.
 """
-# tprintln(x; highlight=true) = tprintln(stdout, x; highlight=true)
-# tprintln(io::IO, x; highlight=true) = tprint(io, x, "\n"; highlight=highlight)
-# tprintln(io::IO, args...; highlight=true) = tprint(io, args..., "\n"; highlight=highlight)
+
 tprintln(args...; highlight = true) = tprint(args..., "\n"; highlight = highlight)
 
 end

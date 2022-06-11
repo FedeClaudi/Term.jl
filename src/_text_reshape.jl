@@ -1,4 +1,4 @@
-import Term: textlen, apply_style, OPEN_TAG_REGEX, do_by_line
+# import Term: textlen, apply_style, OPEN_TAG_REGEX, do_by_line
 
 rx = r"\s*\S+\s*"
 
@@ -86,10 +86,11 @@ Reshape a text to have a given width.
 Insert newline characters in a string so that each line is within the given width.
 """
 function reshape_text(text::AbstractString, width::Int)
-    # if occursin('\n', text)
-    #     return do_by_line(ln -> reshape_text(ln, width), text)
-    # end
+    if occursin('\n', text)
+        return do_by_line(ln -> reshape_text(ln, width), text)
+    end
 
+    textlen(text) <= width && return text
     text = split_tags_into_words(text)
     position = 0
     cuts = []

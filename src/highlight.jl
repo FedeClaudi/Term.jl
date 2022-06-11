@@ -112,12 +112,12 @@ function highlight_syntax(code::AbstractString; style::Bool = true)
         CodeTheme;
         context = stdout,
     )
-
+    txt = unescape_brackets(txt)
     if style
         txt = apply_style(txt)
     end
 
-    return txt
+    return do_by_line(rstrip, remove_markup(txt))
 end
 
 """
