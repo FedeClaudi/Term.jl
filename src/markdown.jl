@@ -60,8 +60,9 @@ function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...
     end
 end
 
-function parse_md(paragraph::Markdown.Paragraph; kwargs...)::String
-    join(parse_md.(paragraph.content; inline = true))
+function parse_md(paragraph::Markdown.Paragraph; width = console_width(), kwargs...)::String
+    out = join(parse_md.(paragraph.content; inline = true))
+    return reshape_text(out, width)
 end
 
 parse_md(italic::Markdown.Italic; kwargs...)::String =

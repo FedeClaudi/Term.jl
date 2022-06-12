@@ -27,7 +27,8 @@ import ..Segments: Segment
 import ..Colors: RGBColor
 import ..Layout: hLine
 
-export ProgressBar, ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track, render
+export ProgressBar,
+    ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track, render
 
 # ---------------------------------------------------------------------------- #
 #                               PROGRESS BAR JOB                               #
