@@ -88,27 +88,7 @@ using .Consoles: console_height, console_width
 
 using .Renderables: AbstractRenderable, Renderable, RenderableText
 
-using .Layout:
-    Padding,
-    vstack,
-    hstack,
-    Spacer,
-    vLine,
-    hLine,
-    pad,
-    pad!,
-    rightalign!,
-    leftalign!,
-    center!,
-    leftalign,
-    center,
-    rightalign,
-    lvstack,
-    cvstack,
-    rvstack,
-    PlaceHolder,
-    vertical_pad!,
-    vertical_pad
+using .Layout
 
 using .Panels: Panel, TextBox
 
@@ -126,7 +106,7 @@ using .Logs: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
 
-using .Progress: ProgressBar, ProgressJob # update, track
+using .Progress: ProgressBar, ProgressJob, with, @track
 
 using .Trees: Tree
 

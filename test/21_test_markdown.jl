@@ -107,7 +107,9 @@ This is where you print the content of your foot notes:
 #     tofile(string(t), "./txtfiles/markdown_$i.txt")
 # end
 
-for (i, m) in enumerate([m1, m2, m3])
-    t = sprint(tprint, m)
-    @test fromfile("./txtfiles/markdown_$i.txt") == t
+@testset "Test Markdown Strings" begin
+    for (i, m) in enumerate([m1, m2, m3])
+        t = sprint(tprint, m)
+        @test fromfile("./txtfiles/markdown_$i.txt") == t
+    end
 end

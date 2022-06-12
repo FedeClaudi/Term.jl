@@ -1,5 +1,5 @@
 using Term
-import Term.Progress: ProgressBar, start!, update!, stop!, with, @track, addjob!
+import Term.Progress: ProgressBar, start!, update!, stop!, with, @track, addjob!, render
 import Term.Consoles: clear
 
 tprint(hLine("progress bars"; style = "blue"))
@@ -21,6 +21,7 @@ for i in 1:100
     update!(job)
     sleep(0.01)
     i % 25 == 0 && println("We can print from here too")
+    render(pbar)
 end
 stop!(pbar)
 
@@ -39,6 +40,7 @@ for i in 1:100
     i % 2 == 0 && update!(job2)
     i % 3 == 0 && update!(job3)
     sleep(0.01)
+    render(pbar)
 end
 stop!(pbar)
 
@@ -60,6 +62,7 @@ with(pbar) do
         update!(job)
         sleep(0.01)
         i % 25 == 0 && println("We can print from here too")
+        render(pbar)
     end
 end
 
