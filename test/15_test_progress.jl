@@ -13,8 +13,8 @@ using ProgressLogging
     @test j1.N == 10
     @test j1.i == 1
     @test j1.description == "test"
-    @test j1.started == true
-    @test typeof(j1.columns) == Vector{AbstractColumn}
+    @test j1.started
+    @test j1.columns isa Vector{AbstractColumn}
 
     update!(j1)
     @test j1.i == 2
@@ -66,10 +66,10 @@ end
     for colinfo in (:minimal, :default, :spinner, :detailed)
         pbar = ProgressBar(; columns = colinfo)
         @test pbar.columns == get_columns(colinfo)
-        @test typeof(pbar.columns) == Vector{DataType}
+        @test pbar.columns isa Vector{DataType}
 
         job = addjob!(pbar; N = colinfo == :spinner ? nothing : 10)
-        @test typeof(job.columns) == Vector{AbstractColumn}
+        @test job.columns isa Vector{AbstractColumn}
 
         with(pbar) do
             for i in 1:10

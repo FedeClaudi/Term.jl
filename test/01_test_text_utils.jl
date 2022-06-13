@@ -35,14 +35,14 @@ import Term.Measures: width as get_width
     ]
 
     for (s1, s2) in strings
-        @test has_markup(s1) == true
+        @test has_markup(s1)
         @test remove_markup(s1) == s2
         @test cleantext(s1) == s2
         @test textlen(s1) == textwidth(s2)
     end
 
     @test remove_markup("text with {{double}} squares") == "text with {{double}} squares"
-    @test has_markup("text with {{double}} squares") == false
+    @test !has_markup("text with {{double}} squares")
 end
 
 @testset "TU_ansi" begin
@@ -66,7 +66,7 @@ end
     ]
 
     for (s1, s2, ltag) in strings
-        @test has_ansi(s1) == true
+        @test has_ansi(s1)
         @test remove_ansi(s1) == s2
         @test get_last_ANSI_code(s1) == ltag
     end
@@ -213,6 +213,6 @@ id est laborum."""
 
     for width in (40, 60, 99)
         rh = reshape_text(str, width)
-        @test any(textlen.(split(rh, "\n")) .> width) == false
+        @test !any(textlen.(split(rh, "\n")) .> width)
     end
 end
