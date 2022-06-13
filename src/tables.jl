@@ -346,18 +346,18 @@ function table_row(
     end
 
     # create row
-    if length(widths) > 1
-        mid = l * foldl((a, b) -> a * m * b, cells[1:end]) * r
+    mid = if length(widths) > 1
+        l * foldl((a, b) -> a * m * b, cells[1:end]) * r
     else
-        mid = l * cells[1] * r
+        l * cells[1] * r
     end
     bottom = apply_style(get_row(box, widths, bottom_level), box_style)
 
-    if !isnothing(top_level)
+    return if !isnothing(top_level)
         top = apply_style(get_row(box, widths, top_level), box_style)
-        return string(vstack(top, mid, bottom))
+        string(vstack(top, mid, bottom))
     else
-        return compact ? string(mid) : string(vstack(mid, bottom))
+        compact ? string(mid) : string(vstack(mid, bottom))
     end
 end
 

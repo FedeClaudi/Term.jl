@@ -2,12 +2,10 @@
 
 rx = r"\s*\S+\s*"
 
-function words(text)
-    return map(
-        m -> (m.offset, m.offset + textlen(m.match), m.match, textlen(m.match)),
-        eachmatch(rx, text),
-    )
-end
+words(text) = map(
+    m -> (m.offset, m.offset + textlen(m.match), m.match, textlen(m.match)),
+    eachmatch(rx, text),
+)
 
 function characters(word)
     chars = collect(word)
@@ -36,16 +34,12 @@ function split_tags_into_words(text)
 
     for markup in tags
         tag = match(Regex("\\{$markup\\}"), text)
-        if isnothing(tag)
-            continue
-        end
+        isnothing(tag) && continue
 
         close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
         close_tag = match(close_rx, text)
 
-        if isnothing(close_tag)
-            continue
-        end
+        isnothing(close_tag) && continue
 
         tag_words = map(
             w -> replace(replace(w, "{" => ""), "}" => ""),
@@ -86,16 +80,14 @@ Reshape a text to have a given width.
 Insert newline characters in a string so that each line is within the given width.
 """
 function reshape_text(text::AbstractString, width::Int)
-    if occursin('\n', text)
-        return do_by_line(ln -> reshape_text(ln, width), text)
-    end
+    occursin('\n', text) && (return do_by_line(ln -> reshape_text(ln, width), text))
 
-    textlen(text) <= width && return text
+    textlen(text) ≤ width && return text
     text = split_tags_into_words(text)
     position = 0
     cuts = []
     for (start, stop, word, word_length) in words(text)
-        if position + word_length >= width
+        if position + word_length ≥ width
             # we need to cut the text
             if word_length > width
                 # the word is longer than the line
@@ -113,7 +105,7 @@ function reshape_text(text::AbstractString, width::Int)
                     end
                 end
 
-                if position + word_chars[end][2] >= width
+                if position + word_chars[end][2] ≥ width
                     push!(cuts, I + length(word_chars) - 1)
                 end
 

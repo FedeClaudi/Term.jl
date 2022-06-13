@@ -33,7 +33,7 @@ import Term: Segment
 
     # test get title row with no justification
     tr = get_title_row(:top, Term.Boxes.ROUNDED, nothing; width = 22, style = "red")
-    @test typeof(tr) == Segment
+    @test tr isa Segment
     @test tr.measure.w == 22
 
     # test title row with justification

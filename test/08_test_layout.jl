@@ -30,14 +30,12 @@ import Term:
     p = Panel(; width = 20, height = 10)
     pad!(p, 20, 20)
     @test p isa Panel
-    @test p.measure.w == 60
-    @test p.measure.h == 10
+    @test size(p.measure) == (60, 10)
 
     p = Panel(; width = 20, height = 10)
     pad!(p; width = 30)
     @test p isa Panel
-    @test p.measure.w == 30
-    @test p.measure.h == 10
+    @test size(p.measure) == (30, 10)
 end
 
 @testset "Layout - vertical pad" begin
@@ -53,31 +51,24 @@ end
 
     vertical_pad!(p, 4, 4)
     @test p isa Panel
-    @test p.measure.w == 20
-    @test p.measure.h == 18
+    @test size(p.measure) == (20, 18)
 
     p = Panel(; width = 20, height = 10)
     vertical_pad!(p; height = 30)
     @test p isa Panel
-    @test p.measure.w == 20
-    @test p.measure.h == 30
+    @test size(p.measure) == (20, 30)
 end
 
 @testset "\e[34mlayout - spacer" begin
     sizes = [(22, 1), (44, 123), (21, 1), (4334, 232)]
     for (w, h) in sizes
         spacer = Spacer(w, h)
-        @test spacer.measure.w == w
-        @test spacer.measure.h == h
+        @test size(spacer.measure) == (w, h)
     end
 end
 
 @testset "\e[34mlayout - justification" begin
-    function make_panels()
-        begin
-            return (Panel(; width = 5), Panel(; width = 10), Panel(; width = 15))
-        end
-    end
+    make_panels() = (Panel(; width = 5), Panel(; width = 10), Panel(; width = 15))
 
     # right justify
     p1, p2, p3 = make_panels()
@@ -200,26 +191,22 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 / r2
-    @test r.measure.w == 50
-    @test r.measure.h == 8
+    @test size(r.measure) == (50, 8)
 
     h1 = hLine(22)
     h2 = hLine(33)
-    @test (h1 / h2).measure.w == 33
-    @test (h1 / h2).measure.h == 2
+    @test size(Measure(h1 / h2)) == (33, 2)
 
     r1 = RenderableText("."^100; width = 25)
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 * r2
-    @test r.measure.w == 75
-    @test r.measure.h == 5
+    @test size(r.measure) == (75, 5)
 
     # stack other renderables
     h1 = vLine(22)
     h2 = vLine(33)
-    @test (h1 * h2).measure.w == 2
-    @test (h1 * h2).measure.h == 33
+    @test size(Measure(h1 * h2)) == (2, 33)
 end
 
 @testset "\e[34mlayout - panels" begin
@@ -247,8 +234,7 @@ end
 @testset "\e[34mlayout - placeholder" begin
     ph = PlaceHolder(4, 2)
     @test length(ph.segments) == 2
-    @test ph.measure.w == 4
-    @test ph.measure.h == 2
+    @test size(ph.measure) == (4, 2)
     @test string(ph) == "\e[2m╲ ╲ \e[22m\n\e[2m ╲ ╲\e[22m"
 
     @test string(PlaceHolder(25, 12)) ==
@@ -256,8 +242,7 @@ end
 
     p = Panel(; width = 8, height = 4)
     ph = PlaceHolder(p)
-    @test ph.measure.w == p.measure.w
-    @test ph.measure.h == p.measure.h
+    @test size(ph.measure) == size(p.measure)
 end
 
 @testset "Layout - h/vstack with pad" begin
@@ -283,48 +268,28 @@ end
 end
 
 @testset "Layout - GRID" begin
-    g = grid(; layout = (3, 3), pad = (0, 0))
-    @test g.measure.w == 48
-    @test g.measure.h == 27
+    @test size(grid(layout = (3, 3), pad = (0, 0)).measure) == (48, 27)
 
-    g = grid(; layout = (3, 3))
-    @test g.measure.w == 48
-    @test g.measure.h == 27
+    @test size(grid(layout = (3, 3)).measure) == (48, 27)
 
-    g = grid(; layout = (3, 3), pad = 2)
-    @test g.measure.w == 52
-    @test g.measure.h == 31
+    @test size(grid(layout = (3, 3), pad = 2).measure) == (52, 31)
 
-    g = grid(; layout = (3, 3), pad = (5, 1))
-    @test g.measure.w == 58
-    @test g.measure.h == 29
+    @test size(grid(layout = (3, 3), pad = (5, 1)).measure) == (58, 29)
 
-    g = grid(; layout = (3, 3), pad = (5, 3))
-    @test g.measure.w == 58
-    @test g.measure.h == 33
+    @test size(grid(layout = (3, 3), pad = (5, 3)).measure) == (58, 33)
 
     # test passing renderables
     rens = repeat([PlaceHolder(10, 5)], 9)
 
-    g = grid(rens; aspect = 1)
-    @test g.measure.w == 30
-    @test g.measure.h == 15
+    @test size(grid(rens; aspect = 1).measure) == (30, 15)
 
-    g = grid(rens;)
-    @test g.measure.w == 50
-    @test g.measure.h == 10
+    @test size(grid(rens).measure) == (50, 10)
 
-    g = grid(rens; pad = (2, 1))
-    @test g.measure.w == 58
-    @test g.measure.h == 11
+    @test size(grid(rens; pad = (2, 1)).measure) == (58, 11)
 
-    g = grid(rens; pad = (2, 1), aspect = 0.5)
-    @test g.measure.w == 22
-    @test g.measure.h == 29
+    @test size(grid(rens; pad = (2, 1), aspect = 0.5).measure) == (22, 29)
 
-    g = grid(rens; pad = (2, 1), aspect = 1.5)
-    @test g.measure.w == 46
-    @test g.measure.h == 17
+    @test size(grid(rens; pad = (2, 1), aspect = 1.5).measure) == (46, 17)
 
     g = grid(
         rens;
@@ -332,6 +297,42 @@ end
         aspect = (12, 12),
         placeholder = PlaceHolder(10, 5; style = "red"),
     )
-    @test g.measure.w == 34
-    @test g.measure.h == 17
+    @test size(g.measure) == (34, 17)
+
+    w, h = 20, 10
+    panels = collect(
+        Panel("{on_$c} {/on_$c}", width = w, height = h) for c in (
+            :bright_red,
+            :bright_green,
+            :bright_blue,
+            :bright_yellow,
+            :bright_magenta,
+            :bright_cyan,
+            :bright_black,
+            :bright_white,
+        )
+    )
+
+    # auto layout (default placeholder)
+    for i in 2:length(panels)
+        g = grid(panels[1:i])
+        nc, nr = if i ≤ 3
+            (i, 1)
+        elseif i ≤ 5
+            (3, 2)
+        else
+            (4, 2)
+        end
+        @test size(g.measure) == (w * nc, h * nr)
+    end
+
+    # matrix, explicit
+    grid(reshape(panels[1:4], 2, 2))
+
+    # vector, half explicit
+    grid(panels, layout = (nothing, 4))
+    grid(panels, layout = (2, nothing))
+
+    # vector, explicit
+    grid(panels; layout = (2, 4))
 end

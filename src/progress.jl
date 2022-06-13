@@ -117,9 +117,8 @@ mutable struct ProgressJob
     end
 end
 
-function Base.show(io::IO, ::MIME"text/plain", job::ProgressJob)
-    return print(io, "Progress job $(job.id) \e[2m(started: $(job.started))\e[0m")
-end
+Base.show(io::IO, ::MIME"text/plain", job::ProgressJob) =
+    print(io, "Progress job $(job.id) \e[2m(started: $(job.started))\e[0m")
 
 """
     start!(job::ProgressJob)
@@ -137,9 +136,7 @@ function start!(job::ProgressJob)
         filter!(c -> c != ProgressColumn, job.columns)
 
         # but we should have a spinner column if there isnt one.
-        if !any(job.columns .== SpinnerColumn)
-            push!(job.columns, SpinnerColumn)
-        end
+        !any(job.columns .== SpinnerColumn) && push!(job.columns, SpinnerColumn)
     end
 
     # create columns type instances, passing the appropriate keyword arguments
@@ -176,7 +173,7 @@ end
 Update a job's progress `i` by setting its value or adding `+1`.
 """
 function update!(job::ProgressJob; i = nothing)
-    (!isnothing(job.N) && job.i >= job.N) && return stop!(job)
+    (!isnothing(job.N) && job.i ≥ job.N) && return stop!(job)
 
     job.i = isnothing(i) ? job.i + 1 : job.i + i
     return nothing

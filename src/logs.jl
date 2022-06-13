@@ -179,27 +179,26 @@ function Logging.handle_message(
     end
 
     # prepare styles
-    if lvl == Logging.Info
-        color = logger.theme.info
+    color = if lvl == Logging.Info
+        logger.theme.info
     elseif lvl == Logging.Debug
-        color = logger.theme.debug
+        logger.theme.debug
     elseif lvl == Logging.Warn
-        color = logger.theme.warn
+        logger.theme.warn
     elseif lvl == Logging.Error
-        color = logger.theme.error
+        logger.theme.error
     else
-        color = "#90CAF9"
+        "#90CAF9"
     end
 
     outline_markup = "$color dim"
     vert = "{$outline_markup}" * ROUNDED.mid.left * "{/$outline_markup}"
 
     # style message
-    if msg isa AbstractString
-        msg = has_markup(msg) ? msg : "{#8abeff}$msg{/#8abeff}"
-        msg = reshape_text(msg, 64)
+    msg = if msg isa AbstractString
+        reshape_text(has_markup(msg) ? msg : "{#8abeff}$msg{/#8abeff}", 64)
     else
-        msg = string(msg)
+        string(msg)
     end
 
     # get the first line of information
@@ -210,9 +209,9 @@ function Logging.handle_message(
     for n in 2:length(msg_lines)
         msg_lines[n] = "  $vert   " * " "^textlen(content) * "{#8abeff}" * msg_lines[n]
     end
-    if length(msg_lines) > 0
-        content *= "  " * msg_lines[1]
-    end
+
+    length(msg_lines) > 0 && (content *= "  " * msg_lines[1])
+
     tprintln(content; highlight = false)
     tprintln.(msg_lines[2:end]; highlight = false)
 
@@ -226,9 +225,7 @@ function Logging.handle_message(
     _types = string.(typeof.(collect(values(kwargs))))
     _types = map(t -> ltrim_str(t, 22), _types)
     for (i, _type) in enumerate(values(kwargs))
-        if typeof(_type) <: Function
-            _types[i] = string(Function)
-        end
+        typeof(_type) <: Function && (_types[i] = string(Function))
     end
 
     wpad = max(textlen.((_types))...) + 2
@@ -289,14 +286,14 @@ function Logging.handle_message(
         end
         vlines = split(v, "\n")
 
-        if !isnothing(_style)
-            vlines = map(ln -> "{" * _style * "}" * ln * "{/" * _style * "}", vlines)
+        vlines = if !isnothing(_style)
+            map(ln -> "{" * _style * "}" * ln * "{/" * _style * "}", vlines)
         else
-            vlines = highlight.(vlines)
+            highlight.(vlines)
         end
 
         tprintln(line * vlines[1]; highlight = false)
-        if length(vlines) >= 1
+        if length(vlines) ≥ 1
             for ln in vlines[2:end]
                 tprintln("  $vert " * " "^lpad * ln; highlight = false)
             end

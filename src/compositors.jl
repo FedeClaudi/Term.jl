@@ -37,10 +37,10 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     elements = elements isa Expr ? parse_single_element_layout(elements) : elements
 
     # create renderables
-    if length(elements) > 1
-        colors = getfield.(Palette(blue, pink; N = length(elements)).colors, :string)
+    colors = if length(elements) > 1
+        getfield.(Palette(blue, pink; N = length(elements)).colors, :string)
     else
-        colors = [pink]
+        [pink]
     end
 
     renderables = Dict(
@@ -64,13 +64,10 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     # edit layout expression to add padding and remove size info
     expr = string(clean_layout_expr(copy(layout)))
 
-    if hpad > 0
-        expr = replace(expr, "* " => "* Spacer($hpad, 1) * ")
-    end
+    hpad > 0 && (expr = replace(expr, "* " => "* Spacer($hpad, 1) * "))
 
-    if vpad > 0
-        expr = replace(expr, "/" => "/ Spacer(1, $vpad) / ")
-    end
+    vpad > 0 && (expr = replace(expr, "/" => "/ Spacer(1, $vpad) / "))
+
     expr = Meta.parse(expr)
 
     # handle the edge case with a single element
@@ -116,10 +113,10 @@ function render(compositor::Compositor; show_placeholders = false)
     length(renderables) == 1 &&
         return isnothing(renderables[1]) ? placeholders[1] : renderables[1]
 
-    if show_placeholders
-        components = Dict(e => p for (e, p) in zip(elements, placeholders))
+    components = if show_placeholders
+        Dict(e => p for (e, p) in zip(elements, placeholders))
     else
-        components = Dict(
+        Dict(
             e => isnothing(r) ? p : r for
             (e, r, p) in zip(elements, renderables, placeholders)
         )

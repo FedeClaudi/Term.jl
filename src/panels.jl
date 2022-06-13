@@ -37,10 +37,10 @@ mutable struct Panel <: AbstractPanel
     function Panel(x1, x2; kwargs...)
         # this is necessary to handle the special case in which 2 objs are passed
         # but they are not segments/measure
-        if x1 isa Vector
-            return new(x1, x2)
+        return if x1 isa Vector
+            new(x1, x2)
         else
-            return Panel(vstack(x1, x2); kwargs...)
+            Panel(vstack(x1, x2); kwargs...)
         end
     end
 end
@@ -82,11 +82,11 @@ function Panel(;
     kwargs...,
 )
     # get panel measure
-    if fit
+    panel_measure = if fit
         # hardcoded size of empty 'fitted' panel
-        panel_measure = Measure(3, 2)
+        Measure(3, 2)
     else
-        panel_measure = Measure(width, height)
+        Measure(width, height)
     end
 
     # get empty content measure
@@ -239,15 +239,14 @@ function Panel(
 
     # if the content is too tall, exclude some lines
     if content.measure.h > height - Δh - 1
-        if content.measure.h - height - Δh - 2 > 0
+        content = if content.measure.h - height - Δh - 2 > 0
             segments = [
                 content.segments[1:(height - Δh - 3)]...
                 Segment("... content omitted ...", "dim")
             ]
-
-            content = Renderable(segments, Measure(segments))
+            Renderable(segments, Measure(segments))
         else
-            content = RenderableText("")
+            RenderableText("")
         end
     end
 
@@ -267,9 +266,8 @@ end
 
 `Panel` constructor for creating a panel out of multiple renderables at once.
 """
-function Panel(renderables::Vector{RenderablesUnion}; kwargs...)
-    return Panel(vstack(renderables...); kwargs...)
-end
+Panel(renderables::Vector{RenderablesUnion}; kwargs...) =
+    Panel(vstack(renderables...); kwargs...)
 
 Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
 
@@ -357,10 +355,10 @@ function render(
     end
 
     # check if we need extra lines at the bottom to reach target height
-    if content_measure.h < panel_measure.h - Δh - 2
-        n_extra = panel_measure.h - content_measure.h - Δh - 2
+    n_extra = if content_measure.h < panel_measure.h - Δh - 2
+        panel_measure.h - content_measure.h - Δh - 2
     else
-        n_extra = 0
+        0
     end
 
     # create segments
@@ -403,19 +401,17 @@ end
 Trim a string or renderable to a max width.
 """
 function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::Int)
-    if ren isa AbstractString || ren isa RenderableText
+    return if ren isa AbstractString || ren isa RenderableText
         ren = ren isa RenderableText ? join(getfield.(ren.segments, :text), "\n") : ren
-        ren = reshape_text(ren, width)
+        reshape_text(ren, width)
     else
         texts = rstrip.(getfield.(ren.segments, :text))
         segs = map(
             s -> get_width(s) > width ? pad(truncate(s, width), width, :left) : s,
             texts,
         )
-
-        ren = lvstack(segs)
+        lvstack(segs)
     end
-    return ren
 end
 
 end

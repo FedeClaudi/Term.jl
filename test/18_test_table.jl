@@ -38,7 +38,7 @@ data = Dict(
 
 t6 = Table(data)
 
-X = rand(5, 3)
+X = rand(RNG, 5, 3)
 t8 = Table(
     X;
     columns_widths = [12, 10, 22],

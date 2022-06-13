@@ -14,8 +14,7 @@ import Term: fillin
     @test seg.measure.w == 4
 
     seg = Segment("aa\n{blue}123{/blue}")
-    @test seg.measure.w == 3
-    @test seg.measure.h == 2
+    @test size(seg.measure) == (3, 2)
 
     seg = Segment("test")
     @test seg * "test" isa Segment
@@ -28,12 +27,10 @@ end
     lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
     r = RenderableText(lorem)
 
-    @test r.measure.w == 99
-    @test r.measure.h == 1
+    @test size(r.measure) == (99, 1)
 
     r2 = RenderableText(r)
-    @test r.measure.w == 99
-    @test r.measure.h == 1
+    @test size(r.measure) == (99, 1)
 
     r = RenderableText(lorem; width = 22)
     @test string(r) ==

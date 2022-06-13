@@ -3,11 +3,9 @@ import Term.Layout: PlaceHolder
 
 @testset "\e[34mPanel - no content" begin
     for style in ("default", "red", "on_blue")
-        testpanel(Panel(; fit = true, style = style), 3, 2)
-
+        testpanel(Panel(fit = true, style = style), 3, 2)
         testpanel(Panel(), 88, 2)
-
-        testpanel(Panel(; width = 12, height = 4, style = style), 12, 4)
+        testpanel(Panel(width = 12, height = 4, style = style), 12, 4)
     end
 end
 
@@ -34,136 +32,62 @@ end
 
 @testset "\e[34mPANEL - fit - measure" begin
     for style in ("default", "red", "on_blue")
-        for justify in (:left, :center, :right)
-            # ----------------------------- text only content ---------------------------- #
-            testpanel(Panel("t"; fit = true, style = style), 7, 3)
-            testpanel(Panel("test"; fit = true, style = style), 10, 3)
-            testpanel(Panel("1234\n123456789012"; fit = true, style = style), 18, 4)
-            testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true, style = style), 28, 3)
-            testpanel(
-                Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true, style = style),
-                28,
-                4,
-            )
-            testpanel(
-                Panel("."^500; fit = true, style = style),
-                displaysize(stdout)[2] - 1,
-                nothing,
-            )
+        # ----------------------------- text only content ---------------------------- #
+        _kw = (fit = true, style = style)
+        testpanel(Panel("t"; _kw...), 7, 3)
+        testpanel(Panel("test"; _kw...), 10, 3)
+        testpanel(Panel("1234\n123456789012"; _kw...), 18, 4)
+        testpanel(Panel("나랏말싸미 듕귁에 달아"; _kw...), 28, 3)
+        testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; _kw...), 28, 4)
+        testpanel(Panel("."^500; _kw...), displaysize(stdout)[2] - 1, nothing)
 
-            # ------------------------------- nested panels ------------------------------ #
-            testpanel(
-                Panel(Panel("test"; fit = true, style = style); fit = true, style = style),
-                16,
-                5,
-            )
+        # ------------------------------- nested panels ------------------------------ #
+        testpanel(Panel(Panel("test"; _kw...); _kw...), 16, 5)
 
-            testpanel(
-                Panel(
-                    Panel(Panel("."; fit = true, style = style); fit = true, style = style);
-                    fit = true,
-                    style = style,
-                ),
-                19,
-                7,
-            )
-
-            # @test_nothrow Panel(
-            #         Panel("."^250; fit=true, style=style); fit=true, style=style
-            #     )
-        end
+        testpanel(
+            Panel(Panel(Panel("."; _kw...); _kw...); fit = true, style = style),
+            19,
+            7,
+        )
     end
 end
 
 @testset "\e[34mPANEL - nofit - measure" begin
     for style in ("default", "red", "on_blue")
+        testpanel(Panel("t"; style = style, fit = false), 88, 3)
+        testpanel(Panel("test"; style = style, fit = false), 88, 3)
+        testpanel(Panel("1234\n123456789012"; style = style, fit = false), 88, 4)
+        testpanel(Panel("나랏말싸미 듕귁에 달아"; style = style, fit = false), 88, 3)
+        testpanel(
+            Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; style = style, fit = false),
+            88,
+            4,
+        )
         for justify in (:left, :center, :right)
             # ----------------------------- text only content ---------------------------- #
-            testpanel(Panel("t"; style = style, fit = false), 88, 3)
-            testpanel(Panel("test"; style = style, fit = false), 88, 3)
-            testpanel(Panel("1234\n123456789012"; style = style, fit = false), 88, 4)
-            testpanel(Panel("나랏말싸미 듕귁에 달아"; style = style, fit = false), 88, 3)
-            testpanel(
-                Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; style = style, fit = false),
-                88,
-                4,
-            )
-            testpanel(
-                Panel("."^1500; justify = justify, style = style, fit = false),
-                88,
-                21,
-            )
+            _kw = (justify = justify, style = style)
+            _nofit = (; fit = false, _kw...)
+            testpanel(Panel("."^1500; _nofit...), 88, 21)
 
             # ------------------------------- nested panels ------------------------------ #
-            testpanel(
-                Panel(Panel("test"); fit = true, justify = justify, style = style),
-                16,
-                5,
-            )
+            testpanel(Panel(Panel("test"); fit = true, _kw...), 16, 5)
 
-            testpanel(
-                Panel(
-                    Panel(Panel("."); fit = false, justify = justify, style = style);
-                    fit = false,
-                    justify = justify,
-                    style = style,
-                ),
-                88,
-                7,
-            )
+            testpanel(Panel(Panel(Panel("."); _nofit...); _nofit...), 88, 7)
 
-            testpanel(
-                Panel(Panel("."^250); fit = false, justify = justify, style = style),
-                88,
-                6,
-            )
+            testpanel(Panel(Panel("."^250); _nofit...), 88, 6)
 
-            testpanel(
-                Panel(Panel("test"; justify = justify, style = style); fit = false),
-                88,
-                5,
-            )
+            testpanel(Panel(Panel("test"; _kw...); fit = false), 88, 5)
 
-            testpanel(
-                Panel(
-                    Panel(
-                        Panel("."; justify = justify, style = style);
-                        justify = justify,
-                        style = style,
-                    );
-                    fit = false,
-                ),
-                88,
-                7,
-            )
+            testpanel(Panel(Panel(Panel("."; _kw...); _kw...); fit = false), 88, 7)
 
-            testpanel(
-                Panel(Panel("."^250; justify = justify, style = style); fit = false),
-                88,
-                6,
-            )
+            testpanel(Panel(Panel("."^250; _kw...); fit = false), 88, 6)
 
-            testpanel(
-                Panel(
-                    Panel("t1"; justify = justify, style = style),
-                    Panel("t2"; justify = justify, style = style);
-                    fit = false,
-                ),
-                88,
-                8,
-            )
+            testpanel(Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = false), 88, 8)
 
-            testpanel(
-                Panel(Panel("test"; width = 22); fit = false, width = 30, height = 8),
-                30,
-                8,
-            )
+            _kw = (fit = false, width = 30, height = 8)
+            testpanel(Panel(Panel("test"; width = 22); _kw...), 30, 8)
 
-            testpanel(
-                Panel(Panel("test"; width = 42); fit = false, width = 30, height = 8),
-                30,
-                8,
-            )
+            testpanel(Panel(Panel("test"; width = 42); _kw...), 30, 8)
 
             testpanel(
                 Panel(
@@ -180,37 +104,22 @@ end
 end
 
 @testset "\e[34mPANEL - FIT - measure" begin
+    testpanel(Panel("t"; fit = true), 7, 3)
+    testpanel(Panel("test"; fit = true), 10, 3)
+    testpanel(Panel("1234\n123456789012"; fit = true), 18, 4)
+    testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true), 28, 3)
+    testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true), 28, 4)
     for justify in (:left, :center, :right)
         # ----------------------------- text only content ---------------------------- #
-        testpanel(Panel("t"; fit = true), 7, 3)
-        testpanel(Panel("test"; fit = true), 10, 3)
-        testpanel(Panel("1234\n123456789012"; fit = true), 18, 4)
-        testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true), 28, 3)
-        testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true), 28, 4)
-        testpanel(
-            Panel("."^1500; justify = justify, fit = true),
-            console_width() - 1,
-            nothing,
-        )
+        _kw = (fit = true, justify = justify)
+        testpanel(Panel("."^1500; _kw...), console_width() - 1, nothing)
 
         # ------------------------------- nested panels ------------------------------ #
-        testpanel(Panel(Panel("test"); fit = true, justify = justify), 16, 5)
+        testpanel(Panel(Panel("test"); _kw...), 16, 5)
 
-        testpanel(
-            Panel(
-                Panel(Panel("."); fit = true, justify = justify);
-                fit = true,
-                justify = justify,
-            ),
-            19,
-            7,
-        )
+        testpanel(Panel(Panel(Panel("."); _kw...); _kw...), 19, 7)
 
-        testpanel(
-            Panel(Panel("."^250); fit = true, justify = justify),
-            console_width() - 1,
-            nothing,
-        )
+        testpanel(Panel(Panel("."^250); _kw...), console_width() - 1, nothing)
 
         testpanel(Panel(Panel("test"; justify = justify); fit = true), 16, 5)
 
@@ -236,53 +145,37 @@ end
             8,
         )
 
-        testpanel(
-            Panel(Panel("test"; width = 22); fit = true, width = 30, height = 8),
-            30,
-            8,
-        )
+        _kw = (fit = true, width = 30, height = 8)
+        testpanel(Panel(Panel("test"; width = 22); _kw...), 30, 8)
 
-        testpanel(
-            Panel(Panel("test"; width = 42); fit = true, width = 30, height = 8),
-            48,
-            8,
-        )
+        testpanel(Panel(Panel("test"; width = 42); _kw...), 48, 8)
 
-        testpanel(
-            Panel(
-                Panel("test"; width = 42, height = 12);
-                fit = true,
-                width = 30,
-                height = 8,
-            ),
-            48,
-            14,
-        )
+        testpanel(Panel(Panel("test"; width = 42, height = 12); _kw...), 48, 14)
     end
 end
 
 @testset "PANEL - centered title style" begin
     @test string(
-        Panel(; title = "test", title_justify = :left, title_style = "italic red"),
+        Panel(title = "test", title_justify = :left, title_style = "italic red"),
     ) ==
           "\e[22m╭──── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────────────────────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(
-        Panel(; title = "test", title_justify = :center, title_style = "italic red"),
+        Panel(title = "test", title_justify = :center, title_style = "italic red"),
     ) ==
           "\e[22m╭────────────────────────────────────────\e[22m \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────────────────╮\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(
-        Panel(; title = "test", title_justify = :right, title_style = "italic red"),
+        Panel(title = "test", title_justify = :right, title_style = "italic red"),
     ) ==
           "\e[22m╭───────────────────────────────────────────────────────────────────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ───╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
 
-    @test string(Panel(; title = "test", title_justify = :left)) ==
+    @test string(Panel(title = "test", title_justify = :left)) ==
           "\e[22m╭──── test\e[22m ────────────────────────────────────────────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(; title = "test", title_justify = :center)) ==
+    @test string(Panel(title = "test", title_justify = :center)) ==
           "\e[22m╭────────────────────────────────────────\e[22m test\e[22m ────────────────────────────────────────╮\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(; title = "test", title_justify = :right)) ==
+    @test string(Panel(title = "test", title_justify = :right)) ==
           "\e[22m╭───────────────────────────────────────────────────────────────────────────── test\e[22m ───╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
 
-    p = Panel(;
+    p = Panel(
         title = "test",
         title_justify = :left,
         subtitle = "aaaaa",
@@ -319,14 +212,6 @@ id est laborum.""",
         "\n" => "",
     )
 
-    # if dotest
-    #     # @test string(Panel(pts; style = "red", fit = false, width = 44)) ==
-    #     # "\e[31m╭──────────────────────────────────────────╮\e[39m\n\e[0m\e[31m│\e[39m\e[0m  Lorem\e[31m ipsum dolor s\e[39mit amet,             \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  consectetur adipiscing elit,            \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  ed do                                   \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  eiusmod tempor \e[1m\e[34mincididu\e[4mnt ut labore     \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  et dolore magna aliqua. Ut enim ad      \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  minim                                   \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  veniam, quis nos\e[24m\e[34mtrud                    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  exercitation ullamco laboris nisi ut    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  aliquip ex                              \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│" ⋯ 266 bytes ⋯ "m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  in voluptate velit                      \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  esse cillum dolore eu fugiat nulla      \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m                                          \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  pariatur. Excepteur sint occaecat\e[39m\e[1m\e[49m\e[31m       \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  cupidatat non proident,                 \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  sunt in                                 \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  \e[32mculpa qui officia\e[39m\e[31m deserunt mollit       \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  anim                                    \e[0m\e[31m│\e[39m\e[0m\n\e[0m\e[31m│\e[39m\e[0m  id est laborum.                         \e[0m\e[31m│\e[39m\e[0m\n\e[31m╰──────────────────────────────────────────╯\e[39m\e[0m"
-
-    #     @test string(Panel(pts; fit = false, width = 60)) ==
-    #         "\e[22m╭──────────────────────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem\e[31m ipsum dolor s\e[39mit amet, consectetur adipiscing      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  elit,                                                   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  ed do eiusmod tempor \e[1m\e[34mincididu\e[4mnt ut labore et            \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  dolore magna aliqua. Ut enim ad minim                   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  veniam, quis                                            \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  nos\e[24m\e[34mtrud exercitation ullamco laboris nisi ut aliquip    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  ex                                                      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  ea commodo consequat. D" ⋯ 143 bytes ⋯ "                    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  in voluptate velit esse cillum dolore                   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  eu fugiat nulla                                         \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  pariatur. Excepteur sint occaecat\e[39m\e[1m\e[49m\e[31m                       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  cupidatat non proident,                                 \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  sunt in \e[32mculpa qui officia\e[39m\e[31m                               \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  deserunt mollit anim                                    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  id est laborum.                                         \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────╯\e[22m\e[0m"
-    # end
-
     @test string(Panel(pts2; fit = false, width = 44)) ==
           "\e[22m╭──────────────────────────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m  Lorem ipsum \e[1mdolor sit\e[22m amet,             \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  consectetur adipiscing elit,ed do       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  e\e[31miusmod tempor incididunt\e[39m\e[22m ut \e[1mlabore     \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  et \e[4mdolore\e[24m\e[1m magna aliqua.\e[22m Ut enim ad      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  minimveniam, quis\e[32m nostrud               \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  exercitation \e[40mullamco laboris nisi ut    \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  aliquip ex \e[49m\e[32mea commodo consequat.\e[34m        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  Duis aute irure dolor in\e[39m\e[32m                \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  reprehenderit in voluptate velit\e[39m\e[22m        \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  esse \e[3mcillum dolore\e[23m\e[22m\e[31m eu\e[39m\e[22m\e[3m\e[32m fugiat \e[23m\e[22m\e[39m\e[3mnulla      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  pariatur. Excepteur\e[31m sint\e[39m\e[3m\e[34m occaecat       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  cupidatat \e[39m\e[3mnon proident, sunt in         \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  culpa qui \e[3mofficia\e[23m\e[3m deserunt mollit       \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  anim id est laborum.                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────╯\e[22m\e[0m"
 
@@ -359,10 +244,7 @@ id est laborum.""",
         padding = (2, 4, 4, 2),
         fit = false,
     )
-    @test p.measure.w == 49
-    @test p.measure.h == 22
-
-    # @test string(p) == "\e[22m┏━━━━━━━━━━━━━━━━━\e[22m \e[1m\e[38;5;12mdescription\e[22m\e[39m\e[22m ━━━━━━━━━━━━━━━━━┓\e[22m\e[39m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[" ⋯ 623 bytes ⋯ "╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\e[1m           \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m             \e[2m... content omitted ...\e[22m           \e[0m\e[22m┃\e[22m\e[0m\n\e[22m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\e[22m\e[0m"
+    @test size(p.measure) == (49, 22)
 
     p = Panel(
         "test"^25;
@@ -376,9 +258,7 @@ id est laborum.""",
         padding = (2, 4, 4, 2),
         fit = false,
     )
-    @test p.measure.w == 49
-    @test p.measure.h == 22
-    # @test string(p) == "\e[22m┏━━━━━━━━━━━━━━━━━\e[22m \e[1m\e[38;5;12mdescription\e[22m\e[39m\e[22m ━━━━━━━━━━━━━━━━━┓\e[22m\e[39m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[22m╭───────────────────────────────────       \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[0m\e[22m│\e[22m\e[0m                                          \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[0m\e[22m│\e[22m\e[0m                                          \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[0m\e[22m│\e[22m\e[0m                                       " ⋯ 446 bytes ⋯ "m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[0m\e[22m│\e[22m\e[0m                                          \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[0m\e[22m│\e[22m\e[0m                                          \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[0m\e[22m│\e[22m\e[0m                                          \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[22m╰───────────────────────────────────       \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[22m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\e[22m\e[0m"
+    @test size(p.measure) == (49, 22)
 
     p = Panel(
         PlaceHolder(60, 30);
@@ -392,9 +272,7 @@ id est laborum.""",
         padding = (2, 0, 2, 0),
         fit = false,
     )
-    @test p.measure.w == 49
-    @test p.measure.h == 22
-    # @test string(p) == "\e[22m┏━━━━━━━━━━━━━━━━━\e[22m \e[1m\e[38;5;12mdescription\e[22m\e[39m\e[22m ━━━━━━━━━━━━━━━━━┓\e[22m\e[39m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m                                               \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[" ⋯ 623 bytes ⋯ "╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\e[1m           \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲  \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m    \e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲   \e[0m\e[22m┃\e[22m\e[0m\n\e[0m\e[22m┃\e[22m\e[0m             \e[2m... content omitted ...\e[22m           \e[0m\e[22m┃\e[22m\e[0m\n\e[22m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\e[22m\e[0m"
+    @test size(p.measure) == (49, 22)
 end
 
 @testset "\e[34mPanel + renderables" begin
@@ -429,24 +307,6 @@ end
                 fit ? nothing : 88,
                 3,
             )
-
-            # testpanel(
-            #     Panel(
-            #         Panel(
-            #             "."^50;
-            #             title = "test",
-            #             title_style = style,
-            #             title_justify = justify,
-            #             subtitle = "subtest",
-            #             subtitle_style = style,
-            #             subtitle_justify = justify,
-            #             fit = fit,
-            #         );
-            #         fit = fit,
-            #     ),
-            #     fit ? nothing : 88,
-            #     5,
-            # )
         end
     end
 end
@@ -454,7 +314,6 @@ end
 @testset "\e[34mPanel - padding" begin
     p = Panel("."^24; padding = (4, 4, 2, 2), fit = false)
     testpanel(p, 88, 7)
-    # @test string(p) == "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m    ........................                                                          \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m│\e[22m                                                                                      \e[22m│\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m"
 
     p = Panel("."^24; padding = (4, 4, 2, 2), fit = true)
     testpanel(p, 34, 7)

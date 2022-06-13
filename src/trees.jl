@@ -53,11 +53,8 @@ end
 
 Get tree guides with style information applied
 """
-function TreeGuides(guides_type::Symbol, style::String)
-    return TreeGuides(
-        map((g) -> apply_style("{$style}$g{/$style}"), treeguides[guides_type])...,
-    )
-end
+TreeGuides(guides_type::Symbol, style::String) =
+    TreeGuides(map((g) -> apply_style("{$style}$g{/$style}"), treeguides[guides_type])...)
 
 # ---------------------------------------------------------------------------- #
 #                                     TREE                                     #
@@ -234,9 +231,7 @@ function render(
     """
         Add a segment to the segments vector
     """
-    function _add(x::String, style)
-        return push!(segments, Segment(x, style))
-    end
+    _add(x::String, style) = push!(segments, Segment(x, style))
     _add(x::String) = _add(x, "default")
 
     # ------------------------------ render in parts ----------------------------- #
@@ -272,11 +267,7 @@ function render(
         lasttree = last && !hasleaves
 
         # get the appropriate guides
-        if lasttree
-            prev = prevguides * guides.space
-        else
-            prev = prevguides * guides.vline
-        end
+        prev = prevguides * (lasttree ? guides.space : guides.vline)
 
         append!(
             segments,
