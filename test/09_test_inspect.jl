@@ -37,6 +37,9 @@ expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
 
             @test fromfile("./txtfiles/exptree_expr_$i.txt") ==
                   cleansprint(expressiontree, e)
+
+            inspect(devnull, e)
         end
+        typestree(devnull, Float64)
     end
 end

@@ -112,7 +112,6 @@ Get a box's row of given width.
 """
 function get_row(box::Box, width::Int, level::Symbol)::String
     level = getfield(box, level)
-
     return level.left * level.mid^(width - 2) * level.right
 end
 
@@ -127,10 +126,10 @@ See also [`get_row`](@ref), [`get_rrow`](@ref).
 function get_lrow(box::Box, width::Int, level::Symbol; with_left = true)::String
     level = getfield(box, level)
 
-    if with_left
-        return level.left * level.mid^(width - 1)
+    return if with_left
+        level.left * level.mid^(width - 1)
     else
-        return level.mid^(width - 1)
+        level.mid^(width - 1)
     end
 end
 
@@ -143,10 +142,10 @@ See also [`get_row`](@ref), [`get_lrow`](@ref).
 function get_rrow(box::Box, width::Int, level::Symbol; with_right = true)::String
     level = getfield(box, level)
 
-    if with_right
-        return level.mid^(width - 1) * level.right
+    return if with_right
+        level.mid^(width - 1) * level.right
     else
-        return level.mid^(width - 1)
+        level.mid^(width - 1)
     end
 end
 
@@ -190,11 +189,10 @@ function get_title_row(
 
     topen, tclose = "", open
     if !isnothing(title_style)
-        if style == "hidden"
-            topen = "\e[28m" * topen
-            tclose = tclose * "\e[8m"
+        topen, tclose = if style == "hidden"
+            "\e[28m" * topen, tclose * "\e[8m"
         else
-            topen, tclose = "{" * title_style * "}", "{/" * title_style * "}" * open
+            "{" * title_style * "}", "{/" * title_style * "}" * open
         end
     end
     title = space * topen * title * tclose * space
@@ -231,19 +229,16 @@ Creates a box.
 The box has one of each level type with columns
 widths specified by a vector of widhts.
 """
-function fit(box::Box, widths::Vector{Int})::String
-    strings = [
-        get_row(box, widths, :top),
-        get_row(box, widths, :head),
-        get_row(box, widths, :head_row),
-        get_row(box, widths, :mid),
-        get_row(box, widths, :row),
-        get_row(box, widths, :foot_row),
-        get_row(box, widths, :foot),
-        get_row(box, widths, :bottom),
-    ]
-    return join_lines(strings)
-end
+fit(box::Box, widths::Vector{Int}) = join_lines([
+    get_row(box, widths, :top),
+    get_row(box, widths, :head),
+    get_row(box, widths, :head_row),
+    get_row(box, widths, :mid),
+    get_row(box, widths, :row),
+    get_row(box, widths, :foot_row),
+    get_row(box, widths, :foot),
+    get_row(box, widths, :bottom),
+])
 
 # ---------------------------------------------------------------------------- #
 #                                   Box types                                  #

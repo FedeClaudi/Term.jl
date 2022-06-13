@@ -93,6 +93,10 @@ tprint("\n\n{bold green}Running: '20_test_compositor.jl' {/bold green}")
 tprint("\n\n{bold green}Running: '21_test_markdown.jl' {/bold green}")
 @time @timeit_include("21_test_markdown.jl")
 
+# ? 22 Theme
+tprint("\n\n{bold green}Running: '22_test_theme.jl' {/bold green}")
+@time @timeit_include("22_test_theme.jl")
+
 # ? 999 EXAMPLES
 tprint("\n\n{bold green}Running: '999_test_examples.jl' {/bold green}")
 @time @timeit_include("999_test_examples.jl")

@@ -296,11 +296,7 @@ function replace_line_midpoint(line::String; widths = nothing)
     w2 = nextind(line, int(ncodeunits(line) / 2) + 1)
 
     char = SQUARE.bottom.vertical
-    if !isnothing(widths)
-        if textwidth(line[1:w1]) in widths
-            char = SQUARE.row.vertical
-        end
-    end
+    isnothing(widths) || (textwidth(line[1:w1]) in widths && (char = SQUARE.row.vertical))
     line = line[1:w1] * char * line[w2:end]
     return line, length(line[1:w1])
 end

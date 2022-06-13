@@ -134,8 +134,7 @@ function Panel(
     kwargs...,
 )
     padding = padding isa Padding ? padding : Padding(padding...)
-    isfit = fit ? Val(true) : Val(false)
-    return Panel(content, isfit, padding; kwargs...)
+    return Panel(content, Val(fit), padding; kwargs...)
 end
 
 """
@@ -174,15 +173,13 @@ function Panel(
     )
 
     # if panel is larger than console, fit content to panel
-    if panel_measure.w > console_width()
-        return Panel(
-            content,
-            Val(false),
-            padding;
-            width = min(panel_measure.w, console_width() - 1),
-            kwargs...,
-        )
-    end
+    panel_measure.w > console_width() && return Panel(
+        content,
+        Val(false),
+        padding;
+        width = min(panel_measure.w, console_width() - 1),
+        kwargs...,
+    )
 
     Δw = padding.left + padding.right + 2
     Δh = padding.top + padding.bottom
@@ -228,9 +225,7 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # if the content is too large, resize it to fit the panel's width.
-    if get_width(content) > width - Δw + 1
-        content = trim_renderable(content, width - Δw)
-    end
+    get_width(content) > width - Δw + 1 && (content = trim_renderable(content, width - Δw))
 
     # get panel height
     content = content isa AbstractRenderable ? content : RenderableText(fillin(content))
@@ -386,10 +381,7 @@ end
 #                                    TextBox                                   #
 # ---------------------------------------------------------------------------- #
 
-function TextBox(args...; kwargs...)
-    box = get(kwargs, :box, :NONE)
-    return Panel(args...; box = box, kwargs...)
-end
+TextBox(args...; kwargs...) = Panel(args...; box = get(kwargs, :box, :NONE), kwargs...)
 
 # ---------------------------------------------------------------------------- #
 #                                     MISC.                                    #
