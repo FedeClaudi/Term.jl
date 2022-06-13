@@ -72,20 +72,6 @@ end
     end
 end
 
-# @testset "TU_brackets" begin
-#     strings = [
-#         ("test {vec} nn", "test {{vec}} nn"),
-#         ("[1, 2, 3}", "{{1, 2, 3}}")
-#     ]
-
-#     for (s1, s2) in strings
-#         escaped = escape_brackets(s1)
-#         @test escaped == s2
-#         @test unescape_brackets(escaped) == s1
-#         @test unescape_brackets(s1) == s1
-#     end
-# end
-
 @testset "TU_replace_text" begin
     text = "abcdefghilmnopqrstuvz"
 
@@ -130,7 +116,24 @@ pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident
 sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
 id est laborum."""
 
-    str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, \nconsectetur adipiscing elit,\ned do e\e[31miusmod tempor incididunt\e[39m \nut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna \naliqua.\e[22m\e[39m Ut enim ad minim\nveniam, quis\e[32m nostrud \n\e[32mexercitation \e[40mullamco laboris \n\e[32mnisi ut aliquip ex \e[49m\e[32m\e[39m\e[39m\e[32m\e[39m\e[40m\nea commodo consequat.\e[34m Duis aute \nirure dolor in\e[39m reprehenderit \nin voluptate velit\e[39m\e[3m esse \e[3mcillum \ndolore\e[23m\e[31m eu\e[39m\e[23m\e[3m\e[32m fugiat \e[23m{/green}nulla \npariatur. Excepteur\e[31m sint\e[39m\e[34m \noccaecat cupidatat \e[39mnon \nproident, \nsunt in culpa qui \e[3mofficia\e[23m \ndeserunt mollit anim \nid est laborum."
+    str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, \nconsectetur adipiscing elit,\ned do e\e[31miusmod tempor incididunt\e[39m \nut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna \naliqua.\e[22m\e[39m Ut enim ad minim\nveniam, quis\e[32m nostrud \n\e[32mexercitation \e[40mullamco laboris \n\e[32mnisi ut aliquip ex \e[49m\e[32m\e[39m\e[39m\e[32m\e[39m\e[40m\nea commodo consequat.\e[34m Duis aute \nirure dolor in\e[39m reprehenderit \nin voluptate velit\e[39m\e[3m esse \e[3mcillum \ndolore\e[23m\e[31m eu\e[39m\e[23m\e[3m\e[32m fugiat \e[23m{/green}nulla \npariatur. Excepteur\e[31m sint\e[39m\e[34m \noccaecat cupidatat \e[39mnon proident, \nsunt in culpa qui \e[3mofficia\e[23m \ndeserunt mollit anim \nid est laborum."
+
+    for width in (40, 60, 99)
+        rh = reshape_text(str, width)
+        @test all(textlen.(split(rh, '\n')) .≤ width)
+    end
+
+    for i in 5:10
+        width = 2^i
+        for offset in -10:10
+            txt = '.'^(2width + offset)
+            rt = reshape_text(txt, width)
+            len = length.(split(rt, '\n'))
+            # @show length(txt) width rt len
+            @test all(len[1:(end - 1)] .== width)
+            @test len[end] == (offset > 0 ? offset : width + offset)
+        end
+    end
 
     logo_str = """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
 
@@ -139,16 +142,16 @@ id est laborum."""
     as {red}"Panel"{/red} and {red}"TextBox"{/red}.
     These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code"""
 
-    logo_str_reshaped = "Term.jl is a \e[38;2;149;88;178mJulia\e[39m package for \ncreating styled terminal \noutputs.\n\nTerm provides a simple \e[3m\e[38;5;28m\e[1mmarkup \nlanguage\e[23m\e[39m\e[3m\e[22m\e[38;5;28m to add \e[1m\e[38;5;12mcolor\e[22m\e[38;5;28m\e[39m\e[1m and \n\e[1m\e[4mstyles\e[22m\e[1m\e[24m\e[1m to your text.\nMore complicated text layout \ncan be created using \n\e[31m\"Renderable\"\e[39m objects such \nas {red}\"Panel\"{/red} and {red}\"TextBox\"{/red}.\nThese can also be nested and \nstacked to create \e[3m\e[38;5;175mfancy\e[23m\e[39m\e[3m and \n\e[4minformative\e[24m\e[3m terminal ouputs for \nyour Julia code"
+    logo_str_reshaped = "Term.jl is a \e[38;2;149;88;178mJulia\e[39m package for \ncreating styled terminal outputs.\n\nTerm provides a simple \e[3m\e[38;5;28m\e[1mmarkup \nlanguage\e[23m\e[39m\e[3m\e[22m\e[38;5;28m to add \e[1m\e[38;5;12mcolor\e[22m\e[38;5;28m\e[39m\e[1m and \e[1m\e[4mstyles\e[22m\e[1m\e[24m\e[1m \nto your text.\nMore complicated text layout can \nbe created using \e[31m\"Renderable\"\e[39m \nobjects such \nas {red}\"Panel\"{/red} and {red}\"TextBox\"{/red}.\nThese can also be nested and \nstacked to create \e[3m\e[38;5;175mfancy\e[23m\e[39m\e[3m and \n\e[4minformative\e[24m\e[3m terminal ouputs for \nyour Julia code"
 
     strings = [
         (
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit, \nsed do eiusmod tempor \nincididunt ut labore et dolore \nmagna aliqua.",
+            "Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit, sed \ndo eiusmod tempor incididunt ut \nlabore et dolore magna aliqua.",
         ),
         (
             "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
-            "Lorem \e[31mipsum dolor sit \e[4mamet, \nconsectetur\e[24m\e[31m adipiscing elit, \n\e[39m\e[34msed do eiusmod tempor \nincididunt\e[39m ut labore et dolore \nmagna aliqua.",
+            "Lorem \e[31mipsum dolor sit \e[4mamet, \nconsectetur\e[24m\e[31m adipiscing elit, \e[39m\e[34msed \ndo eiusmod tempor incididunt\e[39m ut \nlabore et dolore magna aliqua.",
         ),
         (
             "Lorem{red}ipsumdolorsit{underline}amet, consectetur{/underline} adipiscing elit, {/red}seddoeiusmo{blue}dtemporincididunt{/blue}ut labore et dolore magna aliqua.",
@@ -172,47 +175,60 @@ id est laborum."""
         ),
         (
             "朗眠裕安無際集正聞進士健音社野件草売規作独特認権価官家複入豚末告設悟自職遠氷育教載最週場仕踪持白炎組特曲強真雅立覧自価宰身訴側善論住理案者券真犯著避銀楽験館稿告",
-            "朗眠裕安無際集正聞進士健音社野件\n草売規作独特認権価官家複入豚末\n告設悟自職遠氷育教載最週場仕踪\n持白炎組特曲強真雅立覧自価宰身\n訴側善論住理案者券真犯著避銀\n楽験館稿告",
+            "朗眠裕安無際集正聞進士健音社野件\n草売規作独特認権価官家複入豚末告\n設悟自職遠氷育教載最週場仕踪持白\n炎組特曲強真雅立覧自価宰身訴側善\n論住理案者券真犯著避銀楽験館稿告",
         ),
         (
             "┌────────────────┬────────────────┬────────────────┬────────────────┬──────────────",
-            "┌────────────────┬───────────────\n─┬────────────────┬─────────────\n───┬──────────────",
+            "┌────────────────┬───────────────\n─┬────────────────┬──────────────\n──┬──────────────",
         ),
         (
             "┌────────────abcde────┬──────────── ────┬────────abcde fghi────────┬────────────────┬──────────────",
-            "┌────────────abcde────┬──────────\n── ────┬────────abcde \nfghi────────┬────────────────┬──\n────────────",
+            "┌────────────abcde────┬──────────\n── ────┬────────abcde \nfghi────────┬────────────────┬───\n───────────",
         ),
         (
             "┌─────────{red}───ab{/red}cde────┬──────{green}────── ────┬────────abcde fghi{/green}────────┬────────────────┬──────────────",
-            "┌─────────\e[31m───ab\e[39mcde────\n┬──────\e[32m────── \n────┬────────abcde \nfghi\e[39m────────┬───────────\n─────┬──────────────",
+            "┌─────────\e[31m───ab\e[39mcde────\n┬──────\e[32m────── \n────┬────────abcde \nfghi\e[39m────────┬────────────\n────┬──────────────",
         ),
         (
             "┌──────────{red}────{/red}──┬{blue bold}────────────────┬──{/blue bold}──────────────┬────────────────┬──────────────end",
-            "┌──────────\e[31m────\e[39m──┬\e[1m───────────────┬──{/blue\n}\e[22m\e[39m}──────────────┬────────\n────────┬──────────────end\e[39m",
+            "┌──────────\e[31m────\e[39m──┬\e[1m───────────────┬──{/blue}\n\e[22m\e[39m}──────────────┬──────────\n──────┬──────────────end\e[39m",
         ),
         (
             "."^100,
-            ".................................\n................................\n................................\n...",
+            ".................................\n.................................\n.................................\n.",
         ),
         (
             ".{red}|||{/red}...."^10,
-            ".\e[31m|||\e[39m.....\e[31m|||{/red\n}.....\e[31m|||\e[39m.....\e[31m||\n|\e[39m\e[31m.....\e[31m|||\e[39m.....\e[31m|||\e[39m\e[31m.....\e[31m|||\e[39m\e[31m\n.....\e[31m|||\e[39m\e[31m.....\e[31m|||\n\e[39m\e[31m.....\e[31m|||\e[39m\e[31m....\e[39m",
+            ".\e[31m|||\e[39m.....\e[31m|||{/red\n}.....\e[31m|||\e[39m.....\e[31m|||\n\e[39m\e[31m.....\e[31m|||\e[39m.....|||\e[39m\e[31m.....\e[31m|||\e[39m\e[31m...\n..\e[31m|||\e[39m\e[31m.....\e[31m|||\e[39m.....\e[31m|||\e[39m\e[31m....\e[39m",
         ),
         (
             ".|||...."^10,
-            ".|||.....|||.....|||.....|||.....\n|||.....|||.....|||.....|||.....\n|||.....|||....",
+            ".|||.....|||.....|||.....|||.....\n|||.....|||.....|||.....|||.....|\n||.....|||....",
         ),
         (str, str_reshaped),
         (logo_str, logo_str_reshaped),
     ]
 
-    for (s1, s2) in strings
-        reshaped = reshape_text(s1, 33)
-        @test reshaped == s2
-    end
-
-    for width in (40, 60, 99)
-        rh = reshape_text(str, width)
-        @test !any(textlen.(split(rh, "\n")) .> width)
+    width = 33
+    debug = false
+    for (i, (input, expected)) in enumerate(strings)
+        reshaped = reshape_text(input, width)
+        reshaped_no_ansi = remove_ansi(reshaped)
+        lens = length.(split(reshaped_no_ansi, '\n'))
+        if debug && reshaped != expected
+            println("== reshaped == ")
+            println(reshaped)
+            println(repr(reshaped))
+            println("\n== reshaped no ansi == ")
+            println(reshaped_no_ansi)
+            println("\n== expected == ")
+            println(expected)
+        end
+        # FIXME: should work when `length(input) != ncodeunits(input)` using non unit byte characters: see docs.julialang.org/en/v1/manual/strings/#Unicode-and-UTF-8
+        if length(input) == ncodeunits(input) && !occursin('\n', input)
+            (debug && any(lens .> width)) && println(lens)
+            @test all(lens .≤ width)
+        end
+        @test reshaped == expected
     end
 end

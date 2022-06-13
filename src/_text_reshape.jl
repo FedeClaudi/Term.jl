@@ -1,4 +1,3 @@
-# import Term: textlen, apply_style, OPEN_TAG_REGEX, do_by_line
 
 rx = r"\s*\S+\s*"
 
@@ -26,7 +25,7 @@ function style_at_each_line(text)
             end
         end
     end
-    return join(lines, "\n")
+    return join(lines, '\n')
 end
 
 function split_tags_into_words(text)
@@ -86,31 +85,27 @@ function reshape_text(text::AbstractString, width::Int)
     text = split_tags_into_words(text)
     position = 0
     cuts = []
-    for (start, stop, word, word_length) in words(text)
-        if position + word_length ≥ width
+    for (start, _, word, word_length) in words(text)
+        if position + word_length > width
+            len_t = length(text[1:start])
             # we need to cut the text
             if word_length > width
                 # the word is longer than the line
                 word_chars = characters(word)
-                I = length(text[1:start]) + length(cuts)
-                position > 0 && push!(cuts, I)
-                position = word_chars[1][2]  # width of first char
+                position > 0 && push!(cuts, len_t + length(cuts))
+                _, position = first(word_chars)  # width of first char
 
                 for (i, (char, w)) in enumerate(word_chars[2:end])
                     if position + w > width
-                        push!(cuts, I + i)
+                        push!(cuts, len_t + length(cuts) + i)
                         position = w
                     else
                         position += w
                     end
                 end
 
-                if position + word_chars[end][2] ≥ width
-                    push!(cuts, I + length(word_chars) - 1)
-                end
-
             elseif position > 0 && start > 1
-                push!(cuts, length(text[1:start]) + length(cuts))
+                push!(cuts, len_t + length(cuts))
                 position = word_length
             end
         else
@@ -122,6 +117,7 @@ function reshape_text(text::AbstractString, width::Int)
     for cut in cuts
         insert!(chars, cut, '\n')
     end
-    out = apply_style(style_at_each_line(join(chars)))
+
+    out = apply_style(style_at_each_line(String(chars)))
     # do_by_line(ln -> ln * "\e[0m", out)
 end

@@ -74,12 +74,10 @@ Measures.Measure(seg::Segment) = seg.measure
 
 gives the measure of a vector of segments
 """
-function Measures.Measure(segments::Vector{Segment})
-    return Measure(
-        max([seg.measure.w for seg in segments]...),
-        sum([seg.measure.h for seg in segments]),
-    )
-end
+Measures.Measure(segments::Vector{Segment}) = Measure(
+    max([seg.measure.w for seg in segments]...),
+    sum([seg.measure.h for seg in segments]),
+)
 
 # -------------------------------- renderables ------------------------------- #
 using .Boxes
