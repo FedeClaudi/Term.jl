@@ -40,5 +40,6 @@ expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
 
             inspect(devnull, e)
         end
+        typestree(devnull, Float64)
     end
 end

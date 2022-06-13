@@ -35,6 +35,12 @@ end
     @test width("test") == 4
     @test height("test") == 1
 
-    @test width(Panel(; width = 5, height = 5)) == 5
-    @test height(Panel(; width = 5, height = 5)) == 5
+    w = h = 5
+    p = Panel(width = w, height = h)
+    @test width(p) == w
+    @test height(p) == h
+
+    s = first(p.segments)
+    @test width(s) == w
+    @test height(s) == 1
 end

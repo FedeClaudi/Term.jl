@@ -129,9 +129,8 @@ end
 
 Base.string(compositor::Compositor; kwargs...) = string(render(compositor; kwargs...))
 
-function Base.print(io::IO, compositor::Compositor; highlight = true, kwargs...)
-    return println(io, string(compositor; kwargs...))
-end
+Base.print(io::IO, compositor::Compositor; highlight = true, kwargs...) =
+    println(io, string(compositor; kwargs...))
 
 Base.print(compositor::Compositor; kwargs...) = Base.print(stdout, compositor; kwargs...)
 
@@ -140,8 +139,7 @@ Base.show(io::IO, ::MIME"text/plain", compositor::Compositor)
 
 Show a compositor.
 """
-function Base.show(io::IO, ::MIME"text/plain", compositor::Compositor)
+Base.show(io::IO, ::MIME"text/plain", compositor::Compositor) =
     println(io, string(compositor))
-end
 
 end
