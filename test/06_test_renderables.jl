@@ -32,15 +32,16 @@ end
     r2 = RenderableText(r)
     @test size(r.measure) == (length(lorem), 1)
 
-    r = RenderableText(lorem; width = 22)
+    width = 22
+    r = RenderableText(lorem; width = width)
     @test string(r) ==
           "Lorem ipsum dolor sit \namet, consectetur     \nadipiscing elit, sed  \ndo eiusmod tempor     \nincididunt ut labore  "
-    @test r.measure.w == 22
+    @test r.measure.w == width
 
-    r = RenderableText(lorem; width = 22, style = "red")
+    r = RenderableText(lorem; width = width, style = "red")
     @test string(r) ==
           "\e[31mLorem ipsum dolor sit \e[39m\n\e[31mamet, consectetur     \e[39m\n\e[31madipiscing elit, sed  \e[39m\n\e[31mdo eiusmod tempor     \e[39m\n\e[31mincididunt ut labore  \e[39m"
-    @test r.measure.w == 22
+    @test r.measure.w == width
 
     @test string(RenderableText("a string")) == "a string"
     @test string(RenderableText("a\nstring")) == "a     \nstring"
