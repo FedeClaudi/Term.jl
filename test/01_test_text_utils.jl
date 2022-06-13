@@ -118,23 +118,6 @@ id est laborum."""
 
     str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, \nconsectetur adipiscing elit,\ned do e\e[31miusmod tempor incididunt\e[39m \nut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna \naliqua.\e[22m\e[39m Ut enim ad minim\nveniam, quis\e[32m nostrud \n\e[32mexercitation \e[40mullamco laboris \n\e[32mnisi ut aliquip ex \e[49m\e[32m\e[39m\e[39m\e[32m\e[39m\e[40m\nea commodo consequat.\e[34m Duis aute \nirure dolor in\e[39m reprehenderit \nin voluptate velit\e[39m\e[3m esse \e[3mcillum \ndolore\e[23m\e[31m eu\e[39m\e[23m\e[3m\e[32m fugiat \e[23m{/green}nulla \npariatur. Excepteur\e[31m sint\e[39m\e[34m \noccaecat cupidatat \e[39mnon proident, \nsunt in culpa qui \e[3mofficia\e[23m \ndeserunt mollit anim \nid est laborum."
 
-    for width in (40, 60, 99)
-        rh = reshape_text(str, width)
-        @test all(textlen.(split(rh, '\n')) .≤ width)
-    end
-
-    for i in 5:10
-        width = 2^i
-        for offset in -10:10
-            txt = '.'^(2width + offset)
-            rt = reshape_text(txt, width)
-            len = length.(split(rt, '\n'))
-            # @show length(txt) width rt len
-            @test all(len[1:(end - 1)] .== width)
-            @test len[end] == (offset > 0 ? offset : width + offset)
-        end
-    end
-
     logo_str = """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
 
     Term provides a simple {italic green4 bold}markup language{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline} to your text.
@@ -230,5 +213,22 @@ id est laborum."""
             @test all(lens .≤ width)
         end
         @test reshaped == expected
+    end
+
+    for width in (40, 60, 99)
+        rh = reshape_text(str, width)
+        @test all(textlen.(split(rh, '\n')) .≤ width)
+    end
+
+    for i in 5:10
+        width = 2^i
+        for offset in (-(width ÷ 2)):(width ÷ 2)
+            txt = '.'^(2width + offset)
+            rt = reshape_text(txt, width)
+            len = length.(split(rt, '\n'))
+            # @show length(txt) width rt len
+            @test all(len[1:(end - 1)] .== width)
+            @test len[end] == (offset > 0 ? offset : width + offset)
+        end
     end
 end
