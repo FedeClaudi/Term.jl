@@ -227,8 +227,6 @@ function Panel(
     # if the content is too large, resize it to fit the panel's width.
     get_width(content) > width - Δw + 1 && (content = trim_renderable(content, width - Δw))
 
-    content |> println
-
     # get panel height
     content = content isa AbstractRenderable ? content : RenderableText(fillin(content))
     height = isnothing(height) ? content.measure.h + Δh + 2 : height
