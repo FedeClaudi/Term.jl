@@ -195,8 +195,7 @@ end
 
     h1 = hLine(22)
     h2 = hLine(33)
-    @test (h1 / h2).measure.w == 33
-    @test (h1 / h2).measure.h == 2
+    @test size(Measure(h1 / h2)) == (33, 2)
 
     r1 = RenderableText("."^100; width = 25)
     r2 = RenderableText("."^100; width = 50)
@@ -207,8 +206,7 @@ end
     # stack other renderables
     h1 = vLine(22)
     h2 = vLine(33)
-    @test (h1 * h2).measure.w == 2
-    @test (h1 * h2).measure.h == 33
+    @test size(Measure(h1 * h2)) == (2, 33)
 end
 
 @testset "\e[34mlayout - panels" begin
@@ -270,38 +268,28 @@ end
 end
 
 @testset "Layout - GRID" begin
-    g = grid(layout = (3, 3), pad = (0, 0))
-    @test size(g.measure) == (48, 27)
+    @test size(grid(layout = (3, 3), pad = (0, 0)).measure) == (48, 27)
 
-    g = grid(layout = (3, 3))
-    @test size(g.measure) == (48, 27)
+    @test size(grid(layout = (3, 3)).measure) == (48, 27)
 
-    g = grid(layout = (3, 3), pad = 2)
-    @test size(g.measure) == (52, 31)
+    @test size(grid(layout = (3, 3), pad = 2).measure) == (52, 31)
 
-    g = grid(layout = (3, 3), pad = (5, 1))
-    @test size(g.measure) == (58, 29)
+    @test size(grid(layout = (3, 3), pad = (5, 1)).measure) == (58, 29)
 
-    g = grid(layout = (3, 3), pad = (5, 3))
-    @test size(g.measure) == (58, 33)
+    @test size(grid(layout = (3, 3), pad = (5, 3)).measure) == (58, 33)
 
     # test passing renderables
     rens = repeat([PlaceHolder(10, 5)], 9)
 
-    g = grid(rens; aspect = 1)
-    @test size(g.measure) == (30, 15)
+    @test size(grid(rens; aspect = 1).measure) == (30, 15)
 
-    g = grid(rens)
-    @test size(g.measure) == (50, 10)
+    @test size(grid(rens).measure) == (50, 10)
 
-    g = grid(rens; pad = (2, 1))
-    @test size(g.measure) == (58, 11)
+    @test size(grid(rens; pad = (2, 1)).measure) == (58, 11)
 
-    g = grid(rens; pad = (2, 1), aspect = 0.5)
-    @test size(g.measure) == (22, 29)
+    @test size(grid(rens; pad = (2, 1), aspect = 0.5).measure) == (22, 29)
 
-    g = grid(rens; pad = (2, 1), aspect = 1.5)
-    @test size(g.measure) == (46, 17)
+    @test size(grid(rens; pad = (2, 1), aspect = 1.5).measure) == (46, 17)
 
     g = grid(
         rens;
