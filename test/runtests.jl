@@ -1,7 +1,7 @@
+using Suppressor
 using StableRNGs
 using Term
 using Test
-using Suppressor
 import Term: console_width
 
 const RNG = StableRNG(1337)
