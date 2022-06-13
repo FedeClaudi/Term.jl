@@ -1,14 +1,17 @@
+using StableRNGs
 using Term
 using Test
 using Suppressor
 import Term: console_width
+
+const RNG = StableRNG(1337)
 
 include("__test_utils.jl")
 
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
-dotest = console_width() >= 88
+dotest = console_width() ≥ 88
 
 # ? 1  - text utils
 tprint("{bold green}Running: '01_test_text_utils.jl' {/bold green}")
