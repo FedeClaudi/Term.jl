@@ -3,11 +3,11 @@ import Term.Layout: PlaceHolder
 
 @testset "\e[34mPanel - no content" begin
     for style in ("default", "red", "on_blue")
-        testpanel(Panel(; fit = true, style = style), 3, 2)
+        testpanel(Panel(fit = true, style = style), 3, 2)
 
         testpanel(Panel(), 88, 2)
 
-        testpanel(Panel(; width = 12, height = 4, style = style), 12, 4)
+        testpanel(Panel(width = 12, height = 4, style = style), 12, 4)
     end
 end
 
@@ -257,26 +257,26 @@ end
 
 @testset "PANEL - centered title style" begin
     @test string(
-        Panel(; title = "test", title_justify = :left, title_style = "italic red"),
+        Panel(title = "test", title_justify = :left, title_style = "italic red"),
     ) ==
           "\e[22m╭──── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────────────────────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(
-        Panel(; title = "test", title_justify = :center, title_style = "italic red"),
+        Panel(title = "test", title_justify = :center, title_style = "italic red"),
     ) ==
           "\e[22m╭────────────────────────────────────────\e[22m \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────────────────╮\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(
-        Panel(; title = "test", title_justify = :right, title_style = "italic red"),
+        Panel(title = "test", title_justify = :right, title_style = "italic red"),
     ) ==
           "\e[22m╭───────────────────────────────────────────────────────────────────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ───╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
 
-    @test string(Panel(; title = "test", title_justify = :left)) ==
+    @test string(Panel(title = "test", title_justify = :left)) ==
           "\e[22m╭──── test\e[22m ────────────────────────────────────────────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(; title = "test", title_justify = :center)) ==
+    @test string(Panel(title = "test", title_justify = :center)) ==
           "\e[22m╭────────────────────────────────────────\e[22m test\e[22m ────────────────────────────────────────╮\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(; title = "test", title_justify = :right)) ==
+    @test string(Panel(title = "test", title_justify = :right)) ==
           "\e[22m╭───────────────────────────────────────────────────────────────────────────── test\e[22m ───╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
 
-    p = Panel(;
+    p = Panel(
         title = "test",
         title_justify = :left,
         subtitle = "aaaaa",
@@ -423,24 +423,6 @@ end
                 fit ? nothing : 88,
                 3,
             )
-
-            # testpanel(
-            #     Panel(
-            #         Panel(
-            #             "."^50;
-            #             title = "test",
-            #             title_style = style,
-            #             title_justify = justify,
-            #             subtitle = "subtest",
-            #             subtitle_style = style,
-            #             subtitle_justify = justify,
-            #             fit = fit,
-            #         );
-            #         fit = fit,
-            #     ),
-            #     fit ? nothing : 88,
-            #     5,
-            # )
         end
     end
 end

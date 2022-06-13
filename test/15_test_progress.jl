@@ -45,17 +45,9 @@ end
             job = addjob!(pbar2; N = 10)
             job2 = nothing
             for i in 1:10
-                if i == 50
-                    job2 = addjob!(pbar2; N = 10)
-                end
-
-                if i >= 50
-                    update!(job2)
-                end
-
-                if i == 75
-                    removejob!(pbar2, job2)
-                end
+                i == 50 && (job2 = addjob!(pbar2; N = 10))
+                i ≥ 50 && update!(job2)
+                i == 75 && removejob!(pbar2, job2)
 
                 update!(job)
                 sleep(0.001)

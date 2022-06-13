@@ -2,7 +2,7 @@ import Term.Measures: Measure, width, height
 import Term: remove_markup, Panel
 
 @testset "\e[34mMeasure - str" begin
-    @test Measure("a"^10).w == 10
+    @test size(Measure("a"^10)) == (10, 1)
 
     strings = (
         "asadasda"^2,
