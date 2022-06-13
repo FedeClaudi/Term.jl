@@ -44,9 +44,8 @@ Segment(seg::Segment) = seg
 
 Base.show(io::IO, seg::Segment) = print(io, unescape_brackets(seg.text))
 
-function Base.show(io::IO, ::MIME"text/plain", seg::Segment)
-    return print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
-end
+Base.show(io::IO, ::MIME"text/plain", seg::Segment) =
+    print(io, "Segment \e[2m(size: $(seg.measure))\e[0m")
 
 # ---------------------------------------------------------------------------- #
 #                                    LAYOUT                                    #

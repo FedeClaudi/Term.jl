@@ -43,10 +43,10 @@ Construct a `Leaf` out of any object.
 function Leaf(leaf)
     # get a string representation of the appropriate length
     leaf = string(leaf)
-    if textlen(leaf) > CELLWIDTH
-        leaf = truncate(leaf, CELLWIDTH)
+    leaf = if textlen(leaf) > CELLWIDTH
+        truncate(leaf, CELLWIDTH)
     else
-        leaf = pad(leaf, CELLWIDTH + 1, :center)
+        pad(leaf, CELLWIDTH + 1, :center)
     end
 
     # create renderable Leaf
@@ -107,14 +107,12 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
     end
 
     # get title
-    if isnothing(first_arg)
-        title = pad(apply_style("$(head)", salmon_light), width, :center)
-
+    title = if isnothing(first_arg)
+        pad(apply_style("$(head)", salmon_light), width, :center)
     else
         _title = ": {bold default underline $salmon_light}$first_arg{/bold default underline $salmon_light}"
-        title =
-            pad(apply_style("$(head)$_title", salmon_light * " dim"), width - 4, :center) *
-            " "^4
+        pad(apply_style("$(head)$_title", salmon_light * " dim"), width - 4, :center) *
+        " "^4
     end
 
     # put together

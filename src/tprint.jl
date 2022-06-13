@@ -24,9 +24,8 @@ tprint(x; highlight = true) = tprint(stdout, x; highlight = highlight)
 
 tprint(io::IO, x; highlight = true) = tprint(io, string(x); highlight = highlight)
 
-function tprint(io::IO, ::MIME"text/html", x; highlight = true)
-    return tprint(io, x; highlight = highlight)
-end
+tprint(io::IO, ::MIME"text/html", x; highlight = true) =
+    tprint(io, x; highlight = highlight)
 
 """
 ---
@@ -34,13 +33,8 @@ end
 
 Apply style to a string and print it
 """
-function tprint(io::IO, x::AbstractString; highlight = true)
-    return if highlight
-        print(io, (apply_style ∘ highlighter)(x))
-    else
-        print(io, (apply_style)(x))
-    end
-end
+tprint(io::IO, x::AbstractString; highlight = true) =
+    print(io, (highlight ? apply_style ∘ highlighter : apply_style)(x))
 
 """
 ---
@@ -50,9 +44,8 @@ Print an `AbstractRenderable`.
 
 Equivalent to `println(x)`
 """
-function tprint(io::IO, x::AbstractRenderable; highlight = true)
-    return print(io, x; highlight = highlight)
-end
+tprint(io::IO, x::AbstractRenderable; highlight = true) =
+    print(io, x; highlight = highlight)
 
 function tprint(io::IO, args...)
     for (n, arg) in enumerate(args)

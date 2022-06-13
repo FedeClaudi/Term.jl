@@ -52,24 +52,23 @@ function highlight(text::AbstractString, like::Symbol; theme::Theme = term_theme
 end
 
 # shorthand to highlight objects based on type
-function highlight(x::Union{UnionAll,DataType}; theme::Theme = term_theme[])
-    return highlight(string(x), :type; theme = theme)
-end
-function highlight(x::Number; theme::Theme = term_theme[])
-    return highlight(string(x), :number; theme = theme)
-end
-function highlight(x::Function; theme::Theme = term_theme[])
-    return highlight(string(x), :func; theme = theme)
-end
-function highlight(x::Symbol; theme::Theme = term_theme[])
-    return highlight(string(x), :symbol; theme = theme)
-end
-function highlight(x::Expr; theme::Theme = term_theme[])
-    return highlight(string(x), :expression; theme = theme)
-end
-function highlight(x::AbstractVector; theme::Theme = term_theme[])
-    return highlight(string(x), :number; theme = theme)
-end
+highlight(x::Union{UnionAll,DataType}; theme::Theme = term_theme[]) =
+    highlight(string(x), :type; theme = theme)
+
+highlight(x::Number; theme::Theme = term_theme[]) =
+    highlight(string(x), :number; theme = theme)
+
+highlight(x::Function; theme::Theme = term_theme[]) =
+    highlight(string(x), :func; theme = theme)
+
+highlight(x::Symbol; theme::Theme = term_theme[]) =
+    highlight(string(x), :symbol; theme = theme)
+
+highlight(x::Expr; theme::Theme = term_theme[]) =
+    highlight(string(x), :expression; theme = theme)
+
+highlight(x::AbstractVector; theme::Theme = term_theme[]) =
+    highlight(string(x), :number; theme = theme)
 
 highlight(x; theme = term_theme[]) = string(x)  # capture all other cases
 
@@ -113,9 +112,7 @@ function highlight_syntax(code::AbstractString; style::Bool = true)
         context = stdout,
     )
     txt = unescape_brackets(txt)
-    if style
-        txt = apply_style(txt)
-    end
+    style && (txt = apply_style(txt))
 
     return do_by_line(rstrip, remove_markup(txt))
 end
@@ -132,7 +129,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
 
     lines = read_file_lines(path, lineno - 9, lineno + 10)
 
-    linenos = [ln[1] for ln in lines]
+    linenos = first.(lines)
     lines = [ln[2] for ln in lines]
     code = split(highlight_syntax(join(lines); style = false), "\n")
 
@@ -166,18 +163,15 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     cleaned_lines = []
     for (n, line) in zip(linenos, codelines)
         # style
-        if n == lineno
-            symb = "{red bold}❯{/red bold}"
-            color = "white"
+        symb, color = if n == lineno
+            "{red bold}❯{/red bold}", "white"
         else
-            symb = " "
-            color = "grey39"
+            " ", "grey39"
         end
 
         # end
         line = textlen(line) > 1 ? lpad(line[dedent:end], 8) : line
-        line = symb * " {$color}$n{/$color} " * line
-        push!(cleaned_lines, line)
+        push!(cleaned_lines, symb * " {$color}$n{/$color} " * line)
     end
 
     return join(cleaned_lines, "\n")

@@ -92,7 +92,7 @@ function termshow(io::IO, obj::AbstractDict)
         )
 
     # trim if too many
-    if length(k) > 10
+    arrows = if length(k) > 10
         k, ktypes, vals, vtypes = k[1:10], ktypes[1:10], vals[1:10], vtypes[1:10]
 
         push!(k, RenderableText("⋮"; style = term_theme[].repr_accent_style))
@@ -100,10 +100,9 @@ function termshow(io::IO, obj::AbstractDict)
         push!(vals, RenderableText("⋮"; style = term_theme[].repr_values_style))
         push!(vtypes, RenderableText("⋮"; style = term_theme[].repr_type_style * " dim"))
 
-        arrows =
-            vstack(RenderableText.(repeat(["=>"], length(k) - 1); style = "red bold")...)
+        vstack(RenderableText.(repeat(["=>"], length(k) - 1); style = "red bold")...)
     else
-        arrows = vstack(RenderableText.(repeat(["=>"], length(k)); style = "red bold")...)
+        vstack(RenderableText.(repeat(["=>"], length(k)); style = "red bold")...)
     end
 
     # prepare other renderables
@@ -134,28 +133,24 @@ end
 # ---------------------------------------------------------------------------- #
 #                                ABSTRACT ARRAYS                               #
 # ---------------------------------------------------------------------------- #
-function termshow(io::IO, mtx::AbstractMatrix)
-    return print(
-        io,
-        repr_panel(
-            mtx,
-            matrix2content(mtx),
-            "{bold white}$(size(mtx, 1)) × $(size(mtx, 2)){/bold white}{default} {/default}",
-        ),
-    )
-end
+termshow(io::IO, mtx::AbstractMatrix) = print(
+    io,
+    repr_panel(
+        mtx,
+        matrix2content(mtx),
+        "{bold white}$(size(mtx, 1)) × $(size(mtx, 2)){/bold white}{default} {/default}",
+    ),
+)
 
-function termshow(io::IO, vec::Union{Tuple,AbstractVector})
-    return print(
-        io,
-        repr_panel(
-            vec,
-            vec2content(vec),
-            "{bold white}$(length(vec)){/bold white}{default} items{/default}";
-            justify = :left,
-        ),
-    )
-end
+termshow(io::IO, vec::Union{Tuple,AbstractVector}) = print(
+    io,
+    repr_panel(
+        vec,
+        vec2content(vec),
+        "{bold white}$(length(vec)){/bold white}{default} items{/default}";
+        justify = :left,
+    ),
+)
 
 function termshow(io::IO, arr::AbstractArray)
     I0 = CartesianIndices(size(arr)[3:end])
@@ -260,11 +255,10 @@ function termshow(io::IO, fun::Function)
         _methods,
         "\n{bold dim bright_blue}$(N - length(_methods)-1){/bold dim bright_blue}{dim bright_blue} methods omitted...{/dim bright_blue}",
     )
-    if N > 1
-        methods_contents =
-            rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...)
+    methods_contents = if N > 1
+        rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...)
     else
-        methods_contents = split_lines(string(methods(fun)))[1]
+        split_lines(string(methods(fun)))[1]
     end
 
     panel =
@@ -298,37 +292,21 @@ function install_term_repr()
     @eval begin
         import Term: termshow
 
-        function Base.show(io::IO, ::MIME"text/plain", num::Number)
-            return tprint(io, string(num); highlight = true)
-        end
+        Base.show(io::IO, ::MIME"text/plain", num::Number) =
+            tprint(io, string(num); highlight = true)
 
-        function Base.show(io::IO, num::Number)
-            return tprint(io, string(num); highlight = true)
-        end
+        Base.show(io::IO, num::Number) = tprint(io, string(num); highlight = true)
 
-        function Base.show(io::IO, ::MIME"text/plain", obj::AbstractDict)
-            return termshow(io, obj)
-        end
+        Base.show(io::IO, ::MIME"text/plain", obj::AbstractDict) = termshow(io, obj)
 
-        function Base.show(
-            io::IO,
-            ::MIME"text/plain",
-            obj::Union{AbstractArray,AbstractMatrix},
-        )
-            return termshow(io, obj)
-        end
+        Base.show(io::IO, ::MIME"text/plain", obj::Union{AbstractArray,AbstractMatrix}) =
+            termshow(io, obj)
 
-        function Base.show(io::IO, ::MIME"text/plain", fun::Function)
-            return termshow(io, fun)
-        end
+        Base.show(io::IO, ::MIME"text/plain", fun::Function) = termshow(io, fun)
 
-        function Base.show(io::IO, ::MIME"text/plain", obj::DataType)
-            return termshow(io, obj)
-        end
+        Base.show(io::IO, ::MIME"text/plain", obj::DataType) = termshow(io, obj)
 
-        function Base.show(io::IO, ::MIME"text/plain", expr::Expr)
-            return termshow(io, expr)
-        end
+        Base.show(io::IO, ::MIME"text/plain", expr::Expr) = termshow(io, expr)
     end
 end
 

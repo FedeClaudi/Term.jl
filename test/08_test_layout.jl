@@ -313,8 +313,7 @@ end
 
     w, h = 20, 10
     panels = collect(
-        Panel("{on_$c} {/on_$c}", style = "bold yellow", width = w, height = h) for
-        c in (
+        Panel("{on_$c} {/on_$c}", width = w, height = h) for c in (
             :bright_red,
             :bright_green,
             :bright_blue,

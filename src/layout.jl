@@ -683,18 +683,16 @@ end
 
 Construct an `hLine` as wide as the `stdout`.
 """
-function hLine(; style::String = "default", box::Symbol = :ROUNDED)
-    return hLine(console_width(stdout); style = style, box = box)
-end
+hLine(; style::String = "default", box::Symbol = :ROUNDED) =
+    hLine(console_width(stdout); style = style, box = box)
 
 """
     hLine(text::AbstractString; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
 
 Construct an `hLine` as wide as the `stdout` with centered text.
 """
-function hLine(text::AbstractString; style::String = "default", box::Symbol = :ROUNDED)
-    return hLine(console_width(stdout), text; style = style, box = box)
-end
+hLine(text::AbstractString; style::String = "default", box::Symbol = :ROUNDED) =
+    hLine(console_width(stdout), text; style = style, box = box)
 
 """
     hLine(ren::AbstractRenderable; kwargs)

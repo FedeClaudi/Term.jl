@@ -18,9 +18,8 @@ import ..Colors:
 
 export apply_style
 
-function apply_style(text::String, style::String)
-    return apply_style("{" * style * "}" * text * "{/" * style * "}")
-end
+apply_style(text::String, style::String) =
+    apply_style("{" * style * "}" * text * "{/" * style * "}")
 
 apply_style(c::Char, style::String) = apply_style(string(c), style)
 
@@ -88,11 +87,7 @@ function get_style_codes(style::MarkupStyle)
         value = getfield(style, attr)
         # BACKGROUND
         if attr == :background
-            if !isnothing(value)
-                code = ANSICode(value; bg = true)
-            else
-                code = nothing
-            end
+            code = isnothing(value) ? nothing : ANSICode(value; bg = true)
 
             # COLOR
         elseif attr == :color

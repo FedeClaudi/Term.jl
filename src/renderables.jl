@@ -34,10 +34,7 @@ info(r::AbstractRenderable)::String =
 
 Creates a string representation of a renderable
 """
-function Base.string(r::AbstractRenderable)::String
-    lines = [seg.text for seg in r.segments]
-    return join(lines, "\n")
-end
+Base.string(r::AbstractRenderable)::String = join([seg.text for seg in r.segments], "\n")
 
 """
     print(io::IO, renderable::AbstractRenderable)
@@ -140,12 +137,11 @@ function RenderableText(
 
     # create renderable
     if isnothing(style)
-        if !isnothing(width)
-            segments =
-                Segment.(map(ln -> rpad(ln, width - textwidth(ln) + 1), split_lines(text)))
+        segments = if !isnothing(width)
+            Segment.(map(ln -> rpad(ln, width - textwidth(ln) + 1), split_lines(text)))
 
         else
-            segments = Segment.(split_lines(text))
+            Segment.(split_lines(text))
         end
     else
         style_init, style_finish = get_style_codes(MarkupStyle(style))

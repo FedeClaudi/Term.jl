@@ -185,20 +185,20 @@ function parse_md(note::Markdown.Footnote; width = console_width(), inline = fal
     else
         id = (inline ? "\n" : "") * "{#9aacdb}[$(note.id)]{/#9aacdb}"
         content = parse_md.(note.text)
-        if length(content) == 1
-            return string(RenderableText("$id: " * content[1]; width = width))
+        return if length(content) == 1
+            string(RenderableText("$id: " * content[1]; width = width))
         else
-            return string(RenderableText("$id:\n" * join(content); width = width))
+            string(RenderableText("$id:\n" * join(content); width = width))
         end
     end
 end
 
 function parse_md(content::Vector; kwargs...)::String
     content = parse_md.(content; kwargs...)
-    if length(content) == 1
-        return content[1]
+    return if length(content) == 1
+        content[1]
     else
-        return join(content)
+        join(content)
     end
 end
 
@@ -224,9 +224,8 @@ function parse_md(tb::Markdown.Table; width = console_width())::String
     )
 end
 
-function parse_md(link::Markdown.Link; kwargs...)::String
+parse_md(link::Markdown.Link; kwargs...)::String =
     "{white bold}$(parse_md(link.text; inline=true)){/white bold} {dim}($(link.url)){/dim}"
-end
 
 function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::String
     title_styles = Dict(
