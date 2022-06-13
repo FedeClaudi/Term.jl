@@ -191,7 +191,7 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 / r2
-    @test size(r.measure) == (50, 8)
+    @test size(r.measure) == (50, 6)
 
     h1 = hLine(22)
     h2 = hLine(33)
@@ -201,7 +201,7 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 * r2
-    @test size(r.measure) == (75, 5)
+    @test size(r.measure) == (75, 4)
 
     # stack other renderables
     h1 = vLine(22)
