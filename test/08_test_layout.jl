@@ -270,19 +270,19 @@ end
 end
 
 @testset "Layout - GRID" begin
-    g = grid(; layout = (3, 3), pad = (0, 0))
+    g = grid(layout = (3, 3), pad = (0, 0))
     @test size(g.measure) == (48, 27)
 
-    g = grid(; layout = (3, 3))
+    g = grid(layout = (3, 3))
     @test size(g.measure) == (48, 27)
 
-    g = grid(; layout = (3, 3), pad = 2)
+    g = grid(layout = (3, 3), pad = 2)
     @test size(g.measure) == (52, 31)
 
-    g = grid(; layout = (3, 3), pad = (5, 1))
+    g = grid(layout = (3, 3), pad = (5, 1))
     @test size(g.measure) == (58, 29)
 
-    g = grid(; layout = (3, 3), pad = (5, 3))
+    g = grid(layout = (3, 3), pad = (5, 3))
     @test size(g.measure) == (58, 33)
 
     # test passing renderables
@@ -291,7 +291,7 @@ end
     g = grid(rens; aspect = 1)
     @test size(g.measure) == (30, 15)
 
-    g = grid(rens;)
+    g = grid(rens)
     @test size(g.measure) == (50, 10)
 
     g = grid(rens; pad = (2, 1))
@@ -329,7 +329,14 @@ end
     # auto layout (default placeholder)
     for i in 2:length(panels)
         g = grid(panels[1:i])
-        # @test size(g.measure) == 
+        nc, nr = if i ≤ 3
+            (i, 1)
+        elseif i ≤ 5
+            (3, 2)
+        else
+            (4, 2)
+        end
+        @test size(g.measure) == (w * nc, h * nr)
     end
 
     # matrix, explicit
