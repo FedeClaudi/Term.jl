@@ -3,7 +3,7 @@
 The `Tree` renderable shows hierarchical structures:
 
 ```@example tree
-import Term.tree: Tree
+import Term.Trees: Tree
 
 data = Dict(
     "a" => 1,
@@ -32,7 +32,7 @@ data = Dict(
 print(Tree(data))
 ```
 
-Easy! [`Tree](@ref) has lots of options to allow you to style it as you like:
+Easy! [`Tree`](@ref) has lots of options to allow you to style it as you like:
 
 ```@example tree
 print(

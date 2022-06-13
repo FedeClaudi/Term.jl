@@ -1,4 +1,10 @@
 # Progress bars
+
+
+!!! warning
+    Progress bars displays are updated in the background while your code executes. This is done by having the display rendering code run on a separate thread. If you're using a single thread (see: https://docs.julialang.org/en/v1/manual/multi-threading/) you'll need to add a `sleep(0.001)` or `yield()` command inside your code whose progress you're monitoring to ensure that the display is updated correctly.
+
+
 ## Overview
 Progress bars! We all love progress bars, and julia has some great [progress bars](https://juliapackages.com/p/progressbars) packages. 
 But this is `Term`, and `Term` too has its own progress bars API. We think you'll like it. If not, worry not! `Term`'s progress bars play well `ProgressLogging.jl`, scroll to the bottomof this page!
@@ -10,7 +16,7 @@ But this is `Term`, and `Term` too has its own progress bars API. We think you'l
 So this is what a progress bar looks like in `Term`:
 
 ```@example prog
-using Term.progress
+using Term.Progress
 
 pbar = ProgressBar()
 job = addjob!(pbar; N=5)
@@ -85,6 +91,7 @@ end
 As simple as that!
 
 
+
 ### ProgressJob
 There's just couple things you need to know about `ProgessJob`. First, you can set the expected number of steps in the progress bar. We've seen that before, it's the `N` in `addjob!(pbar; N=5)`. You don't have to though, if you don't know how long your job's going to be then just leave it out! In that case you won't see a progress bar, but you can still see some progress:
 
@@ -103,7 +110,7 @@ end
 What's up witht that `columns=:spinner`? Read below. By the way, there's a few different kind of spinners
 
 ```@example prog
-import Term.progress: SPINNERS
+import Term.Progress: SPINNERS
 
 for spinner in keys(SPINNERS)
     columns_kwargs = Dict(
@@ -113,7 +120,7 @@ for spinner in keys(SPINNERS)
 
     pbar = ProgressBar(; columns=:spinner, columns_kwargs=columns_kwargs)
     with(pbar) do
-        job = addjob!(pbar; description="[orange1]$spinner...")
+        job = addjob!(pbar; description="{orange1}$spinner...")
         for i in 1:3
             update!(job)
             sleep(.0025)
@@ -149,7 +156,7 @@ end
 but you can also choose your own combination of columns:
 
 ```@example prog
-import Term.progress: CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn
+import Term.Progress: CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn
 
 mycols = [DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn]
 cols_kwargs = Dict(
@@ -176,11 +183,10 @@ You need two things: a column type that is a subtype of `AbstractColumn` and an 
 ```@example customcolumn
 using Random
 
-import Term.progress
-using Term.progress
-import Term.progress: AbstractColumn, DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn
-import Term.segment: Segment
-import Term.measure: Measure
+using Term.Progress
+import Term.Progress: AbstractColumn, DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn
+import Term.Segments: Segment
+import Term.Measures: Measure
 
 struct RandomColumn <: AbstractColumn
     job::ProgressJob
@@ -195,7 +201,7 @@ struct RandomColumn <: AbstractColumn
 end
 
 
-function progress.update!(col::RandomColumn, color::String, args...)::String
+function Progress.update!(col::RandomColumn, color::String, args...)::String
     txt = Segment(randstring(6), col.style)
     return txt.text
 end
@@ -225,7 +231,7 @@ done!
 
 
 ## ProgressLogging
-I know that some of you will be thinking: hold on, Julia already had a perfectly functioning progress API with `ProgressLogging.jl`, can't we just use that? Long story short, yes you can. But `Term`'s API gives you so much more control over what kind information to display and what it should look like. Nonetheless, many of you will want to use `ProgressLogging` in conjuction with Term, so we've made it possible, you just need to use Term's logger (see [Logger](@ref)):
+I know that some of you will be thinking: hold on, Julia already had a perfectly functioning progress API with `ProgressLogging.jl`, can't we just use that? Long story short, yes you can. But `Term`'s API gives you so much more control over what kind information to display and what it should look like. Nonetheless, many of you will want to use `ProgressLogging` in conjuction with Term, so we've made it possible, you just need to use Term's logger (see [Logger](@ref LoggingDoc)):
 
 
 ```Julia

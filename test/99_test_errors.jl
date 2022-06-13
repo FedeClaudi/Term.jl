@@ -1,6 +1,6 @@
-import Term: install_stacktrace
+import Term: install_term_stacktrace
 
-install_stacktrace()
+install_term_stacktrace()
 
 """
 The logic behind these tests is that if something goes
@@ -32,9 +32,7 @@ will be different from the one you'd expect
 
     @test_throws InexactError Int(2.5)
 
-    function my_func(; my_arg::Int)
-        return my_arg + 1
-    end
+    my_func(; my_arg::Int) = my_arg + 1
     @test_throws UndefKeywordError my_func()
 
     m = zeros(20, 20)

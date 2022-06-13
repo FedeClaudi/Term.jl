@@ -1,6 +1,6 @@
 # Style
 ```@meta
-CurrentModule = Term.style
+CurrentModule = Term.Style
 ```
 
 
@@ -9,5 +9,5 @@ Pages   = ["api_style.md"]
 ```
 
 ```@autodocs
-Modules = [style]
+Modules = [Style]
 ```

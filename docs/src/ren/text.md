@@ -3,7 +3,7 @@
 ```@example
 using Term # hide
 rend = RenderableText("""
-[bold red]Woah, my first [yellow italic]`Renderable`!
+{bold red}Woah, my first {yellow italic}`Renderable`!
 """)
 print(rend)
 ```

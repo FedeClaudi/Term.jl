@@ -1,6 +1,6 @@
 # Renderables
 ```@meta
-CurrentModule = Term.renderables
+CurrentModule = Term.Renderables
 ```
 
 
@@ -9,5 +9,5 @@ Pages   = ["api_renderables.md"]
 ```
 
 ```@autodocs
-Modules = [renderables]
+Modules = [Renderables]
 ```

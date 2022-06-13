@@ -10,9 +10,9 @@ In `Logging` we've seen how `Term` can replace the default logging system in Jul
 
 Setting up `Term` to handle errors for you is very simple:
 ```Julia
-import Term: install_stacktrace
+import Term: install_term_stacktrace
 
-install_stacktrace()  # entering the danger zone
+install_term_stacktrace()  # entering the danger zone
 
 1 + "this wont work"
 ```

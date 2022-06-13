@@ -42,7 +42,7 @@ print(
 And of course it works well with markup styles too
 """
 another_long_one =
-    "This is a [red bold]long[/red bold] piece of [green italic]content[/green italic]. But TextBox can handle [underline]anything[/underline]!! "^5
+    "This is a {red bold}long{/red bold} piece of {green italic}content{/green italic}. But TextBox can handle {underline}anything{/underline}!! "^5
 
 print(TextBox(another_long_one; width = 44))
 
@@ -81,28 +81,30 @@ very wide piece of text
 """
 
 import Term: Panel
-print(Panel(tb1 * tb2; width = 100, justify=:center, title = "My Panel"))
-
+print(Panel(tb1 * tb2; width = 100, justify = :center, title = "My Panel"))
 
 """
 For comparison, we can try to use RenderableText instead of TextBox
 """
 
 import Term: RenderableText
-print(Panel(RenderableText(my_long_text; width=44) * RenderableText(another_long_one; width=40); width = 100, justify=:center, title = "Bad idea"))
-
+print(
+    Panel(
+        RenderableText(my_long_text; width = 44) *
+        RenderableText(another_long_one; width = 40);
+        width = 100,
+        justify = :center,
+        title = "Bad idea",
+    ),
+)
 
 """
 Ooopss, that doesn't look great. We can remedy this with a Spacer layout object.
 However you get the idea, textbox behave more intutively. We can use 
 padding to control how much space we want around our text
 """
-tb1 = TextBox(my_long_text; width=38, padding=(0, 10, 0, 0))
-tb2 = TextBox(my_long_text; width=30, padding=(0, 0, 1, 1))
-print(
-    tb1 * tb1
-)
+tb1 = TextBox(my_long_text; width = 38, padding = (0, 10, 0, 0))
+tb2 = TextBox(my_long_text; width = 30, padding = (0, 0, 1, 1))
+print(tb1 * tb1)
 
-print(
-    tb2 * tb2
-)
+print(tb2 * tb2)

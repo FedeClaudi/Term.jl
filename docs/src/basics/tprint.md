@@ -3,7 +3,7 @@ We've seen tprint before. When passed a string with markup information it will p
 
 ```@example
 using Term # hide
-tprint("This text has [bold gold1 underline]style!")
+tprint("This text has {bold gold1 underline}style!")
 ```
 
 But there's more. Compare `Base.print` with `Term.tprint` here:

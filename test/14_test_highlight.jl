@@ -1,39 +1,40 @@
 import Term: load_code_and_highlight, highlight_syntax, highlight, theme
 
-
 @testset "\e[34mHIGHLIGHT" begin
+    @test highlight("test 1 123 33.4 44,5 +1 -2 12 0.5, ,, ...") ==
+          "test \e[38;2;144;202;249m1\e[39m \e[38;2;144;202;249m123\e[39m \e[38;2;144;202;249m33.4\e[39m \e[38;2;144;202;249m44\e[39m,\e[38;2;144;202;249m5\e[39m \e[38;2;239;83;80m+\e[39m\e[38;2;144;202;249m1\e[39m \e[38;2;239;83;80m-\e[39m\e[38;2;144;202;249m2\e[39m \e[38;2;144;202;249m12\e[39m \e[38;2;144;202;249m0.5\e[39m, ,, ..."
 
-    # @test highlight("test 1 123 33.4 44,5 +1 -2 12 0.5, ,, ...") == "test[#90CAF9][#90CAF9] 1 [/#90CAF9][/#90CAF9][#90CAF9]123[/#90CAF9] [#90CAF9]33.4[/#90CAF9] [#90CAF9]44,5[/#90CAF9] [#90CAF9]+1 [/#90CAF9][#90CAF9]-2 [/#90CAF9][#90CAF9]12[/#90CAF9] [#90CAF9]0.5[/#90CAF9][#90CAF9], [/#90CAF9],[#90CAF9], [/#90CAF9]..."
+    @test highlight("this is ::Int64") == "this is \e[38;2;206;147;216m::Int64\e[39m"
 
-    @test highlight("this is ::Int64") == "this is [#CE93D8]::Int64[/#CE93D8]"
+    @test highlight("print", :func) == "\e[38;2;255;238;88mprint\e[39m"
 
-    @test highlight("print", :func) == "[#FFEE58]print[/#FFEE58]"
+    @test highlight("1 + 2", :code) == "\e[3m\e[38;2;255;238;88m1 + 2\e[23m\e[39m"
 
-    @test highlight("1 + 2", :code) == "[#90CAF9]1 + 2[/#90CAF9]"
+    @test highlight("this 1 + `test`") ==
+          "this \e[38;2;144;202;249m1\e[39m \e[38;2;239;83;80m+\e[39m \e[3m\e[38;2;255;238;88m`test`\e[23m\e[39m"
 
-    @test highlight("this 1 + `test`") == "this 1 + [#90CAF9]`test`[/#90CAF9]"
+    @test highlight(1) == "\e[38;2;144;202;249m1\e[39m"
 
-    @test highlight(1) == "[#42A5F5]1[/#42A5F5]"
+    @test highlight([1, 2, 3]) == "\e[38;2;144;202;249m[1, 2, 3]\e[39m"
 
-    @test highlight([1, 2, 3]) == "[#42A5F5][1, 2, 3][/#42A5F5]"
+    @test highlight(Int32) == "\e[38;2;206;147;216mInt32\e[39m"
 
-    @test highlight(Int32) == "[#CE93D8]Int32[/#CE93D8]"
+    @test highlight(print) == "\e[38;2;255;238;88mprint\e[39m"
 
-    @test highlight(print) == "[#FFEE58]print[/#FFEE58]"
+    @test highlight("this :this :(x+y) 'a'") ==
+          "this \e[38;2;255;167;38m:this\e[39m \e[38;2;255;202;40m:\e[38;2;255;245;157m(\e[39m\e[38;2;255;202;40mx\e[38;2;239;83;80m+\e[39m\e[38;2;255;202;40my\e[38;2;255;245;157m)\e[39m\e[38;2;255;202;40m\e[39m \e[38;2;100;181;101m'\e[39ma\e[38;2;100;181;101m'\e[39m"
 
-    if !Sys.iswindows()
+    @test highlight(:x) == "\e[38;2;255;167;38mx\e[39m"
 
-        @test highlight_syntax("""
-        This is ::Int64 my style
-        """) == "This is \e[1m\e[38;2;252;98;98m::\e[22m\e[39mInt64 my style\n"
+    @test highlight(:(x + y)) == "\e[38;2;255;202;40mx + y\e[39m"
 
-        @test highlight_syntax("""
-        This is ::Int64 my style
-        print(x + 2)
-        """) == "This is \e[1m\e[38;2;252;98;98m::\e[22m\e[39mInt64 my style\n\e[1m\e[38;2;255;245;157mprint\e[22m\e[39m\e[38;2;252;116;116m(\e[39mx \e[1m\e[38;2;252;98;98m+\e[22m\e[39m \e[38;2;144;202;249m2\e[39m\e[38;2;252;116;116m)\e[39m\n"
+    @test highlight_syntax("""
+    This is ::Int64 my style
+    print(x + 2)
+    """) ==
+          "\e[38;2;222;222;222mThis\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mis\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;109;89m::\e[39m\e[38;2;222;222;222mInt64\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mmy\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mstyle\e[39m\e[38;2;222;222;222m\n\e[39m\e[38;2;232;212;114mprint\e[39m\e[38;2;227;136;100m(\e[39m\e[38;2;222;222;222mx\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;109;89m+\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;144;202;249m2\e[39m\e[38;2;227;136;100m)\e[39m\e[38;2;222;222;222m\n\e[39m"
 
-        @test load_code_and_highlight("14_test_highlight.jl", 7) == "[red bold]❯[/red bold] [white]7[/white] \n  [grey39]8[/grey39]  @test [(255, 245, 157)  bold  ]highlight[/(255, 245, 157)  bold  ][(252, 116, 116)    ]([/(252, 116, 116)    ][(165, 214, 167)    ]\"this is ::Int64\"[/(165, 214, 167)    ][(252, 116, 116)    ])[/(252, 116, 116)    ] [(252, 98, 98)  bold  ]==[/(252, 98, 98)  bold  ] [(165, 214, 167)    ]\"this is [[#CE93D8]]::Int64[[/#CE93D8]]\"[/(165, 214, 167)    ]\n  [grey39]9[/grey39] \n  [grey39]10[/grey39]  @test [(255, 245, 157)  bold  ]highlight[/(255, 245, 157)  bold  ][(252, 116, 116)    ]([/(252, 116, 116)    ][(165, 214, 167)    ]\"print\"[/(165, 214, 167)    ][(252, 116, 116)    ],[/(252, 116, 116)    ] [(165, 214, 167)    ]:func[/(165, 214, 167)    ][(252, 116, 116)    ])[/(252, 116, 116)    ] [(252, 98, 98)  bold  ]==[/(252, 98, 98)  bold  ] [(165, 214, 167)    ]\"[[#FFEE58]]print[[/#FFEE58]]\"[/(165, 214, 167)    ]\n  [grey39]11[/grey39] \n  [grey39]12[/grey39]  @test [(255, 245, 157)  bold  ]highlight[/(255, 245, 157)  bold  ][(252, 116, 116)    ]([/(252, 116, 116)    ][(165, 214, 167)    ]\"1 + 2\"[/(165, 214, 167)    ][(252, 116, 116)    ],[/(252, 116, 116)    ] [(165, 214, 167)    ]:code[/(165, 214, 167)    ][(252, 116, 116)    ])[/(252, 116, 116)    ] [(252, 98, 98)  bold  ]==[/(252, 98, 98)  bold  ] [(165, 214, 167)    ]\"[[#90CAF9]]1 + 2[[/#90CAF9]]\"[/(165, 214, 167)    ]\n  [grey39]13[/grey39] "
-
-    end
+    @test load_code_and_highlight("02_test_ansi.jl", 7)[1:100] ==
+          "{red bold}❯{/red bold} {white}7{/white}     get_color,\n  {grey39}8{/grey39}     NamedColor,\n  {gre"
+    # end
 end
-

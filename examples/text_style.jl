@@ -26,7 +26,7 @@ information 'xx' must be identical between the start/end parentheses.
 
 import Term: tprintln
 
-my_string = "[bold underline]This[/bold underline] is [red italic]my[/red italic] [on_green black bold]string[/on_green black bold]"
+my_string = "{bold underline}This{/bold underline} is {red italic}my{/red italic} {on_green black bold}string{/on_green black bold}"
 tprintln(my_string)
 
 """

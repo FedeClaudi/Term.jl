@@ -2,7 +2,7 @@
 In the previous section we...
 ```@example
 using Term  # hidden
-tprint("[green]...have seen how to add some [gold3 bold underline]style[/gold3 bold underline] to our text")  # hidden
+tprint("{green}...have seen how to add some {gold3 bold underline}style{/gold3 bold underline} to our text")  # hidden
 ```
 
 and that's great, but it's not enough. If you want to create really beautiful and structured terminal outputs, a bit of color and bold text is not enough. You want to be able to create panels to separate different pieces of content, lines to mark out different sections, you want to be able to control the aspect (e.g. line length) of the content you are printing and, most importantly, you want to do all this without too many headaches. `Term.jl` has got your back.
@@ -14,7 +14,7 @@ In this section we will look at `Renderable` objects (subtypes of `AbstractRende
 This section focuses a bit on how renderables work under the hood. If you just want use `Term` and you don't care too much for how it works, skip ahead to the next section!
 
 
-When you venture beyond styling simple strings, virtually every object you'll encounter will be a subtype of the  [`AbstractRenderable`](@ref Term.renderables.AbstractRenderable) type. We will call these objects renderables. Renderable types vary, but they all must have two fields: [`Segment`](@ref Term.segment.Segment) and [`Measure`](@ref Term.measure.Measure):
+When you venture beyond styling simple strings, virtually every object you'll encounter will be a subtype of the  [`AbstractRenderable`](@ref Term.Renderables.AbstractRenderable) type. We will call these objects renderables. Renderable types vary, but they all must have two fields: [`Segment`](@ref Term.Segments.Segment) and [`Measure`](@ref Term.Measures.Measure):
 
 
 A `Segment` is roughly equivalent to one line of text. Let's take something like this (printed out in your terminal):
@@ -43,7 +43,7 @@ In addition to a vector of segments, a renderable is defined by a `Measure` obje
 ```@example
 import Term: Panel
 
-print(Panel("this is [red]RED[/red]"; fit=true))
+print(Panel("this is {red}RED{/red}"; fit=true))
 ```
 
 in order to do that `Panel` needs to know the size of the text it needs to fit, and that's done by taking its measure (note that the measure correctly ignores the style information to get the size of the text as it will be when printed out).

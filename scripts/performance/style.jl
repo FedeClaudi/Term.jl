@@ -1,4 +1,4 @@
-import Term.style: apply_style
+import Term.Style: apply_style
 import Term: Panel
 
 pts = """Lorem[red] ipsum dolor s[/red]it amet, consectetur adipiscing elit,
@@ -14,4 +14,4 @@ print(apply_style(pts))
 @time apply_style(pts);
 
 p2 = apply_style(pts)
-@time print(Panel(pts; style="red"))
+@time print(Panel(pts; style = "red"))

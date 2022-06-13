@@ -1,28 +1,27 @@
-module errors
+module Errors
+
+import Base: show_method_candidates, ExceptionStack, InterpreterIP
+
+import Term: highlight, truncate, reshape_text, load_code_and_highlight
+
+import ..Layout:
+    hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
+import ..Renderables: RenderableText, AbstractRenderable
+import ..Panels: Panel
+
+export install_term_stacktrace
+
 include("_errors.jl")
-
-import Base: InterpreterIP, show_method_candidates, ExceptionStack
-
-import Term:
-    theme, highlight, reshape_text, read_file_lines, load_code_and_highlight, split_lines
-import Term.style: apply_style
-import ..panel: Panel, TextBox
-import ..renderables: RenderableText
-import ..layout: hLine, Spacer
-import ..console: console_width
-import ..measure: Measure
-
-export install_stacktrace
 
 const ErrorsExplanations = Dict(
     ArgumentError => "The parameters to a function call do not match a valid signature.",
     AssertionError => "comes up when an assertion's check fails (e.g., `@assert 1==2`)",
     BoundsError => "comes up when trying to acces a container at invalid position (e.g., a string a='abcd' with 4 characters cannot be accessed as a[5]).",
     DimensionMismatch => "comes up when trying to perform an operation on objects which don't have matching dimensionality (e.g., summing matrixes of different size).",
-    DivideError => "comes up when attempting integer division with 0 as denominator. [blue]2/0=Inf[/blue] is okay, but [orange1]div(2, )[/orange1] will give an error",
+    DivideError => "comes up when attempting integer division with 0 as denominator. {blue}2/0=Inf{/blue} is okay, but {orange1}div(2, ){/orange1} will give an error",
     DomainError => "comes up when the argument to a function is outside its domain (e.g., √(-1))",
     ErrorException => "is a generic error type",
-    KeyError => "comes up when attempting to access a non-existing [blue]Dict[/blue] key.",
+    KeyError => "comes up when attempting to access a non-existing {blue}Dict{/blue} key.",
     InexactError => "comes up when a type cannot exactly be converted to another (e.g. Int(2.5) cannot convert Float64 to Int64, but Int(round(2.5)) will work)",
     LoadError => "occurs when another comes up while evaluating 'include', 'require' or 'using' statements",
     MethodError => "comes up when to method can be found with a given name and for a given set of argument types.",
@@ -37,19 +36,15 @@ _width() = min(console_width(stderr), 100)
 # ----------------------- error type specific messages ----------------------- #
 
 # ! ARGUMENT ERROR
-function error_message(io::IO, er::ArgumentError)
-    return er.msg, ""
-end
+error_message(er::ArgumentError) = er.msg, ""
 
 # ! ASSERTION ERROR
-function error_message(io::IO, er::AssertionError)
-    return er.msg, ""
-end
+error_message(er::AssertionError) = return er.msg, ""
 
 # ! BOUNDS ERROR
-function error_message(io::IO, er::BoundsError)
+function error_message(er::BoundsError)
     # @info "bounds error" er fieldnames(typeof(er))
-    main_msg = "Attempted to access $(_highlight_with_type(er.a)) at index $(_highlight_with_type(er.i))"
+    main_msg = "Attempted to access `$(er.a)` at index $(er.i)"
 
     additional_msg = ""
 
@@ -59,147 +54,152 @@ function error_message(io::IO, er::BoundsError)
             additional_msg = "S\ntring has $nunits codeunits, $(length(er.a)) characters."
         end
     else
-        additional_msg = "\n[red]Variable is not defined!.[/red]"
+        additional_msg = "\n{red}Variable is not defined!.{/red}"
     end
     return main_msg, additional_msg
 end
 
 # ! Domain ERROR
-function error_message(io::IO, er::DomainError)
+function error_message(er::DomainError)
     # @info "err exceprion" er fieldnames(DomainError) er.val
     # msg = split(er.msg, " around ")[1]
-    return er.msg, "\nThe invalid value is: $(_highlight_with_type(er.val))."
+    return er.msg, "\nThe invalid value is: $(er.val)."
 end
 
 # ! DimensionMismatch
-function error_message(io::IO, er::DimensionMismatch)
-    return _highlight_numbers(er.msg), ""
-end
+error_message(er::DimensionMismatch) = er.msg, ""
 
 # ! DivideError
-function error_message(io::IO, er::DivideError)
-    return "Attempted integer division by [blue]0[/blue]", ""
-end
+error_message(er::DivideError) = "Attempted integer division by {bold}0{/bold}", ""
 
 # ! EXCEPTION ERROR
-function error_message(io::IO, er::ErrorException)
+function error_message(er::ErrorException)
     # @info "err exceprion" er fieldnames(ErrorException) er.msg
     msg = split(er.msg, " around ")[1]
     return msg, ""
 end
 
 # !  KeyError
-function error_message(io::IO, er::KeyError)
+function error_message(er::KeyError)
     # @info "err KeyError" er fieldnames(KeyError)
-    msg = "Key $(_highlight_with_type(er.key)) not found!"
+    msg = "Key `$(er.key)` not found!"
     return msg, ""
 end
 
 # ! InexactError
-function error_message(io::IO, er::InexactError)
+function error_message(er::InexactError)
     # @info "load error message"  fieldnames(InexactError)
-    msg = "Cannot convert $(_highlight_with_type(er.val)) to type [$(theme.type)]$(er.T)[/$(theme.type)]"
-    subm = "\nConversion error in function: $(_highlight(er.func))"
+    msg = "Cannot convert $(er.val) to type ::$(er.T)"
+    subm = "\nConversion error in function: $(er.func)"
     return msg, subm
 end
 
 # ! LoadError
-function error_message(io::IO, er::LoadError)
+function error_message(er::LoadError)
     # @info "load error message"  fieldnames(LoadError)
-    msg = "At [grey62 underline]$(er.file)[/grey62 underline] line [bold]$(er.line)"
-    subm = "The cause is an error of type: [bright_red]$(string(typeof(er.error)))"
+    msg = "At {grey62 underline}$(er.file){/grey62 underline} line {bold}$(er.line){/bold}"
+    subm = "The cause is an error of type: {bright_red}$(string(typeof(er.error)))"
     return msg, subm
 end
 
 # ! METHOD ERROR
-_method_regexes = [r"!Matched+[:a-zA-Z]*\{+[a-zA-Z\s \,]*\}", r"!Matched+[:a-zA-Z]*"]
-function error_message(io::IO, er::MethodError; kwargs...)
+method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
+function method_error_candidate(fun, candidate)
+    # highlight non-matched types
+    candidate = replace(
+        candidate,
+        method_error_regex => SubstitutionString("{red}" * s"\g<0>" * "{/red}"),
+    )
+    # remove
+    candidate = replace(candidate, "!Matched" => "")
+
+    # highlight fun
+    candidate = replace(candidate, string(fun) => "{bold yellow}$(fun){/bold yellow}")
+    return candidate
+end
+
+function error_message(er::MethodError; kwargs...)
+    f = er.f
+    ft = typeof(f)
+    name = ft.name.mt.name
+    kwargs = ()
+    if endswith(string(ft.name.name), "##kw")
+        f = er.args[2]
+        ft = typeof(f)
+        name = ft.name.mt.name
+        arg_types_param = arg_types_param[3:end]
+        kwargs = pairs(er.args[1])
+        # er = MethodError(f, er.args[3:end::Int])
+    end
+
     # get main error message
-    _args = join([string(ar) * _highlight(typeof(ar)) for ar in er.args], "\n      ")
-    fn_name = "$(_highlight(string(er.f)))"
-    main_line = "No method matching $fn_name with arguments:\n      " * _args
+    _args = join(
+        map(
+            a ->
+                "   {dim bold}($(a[1])){/dim bold} $(truncate(highlight("::"*string(typeof(a[2]))), 30))",
+            enumerate(er.args),
+        ),
+        "\n",
+    )
+    main_line = "No method matching `$name` with arguments types:" / _args
 
     # get recomended candidates
-    _candidates = split(sprint(show_method_candidates, er; context = io), "\n")
-    candidates::Vector{String} = []
+    _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
 
-    for can in _candidates[3:(end - 1)]
-        fun, file = split(can, " at ")
-        name, args = split(fun, "("; limit = 2)
-        # name = "[red]$name[/red]"
-
-        for regex in _method_regexes
-            for match in collect(eachmatch(regex, args))
-                args = replace(
-                    args, match.match => "[dim red]$(match.match[9:end])[/dim red]"
-                )
-            end
-        end
-
-        file, lineno = split(file, ":")
-
-        # println(RenderableText(name, "red"))
-        push!(candidates, fn_name * "(" * args)
-        push!(candidates, "[dim]$file [bold dim](line: $lineno)[/bold dim][/dim]\n")
+    if length(_candidates) > 0
+        _candidates = map(c -> split(c, " at ")[1], _candidates)
+        candidates = map(c -> method_error_candidate(name, c), _candidates)
+        main_line =
+            main_line /
+            lvstack("" / "Alternative candidates:", RenderableText.(candidates)...;)
+    else
+        main_line = main_line / " " / "{dim}No alternative candidates found"
     end
-    candidates =
-        length(candidates) == 0 ? ["[dim]no candidate method found[/dim]"] : candidates
-
-    return main_line * "\n",
-    Panel(
-        "\n" * join(candidates, "\n");
-        width = _width() - 10,
-        title = "closest candidates",
-        title_style = "yellow",
-        style = "blue dim",
-    )
+    return string(main_line), ""
 end
 
 # ! StackOverflowError
-function error_message(io::IO, er::StackOverflowError)
-    return "Stack overflow error: too many function calls.", ""
-end
+error_message(er::StackOverflowError) = "Stack overflow error: too many function calls.", ""
 
 # ! TYPE ERROR
-function error_message(io::IO, er::TypeError)
+function error_message(er::TypeError)
     # @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
     # var = string(er.var)
-    msg = "In `[$(theme.emphasis_light) italic]$(er.func)` > `$(er.context)[/$(theme.emphasis_light) italic]` got"
-    msg *= " [orange1 bold]$(er.got)[/orange1 bold][$(theme.type)](::$(typeof(er.got)))[/$(theme.type)] but expected argument of type"
-    msg *= " [$(theme.type)]::$(er.expected)[/$(theme.type)]"
+    msg = "In `$(er.func)` > `$(er.context)` got"
+    msg *= " {orange1 bold}$(er.got){/orange1 bold}(::$(typeof(er.got))) but expected argument of type ::$(er.expected)"
     return msg, ""
 end
 
 # ! UndefKeywordError
-function error_message(io::IO, er::UndefKeywordError)
+function error_message(er::UndefKeywordError)
     # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
     var = string(er.var)
-    return "Undefined function keyword argument: '$(_highlight(er.var))'.", ""
+    return "Undefined function keyword argument: `$(er.var)`.", ""
 end
 
 # ! UNDEFVAR ERROR
-function error_message(io::IO, er::UndefVarError)
+function error_message(er::UndefVarError)
     # @info "undef var error" er er.var typeof(er.var)
     var = string(er.var)
-    return "Undefined variable '$(_highlight(er.var))'.", ""
+    return "Undefined variable `$(er.var)`.", ""
 end
 
 # ! STRING INDEX ERROR
-function error_message(io::IO, er::StringIndexError)
+function error_message(er::StringIndexError)
     # @info er typeof(er) fieldnames(typeof(er)) 
     m1 = "attempted to access a String at index $(er.index)\n"
     return m1, ""
 end
 
 # ! catch all other errors
-function error_message(io::IO, er)
-    @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(
-        typeof(er)
-    )
+function error_message(er)
+    # @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(
+    #     typeof(er)
+    # )
     if hasfield(typeof(er), :error)
         # @info "nested error" typeof(er.error)
-        m1, m2 = error_message(io, er.error)
-        msg = "\n[bold red]LoadError:[/bold red]\n" * m1
+        m1, m2 = error_message(er.error)
+        msg = "\n{bold red}LoadError:{/bold red}\n" * m1
     else
         msg = if hasfield(typeof(er), :msg)
             er.msg
@@ -214,52 +214,47 @@ end
 # ---------------------------------------------------------------------------- #
 #                              INSTALL STACKTRACE                              #
 # ---------------------------------------------------------------------------- #
-function install_stacktrace()
+function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30)
     @eval begin
-
-        # ---------------------------- handle load errors ---------------------------- #
-
-        function Base.showerror(io::IO, er::LoadError, bt; backtrace = true)
-            print("\n")
-            println(hLine(_width(), "[default bold red]LoadError[/default bold red]"; style = "dim red"))
-            Base.display_error(io, er, bt)
-
-            return Base.showerror(io, er.error, bt; backtrace = true)
-        end
-
-        """
-        prints a line to mark te start of the error followed
-        by the error's stack trace
-        """
-
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            ename = string(typeof(er))
-            print("\n"*hLine(_width(), "[default bold red]$ename[/default bold red]"; style = "dim red"))
-
+            (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             try
-                stack = style_backtrace(io, bt)
-                print(stack)
-            catch stack_error
-                @warn "failed to generate stack trace" er stack_error
-                println.(style_stacktrace_simple(bt))
-            end
-        end
-
-        # # ------------------ handle all other errors (no backtrace) ------------------ #
-        """
-        Re-define Base module function. Prints a nicely formatted error message.
-        """
-        
-        function Base.display_error(io::IO, er, bt)
-            try
-                err, err_msg = style_error(io, er)
-                println(err / err_msg)
-            catch styling_error
-                @error "Failed to generate styled error message" styling_error stacktrace()
-
-                println(apply_style("Original error: [bright_red]$(string(er))"))
+                println("\n")
+                ename = string(typeof(er))
+                error =
+                    hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
+                if length(bt) > 0
+                    rendered_bt = render_backtrace(
+                        bt;
+                        reverse_backtrace = $(reverse_backtrace),
+                        max_n_frames = $(max_n_frames),
+                    )
+                    error /= rendered_bt
+                    W = rendered_bt.measure.w
+                else
+                    W = 88
+                end
+                err, _ = error_message(er)
+                msg =
+                    "" / Panel(
+                        "{#aec2e8}$(err){/#aec2e8}";
+                        width = W,
+                        title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
+                        padding = (2, 2, 1, 1),
+                        style = "dim red",
+                        title_justify = :center,
+                        # fit = true,
+                        # width=W
+                    )
+                error /= msg
+                print(error)
+            catch err
+                @error "ERROR: " exception = err
+                @warn "Term.jl: failed to render error message" err
+                Base.showerror(io, er)
             end
         end
     end
 end
+
 end

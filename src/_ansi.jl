@@ -260,9 +260,8 @@ const CODES_16BIT_COLORS = Dict(
 # ---------------------------------------------------------------------------- #
 #                                    COLORS                                    #
 # ---------------------------------------------------------------------------- #
-const NAMED_COLORS = [
-    "default", "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
-]
+const NAMED_COLORS =
+    ["default", "black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
 
 const COLORS_16b = vcat(
     [

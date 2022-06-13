@@ -1,9 +1,8 @@
-import Term: Measure
-import Term.measure: width, height
+import Term.Measures: Measure, width, height
 import Term: remove_markup, Panel
 
 @testset "\e[34mMeasure - str" begin
-    @test Measure("a"^10).w == 10
+    @test size(Measure("a"^10)) == (10, 1)
 
     strings = (
         "asadasda"^2,
@@ -19,9 +18,9 @@ import Term: remove_markup, Panel
 
     strings = (
         "[red]is my color"^2,
-        "~~±±||__[red on_green]aasdas[bold]asdsad[/bold]asdas[/red on_green]xc\nasdfsiaudfhsdiufhndskjv",
-        "dasda[#ffffff]dsa[#ffffff]\nsdfsd"^7,
-        "asdasdsa|dfvcxvashf[bold]usdn\nfid[/bold]suhfsdf",
+        "~~±±||__{red on_green}aasdas{bold}asdsad{/bold}asdas{/red on_green}xc\nasdfsiaudfhsdiufhndskjv",
+        "dasda{#ffffff}dsa{#ffffff}\nsdfsd"^7,
+        "asdasdsa|dfvcxvashf{bold}usdn\nfid[/bold]suhfsdf",
     )
     for string in strings
         m = Measure(string)
@@ -36,8 +35,12 @@ end
     @test width("test") == 4
     @test height("test") == 1
 
-    @test width(Panel(;width=5, height=5)) == 5
-    @test height(Panel(;width=5, height=5)) == 5
+    w = h = 5
+    p = Panel(width = w, height = h)
+    @test width(p) == w
+    @test height(p) == h
+
+    s = first(p.segments)
+    @test width(s) == w
+    @test height(s) == 1
 end
-
-

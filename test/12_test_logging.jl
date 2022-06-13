@@ -2,7 +2,6 @@ import Term: install_term_logger, uninstall_term_logger
 
 install_term_logger()
 
-
 @testset "\e[34mLOGS test" begin
     println("\nTesting logging, stdout temporarily disabled")
 
@@ -27,7 +26,6 @@ install_term_logger()
 
         # uninstall_term_logger()
         # @info "removed"
-    
+
     end
 end
-

@@ -1,6 +1,6 @@
 # Errors
 ```@meta
-CurrentModule = Term.errors
+CurrentModule = Term.Errors
 ```
 
 
@@ -11,5 +11,5 @@ Pages   = ["api_errors.md"]
 
 
 ```@autodocs
-Modules = [errors]
+Modules = [Errors]
 ```

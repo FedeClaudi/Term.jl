@@ -3,10 +3,13 @@
 *.jl.mem
 
 /Manifest.toml
+/test/Manifest.toml
 /docs/Manifest.toml
 /docs/build/
+/base/
 
 workspace.jl
+workspace copy.jl
 test.jl
 
 progress copy.jl

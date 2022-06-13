@@ -16,7 +16,6 @@ using Term.dendogram
 # e = :(print(x))
 # e = :(print(lstrip("test")))
 
-
 # NOWORKS
 # e = :(for i in 1:10; println(i); end) 
 
@@ -28,8 +27,4 @@ print("\n"^3)
 expressiontree(e)
 inspect(e)
 
-
 # TODO make Tree work for vector of Pair/Dict
-
-
-

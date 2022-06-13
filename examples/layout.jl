@@ -25,7 +25,7 @@ println(s1 * " " * s2)
 println(s1 / s2)
 
 # with panels (and text boxes)
-p1 = Panel("content [blue]content[/blue] "^10; width = 40)
+p1 = Panel("content {blue}content{/blue} "^10; width = 40)
 tb1 = TextBox("this is a text boox! "^5; width = 66)
 
 println(p1 * tb1)
@@ -61,6 +61,6 @@ println(
         title_style = "bold red",
         style = "red dim",
         title_justify = :left,
-        fit=true
+        fit = true,
     ),
 )

@@ -7,3 +7,4 @@ test/txtfiles/* linguist-documentation=true
 *.css linguist-detectable=false
 *.md linguist-detectable=false
 *.txt linguist-detectable=false
+*.js linguist-detectable=false

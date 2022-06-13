@@ -68,44 +68,43 @@ Well, that's exactly what we're going to do:
 ```@example
 import Term: tprint
 tprint(
-    "[red]Every[/red] other [green]word[/green] has [blue]colors![/blue]"
+    "{red}Every{/red} other {green}word{/green} has {blue}colors!{/blue}"
 )
 ```
 
 Woah! What just happened!!
-Two things happened: 1) `Term` styling machinery detects strings segments like `"[red]Every[/red]"` as meaning that the text between `"[...]"` and `"[/...]"` should be colored red and 2) `tprint` (short for term print) detects this style information and applies it to your text before printing. 
+Two things happened: 1) `Term` styling machinery detects strings segments like `"{red}Every{/red}"` as meaning that the text between `"{...}"` and `"{/...}"` should be colored red and 2) `tprint` (short for term print) detects this style information and applies it to your text before printing. 
 
 Not bad huh? Even better, the style information inside a parentheses can be more than just color:
 ```@example
 using Term # hide
 tprint(
-    "[bold black underline on_red]So much [gold3 bold]STYLE[/gold3 bold] in this text[/bold black underline on_red]"
+    "{bold black underline on_red}So much {gold3 bold}STYLE{/gold3 bold} in this text{/bold black underline on_red}"
 )
 ```
-that's right, `Term.jl` can also color the background of your text (by adding `on_C` to your color `C` you set it as the background, see `colors` page). As you can see you can pass multiple style information tags as space separated words within the `"[...]"`. Also, you might have noticed, `Term` can also handle nested style tags!
+that's right, `Term.jl` can also color the background of your text (by adding `on_C` to your color `C` you set it as the background, see `colors` page). As you can see you can pass multiple style information tags as space separated words within the `"{...}"`. Also, you might have noticed, `Term` can also handle nested style tags!
 
 !!! info "Where did my brackets go!?!?"
-    Perhaps you've tried something like `tprint("This is [my] text")` and got suprised when the output was `"This is text"`. If so, read on. What happend there is that `Term.jl` interprets anything with single squared parentheses (`[...]`) as style information
-    and removes that from your text output. So in the example it treated `[my]` as a markup style tag and removed it from the text, but `my` is not a valid style so it was ultimately ignored. If you want to use `[]` in your text, you simply need to use double brackets: `tprint("This is [[my]] text")` will print `"This is [my] text"` as expected. 
+    Perhaps you've tried something like `tprint("This is {my} text")` and got suprised when the output was `"This is text"`. If so, read on. What happend there is that `Term.jl` interprets anything with single squared parentheses (`{...}`) as style information
+    and removes that from your text output. So in the example it treated `{my}` as a markup style tag and removed it from the text, but `my` is not a valid style so it was ultimately ignored. If you want to use `[]` in your text, you simply need to use double brackets: `tprint("This is {{my}} text")` will print `"This is {my} text"` as expected. 
 
 
 If you just want to **use** `Term.jl`'s style functionality, just make sure to read the admonition below. If you're curious about what's happening under the hood, read on below!
 
 !!! warning "A note on style tags"
-    The style tags used by `Term.jl` have an opening `"[style]"` and closing `"[/style]"` syntax. The style is applied to everything inbetween. For `"[/style]"` to close `"[style]"` the text in the parentheses must match exactly (excuding `/`), up to the number and position of spaces and the words order. So:
+    The style tags used by `Term.jl` have an opening `"{style}"` and closing `"{/style}"` syntax. The style is applied to everything inbetween. For `"{/style]"` to close `"{style]"` the text in the parentheses must match exactly (excuding `/`), up to the number and position of spaces and the words order. So:
     ```julia
-    "[red] wohoo [/red]"  # works
-    "[red] wohoo [/red ]" # doesn't -- no extra spaces
-    "[bold blue] wohoo [/bold blue]" # works
-    "[bold blue] wohoo [/blue bold]" # doesn't -- should match the first style tag "bold"
-    "[bold blue] wohoo [/bold /blue]" # doesn't -- one single / only
+    "{red} wohoo {/red}"  # works
+    "{red} wohoo {/red }" # doesn't
+    "{bold blue} wohoo {/bold blue}" # works
+    "{bold blue} wohoo {/blue bold}" # doesn't
     ```
 
 !!! tip
     Occasionally you can do without the closing tag:
     
     ```@example
-    tprint("[red]text")
+    tprint("{red}text")
     ```
     `Term.jl` will add the closing tag to the end of the string for you. Generally though, when multiple styles are 
     applied to the same string, it's better to be explicit in exactly where each style starts and ends.
@@ -123,35 +122,35 @@ So the first thing that needs to happen is the **detection** of these markup tag
 using Term # hide
 tprint(
     """
-And [blue] somehow
-it [bold red] all [/bold red]
-has to [green underline] always
-work [/green underline] correctly [/blue]
+And {blue} somehow
+it {bold red} all {/bold red}
+has to {green underline} always
+work {/green underline} correctly {/blue}
 somehow.
     """
 )
 ```
 
 ```@meta
-CurrentModule = Term.style
+CurrentModule = Term.Style
 ```
 
-All of this is taken care of by `Term.style.apply_style` which extracts markup style information from your strings and replaces them with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text bewteen `[...]`) into a `Term.style.MarkupStyle` object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
+All of this is taken care of by `Term.Style.apply_style` which extracts markup style information from your strings and replaces them with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text bewteen `{...}`) into a `Term.Style.MarkupStyle` object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
 So in summary:
 
 ```julia
-apply_style("[red]text[/red]")
+apply_style("{red}text{/red}")
 ```
 will return a string with style information
 
 ```@example
-import Term.style: apply_style  # hide
-apply_style("[red]text[/red]") # hide
+import Term.Style: apply_style  # hide
+apply_style("{red}text{/red}") # hide
 ```
 
 which printed to the console looks like:
 ```@example
-import Term.style: apply_style  # hide
-print(apply_style("[red]text[/red]")) # hide
+import Term.Style: apply_style  # hide
+print(apply_style("{red}text{/red}")) # hide
 ```
 
