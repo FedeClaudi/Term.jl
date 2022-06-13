@@ -73,11 +73,7 @@ end
 end
 
 @testset "\e[34mlayout - justification" begin
-    function make_panels()
-        begin
-            return (Panel(; width = 5), Panel(; width = 10), Panel(; width = 15))
-        end
-    end
+    make_panels() = (Panel(; width = 5), Panel(; width = 10), Panel(; width = 15))
 
     # right justify
     p1, p2, p3 = make_panels()
@@ -334,4 +330,25 @@ end
     )
     @test g.measure.w == 34
     @test g.measure.h == 17
+
+    panels = collect(
+        Panel("{on_$c} {/on_$c}", style = "bold yellow", width = 20, height = 10)
+        for c in (:bright_red, :bright_green, :bright_blue, :bright_yellow, :bright_magenta, :bright_cyan, :bright_black, :bright_white)
+    )
+
+    # auto layout (default placeholder)
+    for i in 2:length(panels)
+        grid(panels[1:i])
+    end
+
+    # matrix, explicit
+    grid(reshape(panels[1:4], 2, 2))
+
+    # vector, half explicit
+    grid(panels, layout=(nothing, 4))
+    grid(panels, layout=(2, nothing))
+
+    # vector, explicit
+    grid(panels; layout=(2, 4))
+
 end

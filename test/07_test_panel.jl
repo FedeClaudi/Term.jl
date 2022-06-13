@@ -34,60 +34,55 @@ end
 
 @testset "\e[34mPANEL - fit - measure" begin
     for style in ("default", "red", "on_blue")
-        for justify in (:left, :center, :right)
-            # ----------------------------- text only content ---------------------------- #
-            testpanel(Panel("t"; fit = true, style = style), 7, 3)
-            testpanel(Panel("test"; fit = true, style = style), 10, 3)
-            testpanel(Panel("1234\n123456789012"; fit = true, style = style), 18, 4)
-            testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true, style = style), 28, 3)
-            testpanel(
-                Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true, style = style),
-                28,
-                4,
-            )
-            testpanel(
-                Panel("."^500; fit = true, style = style),
-                displaysize(stdout)[2] - 1,
-                nothing,
-            )
+        # ----------------------------- text only content ---------------------------- #
+        testpanel(Panel("t"; fit = true, style = style), 7, 3)
+        testpanel(Panel("test"; fit = true, style = style), 10, 3)
+        testpanel(Panel("1234\n123456789012"; fit = true, style = style), 18, 4)
+        testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true, style = style), 28, 3)
+        testpanel(
+            Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true, style = style),
+            28,
+            4,
+        )
+        testpanel(
+            Panel("."^500; fit = true, style = style),
+            displaysize(stdout)[2] - 1,
+            nothing,
+        )
 
-            # ------------------------------- nested panels ------------------------------ #
-            testpanel(
-                Panel(Panel("test"; fit = true, style = style); fit = true, style = style),
-                16,
-                5,
-            )
+        # ------------------------------- nested panels ------------------------------ #
+        testpanel(
+            Panel(Panel("test"; fit = true, style = style); fit = true, style = style),
+            16,
+            5,
+        )
 
-            testpanel(
-                Panel(
-                    Panel(Panel("."; fit = true, style = style); fit = true, style = style);
-                    fit = true,
-                    style = style,
-                ),
-                19,
-                7,
-            )
+        testpanel(
+            Panel(
+                Panel(Panel("."; fit = true, style = style); fit = true, style = style);
+                fit = true,
+                style = style,
+            ),
+            19,
+            7,
+        )
 
-            # @test_nothrow Panel(
-            #         Panel("."^250; fit=true, style=style); fit=true, style=style
-            #     )
-        end
     end
 end
 
 @testset "\e[34mPANEL - nofit - measure" begin
     for style in ("default", "red", "on_blue")
+        testpanel(Panel("t"; style = style, fit = false), 88, 3)
+        testpanel(Panel("test"; style = style, fit = false), 88, 3)
+        testpanel(Panel("1234\n123456789012"; style = style, fit = false), 88, 4)
+        testpanel(Panel("나랏말싸미 듕귁에 달아"; style = style, fit = false), 88, 3)
+        testpanel(
+            Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; style = style, fit = false),
+            88,
+            4,
+        )
         for justify in (:left, :center, :right)
             # ----------------------------- text only content ---------------------------- #
-            testpanel(Panel("t"; style = style, fit = false), 88, 3)
-            testpanel(Panel("test"; style = style, fit = false), 88, 3)
-            testpanel(Panel("1234\n123456789012"; style = style, fit = false), 88, 4)
-            testpanel(Panel("나랏말싸미 듕귁에 달아"; style = style, fit = false), 88, 3)
-            testpanel(
-                Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; style = style, fit = false),
-                88,
-                4,
-            )
             testpanel(
                 Panel("."^1500; justify = justify, style = style, fit = false),
                 88,
@@ -180,13 +175,13 @@ end
 end
 
 @testset "\e[34mPANEL - FIT - measure" begin
+    testpanel(Panel("t"; fit = true), 7, 3)
+    testpanel(Panel("test"; fit = true), 10, 3)
+    testpanel(Panel("1234\n123456789012"; fit = true), 18, 4)
+    testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true), 28, 3)
+    testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true), 28, 4)
     for justify in (:left, :center, :right)
         # ----------------------------- text only content ---------------------------- #
-        testpanel(Panel("t"; fit = true), 7, 3)
-        testpanel(Panel("test"; fit = true), 10, 3)
-        testpanel(Panel("1234\n123456789012"; fit = true), 18, 4)
-        testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true), 28, 3)
-        testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true), 28, 4)
         testpanel(
             Panel("."^1500; justify = justify, fit = true),
             console_width() - 1,

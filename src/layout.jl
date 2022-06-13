@@ -752,14 +752,14 @@ function place_holder_line(w, i)
 end
 
 """
-    function PlaceHolder(
+    PlaceHolder(
         w::Int,
         h::Int;
         style::String = "dim",
         text::Union{Nothing,String} = nothing,
     )
 
-Create a `PlaaceHolder` with additional style information.
+Create a `PlaceHolder` with additional style information.
 """
 function PlaceHolder(
     w::Int,
@@ -808,8 +808,9 @@ PlaceHolder(ren::AbstractRenderable) = PlaceHolder(ren.measure.w, ren.measure.h)
         placeholder::Union{Nothing,AbstractRenderable} = nothing,
         aspect::Union{Number,NTuple} = (16, 9),
         layout::Union{Nothing,Tuple} = nothing, 
-        pad::Union{Nothing,Integer} = 0,
+        pad::Union{Tuple,Integer} = 0,
     )
+
 Construct a square grid from a `AbsractVector` of `AbstractRenderable`.
 """
 function grid(
@@ -833,13 +834,14 @@ function grid(
             r == 0 || (ncols += 1)
         end
         fill_in = isnothing(placeholder) ? PlaceHolder(first(rens)) : placeholder
-        rens = append!(copy(rens), [fill_in for _ in 1:(nrows * ncols - length(rens))])
+        rens = vcat(rens, repeat([fill_in], nrows * ncols - length(rens)))
     end
     return grid(reshape(rens, nrows, ncols); pad = pad)
 end
 
 """
     grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Nothing,Integer} = 0))
+
 Construct a grid from a `AbstractMatrix` of `AbstractRenderable`.
 """
 function grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Tuple,Integer} = 0)
@@ -848,16 +850,17 @@ function grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Tuple,Integ
     else
         pad
     end
-    @info hpad vpad
     rows = collect(
         foldl((a, b) -> a * ' '^hpad * b, col[2:end]; init = first(col)) for
         col in eachrow(rens)
     )
     if vpad > 0
         vspace = vpad > 1 ? vstack(repeat([" "], vpad)...) : " "
-        return foldl((a, b) -> a / vspace / b, rows[2:end]; init = first(rows))
+        cat = (a, b) -> a / vspace / b
     else
-        return foldl((a, b) -> a / b, rows[2:end]; init = first(rows))
+        cat = (a, b) -> a / b
     end
+    return foldl(cat, rows[2:end]; init = first(rows))
 end
+
 end
