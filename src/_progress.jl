@@ -104,8 +104,7 @@ function update!(col::PercentageColumn, args...)::String
     isnothing(col.job.N) && return ""
     frac = int(col.job.i / col.job.N * 100)
     p = string(frac)
-    p = frac == 100 ? p : lpad(p, 3)
-    return "\e[2m" * p * "%\e[0m"
+    return "\e[2m" * (frac == 100 ? p : lpad(p, 3)) * "%\e[0m"
 end
 
 # ----------------------------- downloaded column ---------------------------- #
@@ -141,9 +140,8 @@ struct ElapsedColumn <: AbstractColumn
     style::String
     padwidth::Int
 
-    function ElapsedColumn(job::ProgressJob; style = purple_light)
-        return new(job, [], Measure(6 + 9, 1), style, 6)
-    end
+    ElapsedColumn(job::ProgressJob; style = purple_light) =
+        new(job, [], Measure(6 + 9, 1), style, 6)
 end
 
 function update!(col::ElapsedColumn, args...)::String
@@ -151,16 +149,14 @@ function update!(col::ElapsedColumn, args...)::String
     elapsedtime = (now() - col.job.startime).value  # in ms
 
     # format elapsed message
-    if elapsedtime < 1000
-        msg = "$(elapsedtime)ms"
+    msg = if elapsedtime < 1000
+        string(elapsedtime, "ms")
     elseif elapsedtime < (60 * 1000)
         # under a minute
-        elapsed = round(elapsedtime / 1000; digits = 2)
-        msg = "$(elapsed)s"
+        string(round(elapsedtime / 1000; digits = 2), "s")
     else
         # show minutes
-        elapsed = round(elapsedtime / (60 * 1000); digits = 2)
-        msg = "$(elapsed)min"
+        string(round(elapsedtime / (60 * 1000); digits = 2), "min")
     end
 
     msg = lpad(truncate(msg, col.padwidth), col.padwidth)
@@ -189,16 +185,14 @@ function update!(col::ETAColumn, args...)::String
     remaining = elapsed * (1 - perc) / perc
 
     # format elapsed message
-    if remaining < 1000
-        msg = "$(round(remaining; digits=0))ms"
+    msg = if remaining < 1000
+        string(round(remaining; digits = 0), "ms")
     elseif remaining < (60 * 1000)
         # under a minute
-        remaining = round(remaining / 1000; digits = 2)
-        msg = "$(remaining)s"
+        string(round(remaining / 1000; digits = 2), "s")
     else
         # show minutes
-        remaining = round(remaining / (60 * 1000); digits = 2)
-        msg = "$(remaining)min"
+        string(round(remaining / (60 * 1000); digits = 2), "min")
     end
 
     msg = lpad(truncate(msg, col.padwidth), col.padwidth)
@@ -325,7 +319,7 @@ function update!(col::SpinnerColumn, args...)::String
 
     t = (now() - col.job.startime).value
 
-    if t - col.lastupdated >= col.Δt
+    if t - col.lastupdated ≥ col.Δt
         col.lastupdated = t
         col.frameidx = col.frameidx == col.nframes ? 1 : col.frameidx + 1
         col.lasttext = col.frames[col.frameidx]
@@ -339,10 +333,10 @@ end
 # ---------------------------------------------------------------------------- #
 
 function get_columns(columnsset::Symbol)::Vector{DataType}
-    if columnsset == :minimal
-        return [DescriptionColumn, ProgressColumn]
+    return if columnsset == :minimal
+        [DescriptionColumn, ProgressColumn]
     elseif columnsset == :default
-        return [
+        [
             DescriptionColumn,
             SeparatorColumn,
             ProgressColumn,
@@ -351,10 +345,10 @@ function get_columns(columnsset::Symbol)::Vector{DataType}
             PercentageColumn,
         ]
     elseif columnsset == :spinner
-        return [DescriptionColumn, SpaceColumn, SpinnerColumn, SpaceColumn, CompletedColumn]
+        [DescriptionColumn, SpaceColumn, SpinnerColumn, SpaceColumn, CompletedColumn]
     elseif columnsset == :detailed
         # extensive
-        return [
+        [
             DescriptionColumn,
             SeparatorColumn,
             ProgressColumn,
@@ -367,6 +361,6 @@ function get_columns(columnsset::Symbol)::Vector{DataType}
         ]
     else
         @warn "Columns name not recognized: $columnsset"
-        return get_columns(:minimal)
+        get_columns(:minimal)
     end
 end

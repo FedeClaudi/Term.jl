@@ -9,11 +9,10 @@ function get_docstring(obj)
     # get doc and docstring
     doc = getdocs(obj)
 
-    if isnothing(doc)
-        docstring = "no docstring"
+    docstring = if isnothing(doc)
+        "no docstring"
     else
-        docstring = highlight(doc)
-        docstring = highlight(docstring, :docstring)
+        highlight(highlight(doc), :docstring)
     end
     return doc, unescape_brackets(docstring)
 end
@@ -29,7 +28,7 @@ function style_super_types(info)::String
         for sup in info.supertypes[2:end]
             abstract = isabstracttype(sup) ? "underline" : ""
             name = split(string(sup), ".")[end]
-            stypes = stypes * "{blue} <{/blue} {bold $abstract}$name{/bold $abstract}"
+            stypes *= "{blue} <{/blue} {bold $abstract}$name{/bold $abstract}"
         end
     else
         stypes = "{dim}(supertypes): no super types{/dim}"

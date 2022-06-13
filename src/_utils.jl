@@ -35,16 +35,14 @@ end
 """
 Get a clean string representation of an expression
 """
-function expr2string(e::Expr)
-    return replace_multi(
-        string(e),
-        '\n' => "",
-        ' ' => "",
-        r"#=.*=#" => "",
-        "begin" => "",
-        "end" => "",
-    )
-end
+expr2string(e::Expr) = replace_multi(
+    string(e),
+    '\n' => "",
+    ' ' => "",
+    r"#=.*=#" => "",
+    "begin" => "",
+    "end" => "",
+)
 
 """
   get_file_format(nbytes; suffix="B")

@@ -1,6 +1,6 @@
 """ multiple strings replacement, for multiple on Julia version """
 function replace_multi(text, pairs...)::String
-    VERSION >= v"1.7" && return replace(text, pairs...)
+    VERSION ≥ v"1.7" && return replace(text, pairs...)
     VERSION < v"1.7" && begin
         for pair in pairs
             text = replace(text, pair)
@@ -173,7 +173,7 @@ function read_file_lines(path::AbstractString, start::Int, stop::Int)
     !isfile(path) && return nothing
 
     start = start < 1 ? 1 : start
-    stop = stop >= countlines(path) ? countlines(path) : stop
+    stop = stop ≥ countlines(path) ? countlines(path) : stop
     lines = readlines(path; keep = true)
     return collect(enumerate(lines))[start:stop]
 end
@@ -200,12 +200,12 @@ function replace_text(text, start::Int, stop::Int, replace::String)::String
     end
 
     start = isvalid(text, start) ? start : max(prevind(text, start), 1)
-    if start == 1
-        return text[1] * replace * text[(stop + 1):end]
+    return if start == 1
+        text[1] * replace * text[(stop + 1):end]
     elseif stop == ncodeunits(text)
-        return text[1:start] * replace
+        text[1:start] * replace
     else
-        return text[1:start] * replace * text[(stop + 1):end]
+        text[1:start] * replace * text[(stop + 1):end]
     end
 end
 
@@ -226,7 +226,7 @@ Cut a chunk of width `width` form the left of a string
 """
 function ltrim_str(str, width)
     edge = nextind(str, 0, width)
-    if edge >= ncodeunits(str)
+    return if edge ≥ ncodeunits(str)
         str
     else
         str[1:edge]
@@ -335,7 +335,7 @@ Shorten a string of text to a target width
 function truncate(text::AbstractString, width::Int; trailing_dots = "...")
     # occursin('\n', text) &&  do_by_line(ln -> truncate(ln, width; trailing_dots=trailing_dots), text)
     width < 0 && return text
-    textlen(text) <= width && return text
+    textlen(text) ≤ width && return text
 
     trunc = reshape_text(text, width - 3)
     return split_lines(trunc)[1] * trailing_dots

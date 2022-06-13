@@ -89,9 +89,8 @@ Base.convert(::Renderable, x) = Renderable(x)
 
 Convenience method to construct a RenderableText
 """
-function Renderable(str::AbstractString; width::Union{Nothing,Int} = nothing)
-    return RenderableText(str; width = width)
-end
+Renderable(str::AbstractString; width::Union{Nothing,Int} = nothing) =
+    RenderableText(str; width = width)
 
 Renderable(ren::AbstractRenderable) = ren
 Renderable() = Renderable(Vector{Segment}[], Measure(0, 0))
@@ -136,16 +135,14 @@ function RenderableText(
     text = fillin(text)
 
     # create renderable
-    if isnothing(style)
-        segments = if !isnothing(width)
-            Segment.(map(ln -> rpad(ln, width - textwidth(ln) + 1), split_lines(text)))
-
-        else
-            Segment.(split_lines(text))
-        end
+    segments = if isnothing(style)
+        Segment.(
+            isnothing(width) ? split_lines(text) :
+            map(ln -> rpad(ln, width - textwidth(ln) + 1), split_lines(text))
+        )
     else
         style_init, style_finish = get_style_codes(MarkupStyle(style))
-        segments = map(ln -> Segment(style_init * ln * style_finish), split_lines(text))
+        map(ln -> Segment(style_init * ln * style_finish), split_lines(text))
     end
 
     # @info "a" Measure(segments) segments[1]
@@ -163,11 +160,11 @@ function RenderableText(
     style::Union{Nothing,String} = nothing,
     width::Union{Nothing,Int} = nothing,
 )
-    if rt.style == style && rt.measure.w == width
-        return rt
+    return if rt.style == style && rt.measure.w == width
+        rt
     else
         text = join_lines([seg.text for seg in rt.segments])
-        return RenderableText(text; style = style, width = width)
+        RenderableText(text; style = style, width = width)
     end
 end
 

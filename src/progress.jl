@@ -173,7 +173,7 @@ end
 Update a job's progress `i` by setting its value or adding `+1`.
 """
 function update!(job::ProgressJob; i = nothing)
-    (!isnothing(job.N) && job.i >= job.N) && return stop!(job)
+    (!isnothing(job.N) && job.i ≥ job.N) && return stop!(job)
 
     job.i = isnothing(i) ? job.i + 1 : job.i + i
     return nothing

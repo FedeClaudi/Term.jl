@@ -333,11 +333,7 @@ end
 """
 function with_repr(typedef::Expr)
     tn = typename(typedef) # the name of the type
-    showfn = begin
-        :(function Base.show(io::IO, ::MIME"text/plain", obj::$tn)
-            return termshow(io, obj)
-        end)
-    end
+    showfn = :(Base.show(io::IO, ::MIME"text/plain", obj::$tn) = termshow(io, obj))
 
     quote
         $typedef

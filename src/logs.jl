@@ -293,7 +293,7 @@ function Logging.handle_message(
         end
 
         tprintln(line * vlines[1]; highlight = false)
-        if length(vlines) >= 1
+        if length(vlines) ≥ 1
             for ln in vlines[2:end]
                 tprintln("  $vert " * " "^lpad * ln; highlight = false)
             end

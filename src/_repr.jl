@@ -38,12 +38,12 @@ end
 Get the name of a type as an expression
 """
 function typename(typedef::Expr)
-    if typedef.args[2] isa Symbol
-        return typedef.args[2]
+    return if typedef.args[2] isa Symbol
+        typedef.args[2]
     elseif typedef.args[2].args[1] isa Symbol
-        return typedef.args[2].args[1]
+        typedef.args[2].args[1]
     elseif typedef.args[2].args[1].args[1] isa Symbol
-        return typedef.args[2].args[1].args[1]
+        typedef.args[2].args[1].args[1]
     else
         error("Could not parse type-head from: $typedef")
     end

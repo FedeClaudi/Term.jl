@@ -68,7 +68,7 @@ function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothi
 
     # get total padding size
     lw = width(text)
-    lw >= target_width && return text
+    lw ≥ target_width && return text
 
     npads = target_width - lw
     if method == :left
@@ -177,7 +177,7 @@ Where the spaces are added depends on the justification `method` ∈ (:top, :cen
 function vertical_pad(text::AbstractString, target_height::Int, method::Symbol)::String
     # get total padding size
     h = height(text)
-    h >= target_height && return text
+    h ≥ target_height && return text
 
     space = " "^(width(text))
     npads = target_height - h

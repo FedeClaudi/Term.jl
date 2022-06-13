@@ -80,10 +80,10 @@ function render_backtrace_frame(
     kwargs...,
 )
     content = hstack(num, info, pad = 2)
-    if as_panel
-        p = Panel(content; padding = (2, 2, 1, 1), style = "#9bb3e0", fit = true, kwargs...)
+    p = if as_panel
+        Panel(content; padding = (2, 2, 1, 1), style = "#9bb3e0", fit = true, kwargs...)
     else
-        p = "   " * content
+        "   " * content
     end
 
     return p / " "
