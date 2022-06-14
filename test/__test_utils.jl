@@ -48,7 +48,7 @@ function testpanel(p, w, h)
     if isnothing(w) || w > dw
         return nothing
     else
-        widths = textwidth.(cleantext.(split(_p, "\n")))
+        widths = textwidth.(cleantext.(split(_p, '\n')))
     end
 
     # println(p, p.measure, widths)
@@ -75,7 +75,7 @@ function testtree(p, w, h)
     if isnothing(w) || w > dw
         return nothing
     else
-        widths = textwidth.(cleantext.(split(_p, "\n")))
+        widths = textwidth.(cleantext.(split(_p, '\n')))
     end
 
     # println(p, p.measure, widths)
@@ -92,8 +92,8 @@ function testtree(p, w, h)
     end
 end
 
-nlines(x) = length(split(x, "\n"))
-lw(x) = max(length.(split(x, "\n"))...)
+nlines(x) = length(split(x, '\n'))
+lw(x) = max(length.(split(x, '\n'))...)
 
 """
 Include but with a timer

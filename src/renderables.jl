@@ -7,7 +7,7 @@ import Term:
     fillin,
     join_lines,
     unescape_brackets_with_space,
-    TERM_DEBUG_ON
+    DEBUG_ON
 
 import ..Style: get_style_codes, MarkupStyle, apply_style
 import Term: highlight as highlighter
@@ -59,12 +59,8 @@ Base.show(io::IO, renderable::AbstractRenderable) = print(io, info(renderable))
 Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
-    if TERM_DEBUG_ON[]
-        println(io, string(renderable))
-        println(io, info(renderable))
-    else
-        print(io, string(renderable))
-    end
+    println(io, string(renderable))
+    DEBUG_ON[] && println(io, info(renderable))
 end
 
 # ------------------------- generic renderable object ------------------------ #

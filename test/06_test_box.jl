@@ -1,7 +1,7 @@
 using Term.Boxes
 import Term: Segment
 
-@testset "\e34mBOX" begin
+@testset "\e[34mBOX" begin
     testbox = Term.Boxes.Box(
         "ASCII",
         """

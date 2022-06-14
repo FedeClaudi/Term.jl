@@ -2,7 +2,7 @@ module Tables
 
 import Tables as TablesPkg
 
-import Term: do_by_line, term_theme, fillin, truncate
+import Term: do_by_line, fillin, truncate
 import MyterialColors: orange
 
 import ..Renderables: AbstractRenderable, RenderableText

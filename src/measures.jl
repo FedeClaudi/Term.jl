@@ -1,6 +1,6 @@
 module Measures
 
-import Term: remove_ansi, remove_markup
+import Term: rint, remove_ansi, remove_markup, DEFAULT_WT, DEFAULT_AR
 
 export Measure
 
@@ -15,6 +15,13 @@ mutable struct Measure
 end
 
 Base.show(io::IO, M::Measure) = print(io, "Measure (w: $(M.w), h: $(M.h))")
+
+"""
+    default_size()
+
+Return default size (w, h)
+"""
+default_size() = (DEFAULT_WT[], rint(DEFAULT_WT[] / DEFAULT_AR[]))
 
 """
     Measure(str::String)

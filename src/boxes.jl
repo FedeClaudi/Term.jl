@@ -1,6 +1,6 @@
 module Boxes
 
-import Term: int, chars, join_lines, loop_last, textlen, get_lr_widths, truncate
+import Term: rint, chars, join_lines, loop_last, textlen, get_lr_widths, truncate
 
 import ..Style: apply_style
 import ..Segments: Segment
@@ -168,7 +168,7 @@ function get_title_row(
     row::Symbol,
     box,  # ::Box,
     title::Union{Nothing,String};
-    width::Int = 88,
+    width::Int = DEFAULT_WT[],
     style::String = "default",
     title_style::Union{Nothing,String} = nothing,
     justify::Symbol = :left,

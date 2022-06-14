@@ -1,4 +1,6 @@
-import Term: install_term_logger, uninstall_term_logger
+import Term: install_term_logger, uninstall_term_logger, TermLogger
+using Term.Logs: handle_progress
+using Term.Progress
 
 install_term_logger()
 
@@ -26,6 +28,12 @@ install_term_logger()
 
         # uninstall_term_logger()
         # @info "removed"
-
     end
+end
+
+@testset "\e[34mLOGS test" begin
+    pbar = ProgressBar()
+    # handle_progress(TermLogger(TERM_THEME[]), pbar)
+
+    @test true
 end

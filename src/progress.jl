@@ -4,7 +4,7 @@ using Dates
 import Parameters: @with_kw
 import UUIDs: UUID
 
-import Term: int, textlen, truncate, loop_last, get_file_format, update!
+import Term: rint, textlen, truncate, loop_last, get_file_format, update!, DEFAULT_WT
 import ..Tprint: tprint, tprintln
 import ..Style: apply_style
 import ..Consoles:
@@ -260,7 +260,7 @@ end
 
 """
     ProgressBar(;
-        width::Int=88,
+        width::Int=$(DEFAULT_WT[]),
         columns::Union{Vector{DataType}, Symbol} = :default,
         columns_kwargs::Dict = Dict(),
         expand::Bool=false,
@@ -276,7 +276,7 @@ end
 Create a ProgressBar instance.
 """
 function ProgressBar(;
-    width::Int = 88,
+    width::Int = DEFAULT_WT[],
     columns::Union{Vector{DataType},Symbol} = :default,
     columns_kwargs::Dict = Dict(),
     expand::Bool = false,
@@ -309,9 +309,8 @@ function ProgressBar(;
     )
 end
 
-function Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar)
-    return print(io, "Progress bar \e[2m($(length(pbar.jobs)) jobs)\e[0m")
-end
+Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar) =
+    print(io, "Progress bar \e[2m($(length(pbar.jobs)) jobs)\e[0m")
 
 # ---------------------------------------------------------------------------- #
 #                                    METHODS                                   #
@@ -625,9 +624,9 @@ function jobcolor(pbar::ProgressBar, job::ProgressJob)
     β = max(sin(π * job.i / job.N) * 0.7, 0.4)
 
     c1, c2, c3 = pbar.colors
-    r = string(int((0.8 - α) * c1.r + β * c2.r + α * c3.r))
-    g = string(int((0.8 - α) * c1.g + β * c2.g + α * c3.g))
-    b = string(int((0.8 - α) * c1.b + β * c2.b + α * c3.b))
+    r = string(rint((0.8 - α) * c1.r + β * c2.r + α * c3.r))
+    g = string(rint((0.8 - α) * c1.g + β * c2.g + α * c3.g))
+    b = string(rint((0.8 - α) * c1.b + β * c2.b + α * c3.b))
     return "(" * r * ", " * g * ", " * b * ")"
 end
 
@@ -642,9 +641,9 @@ function jobcolor(job::ProgressJob)
     β = max(sin(π * job.i / job.N) * 0.7, 0.4)
 
     c1, c2, c3 = PbarCol1, PbarCol2, PbarCol3
-    r = string(int((0.8 - α) * c1.r + β * c2.r + α * c3.r))
-    g = string(int((0.8 - α) * c1.g + β * c2.g + α * c3.g))
-    b = string(int((0.8 - α) * c1.b + β * c2.b + α * c3.b))
+    r = string(rint((0.8 - α) * c1.r + β * c2.r + α * c3.r))
+    g = string(rint((0.8 - α) * c1.g + β * c2.g + α * c3.g))
+    b = string(rint((0.8 - α) * c1.b + β * c2.b + α * c3.b))
     return "(" * r * ", " * g * ", " * b * ")"
 end
 

@@ -6,7 +6,7 @@ import Term:
     COLORS_16b,
     remove_brackets,
     ANSICode,
-    int,
+    rint,
     CODES,
     CODES_16BIT_COLORS
 
@@ -44,7 +44,7 @@ function RGBColor(s)
         g *= 255
         b *= 255
     end
-    return RGBColor(int(r), int(g), int(b))
+    return RGBColor(rint(r), rint(g), rint(b))
 end
 
 """
@@ -136,12 +136,12 @@ function get_color(string; bg = false)::AbstractColor
     bg && (string = nospaces(string)[4:end])
 
     if is_named_color(string)
-        if string ∈ COLORS_16b
+        return if string ∈ COLORS_16b
             idx = findfirst((c) -> c == string, COLORS_16b)[1]
-            return BitColor(COLORS_16b[idx])
+            BitColor(COLORS_16b[idx])
         else
             idx = findfirst((c) -> c == string, NAMED_COLORS)[1]
-            return NamedColor(NAMED_COLORS[idx])
+            NamedColor(NAMED_COLORS[idx])
         end
     elseif is_rgb_color(string)
         return RGBColor(string)

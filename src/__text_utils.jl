@@ -92,14 +92,9 @@ The number of '¦' matches the length of the ANSI tags.
 Used when we want to hide ANSI tags but keep the string length intact.
 """
 function replace_ansi(input_text)
-    while occursin(rx, input_text)
-        mtch = match(ANSI_REGEXE, input_text)
-        input_text = replace_text(
-            input_text,
-            mtch.offset - 1,
-            mtch.offset + length(mtch.match) - 1,
-            '¦',
-        )
+    while occursin(rx, input_text) && (m = match(ANSI_REGEXE, input_text)) !== nothing
+        input_text =
+            replace_text(input_text, m.offset - 1, m.offset + length(m.match) - 1, '¦')
     end
     return input_text
 end

@@ -4,6 +4,8 @@ using Term
 using Test
 import Term: console_width
 
+Term.DEBUG_ON[] = true
+
 const RNG = StableRNG(1337)
 
 include("__test_utils.jl")
@@ -13,97 +15,36 @@ const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
 dotest = console_width() ≥ 88
 
-# ? 1  - text utils
-tprint("{bold green}Running: '01_test_text_utils.jl' {/bold green}")
-@time @timeit_include("01_test_text_utils.jl")
+macro runner(fn)
+    quote
+        tprintln($("\n{bold green}Running: '$fn' {/bold green}"))
+        @time @timeit_include($fn)
+    end |> esc
+end
 
-# ? 2 ansi
-tprint("\n\n{bold green}Running: '02_test_ansi.jl' {/bold green}")  # ansi & col' {/bold green}")
-@time @timeit_include("02_test_ansi.jl")
-
-# ? 3 measure
-tprint("\n\n{bold green}Running: '03_test_measure.jl' {/bold green}")
-@time @timeit_include("03_test_measure.jl")
-
-# ? 4 style
-tprint("\n\n{bold green}Running: '04_test_style.jl' {/bold green}")
-@time @timeit_include("04_test_style.jl")
-
-# ? 5 macros
-tprint("\n\n{bold green}Running: '05_test_macros.jl' {/bold green}")
-@time @timeit_include("05_test_macros.jl")
-
-# ? 6a box
-tprint("\n\n{bold green}Running: '6a_test_box.jl' {/bold green}")
-@time @timeit_include("6a_test_box.jl")
-
-# ? 6 renderables
-tprint("\n\n{bold green}Running: '06_test_renderables.jl' {/bold green}")
-@time @timeit_include("06_test_renderables.jl")
-
-# ? 7 panel
-tprint("\n\n{bold green}Running: '07_test_panel.jl' {/bold green}")
-@time @timeit_include("07_test_panel.jl")
-
-# ? 8 layout
-tprint("\n\n{bold green}Running: '08_test_layout.jl' {/bold green}")
-@time @timeit_include("08_test_layout.jl")
-
-#  ? 9 inspect
-tprint("\n\n{bold green}Running: '09_test_inspect.jl' {/bold green}")
-@time @timeit_include("09_test_inspect.jl")
-
-# ? 11 console
-tprint("\n\n{bold green}Running: '11_test_console.jl' {/bold green}")
-@time @timeit_include("11_test_console.jl")
-
-# ? 12 logging
-tprint("\n\n{bold green}Running: '12_test_logging.jl' {/bold green}")
-@time @timeit_include("12_test_logging.jl")
-
-# ? 14 highlight
-tprint("\n\n{bold green}Running: '14_test_highlight.jl' {/bold green}")
-@time @timeit_include("14_test_highlight.jl")
-
-# ? 15 progress
-tprint("\n\n{bold green}Running: '15_test_progress.jl' {/bold green}")
-@time @timeit_include("15_test_progress.jl")
-
-# ? 16 Tree
-tprint("\n\n{bold green}Running: '16_test_tree.jl' {/bold green}")
-@time @timeit_include("16_test_tree.jl")
-
-# ? 17 Dendogram
-tprint("\n\n{bold green}Running: '17_test_dendogram.jl' {/bold green}")
-@time @timeit_include("17_test_dendogram.jl")
-
-# ? 18 Table
-tprint("\n\n{bold green}Running: '18_test_table.jl' {/bold green}")
-@time @timeit_include("18_test_table.jl")
-
-# ? 19 Repr
-tprint("\n\n{bold green}Running: '19_test_repr.jl' {/bold green}")
-@time @timeit_include("19_test_repr.jl")
-
-# ? 20 Compositor
-tprint("\n\n{bold green}Running: '20_test_compositor.jl' {/bold green}")
-@time @timeit_include("20_test_compositor.jl")
-
-# ? 21 Markdown
-tprint("\n\n{bold green}Running: '21_test_markdown.jl' {/bold green}")
-@time @timeit_include("21_test_markdown.jl")
-
-# ? 22 Theme
-tprint("\n\n{bold green}Running: '22_test_theme.jl' {/bold green}")
-@time @timeit_include("22_test_theme.jl")
-
-# ? 999 EXAMPLES
-tprint("\n\n{bold green}Running: '999_test_examples.jl' {/bold green}")
-@time @timeit_include("999_test_examples.jl")
-
-# ? 99 ERRORS
-tprint("\n\n{bold green}Running: '99_test_errors.jl' {/bold green}")
-@time @timeit_include("99_test_errors.jl")
+@runner "01_test_text_utils.jl"
+@runner "02_test_ansi.jl"
+@runner "03_test_measure.jl"
+@runner "04_test_style.jl"
+@runner "05_test_macros.jl"
+@runner "06_test_box.jl"
+@runner "07_test_renderables.jl"
+@runner "08_test_panel.jl"
+@runner "09_test_layout.jl"
+@runner "10_test_inspect.jl"
+@runner "11_test_theme.jl"
+@runner "12_test_console.jl"
+@runner "13_test_logs.jl"
+@runner "14_test_highlight.jl"
+@runner "15_test_progress.jl"
+@runner "16_test_tree.jl"
+@runner "17_test_dendogram.jl"
+@runner "18_test_table.jl"
+@runner "19_test_repr.jl"
+@runner "20_test_compositor.jl"
+@runner "21_test_markdown.jl"
+@runner "999_test_examples.jl"
+@runner "99_test_errors.jl"
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
-println("\n")
+println('\n')

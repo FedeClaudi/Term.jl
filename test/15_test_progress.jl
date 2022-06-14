@@ -1,5 +1,5 @@
 using Term.Progress
-import Term.Progress: AbstractColumn, getjob, get_columns
+import Term.Progress: AbstractColumn, getjob, get_columns, jobcolor
 import Term: install_term_logger, uninstall_term_logger
 
 using ProgressLogging
@@ -7,7 +7,13 @@ using ProgressLogging
 @testset "\e[34mProgress - jobs" begin
     pbar = ProgressBar()
 
+    io = PipeBuffer()
+    show(io, MIME("text/plain"), pbar)  # coverage
+    @test startswith(read(io, String), "Progress bar")
+
     j1 = addjob!(pbar; description = "test", N = 10)
+    @test render(j1) isa String  # coverage
+    @test jobcolor(j1) == "(190, 35, 112)"
 
     @test j1.id == 1
     @test j1.N == 10
@@ -86,7 +92,6 @@ end
 end
 
 # @testset "\e[34mProgress ProgressLogging" begin
-
 #     install_term_logger()
 
 #     @test_nothrow begin

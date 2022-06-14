@@ -11,8 +11,8 @@ import Term:
     escape_brackets,
     fillin,
     highlight,
-    int,
-    term_theme,
+    rint,
+    TERM_THEME,
     textlen,
     truncate,
     expr2string
@@ -69,12 +69,12 @@ Style an object to render it as a a string
 """
 function asleaf end
 
-asleaf(x) = truncate(highlight(string(x)), term_theme[].tree_max_width)
+asleaf(x) = truncate(highlight(string(x)), TERM_THEME[].tree_max_width)
 asleaf(x::Nothing) = nothing
 function asleaf(x::AbstractVector)
-    return truncate((escape_brackets ∘ string)(x), term_theme[].tree_max_width)
+    return truncate((escape_brackets ∘ string)(x), TERM_THEME[].tree_max_width)
 end
-asleaf(x::AbstractString) = truncate(highlight(x, :string), term_theme[].tree_max_width)
+asleaf(x::AbstractString) = truncate(highlight(x, :string), TERM_THEME[].tree_max_width)
 
 """
     Leaf
@@ -102,10 +102,10 @@ It renders as a hierarchical structure with lines (guides) connecting the variou
     nodes::Vector{Tree}
     leaves::Vector{Leaf}
 
-    title_style::String = term_theme[].tree_title_style
-    node_style::String = term_theme[].tree_node_style
-    leaf_style::String = term_theme[].tree_leaf_style
-    guides_style::String = term_theme[].tree_guide_style
+    title_style::String = TERM_THEME[].tree_title_style
+    node_style::String = TERM_THEME[].tree_node_style
+    leaf_style::String = TERM_THEME[].tree_leaf_style
+    guides_style::String = TERM_THEME[].tree_guide_style
     guides_type::Symbol = :standardtree
 end
 
@@ -131,7 +131,7 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Abstra
         Tree(
             v;
             level = level + 1,
-            title = truncate(string(k), term_theme[].tree_max_width),
+            title = truncate(string(k), TERM_THEME[].tree_max_width),
         ),
     )
 end
@@ -140,13 +140,13 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Pair)
     k = if isnothing(v.first)
         nothing
     else
-        truncate(string(v.first), term_theme[].tree_max_width)
+        truncate(string(v.first), TERM_THEME[].tree_max_width)
     end
     return push!(leaves, Leaf(k, asleaf(v.second)))
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Any)
-    k = isnothing(k) ? nothing : truncate(string(k), term_theme[].tree_max_width)
+    k = isnothing(k) ? nothing : truncate(string(k), TERM_THEME[].tree_max_width)
     return push!(leaves, Leaf(k, asleaf(v)))
 end
 
@@ -198,7 +198,7 @@ function Tree(
         return Tree(;
             segments = segments,
             measure = measure,
-            name = truncate(title, term_theme[].tree_max_width),
+            name = truncate(title, TERM_THEME[].tree_max_width),
             level = level,
             nodes = nodes,
             leaves = leaves,
@@ -306,7 +306,7 @@ function render(
         header_length = length(header.segments)
         padded_segments = vcat(
             header.segments...,
-            pad(segments[(header_length + 1):end], int(header.measure.w / 2 - 1))...,
+            pad(segments[(header_length + 1):end], rint(header.measure.w / 2 - 1))...,
         )
         return fillin(padded_segments)
     else

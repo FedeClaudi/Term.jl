@@ -11,7 +11,8 @@ import Term:
     unescape_brackets,
     split_lines,
     do_by_line,
-    expr2string
+    expr2string,
+    DEFAULT_WT
 
 import ..Panels: Panel
 import ..Dendograms: Dendogram
@@ -25,20 +26,19 @@ export inspect, typestree, expressiontree
 #                                TYPES HIERARCHY                               #
 # ---------------------------------------------------------------------------- #
 
-function typestree(io::IO, T::DataType)
-    return print(
-        io,
-        Panel(
-            Tree(T);
-            title = "Types hierarchy",
-            style = "blue dim",
-            title_style = orange * " default",
-            title_justify = :right,
-            fit = true,
-            padding = (1, 4, 1, 1),
-        ),
-    )
-end
+typestree(io::IO, T::DataType) = print(
+    io,
+    Panel(
+        Tree(T);
+        title = "Types hierarchy",
+        style = "blue dim",
+        title_style = orange * " default",
+        title_justify = :right,
+        fit = true,
+        padding = (1, 4, 1, 1),
+    ),
+)
+
 typestree(T::DataType) = typestree(stdout, T)
 
 function expressiontree(io::IO, e::Expr)
@@ -53,8 +53,8 @@ function expressiontree(io::IO, e::Expr)
             title_style = "$light_green default bold",
             title_justify = :center,
             style = grey_dark,
-            fit = tree.measure.w > 88,
-            width = max(tree.measure.w, 88),
+            fit = tree.measure.w > DEFAULT_WT[],
+            width = max(tree.measure.w, DEFAULT_WT[]),
             subtitle = "inspect",
             subtitle_justify = :right,
             justify = :center,
