@@ -8,7 +8,7 @@ import Term:
     do_by_line,
     unescape_brackets,
     split_lines,
-    term_theme
+    TERM_THEME
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
@@ -34,8 +34,8 @@ function termshow(io::IO, obj)
             subtitle_justify = :right,
             width = 40,
             justify = :center,
-            style = term_theme[].repr_panel_style,
-            subtitle_style = term_theme[].repr_name_style,
+            style = TERM_THEME[].repr_panel_style,
+            subtitle_style = TERM_THEME[].repr_name_style,
         ),
     )
 end
@@ -58,8 +58,8 @@ function termshow(io::IO, e::Expr)
             subtitle_justify = :right,
             width = 40,
             justify = :center,
-            style = term_theme[].repr_panel_style,
-            subtitle_style = term_theme[].repr_name_style,
+            style = TERM_THEME[].repr_panel_style,
+            subtitle_style = TERM_THEME[].repr_name_style,
         ),
     )
 end
@@ -69,36 +69,33 @@ end
 # ---------------------------------------------------------------------------- #
 function termshow(io::IO, obj::AbstractDict)
     short_string(x) = truncate(string(x), 30)
+    theme = TERM_THEME[]
     # prepare text renderables
-    k =
-        RenderableText.(
-            short_string.(keys(obj));
-            style = term_theme[].repr_accent_style * " bold",
-        )
+    k = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent_style * " bold")
     ktypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
-            style = term_theme[].repr_type_style * " dim",
+            style = theme.repr_type_style * " dim",
         )
     vals =
         RenderableText.(
             short_string.(values(obj));
-            style = term_theme[].repr_values_style * " bold",
+            style = theme.repr_values_style * " bold",
         )
     vtypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(values(obj)));
-            style = term_theme[].repr_type_style * " dim",
+            style = theme.repr_type_style * " dim",
         )
 
     # trim if too many
     arrows = if length(k) > 10
         k, ktypes, vals, vtypes = k[1:10], ktypes[1:10], vals[1:10], vtypes[1:10]
 
-        push!(k, RenderableText("⋮"; style = term_theme[].repr_accent_style))
-        push!(ktypes, RenderableText("⋮"; style = term_theme[].repr_type_style * " dim"))
-        push!(vals, RenderableText("⋮"; style = term_theme[].repr_values_style))
-        push!(vtypes, RenderableText("⋮"; style = term_theme[].repr_type_style * " dim"))
+        push!(k, RenderableText("⋮"; style = theme.repr_accent_style))
+        push!(ktypes, RenderableText("⋮"; style = theme.repr_type_style * " dim"))
+        push!(vals, RenderableText("⋮"; style = theme.repr_values_style))
+        push!(vtypes, RenderableText("⋮"; style = theme.repr_type_style * " dim"))
 
         vstack(RenderableText.(repeat(["=>"], length(k) - 1); style = "red bold")...)
     else
@@ -121,8 +118,8 @@ function termshow(io::IO, obj::AbstractDict)
             title_justify = :left,
             width = 40,
             justify = :center,
-            style = term_theme[].repr_panel_style,
-            title_style = term_theme[].repr_name_style,
+            style = theme.repr_panel_style,
+            title_style = theme.repr_name_style,
             padding = (2, 2, 1, 1),
             subtitle = "{bold white}$(length(keys(obj))){/bold white}{default} items{/default}",
             subtitle_justify = :right,
@@ -197,15 +194,16 @@ function termshow(io::IO, arr::AbstractArray)
 end
 
 function termshow(io::IO, obj::DataType)
-    ts = term_theme[].repr_type_style
-    field_names = apply_style.(string.(fieldnames(obj)), term_theme[].repr_accent_style)
+    theme = TERM_THEME[]
+    ts = theme.repr_type_style
+    field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent_style)
     field_types = apply_style.(map(f -> "::" * string(f), obj.types), ts)
 
-    line = vLine(length(field_names); style = term_theme[].repr_name_style)
+    line = vLine(length(field_names); style = theme.repr_name_style)
     space = Spacer(1, length(field_names))
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
 
-    type_name = apply_style(string(obj), term_theme[].repr_name_style * " bold")
+    type_name = apply_style(string(obj), theme.repr_name_style * " bold")
     sup = supertypes(obj)[2]
     type_name *= " {bright_blue dim}<: $sup{/bright_blue dim}"
     content =

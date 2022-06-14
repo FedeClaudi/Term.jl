@@ -1,6 +1,6 @@
 module Dendograms
 
-import Term: fint, int, cint, truncate, loop_firstlast, highlight, textlen
+import Term: fint, rint, cint, truncate, loop_firstlast, highlight, textlen
 
 import ..Renderables: AbstractRenderable
 import ..Boxes: get_rrow, get_lrow, get_row, SQUARE
@@ -137,7 +137,7 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
         )
     end
 
-    return Dendogram(segments, Measure(segments), int(width / 2))
+    return Dendogram(segments, Measure(segments), rint(width / 2))
 end
 
 Dendogram(head, args...; kwargs...) = Dendogram(head, collect(args); kwargs...)
@@ -292,8 +292,8 @@ If the mid character is also the location of a branch (one of the entries in `wi
 then use the appropriate double branching character.
 """
 function replace_line_midpoint(line::String; widths = nothing)
-    w1 = prevind(line, int(ncodeunits(line) / 2) - 1)
-    w2 = nextind(line, int(ncodeunits(line) / 2) + 1)
+    w1 = prevind(line, rint(ncodeunits(line) / 2) - 1)
+    w2 = nextind(line, rint(ncodeunits(line) / 2) + 1)
 
     char = SQUARE.bottom.vertical
     isnothing(widths) || (textwidth(line[1:w1]) in widths && (char = SQUARE.row.vertical))

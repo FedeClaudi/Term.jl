@@ -3,7 +3,7 @@ module Layout
 import Parameters: @with_kw
 
 import Term:
-    int,
+    rint,
     get_lr_widths,
     textlen,
     cint,
@@ -11,12 +11,13 @@ import Term:
     rtrim_str,
     ltrim_str,
     calc_nrows_ncols,
-    do_by_line
+    do_by_line,
+    DEFAULT_AR
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
+import ..Measures: Measure, height, width, default_size
 import ..Consoles: console_width, console_height
 import ..Boxes: get_lrow, get_rrow
 import ..Style: apply_style
-import ..Measures: Measure, height, width
 import ..Segments: Segment
 using ..Boxes
 
@@ -62,9 +63,7 @@ julia> pad("ciao", 10, :right)
 ```
 """
 function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothing)::String
-    if occursin('\n', text)
-        return do_by_line(ln -> pad(ln, target_width, method), text)
-    end
+    occursin('\n', text) && return do_by_line(ln -> pad(ln, target_width, method), text)
 
     # get total padding size
     lw = width(text)
@@ -72,15 +71,15 @@ function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothi
 
     npads = target_width - lw
     if method == :left
-        p = isnothing(bg) ? " "^npads : "{$bg}" * " "^npads * "{/$bg}"
+        p = isnothing(bg) ? ' '^npads : "{$bg}" * ' '^npads * "{/$bg}"
         return text * p
     elseif method == :right
-        p = isnothing(bg) ? " "^npads : "{$bg}" * " "^npads * "{/$bg}"
+        p = isnothing(bg) ? ' '^npads : "{$bg}" * ' '^npads * "{/$bg}"
         return p * text
     else
         nl, nr = get_lr_widths(npads)
-        l = isnothing(bg) ? " "^nl : "{$bg}" * " "^nl * "{/$bg}"
-        r = isnothing(bg) ? " "^nr : "{$bg}" * " "^nr * "{/$bg}"
+        l = isnothing(bg) ? ' '^nl : "{$bg}" * ' '^nl * "{/$bg}"
+        r = isnothing(bg) ? ' '^nr : "{$bg}" * ' '^nr * "{/$bg}"
         return l * text * r
     end
 end
@@ -92,12 +91,12 @@ end
 Pad a string by a fixed ammount to the left and to the right.
 """
 function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing)
-    if isnothing(bg)
-        return " "^max(0, left) * text * " "^max(0, right)
+    return if isnothing(bg)
+        ' '^max(0, left) * text * ' '^max(0, right)
     else
-        l = "{$bg}" * " "^max(0, left) * "{/$bg}"
-        r = "{$bg}" * " "^max(0, right) * "{/$bg}"
-        return l * text * r
+        l = "{$bg}" * ' '^max(0, left) * "{/$bg}"
+        r = "{$bg}" * ' '^max(0, right) * "{/$bg}"
+        l * text * r
     end
 end
 """
@@ -106,9 +105,8 @@ end
 
 Pad a renderable's segments to the left and the right.
 """
-function pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0)
-    return map((s) -> Segment(pad(s.text, left, right)), segments)
-end
+pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0) =
+    map((s) -> Segment(pad(s.text, left, right)), segments)
 
 """
 ---
@@ -179,15 +177,15 @@ function vertical_pad(text::AbstractString, target_height::Int, method::Symbol):
     h = height(text)
     h ≥ target_height && return text
 
-    space = " "^(width(text))
+    space = ' '^(width(text))
     npads = target_height - h
-    if method == :bottom
-        return vertical_pad(text, npads, 0)
+    return if method == :bottom
+        vertical_pad(text, npads, 0)
     elseif method == :top
-        return vertical_pad(text, 0, npads)
+        vertical_pad(text, 0, npads)
     else
         above, below = get_lr_widths(npads)
-        return vertical_pad(text, above, below)
+        vertical_pad(text, above, below)
     end
 end
 
@@ -197,7 +195,7 @@ end
 Vertical pad a string by a fixed ammount to above and below.
 """
 function vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
-    space = " "^(width(text))
+    space = ' '^(width(text))
     return string(vstack(repeat([space], above)..., text, repeat([space], below)...))
 end
 
@@ -207,7 +205,7 @@ end
 Pad a renderable's segments to the above and the below.
 """
 function vertical_pad(segments::AbstractVector{Segment}, above::Int = 0, below::Int = 0)
-    space = " "^(segments[1].measure.w)
+    space = ' '^(segments[1].measure.w)
     above::Vector{Segment} = repeat([Segment(space)], above)
     below::Vector{Segment} = repeat([Segment(space)], below)
     return [above..., segments..., below...]
@@ -476,16 +474,16 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     # make sure both renderables have the same number of segments
     if h1 > h2
         s1 = r1.segments
-        s2 = vcat(r2.segments, [Segment(" "^(r2.measure.w)) for i in 1:(Δh)])
+        s2 = vcat(r2.segments, [Segment(' '^(r2.measure.w)) for i in 1:(Δh)])
     elseif h1 < h2
-        s1 = vcat(r1.segments, [Segment(" "^(r1.measure.w)) for i in 1:(Δh)])
+        s1 = vcat(r1.segments, [Segment(' '^(r1.measure.w)) for i in 1:(Δh)])
         s2 = r2.segments
     else
         s1, s2, = r1.segments, r2.segments
     end
 
     # combine segments
-    segments = [Segment(s1.text * " "^pad * s2.text) for (s1, s2) in zip(s1, s2)]
+    segments = [Segment(s1.text * ' '^pad * s2.text) for (s1, s2) in zip(s1, s2)]
 
     return Renderable(segments, Measure(segments))
 end
@@ -579,9 +577,8 @@ function Spacer(width::Int, height::Int; char::Char = ' ')
     return Spacer(segments, Measure(seg.measure.w, height))
 end
 
-function Spacer(width::Number, height::Number; char::Char = ' ')
-    return Spacer(int(width), int(height); char = char)
-end
+Spacer(width::Number, height::Number; char::Char = ' ') =
+    Spacer(rint(width), rint(height); char = char)
 
 # ----------------------------------- vline ---------------------------------- #
 """
@@ -744,7 +741,7 @@ function place_holder_line(w, i)
         end
 
     else
-        line = i == 0 ? "╲" : " "
+        line = i == 0 ? '╲' : ' '
     end
     return line
 end
@@ -804,17 +801,17 @@ PlaceHolder(ren::AbstractRenderable) = PlaceHolder(ren.measure.w, ren.measure.h)
     grid(
         rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
         placeholder::Union{Nothing,AbstractRenderable} = nothing,
-        aspect::Union{Number,NTuple} = (16, 9),
+        aspect::Union{Nothing,Number,NTuple} = nothing,
         layout::Union{Nothing,Tuple} = nothing, 
         pad::Union{Tuple,Integer} = 0,
     )
 
-Construct a square grid from a `AbsractVector` of `AbstractRenderable`.
+Construct a grid from a `AbstractVector` of `AbstractRenderable`s.
 """
 function grid(
     rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
-    aspect::Union{Number,NTuple} = (16, 9),
+    aspect::Union{Nothing,Number,NTuple} = nothing,
     layout::Union{Nothing,Tuple} = nothing,
     pad::Union{Tuple,Integer} = 0,
 )
@@ -822,7 +819,7 @@ function grid(
     if isnothing(rens)
         isnothing(layout) &&
             throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s"))
-        rens = fill(PlaceHolder(aspect...), prod(layout))
+        rens = fill(PlaceHolder(default_size()...), prod(layout))
     else
         if isnothing(nrows)
             nrows, r = divrem(length(rens), ncols)
@@ -840,7 +837,7 @@ end
 """
     grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Nothing,Integer} = 0))
 
-Construct a grid from a `AbstractMatrix` of `AbstractRenderable`.
+Construct a grid from a `AbstractMatrix` of `AbstractRenderable`s.
 """
 function grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Tuple,Integer} = 0)
     hpad, vpad = if pad isa Integer

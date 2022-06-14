@@ -1,4 +1,6 @@
 import Term.Renderables: Renderable
+import Term.Measures: default_size
+
 using Term.Layout
 
 import Term:
@@ -193,8 +195,7 @@ end
     r = r1 / r2
     @test size(r.measure) == (50, 6)
 
-    h1 = hLine(22)
-    h2 = hLine(33)
+    h1, h2 = hLine(22), hLine(33)
     @test size(Measure(h1 / h2)) == (33, 2)
 
     r1 = RenderableText("."^100; width = 25)
@@ -204,14 +205,13 @@ end
     @test size(r.measure) == (75, 4)
 
     # stack other renderables
-    h1 = vLine(22)
-    h2 = vLine(33)
+    h1, h2 = vLine(22), vLine(33)
     @test size(Measure(h1 * h2)) == (2, 33)
 end
 
 @testset "\e[34mlayout - panels" begin
     p1 = Panel()
-    p2 = Panel(; width = 24, height = 3)
+    p2 = Panel(width = 24, height = 3)
     p3 = Panel("this {red}panel{/red}"^5; width = 30, fit = false)
 
     testlayout(p1 * p2, 112, 3)
@@ -240,52 +240,51 @@ end
     @test string(PlaceHolder(25, 12)) ==
           "\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m"
 
-    p = Panel(; width = 8, height = 4)
-    ph = PlaceHolder(p)
-    @test size(ph.measure) == size(p.measure)
+    p = Panel(width = 8, height = 4)
+    @test size(PlaceHolder(p).measure) == size(p.measure)
 end
 
 @testset "Layout - h/vstack with pad" begin
     p1, p2, p3 = PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6)
 
-    @test string(
-        hstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad = 10),
-    ) ==
+    @test string(hstack(p1, p2, p3; pad = 10)) ==
           "\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m          \e[2m ╲ ╲ \e[22m          \e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m          \e[2m ╲ ╲ \e[22m          \e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n                              \e[2m ╲ \e[22m"
-    @test string(
-        hstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad = 0),
-    ) ==
+    @test string(hstack(p1, p2, p3; pad = 0)) ==
           "\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\e[2m ╲ ╲ \e[22m\e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\e[2m ╲ ╲ \e[22m\e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲ ╲\e[22m\e[2m╲ ╲\e[22m\n          \e[2m ╲ \e[22m"
 
-    @test string(
-        vstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad = 0),
-    ) ==
+    @test string(vstack(p1, p2, p3; pad = 0)) ==
           "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
-    @test string(
-        vstack(PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6); pad = 3),
-    ) ==
+    @test string(vstack(p1, p2, p3; pad = 3)) ==
           "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
 end
 
 @testset "Layout - GRID" begin
-    @test size(grid(layout = (3, 3), pad = (0, 0)).measure) == (48, 27)
+    w, h = default_size()
+    n = 3
 
-    @test size(grid(layout = (3, 3)).measure) == (48, 27)
+    @test size(grid(layout = (n, n), pad = (0, 0)).measure) == (w * n, h * n)
 
-    @test size(grid(layout = (3, 3), pad = 2).measure) == (52, 31)
+    @test size(grid(layout = (n, n)).measure) == (w * n, h * n)
 
-    @test size(grid(layout = (3, 3), pad = (5, 1)).measure) == (58, 29)
+    @test size(grid(layout = (n, n), pad = 2).measure) ==
+          (w * n + 2 * (n - 1), h * n + 2 * (n - 1))
 
-    @test size(grid(layout = (3, 3), pad = (5, 3)).measure) == (58, 33)
+    @test size(grid(layout = (n, n), pad = (5, 1)).measure) ==
+          (w * n + 5 * (n - 1), h * n + 1 * (n - 1))
+
+    @test size(grid(layout = (n, n), pad = (5, 3)).measure) ==
+          (w * n + 5 * (n - 1), h * n + 3 * (n - 1))
 
     # test passing renderables
-    rens = repeat([PlaceHolder(10, 5)], 9)
 
-    @test size(grid(rens; aspect = 1).measure) == (30, 15)
+    w, h = 10, 5
+    rens = repeat([PlaceHolder(w, h)], 9)
 
-    @test size(grid(rens).measure) == (50, 10)
+    @test size(grid(rens; aspect = 1).measure) == (3w, 3h)
 
-    @test size(grid(rens; pad = (2, 1)).measure) == (58, 11)
+    @test size(grid(rens).measure) == (3w, 3h)
+
+    @test size(grid(rens; pad = (2, 1)).measure) == (3w + 2 * 2, 3h + 2 * 1)
 
     @test size(grid(rens; pad = (2, 1), aspect = 0.5).measure) == (22, 29)
 
@@ -318,10 +317,8 @@ end
         g = grid(panels[1:i])
         nc, nr = if i ≤ 3
             (i, 1)
-        elseif i ≤ 5
-            (3, 2)
         else
-            (4, 2)
+            (ceil(Int, i / 2), 2)
         end
         @test size(g.measure) == (w * nc, h * nr)
     end
@@ -335,4 +332,11 @@ end
 
     # vector, explicit
     grid(panels; layout = (2, 4))
+
+    # best fit
+    panels = [Panel(width = w, height = h) for _ in 1:9]
+
+    @test size(grid(panels[1:4]).measure) == (w * 2, h * 2)  # 4 best fits onto a (2, 2) grid with unit ar
+    @test size(grid(panels[1:6]).measure) == (w * 3, h * 2)  # 6 best fits onto a (3, 2) grid with 4:3 ar
+    @test size(grid(panels[1:9]).measure) == (w * 3, h * 3)  # 9 best fits onto a (3, 3) grid with unit ar
 end

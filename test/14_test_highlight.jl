@@ -1,4 +1,4 @@
-import Term: load_code_and_highlight, highlight_syntax, highlight, theme
+import Term: load_code_and_highlight, highlight_syntax, highlight
 
 @testset "\e[34mHIGHLIGHT" begin
     @test highlight("test 1 123 33.4 44,5 +1 -2 12 0.5, ,, ...") ==
@@ -36,5 +36,4 @@ import Term: load_code_and_highlight, highlight_syntax, highlight, theme
 
     @test load_code_and_highlight("02_test_ansi.jl", 7)[1:100] ==
           "{red bold}❯{/red bold} {white}7{/white}     get_color,\n  {grey39}8{/grey39}     NamedColor,\n  {gre"
-    # end
 end

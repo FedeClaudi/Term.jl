@@ -102,7 +102,7 @@ end
 
 function update!(col::PercentageColumn, args...)::String
     isnothing(col.job.N) && return ""
-    frac = int(col.job.i / col.job.N * 100)
+    frac = rint(col.job.i / col.job.N * 100)
     p = string(frac)
     return "\e[2m" * (frac == 100 ? p : lpad(p, 3)) * "%\e[0m"
 end
@@ -220,7 +220,7 @@ function setwidth!(col::ProgressColumn, width::Int)
 end
 
 function update!(col::ProgressColumn, color::String, args...)::String
-    completed = int(col.nsegs * col.job.i / col.job.N)
+    completed = rint(col.nsegs * col.job.i / col.job.N)
     remaining = col.nsegs - completed
     return apply_style(
         "{" *

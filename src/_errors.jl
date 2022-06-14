@@ -1,5 +1,6 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
+import Term: DEFAULT_WT
 
 function render_frame_info(frame::StackFrame; show_source = true)
     func = sprint(StackTraces.show_spec_linfo, frame)
@@ -39,7 +40,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
     if length(string(frame.file)) > 0
         file_line = RenderableText(
             "    {dim}$(file):{bold white}$(frame.line){/bold white}{/dim}";
-            width = 88,
+            width = DEFAULT_WT[],
         )
         out = func_line / file_line
         if show_source
@@ -69,7 +70,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
         end
         return out
     else
-        return RenderableText("   " * func; width = 88)
+        return RenderableText("   " * func; width = DEFAULT_WT[])
     end
 end
 

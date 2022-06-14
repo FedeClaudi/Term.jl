@@ -6,7 +6,7 @@ import MyterialColors:
     yellow_light, indigo_light, blue, light_blue, cyan_light, cyan_lighter
 import UnicodeFun: to_latex
 
-import Term: reshape_text, highlight_syntax, do_by_line, fillin, escape_brackets
+import Term: reshape_text, highlight_syntax, do_by_line, fillin, escape_brackets, DEFAULT_WT
 import ..Tables: Table
 import ..Style: apply_style
 import ..Layout: pad, hLine, vLine
@@ -67,8 +67,10 @@ end
 
 parse_md(italic::Markdown.Italic; kwargs...)::String =
     join(map(ln -> "{italic}$(ln){/italic}", italic.text))
+
 parse_md(bold::Markdown.Bold; kwargs...)::String =
     join(map(ln -> "{bold}$(ln){/bold}", bold.text))
+
 parse_md(lb::Markdown.LineBreak; kwargs...)::String = "\n"
 
 function parse_md(
@@ -122,7 +124,7 @@ end
 
 function parse_md(
     qt::Markdown.BlockQuote;
-    width = min(88, console_width() - 30),
+    width = min(DEFAULT_WT[], console_width() - 30),
     kwargs...,
 )::String
     content = parse_md.(qt.content; inline = true)

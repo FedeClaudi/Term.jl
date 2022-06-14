@@ -12,9 +12,9 @@ import Term:
     unescape_brackets,
     reshape_text,
     has_markup,
-    int,
+    rint,
     highlight,
-    term_theme,
+    TERM_THEME,
     truncate,
     ltrim_str
 
@@ -311,7 +311,7 @@ Install `TermLogger` as the global logging system.
 
 `theme::Theme` can be passed to specify the theme to use for styling objects.
 """
-function install_term_logger(theme::Theme = term_theme[])
+function install_term_logger(theme::Theme = TERM_THEME[])
     _logger = TermLogger(theme)
     return global_logger(_logger)
 end

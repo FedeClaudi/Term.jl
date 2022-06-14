@@ -1,5 +1,9 @@
 module Term
 
+const DEBUG_ON = Ref(false)
+const DEFAULT_WT = Ref(88)  # default width
+const DEFAULT_AR = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
+
 # general utils
 include("__text_utils.jl")
 include("_ansi.jl")
@@ -12,8 +16,7 @@ include("colors.jl")
 include("theme.jl")
 include("highlight.jl")
 
-const TERM_DEBUG_ON = Ref(true)
-const term_theme = Ref(Theme())
+const TERM_THEME = Ref(Theme())
 
 function update! end
 
@@ -41,7 +44,7 @@ include("repr.jl")
 include("compositors.jl")
 
 export RenderableText, Panel, TextBox
-export term_theme, highlight
+export TERM_THEME, highlight
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
@@ -50,6 +53,7 @@ export install_term_stacktrace,
 export vLine, hLine
 export @with_repr, termshow
 export Compositor, update!
+export grid
 
 # ----------------------------------- base ----------------------------------- #
 using .Measures
