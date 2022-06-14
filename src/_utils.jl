@@ -56,16 +56,15 @@ end
     calc_nrows_ncols(n, aspect::Union{Nothing,Number,NTuple} = nothing)
 
 Computes the number of rows and columns to fit a given number `n` of subplots in a figure with aspect `aspect`.
-If `aspect` is `nothing`, chooses the best fir between a (16, 9) and a unit aspect ratio.
+If `aspect` is `nothing`, chooses the best fir between a default and a unit aspect ratios.
 
 Adapted from: stackoverflow.com/a/43366784
 """
 function calc_nrows_ncols(n, aspect::Union{Nothing,Number,NTuple} = nothing)
     w, h = if isnothing(aspect)
-        # choose the best fit
         r1, c1 = calc_nrows_ncols(n, DEFAULT_AR[])
-        r2, c2 = calc_nrows_ncols(n, (1, 1))
-        return r1 * c1 < r2 * c2 ? (r1, c1) : (r2, c2)
+        r2, c2 = calc_nrows_ncols(n, 1)  # unit aspect - square
+        return r1 * c1 < r2 * c2 ? (r1, c1) : (r2, c2)  # choose the best fit
     elseif aspect isa Number
         (aspect, one(aspect))
     else
