@@ -54,17 +54,17 @@ else
     )
 end
 
-for (i, t) in objs
-    t = sprint(termshow, t)
-    tofile(string(t), "./txtfiles/termshow_$i.txt")
-end
-
-# @testset "TERMSHOW for types" begin
-#     for (i, t) in objs
-#         t = sprint(termshow, t)
-#         @test fromfile("./txtfiles/termshow_$i.txt") == t
-#     end
+# for (i, t) in objs
+#     t = sprint(termshow, t)
+#     tofile(string(t), "./txtfiles/termshow_$i.txt")
 # end
+
+@testset "TERMSHOW for types" begin
+    for (i, t) in objs
+        t = sprint(termshow, t)
+        @test fromfile("./txtfiles/termshow_$i.txt") == t
+    end
+end
 
 @testset "Term automatic repr" begin
     repr_show(io, x) = show(io, MIME("text/plain"), x)

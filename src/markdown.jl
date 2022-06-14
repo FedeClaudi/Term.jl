@@ -62,7 +62,7 @@ end
 
 function parse_md(paragraph::Markdown.Paragraph; width = console_width(), kwargs...)::String
     out = join(parse_md.(paragraph.content; inline = true))
-    return reshape_text(out, width)
+    return reshape_text(out, width) * "\e[0m"
 end
 
 parse_md(italic::Markdown.Italic; kwargs...)::String =

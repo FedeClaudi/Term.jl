@@ -7,8 +7,6 @@ This is a test function for math syntax
 ```math
 \\alpha^2 - \\sqrt9 \\in [1, 2, 3] \\cup [4, 5, 6]
 ```
-
-whut
 """
 
 m2 = md"""
@@ -101,12 +99,12 @@ This is where you print the content of your foot notes:
 
 """
 
-for (i, m) in enumerate([m1, m2, m3])
-    # tprintln(parse_md(m; width=60))
-    # tprint(m)
-    t = parse_md(m; width = 60)
-    tofile(string(t), "./txtfiles/markdown_$i.txt")
-end
+# for (i, m) in enumerate([m1, m2, m3])
+#     # tprintln(parse_md(m; width=60))
+#     # tprint(m)
+#     t = parse_md(m; width = 60)
+#     tofile(string(t), "./txtfiles/markdown_$i.txt")
+# end
 
 @testset "Test Markdown Strings" begin
     for (i, m) in enumerate([m1, m2, m3])
