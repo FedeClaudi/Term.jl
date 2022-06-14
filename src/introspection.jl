@@ -27,17 +27,17 @@ export inspect, typestree, expressiontree
 # ---------------------------------------------------------------------------- #
 
 typestree(io::IO, T::DataType) = print(
-        io,
-        Panel(
-            Tree(T);
-            title = "Types hierarchy",
-            style = "blue dim",
-            title_style = orange * " default",
-            title_justify = :right,
-            fit = true,
-            padding = (1, 4, 1, 1),
-        ),
-    )
+    io,
+    Panel(
+        Tree(T);
+        title = "Types hierarchy",
+        style = "blue dim",
+        title_style = orange * " default",
+        title_justify = :right,
+        fit = true,
+        padding = (1, 4, 1, 1),
+    ),
+)
 
 typestree(T::DataType) = typestree(stdout, T)
 

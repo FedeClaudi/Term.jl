@@ -8,5 +8,3 @@ import Term: Theme, set_theme
     theme = TERM_THEME[]
     @test set_theme(theme) == theme
 end
-
-# TODO: write more tests

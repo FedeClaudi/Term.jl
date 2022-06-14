@@ -32,7 +32,6 @@ install_term_logger()
 end
 
 @testset "\e[34mLOGS test" begin
-
     pbar = ProgressBar()
     # handle_progress(TermLogger(TERM_THEME[]), pbar)
 
