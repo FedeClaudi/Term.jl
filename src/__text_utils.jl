@@ -314,12 +314,17 @@ do_by_line(fn::Function, text::Vector)::String = join_lines(fn.(text))
 
 Ensure that each line in a multi-line text has the same width.
 """
-function fillin(text)::String
+function fillin(text; bg=nothing)::String
     lines = split_lines(text)
     length(lines) == 1 && return text
 
     w = max(map(textlen, lines)...)
-    return join_lines(map((ln) -> ln * " "^(w - textlen(ln)), lines))
+    padline(ln) = if isnothing(bg)
+        ln * " "^(w - textlen(ln))
+    else
+        ln * "{$bg}" * " "^(w - textlen(ln)) * "{/$bg}"
+    end
+    return join_lines(map(padline, lines))
 end
 
 """

@@ -24,6 +24,7 @@ start!(pbar)
 for i in 1:5
     update!(job)
     sleep(0.01)
+    render(pbar)
 end
 stop!(pbar)
 ```
@@ -45,9 +46,10 @@ what's that? `Term`'s `ProgressBar`s can handle multiple "jobs" simultaneously. 
 ```Julia
 start!(pbar)
 ```
-we update the job at each step of the loop:
+we update the job at each step of the loop and render the updated display:
 ```Julia
     update!(job)
+    render(pbar)
 ```
 and finally we stop the whole thing:
 ```

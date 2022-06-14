@@ -318,3 +318,17 @@ end
     p = Panel("."^24; padding = (4, 4, 2, 2), fit = true)
     testpanel(p, 34, 7)
 end
+
+
+@testset "\e[34mPanel - background" begin
+    p = Panel(
+        apply_style("""
+        asasd
+    asdasadas
+    asdsasdasdsadasdsa
+    ads
+        """, "on_blue"); 
+        background="on_red"
+    )
+    @test string(p) == "\e[22m╭──────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[44m    asasd\e[49m\e[41m         \e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[44masdasadas\e[49m\e[41m         \e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[44masdsasdasdsadasdsa\e[49m\e[41m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[44mads\e[49m\e[41m               \e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[44m    \e[49m\e[41m              \e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────╯\e[22m\e[0m"
+end

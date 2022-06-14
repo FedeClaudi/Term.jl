@@ -6,7 +6,7 @@ import MyterialColors:
     yellow_light, indigo_light, blue, light_blue, cyan_light, cyan_lighter
 import UnicodeFun: to_latex
 
-import Term: reshape_text, highlight_syntax, do_by_line, fillin, escape_brackets, DEFAULT_WT
+import Term: reshape_text, highlight_syntax, fillin, escape_brackets, DEFAULT_WT
 import ..Tables: Table
 import ..Style: apply_style
 import ..Layout: pad, hLine, vLine
@@ -107,7 +107,7 @@ function parse_md(
                "{$yellow_light italic}`{/$yellow_light italic}"
     else
         txt = fillin(reshape_text(syntax, width - 20))
-        txt = do_by_line(ln -> apply_style(ln, "on_#262626"), txt)
+        txt = apply_style(txt, "on_#262626")
         panel = Panel(
             txt;
             style = "white dim on_#262626",

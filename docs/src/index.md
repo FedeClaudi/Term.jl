@@ -16,15 +16,8 @@ These too can be styled, include styled text, and they can be nested and stacked
 structured visual displays in your terminal. 
 
 
-!!! warning "Code under development"
-    While we're happy enough with `Term` to have people start using it, `Term` is a very young package under active development.
-    This means that:
-        - there are likely several bugs that need to be discovered and fixed
-        - as we expand and improve `Term` there's likely going to be frequent breaking changes
-    If you're curious about `Term` and you'd like to start playing around with it, you're more than welcome to join the fun.
-    Infact, you can join on us on [GitHub](https://github.com/FedeClaudi/Term.jl/discussions) and help us make `Term` even better!
-    If, however, you're thinking of using `Term` in production-level code that others will need to rely upon, **we ask you to be 
-    patient for a bit longer as we continue to work on `Term`**.
+!!! warning "Version 1.0"
+    If you're an early adopter of Term, I have some bad news for you (and some good). Version `1.0` introduces some breaking changes. I know, I know. But it's worth it I promise, it also has a ton of new features and improvements. The main thing you need to look out for is the markup syntax. Instead of `[...] content [/...]` now you need to use `{...} content {/...}`. That's right, curly braces instad of square. It's not a huge change!
 
 !!! warning "OS concerns"
     `Term` has been tested extensively so far, but only on Mac. If you're using a Linux or Windows machine you might find some bugs that have eluded us so far. Please get in touch so that we can fix them!

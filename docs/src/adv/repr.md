@@ -1,12 +1,14 @@
-# Consoles type display
+# Term Repr
+Note: by repr here we refer generically to how information about an object is represented in the terminal, not the `repr` function in Julia.
 
+## Type REPR
 You can use `Term.jl` to create a styled type display in your console. 
+
 The easiest way to explain it is by way of example.
 Let's say you define a type, and create an instance of it:
 
-
 ```@example repr
-using Term
+
 
 struct myType
     name::String
@@ -19,92 +21,59 @@ end
 obj = myType("Rocket", 10, 10, 99.9)
 ```
 
-as you can see the default way to represent your object in the console is not very exciting. So what you can do is define a `Base.show` method for your type and use Term to make it fancy! 
-
-
-For this example, we will have it so that showing `obj` in the REPR will create a  [`PanelDocs`](@ref PanelDocs) using `name` as the title and showing the other fields and values inside. 
+as you can see the default way to represent your object in the console is not very exciting. 
+But we can improve that with a simple macro!
 ```@example repr
+using Term.Repr
 
-""" Custom show method """
-function Base.show(io::IO, ::MIME"text/plain", obj::myType)
-    # fields to be shown inside the panel
-    fields = (:height, :width, :mass)
-
-    # get fields and values as `RenderableText` objects
-    info = map(
-        f -> RenderableText(string(f); style="bold"), fields
-    )
-    vals = map(
-        f -> RenderableText(" "*string(getfield(obj, f)); style="bright_blue"), fields
-    )
-
-    # right justify and vertical stack info, left justify and stack values
-    obj_details = rvstack(info...) * vLine(3; style="dim") * lvstack(vals...)
-
-    # print the panel!
-    print(io, 
-        Panel(obj_details; 
-        title=obj.name,
-        style="red dim",
-        title_style="default bright_red bold",
-        fit=true, padding=(2, 2, 1, 1)
-        )
-    )
-end
-
-obj
-```
-
-
-## @with_repr
-
-Maybe you don't want to go through all that for each type you define...
-Fear not! Term has a macro for you:
-
-```@example
-using Term
-
-@with_repr struct Rocket
-    width::Int
+@with_repr struct myFancyType
+    name::String
     height::Int
+    width::Int
     mass::Float64
-    
-    manufacturer::String
 end
 
-obj = Rocket(10, 50, 5000, "NASA")
+
+obj = myFancyType("Rocket", 10, 10, 99.9)
 ```
 
+now every time we display an instance of `myFancyType` in the console, we get a nice representation (note that that's not true for `print(obj)`!).
 
-## `termshow`
-The examples above work when you're the one creating a new type, but how about when you're dealing with types defined in someone else's code?
-
-For that you can use `termshow`: `termshow(x)` prints a `string` or `Panel` with the same kind of visualization you'd get from `@with_repr` - but for any type!
-```@example
-using Term
-termshow(:(x+y))
-```
-
-In fact, you can do more, overwrite the default `show` method (at your own risk!) like so:
+## Termshow
+Very nice, but what if I don't have access to where the types are created (perhaps they are in another package) but still want to have the nice display? One way is to use `termshow`:
 ```@example repr
-using Term
-Base.show(io::IO, ::MIME"text/plain", obj) = print(io, termshow(obj))
+
+dullobj = myType("Rocket", 10, 10, 99.9)
+termshow(dullobj)
 ```
 
-And now the REPL will print fancy info for any object!
+easy!
+
+But wait, there's more!
 ```@example repr
-:(x + y)
+termshow(termshow)  # or any other function
 ```
 
+Fancy right? It shows the function, various methods for it and it's docstrings (by parsin the Markdown). It works with methods too
 ```@example repr
-struct Throttle end
-
-struct Engine
-    id::Int
-    throttle::Throttle
-end
-
-e = Engine(1, Throttle())
+import Term: Panel
+termshow(Panel)
 ```
 
-And so on.... enjoy!
+and in general you can display almost any object
+```@example repr
+termshow(Dict(:x => 1, :y => 2))
+termshow(zeros(3, 3))
+```
+
+### install_term_repr
+Okay, `termshow` is pretty cool (even if I say so myself), but we need to call it every time we need to display something. I just want to type a variable name in the REPL (devs are lazy you know). Well, there's a solution for that too of course:
+```@example repr
+install_term_repr()
+Panel
+```
+
+now showing anything in the REPL goes through `termshow`
+
+!!! warning "Not for developers!!!"
+    If you're writing code just for yourself, go ahead and use `install_term_repr`. Enjoy it. But, if the code you're writing is intended for others you should really avoid doing that. It will modify the behavior of the REPL for them too and that's confusing and possibly error prone. 

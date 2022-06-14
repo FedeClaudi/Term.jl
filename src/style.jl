@@ -11,15 +11,19 @@ import Term:
     get_last_ANSI_code,
     CODES,
     ANSICode,
-    tview
+    tview,
+    do_by_line
 
 import ..Colors:
     AbstractColor, NamedColor, is_color, is_background, get_color, is_hex_color, hex2rgb
 
 export apply_style
 
-apply_style(text::String, style::String) =
-    apply_style("{" * style * "}" * text * "{/" * style * "}")
+apply_style(text::String, style::String) = if occursin('\n', text)
+        do_by_line(ln -> apply_style(ln, style), text)
+    else
+        apply_style("{" * style * "}" * text * "{/" * style * "}")
+end
 
 apply_style(c::Char, style::String) = apply_style(string(c), style)
 

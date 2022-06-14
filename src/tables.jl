@@ -306,9 +306,11 @@ Table(data::AbstractDict; kwargs...)
 Construct `Table` from a `Dict`.
 The Dict's keys make up the table header if none is assigned.
 """
-function Table(data::AbstractDict; kwargs...)
+function Table(data::AbstractDict; header=nothing, kwargs...)
     kwargs = Dict(kwargs...)
-    header = pop!(kwargs, :header, string.(collect(keys(data))))
+    
+    # header = pop!(kwargs, :header, string.(collect(keys(data))))
+    header = isnothing(header) ? string.(collect(keys(data))) : header
 
     data = hcat(values(data)...)
     return Table(data; header = header, kwargs...)
