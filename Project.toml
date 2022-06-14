@@ -23,8 +23,6 @@ MyterialColors = "0.3"
 OrderedCollections = "1"
 Parameters = "0.12"
 ProgressLogging = "0.1"
-UnicodeFun = "0.4"
-Tables = "1"
 julia = "1.6"
 
 [extras]
