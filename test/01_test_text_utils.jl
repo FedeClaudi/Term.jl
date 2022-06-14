@@ -9,6 +9,7 @@ import Term:
     escape_brackets,
     unescape_brackets,
     replace_text,
+    replace_ansi,
     nospaces,
     remove_brackets,
     unspace_commas,
@@ -88,6 +89,14 @@ end
     @test remove_brackets("aaa (asdsd) BB") == "aaa asdsd BB"
 
     @test unspace_commas("a, 2, 3") == "a,2,3"
+end
+
+@testset "TU_replace_ansi" begin
+    text = apply_style(
+        "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua."
+    )
+
+    @test replace_ansi(text) == "Lorem ¦¦¦¦¦ipsum dolor sit ¦¦¦¦amet, consectetur¦¦¦¦¦¦¦¦¦¦ adipiscing elit, ¦¦¦¦¦¦¦¦¦¦sed do eiusmod tempor incididunt¦¦¦¦¦ ut labore et dolore magna aliqua."
 end
 
 @testset "TU_misc" begin

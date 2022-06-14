@@ -113,9 +113,7 @@ function handle_progress(logger::TermLogger, prog)
     pbar.running || start!(pbar)
 
     # if progress not started yet, ignore
-    if isnothing(prog.fraction) || prog.fraction == 0
-        return nothing
-    end
+    (isnothing(prog.fraction) || prog.fraction == 0) && return nothing
 
     # check if a job exists for this progress, or add one
     job = getjob(pbar, prog.id)

@@ -26,8 +26,7 @@ export inspect, typestree, expressiontree
 #                                TYPES HIERARCHY                               #
 # ---------------------------------------------------------------------------- #
 
-function typestree(io::IO, T::DataType)
-    return print(
+typestree(io::IO, T::DataType) = print(
         io,
         Panel(
             Tree(T);
@@ -39,7 +38,7 @@ function typestree(io::IO, T::DataType)
             padding = (1, 4, 1, 1),
         ),
     )
-end
+
 typestree(T::DataType) = typestree(stdout, T)
 
 function expressiontree(io::IO, e::Expr)

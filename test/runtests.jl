@@ -34,7 +34,7 @@ end
 @runner "10_test_inspect.jl"
 @runner "11_test_theme.jl"
 @runner "12_test_console.jl"
-@runner "13_test_logging.jl"
+@runner "13_test_logs.jl"
 @runner "14_test_highlight.jl"
 @runner "15_test_progress.jl"
 @runner "16_test_tree.jl"

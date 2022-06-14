@@ -43,3 +43,8 @@ expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
         typestree(devnull, Float64)
     end
 end
+
+@testset "Inspect: style" begin
+    # @test style_sub_types(...)
+    # @test style_super_types(...)
+end

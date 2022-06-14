@@ -1,8 +1,12 @@
-import Term: Theme
+import Term: Theme, set_theme
 
 @testset "\e[34mtheme" begin
-    show(devnull, Theme())  # coverage
-    @test true
+    io = PipeBuffer()
+    show(io, MIME("text/plain"), Theme())  # coverage
+    @test read(io, String) isa String
+
+    theme = TERM_THEME[]
+    @test set_theme(theme) == theme
 end
 
 # TODO: write more tests
