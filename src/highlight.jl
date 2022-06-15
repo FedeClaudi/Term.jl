@@ -131,7 +131,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
 
     linenos = first.(lines)
     lines = [ln[2] for ln in lines]
-    code = split(highlight_syntax(join(lines); style = false), "\n")
+    code = split(highlight_syntax(join(lines); style = true), "\n")
 
     # clean
     clean(line) = replace(line, "    {/    }" => "")

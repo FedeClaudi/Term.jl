@@ -1,4 +1,4 @@
-# Term Repr
+# [Term Repr](@id ReprDoc)
 Note: by repr here we refer generically to how information about an object is represented in the terminal, not the `repr` function in Julia.
 
 ## Type REPR

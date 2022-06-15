@@ -40,3 +40,7 @@ Finally, you should know that like `print` has `println`, so `tprint` has `tprin
 
 With this we conclude our overview of the basic elements of `Term`: markup style to create styled text, `tprint` to print it to console, renderables like `Panel` and `TextBox` and the layout syntax to create beautiful terminal output. 
 There's a lot more you can use `Term` for, but styled text, panels and layout operators will get you far! Enjoy!
+
+
+!!! tip "highlighting"
+    By default `tprint` highlights strings before printing them out. If you don't like that, set `tprint(...; highlight=false)`! Also, if your text already has markup or ANSI style information, it won't be highlighted: highlighting styled text get messy!

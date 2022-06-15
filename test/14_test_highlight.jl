@@ -35,5 +35,5 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
           "\e[38;2;222;222;222mThis\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mis\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;109;89m::\e[39m\e[38;2;222;222;222mInt64\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mmy\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mstyle\e[39m\e[38;2;222;222;222m\n\e[39m\e[38;2;232;212;114mprint\e[39m\e[38;2;227;136;100m(\e[39m\e[38;2;222;222;222mx\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;109;89m+\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;144;202;249m2\e[39m\e[38;2;227;136;100m)\e[39m\e[38;2;222;222;222m\n\e[39m"
 
     @test load_code_and_highlight("02_test_ansi.jl", 7)[1:100] ==
-          "{red bold}❯{/red bold} {white}7{/white}     get_color,\n  {grey39}8{/grey39}     NamedColor,\n  {gre"
+      "{red bold}❯{/red bold} {white}7{/white}     \e[39m\e[38;2;222;222;222mget_color\e[39m\e[38;2;227;136;1"
 end

@@ -110,6 +110,45 @@ If you just want to **use** `Term.jl`'s style functionality, just make sure to r
     applied to the same string, it's better to be explicit in exactly where each style starts and ends.
 
 
+## Highlighting
+Term provides a higlighting functionality to automatically style text (e.g. coloring numbers, code snippets etc.) The usage is very simple
+```@example h
+import Term: load_code_and_highlight, highlight_syntax, highlight, tprint
+
+tprint(highlight("This text has `code` and 1 2 3 numbers, a ::Int type and a :symbol"))
+```
+
+pretty easy. Highlighting happens automatically when calling tprint:
+```@example h
+tprint("This text has `code` and 1 2 3 numbers, a ::Int type and a :symbol")
+```
+but you can turn it off with `tprint(...; highlight=false)`.
+
+You can also specify how you want some text to be highlighted:
+```@example h
+tprint(highlight("This is just some text", :code))  # it will be colored as code!
+```
+
+The colors used for the highlights are specified by the [Theme](@ref ThemeDocs) being used as seen a previous section. 
+
+You can also highlight syntax from code snippets (only Julia code for now):
+```@example h
+
+tprint(highlight_syntax("""
+function foo(x::Int)
+    x^2
+end
+
+"""))
+```
+
+or just load and highlight a file (showing lines in a specific range):
+```@example h
+
+load_code_and_highlight("src/highlight.jl", 125; δ=5) |> tprint
+```
+
+
 ## Under the hood
 
 If you're reading here you're curious about what exactly is happening under the hood. So let's get started.

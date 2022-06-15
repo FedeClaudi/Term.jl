@@ -19,7 +19,7 @@ makedocs(;
         "Basics" => Any[
             "basics/basics.md",
             "basics/styled_text.md",
-            "basics/colors_and_theme.md", # TODO add theme
+            "basics/colors_and_theme.md",
             "basics/renderables.md",
             "basics/tprint.md",  # TODO add info about highlighting
         ],

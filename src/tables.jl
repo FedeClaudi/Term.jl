@@ -203,7 +203,7 @@ function Table(
             heights[I],
             vertical_justify,
         )
-        if l == 1
+        if l == 1 && show_header
             bottom = if nrows < 2
                 :bottom
             elseif nrows > 2

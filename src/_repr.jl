@@ -118,7 +118,7 @@ function vec2content(vec::Union{Tuple,AbstractVector})
         show_header = false,
         columns_justify = [:right, :left],
         columns_style = ["dim", "default"],
-        columns_widths = [12, 60],
+        # columns_widths = [12, 60],
         vpad = 0,
         hpad = 2,
         compact = true,

@@ -74,13 +74,13 @@ end
 
             testpanel(Panel(Panel(Panel("."); _nofit...); _nofit...), 88, 7)
 
-            testpanel(Panel(Panel("."^250); _nofit...), 88, 6)
+            testpanel(Panel(Panel("."^250); _nofit...), 88, 5)
 
             testpanel(Panel(Panel("test"; _kw...); fit = false), 88, 5)
 
             testpanel(Panel(Panel(Panel("."; _kw...); _kw...); fit = false), 88, 7)
 
-            testpanel(Panel(Panel("."^250; _kw...); fit = false), 88, 6)
+            testpanel(Panel(Panel("."^250; _kw...); fit = false), 88, 5)
 
             testpanel(Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = false), 88, 8)
 

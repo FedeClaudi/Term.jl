@@ -513,6 +513,7 @@ function render(pbar::ProgressBar)
     cleartoend(iob)
 
     # render the progressbars
+    # @info pbar.renderstatus.hline
     write(iob, pbar.renderstatus.hline)
     for (last, job) in loop_last(pbar.jobs)
         contents = render(job, pbar)

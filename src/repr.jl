@@ -147,6 +147,9 @@ termshow(io::IO, vec::Union{Tuple,AbstractVector}) = print(
         vec2content(vec),
         "{bold white}$(length(vec)){/bold white}{default} items{/default}";
         justify = :left,
+        width=nothing,
+        fit=true,
+        title=nothing,
     ),
 )
 

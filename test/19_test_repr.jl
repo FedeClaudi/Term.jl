@@ -54,6 +54,7 @@ else
     )
 end
 
+# ! Save to text file for later comparison
 # for (i, t) in objs
 #     t = sprint(termshow, t)
 #     tofile(string(t), "./txtfiles/termshow_$i.txt")

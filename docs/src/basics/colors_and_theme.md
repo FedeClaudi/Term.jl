@@ -44,60 +44,22 @@ If the style informaton represents a color, `Term` first represents it as a `Abs
 The distinction between `NamedColor`, `BitColor` and `RGBColor` is necessary because the three color styles are represented by a different syntax in the ANSI codes. Naturally, `Term` users won't normally worry about this and can use whichever color formulation is most convenient.
 
 
-## Colors
-Below all named colors, 16bit colors and (many) RGB colors are printed for display.
+# [Panel](@id ThemeDocs)
+Term defines a `Theme` type that carries styling information used throughout. 
+It tells `highlight` what color thigns should be, it stores the colros of elements of [Tree](@ref TreeDoc), and of the [Repr functionality](@ref ReprDoc).
 
-```@example
-import Term: CODES_16BIT_COLORS, Panel
-import Term.Colors: hsl2rgb
+```@example theme
+import Term: Theme, set_theme, TERM_THEME
 
-function make_named_colors()
-    sort_idx = sortperm(collect(values(CODES_16BIT_COLORS)))
-    cnames = collect(keys(CODES_16BIT_COLORS))[sort_idx][1:9]
-    colors = join(map(
-        (c)->"{on_$c} {/on_$c}", cnames
-    ))
-    return colors
-end
-
-
-function make_16bit_colors()
-    sort_idx = sortperm(collect(values(CODES_16BIT_COLORS)))
-    cnames = collect(keys(CODES_16BIT_COLORS))[sort_idx][9:end]
-    colors = join(map(
-        (c)->c[1] %  20 == 0 ? "{on_$(c[2])} {/on_$(c[2])}\n" : "{on_$(c[2])} {/on_$(c[2])}", enumerate(cnames)
-    ))
-    return colors
-end
-
-
-function make_rgb_colors(; max_width=88)
-    colors = ""
-
-    for y in 0:5
-        for x in 0:max_width
-            h = x / max_width
-            l = 0.1 + (((5-y) / 5) * 0.7)
-            color = hsl2rgb(h*360, .9, l)
-            bg = hsl2rgb(h*360, .9, l + 0.7/10)
-
-            colors *= "{$color on_$bg}▄{/$color on_$bg}"
-        end
-        colors *= "\n"
-    end
-
-    return colors
-end
-
-
-print(
-    Panel(make_named_colors(), width=20, justify=:center, title="Named", style="bold yellow", padding=(2, 2, 1, 0)) / # stacking operator, see layout page
-    Panel(make_16bit_colors(), width=42, fit=true, title="16 bit colors", style="bold yellow", padding=(2, 2, 1, 0)) /
-    Panel(make_rgb_colors(), width=88, title="RGB colors", style="bold yellow", fit=true, padding=(2, 2, 1, 0))
-)
+default = TERM_THEME[]
 ```
 
+You can create a new theme with different colors:
+```@example theme
+newtheme = Theme(string="red", code="black on_white")
+```
 
-Oooops, it seems that we broke Documenter's layout again. This is what it looks like if you run this code in your terminal:
-
-![](colors.png)
+and set it as the new theme to be used by Term:
+```@example theme
+set_theme(newtheme)
+```
