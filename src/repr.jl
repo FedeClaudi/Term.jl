@@ -41,12 +41,12 @@ function termshow(io::IO, obj)
     )
 end
 
-termshow(obj) = termshow(stdout, obj)
+termshow(obj; kwargs...) = termshow(stdout, obj; kwargs...)
 
 # ---------------------------------------------------------------------------- #
 #                                     EXPR                                     #
 # ---------------------------------------------------------------------------- #
-function termshow(io::IO, e::Expr)
+function termshow(io::IO, e::Expr; kwargs...)
     content = repr_get_obj_fields_display(e)
     content =
         cvstack("{green}$(highlight(string(e))){/green}", hLine(content.measure.w), content)
@@ -68,9 +68,10 @@ end
 # ---------------------------------------------------------------------------- #
 #                                  DICTIONARY                                  #
 # ---------------------------------------------------------------------------- #
-function termshow(io::IO, obj::AbstractDict)
+function termshow(io::IO, obj::AbstractDict; kwargs...)
     short_string(x) = truncate(string(x), 30)
     theme = TERM_THEME[]
+
     # prepare text renderables
     k = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent_style * " bold")
     ktypes =
@@ -131,7 +132,7 @@ end
 # ---------------------------------------------------------------------------- #
 #                                ABSTRACT ARRAYS                               #
 # ---------------------------------------------------------------------------- #
-termshow(io::IO, mtx::AbstractMatrix) = print(
+termshow(io::IO, mtx::AbstractMatrix; kwargs...) = print(
     io,
     repr_panel(
         mtx,
@@ -140,7 +141,7 @@ termshow(io::IO, mtx::AbstractMatrix) = print(
     ),
 )
 
-termshow(io::IO, vec::Union{Tuple,AbstractVector}) = print(
+termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
     io,
     repr_panel(
         vec,
@@ -153,7 +154,7 @@ termshow(io::IO, vec::Union{Tuple,AbstractVector}) = print(
     ),
 )
 
-function termshow(io::IO, arr::AbstractArray)
+function termshow(io::IO, arr::AbstractArray; kwargs...)
     I0 = CartesianIndices(size(arr)[3:end])
     I = I0[1:min(10, length(I0))]
 
@@ -197,7 +198,7 @@ function termshow(io::IO, arr::AbstractArray)
     )
 end
 
-function termshow(io::IO, obj::DataType)
+function termshow(io::IO, obj::DataType; kwargs...)
     theme = TERM_THEME[]
     ts = theme.repr_type_style
     field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent_style)
@@ -237,7 +238,7 @@ function termshow(io::IO, obj::DataType)
     tprint(io, doc)
 end
 
-function termshow(io::IO, fun::Function)
+function termshow(io::IO, fun::Function; width=nothing)
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)
@@ -269,7 +270,8 @@ function termshow(io::IO, fun::Function)
             methods_contents,
             "{white bold}$(N-1){/white bold} methods",
             title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
-            # width = console_width() - 12,
+            width=width,
+            fit=false
         )
 
     # get docstring 
