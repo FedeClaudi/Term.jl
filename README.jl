@@ -1,6 +1,6 @@
 using Term
 import Term.Renderables: Renderable
-import Term: int
+import Term: rint
 import Term: typestree, inspect
 using Term.Layout
 
@@ -106,7 +106,7 @@ function rainbow_maker(N)
     B = range(50, 200; length = N)
     colors = []
     for n in 1:N
-        r, g, b = int(R[n]), int(G[n]), int(B[n])
+        r, g, b = rint(R[n]), rint(G[n]), rint(B[n])
         push!(colors, "($r,$g,$b)")
     end
     return colors

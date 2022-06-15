@@ -22,7 +22,7 @@ makedocs(;
             "basics/colors_and_theme.md", # TODO add theme
             "basics/renderables.md",
             "basics/content_layout.md",
-            "basics/tprint.md",
+            "basics/tprint.md",  # TODO add info about highlighting
         ],
         "Renderables" => Any[
             "ren/intro.md",
@@ -46,7 +46,7 @@ makedocs(;
             "adv/repr.md",
             "adv/progressbars.md",
             "adv/logging.md",
-            "adv/errors_tracebacks.md",
+            "adv/errors_tracebacks.md",  # TODO update screenshot
             "adv/introspection.md",
             "adv/markdown.md",
         ],
