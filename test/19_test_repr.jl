@@ -42,7 +42,7 @@ objs = if VERSION >= v"1.7.1"
         (4, zeros(120, 300)),
         (5, zeros(200)),
         (6, zeros(3, 3, 3)),
-        (7, termshow),
+        (7, print),
         (8, :(x / y + √9)),
     )
 else
@@ -50,13 +50,14 @@ else
         (1, [1, 2, 3]),
         (2, Dict(:x => [1, 2, 3], "a" => Dict(:z => "a"))),
         (3, Dict(i => i for i in 1:100)),
-        (7, termshow),
+        (7, print),
     )
 end
 
 # for (i, t) in objs
 #     t = sprint(termshow, t)
 #     tofile(string(t), "./txtfiles/termshow_$i.txt")
+#     # termshow(t)
 # end
 
 @testset "TERMSHOW for types" begin

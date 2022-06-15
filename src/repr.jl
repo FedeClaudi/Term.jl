@@ -8,7 +8,8 @@ import Term:
     do_by_line,
     unescape_brackets,
     split_lines,
-    TERM_THEME
+    TERM_THEME,
+    DEFAULT_WT
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
@@ -212,7 +213,7 @@ function termshow(io::IO, obj::DataType)
             string(type_name / ("  " * line * fields)),
             nothing;
             fit = false,
-            width = min(console_width() - 5, 80),
+            width = min(console_width() - 5, DEFAULT_WT[]),
             justify = :center,
         )
 
@@ -260,17 +261,17 @@ function termshow(io::IO, fun::Function)
     end
 
     panel =
-        "       " * repr_panel(
+        "   " * repr_panel(
             nothing,
             methods_contents,
             "{white bold}$(N-1){/white bold} methods",
             title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
-            width = console_width() - 12,
+            # width = console_width() - 12,
         )
 
     # get docstring 
     doc, _ = get_docstring(fun)
-    doc = parse_md(doc; width = console_width() - 8)
+    doc = parse_md(doc; width = panel.measure.w - 4)
     doc = split_lines(doc)
     if length(doc) > 100
         doc = [
@@ -279,8 +280,8 @@ function termshow(io::IO, fun::Function)
         ]
     end
     print(io, panel)
-    print(io, hLine(console_width(), "Docstring"; style = "green dim", box = :HEAVY))
-    print(io, "   " * RenderableText(join(doc, "\n"); width = console_width() - 8))
+    print(io, hLine(panel.measure.w, "Docstring"; style = "green dim", box = :HEAVY))
+    print(io, "   " * RenderableText(join(doc, "\n")))
 end
 
 # ---------------------------------------------------------------------------- #

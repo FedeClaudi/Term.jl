@@ -21,17 +21,16 @@ makedocs(;
             "basics/styled_text.md",
             "basics/colors_and_theme.md", # TODO add theme
             "basics/renderables.md",
-            "basics/content_layout.md",
             "basics/tprint.md",  # TODO add info about highlighting
         ],
         "Renderables" => Any[
             "ren/intro.md",
             "ren/text.md",
             "ren/panel.md",
+            "ren/table.md",            
+            "ren/layout_rens.md",
             "ren/dendogram.md",
             "ren/tree.md",
-            "ren/layout_rens.md",
-            "ren/table.md",
         ],
         "Layout" => Any[
             "layout/layout.md",

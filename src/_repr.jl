@@ -50,7 +50,7 @@ function repr_panel(
     obj,
     content,
     subtitle;
-    width = console_width() - 10,
+    width = min(console_width() - 10, DEFAULT_WT[]),
     justify = :center,
     kwargs...,
 )

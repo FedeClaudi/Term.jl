@@ -158,7 +158,7 @@ print(
 The syntax is `(left, right, top, bottom)` and the default is `(2, 2, 0, 0)`.
 
 
-# TextBox
+# [TextBox](@id TBoxDoc)
 Sometimes you want to have the benefits of `Panel` (you can control the height, width, padding, justification, titles...) without actually showing the panel itself. Introduce: `TextBox`.
 ```@example
 using Term: TextBox
