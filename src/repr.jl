@@ -238,7 +238,7 @@ function termshow(io::IO, obj::DataType; kwargs...)
     tprint(io, doc)
 end
 
-function termshow(io::IO, fun::Function; width=nothing)
+function termshow(io::IO, fun::Function; width=min(console_width() - 10, DEFAULT_WT[]))
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)

@@ -69,7 +69,9 @@ move_to_line(io::IO = stdout, n::Int = 1) = write(io, "\e[" * string(n) * ";1H")
 
 # ---------------------------------- display --------------------------------- #
 """
-Clear terminal.
+    clear(io::IO = stdout)
+
+Clear terminal from anything printed in the REPL.
 """
 clear(io::IO = stdout) = write(io, "\e[2J")
 cleartoend(io::IO = stdout) = write(io, "\e[0J")

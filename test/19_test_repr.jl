@@ -1,4 +1,5 @@
 install_term_repr()
+import Term.Consoles: clear
 
 @testset "REPR renderable repr" begin
     p = string(Panel())
@@ -42,7 +43,7 @@ objs = if VERSION >= v"1.7.1"
         (4, zeros(120, 300)),
         (5, zeros(200)),
         (6, zeros(3, 3, 3)),
-        (7, print),
+        (7, clear),
         (8, :(x / y + √9)),
     )
 else
@@ -50,7 +51,7 @@ else
         (1, [1, 2, 3]),
         (2, Dict(:x => [1, 2, 3], "a" => Dict(:z => "a"))),
         (3, Dict(i => i for i in 1:100)),
-        (7, print),
+        (7, clear),
     )
 end
 
