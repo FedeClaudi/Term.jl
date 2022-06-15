@@ -43,7 +43,6 @@ function style_at_each_line(text)
     return join(lines, '\n')
 end
 
-
 """
     split_tags_into_words(text)
 
@@ -92,7 +91,6 @@ function split_tags_into_words(text)
     end
     return text
 end
-
 
 """
     reshape_text(text::AbstractString, width::Int)

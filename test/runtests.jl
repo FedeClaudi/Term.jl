@@ -17,7 +17,11 @@ dotest = console_width() ≥ 88
 
 macro runner(fn)
     quote
-        tprintln($("\n{bold green}Running:{/bold green} {underline bold white}'$fn'{/underline bold white}"))
+        tprintln(
+            $(
+                "\n{bold green}Running:{/bold green} {underline bold white}'$fn'{/underline bold white}"
+            ),
+        )
         @time @timeit_include($fn)
     end |> esc
 end

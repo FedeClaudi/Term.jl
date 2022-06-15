@@ -160,10 +160,12 @@ function Panel(
     padding::Padding;
     width::Union{Nothing,Int} = nothing,
     height::Union{Nothing,Int} = nothing,
-    background::Union{Nothing, String} = nothing,
+    background::Union{Nothing,String} = nothing,
     kwargs...,
 )
-    content = content isa AbstractRenderable ? content : RenderableText(fillin(content; bg=background))
+    content =
+        content isa AbstractRenderable ? content :
+        RenderableText(fillin(content; bg = background))
 
     content_measure = content.measure
     width = isnothing(width) ? 0 : width
@@ -192,7 +194,7 @@ function Panel(
         Δw = Δw,
         Δh = Δh,
         padding = padding,
-        background=background,
+        background = background,
         kwargs...,
     )
 end
@@ -221,7 +223,7 @@ function Panel(
     padding::Padding;
     width::Int = DEFAULT_WT[],
     height::Union{Nothing,Int} = nothing,
-    background::Union{Nothing, String} = nothing,
+    background::Union{Nothing,String} = nothing,
     kwargs...,
 )
     Δw = padding.left + padding.right + 2
@@ -231,7 +233,9 @@ function Panel(
     get_width(content) > width - Δw + 1 && (content = trim_renderable(content, width - Δw))
 
     # get panel height
-    content = content isa AbstractRenderable ? content : RenderableText(fillin(content; bg=background))
+    content =
+        content isa AbstractRenderable ? content :
+        RenderableText(fillin(content; bg = background))
     height = isnothing(height) ? content.measure.h + Δh + 2 : height
     panel_measure = Measure(width, height)
 
@@ -255,7 +259,7 @@ function Panel(
         Δw = Δw,
         Δh = Δh,
         padding = padding,
-        background=background,
+        background = background,
         kwargs...,
     )
 end
@@ -343,10 +347,17 @@ function render(
 
     # get an empty padding line
     empty = if isnothing(background)
-         [Segment(left * " "^(panel_measure.w - 2) * right; )]
+        [Segment(left * " "^(panel_measure.w - 2) * right;)]
     else
-        [Segment(left * "{$background}" * " "^(panel_measure.w - 2) * "{/$background}" * right; )]
-
+        [
+            Segment(
+                left *
+                "{$background}" *
+                " "^(panel_measure.w - 2) *
+                "{/$background}" *
+                right;
+            ),
+        ]
     end
 
     # add lines with content fn

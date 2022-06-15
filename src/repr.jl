@@ -191,9 +191,9 @@ termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
         vec2content(vec),
         "{bold white}$(length(vec)){/bold white}{default} items{/default}";
         justify = :left,
-        width=nothing,
-        fit=true,
-        title=nothing,
+        width = nothing,
+        fit = true,
+        title = nothing,
     ),
 )
 
@@ -299,7 +299,7 @@ end
 
 Show a function's methods and docstring.
 """
-function termshow(io::IO, fun::Function; width=min(console_width() - 10, DEFAULT_WT[]))
+function termshow(io::IO, fun::Function; width = min(console_width() - 10, DEFAULT_WT[]))
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)
@@ -331,8 +331,8 @@ function termshow(io::IO, fun::Function; width=min(console_width() - 10, DEFAULT
             methods_contents,
             "{white bold}$(N-1){/white bold} methods",
             title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
-            width=width,
-            fit=false
+            width = width,
+            fit = false,
         )
 
     # get docstring 

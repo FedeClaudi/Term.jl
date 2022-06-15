@@ -19,11 +19,12 @@ import ..Colors:
 
 export apply_style
 
-apply_style(text::String, style::String) = if occursin('\n', text)
+apply_style(text::String, style::String) =
+    if occursin('\n', text)
         do_by_line(ln -> apply_style(ln, style), text)
     else
         apply_style("{" * style * "}" * text * "{/" * style * "}")
-end
+    end
 
 apply_style(c::Char, style::String) = apply_style(string(c), style)
 

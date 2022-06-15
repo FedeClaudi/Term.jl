@@ -27,7 +27,7 @@ makedocs(;
             "ren/intro.md",
             "ren/text.md",
             "ren/panel.md",
-            "ren/table.md",            
+            "ren/table.md",
             "ren/layout_rens.md",
             "ren/dendogram.md",
             "ren/tree.md",
@@ -49,9 +49,7 @@ makedocs(;
             "adv/introspection.md",
             "adv/markdown.md",
         ],
-        "Examples" => Any[
-            "examples/examples.md",  # TODO add examples cards
-        ],
+        "Examples" => Any["examples/examples.md",],
         "API" => Any[
             "api/api_term.md",
             "api/api_boxes.md",

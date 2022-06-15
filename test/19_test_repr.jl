@@ -56,13 +56,12 @@ else
 end
 
 # ! Save to text file for later comparison
-sprint_termshow(io::IO, x) = termshow(io, x; width=60)
+sprint_termshow(io::IO, x) = termshow(io, x; width = 60)
 for (i, t) in objs
     t = sprint(sprint_termshow, t)
     tofile(string(t), "./txtfiles/termshow_$i.txt")
     # termshow(t; width=60)
 end
-
 
 @testset "TERMSHOW for types" begin
     for (i, t) in objs

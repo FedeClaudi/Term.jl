@@ -63,7 +63,8 @@ julia> pad("ciao", 10, :right)
 ```
 """
 function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothing)::String
-    occursin('\n', text) && return do_by_line(ln -> pad(ln, target_width, method; bg=bg), text)
+    occursin('\n', text) &&
+        return do_by_line(ln -> pad(ln, target_width, method; bg = bg), text)
 
     # get total padding size
     lw = width(text)
@@ -91,7 +92,6 @@ end
 Pad a string by a fixed ammount to the left and to the right.
 """
 function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing)
-
     return if isnothing(bg)
         ' '^max(0, left) * text * ' '^max(0, right)
     else
@@ -792,7 +792,8 @@ function PlaceHolder(
     return PlaceHolder(lines, Measure(lines))
 end
 
-PlaceHolder(ren::AbstractRenderable; kwargs...) = PlaceHolder(ren.measure.w, ren.measure.h; kwargs...)
+PlaceHolder(ren::AbstractRenderable; kwargs...) =
+    PlaceHolder(ren.measure.w, ren.measure.h; kwargs...)
 
 # ---------------------------------------------------------------------------- #
 #                                     GRID                                     #
@@ -816,7 +817,7 @@ creates placeholders.
 function grid(
     rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
-    show_placeholder::Bool=true,
+    show_placeholder::Bool = true,
     aspect::Union{Nothing,Number,NTuple} = nothing,
     layout::Union{Nothing,Tuple} = nothing,
     pad::Union{Tuple,Integer} = 0,
@@ -838,7 +839,9 @@ function grid(
             ncols, r = divrem(length(rens), nrows)
             r == 0 || (ncols += 1)
         end
-        fill_in = isnothing(placeholder) ? PlaceHolder(first(rens); style=ph_style) : placeholder
+        fill_in =
+            isnothing(placeholder) ? PlaceHolder(first(rens); style = ph_style) :
+            placeholder
         rens = vcat(rens, repeat([fill_in], nrows * ncols - length(rens)))
     end
     return grid(reshape(rens, nrows, ncols); pad = pad)

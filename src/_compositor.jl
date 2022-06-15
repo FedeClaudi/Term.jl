@@ -22,7 +22,6 @@ layout_simbols = (
     :vertical_pad!,
 )
 
-
 """
     parse_single_element_layout(expr::Expr)
 

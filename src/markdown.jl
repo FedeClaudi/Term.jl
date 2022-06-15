@@ -366,8 +366,6 @@ Print a parsed markdown string.
 Tprint.tprint(md::Markdown.MD; kwargs...) = tprint(parse_md(md); kwargs...)
 Tprint.tprint(io::IO, md::Markdown.MD; kwargs...) = tprint(io, parse_md(md); kwargs...)
 
-
-
 """
 ---
     tprintln(md::Markdown.MD; kwargs...)

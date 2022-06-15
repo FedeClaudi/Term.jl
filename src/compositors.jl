@@ -26,6 +26,7 @@ Stores a refence to an element of a `Compositor` layout.
 Rendering a `Compositor` renders the renderable associated with 
 each `LayoutElement` if there is one, the placeholder otherwise.
 """
+
 @with_repr mutable struct LayoutElement
     id::Symbol
     w::Int
@@ -33,7 +34,6 @@ each `LayoutElement` if there is one, the placeholder otherwise.
     renderable::Union{Nothing,String,AbstractRenderable}
     placeholder::PlaceHolder
 end
-
 
 """
     mutable struct Compositor
@@ -101,8 +101,6 @@ end
 
 Renderable(compositor::Compositor) = Renderable(string(compositor))
 
-
-
 # ---------------------------------- update ---------------------------------- #
 """
     function update!(
@@ -138,10 +136,8 @@ function update!(
     compositor.elements[id].renderable = content
 end
 
-update!(compositor::Compositor; kwargs) = map(
-    (id, content) -> update!(compositor, id, content),
-    kwargs
-)
+update!(compositor::Compositor; kwargs) =
+    map((id, content) -> update!(compositor, id, content), kwargs)
 
 # ---------------------------------------------------------------------------- #
 #                                   rendering                                  #
@@ -182,7 +178,6 @@ Base.print(io::IO, compositor::Compositor; highlight = true, kwargs...) =
     println(io, string(compositor; kwargs...))
 
 Base.print(compositor::Compositor; kwargs...) = Base.print(stdout, compositor; kwargs...)
-
 
 """
 Base.show(io::IO, ::MIME"text/plain", compositor::Compositor)
