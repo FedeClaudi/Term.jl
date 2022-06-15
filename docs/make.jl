@@ -21,7 +21,7 @@ makedocs(;
             "basics/styled_text.md",
             "basics/colors_and_theme.md",
             "basics/renderables.md",
-            "basics/tprint.md",  # TODO add info about highlighting
+            "basics/tprint.md",
         ],
         "Renderables" => Any[
             "ren/intro.md",

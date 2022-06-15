@@ -1,17 +1,32 @@
-
 rx = r"\s*\S+\s*"
 
+"""
+    words(text)
+
+Get individual words in a string, their position and size.
+"""
 words(text) = map(
     m -> (m.offset, m.offset + textlen(m.match), m.match, textlen(m.match)),
     eachmatch(rx, text),
 )
 
+"""
+    characters(word)
+
+Get individual characters in a word, their position and size.
+"""
 function characters(word)
     chars = collect(word)
     widths = textwidth.(chars)
     return map(i -> (chars[i], widths[i]), 1:length(chars))
 end
 
+"""
+    style_at_each_line(text)
+
+Get style tags over multiple lines and repeat them at the start/end
+of each line.
+"""
 function style_at_each_line(text)
     lines = split(text, "\n")
     for (i, line) in enumerate(lines)
@@ -28,6 +43,13 @@ function style_at_each_line(text)
     return join(lines, '\n')
 end
 
+
+"""
+    split_tags_into_words(text)
+
+Split markup tags with multiple words 
+into multiple tags with a single word each.
+"""
 function split_tags_into_words(text)
     tags = map(m -> m.match[2:(end - 1)], eachmatch(OPEN_TAG_REGEX, text))
 
@@ -70,6 +92,7 @@ function split_tags_into_words(text)
     end
     return text
 end
+
 
 """
     reshape_text(text::AbstractString, width::Int)

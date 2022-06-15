@@ -1,4 +1,6 @@
-""" multiple strings replacement, for multiple on Julia version """
+""" 
+multiple strings replacement.
+"""
 function replace_multi(text, pairs...)::String
     VERSION ≥ v"1.7" && return replace(text, pairs...)
     VERSION < v"1.7" && begin
@@ -15,7 +17,7 @@ end
 # ---------------------------------- markup ---------------------------------- #
 
 """
-This regex uses lookahead and lookbehind to exclude [[
+This regex uses lookahead and lookbehind to exclude {{
 at the beginning of a tag, with this:
     (?<!\\{)\\[(?!\\{)
 """

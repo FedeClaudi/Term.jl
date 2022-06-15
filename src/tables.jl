@@ -50,35 +50,39 @@ end
         tb::TablesPkg.AbstractColumns;
         box::Symbol = :SQUARE,
         style::String = "default",
-        hpad::Union{Vector, Int}=2,
-        vpad::Union{Vector, Int}=0,
-        vertical_justify::Symbol=:center,
-
+        hpad::Union{Vector,Int} = 2,
+        vpad::Union{Vector,Int} = 0,
+        vertical_justify::Symbol = :center,
         show_header::Bool = true,
-        header::Union{Nothing, Vector, Tuple}=nothing,
-        header_style::Union{String, Vector, Tuple} = "default",
-        header_justify::Union{Nothing, Symbol, Vector, Tuple} = nothing,
-        
-        columns_style::Union{String, Vector, Tuple} = "default",
-        columns_justify::Union{Symbol, Vector, Tuple} = :center,
-
-        footer::Union{Function, Nothing, Vector, Tuple}=nothing,
-        footer_style::Union{String, Vector, Tuple} = "default",
-        footer_justify::Union{Nothing, Symbol, Vector, Tuple} = :center
+        header::Union{Nothing,Vector,Tuple} = nothing,
+        header_style::Union{String,Vector,Tuple} = "default",
+        header_justify::Union{Nothing,Symbol,Vector,Tuple} = nothing,
+        columns_style::Union{String,Vector,Tuple} = "default",
+        columns_justify::Union{Symbol,Vector,Tuple} = :center,
+        columns_widths::Union{Nothing,Int,Vector} = nothing,
+        footer::Union{Function,Nothing,Vector,Tuple} = nothing,
+        footer_style::Union{String,Vector,Tuple} = "default",
+        footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
+        compact::Bool = false,
     )
 
-Generic constructo for a Table renderable.
+Generic constructor for a Table renderable.
+
+!!! tip
+    Arguments such as `header_style`, `columns_style` and `footer_style` can 
+    either be passed a single value, which will be applied to all columns, or
+    a vector of values, which will be applied to each column.
 """
 function Table(
     tb::TablesPkg.AbstractColumns;
-    box::Symbol = :SQUARE,
-    style::String = "default",
+    box::Symbol = :MINIMAL_HEAVY_HEAD,
+    style::String = "#9bb3e0",
     hpad::Union{Vector,Int} = 2,
     vpad::Union{Vector,Int} = 0,
     vertical_justify::Symbol = :center,
     show_header::Bool = true,
     header::Union{Nothing,Vector,Tuple} = nothing,
-    header_style::Union{String,Vector,Tuple} = "default",
+    header_style::Union{String,Vector,Tuple} = "bold white",
     header_justify::Union{Nothing,Symbol,Vector,Tuple} = nothing,
     columns_style::Union{String,Vector,Tuple} = "default",
     columns_justify::Union{Symbol,Vector,Tuple} = :center,

@@ -22,6 +22,23 @@ layout_simbols = (
     :vertical_pad!,
 )
 
+
+"""
+    parse_single_element_layout(expr::Expr)
+
+Parse an expression with a single layout element, like :(A(25, 5))
+"""
+function parse_single_element_layout(expr::Expr)
+    s, w, h = expr.args
+    return [:($s($w, $h))]
+end
+
+"""
+    collect_elements(exp::Expr)
+
+Collects elements (individual LayoutElements) that are
+in a layout expresssion.
+"""
 function collect_elements(exp::Expr)
     if exp.args[1] ∉ layout_simbols && length(exp.args) > 2
         n, w, h = exp.args
@@ -55,6 +72,12 @@ placeholder(s, w, h, c) = PlaceHolder(
     text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($w × $h){/white}",
 )
 
+"""
+    extract_renderable_from_kwargs(s, w, h; kwargs...)
+
+When passing kwargs to a `Compositor`, check for renderables that are 
+to be assigned to its content.
+"""
 function extract_renderable_from_kwargs(s, w, h; kwargs...)
     ren = get(kwargs, s, nothing)
     if !isnothing(ren)

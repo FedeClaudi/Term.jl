@@ -808,6 +808,10 @@ PlaceHolder(ren::AbstractRenderable; kwargs...) = PlaceHolder(ren.measure.w, ren
     )
 
 Construct a grid from a `AbstractVector` of `AbstractRenderable`s.
+
+Lays out the renderables to createa a grid with the desired aspect ratio or
+layout (number of rows, number of columns). If no renderables are passed it
+creates placeholders.
 """
 function grid(
     rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;

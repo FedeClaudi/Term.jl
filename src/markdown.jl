@@ -23,11 +23,35 @@ export parse_md
 # ---------------------------------------------------------------------------- #
 #                                   PARSE MD                                   #
 # ---------------------------------------------------------------------------- #
+
+"""
+    parse_md
+
+Parse a Markdown element (Paragraph, List...) into a string.
+
+A `width` keyword argument can be used to control the width of 
+the string representation and an `inline` boolean argument specifies
+when an element (e.g. a code snippet) is in-line within a larger element
+(e.g. a paragraph).
+"""
+function parse_md end
+
+"""
+    parse_md(text::Markdown.MD; kwargs...)::String
+
+Parse an entier `MD` object by parsing its constituent elements
+and joining the resulting strings.
+"""
 function parse_md(text::Markdown.MD; kwargs...)::String
     elements = parse_md.(text.content; kwargs...)
     return join(elements, "\n\n")
 end
 
+"""
+    parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...) where {l}
+
+Parse `Headers` with different style based on the level
+"""
 function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...) where {l}
     header_styles = Dict(
         1 => "bold $indigo_light",
@@ -60,6 +84,11 @@ function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...
     end
 end
 
+"""
+    parse_md(paragraph::Markdown.Paragraph; width = console_width(), kwargs...)::String
+
+Parse each element in a paragraph
+"""
 function parse_md(paragraph::Markdown.Paragraph; width = console_width(), kwargs...)::String
     out = join(parse_md.(paragraph.content; inline = true))
     return reshape_text(out, width) * "\e[0m"
@@ -73,6 +102,19 @@ parse_md(bold::Markdown.Bold; kwargs...)::String =
 
 parse_md(lb::Markdown.LineBreak; kwargs...)::String = "\n"
 
+"""
+---
+    function parse_md(
+        ltx::Markdown.LaTeX;
+        inline = false,
+        width = console_width(),
+        kwargs...,
+    )::String
+
+Parse a math element.
+Try to convert it to unicode characters when possible,
+otherwise output the latex string.
+"""
 function parse_md(
     ltx::Markdown.LaTeX;
     inline = false,
@@ -94,6 +136,20 @@ function parse_md(
     end
 end
 
+"""
+---
+    function parse_md(
+        code::Markdown.Code;
+        width = console_width(),
+        inline = false,
+        kwargs...,
+    )::String
+
+Parse a code snippet with syntax highlighting (for Julia code).
+
+For non-inline code snippets the code is put in a panel
+with different background coloring to make it stand out.
+"""
 function parse_md(
     code::Markdown.Code;
     width = console_width(),
@@ -122,6 +178,15 @@ function parse_md(
     end
 end
 
+"""
+    function parse_md(
+        qt::Markdown.BlockQuote;
+        width = min(DEFAULT_WT[], console_width() - 30),
+        kwargs...,
+    )::String
+
+Style a BlockQuote with a line and a quotation marker.
+"""
 function parse_md(
     qt::Markdown.BlockQuote;
     width = min(DEFAULT_WT[], console_width() - 30),
@@ -146,6 +211,16 @@ end
 parse_md(hl::Markdown.HorizontalRule; width = console_width(), kwargs...)::String =
     string(hLine(width; style = "dim", box = :HEAVY))
 
+"""
+    function parse_md(
+        list::Markdown.List;
+        width = console_width(),
+        inline = false,
+        space = "",
+    )::String
+
+Parse a list and all its elements, for both numbered and unnumbered lists.
+"""
 function parse_md(
     list::Markdown.List;
     width = console_width(),
@@ -181,6 +256,11 @@ function parse_md(img::Markdown.Image; kwargs...)::String
     "{dim} 🌄 image: {/dim}" * img.alt * " {dim}| at: " * img.url * "{/dim}"
 end
 
+"""
+    parse_md(note::Markdown.Footnote; width = console_width(), inline = false)
+
+Style a footnote differently based on if they are a renference to it or its content.
+"""
 function parse_md(note::Markdown.Footnote; width = console_width(), inline = false)
     if isnothing(note.text)
         return id = "{#9aacdb}[$(note.id)]{/#9aacdb}"
@@ -204,6 +284,11 @@ function parse_md(content::Vector; kwargs...)::String
     end
 end
 
+"""
+    function parse_md(tb::Markdown.Table; width = console_width())::String
+
+Convert a markdown Table to a `Table` renderable.
+"""
 function parse_md(tb::Markdown.Table; width = console_width())::String
     just = Dict(:l => :left, :r => :right, :c => :center)
     header = parse_md.(tb.rows[1])
@@ -229,6 +314,11 @@ end
 parse_md(link::Markdown.Link; kwargs...)::String =
     "{white bold}$(parse_md(link.text; inline=true)){/white bold} {dim}($(link.url)){/dim}"
 
+"""
+    function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::String
+
+Parse adomitions and style them with colored `Panel` renderables.
+"""
 function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::String
     title_styles = Dict(
         "note" => "blue",
@@ -258,12 +348,32 @@ parse_md(x; kwargs...)::String = string(x)
 #                              RENDERABLE & TPRINT                             #
 # ---------------------------------------------------------------------------- #
 
+"""
+---
+    RenderableText(md::Markdown.MD; width = console_width() - 2, kwargs...)
+
+Create a `RenderableText` from a markdown string.
+"""
 Renderables.RenderableText(md::Markdown.MD; width = console_width() - 2, kwargs...) =
     RenderableText(parse_md(md; width = width); width = width, kwargs...)
 
+"""
+---
+    tprint(md::Markdown.MD; kwargs...)
+
+Print a parsed markdown string.
+"""
 Tprint.tprint(md::Markdown.MD; kwargs...) = tprint(parse_md(md); kwargs...)
 Tprint.tprint(io::IO, md::Markdown.MD; kwargs...) = tprint(io, parse_md(md); kwargs...)
 
+
+
+"""
+---
+    tprintln(md::Markdown.MD; kwargs...)
+
+Print a parsed markdown string.
+"""
 Tprint.tprintln(md::Markdown.MD; kwargs...) = tprintln(parse_md(md); kwargs...)
 Tprint.tprintln(io::IO, md::Markdown.MD; kwargs...) = tprintln(io, parse_md(md); kwargs...)
 end

@@ -25,6 +25,25 @@ export @with_repr, termshow, install_term_repr
 include("_repr.jl")
 include("_inspect.jl")
 
+"""
+    termshow
+
+Styled string representation of any object.
+
+`termshow` prints to stdout (or any other IO) a styled
+representation of the object.
+Dedicated methods create displays for specify types such as `Dict`
+or `Vector`.
+"""
+function termshow end
+
+"""
+---
+    termshow(io::IO, obj)
+
+Generic method for any object not caught my dedicated methods.
+Creates a `Panel` with the object's fields and contents.
+"""
 function termshow(io::IO, obj)
     return print(
         io,
@@ -46,6 +65,12 @@ termshow(obj; kwargs...) = termshow(stdout, obj; kwargs...)
 # ---------------------------------------------------------------------------- #
 #                                     EXPR                                     #
 # ---------------------------------------------------------------------------- #
+"""
+---
+    termshow(io::IO, e::Expr; kwargs...)
+
+Show an expression's head and arguments.
+"""
 function termshow(io::IO, e::Expr; kwargs...)
     content = repr_get_obj_fields_display(e)
     content =
@@ -68,6 +93,12 @@ end
 # ---------------------------------------------------------------------------- #
 #                                  DICTIONARY                                  #
 # ---------------------------------------------------------------------------- #
+"""
+---
+    termshow(io::IO, d::Dict; kwargs...)
+
+Show a dictionary's keys and values and their data types.
+"""
 function termshow(io::IO, obj::AbstractDict; kwargs...)
     short_string(x) = truncate(string(x), 30)
     theme = TERM_THEME[]
@@ -132,6 +163,12 @@ end
 # ---------------------------------------------------------------------------- #
 #                                ABSTRACT ARRAYS                               #
 # ---------------------------------------------------------------------------- #
+"""
+---
+    termshow(io::IO, mtx::AbstractMatrix; kwargs...)
+
+Show a matrix content as a 2D table visualization.
+"""
 termshow(io::IO, mtx::AbstractMatrix; kwargs...) = print(
     io,
     repr_panel(
@@ -141,6 +178,12 @@ termshow(io::IO, mtx::AbstractMatrix; kwargs...) = print(
     ),
 )
 
+"""
+---
+    termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...)
+
+Show a vector's content as a 1D table visualization.
+"""
 termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
     io,
     repr_panel(
@@ -154,6 +197,12 @@ termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
     ),
 )
 
+"""
+---
+    termshow(io::IO, arr::AbstractArray; kwargs...)
+
+Show the content of a multidimensional array as a series of 2D slices.
+"""
 function termshow(io::IO, arr::AbstractArray; kwargs...)
     I0 = CartesianIndices(size(arr)[3:end])
     I = I0[1:min(10, length(I0))]
@@ -198,6 +247,12 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
     )
 end
 
+"""
+---
+    termshow(io::IO, obj::DataType; kwargs...)
+
+Show a type's arguments, constructors and docstring.
+"""
 function termshow(io::IO, obj::DataType; kwargs...)
     theme = TERM_THEME[]
     ts = theme.repr_type_style
@@ -238,6 +293,12 @@ function termshow(io::IO, obj::DataType; kwargs...)
     tprint(io, doc)
 end
 
+"""
+---
+    termshow(io::IO, fun::Function; kwargs...)
+
+Show a function's methods and docstring.
+"""
 function termshow(io::IO, fun::Function; width=min(console_width() - 10, DEFAULT_WT[]))
     # get methods
     _methods = split_lines(string(methods(fun)))
@@ -292,6 +353,11 @@ end
 # ---------------------------------------------------------------------------- #
 #                                 INSTALL REPR                                 #
 # ---------------------------------------------------------------------------- #
+"""
+    install_term_repr()
+
+Make `term_show` be called every times something is shown in the REPL
+"""
 function install_term_repr()
     @eval begin
         import Term: termshow
