@@ -45,11 +45,10 @@ makedocs(;
             "adv/repr.md",
             "adv/progressbars.md",
             "adv/logging.md",
-            "adv/errors_tracebacks.md",  # TODO update screenshot
+            "adv/errors_tracebacks.md",
             "adv/introspection.md",
             "adv/markdown.md",
         ],
-        "Examples" => Any["examples/examples.md",],
         "API" => Any[
             "api/api_term.md",
             "api/api_boxes.md",

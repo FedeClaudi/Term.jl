@@ -46,11 +46,14 @@ for text in strings
     # println(reshape_text(text, width))
     print("\n\n")
     println('_'^width)
-    tprint(reshape_text(text, width))
+    tprintln(reshape_text(text, width))
     println('_'^width)
-    tprint(text)
+    # tprint(text)
 end
 
-# text = strings[end-1]
+# text = strings[end]
+
 # println('_'^width)
 # println(reshape_text(text, width))
+# println(text)
+

@@ -9,7 +9,7 @@ highlight_regexes = OrderedDict(
     :number => (r"(?<group>(?<![a-zA-Z0-9_#])\d+(\.\d*)?+([eE][+-]?\d*)?)",),
     :operator =>
         (r"(?<group>(?<!\{)\/)", r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~])"),
-    :string => (r"(?<group>[\"\']{3}|[\'\"]{1}(\n|.)*?[\"\']{3}|[\'\"]{1})",),
+    :string => (r"(?<group>[\'\"][\w\n]*[\'\"])", ),
     :code => (r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))",),
     :expression => (r"(?<group>\:\(+.+[\)])",),
     :symbol => (r"(?<group>(?<!\:)(?<!\:)\:\w+)",),
@@ -35,7 +35,8 @@ function highlight(text::AbstractString; theme::Theme = TERM_THEME[])
         end
     end
 
-    return remove_markup(apply_style(text))
+    # return remove_markup(apply_style(text))
+    return text
 end
 
 """

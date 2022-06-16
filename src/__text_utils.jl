@@ -132,7 +132,7 @@ const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
 """
     remove_ansi(str)::String
 
-Replace each cirly bracket with a double copy of itself
+Replace each curly bracket with a double copy of itself
 """
 escape_brackets(text)::String =
     replace_multi(text, brackets_regexes[1] => "{{", brackets_regexes[2] => "}}")

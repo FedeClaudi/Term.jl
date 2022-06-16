@@ -2,7 +2,7 @@ module Errors
 
 import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
-import Term: highlight, truncate, reshape_text, load_code_and_highlight, DEFAULT_WT
+import Term: highlight, truncate, reshape_text, load_code_and_highlight, DEFAULT_WT, escape_brackets, unescape_brackets
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
@@ -44,7 +44,12 @@ error_message(er::AssertionError) = return er.msg, ""
 # ! BOUNDS ERROR
 function error_message(er::BoundsError)
     # @info "bounds error" er fieldnames(typeof(er))
-    main_msg = "Attempted to access `$(er.a)` at index $(er.i)"
+    obj = escape_brackets(string(typeof(er.a)))
+    println(obj)
+    if er.a isa AbstractArray
+        obj = "a `$obj` width shape $(string(size(er.a)))"
+    end
+    main_msg = "Attempted to access $(obj) at index $(er.i)"
 
     additional_msg = ""
 
@@ -56,7 +61,8 @@ function error_message(er::BoundsError)
     else
         additional_msg = "\n{red}Variable is not defined!.{/red}"
     end
-    return main_msg, additional_msg
+
+    return highlight(main_msg), additional_msg
 end
 
 # ! Domain ERROR
@@ -82,7 +88,8 @@ end
 # !  KeyError
 function error_message(er::KeyError)
     # @info "err KeyError" er fieldnames(KeyError)
-    msg = "Key `$(er.key)` not found!"
+    key = truncate(er.key, 40)
+    msg = "Key `$(key)` not found!"
     return msg, ""
 end
 
@@ -173,14 +180,12 @@ end
 # ! UndefKeywordError
 function error_message(er::UndefKeywordError)
     # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
-    var = string(er.var)
     return "Undefined function keyword argument: `$(er.var)`.", ""
 end
 
 # ! UNDEFVAR ERROR
 function error_message(er::UndefVarError)
     # @info "undef var error" er er.var typeof(er.var)
-    var = string(er.var)
     return "Undefined variable `$(er.var)`.", ""
 end
 
@@ -243,8 +248,6 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                         padding = (2, 2, 1, 1),
                         style = "dim red",
                         title_justify = :center,
-                        # fit = true,
-                        # width=W
                     )
                 error /= msg
                 print(error)

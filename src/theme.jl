@@ -35,8 +35,8 @@ style outputs to terminal.
     type::String = purple_light
     emphasis::String = "$blue  bold"
     emphasis_light::String = yellow_light
-    code::String = "$(yellow) italic"
-    multiline_code::String = "$(yellow) italic"
+    code::String = "$(yellow)"
+    multiline_code::String = "$(yellow)"
     symbol::String = orange
     expression::String = amber
     number::String = blue_light
