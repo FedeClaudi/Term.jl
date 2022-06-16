@@ -49,25 +49,16 @@ mutable struct Compositor
 end
 
 """
-    Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
+    Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, check::Bool = true, kwargs...)
 
 Constructor. Parses a layout expression and creates LayoutElements for 
 each element in the expression.
 """
-function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
-    # get elements names and sizes
-    elements = collect_elements(layout)
-    elements = elements isa Expr ? parse_single_element_layout(elements) : elements
-    w, h = default_size()
-    min_w = min_h = typemax(Int)
-    for e in elements
-        e isa Symbol && continue
-        min_w = min(min_w, e.args[2])
-        min_h = min(min_h, e.args[3])
-    end
-    min_w == typemax(Int) && (min_w = w)
-    min_h == typemax(Int) && (min_h = h)
-    elements = [e isa Symbol ? :($e($min_w, $min_h)) : e for e in elements]
+function Compositor(
+    layout::Expr;
+    hpad::Int = 0, vpad::Int = 0, placeholder_size = nothing, check::Bool = true, kwargs...
+)
+    elements = get_elements_and_sizes(layout; placeholder_size = placeholder_size)
 
     # create renderables
     colors = if length(elements) > 1
@@ -77,7 +68,7 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     end
 
     renderables = Dict(
-        e.args[1] => extract_renderable_from_kwargs(e.args...; kwargs...) for e in elements
+        e.args[1] => extract_renderable_from_kwargs(e.args...; check = check, kwargs...) for e in elements
     )
 
     placeholders =
@@ -171,7 +162,7 @@ function render(compositor::Compositor; show_placeholders = false)
         Dict(e => p for (e, p) in zip(elements, placeholders))
     else
         Dict(
-            e => isnothing(r) ? p : r for
+            e => something(r, p) for
             (e, r, p) in zip(elements, renderables, placeholders)
         )
     end

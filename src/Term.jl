@@ -42,6 +42,7 @@ include("tables.jl")
 include("markdown.jl")
 include("repr.jl")
 include("compositors.jl")
+include("grid.jl")
 
 export RenderableText, Panel, TextBox
 export TERM_THEME, highlight
@@ -123,5 +124,7 @@ using .Compositors: Compositor, update!
 using .TermMarkdown: parse_md
 
 using .Repr: @with_repr, termshow, install_term_repr
+
+using .Grid
 
 end
