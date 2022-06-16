@@ -95,10 +95,6 @@ end
         Panel(width = 20, height = 10),
         Panel(width = 20, height = 15),
     ]
-    compositor = grid(rens, layout = :((_ * a) / (b * _ * c) / (d * e)))
-    @test size(compositor.elements[:a].renderable) == (10, 5)
-    @test size(compositor.elements[:b].renderable) == (15, 5)
-    @test size(compositor.elements[:c].renderable) == (20, 5)
-    @test size(compositor.elements[:d].renderable) == (20, 10)
-    @test size(compositor.elements[:e].renderable) == (20, 15)
+    g = grid(rens, layout = :((_ * a) / (b * _ * c) / (d * e)))
+    @test size(g.measure) == (45, 25)
 end

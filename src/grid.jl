@@ -1,6 +1,6 @@
 module Grid
 
-import ..Renderables: AbstractRenderable
+import ..Renderables: Renderable, AbstractRenderable
 import ..Measures: Measure, default_size
 import ..Layout: PlaceHolder, vstack
 import ..Compositors: Compositor
@@ -47,7 +47,8 @@ function grid(
             (nm = e.args[1]) === :_ && continue
             kw[nm] = rens[n += 1]
         end
-        return Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...)
+        return Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...) |>
+               Renderable
     end
 
     nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
