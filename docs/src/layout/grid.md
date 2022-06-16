@@ -28,10 +28,10 @@ You can also specify the apsect ratio of the grid:
 grid(panels; aspect=1)
 ```
 
-Note that with an aspect ratio of `1` the best way is to create `3` columns and `3` rows, but we only have `8` renderables! No problem, `grid` introduces a placeholder for the missing renderables.
+Note that with an aspect ratio of `1` the best way is to create `3` columns and `3` rows, but we only have `8` renderables! No problem, `grid` introduces a placeholder for the missing renderables. This is not shown by default, but you can see it with:
 But you can hide it too:
 ```@example grid
-grid(panels; aspect=1, show_placeholder=false)
+grid(panels; aspect=1, show_placeholder=true)
 ```
 
 One can use complex expressions for layouts, and use and underscore `_` to specify empty elements in the layout:
