@@ -2,7 +2,14 @@ module Errors
 
 import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
-import Term: highlight, truncate, reshape_text, load_code_and_highlight, DEFAULT_WIDTH, escape_brackets, unescape_brackets
+import Term:
+    highlight,
+    truncate,
+    reshape_text,
+    load_code_and_highlight,
+    DEFAULT_WIDTH,
+    escape_brackets,
+    unescape_brackets
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad

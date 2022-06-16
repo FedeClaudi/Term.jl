@@ -222,18 +222,20 @@ layout_example = cvstack(
 )
 
 using Markdown
-import MyterialColors: pink_light, deep_purple_light, indigo_light, amber_light, teal_light, salmon_light
+import MyterialColors:
+    pink_light, deep_purple_light, indigo_light, amber_light, teal_light, salmon_light
 import Term.TermMarkdown: parse_md
-styles = (
-    pink_light, teal_light, indigo_light, 
-    amber_light, deep_purple_light, salmon_light
-)
-rens = map(s -> Panel(; width=20, height=8,  box=:SQUARE, background="on_$s"), 
-            styles
-) |> collect
+styles =
+    (pink_light, teal_light, indigo_light, amber_light, deep_purple_light, salmon_light)
+rens =
+    map(
+        s -> Panel(; width = 20, height = 8, box = :SQUARE, background = "on_$s"),
+        styles,
+    ) |> collect
 g = grid(rens)
 
-t = parse_md(md"""
+t = parse_md(
+    md"""
 # Markdown parsing
 
 Term parses `MD` types - markdown content - with style!
@@ -263,8 +265,9 @@ termshow(print)  # prints styled docstring to console
         Term has a really awesome `Table` renderable, you should check it out!
 
 
-"""; width=100)
-
+""";
+    width = 100,
+)
 
 # ----------------------------------- print ---------------------------------- #
 # width is 140
@@ -289,8 +292,13 @@ readme =
         tree *
         Spacer(tree.measure.h, 5) *
         dendo
-    ) / line / (Spacer(layout_text.measure.h, 3) * layout_text * layout_example ) /
-    line / 
-    ( Spacer(height(t), 20) * vLine(height(t); style="dim") * "  " * t * "  " * vLine(height(t); style="dim") )
+    ) / line / (Spacer(layout_text.measure.h, 3) * layout_text * layout_example) / line / (
+        Spacer(height(t), 20) *
+        vLine(height(t); style = "dim") *
+        "  " *
+        t *
+        "  " *
+        vLine(height(t); style = "dim")
+    )
 
 print(Spacer(readme.measure.h, 10) * readme)
