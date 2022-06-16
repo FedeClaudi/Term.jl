@@ -45,10 +45,10 @@ function make_logo()
     as_code(x) = "{orange1 italic}`$x`{/orange1 italic}"
 
     # create "spacers" and stack renderables
-    hspacer = Spacer(green.measure.w / 2 + 1, green.measure.h)
-    line = Spacer(green.measure.w * 2 + 6, 1)
+    hspacer = Spacer(green.measure.h, green.measure.w / 2 + 1)
+    line = Spacer(1, green.measure.w * 2 + 6)
     circles =
-        line / (hspacer * green * hspacer) / (red * Spacer(2, purple.measure.h) * purple)
+        line / (hspacer * green * hspacer) / (red * Spacer(purple.measure.h, 2) * purple)
 
     main = TextBox(
         """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
@@ -89,7 +89,7 @@ function make_logo()
             subtitle_justify = :right,
             subtitle_style = "dim",
             fit = true,
-        ) / "" / (Spacer(12, 2) * msg)
+        ) / "" / (Spacer(2, 12) * msg)
 
     return logo
 end
