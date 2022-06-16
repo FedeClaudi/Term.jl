@@ -12,7 +12,7 @@ import Term:
     split_lines,
     do_by_line,
     expr2string,
-    DEFAULT_WT
+    DEFAULT_WIDTH
 
 import ..Panels: Panel
 import ..Dendograms: Dendogram
@@ -53,8 +53,8 @@ function expressiontree(io::IO, e::Expr)
             title_style = "$light_green default bold",
             title_justify = :center,
             style = grey_dark,
-            fit = tree.measure.w > DEFAULT_WT[],
-            width = max(tree.measure.w, DEFAULT_WT[]),
+            fit = tree.measure.w > DEFAULT_WIDTH[],
+            width = max(tree.measure.w, DEFAULT_WIDTH[]),
             subtitle = "inspect",
             subtitle_justify = :right,
             justify = :center,

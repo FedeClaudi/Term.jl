@@ -83,13 +83,13 @@ function Base.show(io::IO, ::MIME"text/plain", theme::Theme)
 
     content =
         hLine(30, "Base"; style = "#9bb3e0") /
-        (rvstack(values[2:13]) * Spacer(2, 1) * lvstack(fields[2:13]))
+        (rvstack(values[2:13]) * Spacer(1, 2) * lvstack(fields[2:13]))
     content /= "" / hLine(30, "Logging"; style = "#9bb3e0")
-    content /= (rvstack(values[14:17]) * Spacer(2, 1) * lvstack(fields[14:17]))
+    content /= (rvstack(values[14:17]) * Spacer(1, 2) * lvstack(fields[14:17]))
     content /= "" / hLine(30, "Tree"; style = "#9bb3e0")
-    content /= (rvstack(values[18:22]) * Spacer(2, 1) * lvstack(fields[18:22]))
+    content /= (rvstack(values[18:22]) * Spacer(1, 2) * lvstack(fields[18:22]))
     content /= "" / hLine(30, "REPL"; style = "#9bb3e0")
-    content /= (rvstack(values[23:end]) * Spacer(2, 1) * lvstack(fields[23:end]))
+    content /= (rvstack(values[23:end]) * Spacer(1, 2) * lvstack(fields[23:end]))
 
     return print(
         io,

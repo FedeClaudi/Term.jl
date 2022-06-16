@@ -59,9 +59,9 @@ Table(data; columns_style=["bold green", "dim"], columns_justify=[:left, :right]
 but there's more (there always is, isn't it?):
 ```@example tb
 import Term.Layout: PlaceHolder
-ph1 = PlaceHolder(12, 3)
-ph2 = PlaceHolder(12, 5)
-ph3 = PlaceHolder(12, 7)
+ph1 = PlaceHolder(3, 12)
+ph2 = PlaceHolder(5, 12)
+ph3 = PlaceHolder(7, 12)
 
 data = Dict(
     "first\ncol." => [ph1, ph2, ph3],

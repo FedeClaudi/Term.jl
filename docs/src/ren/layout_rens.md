@@ -11,8 +11,8 @@ In this section we'll look at a few renderable types that are useful layout elem
 import Term: Panel
 import Term.Layout: Spacer
 
-p = Panel(; width=10, height=3)
-space = Spacer(5, 3)
+p = Panel(height=3, width=10)
+space = Spacer(3, 5)
 print(p * space * p)
 print(p * p)
 ```
@@ -22,14 +22,14 @@ print(p * p)
 ```@example layout
 
 import Term.Layout: vLine
-space = Spacer(5, 10)
+space = Spacer(10, 5)
 vLine(10; style="red") * space * vLine(10; style="blue") * space * vLine(10; style="green", box=:DOUBLE)
 ```
 
 and you can pass another `Renderable` as argument to create a line as tall as it:
 ```@example layout
 import Term: Panel
-p = Panel(; width=15, height=3)
+p = Panel(height=3, width=15)
 l = vLine(p)
 l * p * l
 ```
@@ -60,9 +60,9 @@ Does what it says on the tin. It's a convenience thing to create a renderable wi
 ```@example layout
 import Term.Layout: PlaceHolder
 
-p1 = PlaceHolder(35, 10)
-p2 = PlaceHolder(35, 10; style="red")
-p3 = PlaceHolder(75, 10; style="blue")
+p1 = PlaceHolder(10, 35)
+p2 = PlaceHolder(10, 35; style="red")
+p3 = PlaceHolder(10, 75; style="blue")
 
 (p1 * " "^5 * p2) / " " / p3
 ```

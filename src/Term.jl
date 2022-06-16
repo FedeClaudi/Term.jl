@@ -1,8 +1,8 @@
 module Term
 
 const DEBUG_ON = Ref(false)
-const DEFAULT_WT = Ref(88)  # default width
-const DEFAULT_AR = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
+const DEFAULT_WIDTH = Ref(88)  # default width
+const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
 # general utils
 include("__text_utils.jl")
@@ -42,6 +42,7 @@ include("tables.jl")
 include("markdown.jl")
 include("repr.jl")
 include("compositors.jl")
+include("grid.jl")
 
 export RenderableText, Panel, TextBox
 export TERM_THEME, highlight
@@ -66,23 +67,6 @@ using .Style: apply_style
 
 using .Segments: Segment
 
-"""
-    Measure(seg::Segment) 
-
-gives the measure of a segment
-"""
-Measures.Measure(seg::Segment) = seg.measure
-
-"""
-    Measure(segments::Vector{Segment})
-
-gives the measure of a vector of segments
-"""
-Measures.Measure(segments::Vector{Segment}) = Measure(
-    max([seg.measure.w for seg in segments]...),
-    sum([seg.measure.h for seg in segments]),
-)
-
 # -------------------------------- renderables ------------------------------- #
 using .Boxes
 
@@ -95,11 +79,27 @@ using .Layout
 using .Panels: Panel, TextBox
 
 # define additional methods for measure functions
+
 Measures.width(seg::Segment) = seg.measure.w
 Measures.width(ren::AbstractRenderable) = ren.measure.w
 
 Measures.height(seg::Segment) = seg.measure.h
 Measures.height(ren::AbstractRenderable) = ren.measure.h
+
+"""
+    Measure(seg::Segment) 
+
+gives the measure of a segment
+"""
+Measures.Measure(seg::Segment) = seg.measure
+
+"""
+    Measure(segments::Vector{Segment})
+
+gives the measure of a vector of segments
+"""
+Measures.Measure(segments::Vector{Segment}) =
+    Measure(sum(Measures.height.(segments)), maximum(Measures.width.(segments)))
 
 # ---------------------------------- others ---------------------------------- #
 using .Errors: install_term_stacktrace
@@ -123,5 +123,7 @@ using .Compositors: Compositor, update!
 using .TermMarkdown: parse_md
 
 using .Repr: @with_repr, termshow, install_term_repr
+
+using .Grid
 
 end

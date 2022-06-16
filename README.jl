@@ -74,10 +74,10 @@ oooooooooooo
         subtitle_style = "default bold #389826",
     )
 
-    hspacer = Spacer(green.measure.w / 2 + 1, green.measure.h)
-    line = Spacer(green.measure.w * 2 + 6, 1)
+    hspacer = Spacer(green.measure.h, green.measure.w / 2 + 1)
+    line = Spacer(1, green.measure.w * 2 + 6)
     circles =
-        line / (hspacer * green * hspacer) / (red * Spacer(2, purple.measure.h) * purple)
+        line / (hspacer * green * hspacer) / (red * Spacer(purple.measure.h, 2) * purple)
     return circles
 end
 
@@ -207,7 +207,7 @@ p1b = Panel(; width = 34, style = "#80bbe8")
 p2 = Panel(; width = 28, style = "#5692bf")
 p3 = Panel(; width = 34, style = "#316c99 bold")
 p3b = Panel(; width = 20, style = "#316c99 bold")
-_space = Spacer(1, layout_text.measure.h)
+_space = Spacer(layout_text.measure.h, 1)
 
 layout_example =
     hstack(lvstack(p1, p2, p3), cvstack(p1b, p2, p3b), rvstack(p1, p2, p3); pad = 1)
@@ -225,23 +225,23 @@ print("\n"^3)
 
 readme =
     (
-        Spacer(10, circles.measure.h) *
+        Spacer(circles.measure.h, 10) *
         circles *
-        Spacer(8, circles.measure.h) *
+        Spacer(circles.measure.h, 8) *
         basic_features
-    ) / (Spacer(140, 2) / line) / (
-        Spacer(3, colors_info.measure.h) *
+    ) / (Spacer(2, 140) / line) / (
+        Spacer(colors_info.measure.h, 3) *
         colors_info *
-        Spacer(3, colors_info.measure.h) *
-        (Spacer(100, 1) / colors)
+        Spacer(colors_info.measure.h, 3) *
+        (Spacer(1, 100) / colors)
     ) / line /
-    (Spacer(3, lorem_description.measure.h) * lorem_description * lorem1 * lorem2) / line /
+    (Spacer(lorem_description.measure.h, 3) * lorem_description * lorem1 * lorem2) / line /
     (
-        Spacer(3, tree.measure.h) *
+        Spacer(tree.measure.h, 3) *
         renderables_info *
         tree *
-        Spacer(5, tree.measure.h) *
+        Spacer(tree.measure.h, 5) *
         dendo
-    ) / line / (Spacer(3, layout_text.measure.h) * layout_text * layout_example)
+    ) / line / (Spacer(layout_text.measure.h, 3) * layout_text * layout_example)
 
-print(Spacer(10, readme.measure.h) * readme)
+print(Spacer(readme.measure.h, 10) * readme)

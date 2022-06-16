@@ -6,9 +6,9 @@ We've seen that you can vertically stack renderables:
 using Term
 using Term.Layout
 
-p1 = Panel(; height=3, width=20)
-p2 = Panel(; height=3, width=40)
-p3 = Panel(; height=3, width=60)
+p1 = Panel(height=3, width=20)
+p2 = Panel(height=3, width=40)
+p3 = Panel(height=3, width=60)
 vstack(p1, p2, p3;)
 ```
 
@@ -24,9 +24,9 @@ calling `center!(p1, p3;)` modifies the two renderables to ensure that they have
 Admittedly, this is nice but the syntax is a bit clunky. But don't worry of course we provide a shorthand notation to stack and justify in one fell swoop (because why would you justify if you're not stacking):
 
 ```@example justify
-p1 = Panel(; height=3, width=20)
-p2 = Panel(; height=3, width=40)
-p3 = Panel(; height=3, width=60)
+p1 = Panel(height=3, width=20)
+p2 = Panel(height=3, width=40)
+p3 = Panel(height=3, width=60)
 
 cvstack(p1, p2, p3;)
 ```

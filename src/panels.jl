@@ -1,6 +1,6 @@
 module Panels
 
-import Term: reshape_text, join_lines, fillin, truncate, ltrim_str, DEFAULT_WT
+import Term: reshape_text, join_lines, fillin, truncate, ltrim_str, DEFAULT_WIDTH
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
@@ -45,13 +45,15 @@ mutable struct Panel <: AbstractPanel
     end
 end
 
+Base.size(p::Panel) = size(p.measure)
+
 """
 ---
 
     Panel(; 
         fit::Bool = false,
-        width::Int = $(DEFAULT_WT[]),
         height::Int = 2,
+        width::Int = $(DEFAULT_WIDTH[]),
         padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
         kwargs...,  
     )
@@ -61,14 +63,14 @@ Construct a `Panel` with no content.
 
 ### Examples
 ```
-julia> Panel(; width=10, height=5)
+julia> Panel(height=5, width=10)
 ╭────────╮
 │        │
 │        │
 │        │
 ╰────────╯
 
-julia> Panel(; width=5, height=3)
+julia> Panel(height=3, width=5)
 ╭───╮
 │   │
 ╰───╯
@@ -76,17 +78,17 @@ julia> Panel(; width=5, height=3)
 """
 function Panel(;
     fit::Bool = false,
-    width::Int = DEFAULT_WT[],
     height::Int = 2,
+    width::Int = DEFAULT_WIDTH[],
     padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
     kwargs...,
 )
     # get panel measure
     panel_measure = if fit
         # hardcoded size of empty 'fitted' panel
-        Measure(3, 2)
+        Measure(2, 3)
     else
-        Measure(width, height)
+        Measure(height, width)
     end
 
     # get empty content measure
@@ -144,8 +146,8 @@ end
         content::Union{AbstractString,AbstractRenderable},
         ::Val{true},
         padding::Padding;
-        width::Union{Nothing,Int} = nothing,
         height::Union{Nothing,Int} = nothing,
+        width::Union{Nothing,Int} = nothing,
         kwargs...,
         )
 
@@ -158,8 +160,8 @@ function Panel(
     content::Union{AbstractString,AbstractRenderable},
     ::Val{true},
     padding::Padding;
-    width::Union{Nothing,Int} = nothing,
     height::Union{Nothing,Int} = nothing,
+    width::Union{Nothing,Int} = nothing,
     background::Union{Nothing,String} = nothing,
     kwargs...,
 )
@@ -168,11 +170,11 @@ function Panel(
         RenderableText(fillin(content; bg = background))
 
     content_measure = content.measure
-    width = isnothing(width) ? 0 : width
-    height = isnothing(height) ? 0 : height
+    height = something(height, 0)
+    width = something(width, 0)
     panel_measure = Measure(
-        max(width, content_measure.w + padding.left + padding.right + 2),
         max(height, content_measure.h + padding.top + padding.bottom + 2),
+        max(width, content_measure.w + padding.left + padding.right + 2),
     )
 
     # if panel is larger than console, fit content to panel
@@ -205,8 +207,8 @@ end
         content::Union{AbstractString,AbstractRenderable},
         ::Val{false},
         padding::Padding;
-        width::Int = $(DEFAULT_WT[]),
         height::Union{Nothing,Int} = nothing,
+        width::Int = $(DEFAULT_WIDTH[]),
         kwargs...,
     )
 
@@ -221,8 +223,8 @@ function Panel(
     content::Union{AbstractString,AbstractRenderable},
     ::Val{false},
     padding::Padding;
-    width::Int = DEFAULT_WT[],
     height::Union{Nothing,Int} = nothing,
+    width::Int = DEFAULT_WIDTH[],
     background::Union{Nothing,String} = nothing,
     kwargs...,
 )
@@ -236,8 +238,8 @@ function Panel(
     content =
         content isa AbstractRenderable ? content :
         RenderableText(fillin(content; bg = background))
-    height = isnothing(height) ? content.measure.h + Δh + 2 : height
-    panel_measure = Measure(width, height)
+    height = something(height, content.measure.h + Δh + 2)
+    panel_measure = Measure(height, width)
 
     # if the content is too tall, exclude some lines
     if content.measure.h > height - Δh - 1
@@ -389,7 +391,7 @@ function render(
     final_segments::Vector{Segment} = [
         repeat(empty, n_extra)...,                  # lines to reach target height
         repeat(empty, padding.bottom)...,           # bottom padding
-        bottom * "\e[0m",                                     # bottom border
+        bottom * "\e[0m",                           # bottom border
     ]
 
     segments = vcat(initial_segments, content_sgs, final_segments)
