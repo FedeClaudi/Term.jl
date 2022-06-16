@@ -4,7 +4,7 @@ interpolate_from_dict(ex::Expr, dict) =
 interpolate_from_dict(ex::Symbol, dict::Dict) = get(dict, ex, ex)
 interpolate_from_dict(ex::Any, dict) = ex
 
-layout_simbols = (
+layout_symbols = (
     Symbol(/),
     Symbol(*),
     :vstack,
@@ -25,10 +25,15 @@ layout_simbols = (
 """
     parse_single_element_layout(expr::Expr)
 
-Parse an expression with a single layout element, like :(A(25, 5))
+Parse an expression with a single layout element, like :(A(25, 5)) or :(A)
 """
 function parse_single_element_layout(expr::Expr)
-    s, w, h = expr.args
+    if length(expr.args) == 3
+        s, w, h = expr.args
+    else
+        s = expr.args[1]
+        w, h = default_size()
+    end
     return [:($s($w, $h))]
 end
 
@@ -39,24 +44,22 @@ Collects elements (individual LayoutElements) that are
 in a layout expresssion.
 """
 function collect_elements(exp::Expr)
-    if exp.args[1] ∉ layout_simbols && length(exp.args) > 2
-        n, w, h = exp.args
-        return :($n($w, $h))
-    elseif exp.args[1] ∉ layout_simbols
+    if exp.args[1] ∉ layout_symbols && length(exp.args) > 2
+        s, w, h = exp.args
+        return :($s($w, $h))
+    elseif exp.args[1] ∉ layout_symbols
         return nothing
     else
         symbols = map(x -> x isa Symbol ? x : collect_elements(x), exp.args)
-        symbols = filter(s -> s ∉ layout_simbols && !isnothing(s), symbols)
+        symbols = filter(s -> s ∉ layout_symbols && !isnothing(s), symbols)
         return reduce(vcat, symbols)
     end
 end
 
-function clean_layout_symbol(s::Symbol)
-    s[1] ∉ layout_simbols ? s[1] : s
-end
+clean_layout_symbol(s::Symbol) = s[1] ∉ layout_symbols ? s[1] : s
 
 function clean_layout_expr(exp::Expr)
-    if exp.args[1] ∉ layout_simbols
+    if exp.args[1] ∉ layout_symbols
         return exp.args[1]
     else
         exp.args = map(a -> a isa Expr ? clean_layout_expr(a) : a, exp.args)

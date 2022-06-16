@@ -26,7 +26,7 @@ export Spacer, vLine, hLine, PlaceHolder
 export leftalign!, center!, rightalign!
 export leftalign, center, rightalign
 export lvstack, cvstack, rvstack
-export grid
+export Placeholder, grid
 
 # ---------------------------------------------------------------------------- #
 #                                    PADDING                                   #
@@ -817,12 +817,16 @@ creates placeholders.
 function grid(
     rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
-    show_placeholder::Bool = true,
     aspect::Union{Nothing,Number,NTuple} = nothing,
-    layout::Union{Nothing,Tuple} = nothing,
+    layout::Union{Nothing,Tuple,Expr} = nothing,
+    show_placeholder::Bool = false,
     pad::Union{Tuple,Integer} = 0,
 )
     (isnothing(layout) && isnothing(rens)) && error("Grid: layout or aspect required")
+
+    if layout isa Expr
+        # parse layout, insert placeholders, return grid
+    end
 
     ph_style = show_placeholder ? "" : "hidden"
 

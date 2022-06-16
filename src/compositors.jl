@@ -4,7 +4,7 @@ import MyterialColors: Palette, blue, pink
 
 using ..Layout
 import ..Layout: PlaceHolder
-import ..Measures: width, height
+import ..Measures: width, height, default_size
 import ..Renderables: AbstractRenderable, RenderableText, Renderable
 import ..Repr: @with_repr, termshow
 import Term: highlight, update!
@@ -45,7 +45,7 @@ A layout compositor, creates an updatable layout from an expression.
 """
 mutable struct Compositor
     layout::Expr
-    elements::Dict{Symbol,LayoutElement}
+    elements::Dict{Symbol,Union{Nothing,LayoutElement}}
 end
 
 """
@@ -58,6 +58,16 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     # get elements names and sizes
     elements = collect_elements(layout)
     elements = elements isa Expr ? parse_single_element_layout(elements) : elements
+    w, h = default_size()
+    min_w = min_h = typemax(Int)
+    for e in elements
+        e isa Symbol && continue
+        min_w = min(min_w, e.args[2])
+        min_h = min(min_h, e.args[3])
+    end
+    min_w == typemax(Int) && (min_w = w)
+    min_h == typemax(Int) && (min_h = h)
+    elements = [e isa Symbol ? :($e($min_w, $min_h)) : e for e in elements]
 
     # create renderables
     colors = if length(elements) > 1
@@ -67,29 +77,28 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     end
 
     renderables = Dict(
-        s.args[1] => extract_renderable_from_kwargs(s.args...; kwargs...) for s in elements
+        e.args[1] => extract_renderable_from_kwargs(e.args...; kwargs...) for e in elements
     )
 
     placeholders =
-        Dict(s.args[1] => placeholder(s.args..., c) for (c, s) in zip(colors, elements))
+        Dict(e.args[1] => placeholder(e.args..., e.args[1] === :_ ? "hidden" : c) for (c, e) in zip(colors, elements))
 
-    # craete layout elements
+    # create layout elements
     layout_elements = Dict(
-        s.args[1] => LayoutElement(
-            s.args[1],
-            s.args[2],
-            s.args[3],
-            renderables[s.args[1]],
-            placeholders[s.args[1]],
-        ) for s in elements
+        e.args[1] => LayoutElement(
+            e.args[1],  # symbol
+            e.args[2],  # width
+            e.args[3],  # height
+            renderables[e.args[1]],
+            placeholders[e.args[1]],
+        ) for e in elements
     )
 
     # edit layout expression to add padding and remove size info
     expr = string(clean_layout_expr(copy(layout)))
 
-    hpad > 0 && (expr = replace(expr, "* " => "* Spacer($hpad, 1) * "))
-
-    vpad > 0 && (expr = replace(expr, "/" => "/ Spacer(1, $vpad) / "))
+    hpad > 0 && (expr = replace(expr, "*" => "* Spacer($hpad, 1) *"))
+    vpad > 0 && (expr = replace(expr, "/" => "/ Spacer(1, $vpad) /"))
 
     expr = Meta.parse(expr)
 
