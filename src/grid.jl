@@ -52,9 +52,9 @@ function grid(
                 rens[n += 1]
             end
         end
-        return Renderable(
-            Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...),
-        )
+        compositor = Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...)
+        @show compositor
+        return Renderable(compositor)
     end
 
     nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout

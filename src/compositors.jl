@@ -73,26 +73,27 @@ function Compositor(
         [pink]
     end
 
+    names = [gensym(:compositor) for e in elements]  # make sure we have unique names
+
     renderables = Dict(
-        e.args[1] =>
-            extract_renderable_from_kwargs(e.args...; check = check, kwargs...) for
-        e in elements
+        n => extract_renderable_from_kwargs(e.args...; check = check, kwargs...) for
+        (n, e) in zip(names, elements)
     )
 
     placeholders = Dict(
-        e.args[1] => compositor_placeholder(e.args..., e.args[1] === :_ ? "hidden" : c)
-        for (c, e) in zip(colors, elements)
+        n => compositor_placeholder(e.args..., e.args[1] === :_ ? "hidden" : c)
+        for (n, c, e) in zip(names, colors, elements)
     )
 
     # create layout elements
     layout_elements = Dict(
-        e.args[1] => LayoutElement(
+        n => LayoutElement(
             e.args[1],  # symbol
             e.args[2],  # height
             e.args[3],  # width
-            renderables[e.args[1]],
-            placeholders[e.args[1]],
-        ) for e in elements
+            renderables[n],
+            placeholders[n],
+        ) for (n, e) in zip(names, elements)
     )
 
     # edit layout expression to add padding and remove size info
