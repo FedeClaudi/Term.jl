@@ -95,7 +95,7 @@ print(Panel(&quot;.&quot;^60))</code></pre><pre class="documenter-example-output
 ╰──────────────────────────────────╯
 ╭────────────────────────────────────────────────────────────────╮
 │  ............................................................  │
-╰────────────────────────────────────────────────────────────────╯</code></pre><p>but you can change this by passing a <code>width</code> value. In fact you can se a height too:</p><pre><code class="language-julia hljs">Panel(&quot;.&quot;^10; width=20, height=5)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────────────╮
+╰────────────────────────────────────────────────────────────────╯</code></pre><p>but you can change this by passing a <code>width</code> value. In fact you can se a height too:</p><pre><code class="language-julia hljs">Panel(&quot;.&quot;^10; height=5, width=20)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────────────╮
 │  ..........      │
 │                  │
 │                  │
@@ -103,10 +103,10 @@ print(Panel(&quot;.&quot;^60))</code></pre><pre class="documenter-example-output
 </code></pre><p>Alternatively, you can use <code>fit=false</code>. </p><pre><code class="language-julia hljs">Panel(&quot;.&quot;^10; fit=false)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────────────────────────────────────────────────────────────────────────────────╮
 │  ..........                                                                          │
 ╰──────────────────────────────────────────────────────────────────────────────────────╯
-</code></pre><p>this will make all panels have the same width (uless you specify a width). The main difference is that if the content is larger than the panel, it will be truncated, which is not what happens if <code>fit=true</code>&quot;</p><pre><code class="language-julia hljs">p1 = Panel(&quot;.&quot;^10; width=60, height=5)
-print(Panel(p1; width=30, height=2))  # fit=true -&gt; expand out panel, width/height ignored
-print(Panel(p1; width=30, height=10, fit=false))  # fit=false -&gt; truncate the content
-print(Panel(&quot;very long text&quot;^20; width=30, height=10, fit=false))  # text is reshaped to fit the panel</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭────────────────────────────────────────────────────────────────╮
+</code></pre><p>this will make all panels have the same width (uless you specify a width). The main difference is that if the content is larger than the panel, it will be truncated, which is not what happens if <code>fit=true</code>&quot;</p><pre><code class="language-julia hljs">p1 = Panel(&quot;.&quot;^10; height=5, width=60)
+print(Panel(p1; height=2, width=30))  # fit=true -&gt; expand out panel, width/height ignored
+print(Panel(p1; height=10, width=30, fit=false))  # fit=false -&gt; truncate the content
+print(Panel(&quot;very long text&quot;^20; height=10, width=30, fit=false))  # text is reshaped to fit the panel</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭────────────────────────────────────────────────────────────────╮
 │  ╭──────────────────────────────────────────────────────────╮  │
 │  │  ..........                                              │  │
 │  │                                                          │  │
@@ -132,7 +132,7 @@ print(Panel(&quot;very long text&quot;^20; width=30, height=10, fit=false))  # t
 │  textvery long textvery    │
 │  long textvery long        │
 │  <span class="sgr2">... content omitted ...</span>   │
-╰────────────────────────────╯</code></pre><h2 id="Padding"><a class="docs-heading-anchor" href="#Padding">Padding</a><a id="Padding-1"></a><a class="docs-heading-anchor-permalink" href="#Padding" title="Permalink"></a></h2><p>You&#39;ll notice in the example above that there&#39;s still some space between the panel&#39;s borders and its content. That&#39;s padding. You can change how much padding to have to the left, right, top and bottom (in number of spaces/lines):</p><pre><code class="language- hljs">inner = Panel(; width=8, height=4, background=&quot;bg_#262626&quot;, style=&quot;bold red&quot;)
+╰────────────────────────────╯</code></pre><h2 id="Padding"><a class="docs-heading-anchor" href="#Padding">Padding</a><a id="Padding-1"></a><a class="docs-heading-anchor-permalink" href="#Padding" title="Permalink"></a></h2><p>You&#39;ll notice in the example above that there&#39;s still some space between the panel&#39;s borders and its content. That&#39;s padding. You can change how much padding to have to the left, right, top and bottom (in number of spaces/lines):</p><pre><code class="language- hljs">inner = Panel(height=4, width=8, background=&quot;bg_#262626&quot;, style=&quot;bold red&quot;)
 print(
     Panel(inner; fit=false, padding=(0, 0, 0, 0)),
     Panel(inner; fit=false, padding=(3, 1, 3, 1)),
@@ -153,4 +153,4 @@ TextBox(&quot;A very long piece of text&quot;^10; title=&quot;TEXT&quot;, width=
    textA very long piece      
    of text                    
                               
-</code></pre><p>Easy peasy!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../text/">« RenderableText</a><a class="docs-footer-nextpage" href="../table/">Table »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Thursday 16 June 2022 07:26">Thursday 16 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre><p>Easy peasy!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../text/">« RenderableText</a><a class="docs-footer-nextpage" href="../table/">Table »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Thursday 16 June 2022 20:10">Thursday 16 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
