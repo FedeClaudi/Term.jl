@@ -40,20 +40,21 @@ function grid(
 )
     (isnothing(layout) && isnothing(rens)) && error("Grid: layout or aspect required")
 
+    style = show_placeholder ? "" : "hidden"
+
     if !isnothing(rens) && layout isa Expr
         n, kw = 0, Dict()
         sizes = size.(rens)
         sz = (minimum(first.(sizes)), minimum(last.(sizes)))
-        for e in get_elements_and_sizes(layout; placeholder_size = sz)
+        for (i, e) in enumerate(get_elements_and_sizes(layout; placeholder_size = sz))
             nm = e.args[1]
             kw[nm] = if nm === :_
-                compositor_placeholder(nm, sz..., "hidden")
+                compositor_placeholder(nm, sz..., style)
             else
                 rens[n += 1]
             end
         end
         compositor = Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...)
-        @show compositor
         return Renderable(compositor)
     end
 
@@ -70,11 +71,8 @@ function grid(
             ncols, r = divrem(length(rens), nrows)
             r == 0 || (ncols += 1)
         end
-        fill_in = (
-            isnothing(placeholder) ?
-            PlaceHolder(first(rens); style = show_placeholder ? "" : "hidden") :
-            placeholder
-        )
+        fill_in =
+            (isnothing(placeholder) ? PlaceHolder(first(rens); style = style) : placeholder)
         rens = vcat(rens, repeat([fill_in], nrows * ncols - length(rens)))
     end
     return grid(reshape(rens, nrows, ncols); pad = pad)

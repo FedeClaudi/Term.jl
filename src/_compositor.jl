@@ -66,11 +66,13 @@ Collects elements (individual LayoutElements) that are
 in a layout expresssion.
 """
 function collect_elements(ex::Expr)
-    if ex.args[1] ∉ layout_symbols && length(ex.args) > 2
-        s, h, w = ex.args
-        return :($s($h, $w))
-    elseif ex.args[1] ∉ layout_symbols
-        return nothing
+    if ex.args[1] ∉ layout_symbols
+        return if length(ex.args) > 2
+            s, h, w = ex.args
+            :($s($h, $w))
+        else
+            nothing
+        end
     else
         symbols = map(x -> x isa Symbol ? x : collect_elements(x), ex.args)
         symbols = filter(s -> s ∉ layout_symbols && !isnothing(s), symbols)

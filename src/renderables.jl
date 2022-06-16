@@ -141,8 +141,6 @@ function RenderableText(
         map(ln -> Segment(style_init * ln * style_finish), split_lines(text))
     end
 
-    # @info "a" Measure(segments) segments[1]
-
     return RenderableText(segments, Measure(segments), style)
 end
 

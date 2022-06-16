@@ -65,6 +65,7 @@ function Compositor(
     kwargs...,
 )
     elements = get_elements_and_sizes(layout; placeholder_size = placeholder_size)
+    names = map(e -> first(e.args), elements)
 
     # create renderables
     colors = if length(elements) > 1
@@ -73,22 +74,20 @@ function Compositor(
         [pink]
     end
 
-    names = [gensym(:compositor) for e in elements]  # make sure we have unique names
-
     renderables = Dict(
         n => extract_renderable_from_kwargs(e.args...; check = check, kwargs...) for
         (n, e) in zip(names, elements)
     )
 
     placeholders = Dict(
-        n => compositor_placeholder(e.args..., e.args[1] === :_ ? "hidden" : c)
-        for (n, c, e) in zip(names, colors, elements)
+        n => compositor_placeholder(e.args..., n === :_ ? "hidden" : c) for
+        (n, c, e) in zip(names, colors, elements)
     )
 
     # create layout elements
     layout_elements = Dict(
         n => LayoutElement(
-            e.args[1],  # symbol
+            n,          # symbol
             e.args[2],  # height
             e.args[3],  # width
             renderables[n],
@@ -169,14 +168,11 @@ function render(compositor::Compositor; show_placeholders = false)
     length(renderables) == 1 && return something(renderables[1], placeholders[1])
 
     components = if show_placeholders
-        Dict(e => p for (e, p) in zip(elements, placeholders))
+        Dict(zip(elements, placeholders))
     else
         Dict(e => something(r, p) for (e, r, p) in zip(elements, renderables, placeholders))
     end
-    ex = interpolate_from_dict(compositor.layout, components)
-
-    # insert padding
-    return eval(:(a = $ex))
+    return eval(interpolate_from_dict(compositor.layout, components))
 end
 
 Base.string(compositor::Compositor; kwargs...) = string(render(compositor; kwargs...))
