@@ -4,7 +4,7 @@ using Dates
 import Parameters: @with_kw
 import UUIDs: UUID
 
-import Term: rint, textlen, truncate, loop_last, get_file_format, update!, DEFAULT_WT
+import Term: rint, textlen, truncate, loop_last, get_file_format, update!, DEFAULT_WIDTH
 import ..Tprint: tprint, tprintln
 import ..Style: apply_style
 import ..Consoles:
@@ -175,7 +175,7 @@ Update a job's progress `i` by setting its value or adding `+1`.
 function update!(job::ProgressJob; i = nothing)
     (!isnothing(job.N) && job.i ≥ job.N) && return stop!(job)
 
-    job.i = isnothing(i) ? job.i + 1 : job.i + i
+    job.i += something(i, 1)
     return nothing
 end
 
@@ -260,7 +260,7 @@ end
 
 """
     ProgressBar(;
-        width::Int=$(DEFAULT_WT[]),
+        width::Int=$(DEFAULT_WIDTH[]),
         columns::Union{Vector{DataType}, Symbol} = :default,
         columns_kwargs::Dict = Dict(),
         expand::Bool=false,
@@ -276,7 +276,7 @@ end
 Create a ProgressBar instance.
 """
 function ProgressBar(;
-    width::Int = DEFAULT_WT[],
+    width::Int = DEFAULT_WIDTH[],
     columns::Union{Vector{DataType},Symbol} = :default,
     columns_kwargs::Dict = Dict(),
     expand::Bool = false,

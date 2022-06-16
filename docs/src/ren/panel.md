@@ -128,7 +128,7 @@ print(Panel("."^60))
 
 but you can change this by passing a `width` value. In fact you can se a height too:
 ```@example panel
-Panel("."^10; width=20, height=5)
+Panel("."^10; height=5, width=20)
 ```
 
 Alternatively, you can use `fit=false`. 
@@ -137,17 +137,17 @@ Panel("."^10; fit=false)
 ```
 this will make all panels have the same width (uless you specify a width). The main difference is that if the content is larger than the panel, it will be truncated, which is not what happens if `fit=true`"
 ```@example panel
-p1 = Panel("."^10; width=60, height=5)
-print(Panel(p1; width=30, height=2))  # fit=true -> expand out panel, width/height ignored
-print(Panel(p1; width=30, height=10, fit=false))  # fit=false -> truncate the content
-print(Panel("very long text"^20; width=30, height=10, fit=false))  # text is reshaped to fit the panel
+p1 = Panel("."^10; height=5, width=60)
+print(Panel(p1; height=2, width=30))  # fit=true -> expand out panel, width/height ignored
+print(Panel(p1; height=10, width=30, fit=false))  # fit=false -> truncate the content
+print(Panel("very long text"^20; height=10, width=30, fit=false))  # text is reshaped to fit the panel
 ```
 
 
 ## Padding
 You'll notice in the example above that there's still some space between the panel's borders and its content. That's padding. You can change how much padding to have to the left, right, top and bottom (in number of spaces/lines):
 ```@example panel
-inner = Panel(; width=8, height=4, background="bg_#262626", style="bold red")
+inner = Panel(height=4, width=8, background="bg_#262626", style="bold red")
 print(
     Panel(inner; fit=false, padding=(0, 0, 0, 0)),
     Panel(inner; fit=false, padding=(3, 1, 3, 1)),

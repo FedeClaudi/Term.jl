@@ -62,7 +62,7 @@ Adapted from: stackoverflow.com/a/43366784
 """
 function calc_nrows_ncols(n, aspect::Union{Nothing,Number,NTuple} = nothing)
     w, h = if isnothing(aspect)
-        r1, c1 = calc_nrows_ncols(n, DEFAULT_AR[])
+        r1, c1 = calc_nrows_ncols(n, DEFAULT_ASPECT_RATIO[])
         r2, c2 = calc_nrows_ncols(n, 1)  # unit aspect - square
         return r1 * c1 < r2 * c2 ? (r1, c1) : (r2, c2)  # choose the best fit
     elseif aspect isa Number

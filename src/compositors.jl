@@ -4,7 +4,7 @@ import MyterialColors: Palette, blue, pink
 
 using ..Layout
 import ..Layout: PlaceHolder
-import ..Measures: width, height
+import ..Measures: width, height, default_size
 import ..Renderables: AbstractRenderable, RenderableText, Renderable
 import ..Repr: @with_repr, termshow
 import Term: highlight, update!
@@ -16,8 +16,8 @@ include("_compositor.jl")
 """
     mutable struct LayoutElement
         id::Symbol
-        w::Int
         h::Int
+        w::Int
         renderable::Union{Nothing,String,AbstractRenderable}
         placeholder::PlaceHolder
     end
@@ -29,11 +29,13 @@ each `LayoutElement` if there is one, the placeholder otherwise.
 
 @with_repr mutable struct LayoutElement
     id::Symbol
-    w::Int
     h::Int
+    w::Int
     renderable::Union{Nothing,String,AbstractRenderable}
     placeholder::PlaceHolder
 end
+
+Base.size(e::LayoutElement) = (e.h, e.w)
 
 """
     mutable struct Compositor
@@ -45,19 +47,25 @@ A layout compositor, creates an updatable layout from an expression.
 """
 mutable struct Compositor
     layout::Expr
-    elements::Dict{Symbol,LayoutElement}
+    elements::Dict{Symbol,Union{Nothing,LayoutElement}}
 end
 
 """
-    Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
+    Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, check::Bool = true, kwargs...)
 
 Constructor. Parses a layout expression and creates LayoutElements for 
 each element in the expression.
 """
-function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
-    # get elements names and sizes
-    elements = collect_elements(layout)
-    elements = elements isa Expr ? parse_single_element_layout(elements) : elements
+function Compositor(
+    layout::Expr;
+    hpad::Int = 0,
+    vpad::Int = 0,
+    placeholder_size = nothing,
+    check::Bool = true,
+    kwargs...,
+)
+    elements = get_elements_and_sizes(layout; placeholder_size = placeholder_size)
+    names = map(e -> first(e.args), elements)
 
     # create renderables
     colors = if length(elements) > 1
@@ -67,29 +75,31 @@ function Compositor(layout::Expr; hpad::Int = 0, vpad::Int = 0, kwargs...)
     end
 
     renderables = Dict(
-        s.args[1] => extract_renderable_from_kwargs(s.args...; kwargs...) for s in elements
+        n => extract_renderable_from_kwargs(e.args...; check = check, kwargs...) for
+        (n, e) in zip(names, elements)
     )
 
-    placeholders =
-        Dict(s.args[1] => placeholder(s.args..., c) for (c, s) in zip(colors, elements))
+    placeholders = Dict(
+        n => compositor_placeholder(e.args..., n === :_ ? "hidden" : c) for
+        (n, c, e) in zip(names, colors, elements)
+    )
 
-    # craete layout elements
+    # create layout elements
     layout_elements = Dict(
-        s.args[1] => LayoutElement(
-            s.args[1],
-            s.args[2],
-            s.args[3],
-            renderables[s.args[1]],
-            placeholders[s.args[1]],
-        ) for s in elements
+        n => LayoutElement(
+            n,          # symbol
+            e.args[2],  # height
+            e.args[3],  # width
+            renderables[n],
+            placeholders[n],
+        ) for (n, e) in zip(names, elements)
     )
 
     # edit layout expression to add padding and remove size info
     expr = string(clean_layout_expr(copy(layout)))
 
-    hpad > 0 && (expr = replace(expr, "* " => "* Spacer($hpad, 1) * "))
-
-    vpad > 0 && (expr = replace(expr, "/" => "/ Spacer(1, $vpad) / "))
+    hpad > 0 && (expr = replace(expr, "*" => "* Spacer(1, $hpad) *"))
+    vpad > 0 && (expr = replace(expr, "/" => "/ Spacer($vpad, 1) /"))
 
     expr = Meta.parse(expr)
 
@@ -120,15 +130,15 @@ function update!(
 )
     # check that the id is valid
     haskey(compositor.elements, id) || begin
-        @warn highlight("Could not update compsitor - id: `$id` is not in the layout")
+        @warn highlight("Could not update compositor - id: `$id` is not in the layout")
         return
     end
 
     # check that the shapes match
     elem = compositor.elements[id]
     if elem.w != width(content) || elem.h != height(content)
-        content_shape = "{red}$(width(content)) × $(height(content)){/red}"
-        target_shape = "{bright_blue}$(elem.w) × $(elem.h){/bright_blue}"
+        content_shape = "{red}$(height(content)) × $(width(content)){/red}"
+        target_shape = "{bright_blue}$(elem.h) × $(elem.w){/bright_blue}"
         @warn "Shape mismatch while updating compositor element {yellow}`$id`{/yellow}.\nGot $content_shape, expected $target_shape"
     end
 
@@ -136,8 +146,12 @@ function update!(
     compositor.elements[id].renderable = content
 end
 
-update!(compositor::Compositor; kwargs) =
-    map((id, content) -> update!(compositor, id, content), kwargs)
+function update!(compositor::Compositor; kwargs...)
+    for (id, content) in kwargs
+        update!(compositor, id, content)
+    end
+    compositor
+end
 
 # ---------------------------------------------------------------------------- #
 #                                   rendering                                  #
@@ -155,21 +169,14 @@ function render(compositor::Compositor; show_placeholders = false)
     elements = getfield.(values(compositor.elements), :id)
     renderables = getfield.(values(compositor.elements), :renderable)
     placeholders = getfield.(values(compositor.elements), :placeholder)
-    length(renderables) == 1 &&
-        return isnothing(renderables[1]) ? placeholders[1] : renderables[1]
+    length(renderables) == 1 && return something(renderables[1], placeholders[1])
 
     components = if show_placeholders
-        Dict(e => p for (e, p) in zip(elements, placeholders))
+        Dict(zip(elements, placeholders))
     else
-        Dict(
-            e => isnothing(r) ? p : r for
-            (e, r, p) in zip(elements, renderables, placeholders)
-        )
+        Dict(e => something(r, p) for (e, r, p) in zip(elements, renderables, placeholders))
     end
-    ex = interpolate_from_dict(compositor.layout, components)
-
-    # insert padding
-    return eval(:(a = $ex))
+    return eval(interpolate_from_dict(compositor.layout, components))
 end
 
 Base.string(compositor::Compositor; kwargs...) = string(render(compositor; kwargs...))

@@ -4,7 +4,7 @@ import Term.Consoles: clear
 @testset "REPR renderable repr" begin
     p = string(Panel())
     @test sprint(show, Panel()) ==
-          "\e[38;5;117mPanel <: AbstractRenderable\e[0m \e[2m(w:88, h:2)\e[0m"
+          "\e[38;5;117mPanel <: AbstractRenderable\e[0m \e[2m(h:2, w:88)\e[0m"
 end
 
 @testset "REPR @with_repr" begin

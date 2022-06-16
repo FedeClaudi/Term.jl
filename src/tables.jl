@@ -94,7 +94,7 @@ function Table(
 )
 
     # prepare some variables
-    header_justify = isnothing(header_justify) ? columns_justify : header_justify
+    header_justify = something(header_justify, columns_justify)
     box = eval(box)
 
     # table info
@@ -263,7 +263,7 @@ function Table(
 
     if !isnothing(footer)
         # get footer style
-        footer_justify = isnothing(footer_justify) ? columns_justify : footer_justify
+        footer_justify = something(footer_justify, columns_justify)
         footer_style, footer_justify = expand.([footer_style, footer_justify], N_cols)
 
         push!(
@@ -300,9 +300,8 @@ end
 
 Construct `Table` from `Vector` and `Matrix`
 """
-function Table(data::Union{AbstractVector,AbstractMatrix}; kwargs...)
-    return Table(TablesPkg.table(data); kwargs...)
-end
+Table(data::Union{AbstractVector,AbstractMatrix}; kwargs...) =
+    Table(TablesPkg.table(data); kwargs...)
 
 """ 
 Table(data::AbstractDict; kwargs...)
@@ -368,15 +367,15 @@ function table_row(
 end
 
 """
-    cell(x::AbstractString, w::Int, h::Int, justify::Symbol, style::String, vertical_justify::Symbol)
+    cell(x::AbstractString, hor_pad::Int, h::Int, w::Int, justify::Symbol, style::String, vertical_justify::Symbol)
 
 Create a Table's row's cell from a string - apply styling and vertical/horizontal justification.
 """
 function cell(
     x::AbstractString,
-    w::Int,
     hor_pad::Int,
     h::Int,
+    w::Int,
     justify::Symbol,
     style::String,
     vertical_justify::Symbol,
@@ -392,15 +391,15 @@ function cell(
 end
 
 """
-    cell(x::AbstractString, w::Int, h::Int, justify::Symbol, style::String, vertical_justify::Symbol)
+    cell(x::AbstractString, hor_pad::Int, h::Int, w::Int, justify::Symbol, style::String, vertical_justify::Symbol)
 
 Create a Table's row's cell from a renderable - apply styling and vertical/horizontal justification.
 """
 function cell(
     x::AbstractRenderable,
-    w::Int,
     hor_pad::Int,
     h::Int,
+    w::Int,
     justify::Symbol,
     style::String,
     vertical_justify::Symbol,
@@ -433,9 +432,9 @@ function make_row_cells(
     cells = map(
         i -> cell(
             entries[i],
-            widths[i],
             hor_pad[i],
             height,
+            widths[i],
             justify[i],
             style[i],
             vertical_justify,

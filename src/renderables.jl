@@ -27,7 +27,7 @@ abstract type AbstractRenderable end
 Measure(renderable::AbstractRenderable) = renderable.measure
 
 info(r::AbstractRenderable)::String =
-    "\e[38;5;117m$(typeof(r)) <: AbstractRenderable\e[0m \e[2m(w:$(r.measure.w), h:$(r.measure.h))\e[0m"
+    "\e[38;5;117m$(typeof(r)) <: AbstractRenderable\e[0m \e[2m(h:$(r.measure.h), w:$(r.measure.w))\e[0m"
 
 """
     Base.string(r::AbstractRenderable)::String
@@ -140,8 +140,6 @@ function RenderableText(
         style_init, style_finish = get_style_codes(MarkupStyle(style))
         map(ln -> Segment(style_init * ln * style_finish), split_lines(text))
     end
-
-    # @info "a" Measure(segments) segments[1]
 
     return RenderableText(segments, Measure(segments), style)
 end

@@ -38,7 +38,7 @@ println(s1 / p1 / s2 / tb1)
 Now, stacking things is great, but want if you want some space between them?
 `Spacer` lets you create an empty space with set width and height
 """
-space = Spacer(20, p1.measure.h)  # create empty space with same height as p1!
+space = Spacer(p1.measure.h, 20)  # create empty space with same height as p1!
 
 # horizzontally stack everything and print!
 top = p1 * space * p1

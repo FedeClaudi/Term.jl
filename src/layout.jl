@@ -2,20 +2,10 @@ module Layout
 
 import Parameters: @with_kw
 
-import Term:
-    rint,
-    get_lr_widths,
-    textlen,
-    cint,
-    fint,
-    rtrim_str,
-    ltrim_str,
-    calc_nrows_ncols,
-    do_by_line,
-    DEFAULT_AR
+import Term: rint, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, do_by_line
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
-import ..Measures: Measure, height, width, default_size
 import ..Consoles: console_width, console_height
+import ..Measures: Measure, height, width
 import ..Boxes: get_lrow, get_rrow
 import ..Style: apply_style
 import ..Segments: Segment
@@ -26,7 +16,7 @@ export Spacer, vLine, hLine, PlaceHolder
 export leftalign!, center!, rightalign!
 export leftalign, center, rightalign
 export lvstack, cvstack, rvstack
-export grid
+export Placeholder
 
 # ---------------------------------------------------------------------------- #
 #                                    PADDING                                   #
@@ -571,15 +561,15 @@ mutable struct Spacer <: AbstractLayoutElement
     measure::Measure
 end
 
-function Spacer(width::Int, height::Int; char::Char = ' ')
+function Spacer(height::Int, width::Int; char::Char = ' ')
     line = char^width
     seg = Segment(line)
     segments = repeat([seg], height)
-    return Spacer(segments, Measure(seg.measure.w, height))
+    return Spacer(segments, Measure(height, seg.measure.w))
 end
 
-Spacer(width::Number, height::Number; char::Char = ' ') =
-    Spacer(rint(width), rint(height); char = char)
+Spacer(height::Number, width::Number; char::Char = ' ') =
+    Spacer(rint(height), rint(width); char = char)
 
 # ----------------------------------- vline ---------------------------------- #
 """
@@ -606,7 +596,7 @@ function vLine(
     char = isnothing(char) ? getfield(Boxes, box).head.left : char
     line = apply_style("{" * style * "}" * char * "{/" * style * "}\e[0m")
     segments = repeat([Segment(line)], height)
-    return vLine(segments, Measure(1, height))
+    return vLine(segments, Measure(height, 1))
 end
 
 """
@@ -645,7 +635,7 @@ Create a styled `hLine` of given width.
 function hLine(width::Int; style::String = "default", box::Symbol = :ROUNDED)
     char = eval(box).row.mid
     segments = [Segment(char^width * "\e[0m", style)]
-    return hLine(segments, Measure(width, 1))
+    return hLine(segments, Measure(1, width))
 end
 
 """
@@ -673,7 +663,7 @@ function hLine(
         get_rrow(box, rw - tr, :top; with_right = false) *
         "\e[0m"
 
-    return hLine([Segment(line, style)], Measure(width, 1))
+    return hLine([Segment(line, style)], Measure(1, width))
 end
 
 """
@@ -749,8 +739,8 @@ end
 
 """
     PlaceHolder(
-        w::Int,
-        h::Int;
+        h::In,
+        w::Int;
         style::String = "dim",
         text::Union{Nothing,String} = nothing,
     )
@@ -758,8 +748,8 @@ end
 Create a `PlaceHolder` with additional style information.
 """
 function PlaceHolder(
-    w::Int,
-    h::Int;
+    h::Int,
+    w::Int;
     style::String = "dim",
     text::Union{Nothing,String} = nothing,
 )
@@ -769,7 +759,7 @@ function PlaceHolder(
     lines::Vector{Segment} = map(i -> Segment(i % 2 != 0 ? b1 : b2, style), 1:h)
 
     # insert renderable size at center
-    text = isnothing(text) ? "($w × $h)" : text
+    text = something(text, "($h × $w)")
     text = "  " * text * "  "
     text = width(text) % 2 == 0 ? " " * text : text
     l = width(text)
@@ -793,82 +783,6 @@ function PlaceHolder(
 end
 
 PlaceHolder(ren::AbstractRenderable; kwargs...) =
-    PlaceHolder(ren.measure.w, ren.measure.h; kwargs...)
-
-# ---------------------------------------------------------------------------- #
-#                                     GRID                                     #
-# ---------------------------------------------------------------------------- #
-
-"""
-    grid(
-        rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
-        placeholder::Union{Nothing,AbstractRenderable} = nothing,
-        aspect::Union{Nothing,Number,NTuple} = nothing,
-        layout::Union{Nothing,Tuple} = nothing, 
-        pad::Union{Tuple,Integer} = 0,
-    )
-
-Construct a grid from a `AbstractVector` of `AbstractRenderable`s.
-
-Lays out the renderables to createa a grid with the desired aspect ratio or
-layout (number of rows, number of columns). If no renderables are passed it
-creates placeholders.
-"""
-function grid(
-    rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
-    placeholder::Union{Nothing,AbstractRenderable} = nothing,
-    show_placeholder::Bool = true,
-    aspect::Union{Nothing,Number,NTuple} = nothing,
-    layout::Union{Nothing,Tuple} = nothing,
-    pad::Union{Tuple,Integer} = 0,
-)
-    (isnothing(layout) && isnothing(rens)) && error("Grid: layout or aspect required")
-
-    ph_style = show_placeholder ? "" : "hidden"
-
-    nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
-    if isnothing(rens)
-        isnothing(layout) &&
-            throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s"))
-        rens = fill(PlaceHolder(default_size()...), prod(layout))
-    else
-        if isnothing(nrows)
-            nrows, r = divrem(length(rens), ncols)
-            r == 0 || (nrows += 1)
-        elseif isnothing(ncols)
-            ncols, r = divrem(length(rens), nrows)
-            r == 0 || (ncols += 1)
-        end
-        fill_in =
-            isnothing(placeholder) ? PlaceHolder(first(rens); style = ph_style) :
-            placeholder
-        rens = vcat(rens, repeat([fill_in], nrows * ncols - length(rens)))
-    end
-    return grid(reshape(rens, nrows, ncols); pad = pad)
-end
-
-"""
-    grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Nothing,Integer} = 0))
-
-Construct a grid from a `AbstractMatrix` of `AbstractRenderable`s.
-"""
-function grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Tuple,Integer} = 0)
-    hpad, vpad = if pad isa Integer
-        (pad, pad)
-    else
-        pad
-    end
-    rows = collect(
-        foldl((a, b) -> a * ' '^hpad * b, col[2:end]; init = first(col)) for
-        col in eachrow(rens)
-    )
-    if vpad > 0
-        vspace = vpad > 1 ? vstack(repeat([" "], vpad)...) : " "
-        cat = (a, b) -> a / vspace / b
-    else
-        cat = (a, b) -> a / b
-    end
-    return foldl(cat, rows[2:end]; init = first(rows))
-end
+    PlaceHolder(ren.measure.h, ren.measure.w; kwargs...)
 
 end

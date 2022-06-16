@@ -2,7 +2,7 @@ import Term.Measures: Measure, width, height, default_size
 import Term: remove_markup, Panel
 
 @testset "\e[34mMeasure - str" begin
-    @test size(Measure("a"^10)) == (10, 1)
+    @test size(Measure("a"^10)) == (1, 10)
 
     for string in (
         "asadasda"^2,
@@ -11,8 +11,8 @@ import Term: remove_markup, Panel
         "asdasdsa|dfvcxvashfusdn\nfidsuhfsdf",
     )
         m = Measure(string)
-        @test m.w == lw(string)
         @test m.h == nlines(string)
+        @test m.w == lw(string)
     end
 
     for string in (
@@ -22,27 +22,29 @@ import Term: remove_markup, Panel
         "asdasdsa|dfvcxvashf{bold}usdn\nfid[/bold]suhfsdf",
     )
         m = Measure(string)
-        @test m.w == lw(remove_markup(string))
         @test m.h == nlines(remove_markup(string))
+        @test m.w == lw(remove_markup(string))
     end
 end
 
 # TODO test with renderables
 
 @testset "\e34mMeasure - funcs" begin
-    @test width("test") == 4
     @test height("test") == 1
+    @test width("test") == 4
 
     w = h = 5
     p = Panel(width = w, height = h)
-    @test width(p) == w
     @test height(p) == h
+    @test width(p) == w
 
     s = first(p.segments)
-    @test width(s) == w
     @test height(s) == 1
+    @test width(s) == w
+
+    @test size(Measure("foo") + Measure("testing")) == (2, 7)
 end
 
 @testset "\e34mMeasure - misc" begin
-    @test default_size() == (88, 66)
+    @test default_size() == (33, 88)
 end

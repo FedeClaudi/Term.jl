@@ -1,25 +1,26 @@
 import Term:
-    remove_markup,
-    has_markup,
-    remove_ansi,
-    has_ansi,
     get_last_ANSI_code,
-    cleantext,
-    textlen,
-    escape_brackets,
     unescape_brackets,
+    remove_brackets,
+    escape_brackets,
+    get_ANSI_codes,
+    unspace_commas,
+    remove_markup,
     replace_text,
     replace_ansi,
-    nospaces,
-    remove_brackets,
-    unspace_commas,
-    chars,
-    join_lines,
+    reshape_text,
+    remove_ansi,
     split_lines,
+    join_lines,
+    has_markup,
+    cleantext,
     textwidth,
-    fillin,
     truncate,
-    reshape_text
+    nospaces,
+    has_ansi,
+    textlen,
+    fillin,
+    chars
 import Term.Style: apply_style
 import Term.Measures: width as get_width
 
@@ -70,6 +71,7 @@ end
         @test has_ansi(s1)
         @test remove_ansi(s1) == s2
         @test get_last_ANSI_code(s1) == ltag
+        @test length(get_ANSI_codes(s1)) > 0
     end
 end
 

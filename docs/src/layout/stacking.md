@@ -49,11 +49,11 @@ Previously we briefly mentioned the idea of the `Measure` or a renderable object
 Let's see:
 ```@example
 import Term: Panel # hide
-p1 = Panel(width=5, height=5)
+p1 = Panel(height=5, width=5)
 println("p1.measure: ", p1.measure)
 
 
-p2 = Panel(width=8, height=5)
+p2 = Panel(height=5, width=8)
 println("p2.measure: ", p2.measure)
 
 h = p1 * p2
@@ -71,7 +71,7 @@ When stacking more than 2 renderables at one time, it's probably easier to use `
 ```@example stacking
 import Term.Layout: vstack, hstack # hide
 import Term: Panel # hide
-p1 = Panel(width=8, height=4) # hide
+p1 = Panel(height=4, width=8) # hide
 
 p1 * p1 * p1 * p1
 ```
