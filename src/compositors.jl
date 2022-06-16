@@ -130,7 +130,7 @@ function update!(
 )
     # check that the id is valid
     haskey(compositor.elements, id) || begin
-        @warn highlight("Could not update compsitor - id: `$id` is not in the layout")
+        @warn highlight("Could not update compositor - id: `$id` is not in the layout")
         return
     end
 
@@ -146,8 +146,12 @@ function update!(
     compositor.elements[id].renderable = content
 end
 
-update!(compositor::Compositor; kwargs) =
-    map((id, content) -> update!(compositor, id, content), kwargs)
+function update!(compositor::Compositor; kwargs...)
+    for (id, content) in kwargs
+        update!(compositor, id, content)
+    end
+    compositor
+end
 
 # ---------------------------------------------------------------------------- #
 #                                   rendering                                  #

@@ -21,15 +21,21 @@ end
 
 @testset "Compositor - creation" begin
     expr_1 = :(A(14, 12) * B(14, 12) / C(14, 12))
-    expr_2 = :(hstack(A(14, 12), B(14, 12), C(14, 12)))
-    expr_3 = :(vstack(A(14, 20), B(14, 12), C(14, 12); pad = 2))
 
     C1 = Compositor(expr_1)
     C1_b = Compositor(expr_1; B = Panel(height = 14, width = 12))
-    C2 = Compositor(expr_2)
-    C3 = Compositor(expr_3)
+    C2 = Compositor(:(hstack(A(14, 12), B(14, 12), C(14, 12))))
+
+    C3 = Compositor(:(vstack(A(14, 20), B(14, 12), C(14, 12); pad = 2)))
+
     update!(C3, :B, Panel(height = 14, width = 12))
     update!(C3, :A, Panel(height = 14, width = 20))
+    @test_logs (:warn, r"Could not update compositor") update!(C3, :FOO, Panel())
+    update!(C3, :A, Panel(height = 14, width = 20))
+
+    C4 = Compositor(:(vstack(A(5, 10), B(20, 15))))
+    update!(C4; A = Panel(height = 5, width = 10), B = Panel(height = 20, width = 15))
+
     compositors = [C1, C1_b, C2, C3]
 
     if !Sys.iswindows()
@@ -38,8 +44,9 @@ end
 
             # coverage
             @test Renderable(t) isa RenderableText
-            show(devnull, t)
             print(devnull, t)
+            show(devnull, MIME("text/plain"), t)
+            show(devnull, t)
         end
     end
 end
