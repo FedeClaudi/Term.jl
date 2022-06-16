@@ -2,8 +2,7 @@ module Layout
 
 import Parameters: @with_kw
 
-import Term:
-    rint, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, do_by_line
+import Term: rint, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, do_by_line
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..Consoles: console_width, console_height
 import ..Measures: Measure, height, width
