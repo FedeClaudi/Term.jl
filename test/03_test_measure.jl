@@ -41,6 +41,8 @@ end
     s = first(p.segments)
     @test height(s) == 1
     @test width(s) == w
+
+    @test size(Measure("foo") + Measure("testing")) == (2, 7)
 end
 
 @testset "\e34mMeasure - misc" begin

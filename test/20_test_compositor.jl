@@ -30,11 +30,14 @@ end
 
     update!(C3, :B, Panel(height = 14, width = 12))
     update!(C3, :A, Panel(height = 14, width = 20))
-    @test_logs (:warn, r"Could not update compositor") update!(C3, :FOO, Panel())
     update!(C3, :A, Panel(height = 14, width = 20))
 
     C4 = Compositor(:(vstack(A(5, 10), B(20, 15))))
     update!(C4; A = Panel(height = 5, width = 10), B = Panel(height = 20, width = 15))
+    @test_logs (:warn, r"Could not update compositor") update!(C4, :FOO, Panel())
+
+    C5 = Compositor(:(A(100, 55) * B(20, 15)))
+    @test_logs (:warn, r"Shape mismatch while updating compositor element") update!(C5, :A, Panel())
 
     compositors = [C1, C1_b, C2, C3]
 
