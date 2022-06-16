@@ -21,7 +21,7 @@ highlight_regexes = OrderedDict(
     highlight(text::AbstractString, theme::Theme)
 
 Highlighs a text introducing markup to style semantically
-relevant segments, colors specified by a theme object
+relevant segments, colors specified by a theme object.
 """
 function highlight(text::AbstractString; theme::Theme = TERM_THEME[])
     has_ansi(text) && return text
