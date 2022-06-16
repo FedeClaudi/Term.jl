@@ -2,6 +2,8 @@ import Term: Panel, TextBox
 import Term.Layout: PlaceHolder
 
 @testset "\e[34mPanel - no content" begin
+    @test size(Panel(width = 3, height = 4)) == (3, 4)
+
     for style in ("default", "red", "on_blue")
         testpanel(Panel(fit = true, style = style), 3, 2)
         testpanel(Panel(), 88, 2)

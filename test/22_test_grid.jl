@@ -1,18 +1,22 @@
+import Term.Measures: default_size
+import Term.Layout: PlaceHolder
+
 @testset "Grid - simple" begin
     w, h = default_size()
     n = 3
     nm1 = n - 1
+    lo = (n, n)
 
-    @test size(grid(layout = (n, n), pad = (0, 0)).measure) == (w * n, h * n)
+    @test size(grid(layout = lo, pad = (0, 0)).measure) == (w * n, h * n)
 
-    @test size(grid(layout = (n, n)).measure) == (w * n, h * n)
+    @test size(grid(layout = lo).measure) == (w * n, h * n)
 
-    @test size(grid(layout = (n, n), pad = 2).measure) == (w * n + 2 * nm1, h * n + 2 * nm1)
+    @test size(grid(layout = lo, pad = 2).measure) == (w * n + 2 * nm1, h * n + 2 * nm1)
 
-    @test size(grid(layout = (n, n), pad = (5, 1)).measure) ==
+    @test size(grid(layout = lo, pad = (5, 1)).measure) ==
           (w * n + 5 * nm1, h * n + 1 * nm1)
 
-    @test size(grid(layout = (n, n), pad = (5, 3)).measure) ==
+    @test size(grid(layout = lo, pad = (5, 3)).measure) ==
           (w * n + 5 * nm1, h * n + 3 * nm1)
 
     # test passing renderables
@@ -76,7 +80,7 @@ end
     grid(panels; layout = (2, 4))
 
     # best fit
-    panels = [Panel(width = w, height = h) for _ in 1:9]
+    panels = repeat([Panel(width = w, height = h)], 9)
 
     @test size(grid(panels[1:4]).measure) == (2w, 2h)  # 4 best fits onto a (2, 2) grid with unit ar
     @test size(grid(panels[1:6]).measure) == (3w, 2h)  # 6 best fits onto a (3, 2) grid with 4:3 ar
@@ -84,8 +88,17 @@ end
 end
 
 @testset "Grid - complex layout" begin
-    w, h = 20, 10
-    p = Panel(width = w, height = w)
-    g = grid(repeat([p], 5), layout = :((_ * □) / (□ * _ * □) / (□ * □)))
-    @test size(g).measure == (3w, 3h)
+    rens = [
+        Panel(width = 10, height = 5),
+        Panel(width = 15, height = 5),
+        Panel(width = 20, height = 5),
+        Panel(width = 20, height = 10),
+        Panel(width = 20, height = 15),
+    ]
+    compositor = grid(rens, layout = :((_ * a) / (b * _ * c) / (d * e)))
+    @test size(compositor.elements[:a].renderable) == (10, 5)
+    @test size(compositor.elements[:b].renderable) == (15, 5)
+    @test size(compositor.elements[:c].renderable) == (20, 5)
+    @test size(compositor.elements[:d].renderable) == (20, 10)
+    @test size(compositor.elements[:e].renderable) == (20, 15)
 end

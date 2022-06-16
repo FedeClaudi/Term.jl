@@ -2,7 +2,10 @@ module Grid
 
 import ..Renderables: AbstractRenderable
 import ..Measures: Measure, default_size
+import ..Layout: PlaceHolder, vstack
 import ..Compositors: Compositor
+
+import Term: calc_nrows_ncols
 
 export grid
 

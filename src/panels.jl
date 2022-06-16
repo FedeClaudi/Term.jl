@@ -45,6 +45,8 @@ mutable struct Panel <: AbstractPanel
     end
 end
 
+Base.size(p::Panel) = size(p.measure)
+
 """
 ---
 

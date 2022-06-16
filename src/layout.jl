@@ -3,19 +3,10 @@ module Layout
 import Parameters: @with_kw
 
 import Term:
-    rint,
-    get_lr_widths,
-    textlen,
-    cint,
-    fint,
-    rtrim_str,
-    ltrim_str,
-    calc_nrows_ncols,
-    do_by_line,
-    DEFAULT_AR
+    rint, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, do_by_line
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
-import ..Measures: Measure, height, width, default_size
 import ..Consoles: console_width, console_height
+import ..Measures: Measure, height, width
 import ..Boxes: get_lrow, get_rrow
 import ..Style: apply_style
 import ..Segments: Segment

@@ -35,6 +35,8 @@ each `LayoutElement` if there is one, the placeholder otherwise.
     placeholder::PlaceHolder
 end
 
+Base.size(e::LayoutElement) = (e.w, e.h)
+
 """
     mutable struct Compositor
         layout::Expr
