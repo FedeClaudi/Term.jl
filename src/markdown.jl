@@ -42,7 +42,7 @@ function parse_md end
 Parse an entier `MD` object by parsing its constituent elements
 and joining the resulting strings.
 """
-function parse_md(text::Markdown.MD; width=DEFAULT_WT[], kwargs...)::String
+function parse_md(text::Markdown.MD; width=DEFAULT_WIDTH[], kwargs...)::String
     elements = parse_md.(text.content; width=width, kwargs...)
     return join(elements, "\n\n")
 end
@@ -328,7 +328,7 @@ function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::
         "tip" => "green",
     )
     has_title = length(ad.title) > 0
-    content = parse_md(ad.content)
+    content = parse_md(ad.content; inline=true)
     content = reshape_text(content, width - 10)
     style = get(title_styles, ad.category, "white")
     return string(

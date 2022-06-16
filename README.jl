@@ -3,6 +3,7 @@ import Term.Renderables: Renderable
 import Term: rint
 import Term: typestree, inspect
 using Term.Layout
+import Term.Measures: height
 
 import MyterialColors: orange_light, blue_light, green_light
 
@@ -116,7 +117,7 @@ circles = make_julia_circles() # 42 x 17
 
 _code_style = "yellow italic bold"
 
-bfc = rainbow_maker(9)
+bfc = rainbow_maker(10)
 basic_features = Panel(
     """
     {bright_red bold underline}Features{/bright_red bold underline}
@@ -126,10 +127,11 @@ basic_features = Panel(
 {bold $(bfc[3])}✔{/bold $(bfc[3])}{white} styling {$_code_style}@macros{/$_code_style}{/white}
 {bold $(bfc[4])}✔{/bold $(bfc[4])}{white} {italic white}markup{/italic white} style syntax{/white}
 {bold $(bfc[5])}✔{/bold $(bfc[5])}{white} progress bars{/white}
-{bold $(bfc[6])}✔{/bold $(bfc[6])}{white} {$_code_style}`Expr`{/$_code_style} and {$_code_style}`Type`{/$_code_style} introspection{/white}
+{bold $(bfc[6])}✔{/bold $(bfc[6])}{white} Code introspection and REPR
 {bold $(bfc[7])}✔{/bold $(bfc[7])}{white} logging{/white}
 {bold $(bfc[8])}✔{/bold $(bfc[8])}{white} stacktraces{/white}
 {bold $(bfc[9])}✔{/bold $(bfc[9])}{white} syntax highlighting{/white}
+{bold $(bfc[10])}✔{/bold $(bfc[10])}{white} Markdown parsing{/white}
 """;
     width = 70,
     padding = (2, 2, 1, 2),
@@ -219,9 +221,54 @@ layout_example = cvstack(
     layout_example,
 )
 
+using Markdown
+import MyterialColors: pink_light, deep_purple_light, indigo_light, amber_light, teal_light, salmon_light
+import Term.TermMarkdown: parse_md
+styles = (
+    pink_light, teal_light, indigo_light, 
+    amber_light, deep_purple_light, salmon_light
+)
+rens = map(s -> Panel(; width=20, height=8,  box=:SQUARE, background="on_$s"), 
+            styles
+) |> collect
+g = grid(rens)
+
+t = parse_md(md"""
+# Markdown parsing
+
+Term parses `MD` types - markdown content - with style!
+
+!!! tip "Docs"
+    Have a look at the docs for more info!
+    [docs](https://fedeclaudi.github.io/Term.jl/stable/)
+
+Julia's docstring are parsed as Markdown, and Term turns markdown insto styled terminal output. 
+So you can use term to print styled docstrings and other info to the REPL. 
+
+```julia
+import Term: termshow
+
+termshow(print)  # prints styled docstring to console
+```
+
+---
+| Col1 | Col2 | Col3 | Col4 |
+|:---------- | :----------: |:------------:|:------------:|
+| ONE    | TWO |   THREE           |      FOUR        |
+| ONE    | TWO  | THREE | FOUR|
+
+
+!!! tip "Tables"
+        The table above was parsed from a markdown to a `Table` renderable
+        Term has a really awesome `Table` renderable, you should check it out!
+
+
+"""; width=100)
+
+
 # ----------------------------------- print ---------------------------------- #
 # width is 140
-print("\n"^3)
+print("\n"^10)
 
 readme =
     (
@@ -242,6 +289,8 @@ readme =
         tree *
         Spacer(tree.measure.h, 5) *
         dendo
-    ) / line / (Spacer(layout_text.measure.h, 3) * layout_text * layout_example)
+    ) / line / (Spacer(layout_text.measure.h, 3) * layout_text * layout_example ) /
+    line / 
+    ( Spacer(height(t), 20) * vLine(height(t); style="dim") * "  " * t * "  " * vLine(height(t); style="dim") )
 
 print(Spacer(readme.measure.h, 10) * readme)
