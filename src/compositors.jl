@@ -80,8 +80,8 @@ function Compositor(
     )
 
     placeholders = Dict(
-        e.args[1] => compositor_placeholder(e.args..., e.args[1] === :_ ? "hidden" : c) for
-        (c, e) in zip(colors, elements)
+        e.args[1] => compositor_placeholder(e.args..., e.args[1] === :_ ? "hidden" : c)
+        for (c, e) in zip(colors, elements)
     )
 
     # create layout elements

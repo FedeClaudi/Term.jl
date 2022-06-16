@@ -42,7 +42,8 @@ function grid(
 
     if !isnothing(rens) && layout isa Expr
         n, kw = 0, Dict()
-        sz = (minimum(first.(size.(rens))), minimum(last.(size.(rens))))
+        sizes = size.(rens)
+        sz = (minimum(first.(sizes)), minimum(last.(sizes)))
         for e in get_elements_and_sizes(layout; placeholder_size = sz)
             nm = e.args[1]
             kw[nm] = if nm === :_
@@ -51,7 +52,9 @@ function grid(
                 rens[n += 1]
             end
         end
-        return Renderable(Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...))
+        return Renderable(
+            Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...),
+        )
     end
 
     nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
