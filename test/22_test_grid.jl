@@ -95,4 +95,8 @@ end
     ]
     g = grid(rens, layout = :((_ * a) / (b * _ * c) / (d * e)))
     @test size(g.measure) == (25, 45)
+
+    # repeated in layout
+    g = grid(rens, layout = :((_ * a) / (b * _ * c * c) / (d * e)))
+    @test size(g.measure) == (25, 65)
 end

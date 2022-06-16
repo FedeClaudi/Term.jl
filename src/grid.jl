@@ -51,7 +51,7 @@ function grid(
             kw[nm] = if nm === :_
                 compositor_placeholder(nm, sz..., style)
             else
-                rens[n += 1]
+                haskey(kw, nm) ? kw[nm] : rens[n += 1]
             end
         end
         compositor = Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...)
