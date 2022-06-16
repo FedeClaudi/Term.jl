@@ -56,7 +56,11 @@ each element in the expression.
 """
 function Compositor(
     layout::Expr;
-    hpad::Int = 0, vpad::Int = 0, placeholder_size = nothing, check::Bool = true, kwargs...
+    hpad::Int = 0,
+    vpad::Int = 0,
+    placeholder_size = nothing,
+    check::Bool = true,
+    kwargs...,
 )
     elements = get_elements_and_sizes(layout; placeholder_size = placeholder_size)
 
@@ -68,11 +72,15 @@ function Compositor(
     end
 
     renderables = Dict(
-        e.args[1] => extract_renderable_from_kwargs(e.args...; check = check, kwargs...) for e in elements
+        e.args[1] =>
+            extract_renderable_from_kwargs(e.args...; check = check, kwargs...) for
+        e in elements
     )
 
-    placeholders =
-        Dict(e.args[1] => placeholder(e.args..., e.args[1] === :_ ? "hidden" : c) for (c, e) in zip(colors, elements))
+    placeholders = Dict(
+        e.args[1] => placeholder(e.args..., e.args[1] === :_ ? "hidden" : c) for
+        (c, e) in zip(colors, elements)
+    )
 
     # create layout elements
     layout_elements = Dict(
@@ -161,10 +169,7 @@ function render(compositor::Compositor; show_placeholders = false)
     components = if show_placeholders
         Dict(e => p for (e, p) in zip(elements, placeholders))
     else
-        Dict(
-            e => something(r, p) for
-            (e, r, p) in zip(elements, renderables, placeholders)
-        )
+        Dict(e => something(r, p) for (e, r, p) in zip(elements, renderables, placeholders))
     end
     ex = interpolate_from_dict(compositor.layout, components)
 

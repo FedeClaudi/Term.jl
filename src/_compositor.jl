@@ -56,7 +56,7 @@ function get_elements_and_sizes(ex::Expr; placeholder_size = nothing)
     min_w == typemax(Int) && (min_w = w)
     min_h == typemax(Int) && (min_h = h)
 
-   return [e isa Symbol ? :($e($min_w, $min_h)) : e for e in elements]
+    return [e isa Symbol ? :($e($min_w, $min_h)) : e for e in elements]
 end
 
 """
@@ -111,7 +111,8 @@ function extract_renderable_from_kwargs(s, w, h; check = true, kwargs...)
         if check
             msg = "While creating a Compository layout, the layout element"
             @assert ren.measure.w == w highlight(
-                msg * " :$s has width $w but the renderable passed has width $(ren.measure.w)",
+                msg *
+                " :$s has width $w but the renderable passed has width $(ren.measure.w)",
             )
             @assert ren.measure.h == h highlight(
                 msg *

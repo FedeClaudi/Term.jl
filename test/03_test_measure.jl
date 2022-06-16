@@ -44,5 +44,5 @@ end
 end
 
 @testset "\e34mMeasure - misc" begin
-    @test default_size() == (88, 66)
+    @test default_size() == (88, 33)
 end
