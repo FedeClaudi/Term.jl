@@ -79,9 +79,9 @@ Tables can also be created from `Dict` objects and can include other
 renderables.
 """
 
-ph1 = PlaceHolder(25, 5)
-ph2 = PlaceHolder(23, 9)
-ph3 = PlaceHolder(22, 11)
+ph1 = PlaceHolder(5, 25)
+ph2 = PlaceHolder(9, 23)
+ph3 = PlaceHolder(11, 22)
 
 data = Dict(
     "first\ncol." => [ph1, ph2, ph3],

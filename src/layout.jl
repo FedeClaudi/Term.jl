@@ -561,15 +561,15 @@ mutable struct Spacer <: AbstractLayoutElement
     measure::Measure
 end
 
-function Spacer(width::Int, height::Int; char::Char = ' ')
+function Spacer(height::Int, width::Int; char::Char = ' ')
     line = char^width
     seg = Segment(line)
     segments = repeat([seg], height)
-    return Spacer(segments, Measure(seg.measure.w, height))
+    return Spacer(segments, Measure(height, seg.measure.w))
 end
 
-Spacer(width::Number, height::Number; char::Char = ' ') =
-    Spacer(rint(width), rint(height); char = char)
+Spacer(height::Number, width::Number; char::Char = ' ') =
+    Spacer(rint(height), rint(width); char = char)
 
 # ----------------------------------- vline ---------------------------------- #
 """
@@ -596,7 +596,7 @@ function vLine(
     char = isnothing(char) ? getfield(Boxes, box).head.left : char
     line = apply_style("{" * style * "}" * char * "{/" * style * "}\e[0m")
     segments = repeat([Segment(line)], height)
-    return vLine(segments, Measure(1, height))
+    return vLine(segments, Measure(height, 1))
 end
 
 """
@@ -635,7 +635,7 @@ Create a styled `hLine` of given width.
 function hLine(width::Int; style::String = "default", box::Symbol = :ROUNDED)
     char = eval(box).row.mid
     segments = [Segment(char^width * "\e[0m", style)]
-    return hLine(segments, Measure(width, 1))
+    return hLine(segments, Measure(1, width))
 end
 
 """
@@ -663,7 +663,7 @@ function hLine(
         get_rrow(box, rw - tr, :top; with_right = false) *
         "\e[0m"
 
-    return hLine([Segment(line, style)], Measure(width, 1))
+    return hLine([Segment(line, style)], Measure(1, width))
 end
 
 """
@@ -739,8 +739,8 @@ end
 
 """
     PlaceHolder(
-        w::Int,
-        h::Int;
+        h::In,
+        w::Int;
         style::String = "dim",
         text::Union{Nothing,String} = nothing,
     )
@@ -748,8 +748,8 @@ end
 Create a `PlaceHolder` with additional style information.
 """
 function PlaceHolder(
-    w::Int,
-    h::Int;
+    h::Int,
+    w::Int;
     style::String = "dim",
     text::Union{Nothing,String} = nothing,
 )
@@ -759,7 +759,7 @@ function PlaceHolder(
     lines::Vector{Segment} = map(i -> Segment(i % 2 != 0 ? b1 : b2, style), 1:h)
 
     # insert renderable size at center
-    text = isnothing(text) ? "($w × $h)" : text
+    text = something(text, "($h × $w)")
     text = "  " * text * "  "
     text = width(text) % 2 == 0 ? " " * text : text
     l = width(text)
@@ -783,6 +783,6 @@ function PlaceHolder(
 end
 
 PlaceHolder(ren::AbstractRenderable; kwargs...) =
-    PlaceHolder(ren.measure.w, ren.measure.h; kwargs...)
+    PlaceHolder(ren.measure.h, ren.measure.w; kwargs...)
 
 end

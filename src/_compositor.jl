@@ -25,16 +25,16 @@ layout_symbols = (
 """
     parse_single_element_layout(ex::Expr)
 
-Parse an expression with a single layout element, like :(A(25, 5)) or :(A)
+Parse an expression with a single layout element, like :(A(5, 25)) or :(A)
 """
 function parse_single_element_layout(ex::Expr)
     if length(ex.args) == 3
-        s, w, h = ex.args
+        s, h, w = ex.args
     else
         s = ex.args[1]
-        w, h = default_size()
+        h, w = default_size()
     end
-    return [:($s($w, $h))]
+    return [:($s($h, $w))]
 end
 
 """
@@ -45,18 +45,18 @@ Get elements names and sizes.
 function get_elements_and_sizes(ex::Expr; placeholder_size = nothing)
     elements = collect_elements(ex)
     elements = elements isa Expr ? parse_single_element_layout(elements) : elements
-    min_w = min_h = typemax(Int)
+    min_h = min_w = typemax(Int)
     for e in elements
         e isa Symbol && continue
-        min_w = min(min_w, e.args[2])
-        min_h = min(min_h, e.args[3])
+        min_h = min(min_h, e.args[2])
+        min_w = min(min_w, e.args[3])
     end
     # fallback size
-    w, h = something(placeholder_size, default_size())
-    min_w == typemax(Int) && (min_w = w)
+    h, w = something(placeholder_size, default_size())
     min_h == typemax(Int) && (min_h = h)
+    min_w == typemax(Int) && (min_w = w)
 
-    return [e isa Symbol ? :($e($min_w, $min_h)) : e for e in elements]
+    return [e isa Symbol ? :($e($min_h, $min_w)) : e for e in elements]
 end
 
 """
@@ -67,8 +67,8 @@ in a layout expresssion.
 """
 function collect_elements(ex::Expr)
     if ex.args[1] ∉ layout_symbols && length(ex.args) > 2
-        s, w, h = ex.args
-        return :($s($w, $h))
+        s, h, w = ex.args
+        return :($s($h, $w))
     elseif ex.args[1] ∉ layout_symbols
         return nothing
     else
@@ -89,20 +89,20 @@ function clean_layout_expr(ex::Expr)
     return ex
 end
 
-placeholder(s, w, h, c) = PlaceHolder(
-    w,
-    h;
+placeholder(s, h, w, c) = PlaceHolder(
+    h,
+    w;
     style = c,
-    text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($w × $h){/white}",
+    text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($h × $w){/white}",
 )
 
 """
-    extract_renderable_from_kwargs(s, w, h; kwargs...)
+    extract_renderable_from_kwargs(s, h, w; kwargs...)
 
 When passing kwargs to a `Compositor`, check for renderables that are 
 to be assigned to its content.
 """
-function extract_renderable_from_kwargs(s, w, h; check = true, kwargs...)
+function extract_renderable_from_kwargs(s, h, w; check = true, kwargs...)
     ren = get(kwargs, s, nothing)
     if !isnothing(ren)
         ren = ren isa AbstractRenderable ? ren : RenderableText(ren)
@@ -110,13 +110,11 @@ function extract_renderable_from_kwargs(s, w, h; check = true, kwargs...)
         # check renderable has the right size
         if check
             msg = "While creating a Compository layout, the layout element"
-            @assert ren.measure.w == w highlight(
-                msg *
-                " :$s has width $w but the renderable passed has width $(ren.measure.w)",
-            )
             @assert ren.measure.h == h highlight(
-                msg *
-                " :$s has height $h but the renderable passed has height $(ren.measure.h)",
+                "$msg :$s has height $h but the renderable passed has height $(ren.measure.h)",
+            )
+            @assert ren.measure.w == w highlight(
+                "$msg :$s has width $w but the renderable passed has width $(ren.measure.w)",
             )
         end
     end

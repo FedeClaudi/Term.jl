@@ -2,21 +2,21 @@ import Term: Panel, TextBox
 import Term.Layout: PlaceHolder
 
 @testset "\e[34mPanel - no content" begin
-    @test size(Panel(width = 3, height = 4)) == (3, 4)
+    @test size(Panel(height = 4, width = 3)) == (4, 3)
 
     for style in ("default", "red", "on_blue")
         testpanel(Panel(fit = true, style = style), 3, 2)
         testpanel(Panel(), 88, 2)
-        testpanel(Panel(width = 12, height = 4, style = style), 12, 4)
+        testpanel(Panel(height = 4, width = 12, style = style), 12, 4)
     end
 end
 
 @testset "\e[34mPanel - fit basic shape" begin
-    testpanel(Panel("MYTEXT"; width = 60, height = 10), 60, 10)
+    testpanel(Panel("MYTEXT"; height = 10, width = 60), 60, 10)
     testpanel(Panel("MYTEXT"; width = 60), 60, 3)
     testpanel(Panel("MYTEXT"), 12, 3)
 
-    testpanel(Panel("MYTEXT"; width = 60, height = 10, padding = (4, 4, 2, 2)), 60, 10)
+    testpanel(Panel("MYTEXT"; height = 10, width = 60, padding = (4, 4, 2, 2)), 60, 10)
     testpanel(Panel("MYTEXT"; width = 60, padding = (4, 4, 2, 2)), 60, 7)
     testpanel(Panel("MYTEXT"; padding = (4, 4, 2, 2)), 16, 7)
 end
@@ -24,8 +24,8 @@ end
 @testset "\e[34mPanel - fit overflow" begin
     testpanel(
         Panel(
-            Panel("MYTEXT"^50; width = 60, height = 10) /
-            Panel("MYTEXT"^50; width = 60, height = 10),
+            Panel("MYTEXT"^50; height = 10, width = 60) /
+            Panel("MYTEXT"^50; height = 10, width = 60),
         ),
         console_width() - 1,
         nothing,
@@ -93,10 +93,10 @@ end
 
             testpanel(
                 Panel(
-                    Panel("test"; width = 42, height = 12);
+                    Panel("test"; height = 12, width = 42);
                     fit = false,
-                    width = 30,
                     height = 8,
+                    width = 30,
                 ),
                 30,
                 8,
@@ -152,7 +152,7 @@ end
 
         testpanel(Panel(Panel("test"; width = 42); _kw...), 48, 8)
 
-        testpanel(Panel(Panel("test"; width = 42, height = 12); _kw...), 48, 14)
+        testpanel(Panel(Panel("test"; height = 12, width = 42); _kw...), 48, 14)
     end
 end
 
@@ -236,8 +236,8 @@ id est laborum.""",
 
     p = Panel(
         "test"^25;
-        width = 49,
         height = 22,
+        width = 49,
         box = :HEAVY,
         justify = :center,
         title = "description",
@@ -246,12 +246,12 @@ id est laborum.""",
         padding = (2, 4, 4, 2),
         fit = false,
     )
-    @test size(p.measure) == (49, 22)
+    @test size(p.measure) == (22, 49)
 
     p = Panel(
         "test"^25;
-        width = 49,
         height = 22,
+        width = 49,
         box = :SIMPLE,
         justify = :center,
         title = "description",
@@ -260,12 +260,12 @@ id est laborum.""",
         padding = (2, 4, 4, 2),
         fit = false,
     )
-    @test size(p.measure) == (49, 22)
+    @test size(p.measure) == (22, 49)
 
     p = Panel(
         PlaceHolder(60, 30);
-        width = 49,
         height = 22,
+        width = 49,
         box = :HEAVY,
         justify = :center,
         title = "description",
@@ -274,7 +274,7 @@ id est laborum.""",
         padding = (2, 0, 2, 0),
         fit = false,
     )
-    @test size(p.measure) == (49, 22)
+    @test size(p.measure) == (22, 49)
 end
 
 @testset "\e[34mPanel + renderables" begin

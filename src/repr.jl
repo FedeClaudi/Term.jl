@@ -9,7 +9,7 @@ import Term:
     unescape_brackets,
     split_lines,
     TERM_THEME,
-    DEFAULT_WT
+    DEFAULT_WIDTH
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
@@ -136,7 +136,7 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
     end
 
     # prepare other renderables
-    space = Spacer(1, length(k))
+    space = Spacer(length(k), 1)
     line = vLine(length(k); style = "dim #7e9dd9")
 
     _keys_renderables = cvstack(ktypes...) * line * space * cvstack(k...)
@@ -223,7 +223,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
                 title_style = "dim bright_blue",
             ),
         )
-        push!(panels, Spacer(1, 2))
+        push!(panels, Spacer(2, 1))
     end
 
     if length(I0) > length(I)
@@ -260,7 +260,7 @@ function termshow(io::IO, obj::DataType; kwargs...)
     field_types = apply_style.(map(f -> "::" * string(f), obj.types), ts)
 
     line = vLine(length(field_names); style = theme.repr_name_style)
-    space = Spacer(1, length(field_names))
+    space = Spacer(length(field_names), 1)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
 
     type_name = apply_style(string(obj), theme.repr_name_style * " bold")
@@ -272,7 +272,7 @@ function termshow(io::IO, obj::DataType; kwargs...)
             string(type_name / ("  " * line * fields)),
             nothing;
             fit = false,
-            width = min(console_width() - 5, DEFAULT_WT[]),
+            width = min(console_width() - 5, DEFAULT_WIDTH[]),
             justify = :center,
         )
 
@@ -299,7 +299,7 @@ end
 
 Show a function's methods and docstring.
 """
-function termshow(io::IO, fun::Function; width = min(console_width() - 10, DEFAULT_WT[]))
+function termshow(io::IO, fun::Function; width = min(console_width() - 10, DEFAULT_WIDTH[]))
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)

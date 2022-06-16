@@ -28,15 +28,15 @@ import Term:
     @test pad("aaa", 20, :center) == "        aaa         "
     @test pad("aaa", 10, 20) == "          aaa                    "
 
-    p = Panel(width = 20, height = 10)
+    p = Panel(height = 10, width = 20)
     pad!(p, 20, 20)
     @test p isa Panel
-    @test size(p.measure) == (60, 10)
+    @test size(p.measure) == (10, 60)
 
-    p = Panel(width = 20, height = 10)
+    p = Panel(height = 10, width = 20)
     pad!(p; width = 30)
     @test p isa Panel
-    @test size(p.measure) == (30, 10)
+    @test size(p.measure) == (10, 30)
 end
 
 @testset "Layout - vertical pad" begin
@@ -46,25 +46,25 @@ end
 
     @test vertical_pad("ab", 5, 5) == "  \n  \n  \n  \n  \nab\n  \n  \n  \n  \n  "
 
-    p = Panel(width = 20, height = 10)
+    p = Panel(height = 10, width = 20)
     @test string(vertical_pad(p, 4, 4)) ==
           "                    \n                    \n                    \n                    \n\e[22m╭──────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────╯\e[22m\e[0m\n                    \n                    \n                    \n                    "
 
     vertical_pad!(p, 4, 4)
     @test p isa Panel
-    @test size(p.measure) == (20, 18)
+    @test size(p.measure) == (18, 20)
 
-    p = Panel(width = 20, height = 10)
+    p = Panel(height = 10, width = 20)
     vertical_pad!(p; height = 30)
     @test p isa Panel
-    @test size(p.measure) == (20, 30)
+    @test size(p.measure) == (30, 20)
 end
 
 @testset "\e[34mlayout - spacer" begin
     sizes = [(22, 1), (44, 123), (21, 1), (4334, 232)]
     for (w, h) in sizes
-        spacer = Spacer(w, h)
-        @test size(spacer.measure) == (w, h)
+        spacer = Spacer(h, w)
+        @test size(spacer.measure) == (h, w)
     end
 end
 
@@ -140,7 +140,7 @@ end
         @test vLine(22; box = box).measure.h == 22
     end
 
-    panel = Panel(width = 20, height = 5)
+    panel = Panel(height = 5, width = 20)
     @test length(vLine(panel).segments) == 5
     @test vLine().measure.h == displaysize(stdout)[1]
 end
@@ -163,7 +163,7 @@ end
         @test textlen(hLine(11, "ttl"; style = style).segments[1].text) == 11
     end
 
-    panel = Panel(width = 20, height = 5)
+    panel = Panel(height = 5, width = 20)
     @test hLine().measure.w == displaysize(stdout)[2]
     @test textlen(hLine(panel).segments[1].text) == 20
 end
@@ -192,25 +192,25 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 / r2
-    @test size(r.measure) == (50, 6)
+    @test size(r.measure) == (6, 50)
 
     h1, h2 = hLine(22), hLine(33)
-    @test size(Measure(h1 / h2)) == (33, 2)
+    @test size(Measure(h1 / h2)) == (2, 33)
 
     r1 = RenderableText("."^100; width = 25)
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 * r2
-    @test size(r.measure) == (75, 4)
+    @test size(r.measure) == (4, 75)
 
     # stack other renderables
     h1, h2 = vLine(22), vLine(33)
-    @test size(Measure(h1 * h2)) == (2, 33)
+    @test size(Measure(h1 * h2)) == (33, 2)
 end
 
 @testset "\e[34mlayout - panels" begin
     p1 = Panel()
-    p2 = Panel(width = 24, height = 3)
+    p2 = Panel(height = 3, width = 24)
     p3 = Panel("this {red}panel{/red}"^5; width = 30, fit = false)
 
     testlayout(p1 * p2, 112, 3)
@@ -231,20 +231,20 @@ end
 end
 
 @testset "\e[34mlayout - placeholder" begin
-    ph = PlaceHolder(4, 2)
+    ph = PlaceHolder(2, 4)
     @test length(ph.segments) == 2
-    @test size(ph.measure) == (4, 2)
+    @test size(ph.measure) == (2, 4)
     @test string(ph) == "\e[2m╲ ╲ \e[22m\n\e[2m ╲ ╲\e[22m"
 
-    @test string(PlaceHolder(25, 12)) ==
+    @test string(PlaceHolder(12, 25)) ==
           "\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m"
 
-    p = Panel(width = 8, height = 4)
+    p = Panel(height = 4, width = 8)
     @test size(PlaceHolder(p).measure) == size(p.measure)
 end
 
 @testset "Layout - h/vstack with pad" begin
-    p1, p2, p3 = PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(3, 6)
+    p1, p2, p3 = PlaceHolder(5, 5), PlaceHolder(5, 5), PlaceHolder(6, 3)
 
     @test string(hstack(p1, p2, p3; pad = 10)) ==
           "\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m          \e[2m ╲ ╲ \e[22m          \e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m          \e[2m ╲ ╲ \e[22m          \e[2m ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲ ╲\e[22m          \e[2m╲ ╲\e[22m\n                              \e[2m ╲ \e[22m"

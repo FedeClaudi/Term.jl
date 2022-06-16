@@ -2,51 +2,49 @@ import Term.Measures: default_size
 import Term.Layout: PlaceHolder
 
 @testset "Grid - simple" begin
-    w, h = default_size()
+    h, w = default_size()
     n = 3
     nm1 = n - 1
     lo = (n, n)
 
-    @test size(grid(layout = lo, pad = (0, 0)).measure) == (w * n, h * n)
+    @test size(grid(layout = lo, pad = (0, 0)).measure) == (h * n, w * n)
 
-    @test size(grid(layout = lo).measure) == (w * n, h * n)
+    @test size(grid(layout = lo).measure) == (h * n, w * n)
 
-    @test size(grid(layout = lo, pad = 2).measure) == (w * n + 2 * nm1, h * n + 2 * nm1)
+    @test size(grid(layout = lo, pad = 2).measure) == (h * n + 2nm1, w * n + 2nm1)
 
-    @test size(grid(layout = lo, pad = (5, 1)).measure) ==
-          (w * n + 5 * nm1, h * n + 1 * nm1)
+    @test size(grid(layout = lo, pad = (5, 1)).measure) == (h * n + 1nm1, w * n + 5nm1)
 
-    @test size(grid(layout = lo, pad = (5, 3)).measure) ==
-          (w * n + 5 * nm1, h * n + 3 * nm1)
+    @test size(grid(layout = lo, pad = (5, 3)).measure) == (h * n + 3nm1, w * n + 5nm1)
 
     # test passing renderables
 
-    w, h = 10, 5
-    rens = repeat([PlaceHolder(w, h)], 9)
+    h, w = 5, 10
+    rens = repeat([PlaceHolder(h, w)], 9)
 
-    @test size(grid(rens; aspect = 1).measure) == (3w, 3h)
+    @test size(grid(rens; aspect = 1).measure) == (3h, 3w)
 
-    @test size(grid(rens).measure) == (3w, 3h)
+    @test size(grid(rens).measure) == (3h, 3w)
 
-    @test size(grid(rens; pad = (2, 1)).measure) == (3w + 2 * 2, 3h + 2 * 1)
+    @test size(grid(rens; pad = (2, 1)).measure) == (3h + 2 * 1, 3w + 2 * 2)
 
-    @test size(grid(rens; pad = (2, 1), aspect = 0.5).measure) == (22, 29)
+    @test size(grid(rens; pad = (2, 1), aspect = 0.5).measure) == (29, 22)
 
-    @test size(grid(rens; pad = (2, 1), aspect = 1.5).measure) == (46, 17)
+    @test size(grid(rens; pad = (2, 1), aspect = 1.5).measure) == (17, 46)
 
     g = grid(
         rens;
         pad = (2, 1),
         aspect = (12, 12),
-        placeholder = PlaceHolder(10, 5; style = "red"),
+        placeholder = PlaceHolder(5, 10; style = "red"),
     )
-    @test size(g.measure) == (34, 17)
+    @test size(g.measure) == (17, 34)
 end
 
 @testset "Grid - layout fit" begin
-    w, h = 20, 10
+    h, w = 10, 20
     panels = collect(
-        Panel("{on_$c} {/on_$c}", width = w, height = h) for c in (
+        Panel("{on_$c} {/on_$c}", height = h, width = w) for c in (
             :bright_red,
             :bright_green,
             :bright_blue,
@@ -66,7 +64,7 @@ end
         else
             (ceil(Int, i / 2), 2)
         end
-        @test size(g.measure) == (w * nc, h * nr)
+        @test size(g.measure) == (h * nr, w * nc)
     end
 
     # matrix, explicit
@@ -80,21 +78,21 @@ end
     grid(panels; layout = (2, 4))
 
     # best fit
-    panels = repeat([Panel(width = w, height = h)], 9)
+    panels = repeat([Panel(height = h, width = w)], 9)
 
-    @test size(grid(panels[1:4]).measure) == (2w, 2h)  # 4 best fits onto a (2, 2) grid with unit ar
-    @test size(grid(panels[1:6]).measure) == (3w, 2h)  # 6 best fits onto a (3, 2) grid with 4:3 ar
-    @test size(grid(panels[1:9]).measure) == (3w, 3h)  # 9 best fits onto a (3, 3) grid with unit ar
+    @test size(grid(panels[1:4]).measure) == (2h, 2w)  # 4 best fits onto a (2, 2) grid with unit ar
+    @test size(grid(panels[1:6]).measure) == (2h, 3w)  # 6 best fits onto a (2, 3) grid with 4:3 ar
+    @test size(grid(panels[1:9]).measure) == (3h, 3w)  # 9 best fits onto a (3, 3) grid with unit ar
 end
 
 @testset "Grid - complex layout" begin
     rens = [
-        Panel(width = 10, height = 5),
-        Panel(width = 15, height = 5),
-        Panel(width = 20, height = 5),
-        Panel(width = 20, height = 10),
-        Panel(width = 20, height = 15),
+        Panel(height = 5, width = 10),
+        Panel(height = 5, width = 15),
+        Panel(height = 5, width = 20),
+        Panel(height = 10, width = 20),
+        Panel(height = 15, width = 20),
     ]
     g = grid(rens, layout = :((_ * a) / (b * _ * c) / (d * e)))
-    @test size(g.measure) == (45, 25)
+    @test size(g.measure) == (25, 45)
 end

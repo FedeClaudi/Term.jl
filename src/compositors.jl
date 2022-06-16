@@ -29,13 +29,13 @@ each `LayoutElement` if there is one, the placeholder otherwise.
 
 @with_repr mutable struct LayoutElement
     id::Symbol
-    w::Int
     h::Int
+    w::Int
     renderable::Union{Nothing,String,AbstractRenderable}
     placeholder::PlaceHolder
 end
 
-Base.size(e::LayoutElement) = (e.w, e.h)
+Base.size(e::LayoutElement) = (e.h, e.w)
 
 """
     mutable struct Compositor
@@ -88,8 +88,8 @@ function Compositor(
     layout_elements = Dict(
         e.args[1] => LayoutElement(
             e.args[1],  # symbol
-            e.args[2],  # width
-            e.args[3],  # height
+            e.args[2],  # height
+            e.args[3],  # width
             renderables[e.args[1]],
             placeholders[e.args[1]],
         ) for e in elements
@@ -98,8 +98,8 @@ function Compositor(
     # edit layout expression to add padding and remove size info
     expr = string(clean_layout_expr(copy(layout)))
 
-    hpad > 0 && (expr = replace(expr, "*" => "* Spacer($hpad, 1) *"))
-    vpad > 0 && (expr = replace(expr, "/" => "/ Spacer(1, $vpad) /"))
+    hpad > 0 && (expr = replace(expr, "*" => "* Spacer(1, $hpad) *"))
+    vpad > 0 && (expr = replace(expr, "/" => "/ Spacer($vpad, 1) /"))
 
     expr = Meta.parse(expr)
 
@@ -137,8 +137,8 @@ function update!(
     # check that the shapes match
     elem = compositor.elements[id]
     if elem.w != width(content) || elem.h != height(content)
-        content_shape = "{red}$(width(content)) × $(height(content)){/red}"
-        target_shape = "{bright_blue}$(elem.w) × $(elem.h){/bright_blue}"
+        content_shape = "{red}$(height(content)) × $(width(content)){/red}"
+        target_shape = "{bright_blue}$(elem.h) × $(elem.w){/bright_blue}"
         @warn "Shape mismatch while updating compositor element {yellow}`$id`{/yellow}.\nGot $content_shape, expected $target_shape"
     end
 
@@ -165,8 +165,7 @@ function render(compositor::Compositor; show_placeholders = false)
     elements = getfield.(values(compositor.elements), :id)
     renderables = getfield.(values(compositor.elements), :renderable)
     placeholders = getfield.(values(compositor.elements), :placeholder)
-    length(renderables) == 1 &&
-        return isnothing(renderables[1]) ? placeholders[1] : renderables[1]
+    length(renderables) == 1 && return something(renderables[1], placeholders[1])
 
     components = if show_placeholders
         Dict(e => p for (e, p) in zip(elements, placeholders))

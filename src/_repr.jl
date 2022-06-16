@@ -1,4 +1,4 @@
-import Term: DEFAULT_WT
+import Term: DEFAULT_WIDTH
 
 function repr_get_obj_fields_display(obj)
     field_names = fieldnames(typeof(obj))
@@ -24,7 +24,7 @@ function repr_get_obj_fields_display(obj)
     end
 
     line = vLine(length(fields); style = theme.repr_line_style)
-    space = Spacer(1, length(fields))
+    space = Spacer(length(fields), 1)
 
     return rvstack(fields...) * line * space * lvstack(values...)
 end
@@ -50,7 +50,7 @@ function repr_panel(
     obj,
     content,
     subtitle;
-    width = min(console_width() - 10, DEFAULT_WT[]),
+    width = min(console_width() - 10, DEFAULT_WIDTH[]),
     justify = :center,
     kwargs...,
 )
@@ -89,7 +89,7 @@ function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 100, max_D 
     counts = RenderableText.("(" .* string.(1:N) .* ")"; style = "dim")
     top_counts = RenderableText.("(" .* string.(1:D) .* ")"; style = "dim white bold")
 
-    space1, space2 = Spacer(3, length(counts)), Spacer(2, length(counts))
+    space1, space2 = Spacer(length(counts), 3), Spacer(length(counts), 2)
 
     content = ("" / "" / rvstack(counts...)) * space1
     for i in 1:(D - 1)
@@ -104,7 +104,7 @@ function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 100, max_D 
 end
 
 function vec2content(vec::Union{Tuple,AbstractVector})
-    max_w = DEFAULT_WT[]
+    max_w = DEFAULT_WIDTH[]
     max_items = 100
     N = min(max_items, length(vec))
 
@@ -125,6 +125,6 @@ function vec2content(vec::Union{Tuple,AbstractVector})
         box = :NONE,
     )
 
-    # content = rvstack(counts...) * Spacer(3, length(counts)) * cvstack(vec_items)
+    # content = rvstack(counts...) * Spacer(length(counts), 3) * cvstack(vec_items)
     return content
 end

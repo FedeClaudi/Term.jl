@@ -1,6 +1,6 @@
 module Measures
 
-import Term: rint, remove_ansi, remove_markup, DEFAULT_WT, DEFAULT_AR
+import Term: rint, remove_ansi, remove_markup, DEFAULT_WIDTH, DEFAULT_ASPECT_RATIO
 
 export Measure
 
@@ -10,18 +10,18 @@ export Measure
 Stores the size of a piece of renderable material.
 """
 mutable struct Measure
-    w::Int
     h::Int
+    w::Int
 end
 
-Base.show(io::IO, M::Measure) = print(io, "Measure (w: $(M.w), h: $(M.h))")
+Base.show(io::IO, M::Measure) = print(io, "Measure (h: $(M.h), w: $(M.w))")
 
 """
     default_size()
 
-Returns default size (w, h).
+Returns default size (h, w).
 """
-default_size() = (DEFAULT_WT[], rint(DEFAULT_WT[] / 2DEFAULT_AR[]))
+default_size() = (rint(DEFAULT_WIDTH[] / 2DEFAULT_ASPECT_RATIO[]), DEFAULT_WIDTH[])
 
 """
     Measure(str::String)
@@ -30,15 +30,14 @@ Constructs a measure object from a string
 """
 function Measure(str::AbstractString)
     str = (remove_ansi ∘ remove_markup)(str)
-    lines = split(str, "\n")
-    w = max([textwidth(ln) for ln in lines]...)
-    return Measure(w, length(lines))
+    lines = split(str, '\n')
+    return Measure(length(lines), maximum(textwidth.(lines)))
 end
 
 """
 The sum of measures returns a measure with the highest value along each dimension.
 """
-Base.:+(m1::Measure, m2::Measure)::Measure = Measure(max(m1.w, m2.w), m1.h + m2.h)
+Base.:+(m1::Measure, m2::Measure)::Measure = Measure(m1.h + m2.h, max(m1.w, m2.w))
 
 """
     width
@@ -56,6 +55,6 @@ Measure the height of renderable objects (text, AbsstractRenderable).
 height(x) = height(string(x))
 height(x::AbstractString) = Measure(x).h
 
-Base.size(m::Measure) = (m.w, m.h)
+Base.size(m::Measure) = (m.h, m.w)
 
 end

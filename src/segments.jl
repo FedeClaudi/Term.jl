@@ -3,7 +3,7 @@ module Segments
 import Term: remove_markup, remove_ansi, unescape_brackets
 
 import ..Style: apply_style, MarkupStyle
-import ..Measures: Measure
+import ..Measures: Measure, width
 
 using Term: Term
 
@@ -57,8 +57,7 @@ Base.show(io::IO, ::MIME"text/plain", seg::Segment) =
 Ensure that for each segment the text has the same width
 """
 function Term.fillin(segments::Vector{Segment})::Vector{Segment}
-    widths = [seg.measure.w for seg in segments]
-    w = max(widths...)
+    w = maximum(width.(segments))
 
     filled::Vector{Segment} = []
     for seg in segments

@@ -8,33 +8,38 @@ The idea is simple: take a bunch of renderables and make a grid out of them:
 import Term: Panel
 import Term.Layout: grid
 
-p = Panel(; width=12, height=6)
+p = Panel(height=6, width=12)
 panels = repeat([p], 8)
 
 grid(panels)
 ```
 
-Simple, but effective. `grid` gives you a lot of options to control the layout.
+Simple, but effective. `grid` gives you a lot of options to control the layout:
 ```@example grid
 grid(panels; pad=2)  # specify padding
 ```
 
 ```@example grid
-grid(panels; pad=(8, 1))  # hpad & vpad
+grid(panels; pad=(8, 1))  # hpad & vpad
 ```
 
-and you can also specify the apsect ratio of the grid:
+You can also specify the apsect ratio of the grid:
 ```@example grid
 grid(panels; aspect=1)
 ```
 
-note that with an aspect ratio of `1` the best way is to create 3 columns and 3 rows, but we only have 8 renderables! No problem, `grid` introduces a placeholder for the missing renderables.
+Note that with an aspect ratio of `1` the best way is to create `3` columns and `3` rows, but we only have `8` renderables! No problem, `grid` introduces a placeholder for the missing renderables.
 But you can hide it too:
 ```@example grid
 grid(panels; aspect=1, show_placeholder=false)
 ```
 
-finally you can use `layout` to more directly specify the number of rows and columns in the grid:
+One can use complex expressions for layouts, and use and underscore `_` to specify empty elements in the layout:
+```@example grid
+grid(panels[1:6]; layout=:((a * _ * b) / (_ * _ * c * d) / (_ * e * f)))
+```
+
+Finally you can use `layout` to more directly specify the number of rows and columns in the grid:
 ```@example grid
 grid(panels; layout=(3, 4), show_placeholder=true)
 ```

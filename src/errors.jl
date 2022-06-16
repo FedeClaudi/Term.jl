@@ -2,7 +2,7 @@ module Errors
 
 import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
-import Term: highlight, truncate, reshape_text, load_code_and_highlight, DEFAULT_WT
+import Term: highlight, truncate, reshape_text, load_code_and_highlight, DEFAULT_WIDTH
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
@@ -232,7 +232,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                     error /= rendered_bt
                     W = rendered_bt.measure.w
                 else
-                    W = DEFAULT_WT[]
+                    W = DEFAULT_WIDTH[]
                 end
                 err, _ = error_message(er)
                 msg =

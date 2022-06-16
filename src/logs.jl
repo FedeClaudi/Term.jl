@@ -226,9 +226,9 @@ function Logging.handle_message(
         typeof(_type) <: Function && (_types[i] = string(Function))
     end
 
-    wpad = max(textlen.((_types))...) + 2
+    wpad = maximum(textlen.(_types)) + 2
     ks = truncate.(string.(keys(kwargs)), 28)
-    namepad = max(textlen.(ks)...)
+    namepad = maximum(textlen.(ks))
 
     # print all kwargs
     tprintln("  $vert"; highlight = false)
