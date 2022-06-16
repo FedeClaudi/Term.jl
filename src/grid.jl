@@ -1,7 +1,7 @@
 module Grid
 
 import ..Renderables: Renderable, AbstractRenderable
-import ..Measures: Measure, default_size
+import ..Measures: Measure, default_size, height, width
 import ..Layout: PlaceHolder, vstack
 import ..Compositors: Compositor
 
@@ -42,13 +42,16 @@ function grid(
 
     if !isnothing(rens) && layout isa Expr
         n, kw = 0, Dict()
-        sz = size(Measure(first(rens).segments))
+        sz = (minimum(first.(size.(rens))), minimum(last.(size.(rens))))
         for e in get_elements_and_sizes(layout; placeholder_size = sz)
-            (nm = e.args[1]) === :_ && continue
-            kw[nm] = rens[n += 1]
+            nm = e.args[1]
+            kw[nm] = if nm === :_
+                compositor_placeholder(nm, sz..., "hidden")
+            else
+                rens[n += 1]
+            end
         end
-        return Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...) |>
-               Renderable
+        return Renderable(Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...))
     end
 
     nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout

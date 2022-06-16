@@ -89,7 +89,7 @@ function clean_layout_expr(ex::Expr)
     return ex
 end
 
-placeholder(s, h, w, c) = PlaceHolder(
+compositor_placeholder(s, h, w, c) = PlaceHolder(
     h,
     w;
     style = c,

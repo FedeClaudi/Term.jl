@@ -16,8 +16,8 @@ include("_compositor.jl")
 """
     mutable struct LayoutElement
         id::Symbol
-        w::Int
         h::Int
+        w::Int
         renderable::Union{Nothing,String,AbstractRenderable}
         placeholder::PlaceHolder
     end
@@ -80,7 +80,7 @@ function Compositor(
     )
 
     placeholders = Dict(
-        e.args[1] => placeholder(e.args..., e.args[1] === :_ ? "hidden" : c) for
+        e.args[1] => compositor_placeholder(e.args..., e.args[1] === :_ ? "hidden" : c) for
         (c, e) in zip(colors, elements)
     )
 
