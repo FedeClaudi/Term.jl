@@ -33,6 +33,17 @@ But you can hide it too:
 grid(panels; aspect=1, show_placeholder=true)
 ```
 
+You can use `layout` to more directly specify the number of rows and columns in the grid:
+```@example grid
+grid(panels; layout=(3, 4), show_placeholder=true)
+```
+
+Leaving a `nothing` argument will auto-magically compute the remaining `rows` or `cols` of the layout:
+You can use `layout` to more directly specify the number of rows and columns in the grid:
+```@example grid
+grid(panels; layout=(3, nothing), show_placeholder=true)
+```
+
 One can use complex expressions for layouts, using an underscore `_` to specify empty elements in the layout:
 ```@example grid
 grid(panels[1:6]; layout=:((a * _ * b) / (_ * _ * c * d) / (_ * e * f)))
@@ -40,13 +51,9 @@ grid(panels[1:6]; layout=:((a * _ * b) / (_ * _ * c * d) / (_ * e * f)))
 
 Repeating elements is supported:
 ```@example grid
-grid(panels[1:2]; layout=:((a * _ * a) / (_ * _ * b * b)))
+grid(panels[1:2]; layout=:((α * _ * α) / (_ * _ * β * β)))
 ```
 
-Finally you can use `layout` to more directly specify the number of rows and columns in the grid:
-```@example grid
-grid(panels; layout=(3, 4), show_placeholder=true)
-```
 
 !!! note 
     Note that grid uses `vstack` and `hstack` to combine the renderables into the layout you requested. As such, it returns a single renderable, you don't have access to the individual renderables that went into making the grid any longer. This also means that the grid can be stack with other content to create a larger layout. 
