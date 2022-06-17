@@ -331,15 +331,17 @@ function fillin(text; bg = nothing)::String
 end
 
 """
-    truncate(text::AbstractString, width::Int)
+    str_trunc(text::AbstractString, width::Int)
 
 Shorten a string of text to a target width
 """
-function truncate(text::AbstractString, width::Int; trailing_dots = "...")
-    # occursin('\n', text) &&  do_by_line(ln -> truncate(ln, width; trailing_dots=trailing_dots), text)
+function str_trunc(text::AbstractString, width::Int; trailing_dots = "...")
+    # occursin('\n', text) && do_by_line(ln -> str_trunc(ln, width; trailing_dots=trailing_dots), text)
     width < 0 && return text
     textlen(text) ≤ width && return text
 
     trunc = reshape_text(text, width - 3)
-    return split_lines(trunc)[1] * trailing_dots
+    out = first(split_lines(trunc)) * trailing_dots
+    # @assert textlen(out) ≤ width - 3
+    return out
 end

@@ -13,7 +13,7 @@ include("__test_utils.jl")
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
-dotest = console_width() ≥ Term.DEFAULT_WIDTH[]
+const WIDE_TERM = console_width() ≥ Term.DEFAULT_WIDTH[]
 
 macro runner(fn)
     quote

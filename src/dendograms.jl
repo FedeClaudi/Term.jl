@@ -1,6 +1,6 @@
 module Dendograms
 
-import Term: fint, rint, cint, truncate, loop_firstlast, highlight, textlen
+import Term: fint, rint, cint, str_trunc, loop_firstlast, highlight, textlen
 
 import ..Renderables: AbstractRenderable
 import ..Boxes: get_rrow, get_lrow, get_row, SQUARE
@@ -44,7 +44,7 @@ function Leaf(leaf)
     # get a string representation of the appropriate length
     leaf = string(leaf)
     leaf = if textlen(leaf) > CELLWIDTH
-        truncate(leaf, CELLWIDTH)
+        str_trunc(leaf, CELLWIDTH)
     else
         pad(leaf, CELLWIDTH + 1, :center)
     end
@@ -125,7 +125,7 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
             segments,
             [
                 Segment(
-                    " " * pad(truncate(pretitle, CELLWIDTH), width - 1, :center),
+                    " " * pad(str_trunc(pretitle, CELLWIDTH), width - 1, :center),
                     PRETITLE_STYLE,
                 ),
                 Segment(" " * pad("⋀", width - 1, :center), "green bold"),
@@ -244,7 +244,7 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
 
     # add 'pretitle' lines (for expressions only)
     if !isnothing(pretitle)
-        pretitle = truncate(pretitle, CELLWIDTH)
+        pretitle = str_trunc(pretitle, CELLWIDTH)
         l(txt) = fint(midpoint - textwidth(txt) / 2) + length(space)
         r(txt) = cint((width - midpoint - textwidth(txt) / 2))
         prepend!(

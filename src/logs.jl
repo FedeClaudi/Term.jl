@@ -15,7 +15,7 @@ import Term:
     rint,
     highlight,
     TERM_THEME,
-    truncate,
+    str_trunc,
     ltrim_str
 
 import ..Consoles: console_width, console_height, change_scroll_region, move_to_line
@@ -227,7 +227,7 @@ function Logging.handle_message(
     end
 
     wpad = maximum(textlen.(_types)) + 2
-    ks = truncate.(string.(keys(kwargs)), 28)
+    ks = str_trunc.(string.(keys(kwargs)), 28)
     namepad = maximum(textlen.(ks))
 
     # print all kwargs

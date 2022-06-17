@@ -41,15 +41,15 @@ tree_dict_4 = Dict(
 
 @testset "\e[34mTree" begin
     # creation
-    testtree(Tree(tree_dict), 50, 6)
+    @testtree(Tree(tree_dict), 6, 50)
 
-    testtree(Tree(tree_dict_1), 15, 9)
+    @testtree(Tree(tree_dict_1), 9, 15)
 
-    testtree(Tree(tree_dict_2), 18, 11)
+    @testtree(Tree(tree_dict_2), 11, 18)
 
-    testtree(Tree(tree_dict_3), 33, 13)
+    @testtree(Tree(tree_dict_3), 13, 33)
 
-    testtree(Tree(tree_dict_4), 33, 19)
+    @testtree(Tree(tree_dict_4), 19, 33)
 
     # styling
     for guides_type in (:standardtree, :boldtree, :asciitree)
@@ -60,7 +60,7 @@ tree_dict_4 = Dict(
         )
     end
 
-    testtree(
+    @testtree(
         Tree(
             tree_dict;
             title = "my colors",
@@ -69,8 +69,8 @@ tree_dict_4 = Dict(
             leaf_style = "green",
             guides_style = "red dim",
         ),
-        52,
         6,
+        52,
     )
 
     # test with no errors
