@@ -48,7 +48,7 @@ function grid(
         ph_size = (minimum(first.(sizes)), minimum(last.(sizes)))
 
         for (i, e) in enumerate(get_elements_and_sizes(layout; placeholder_size = ph_size))
-            kw[(nm = e.args[1])] = if nm === :_
+            kw[nm] = if (nm = e.args[1]) === :_
                 compositor_placeholder(nm, ph_size..., ph_style)
             else
                 haskey(kw, nm) ? kw[nm] : rens[n += 1]
