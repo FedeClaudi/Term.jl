@@ -103,7 +103,7 @@ end
 """
     handle_progress(logger::TermLogger, prog)
 
-Handle progress information passed by `ProgressLogging`
+Handle progress information passed by `ProgressLogging`.
 
 It creates/adds/removes `ProgressJob`s to the logger's
 `ProgressBar` to create progress visualizations. 
