@@ -8,8 +8,7 @@ The idea is simple: take a bunch of renderables and make a grid out of them:
 import Term: Panel
 import Term.Layout: grid
 
-p = Panel(height=6, width=12)
-panels = repeat([p], 8)
+panels = repeat([Panel(height=6, width=12)], 8)
 
 grid(panels)
 ```
@@ -34,9 +33,14 @@ But you can hide it too:
 grid(panels; aspect=1, show_placeholder=true)
 ```
 
-One can use complex expressions for layouts, and use and underscore `_` to specify empty elements in the layout:
+One can use complex expressions for layouts, using an underscore `_` to specify empty elements in the layout:
 ```@example grid
 grid(panels[1:6]; layout=:((a * _ * b) / (_ * _ * c * d) / (_ * e * f)))
+```
+
+Repeating elements is supported:
+```@example grid
+grid(panels[1:2]; layout=:((a * _ * a) / (_ * _ * b * b)))
 ```
 
 Finally you can use `layout` to more directly specify the number of rows and columns in the grid:
