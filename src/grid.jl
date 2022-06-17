@@ -1,3 +1,6 @@
+"""
+Author(s): T Bltg (github.com/t-bltg)
+"""
 module Grid
 
 import ..Renderables: Renderable, AbstractRenderable
@@ -10,10 +13,6 @@ import Term: calc_nrows_ncols
 export grid
 
 include("_compositor.jl")
-
-# ---------------------------------------------------------------------------- #
-#                                     GRID                                     #
-# ---------------------------------------------------------------------------- #
 
 """
     grid(
@@ -28,7 +27,7 @@ Construct a grid from a `AbstractVector` of `AbstractRenderable`s.
 
 Lays out the renderables to createa a grid with the desired aspect ratio or
 layout (number of rows, number of columns). If no renderables are passed it
-creates placeholders.
+creates placeholders. Complex layout is supported using compositor expressions.
 """
 function grid(
     rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
@@ -40,21 +39,23 @@ function grid(
 )
     (isnothing(layout) && isnothing(rens)) && error("Grid: layout or aspect required")
 
-    style = show_placeholder ? "" : "hidden"
+    ph_style = show_placeholder ? "" : "hidden"
 
     if !isnothing(rens) && layout isa Expr
         n, kw = 0, Dict()
         sizes = size.(rens)
-        sz = (minimum(first.(sizes)), minimum(last.(sizes)))
-        for (i, e) in enumerate(get_elements_and_sizes(layout; placeholder_size = sz))
-            nm = e.args[1]
-            kw[nm] = if nm === :_
-                compositor_placeholder(nm, sz..., style)
+        # arbitrary, taking the smallest `Renderable` size for placeholder
+        ph_size = (minimum(first.(sizes)), minimum(last.(sizes)))
+
+        for (i, e) in enumerate(get_elements_and_sizes(layout; placeholder_size = ph_size))
+            kw[(nm = e.args[1])] = if nm === :_
+                compositor_placeholder(nm, ph_size..., ph_style)
             else
                 haskey(kw, nm) ? kw[nm] : rens[n += 1]
             end
         end
-        compositor = Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...)
+        compositor =
+            Compositor(layout; placeholder_size = ph_size, check = false, pairs(kw)...)
         return Renderable(compositor)
     end
 
@@ -71,8 +72,7 @@ function grid(
             ncols, r = divrem(length(rens), nrows)
             r == 0 || (ncols += 1)
         end
-        fill_in =
-            (isnothing(placeholder) ? PlaceHolder(first(rens); style = style) : placeholder)
+        fill_in = something(placeholder, PlaceHolder(first(rens); style = ph_style))
         rens = vcat(rens, repeat([fill_in], nrows * ncols - length(rens)))
     end
     return grid(reshape(rens, nrows, ncols); pad = pad)
