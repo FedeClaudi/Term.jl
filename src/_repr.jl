@@ -19,7 +19,7 @@ function repr_get_obj_fields_display(obj)
 
     values = []
     for val in _values
-        val = truncate(string(val), 45)
+        val = str_trunc(string(val), 45)
         push!(values, RenderableText.(val; style = theme.repr_values_style))
     end
 
@@ -73,7 +73,7 @@ function repr_panel(
 end
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w)
-    shortsting(x) = x isa AbstractRenderable ? info(x) : truncate(string(x), max_w)
+    shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     out = highlight.(shortsting.(v[1:N]))
 
     length(v) > N && push!(out, "⋮";)

@@ -39,57 +39,62 @@ end
 Extensively test a panel making sure it has
 the right size and Measure
 """
-function testpanel(p, w, h)
-    # isnothing(h) || println(vLine(h) * p)
-    # check all lines have the same length
-    _p = string(p)
+macro testpanel(p, h, w)
+    quote
+        # isnothing($h) || println(vLine(h) * $p)
+        # check all lines have the same length
+        _p = string($p)
 
-    dw = displaysize(stdout)[2]
-    if isnothing(w) || w > dw
-        return nothing
-    else
-        widths = textwidth.(cleantext.(split(_p, '\n')))
-    end
+        dw = displaysize(stdout)[2]
+        if isnothing($w) || $w > dw
+            return nothing
+        else
+            widths = textwidth.(cleantext.(split(_p, '\n')))
+        end
 
-    # println(p, p.measure, widths)
-    @test length(unique(widths)) == 1
+        # println(p, p.measure, widths)
+        @test length(unique(widths)) == 1
 
-    # check it has the right measure
-    if !isnothing(w)
-        @test p.measure.w == w
-        @test textlen(cleantext(p.segments[1].text)) == w
-        @test length(chars(cleantext(p.segments[1].text))) == w
-    end
+        # check it has the right measure
+        if !isnothing($w)
+            @test $p.measure.w == $w
+            _txt = $p.segments[1].text
+            @test textlen(cleantext(_txt)) == $w
+            @test length(chars(cleantext(_txt))) == $w
+        end
 
-    if !isnothing(h)
-        @test p.measure.h == h
-        @test length(p.segments) == h
-    end
+        if !isnothing($h)
+            @test $p.measure.h == $h
+            @test length($p.segments) == $h
+        end
+    end |> esc
 end
 
-function testtree(p, w, h)
-    # check all lines have the same length
-    _p = string(p)
+macro testtree(p, h, w)
+    quote
+        # check all lines have the same length
+        _p = string($p)
 
-    dw = displaysize(stdout)[2]
-    if isnothing(w) || w > dw
-        return nothing
-    else
-        widths = textwidth.(cleantext.(split(_p, '\n')))
-    end
+        dw = displaysize(stdout)[2]
+        if isnothing($w) || $w > dw
+            return nothing
+        else
+            widths = textwidth.(cleantext.(split(_p, '\n')))
+        end
 
-    # println(p, p.measure, widths)
-    @test length(unique(widths)) == 1
+        # println(p, p.measure, widths)
+        @test length(unique(widths)) == 1
 
-    # check it has the right measure
-    if !isnothing(w)
-        @test p.measure.w == w
-    end
+        # check it has the right measure
+        if !isnothing($w)
+            @test $p.measure.w == $w
+        end
 
-    if !isnothing(h)
-        @test p.measure.h == h
-        @test length(p.segments) == h
-    end
+        if !isnothing($h)
+            @test $p.measure.h == $h
+            @test length($p.segments) == $h
+        end
+    end |> esc
 end
 
 nlines(x) = length(split(x, '\n'))

@@ -41,10 +41,9 @@ expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
             inspect(devnull, e)
         end
         typestree(devnull, Float64)
+        redirect_stdout(devnull) do
+            typestree(Float64)
+            expressiontree(:(1 + 2.0))
+        end
     end
-end
-
-@testset "Inspect: style" begin
-    # @test style_sub_types(...)
-    # @test style_super_types(...)
 end

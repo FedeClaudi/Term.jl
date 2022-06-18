@@ -2,7 +2,7 @@ module Repr
 using InteractiveUtils
 
 import Term:
-    truncate,
+    str_trunc,
     escape_brackets,
     highlight,
     do_by_line,
@@ -100,7 +100,7 @@ end
 Show a dictionary's keys and values and their data types.
 """
 function termshow(io::IO, obj::AbstractDict; kwargs...)
-    short_string(x) = truncate(string(x), 30)
+    short_string(x) = str_trunc(string(x), 30)
     theme = TERM_THEME[]
 
     # prepare text renderables

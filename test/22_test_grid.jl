@@ -1,5 +1,6 @@
 import Term.Measures: default_size
 import Term.Layout: PlaceHolder
+import Term: Renderable
 
 @testset "Grid - simple" begin
     h, w = default_size()
@@ -85,6 +86,10 @@ end
     @test size(grid(panels[1:9]).measure) == (3h, 3w)  # 9 best fits onto a (3, 3) grid with unit ar
 end
 
+@testset "Grid - named tuple" begin
+    @test grid((a = Panel(), b = Panel())) isa Renderable
+end
+
 @testset "Grid - complex layout" begin
     rens = [
         Panel(height = 5, width = 10),
@@ -99,4 +104,8 @@ end
     # repeated in layout
     g = grid(rens, layout = :((_ * a) / (b * _ * c * c) / (d * e)))
     @test size(g.measure) == (25, 65)
+
+    # named tuple
+    g = grid((a = rens[1], b = rens[2]); layout = :((_ * a) / (b * _)))
+    @test size(g.measure) == (10, 25)
 end

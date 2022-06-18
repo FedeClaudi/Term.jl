@@ -159,7 +159,7 @@ function update!(col::ElapsedColumn, args...)::String
         string(round(elapsedtime / (60 * 1000); digits = 2), "min")
     end
 
-    msg = lpad(truncate(msg, col.padwidth), col.padwidth)
+    msg = lpad(str_trunc(msg, col.padwidth), col.padwidth)
     return apply_style("elapsed: $(msg)", col.style)
 end
 
@@ -195,7 +195,7 @@ function update!(col::ETAColumn, args...)::String
         string(round(remaining / (60 * 1000); digits = 2), "min")
     end
 
-    msg = lpad(truncate(msg, col.padwidth), col.padwidth)
+    msg = lpad(str_trunc(msg, col.padwidth), col.padwidth)
 
     return apply_style("remaining: $(msg)", col.style)
 end

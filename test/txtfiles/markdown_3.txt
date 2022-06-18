@@ -26,8 +26,9 @@ And, of course, you can show some code too:[0m
 You can use "quotes" to highlight a section:[0m
 
   [38;2;90;116;242m>[39m [1m[37m“[22m[39mMulti-line quotes can be helpful to make a  paragram stand 
-  [2m[38;2;107;119;176m┃[22m[39m[0m out, so that users won't miss it! You can use [1mother inline  
-  [2m[38;2;107;119;176m┃[22m[39m[0m syntax[22m[39m in you [3m[38;2;255;245;157m`[23m[39m[38;2;222;222;222mquotes[39m[3m[38;2;255;245;157m`[23m[39m too.[0m[1m[37m”[22m[39m[0m[0m                                
+  [2m[38;2;107;119;176m┃[22m[39m[0m out, so that users                                          
+  [2m[38;2;107;119;176m┃[22m[39m[0m won't miss it! You can use [1mother inline syntax[22m in you       
+  [2m[38;2;107;119;176m┃[22m[39m[0m [38;2;255;245;157m[3m`[39m[22m[23m[38;2;255;245;157m[38;2;222;222;222mquotes[39m[38;2;255;245;157m[3m`[39m[23m[38;2;255;245;157m too.[0m[1m[37m”[22m[39m[0m[0m                                              
 
 but if you really need to grab someone's attention, use 
 admonitions:[0m
@@ -70,9 +71,9 @@ and ordered lists too:[0m
 
     [2m[34m╭──── [22m[34mTables[22m[39m[34m[2m[34m ──────────────────────────────────────────╮[22m[39m[0m[22m[39m[34m
     [0m[2m[34m│[22m[39m[0m  You can use the [37m[1mMarkdown table syntax[39m[22m[37m               [0m[2m[34m│[22m[39m[0m
-    [0m[2m[34m│[22m[39m[0m  [2m(https://www.markdownguide.org/extended-synta       [0m[2m[34m│[22m[39m[0m
-    [0m[2m[34m│[22m[39m[0m  x/#tables)[22m[37m to insert tables - Term.jl will          [0m[2m[34m│[22m[39m[0m
-    [0m[2m[34m│[22m[39m[0m  convert them to Table object![0m                       [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  [2m(https://www.markdownguide.org/extended-syntax/     [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  #tables)[22m[37m to insert tables -                         [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  Term.jl will convert them to Table object![0m          [0m[2m[34m│[22m[39m[0m
     [2m[34m╰──────────────────────────────────────────────────────╯[22m[39m[0m
 
          [2m╭───────────┬──────────────┬────────────╮[22m          

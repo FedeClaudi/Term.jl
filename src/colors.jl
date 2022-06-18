@@ -137,11 +137,9 @@ function get_color(string; bg = false)::AbstractColor
 
     if is_named_color(string)
         return if string ∈ COLORS_16b
-            idx = findfirst((c) -> c == string, COLORS_16b)[1]
-            BitColor(COLORS_16b[idx])
-        else
-            idx = findfirst((c) -> c == string, NAMED_COLORS)[1]
-            NamedColor(NAMED_COLORS[idx])
+            BitColor(COLORS_16b[findfirst(c -> c == string, COLORS_16b)])
+        elseif string ∈ NAMED_COLORS
+            NamedColor(NAMED_COLORS[findfirst(c -> c == string, NAMED_COLORS)])
         end
     elseif is_rgb_color(string)
         return RGBColor(string)

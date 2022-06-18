@@ -1,34 +1,34 @@
-import Term: Panel, TextBox
+import Term: Panel, TextBox, apply_style, DEFAULT_WIDTH
 import Term.Layout: PlaceHolder
 
 @testset "\e[34mPanel - no content" begin
-    @test size(Panel(height = 4, width = 3)) == (4, 3)
+    @test size(Panel(height = 4, width = 10)) == (4, 10)
 
     for style in ("default", "red", "on_blue")
-        testpanel(Panel(fit = true, style = style), 3, 2)
-        testpanel(Panel(), 88, 2)
-        testpanel(Panel(height = 4, width = 12, style = style), 12, 4)
+        @testpanel(Panel(fit = true, style = style), 2, 3)
+        @testpanel(Panel(), 2, DEFAULT_WIDTH[])
+        @testpanel(Panel(height = 4, width = 12, style = style), 4, 12)
     end
 end
 
 @testset "\e[34mPanel - fit basic shape" begin
-    testpanel(Panel("MYTEXT"; height = 10, width = 60), 60, 10)
-    testpanel(Panel("MYTEXT"; width = 60), 60, 3)
-    testpanel(Panel("MYTEXT"), 12, 3)
+    @testpanel(Panel("MYTEXT"; height = 10, width = 60), 10, 60)
+    @testpanel(Panel("MYTEXT"; width = 60), 3, 60)
+    @testpanel(Panel("MYTEXT"), 3, 12)
 
-    testpanel(Panel("MYTEXT"; height = 10, width = 60, padding = (4, 4, 2, 2)), 60, 10)
-    testpanel(Panel("MYTEXT"; width = 60, padding = (4, 4, 2, 2)), 60, 7)
-    testpanel(Panel("MYTEXT"; padding = (4, 4, 2, 2)), 16, 7)
+    @testpanel(Panel("MYTEXT"; height = 10, width = 60, padding = (4, 4, 2, 2)), 10, 60)
+    @testpanel(Panel("MYTEXT"; width = 60, padding = (4, 4, 2, 2)), 7, 60)
+    @testpanel(Panel("MYTEXT"; padding = (4, 4, 2, 2)), 7, 16)
 end
 
 @testset "\e[34mPanel - fit overflow" begin
-    testpanel(
+    @testpanel(
         Panel(
             Panel("MYTEXT"^50; height = 10, width = 60) /
             Panel("MYTEXT"^50; height = 10, width = 60),
         ),
-        console_width() - 1,
         nothing,
+        console_width() - 1,
     )
 end
 
@@ -36,123 +36,149 @@ end
     for style in ("default", "red", "on_blue")
         # ----------------------------- text only content ---------------------------- #
         _kw = (fit = true, style = style)
-        testpanel(Panel("t"; _kw...), 7, 3)
-        testpanel(Panel("test"; _kw...), 10, 3)
-        testpanel(Panel("1234\n123456789012"; _kw...), 18, 4)
-        testpanel(Panel("나랏말싸미 듕귁에 달아"; _kw...), 28, 3)
-        testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; _kw...), 28, 4)
-        testpanel(Panel("."^500; _kw...), displaysize(stdout)[2] - 1, nothing)
+        @testpanel(Panel("t"; _kw...), 3, 7)
+        @testpanel(Panel("test"; _kw...), 3, 10)
+        @testpanel(Panel("1234\n123456789012"; _kw...), 4, 18)
+        @testpanel(Panel("나랏말싸미 듕귁에 달아"; _kw...), 3, 28)
+        @testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; _kw...), 4, 28)
+        @testpanel(Panel("°"^500; _kw...), nothing, displaysize(stdout)[2] - 1)
 
         # ------------------------------- nested panels ------------------------------ #
-        testpanel(Panel(Panel("test"; _kw...); _kw...), 16, 5)
+        @testpanel(Panel(Panel("test"; _kw...); _kw...), 5, 16)
 
-        testpanel(
-            Panel(Panel(Panel("."; _kw...); _kw...); fit = true, style = style),
-            19,
+        @testpanel(
+            Panel(Panel(Panel("°"; _kw...); _kw...); fit = true, style = style),
             7,
+            19,
         )
     end
 end
 
 @testset "\e[34mPANEL - nofit - measure" begin
     for style in ("default", "red", "on_blue")
-        testpanel(Panel("t"; style = style, fit = false), 88, 3)
-        testpanel(Panel("test"; style = style, fit = false), 88, 3)
-        testpanel(Panel("1234\n123456789012"; style = style, fit = false), 88, 4)
-        testpanel(Panel("나랏말싸미 듕귁에 달아"; style = style, fit = false), 88, 3)
-        testpanel(
-            Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; style = style, fit = false),
-            88,
+        @testpanel(Panel("t"; style = style, fit = false), 3, DEFAULT_WIDTH[])
+        @testpanel(Panel("test"; style = style, fit = false), 3, DEFAULT_WIDTH[])
+        @testpanel(
+            Panel("1234\n123456789012"; style = style, fit = false),
             4,
+            DEFAULT_WIDTH[]
+        )
+        @testpanel(Panel("나랏말싸미 듕귁에 달아"; style = style, fit = false), 3, DEFAULT_WIDTH[])
+        @testpanel(
+            Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; style = style, fit = false),
+            4,
+            DEFAULT_WIDTH[],
         )
         for justify in (:left, :center, :right)
             # ----------------------------- text only content ---------------------------- #
             _kw = (justify = justify, style = style)
             _nofit = (; fit = false, _kw...)
-            testpanel(Panel("."^1500; _nofit...), 88, 21)
+            @testpanel(Panel("°"^1500; _nofit...), nothing, DEFAULT_WIDTH[])
 
             # ------------------------------- nested panels ------------------------------ #
-            testpanel(Panel(Panel("test"); fit = true, _kw...), 16, 5)
+            @testpanel(Panel(Panel("test"); fit = true, _kw...), 5, 16)
 
-            testpanel(Panel(Panel(Panel("."); _nofit...); _nofit...), 88, 7)
+            @testpanel(Panel(Panel(Panel("°"); _nofit...); _nofit...), 7, DEFAULT_WIDTH[])
 
-            testpanel(Panel(Panel("."^250); _nofit...), 88, 5)
+            # NOTE: using a panel with arbitrary long text can fail testing on wide terminals, since
+            # the final `height` can vary (github.com/FedeClaudi/Term.jl/issues/112)
+            @testpanel(
+                Panel(Panel("°"^250); _nofit...),
+                WIDE_TERM ? nothing : 5,
+                DEFAULT_WIDTH[]
+            )
 
-            testpanel(Panel(Panel("test"; _kw...); fit = false), 88, 5)
+            @testpanel(Panel(Panel("test"; _kw...); fit = false), 5, DEFAULT_WIDTH[])
 
-            testpanel(Panel(Panel(Panel("."; _kw...); _kw...); fit = false), 88, 7)
+            @testpanel(
+                Panel(Panel(Panel("°"; _kw...); _kw...); fit = false),
+                7,
+                DEFAULT_WIDTH[]
+            )
 
-            testpanel(Panel(Panel("."^250; _kw...); fit = false), 88, 5)
+            @testpanel(
+                Panel(Panel("°"^250; _kw...); fit = false),
+                WIDE_TERM ? nothing : 5,
+                DEFAULT_WIDTH[]
+            )
 
-            testpanel(Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = false), 88, 8)
+            @testpanel(
+                Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = false),
+                8,
+                DEFAULT_WIDTH[]
+            )
 
-            _kw = (fit = false, width = 30, height = 8)
-            testpanel(Panel(Panel("test"; width = 22); _kw...), 30, 8)
+            _kw = (fit = false, height = 8, width = 30)
+            @testpanel(Panel(Panel("test"; width = 22); _kw...), 8, 30)
 
-            testpanel(Panel(Panel("test"; width = 42); _kw...), 30, 8)
+            @testpanel(Panel(Panel("test"; width = 42); _kw...), 8, 30)
 
-            testpanel(
+            @testpanel(
                 Panel(
                     Panel("test"; height = 12, width = 42);
                     fit = false,
                     height = 8,
                     width = 30,
                 ),
-                30,
                 8,
+                30,
             )
         end
     end
 end
 
 @testset "\e[34mPANEL - FIT - measure" begin
-    testpanel(Panel("t"; fit = true), 7, 3)
-    testpanel(Panel("test"; fit = true), 10, 3)
-    testpanel(Panel("1234\n123456789012"; fit = true), 18, 4)
-    testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true), 28, 3)
-    testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true), 28, 4)
+    @testpanel(Panel("t"; fit = true), 3, 7)
+    @testpanel(Panel("test"; fit = true), 3, 10)
+    @testpanel(Panel("1234\n123456789012"; fit = true), 4, 18)
+    @testpanel(Panel("나랏말싸미 듕귁에 달아"; fit = true), 3, 28)
+    @testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; fit = true), 4, 28)
     for justify in (:left, :center, :right)
         # ----------------------------- text only content ---------------------------- #
         _kw = (fit = true, justify = justify)
-        testpanel(Panel("."^1500; _kw...), console_width() - 1, nothing)
+        @testpanel(Panel("°"^1500; _kw...), nothing, console_width() - 1)
 
         # ------------------------------- nested panels ------------------------------ #
-        testpanel(Panel(Panel("test"); _kw...), 16, 5)
+        @testpanel(Panel(Panel("test"); _kw...), 5, 16)
 
-        testpanel(Panel(Panel(Panel("."); _kw...); _kw...), 19, 7)
+        @testpanel(Panel(Panel(Panel("°"); _kw...); _kw...), 7, 19)
 
-        testpanel(Panel(Panel("."^250); _kw...), console_width() - 1, nothing)
+        @testpanel(
+            Panel(Panel("°"^250); _kw...),
+            WIDE_TERM ? nothing : 8,
+            console_width() - 1
+        )
 
-        testpanel(Panel(Panel("test"; justify = justify); fit = true), 16, 5)
+        @testpanel(Panel(Panel("test"; justify = justify); fit = true), 5, 16)
 
-        testpanel(
-            Panel(Panel(Panel("."; justify = justify); justify = justify); fit = true),
-            19,
+        @testpanel(
+            Panel(Panel(Panel("°"; justify = justify); justify = justify); fit = true),
             7,
+            19,
         )
 
-        testpanel(
-            Panel(Panel("."^250; justify = justify); fit = true),
-            console_width() - 1,
+        @testpanel(
+            Panel(Panel("°"^250; justify = justify); fit = true),
             nothing,
+            console_width() - 1,
         )
 
-        testpanel(
+        @testpanel(
             Panel(
                 Panel("t1"; justify = justify),
                 Panel("t2"; justify = justify);
                 fit = true,
             ),
-            14,
             8,
+            14,
         )
 
         _kw = (fit = true, width = 30, height = 8)
-        testpanel(Panel(Panel("test"; width = 22); _kw...), 30, 8)
+        @testpanel(Panel(Panel("test"; width = 22); _kw...), 8, 30)
 
-        testpanel(Panel(Panel("test"; width = 42); _kw...), 48, 8)
+        @testpanel(Panel(Panel("test"; width = 42); _kw...), 8, 48)
 
-        testpanel(Panel(Panel("test"; height = 12, width = 42); _kw...), 48, 14)
+        @testpanel(Panel(Panel("test"; height = 12, width = 42); _kw...), 14, 48)
     end
 end
 
@@ -278,16 +304,16 @@ id est laborum.""",
 end
 
 @testset "\e[34mPanel + renderables" begin
-    testpanel(Panel(RenderableText("x" .^ 5)), 11, 3)
+    @testpanel(Panel(RenderableText("x"^5)), 3, 11)
 
-    testpanel(Panel(RenderableText("x" .^ 500); fit = false), 88, 9)
+    @testpanel(Panel(RenderableText("x"^500); fit = false), 9, DEFAULT_WIDTH[])
 
-    testpanel(Panel(RenderableText("x" .^ 5); fit = true), 11, 3)
+    @testpanel(Panel(RenderableText("x"^5); fit = true), 3, 11)
 
-    testpanel(
-        Panel(RenderableText("x" .^ 500); fit = true),
-        displaysize(stdout)[2] - 1,
+    @testpanel(
+        Panel(RenderableText("x"^500); fit = true),
         nothing,
+        displaysize(stdout)[2] - 1,
     )
 end
 
@@ -295,9 +321,9 @@ end
     style = "red"
     for fit in (true, false)
         for justify in (:left, :center, :right)
-            testpanel(
+            @testpanel(
                 Panel(
-                    "."^50;
+                    "°"^50;
                     title = "test",
                     title_style = style,
                     title_justify = justify,
@@ -306,19 +332,19 @@ end
                     subtitle_justify = justify,
                     fit = fit,
                 ),
-                fit ? nothing : 88,
                 3,
+                fit ? nothing : DEFAULT_WIDTH[],
             )
         end
     end
 end
 
 @testset "\e[34mPanel - padding" begin
-    p = Panel("."^24; padding = (4, 4, 2, 2), fit = false)
-    testpanel(p, 88, 7)
+    p = Panel("°"^24; padding = (4, 4, 2, 2), fit = false)
+    @testpanel(p, 7, DEFAULT_WIDTH[])
 
-    p = Panel("."^24; padding = (4, 4, 2, 2), fit = true)
-    testpanel(p, 34, 7)
+    p = Panel("°"^24; padding = (4, 4, 2, 2), fit = true)
+    @testpanel(p, 7, 34)
 end
 
 @testset "\e[34mPanel - background" begin
