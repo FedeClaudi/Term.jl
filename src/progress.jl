@@ -4,7 +4,7 @@ using Dates
 import Parameters: @with_kw
 import UUIDs: UUID
 
-import Term: rint, textlen, truncate, loop_last, get_file_format, update!, DEFAULT_WIDTH
+import Term: rint, textlen, truncate, loop_last, get_file_format, update!, default_width
 import ..Tprint: tprint, tprintln
 import ..Style: apply_style
 import ..Consoles:
@@ -260,7 +260,7 @@ end
 
 """
     ProgressBar(;
-        width::Int=$(DEFAULT_WIDTH[]),
+        width::Int=$(default_width()),
         columns::Union{Vector{DataType}, Symbol} = :default,
         columns_kwargs::Dict = Dict(),
         expand::Bool=false,
@@ -276,7 +276,7 @@ end
 Create a ProgressBar instance.
 """
 function ProgressBar(;
-    width::Int = DEFAULT_WIDTH[],
+    width::Int = default_width(),
     columns::Union{Vector{DataType},Symbol} = :default,
     columns_kwargs::Dict = Dict(),
     expand::Bool = false,

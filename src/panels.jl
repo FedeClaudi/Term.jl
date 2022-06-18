@@ -1,6 +1,6 @@
 module Panels
 
-import Term: reshape_text, join_lines, fillin, truncate, ltrim_str, DEFAULT_WIDTH
+import Term: reshape_text, join_lines, fillin, truncate, ltrim_str, default_width
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
@@ -53,7 +53,7 @@ Base.size(p::Panel) = size(p.measure)
     Panel(; 
         fit::Bool = false,
         height::Int = 2,
-        width::Int = $(DEFAULT_WIDTH[]),
+        width::Int = $(default_width()),
         padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
         kwargs...,  
     )
@@ -79,7 +79,7 @@ julia> Panel(height=3, width=5)
 function Panel(;
     fit::Bool = false,
     height::Int = 2,
-    width::Int = DEFAULT_WIDTH[],
+    width::Int = default_width(),
     padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
     kwargs...,
 )
@@ -208,7 +208,7 @@ end
         ::Val{false},
         padding::Padding;
         height::Union{Nothing,Int} = nothing,
-        width::Int = $(DEFAULT_WIDTH[]),
+        width::Int = $(default_width()),
         kwargs...,
     )
 
@@ -224,7 +224,7 @@ function Panel(
     ::Val{false},
     padding::Padding;
     height::Union{Nothing,Int} = nothing,
-    width::Int = DEFAULT_WIDTH[],
+    width::Int = default_width(),
     background::Union{Nothing,String} = nothing,
     kwargs...,
 )

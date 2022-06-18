@@ -1,4 +1,4 @@
-import Term: DEFAULT_WIDTH
+import Term: default_width
 
 function repr_get_obj_fields_display(obj)
     field_names = fieldnames(typeof(obj))
@@ -50,7 +50,7 @@ function repr_panel(
     obj,
     content,
     subtitle;
-    width = min(console_width() - 10, DEFAULT_WIDTH[]),
+    width = min(console_width() - 10, default_width()),
     justify = :center,
     kwargs...,
 )
@@ -104,7 +104,7 @@ function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 100, max_D 
 end
 
 function vec2content(vec::Union{Tuple,AbstractVector})
-    max_w = DEFAULT_WIDTH[]
+    max_w = default_width()
     max_items = 100
     N = min(max_items, length(vec))
 

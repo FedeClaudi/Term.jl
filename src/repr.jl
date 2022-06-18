@@ -9,7 +9,7 @@ import Term:
     unescape_brackets,
     split_lines,
     TERM_THEME,
-    DEFAULT_WIDTH
+    default_width
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
@@ -272,7 +272,7 @@ function termshow(io::IO, obj::DataType; kwargs...)
             string(type_name / ("  " * line * fields)),
             nothing;
             fit = false,
-            width = min(console_width() - 5, DEFAULT_WIDTH[]),
+            width = min(console_width() - 5, default_width(io)),
             justify = :center,
         )
 
@@ -299,7 +299,7 @@ end
 
 Show a function's methods and docstring.
 """
-function termshow(io::IO, fun::Function; width = min(console_width() - 10, DEFAULT_WIDTH[]))
+function termshow(io::IO, fun::Function; width = min(console_width() - 10, default_width(io)))
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)

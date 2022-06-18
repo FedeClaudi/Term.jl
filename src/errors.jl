@@ -7,9 +7,10 @@ import Term:
     truncate,
     reshape_text,
     load_code_and_highlight,
-    DEFAULT_STACKTRACE_WIDTH,
+    default_stacktrace_width,
     escape_brackets,
-    unescape_brackets
+    unescape_brackets,
+    remove_markup
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
@@ -244,7 +245,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                     error /= rendered_bt
                     W = rendered_bt.measure.w
                 else
-                    W = DEFAULT_STACKTRACE_WIDTH[]
+                    W = default_stacktrace_width()
                 end
                 err, _ = error_message(er)
                 msg =
