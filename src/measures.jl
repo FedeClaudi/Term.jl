@@ -1,6 +1,6 @@
 module Measures
 
-import Term: rint, remove_ansi, remove_markup, DEFAULT_WIDTH, DEFAULT_ASPECT_RATIO
+import Term: rint, remove_ansi, remove_markup, default_width, DEFAULT_ASPECT_RATIO
 
 export Measure
 
@@ -21,7 +21,7 @@ Base.show(io::IO, M::Measure) = print(io, "Measure (h: $(M.h), w: $(M.w))")
 
 Returns default size (h, w).
 """
-default_size() = (rint(DEFAULT_WIDTH[] / 2DEFAULT_ASPECT_RATIO[]), DEFAULT_WIDTH[])
+default_size() = (rint(default_width() / 2DEFAULT_ASPECT_RATIO[]), default_width())
 
 """
     Measure(str::String)

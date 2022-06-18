@@ -168,7 +168,7 @@ function get_title_row(
     row::Symbol,
     box,  # ::Box,
     title::Union{Nothing,String};
-    width::Int = DEFAULT_WIDTH[],
+    width::Int = default_width(),
     style::String = "default",
     title_style::Union{Nothing,String} = nothing,
     justify::Symbol = :left,
