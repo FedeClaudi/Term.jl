@@ -421,7 +421,7 @@ function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::I
     else
         texts = rstrip.(getfield.(ren.segments, :text))
         segs = map(
-            s -> get_width(s) > width ? pad(truncate(s, width), width, :left) : s,
+            s -> get_width(s) > width ? pad(str_trunc(s, width), width, :left) : s,
             texts,
         )
         lvstack(segs)

@@ -3,6 +3,7 @@ import Term.Renderables: Renderable
 using Term.Layout
 
 import Term:
+    Measure,
     RenderableText,
     Spacer,
     vLine,

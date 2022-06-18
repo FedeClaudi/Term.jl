@@ -1,6 +1,6 @@
 module Boxes
 
-import Term: rint, chars, join_lines, loop_last, textlen, get_lr_widths, truncate
+import Term: rint, chars, join_lines, loop_last, textlen, get_lr_widths, str_trunc
 
 import ..Style: apply_style
 import ..Segments: Segment
@@ -179,7 +179,7 @@ function get_title_row(
         return Segment(get_row(box, width, row), style)
     else
         title = apply_style(title)
-        title = textlen(title) < width - 8 ? title : truncate(title, width - 8)
+        title = textlen(title) < width - 8 ? title : str_trunc(title, width - 8)
     end
 
     # compose title line 

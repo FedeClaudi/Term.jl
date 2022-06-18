@@ -4,7 +4,7 @@ import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
 import Term:
     highlight,
-    truncate,
+    str_trunc,
     reshape_text,
     load_code_and_highlight,
     default_stacktrace_width,
@@ -151,7 +151,7 @@ function error_message(er::MethodError; kwargs...)
     _args = join(
         map(
             a ->
-                "   {dim bold}($(a[1])){/dim bold} $(truncate(highlight("::"*string(typeof(a[2]))), 30))",
+                "   {dim bold}($(a[1])){/dim bold} $(str_trunc(highlight("::"*string(typeof(a[2]))), 30))",
             enumerate(er.args),
         ),
         "\n",

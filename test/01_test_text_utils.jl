@@ -15,7 +15,6 @@ import Term:
     has_markup,
     cleantext,
     textwidth,
-    truncate,
     nospaces,
     has_ansi,
     textlen,
