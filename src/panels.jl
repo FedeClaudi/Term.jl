@@ -1,6 +1,6 @@
 module Panels
 
-import Term: reshape_text, join_lines, fillin, truncate, ltrim_str, default_width
+import Term: reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack

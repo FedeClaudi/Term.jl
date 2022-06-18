@@ -1,4 +1,4 @@
-import Term: Panel, TextBox, apply_style, DEFAULT_WIDTH
+import Term: Panel, TextBox, apply_style, default_width, str_trunc
 import Term.Layout: PlaceHolder
 
 @testset "\e[34mPanel - no content" begin
@@ -6,7 +6,7 @@ import Term.Layout: PlaceHolder
 
     for style in ("default", "red", "on_blue")
         @testpanel(Panel(fit = true, style = style), 2, 3)
-        @testpanel(Panel(), 2, DEFAULT_WIDTH[])
+        @testpanel(Panel(), 2, default_width())
         @testpanel(Panel(height = 4, width = 12, style = style), 4, 12)
     end
 end
@@ -56,56 +56,56 @@ end
 
 @testset "\e[34mPANEL - nofit - measure" begin
     for style in ("default", "red", "on_blue")
-        @testpanel(Panel("t"; style = style, fit = false), 3, DEFAULT_WIDTH[])
-        @testpanel(Panel("test"; style = style, fit = false), 3, DEFAULT_WIDTH[])
+        @testpanel(Panel("t"; style = style, fit = false), 3, default_width())
+        @testpanel(Panel("test"; style = style, fit = false), 3, default_width())
         @testpanel(
             Panel("1234\n123456789012"; style = style, fit = false),
             4,
-            DEFAULT_WIDTH[]
+            default_width()
         )
-        @testpanel(Panel("나랏말싸미 듕귁에 달아"; style = style, fit = false), 3, DEFAULT_WIDTH[])
+        @testpanel(Panel("나랏말싸미 듕귁에 달아"; style = style, fit = false), 3, default_width())
         @testpanel(
             Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; style = style, fit = false),
             4,
-            DEFAULT_WIDTH[],
+            default_width(),
         )
         for justify in (:left, :center, :right)
             # ----------------------------- text only content ---------------------------- #
             _kw = (justify = justify, style = style)
             _nofit = (; fit = false, _kw...)
-            @testpanel(Panel("°"^1500; _nofit...), nothing, DEFAULT_WIDTH[])
+            @testpanel(Panel("°"^1500; _nofit...), nothing, default_width())
 
             # ------------------------------- nested panels ------------------------------ #
             @testpanel(Panel(Panel("test"); fit = true, _kw...), 5, 16)
 
-            @testpanel(Panel(Panel(Panel("°"); _nofit...); _nofit...), 7, DEFAULT_WIDTH[])
+            @testpanel(Panel(Panel(Panel("°"); _nofit...); _nofit...), 7, default_width())
 
             # NOTE: using a panel with arbitrary long text can fail testing on wide terminals, since
             # the final `height` can vary (github.com/FedeClaudi/Term.jl/issues/112)
             @testpanel(
                 Panel(Panel("°"^250); _nofit...),
                 WIDE_TERM ? nothing : 5,
-                DEFAULT_WIDTH[]
+                default_width()
             )
 
-            @testpanel(Panel(Panel("test"; _kw...); fit = false), 5, DEFAULT_WIDTH[])
+            @testpanel(Panel(Panel("test"; _kw...); fit = false), 5, default_width())
 
             @testpanel(
                 Panel(Panel(Panel("°"; _kw...); _kw...); fit = false),
                 7,
-                DEFAULT_WIDTH[]
+                default_width()
             )
 
             @testpanel(
                 Panel(Panel("°"^250; _kw...); fit = false),
                 WIDE_TERM ? nothing : 5,
-                DEFAULT_WIDTH[]
+                default_width()
             )
 
             @testpanel(
                 Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = false),
                 8,
-                DEFAULT_WIDTH[]
+                default_width()
             )
 
             _kw = (fit = false, height = 8, width = 30)
@@ -306,7 +306,7 @@ end
 @testset "\e[34mPanel + renderables" begin
     @testpanel(Panel(RenderableText("x"^5)), 3, 11)
 
-    @testpanel(Panel(RenderableText("x"^500); fit = false), 9, DEFAULT_WIDTH[])
+    @testpanel(Panel(RenderableText("x"^500); fit = false), 9, default_width())
 
     @testpanel(Panel(RenderableText("x"^5); fit = true), 3, 11)
 
@@ -333,7 +333,7 @@ end
                     fit = fit,
                 ),
                 3,
-                fit ? nothing : DEFAULT_WIDTH[],
+                fit ? nothing : default_width(),
             )
         end
     end
@@ -341,7 +341,7 @@ end
 
 @testset "\e[34mPanel - padding" begin
     p = Panel("°"^24; padding = (4, 4, 2, 2), fit = false)
-    @testpanel(p, 7, DEFAULT_WIDTH[])
+    @testpanel(p, 7, default_width())
 
     p = Panel("°"^24; padding = (4, 4, 2, 2), fit = true)
     @testpanel(p, 7, 34)
