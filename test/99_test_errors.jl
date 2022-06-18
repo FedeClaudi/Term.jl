@@ -39,7 +39,7 @@ will be different from the one you'd expect
     n = zeros(5, 4)
     @test_throws DimensionMismatch m .+ n
 
-    @test_throws MethodError Threads.@threads for i in 1:10
+    @test_throws TaskFailedException Threads.@threads for i in 1:10
         i + "a"
     end
 end
