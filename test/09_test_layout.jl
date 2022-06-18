@@ -215,13 +215,8 @@ end
     p3 = Panel("this {red}panel{/red}"^5; width = 30, fit = false)
     
 
-    testlayout(p1 * p2, p1.measure.w + p2.measure.w, 3)
-    @test string(p1 * p2) ==
-          "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[22m╭──────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\e[0m\e[22m│\e[22m\e[0m                      \e[0m\e[22m│\e[22m\e[0m\n                                                                                        \e[22m╰──────────────────────╯\e[22m\e[0m"
-
+    testlayout(p2 * p2, p2.measure.w + p2.measure.w, 3)
     testlayout(p1 / p2, min(88, default_width()), 5)
-    @test string(p2 / p2) ==
-    "\e[22m╭──────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────╯\e[22m\e[0m\n\e[22m╭──────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────╯\e[22m\e[0m"
 
     testlayout(p2 * p1, p1.measure.w + p2.measure.w, 3)
     testlayout(p2 / p1, min(88, default_width()), 5)
