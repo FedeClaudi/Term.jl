@@ -82,11 +82,12 @@ end
 
             # NOTE: using a panel with arbitrary long text can fail testing on wide terminals, since
             # the final `height` can vary (github.com/FedeClaudi/Term.jl/issues/112)
-            # @testpanel(
-            #     Panel(Panel("°"^250); _nofit...),
-            #     WIDE_TERM ? nothing : 5,
-            #     default_width()
-            # )
+            @testpanel(
+                Panel(Panel("°"^250); _nofit...),
+                # WIDE_TERM ? nothing : 5,
+                nothing,
+                default_width()
+            )
 
             @testpanel(Panel(Panel("test"; _kw...); fit = false), 5, default_width())
 
@@ -96,11 +97,12 @@ end
                 default_width()
             )
 
-            # @testpanel(
-            #     Panel(Panel("°"^250; _kw...); fit = false),
-            #     WIDE_TERM ? nothing : 5,
-            #     default_width()
-            # )
+            @testpanel(
+                Panel(Panel("°"^250; _kw...); fit = false),
+                # WIDE_TERM ? nothing : 5,
+                nothing,
+                default_width()
+            )
 
             @testpanel(
                 Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = false),
@@ -143,11 +145,12 @@ end
 
         @testpanel(Panel(Panel(Panel("°"); _kw...); _kw...), 7, 19)
 
-        # @testpanel(
-        #     Panel(Panel("°"^250); _kw...),
-        #     WIDE_TERM ? nothing : 8,
-        #     console_width() - 1
-        # )
+        @testpanel(
+            Panel(Panel("°"^250); _kw...),
+            # WIDE_TERM ? nothing : 8,
+            nothing,
+            console_width() - 1
+        )
 
         @testpanel(Panel(Panel("test"; justify = justify); fit = true), 5, 16)
 
@@ -157,11 +160,11 @@ end
             19,
         )
 
-        # @testpanel(
-        #     Panel(Panel("°"^250; justify = justify); fit = true),
-        #     nothing,
-        #     console_width() - 1,
-        # )
+        @testpanel(
+            Panel(Panel("°"^250; justify = justify); fit = true),
+            nothing,
+            console_width() - 1,
+        )
 
         @testpanel(
             Panel(
@@ -318,19 +321,19 @@ id est laborum.""",
     @test size(p.measure) == (22, 49)
 end
 
-# @testset "\e[34mPanel + renderables" begin
-#     @testpanel(Panel(RenderableText("x"^5)), 3, 11)
+@testset "\e[34mPanel + renderables" begin
+    @testpanel(Panel(RenderableText("x"^5)), 3, 11)
 
-#     @testpanel(Panel(RenderableText("x"^500); fit = false), 9, default_width())
+    @testpanel(Panel(RenderableText("x"^500); fit = false), nothing, default_width())
 
-#     @testpanel(Panel(RenderableText("x"^5); fit = true), 3, 11)
+    @testpanel(Panel(RenderableText("x"^5); fit = true), nothing, 11)
 
-#     @testpanel(
-#         Panel(RenderableText("x"^500); fit = true),
-#         nothing,
-#         displaysize(stdout)[2] - 1,
-#     )
-# end
+    @testpanel(
+        Panel(RenderableText("x"^500); fit = true),
+        nothing,
+        displaysize(stdout)[2] - 1,
+    )
+end
 
 @testset "\e[34mPANEL - titles" begin
     style = "red"
