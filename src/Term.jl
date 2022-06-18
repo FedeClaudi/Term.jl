@@ -1,7 +1,8 @@
 module Term
 
 const DEBUG_ON = Ref(false)
-const DEFAULT_WIDTH = Ref(88)  # default width
+const DEFAULT_WIDTH = 88 <= displaysize(stdout)[2] ? Ref(88) : Ref(displaysize(stdout)[2] - 4 ) # default width
+const DEFAULT_STACKTRACE_WIDTH = 120 <= displaysize(stdout)[2] ? Ref(120) : Ref(displaysize(stdout)[2] - 4 ) # default width
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
 # general utils

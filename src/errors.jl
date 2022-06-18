@@ -7,7 +7,7 @@ import Term:
     truncate,
     reshape_text,
     load_code_and_highlight,
-    DEFAULT_WIDTH,
+    DEFAULT_STACKTRACE_WIDTH,
     escape_brackets,
     unescape_brackets
 
@@ -244,7 +244,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                     error /= rendered_bt
                     W = rendered_bt.measure.w
                 else
-                    W = DEFAULT_WIDTH[]
+                    W = DEFAULT_STACKTRACE_WIDTH[]
                 end
                 err, _ = error_message(er)
                 msg =
