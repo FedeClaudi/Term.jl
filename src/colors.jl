@@ -1,7 +1,5 @@
 module Colors
 
-import MyterialColors
-
 import Term:
     NAMED_COLORS,
     nospaces,
@@ -82,7 +80,7 @@ HEX_REGEX = r"#(?:[0-9a-fA-F]{3}){1,2}$"
 
 Check if a string represents a named color.
 """
-is_named_color(string)::Bool = string ∈ NAMED_COLORS || string ∈ COLORS_16b || string ∈ MyterialColors.COLORS_NAMES
+is_named_color(string)::Bool = string ∈ NAMED_COLORS || string ∈ COLORS_16b
 
 """
     is_rgb_color(string::String)::Bool
@@ -142,8 +140,6 @@ function get_color(string; bg = false)::AbstractColor
             BitColor(COLORS_16b[findfirst(c -> c == string, COLORS_16b)])
         elseif string ∈ NAMED_COLORS
             NamedColor(NAMED_COLORS[findfirst(c -> c == string, NAMED_COLORS)])
-        elseif string ∈ MyterialColors.COLORS_NAMES
-            hex2rgb(MyterialColors.COLORS[Symbol(string)])
         end
     elseif is_rgb_color(string)
         return RGBColor(string)
