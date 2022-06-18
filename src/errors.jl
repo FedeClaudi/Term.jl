@@ -95,7 +95,7 @@ end
 # !  KeyError
 function error_message(er::KeyError)
     # @info "err KeyError" er fieldnames(KeyError)
-    key = truncate(er.key, 40)
+    key = truncate(string(er.key), 40)
     msg = "Key `$(key)` not found!"
     return msg, ""
 end

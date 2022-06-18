@@ -2,6 +2,12 @@ import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 import Term: DEFAULT_WIDTH
 
+function render_frame_info(pointer::Ptr{Nothing}; show_source = true)
+    frame = StackTraces.lookup(pointer)[1]
+    return render_frame_info(frame; show_source=show_source)
+    return RenderableText("   " * string(frame); width = DEFAULT_WIDTH[])
+end
+
 function render_frame_info(frame::StackFrame; show_source = true)
     func = sprint(StackTraces.show_spec_linfo, frame)
     func = replace(
@@ -10,7 +16,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
             SubstitutionString("{#ffc44f}" * s"\g<0>" * "{/#ffc44f}"),
     )
     # func = highlight(reshape_text(func, 70))
-    func = reshape_text(highlight(func), 70)
+    func = lstrip(reshape_text(highlight(func), 70))
 
     # get other information about the function 
     inline = frame.inlined ? RenderableText("   inlined"; style = "bold dim white") : ""
@@ -39,7 +45,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
 
     if length(string(frame.file)) > 0
         file_line = RenderableText(
-            "    {dim}$(file):{bold white}$(frame.line){/bold white}{/dim}";
+            "{dim}$(file):{bold white}$(frame.line){/bold white}{/dim}";
             width = DEFAULT_WIDTH[],
         )
         out = func_line / file_line
@@ -144,7 +150,6 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
             end
         end
     end
-
     return Panel(
         lvstack(content...);
         padding = (2, 2, 0, 1),
@@ -154,5 +159,6 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         title = "Error Stack",
         title_style = "bold #ff8a4f default",
         fit = true,
+        width=200,
     )
 end
