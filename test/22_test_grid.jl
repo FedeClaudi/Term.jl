@@ -106,6 +106,6 @@ end
     @test size(g.measure) == (25, 65)
 
     # named tuple
-    g = grid((a = rens[1], b = rens[2]); layout = :((_  * a) / (b * _)))
+    g = grid((a = rens[1], b = rens[2]); layout = :((_ * a) / (b * _)))
     @test size(g.measure) == (10, 25)
 end

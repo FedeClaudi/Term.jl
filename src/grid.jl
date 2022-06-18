@@ -86,11 +86,7 @@ end
 
 Construct a grid of `PlaceHolder`s, for a given layout.
 """
-function grid(
-    rens::Nothing = nothing;
-    layout::Union{Nothing,Tuple,Expr} = nothing,
-    kw...
-)
+function grid(rens::Nothing = nothing; layout::Union{Nothing,Tuple,Expr} = nothing, kw...)
     isnothing(layout) &&
         throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s or `Expr`"))
     return grid(fill(PlaceHolder(default_size()...), prod(layout)); kw...)
