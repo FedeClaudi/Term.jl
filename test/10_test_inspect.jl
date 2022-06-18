@@ -16,11 +16,11 @@ e8 = :(print(lstrip("test")))
 expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
 
 # save expressions to file (for later comparisons)
-# for (i, e) in enumerate(expressions)
-#     tofile(string(Dendogram(e)), "./txtfiles/dendo_expr_$i.txt")
-#     tofile(string(Tree(e)), "./txtfiles/tree_expr_$i.txt")
-#     tofile(sprint(expressiontree, e), "./txtfiles/exptree_expr_$i.txt")
-# end
+for (i, e) in enumerate(expressions)
+    tofile(string(Dendogram(e)), "./txtfiles/dendo_expr_$i.txt")
+    tofile(string(Tree(e)), "./txtfiles/tree_expr_$i.txt")
+    tofile(sprint(expressiontree, e), "./txtfiles/exptree_expr_$i.txt")
+end
 
 @testset "Inspect: expressions" begin
     if !Sys.iswindows()

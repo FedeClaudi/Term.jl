@@ -213,7 +213,7 @@ end
     p1 = Panel()
     p2 = Panel(height = 3, width = 24)
     p3 = Panel("this {red}panel{/red}"^5; width = 30, fit = false)
-    
+
 
     testlayout(p2 * p2, p2.measure.w + p2.measure.w, 3)
     testlayout(p1 / p2, min(88, default_width()), 5)
