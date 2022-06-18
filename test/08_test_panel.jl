@@ -303,19 +303,19 @@ id est laborum.""",
     @test size(p.measure) == (22, 49)
 end
 
-@testset "\e[34mPanel + renderables" begin
-    @testpanel(Panel(RenderableText("x"^5)), 3, 11)
+# @testset "\e[34mPanel + renderables" begin
+#     @testpanel(Panel(RenderableText("x"^5)), 3, 11)
 
-    @testpanel(Panel(RenderableText("x"^500); fit = false), 9, default_width())
+#     @testpanel(Panel(RenderableText("x"^500); fit = false), 9, default_width())
 
-    @testpanel(Panel(RenderableText("x"^5); fit = true), 3, 11)
+#     @testpanel(Panel(RenderableText("x"^5); fit = true), 3, 11)
 
-    @testpanel(
-        Panel(RenderableText("x"^500); fit = true),
-        nothing,
-        displaysize(stdout)[2] - 1,
-    )
-end
+#     @testpanel(
+#         Panel(RenderableText("x"^500); fit = true),
+#         nothing,
+#         displaysize(stdout)[2] - 1,
+#     )
+# end
 
 @testset "\e[34mPANEL - titles" begin
     style = "red"
