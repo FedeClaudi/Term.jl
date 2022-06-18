@@ -3,8 +3,8 @@ import MyterialColors: pink, indigo_light
 
 function render_frame_info(pointer::Ptr{Nothing}; show_source = true)
     frame = StackTraces.lookup(pointer)[1]
-    return render_frame_info(frame; show_source=show_source)
-    return RenderableText("   " * string(frame); width = default_stacktrace_width()-12)
+    return render_frame_info(frame; show_source = show_source)
+    return RenderableText("   " * string(frame); width = default_stacktrace_width() - 12)
 end
 
 function render_frame_info(frame::StackFrame; show_source = true)
@@ -45,7 +45,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
     if length(string(frame.file)) > 0
         file_line = RenderableText(
             "{dim}$(file):{bold white}$(frame.line){/bold white}{/dim}";
-            width = default_stacktrace_width()-12,
+            width = default_stacktrace_width() - 12,
         )
         out = func_line / file_line
         if show_source
@@ -66,7 +66,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
                         fit = true,
                         style = "white dim",
                         width = 44,
-                        subtitle_justify=:center,
+                        subtitle_justify = :center,
                         subtitle = "error line",
                         subtitle_style = "default white #fa6673",
                     );
@@ -76,7 +76,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
         end
         return out
     else
-        return RenderableText("   " * func; width = default_stacktrace_width()-4)
+        return RenderableText("   " * func; width = default_stacktrace_width() - 4)
     end
 end
 
@@ -88,7 +88,14 @@ function render_backtrace_frame(
 )
     content = hstack(num, info, pad = 2)
     p = if as_panel
-        Panel(content; padding = (2, 2, 1, 1), style = "#9bb3e0", fit=true, width=default_stacktrace_width()-20, kwargs...)
+        Panel(
+            content;
+            padding = (2, 2, 1, 1),
+            style = "#9bb3e0",
+            fit = true,
+            width = default_stacktrace_width() - 20,
+            kwargs...,
+        )
     else
         "   " * content
     end
@@ -159,6 +166,6 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         title = "Error Stack",
         title_style = "bold #ff8a4f default",
         fit = true,
-        width=default_stacktrace_width()
+        width = default_stacktrace_width(),
     )
 end

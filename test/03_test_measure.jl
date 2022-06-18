@@ -46,7 +46,5 @@ end
 end
 
 @testset "\e34mMeasure - misc" begin
-    console_width() >= 88 && (
-        @test default_size() == (33, 88)
-    )
+    console_width() >= 88 && (@test default_size() == (33, 88))
 end

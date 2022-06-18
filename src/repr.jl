@@ -299,7 +299,11 @@ end
 
 Show a function's methods and docstring.
 """
-function termshow(io::IO, fun::Function; width = min(console_width() - 10, default_width(io)))
+function termshow(
+    io::IO,
+    fun::Function;
+    width = min(console_width() - 10, default_width(io)),
+)
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)

@@ -184,23 +184,38 @@ end
 
 @testset "PANEL - centered title style" begin
     @test string(
-        Panel(title = "test", width=88, title_justify = :left, title_style = "italic red"),
+        Panel(
+            title = "test",
+            width = 88,
+            title_justify = :left,
+            title_style = "italic red",
+        ),
     ) ==
           "\e[22m╭──── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────────────────────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(
-        Panel(title = "test", width=88, title_justify = :center, title_style = "italic red"),
+        Panel(
+            title = "test",
+            width = 88,
+            title_justify = :center,
+            title_style = "italic red",
+        ),
     ) ==
           "\e[22m╭────────────────────────────────────────\e[22m \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────────────────╮\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(
-        Panel(title = "test", width=88, title_justify = :right, title_style = "italic red"),
+        Panel(
+            title = "test",
+            width = 88,
+            title_justify = :right,
+            title_style = "italic red",
+        ),
     ) ==
           "\e[22m╭───────────────────────────────────────────────────────────────────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ───╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
 
-    @test string(Panel(title = "test", width=88, title_justify = :left)) ==
+    @test string(Panel(title = "test", width = 88, title_justify = :left)) ==
           "\e[22m╭──── test\e[22m ────────────────────────────────────────────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(title = "test", width=88, title_justify = :center)) ==
+    @test string(Panel(title = "test", width = 88, title_justify = :center)) ==
           "\e[22m╭────────────────────────────────────────\e[22m test\e[22m ────────────────────────────────────────╮\e[22m\e[0m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(title = "test", width=88, title_justify = :right)) ==
+    @test string(Panel(title = "test", width = 88, title_justify = :right)) ==
           "\e[22m╭───────────────────────────────────────────────────────────────────────────── test\e[22m ───╮\e[22m\e[0m\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m"
 
     p = Panel(

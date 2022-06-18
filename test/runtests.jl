@@ -14,7 +14,6 @@ using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 const WIDE_TERM = console_width() ≥ 88
 
-
 macro runner(fn)
     quote
         tprintln(
