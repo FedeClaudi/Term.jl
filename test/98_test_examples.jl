@@ -9,8 +9,6 @@
         # include("../examples/logging.jl")
         # @test_nothrow include("../examples/progressbars.jl")
         include("../examples/progressbars.jl")
-        # @test_nothrow include("../examples/text_box.jl")
-        include("../examples/text_box.jl")
         # @test_nothrow include("../examples/text_panel.jl")
         include("../examples/text_panel.jl")
         # @test_nothrow include("../examples/text_style.jl")

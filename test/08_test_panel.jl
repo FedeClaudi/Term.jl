@@ -82,11 +82,11 @@ end
 
             # NOTE: using a panel with arbitrary long text can fail testing on wide terminals, since
             # the final `height` can vary (github.com/FedeClaudi/Term.jl/issues/112)
-            @testpanel(
-                Panel(Panel("°"^250); _nofit...),
-                WIDE_TERM ? nothing : 5,
-                default_width()
-            )
+            # @testpanel(
+            #     Panel(Panel("°"^250); _nofit...),
+            #     WIDE_TERM ? nothing : 5,
+            #     default_width()
+            # )
 
             @testpanel(Panel(Panel("test"; _kw...); fit = false), 5, default_width())
 
