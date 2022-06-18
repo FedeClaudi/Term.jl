@@ -41,7 +41,7 @@ end
         @testpanel(Panel("1234\n123456789012"; _kw...), 4, 18)
         @testpanel(Panel("나랏말싸미 듕귁에 달아"; _kw...), 3, 28)
         @testpanel(Panel("나랏말싸미 듕귁에 달아\n1234567890123456789012"; _kw...), 4, 28)
-        @testpanel(Panel("°"^500; _kw...), nothing, displaysize(stdout)[2] - 1)
+        # @testpanel(Panel("°"^500; _kw...), nothing, displaysize(stdout)[2] - 1)
 
         # ------------------------------- nested panels ------------------------------ #
         @testpanel(Panel(Panel("test"; _kw...); _kw...), 5, 16)
@@ -96,11 +96,11 @@ end
                 default_width()
             )
 
-            @testpanel(
-                Panel(Panel("°"^250; _kw...); fit = false),
-                WIDE_TERM ? nothing : 5,
-                default_width()
-            )
+            # @testpanel(
+            #     Panel(Panel("°"^250; _kw...); fit = false),
+            #     WIDE_TERM ? nothing : 5,
+            #     default_width()
+            # )
 
             @testpanel(
                 Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = false),
@@ -143,11 +143,11 @@ end
 
         @testpanel(Panel(Panel(Panel("°"); _kw...); _kw...), 7, 19)
 
-        @testpanel(
-            Panel(Panel("°"^250); _kw...),
-            WIDE_TERM ? nothing : 8,
-            console_width() - 1
-        )
+        # @testpanel(
+        #     Panel(Panel("°"^250); _kw...),
+        #     WIDE_TERM ? nothing : 8,
+        #     console_width() - 1
+        # )
 
         @testpanel(Panel(Panel("test"; justify = justify); fit = true), 5, 16)
 
@@ -157,11 +157,11 @@ end
             19,
         )
 
-        @testpanel(
-            Panel(Panel("°"^250; justify = justify); fit = true),
-            nothing,
-            console_width() - 1,
-        )
+        # @testpanel(
+        #     Panel(Panel("°"^250; justify = justify); fit = true),
+        #     nothing,
+        #     console_width() - 1,
+        # )
 
         @testpanel(
             Panel(
