@@ -19,6 +19,7 @@ This is a list:
 ```
 and now in Term:
 ```@example md
+import Term: tprintln, tprint
 tprintln(parse_md(mymd))
 ```
 

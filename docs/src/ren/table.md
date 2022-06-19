@@ -94,8 +94,7 @@ as you can see it changes the size of the cells around the content.
 
 That's all you need to know about how to make a `Table`. You can play around with the parameters to make great looking tables!
 ```@example tb
-import OrderedCollections: OrderedDict
-data = OrderedDict(
+data = Dict(
     :Parameter => [:α, :β, :γ],
     :Value => [1, 2, 3],
 )
