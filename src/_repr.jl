@@ -1,4 +1,4 @@
-import Term: DEFAULT_WIDTH
+import Term: default_width
 
 function repr_get_obj_fields_display(obj)
     field_names = fieldnames(typeof(obj))
@@ -19,7 +19,7 @@ function repr_get_obj_fields_display(obj)
 
     values = []
     for val in _values
-        val = truncate(string(val), 45)
+        val = str_trunc(string(val), 45)
         push!(values, RenderableText.(val; style = theme.repr_values_style))
     end
 
@@ -50,7 +50,7 @@ function repr_panel(
     obj,
     content,
     subtitle;
-    width = min(console_width() - 10, DEFAULT_WIDTH[]),
+    width = min(console_width() - 10, default_width()),
     justify = :center,
     kwargs...,
 )
@@ -73,7 +73,7 @@ function repr_panel(
 end
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w)
-    shortsting(x) = x isa AbstractRenderable ? info(x) : truncate(string(x), max_w)
+    shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     out = highlight.(shortsting.(v[1:N]))
 
     length(v) > N && push!(out, "⋮";)
@@ -104,7 +104,7 @@ function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 100, max_D 
 end
 
 function vec2content(vec::Union{Tuple,AbstractVector})
-    max_w = DEFAULT_WIDTH[]
+    max_w = default_width()
     max_items = 100
     N = min(max_items, length(vec))
 

@@ -16,6 +16,7 @@ vertically.
 """
 
 using Term
+using Term.Layout
 
 # with strings
 s1 = @red "one string"

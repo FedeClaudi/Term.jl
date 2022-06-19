@@ -12,8 +12,7 @@ include("__test_utils.jl")
 
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
-
-dotest = console_width() ≥ Term.DEFAULT_WIDTH[]
+const WIDE_TERM = console_width() ≥ 88
 
 macro runner(fn)
     quote
@@ -48,7 +47,7 @@ end
 @runner "20_test_compositor.jl"
 @runner "21_test_markdown.jl"
 @runner "22_test_grid.jl"
-@runner "999_test_examples.jl"
+@runner "98_test_examples.jl"
 @runner "99_test_errors.jl"
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)

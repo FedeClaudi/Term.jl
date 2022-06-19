@@ -2,6 +2,9 @@ import Term: install_term_logger, uninstall_term_logger, TermLogger
 using Term.Logs: handle_progress
 using Term.Progress
 
+import ProgressLogging
+import UUIDs: uuid4
+
 install_term_logger()
 
 @testset "\e[34mLOGS test" begin
@@ -27,13 +30,14 @@ install_term_logger()
         s""" 1 + 2
 
         # uninstall_term_logger()
-        # @info "removed"
     end
 end
 
-@testset "\e[34mLOGS test" begin
-    pbar = ProgressBar()
-    # handle_progress(TermLogger(TERM_THEME[]), pbar)
+@testset "\e[34mLOGS handle_progress" begin
+    logger = TermLogger(devnull, TERM_THEME[])
+    for fraction in (nothing, 0.0, 0.5, 1.0)
+        handle_progress(logger, ProgressLogging.Progress(id = uuid4(), fraction = fraction))
+    end
 
     @test true
 end

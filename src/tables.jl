@@ -2,7 +2,7 @@ module Tables
 
 import Tables as TablesPkg
 
-import Term: do_by_line, fillin, truncate
+import Term: do_by_line, fillin, str_trunc
 import MyterialColors: orange
 
 import ..Renderables: AbstractRenderable, RenderableText
@@ -383,7 +383,7 @@ function cell(
     return vertical_pad(
         do_by_line(
             y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
-            truncate(x, w - hor_pad),
+            str_trunc(x, w - hor_pad),
         ),
         h,
         vertical_justify,

@@ -3,6 +3,7 @@ import Term.Renderables: Renderable
 using Term.Layout
 
 import Term:
+    Measure,
     RenderableText,
     Spacer,
     vLine,
@@ -20,7 +21,8 @@ import Term:
     rightalign,
     lvstack,
     cvstack,
-    rvstack
+    rvstack,
+    default_width
 
 @testset "Layout - pad" begin
     @test pad("aaa", 20, :left) == "aaa                 "
@@ -213,21 +215,17 @@ end
     p2 = Panel(height = 3, width = 24)
     p3 = Panel("this {red}panel{/red}"^5; width = 30, fit = false)
 
-    testlayout(p1 * p2, 112, 3)
-    @test string(p1 * p2) ==
-          "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[22m╭──────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\e[0m\e[22m│\e[22m\e[0m                      \e[0m\e[22m│\e[22m\e[0m\n                                                                                        \e[22m╰──────────────────────╯\e[22m\e[0m"
+    testlayout(p2 * p2, p2.measure.w + p2.measure.w, 3)
+    testlayout(p1 / p2, min(88, default_width()), 5)
 
-    testlayout(p1 / p2, 88, 5)
-    @test string(p1 / p2) ==
-          "\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\n\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\n\e[22m╭──────────────────────╮\e[22m                                                                \n\e[0m\e[22m│\e[22m\e[0m                      \e[0m\e[22m│\e[22m\e[0m                                                                \n\e[22m╰──────────────────────╯\e[22m\e[0m                                                                "
+    testlayout(p2 * p1, p1.measure.w + p2.measure.w, 3)
+    testlayout(p2 / p1, min(88, default_width()), 5)
 
-    testlayout(p2 * p1, 112, 3)
-    testlayout(p2 / p1, 88, 5)
-
-    testlayout(p1 * p2 * p3, 142, 5)
-    testlayout(p1 / p2 / p3, 88, 10)
-    testlayout(p3 * p1 * p2, 142, 5)
-    testlayout(p3 / p1 / p2, 88, 10)
+    w = p1.measure.w + p2.measure.w + p3.measure.w
+    testlayout(p1 * p2 * p3, w, 5)
+    testlayout(p1 / p2 / p3, min(88, default_width()), 10)
+    testlayout(p3 * p1 * p2, w, 5)
+    testlayout(p3 / p1 / p2, min(88, default_width()), 10)
 end
 
 @testset "\e[34mlayout - placeholder" begin

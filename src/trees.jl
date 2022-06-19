@@ -14,7 +14,7 @@ import Term:
     rint,
     TERM_THEME,
     textlen,
-    truncate,
+    str_trunc,
     expr2string
 
 import ..Renderables: AbstractRenderable
@@ -69,12 +69,11 @@ Style an object to render it as a a string
 """
 function asleaf end
 
-asleaf(x) = truncate(highlight(string(x)), TERM_THEME[].tree_max_width)
+asleaf(x) = str_trunc(highlight(string(x)), TERM_THEME[].tree_max_width)
 asleaf(x::Nothing) = nothing
-function asleaf(x::AbstractVector)
-    return truncate((escape_brackets ∘ string)(x), TERM_THEME[].tree_max_width)
-end
-asleaf(x::AbstractString) = truncate(highlight(x, :string), TERM_THEME[].tree_max_width)
+asleaf(x::AbstractVector) =
+    str_trunc((escape_brackets ∘ string)(x), TERM_THEME[].tree_max_width)
+asleaf(x::AbstractString) = str_trunc(highlight(x, :string), TERM_THEME[].tree_max_width)
 
 """
     Leaf
@@ -131,7 +130,7 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Abstra
         Tree(
             v;
             level = level + 1,
-            title = truncate(string(k), TERM_THEME[].tree_max_width),
+            title = str_trunc(string(k), TERM_THEME[].tree_max_width),
         ),
     )
 end
@@ -140,13 +139,13 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Pair)
     k = if isnothing(v.first)
         nothing
     else
-        truncate(string(v.first), TERM_THEME[].tree_max_width)
+        str_trunc(string(v.first), TERM_THEME[].tree_max_width)
     end
     return push!(leaves, Leaf(k, asleaf(v.second)))
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Any)
-    k = isnothing(k) ? nothing : truncate(string(k), TERM_THEME[].tree_max_width)
+    k = isnothing(k) ? nothing : str_trunc(string(k), TERM_THEME[].tree_max_width)
     return push!(leaves, Leaf(k, asleaf(v)))
 end
 
@@ -198,7 +197,7 @@ function Tree(
         return Tree(;
             segments = segments,
             measure = measure,
-            name = truncate(title, TERM_THEME[].tree_max_width),
+            name = str_trunc(title, TERM_THEME[].tree_max_width),
             level = level,
             nodes = nodes,
             leaves = leaves,

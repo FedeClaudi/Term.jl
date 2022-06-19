@@ -61,10 +61,8 @@ end
 Builds a MarkupStyle definition from a MarkupTag.
 """
 function MarkupStyle(markup)
-    codes = split(unspace_commas(markup))
-
     style = MarkupStyle()
-    for code in codes
+    for code in split(unspace_commas(markup))
         if is_mode(code)
             setproperty!(style, Symbol(code), true)
         elseif is_color(code)
@@ -90,11 +88,8 @@ function get_style_codes(style::MarkupStyle)
     style_init, style_finish = "", ""
     for attr in fieldnames(MarkupStyle)
         value = getfield(style, attr)
-        # BACKGROUND
         if attr == :background
             code = isnothing(value) ? nothing : ANSICode(value; bg = true)
-
-            # COLOR
         elseif attr == :color
             if !isnothing(value)
                 try
@@ -105,11 +100,8 @@ function get_style_codes(style::MarkupStyle)
             else
                 code = nothing
             end
-
-            # MODES
-        elseif attr != :tag && value == true
+        elseif attr != :tag && value == true  # MODES
             code = CODES[attr]
-
         else
             if value != false && attr != :tag
                 @debug "Attr/value not recognized or not set" attr value

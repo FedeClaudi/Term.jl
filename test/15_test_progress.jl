@@ -1,6 +1,6 @@
 using Term.Progress
 import Term.Progress: AbstractColumn, getjob, get_columns, jobcolor
-import Term: install_term_logger, uninstall_term_logger
+import Term: install_term_logger, uninstall_term_logger, str_trunc
 
 using ProgressLogging
 

@@ -11,19 +11,10 @@ print(typestree(Float64))
 
 ```
 
-:D
+
 
 ## Expression & `expressiontree`
-If you're doing a bit of metaprogramming (or teaching it to new Julia coders), you want to get an idea of what the parts of the `Expr` you're building are. Term's here to help: you can use `inspect(::Expr)` to get a [Dendogram](@ref DendoDoc) based visualization`
-
-```@example
-import Term: inspect # hide
- 
-expr = :(2x + √x^y)
-inspect(expr)
-```
-
-For long expressions, though, this gets out of hand. In that case you can use `expressiontree` to get a [Tree](@ref TreeDoc) based visualization:
+If you're doing a bit of metaprogramming (or teaching it to new Julia coders), you want to get an idea of what the parts of the `Expr` you're building are. You can use `expressiontree` to get a [Tree](@ref TreeDoc) based visualization:
 
 ```@example
 import Term: expressiontree

@@ -1,10 +1,12 @@
 install_term_repr()
 import Term.Consoles: clear
+import Term: default_width
 
 @testset "REPR renderable repr" begin
     p = string(Panel())
+    w = default_width()
     @test sprint(show, Panel()) ==
-          "\e[38;5;117mPanel <: AbstractRenderable\e[0m \e[2m(h:2, w:88)\e[0m"
+          "\e[38;5;117mPanel <: AbstractRenderable\e[0m \e[2m(h:2, w:$w)\e[0m"
 end
 
 @testset "REPR @with_repr" begin

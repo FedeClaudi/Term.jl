@@ -1,3 +1,6 @@
+"""
+Author(s): T Bltg (github.com/t-bltg)
+"""
 module Grid
 
 import ..Renderables: Renderable, AbstractRenderable
@@ -11,71 +14,82 @@ export grid
 
 include("_compositor.jl")
 
-# ---------------------------------------------------------------------------- #
-#                                     GRID                                     #
-# ---------------------------------------------------------------------------- #
-
 """
     grid(
         rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
         placeholder::Union{Nothing,AbstractRenderable} = nothing,
         aspect::Union{Nothing,Number,NTuple} = nothing,
-        layout::Union{Nothing,Tuple} = nothing, 
+        layout::Union{Nothing,Tuple,Expr} = nothing,
         pad::Union{Tuple,Integer} = 0,
     )
 
 Construct a grid from a `AbstractVector` of `AbstractRenderable`s.
 
-Lays out the renderables to createa a grid with the desired aspect ratio or
-layout (number of rows, number of columns). If no renderables are passed it
-creates placeholders.
+Lays out the renderables to create a grid with the desired aspect ratio or
+layout (number of rows, number of columns, or one left free with `nothing`).
+Complex layout is supported using compositor expressions.
 """
 function grid(
-    rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
+    rens::Union{AbstractVector{<:AbstractRenderable},NamedTuple};
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
     aspect::Union{Nothing,Number,NTuple} = nothing,
     layout::Union{Nothing,Tuple,Expr} = nothing,
     show_placeholder::Bool = false,
     pad::Union{Tuple,Integer} = 0,
 )
-    (isnothing(layout) && isnothing(rens)) && error("Grid: layout or aspect required")
+    ph_style = show_placeholder ? "" : "hidden"
 
-    style = show_placeholder ? "" : "hidden"
+    rens_seq = rens isa NamedTuple ? collect(values(rens)) : rens
 
-    if !isnothing(rens) && layout isa Expr
-        n, kw = 0, Dict()
-        sizes = size.(rens)
-        sz = (minimum(first.(sizes)), minimum(last.(sizes)))
-        for (i, e) in enumerate(get_elements_and_sizes(layout; placeholder_size = sz))
-            nm = e.args[1]
-            kw[nm] = if nm === :_
-                compositor_placeholder(nm, sz..., style)
+    if layout isa Expr
+        sizes = size.(rens_seq)
+        # arbitrary, taking the smallest `Renderable` size for placeholder
+        ph_size = (minimum(first.(sizes)), minimum(last.(sizes)))
+
+        kw = Dict{Symbol,Any}()
+        n = 0
+        for (i, e) in enumerate(get_elements_and_sizes(layout; placeholder_size = ph_size))
+            kw[nm] = if (nm = e.args[1]) === :_
+                compositor_placeholder(nm, ph_size..., ph_style)
+            elseif haskey(kw, nm)
+                kw[nm]  # repeated element
+            elseif rens isa NamedTuple
+                rens[nm]  # symbol mapping
             else
-                haskey(kw, nm) ? kw[nm] : rens[n += 1]
+                rens[n += 1]  # stream of `Renderable`s
             end
         end
-        compositor = Compositor(layout; placeholder_size = sz, check = false, pairs(kw)...)
+        compositor =
+            Compositor(layout; placeholder_size = ph_size, check = false, pairs(kw)...)
         return Renderable(compositor)
     end
 
     nrows, ncols = isnothing(layout) ? calc_nrows_ncols(length(rens), aspect) : layout
-    if isnothing(rens)
-        isnothing(layout) &&
-            throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s"))
-        rens = fill(PlaceHolder(default_size()...), prod(layout))
-    else
-        if isnothing(nrows)
-            nrows, r = divrem(length(rens), ncols)
-            r == 0 || (nrows += 1)
-        elseif isnothing(ncols)
-            ncols, r = divrem(length(rens), nrows)
-            r == 0 || (ncols += 1)
-        end
-        fill_in =
-            (isnothing(placeholder) ? PlaceHolder(first(rens); style = style) : placeholder)
-        rens = vcat(rens, repeat([fill_in], nrows * ncols - length(rens)))
+    if isnothing(nrows)
+        nrows, r = divrem(length(rens), ncols)
+        r == 0 || (nrows += 1)
+    elseif isnothing(ncols)
+        ncols, r = divrem(length(rens), nrows)
+        r == 0 || (ncols += 1)
     end
-    return grid(reshape(rens, nrows, ncols); pad = pad)
+    fill_in = something(placeholder, PlaceHolder(first(rens); style = ph_style))
+    rens_all = vcat(rens_seq, repeat([fill_in], nrows * ncols - length(rens)))
+    return grid(reshape(rens_all, nrows, ncols); pad = pad)
+end
+
+"""
+    grid(
+        rens::Nothing = nothing;
+        layout::Union{Nothing,Tuple,Expr} = nothing,
+        kw...
+    )
+
+Construct a grid of `PlaceHolder`s, for a given layout.
+"""
+function grid(rens::Nothing = nothing; layout::Union{Nothing,Tuple,Expr} = nothing, kw...)
+    isnothing(layout) &&
+        throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s or `Expr`"))
+    return grid(fill(PlaceHolder(default_size()...), prod(layout)); kw...)
 end
 
 """

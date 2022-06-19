@@ -57,6 +57,7 @@ makedocs(;
             "api/api_compositors.md",
             "api/api_dendograms.md",
             "api/api_errors.md",
+            "api/api_grid.md",
             "api/api_introspection.md",
             "api/api_layout.md",
             "api/api_logs.md",

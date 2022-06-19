@@ -6,7 +6,7 @@ import MyterialColors:
     yellow_light, indigo_light, blue, light_blue, cyan_light, cyan_lighter
 import UnicodeFun: to_latex
 
-import Term: reshape_text, highlight_syntax, fillin, escape_brackets, DEFAULT_WIDTH
+import Term: reshape_text, highlight_syntax, fillin, escape_brackets, default_width
 import ..Tables: Table
 import ..Style: apply_style
 import ..Layout: pad, hLine, vLine
@@ -42,7 +42,7 @@ function parse_md end
 Parse an entier `MD` object by parsing its constituent elements
 and joining the resulting strings.
 """
-function parse_md(text::Markdown.MD; width = DEFAULT_WIDTH[], kwargs...)::String
+function parse_md(text::Markdown.MD; width = default_width(), kwargs...)::String
     elements = parse_md.(text.content; width = width, kwargs...)
     return join(elements, "\n\n")
 end
@@ -181,7 +181,7 @@ end
 """
     function parse_md(
         qt::Markdown.BlockQuote;
-        width = min(DEFAULT_WIDTH[], console_width() - 30),
+        width = min(default_width(), console_width() - 30),
         kwargs...,
     )::String
 
@@ -189,7 +189,7 @@ Style a BlockQuote with a line and a quotation marker.
 """
 function parse_md(
     qt::Markdown.BlockQuote;
-    width = min(DEFAULT_WIDTH[], console_width() - 30),
+    width = min(default_width(), console_width() - 30),
     kwargs...,
 )::String
     content = parse_md.(qt.content; inline = true)
