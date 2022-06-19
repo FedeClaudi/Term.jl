@@ -8,29 +8,24 @@ import Term: Renderable
     nm1 = n - 1
     lo = (n, n)
 
+    @test size(grid(layout = lo).measure) == (h * n, w * n)
+    @test size(grid(layout = lo, pad = 2).measure) == (h * n + 2nm1, w * n + 2nm1)
+    @test size(grid(layout = lo, pad = (5, 1)).measure) == (h * n + 1nm1, w * n + 5nm1)
+    @test size(grid(layout = lo, pad = (5, 3)).measure) == (h * n + 3nm1, w * n + 5nm1)
     @test size(grid(layout = lo, pad = (0, 0)).measure) == (h * n, w * n)
 
-    @test size(grid(layout = lo).measure) == (h * n, w * n)
-
-    @test size(grid(layout = lo, pad = 2).measure) == (h * n + 2nm1, w * n + 2nm1)
-
-    @test size(grid(layout = lo, pad = (5, 1)).measure) == (h * n + 1nm1, w * n + 5nm1)
-
-    @test size(grid(layout = lo, pad = (5, 3)).measure) == (h * n + 3nm1, w * n + 5nm1)
-
     # test passing renderables
-
     h, w = 5, 10
     rens = repeat([PlaceHolder(h, w)], 9)
 
+    @test size(grid(rens).measure) == (3h, 3w)
     @test size(grid(rens; aspect = 1).measure) == (3h, 3w)
 
-    @test size(grid(rens).measure) == (3h, 3w)
+    @test size(grid(rens[1:8]; aspect = 0.5).measure) == (4h, 2w)
+    @test size(grid(rens[1:8]; aspect = 2).measure) == (2h, 4w)
 
     @test size(grid(rens; pad = (2, 1)).measure) == (3h + 2 * 1, 3w + 2 * 2)
-
     @test size(grid(rens; pad = (2, 1), aspect = 0.5).measure) == (29, 22)
-
     @test size(grid(rens; pad = (2, 1), aspect = 1.5).measure) == (17, 46)
 
     g = grid(
@@ -41,7 +36,18 @@ import Term: Renderable
     )
     @test size(g.measure) == (17, 34)
 
-    grid(Any[Panel(width = 10 + i) for i in 1:4])
+    @test grid(Any[Panel(width = 10 + i) for i in 1:4]) isa AbstractRenderable
+
+    # matrix, fold singletons
+    @test grid([Panel() Panel()]) isa AbstractRenderable
+    @test grid(reshape([Panel()], 1, 1)) isa AbstractRenderable
+end
+
+@testset "Grid - placeholders" begin
+    nr, nc = 3, 2
+    h, w = 5, 15
+    g = grid(nothing; layout = (nr, nc), placeholder_size = (h, w))
+    @test size(g.measure) == (nr * h, nc * w)
 end
 
 @testset "Grid - layout fit" begin
@@ -71,14 +77,14 @@ end
     end
 
     # matrix, explicit
-    grid(reshape(panels[1:4], 2, 2))
+    @test size(grid(reshape(panels[1:4], 2, 2)).measure) == (2h, 2w)
 
     # vector, half explicit
-    grid(panels, layout = (nothing, 4))
-    grid(panels, layout = (2, nothing))
+    @test size(grid(panels, layout = (nothing, 4)).measure) == (2h, 4w)
+    @test size(grid(panels, layout = (2, nothing)).measure) == (2h, 4w)
 
     # vector, explicit
-    grid(panels; layout = (2, 4))
+    @test size(grid(panels; layout = (2, 4)).measure) == (2h, 4w)
 
     # best fit
     panels = repeat([Panel(height = h, width = w)], 9)

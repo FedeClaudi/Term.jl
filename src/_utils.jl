@@ -61,26 +61,26 @@ If `aspect` is `nothing`, chooses the best fir between a default and a unit aspe
 Adapted from: stackoverflow.com/a/43366784
 """
 function calc_nrows_ncols(n, aspect::Union{Nothing,Number,NTuple} = nothing)
-    w, h = if isnothing(aspect)
+    h, w = if isnothing(aspect)
         r1, c1 = calc_nrows_ncols(n, DEFAULT_ASPECT_RATIO[])
         r2, c2 = calc_nrows_ncols(n, 1)  # unit aspect - square
         return r1 * c1 < r2 * c2 ? (r1, c1) : (r2, c2)  # choose the best fit
     elseif aspect isa Number
-        (aspect, one(aspect))
+        (one(aspect), aspect)
     else
         aspect
     end
-    factor = √(n / (w * h))
-    cols = floor(Int, w * factor)
+    factor = √(n / (h * w))
     rows = floor(Int, h * factor)
-    rowFirst = w < h
+    cols = floor(Int, w * factor)
+    row_first = w < h
     while rows * cols < n
-        if rowFirst
+        if row_first
             rows += 1
         else
             cols += 1
         end
-        rowFirst = !rowFirst
+        row_first = !row_first
     end
     return rows, cols
 end
