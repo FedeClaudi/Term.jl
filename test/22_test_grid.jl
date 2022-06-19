@@ -41,11 +41,7 @@ import Term: Renderable
     )
     @test size(g.measure) == (17, 34)
 
-    rens = Any[]
-    for i in 1:4
-        push!(rens, Panel(width=i))
-    end
-    grid(rens)
+    grid(Any[Panel(width = 10 + i) for i in 1:4])
 end
 
 @testset "Grid - layout fit" begin
