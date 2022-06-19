@@ -91,6 +91,13 @@ end
     @test job.columns[1].segments[1].text == "\e[31mRunning...\e[39m"
 end
 
+@testset "\e[34mProgress foreachprogress" begin
+    @test_nowarn redirect_stdout(Base.DevNull()) do
+        Term.Progress.foreachprogress(1:10) do i
+            sleep(0.01)
+        end
+    end
+end
 # @testset "\e[34mProgress ProgressLogging" begin
 #     install_term_logger()
 
