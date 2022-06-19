@@ -28,7 +28,8 @@ import ..Colors: RGBColor
 import ..Layout: hLine
 
 export ProgressBar,
-    ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track, render
+    ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track, render,
+    foreachprogress
 
 # ---------------------------------------------------------------------------- #
 #                               PROGRESS BAR JOB                               #
@@ -43,7 +44,7 @@ Single `job` whose progress we're tracking with a progress bar.
 Each progress bar can have multiple jobs running at the same time, and more can
 be added/removed at any time. Each `ProgressJob` keeps track of the state (progress)
 of each of these jobs. `ProgressJob` is also rendered to create the visual display
-of the progress bar. 
+of the progress bar.
 
 Arguments:
 - `id` specifies the job;s unique id
@@ -221,8 +222,8 @@ to render progress bar renderables for each `ProgressJob` assigned.
 
 ProgressBar takes care of the work needed to setup/update progress bar(s)
 visualizations. Each individual bar corresponds to a (running) `ProgressJob`
-and `ProgressJob` itself is what actually creates the visuals. 
-Most of the work done by ProgressBar is to handling terminal stuff, move 
+and `ProgressJob` itself is what actually creates the visuals.
+Most of the work done by ProgressBar is to handling terminal stuff, move
 cursor position, change scrolling regions, clear/update sections etc.
 
 
@@ -407,7 +408,7 @@ end
 
 Stop a running `ProgressBar`.
 
-Stops the `Task` updating the progress bar 
+Stops the `Task` updating the progress bar
 visuals too, and if the progress bar was
 `transient` it clears up the visuals.
 """
@@ -415,7 +416,7 @@ function stop!(pbar::ProgressBar)
     pbar.paused = true
     pbar.running = false
 
-    # if transient, delete 
+    # if transient, delete
     if pbar.transient
         # move cursor to stale scrollregion and clear
         move_to_line(stdout, console_height())
@@ -461,10 +462,10 @@ end
 Render a `ProgressBar`.
 
 When a progress bar is first rendered, this function uses
-ANSI codes to change the scrolling region of the terminal 
+ANSI codes to change the scrolling region of the terminal
 window to create a space at the bottom where the bar's visuals
 can be displayed. This allows for thext printed to `stdout` to
-still be visualized. On subsequent calls, this function 
+still be visualized. On subsequent calls, this function
 ensures that the height of the reserved space matches the
 number of running jobs.
 
@@ -538,7 +539,7 @@ Wrap an expression to run code in the context of a progress bar.
 
 Ensures that the progress bar is correctly created and distroyed
 even if code within the loop whose progress we're monitoring causes
-and error. Since `render` changes the scrollregion in the terminal, 
+and error. Since `render` changes the scrollregion in the terminal,
 we need to make sure that we can restore things no matter what.
 
 # Examples
@@ -611,6 +612,113 @@ macro track(ex)
         end
     end
 end
+
+
+const FOREACH_PROGRESS = ProgressBar(transient=true)
+
+"""
+    foreachprogress(f, iter[, pbar; parallel=false, transient=true, description])
+
+Apply `f` to every element in iterator `iter`, showing a progress bar.
+This function can be nested.
+
+## Arguments
+
+- `pbar::Term.Progress.ProgressBar = Term.FOREACH_PROGRESS`: The progress bar to use. By
+    default, uses a global progress bar, but it is recommended to explicitly pass in
+    a progress bar.
+- `parallel`: Whether to use `Threads.@threads` to speed up the loop.
+- `transient = true`: See `Term.Progress.addjob!`
+- `description = true`: See `Term.Progress.addjob!`
+
+## Examples
+
+Simple loop passing in a progress bar:
+
+```julia
+foreachprogress(1:10, Term.ProgressBar(); description = "Working...") do i
+    @info i
+    sleep(0.1)
+end
+```
+
+Simple loop using the global progress bar (use with care):
+
+```julia
+foreachprogress(1:10; description = "Working...") do i
+    @info i
+    sleep(0.1)
+end
+```
+
+Nesting a loop inside another:
+
+```julia
+pbar = Term.ProgressBar()
+foreachprogress(1:100, pbar,   description = "Outer    ", parallel=true) do i
+    foreachprogress(1:5, pbar, description = "    Inner") do j
+        sleep(rand() / 5)
+    end
+end
+```
+
+Speeding up the loop using threads by passing `parallel`:
+
+```julia
+foreachprogress(1:50; description = "Working...", parallel=true) do i
+    @info i
+    sleep(0.1)
+end
+```
+"""
+function foreachprogress(f, iter, pbar = FOREACH_PROGRESS; n = _getn(iter), transient = true,
+                         parallel = false, kwargs...)
+    task = nothing
+    try
+        # Only handle rendering of progress bar if it is not already running.
+        # This allows nesting of `foreachprogress`
+        if !pbar.running
+            # If starting the progress bar, clear any previous jobs
+            pbar.jobs = ProgressJob[]
+            start!(pbar)
+            task = Threads.@spawn _startrenderloop(pbar)
+        end
+
+        # The job tracks the iteration through `iter`
+        job = addjob!(pbar; N = n, transient, kwargs...)
+        if parallel
+            Threads.@threads for elem in iter
+                f(elem)
+                update!(job)
+            end
+        else
+            for elem in iter
+                f(elem)
+                update!(job)
+            end
+        end
+        stop!(job)
+    catch
+        rethrow()
+    finally
+        if !isnothing(task)
+            stop!(pbar)
+        end
+    end
+end
+
+_getn(iter) = _getn(iter, Base.IteratorSize(iter))
+_getn(iter, ::Union{Base.HasLength, <:Base.HasShape}) = length(iter)
+_getn(_, _) = nothing
+
+
+function _startrenderloop(pbar)
+    while pbar.running
+        pbar.paused || render(pbar)
+        sleep(pbar.Δt)
+    end
+end
+
 
 # ------------------------------- general utils ------------------------------ #
 """
