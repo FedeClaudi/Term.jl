@@ -28,7 +28,15 @@ import ..Colors: RGBColor
 import ..Layout: hLine
 
 export ProgressBar,
-    ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track, render,
+    ProgressJob,
+    addjob!,
+    start!,
+    stop!,
+    update!,
+    removejob!,
+    with,
+    @track,
+    render,
     foreachprogress
 
 # ---------------------------------------------------------------------------- #
@@ -614,7 +622,7 @@ macro track(ex)
 end
 
 
-const FOREACH_PROGRESS = ProgressBar(transient=true)
+const FOREACH_PROGRESS = ProgressBar(transient = true)
 
 """
     foreachprogress(f, iter[, pbar; parallel=false, transient=true, description])
@@ -671,8 +679,15 @@ foreachprogress(1:50; description = "Working...", parallel=true) do i
 end
 ```
 """
-function foreachprogress(f, iter, pbar = FOREACH_PROGRESS; n = _getn(iter), transient = true,
-                         parallel = false, kwargs...)
+function foreachprogress(
+    f,
+    iter,
+    pbar = FOREACH_PROGRESS;
+    n = _getn(iter),
+    transient = true,
+    parallel = false,
+    kwargs...,
+)
     task = nothing
     try
         # Only handle rendering of progress bar if it is not already running.
@@ -708,7 +723,7 @@ function foreachprogress(f, iter, pbar = FOREACH_PROGRESS; n = _getn(iter), tran
 end
 
 _getn(iter) = _getn(iter, Base.IteratorSize(iter))
-_getn(iter, ::Union{Base.HasLength, <:Base.HasShape}) = length(iter)
+_getn(iter, ::Union{Base.HasLength,<:Base.HasShape}) = length(iter)
 _getn(_, _) = nothing
 
 
