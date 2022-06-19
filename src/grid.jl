@@ -16,22 +16,24 @@ include("_compositor.jl")
 
 """
     grid(
-        rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
+        rens::Union{AbstractVector,NamedTuple};
         placeholder::Union{Nothing,AbstractRenderable} = nothing,
+        placeholder_size::Union{Nothing,Tuple} = nothing,
         aspect::Union{Nothing,Number,NTuple} = nothing,
         layout::Union{Nothing,Tuple,Expr} = nothing,
         pad::Union{Tuple,Integer} = 0,
     )
 
-Construct a grid from a `AbstractVector` of `AbstractRenderable`s.
+Construct a grid from an `AbstractVector`.
 
 Lays out the renderables to create a grid with the desired aspect ratio or
 layout (number of rows, number of columns, or one left free with `nothing`).
 Complex layout is supported using compositor expressions.
 """
 function grid(
-    rens::Union{AbstractVector{<:AbstractRenderable},NamedTuple};
+    rens::Union{AbstractVector,NamedTuple};
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
+    placeholder_size::Union{Nothing,Tuple} = nothing,
     aspect::Union{Nothing,Number,NTuple} = nothing,
     layout::Union{Nothing,Tuple,Expr} = nothing,
     show_placeholder::Bool = false,
@@ -43,8 +45,9 @@ function grid(
 
     if layout isa Expr
         sizes = size.(rens_seq)
-        # arbitrary, taking the smallest `Renderable` size for placeholder
-        ph_size = (minimum(first.(sizes)), minimum(last.(sizes)))
+        # arbitrary, if `placeholder_size` not given, take the smallest `Renderable` size for placeholders
+        ph_size =
+            something(placeholder_size, (minimum(first.(sizes)), minimum(last.(sizes))))
 
         kw = Dict{Symbol,Any}()
         n = 0
@@ -80,24 +83,34 @@ end
 """
     grid(
         rens::Nothing = nothing;
+        placeholder_size::Union{Nothing,Tuple} = nothing,
         layout::Union{Nothing,Tuple,Expr} = nothing,
         kw...
     )
 
 Construct a grid of `PlaceHolder`s, for a given layout.
 """
-function grid(rens::Nothing = nothing; layout::Union{Nothing,Tuple,Expr} = nothing, kw...)
+function grid(
+    rens::Nothing = nothing;
+    placeholder_size::Union{Nothing,Tuple} = nothing,
+    layout::Union{Nothing,Tuple,Expr} = nothing,
+    kw...,
+)
     isnothing(layout) &&
         throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s or `Expr`"))
-    return grid(fill(PlaceHolder(default_size()...), prod(layout)); kw...)
+    return grid(
+        fill(PlaceHolder(something(placeholder_size, default_size())...), prod(layout));
+        layout = layout,
+        kw...,
+    )
 end
 
 """
-    grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Nothing,Integer} = 0))
+    grid(rens::AbstractMatrix; pad::Union{Nothing,Integer} = 0))
 
-Construct a grid from a `AbstractMatrix` of `AbstractRenderable`s.
+Construct a grid from an `AbstractMatrix`.
 """
-function grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Tuple,Integer} = 0)
+function grid(rens::AbstractMatrix; pad::Union{Tuple,Integer} = 0)
     hpad, vpad = if pad isa Integer
         (pad, pad)
     else
