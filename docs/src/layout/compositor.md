@@ -4,6 +4,7 @@ We've just seen how you can use `grid` to achieve nice layouts very easily. That
 ```@example compositor
 using Term: Panel
 using Term.Layout
+import Term.Grid: grid
 
 plarge = Panel(height=10, width=60)
 psmall = Panel(height=10, width=20)
@@ -20,6 +21,7 @@ plarge / hstack(panels...)
 but again you suffer from the same problem if you want to create something like, say, this:
 ```@example compositor
 using Term.Compositors # hide
+import Term.Compositors: update! # hide
 layout = :(vstack(  # hide
             A(5, 40), B(5, 40),  # hide
             hstack(C(5, 18), D(5, 18); pad=4); pad=1 # hide

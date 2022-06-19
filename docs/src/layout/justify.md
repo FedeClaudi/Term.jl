@@ -28,7 +28,7 @@ p1 = Panel(height=3, width=20)
 p2 = Panel(height=3, width=40)
 p3 = Panel(height=3, width=60)
 
-cvstack(p1, p2, p3;)
+rvstack(p1, p2, p3;)
 ```
 
-`cvstack` centers and vertically stacks renderables. Guess what `rvstack` and `lvstack` do?
+`rvstack` justifies to the right and vertically stacks renderables. Guess what `cvstack` and `lvstack` do?

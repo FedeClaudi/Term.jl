@@ -6,7 +6,8 @@ The idea is simple: take a bunch of renderables and make a grid out of them:
 
 ```@example grid
 import Term: Panel
-import Term.Layout: grid
+import Term.Grid: grid
+
 
 panels = repeat([Panel(height=6, width=12)], 8)
 

@@ -4,12 +4,7 @@ CurrentModule = Term
 # Term
 
 `Term.jl` is a Julia library for producing styled, beautiful terminal output, like this:
-
-```@example
-import Term
-print(Term.make_logo())
-```
-
+    
 `Term.jl` uses a simple *markup* syntax to add style information to standard Julia strings.
 It also provides `Renderable` objects such as the `Panel` and `TextBox` as you can see in the example below.
 These too can be styled, include styled text, and they can be nested and stacked to produce
