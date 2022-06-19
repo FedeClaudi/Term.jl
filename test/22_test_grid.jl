@@ -40,6 +40,12 @@ import Term: Renderable
         placeholder = PlaceHolder(5, 10; style = "red"),
     )
     @test size(g.measure) == (17, 34)
+
+    rens = Any[]
+    for i in 1:4
+        push!(rens, Panel(width=i))
+    end
+    grid(rens)
 end
 
 @testset "Grid - layout fit" begin
