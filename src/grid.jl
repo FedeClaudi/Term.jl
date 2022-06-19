@@ -16,21 +16,21 @@ include("_compositor.jl")
 
 """
     grid(
-        rens::Union{Nothing,AbstractVector{<:AbstractRenderable}} = nothing;
+        rens::Union{AbstractVector,NamedTuple};
         placeholder::Union{Nothing,AbstractRenderable} = nothing,
         aspect::Union{Nothing,Number,NTuple} = nothing,
         layout::Union{Nothing,Tuple,Expr} = nothing,
         pad::Union{Tuple,Integer} = 0,
     )
 
-Construct a grid from a `AbstractVector` of `AbstractRenderable`s.
+Construct a grid from an `AbstractVector`.
 
 Lays out the renderables to create a grid with the desired aspect ratio or
 layout (number of rows, number of columns, or one left free with `nothing`).
 Complex layout is supported using compositor expressions.
 """
 function grid(
-    rens::Union{AbstractVector{<:AbstractRenderable},NamedTuple};
+    rens::Union{AbstractVector,NamedTuple};
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
     aspect::Union{Nothing,Number,NTuple} = nothing,
     layout::Union{Nothing,Tuple,Expr} = nothing,
@@ -93,11 +93,11 @@ function grid(rens::Nothing = nothing; layout::Union{Nothing,Tuple,Expr} = nothi
 end
 
 """
-    grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Nothing,Integer} = 0))
+    grid(rens::AbstractMatrix; pad::Union{Nothing,Integer} = 0))
 
-Construct a grid from a `AbstractMatrix` of `AbstractRenderable`s.
+Construct a grid from an `AbstractMatrix`.
 """
-function grid(rens::AbstractMatrix{<:AbstractRenderable}; pad::Union{Tuple,Integer} = 0)
+function grid(rens::AbstractMatrix; pad::Union{Tuple,Integer} = 0)
     hpad, vpad = if pad isa Integer
         (pad, pad)
     else
