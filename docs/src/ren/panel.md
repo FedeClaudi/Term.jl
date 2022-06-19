@@ -146,6 +146,7 @@ print(Panel("very long text"^20; height=10, width=30, fit=false))  # text is res
 
 ## Padding
 You'll notice in the example above that there's still some space between the panel's borders and its content. That's padding. You can change how much padding to have to the left, right, top and bottom (in number of spaces/lines):
+
 ```@example panel
 inner = Panel(height=4, width=8, background="bg_#262626", style="bold red")
 print(

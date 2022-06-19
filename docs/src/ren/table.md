@@ -99,6 +99,7 @@ data = OrderedDict(
     :Parameter => [:α, :β, :γ],
     :Value => [1, 2, 3],
 )
+
 Table(data;
     header_style=["bold green", "green"],
     header_justify=[:right, :left],

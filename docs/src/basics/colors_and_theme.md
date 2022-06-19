@@ -16,14 +16,14 @@ function rainbow_maker() # hide
     return out  # hide
 end # hide
 import Term: tprint # hide
-tprint(rainbow_maker()) # hide
+tprint(rainbow_maker(); highlight=false) # hide
 ```
 
 so how can we use different kinds of colors?
 It's all done through `Term`'s markup syntax of course. Look:
 ```@example
 using Term: tprint # hide
-tprint("{(255, 50, 100)}colors!{/(255, 50, 100)}")
+tprint("{(255, 50, 100)}colors!{/(255, 50, 100)}"; highlight=false)
 ```
 
 yep, you can pass a set of `(r, g, b)` values and that'll do it. Personally, I prefer working with hex codes, and so `Term` can accept them too:
@@ -31,7 +31,7 @@ yep, you can pass a set of `(r, g, b)` values and that'll do it. Personally, I p
 using Term: tprint # hide
 indigo = "#42A5F5"
 
-tprint("Some {$indigo}color!{/$indigo}")
+tprint("Some {$indigo}color!{/$indigo}"; highlight=false)
 ```
 
 ## Under the hood

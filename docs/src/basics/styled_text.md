@@ -115,18 +115,18 @@ Term provides a higlighting functionality to automatically style text (e.g. colo
 ```@example h
 import Term: load_code_and_highlight, highlight_syntax, highlight, tprint
 
-tprint(highlight("This text has `code` and 1 2 3 numbers, a ::Int type and a :symbol"))
+tprint(highlight("This text has 1 2 3 numbers, a ::Int type and a :symbol"))
 ```
 
 pretty easy. Highlighting happens automatically when calling tprint:
 ```@example h
-tprint("This text has `code` and 1 2 3 numbers, a ::Int type and a :symbol")
+tprint("This text has 1 2 3 numbers, a ::Int type and a :symbol")
 ```
 but you can turn it off with `tprint(...; highlight=false)`.
 
 You can also specify how you want some text to be highlighted:
 ```@example h
-tprint(highlight("This is just some text", :code))  # it will be colored as code!
+tprint(highlight("This is just some text", :number))  # it will be colored as number!
 ```
 
 The colors used for the highlights are specified by the [Theme](@ref ThemeDocs) being used as seen a previous section. 
