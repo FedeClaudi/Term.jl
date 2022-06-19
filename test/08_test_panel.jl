@@ -89,7 +89,6 @@ end
                 default_width()
             )
 
-
             @testpanel(Panel(Panel("test"; _kw...); fit = false), 5, default_width())
 
             @testpanel(
@@ -152,7 +151,6 @@ end
             nothing,
             console_width() - 1
         )
-
 
         @testpanel(Panel(Panel("test"; justify = justify); fit = true), 5, 16)
 
@@ -326,10 +324,9 @@ end
 # @testset "\e[34mPanel + renderables" begin
 #     @testpanel(Panel(RenderableText("x"^5)), 3, 11)
 
-    @testpanel(Panel(RenderableText("x"^500); fit = false), nothing, default_width())
+@testpanel(Panel(RenderableText("x"^500); fit = false), nothing, default_width())
 
-    @testpanel(Panel(RenderableText("x"^5); fit = true), nothing, 11)
-
+@testpanel(Panel(RenderableText("x"^5); fit = true), nothing, 11)
 
 #     @testpanel(
 #         Panel(RenderableText("x"^500); fit = true),

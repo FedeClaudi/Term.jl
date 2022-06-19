@@ -9,7 +9,7 @@ end
 
 function render_frame_info(pointer::Ptr{Nothing}; show_source = true)
     frame = StackTraces.lookup(pointer)[1]
-    return render_frame_info(frame; show_source=show_source)
+    return render_frame_info(frame; show_source = show_source)
     return RenderableText("   " * string(frame); width = DEFAULT_WIDTH[])
 end
 

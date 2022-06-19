@@ -621,7 +621,6 @@ macro track(ex)
     end
 end
 
-
 const FOREACH_PROGRESS = ProgressBar(transient = true)
 
 """
@@ -726,14 +725,12 @@ _getn(iter) = _getn(iter, Base.IteratorSize(iter))
 _getn(iter, ::Union{Base.HasLength,<:Base.HasShape}) = length(iter)
 _getn(_, _) = nothing
 
-
 function _startrenderloop(pbar)
     while pbar.running
         pbar.paused || render(pbar)
         sleep(pbar.Δt)
     end
 end
-
 
 # ------------------------------- general utils ------------------------------ #
 """
