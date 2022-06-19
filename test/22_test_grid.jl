@@ -48,6 +48,9 @@ end
     h, w = 5, 15
     g = grid(nothing; layout = (nr, nc), placeholder_size = (h, w))
     @test size(g.measure) == (nr * h, nc * w)
+
+    g = grid(; layout = (nr, nc), placeholder_size = (h, w))
+    @test size(g.measure) == (nr * h, nc * w)
 end
 
 @testset "Grid - layout fit" begin
