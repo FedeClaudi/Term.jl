@@ -17,6 +17,7 @@ This is a list:
 * two
 """
 ```
+
 and now in Term:
 ```@example md
 import Term: tprintln, tprint
@@ -35,9 +36,7 @@ Anything that goes into a Julia's Markdown object can be rendered nicely.
 tprint(md"""
 You markdown can include in-line latex ``\sqrt(\gamma)`` and maths in a new line too:
 
-```math
-f(a) = \alpha \cdot \theta
-```
+# this is where you'd put the math, but it doesn't work in Documenter - sorry
 """)
 
 ```
@@ -47,11 +46,13 @@ f(a) = \alpha \cdot \theta
 ```@example md
 tprint(md"""
 
-```julia
-function say_hi(x)
-    print("Hellow World")
-end
-```
+
+# this is where you'd put the math, but it doesn't work in Documenter - sorry
+# ```julia
+# function say_hi(x)
+#    print("Hellow World")
+# end
+# ```
 """)
 ```
 

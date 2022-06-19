@@ -23,11 +23,3 @@ expressiontree(expr)
 ```
 
 enjoy!
-
-
-You can also create a `Dendogram` visualization of an `Expr`:
-```@example
-import Term: inspect
-expr = :(2x + √x^y)
-inspect(expr)
-```

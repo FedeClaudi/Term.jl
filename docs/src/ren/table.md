@@ -100,7 +100,7 @@ data = Dict(
 )
 
 Table(data;
-    header_style=["bold green", "green"],
+    header_style="bold white on_black",
     header_justify=[:right, :left],
     columns_style=["bold white", "dim"],
     columns_justify=[:right, :left],

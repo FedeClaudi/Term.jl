@@ -39,6 +39,10 @@ obj = myFancyType("Rocket", 10, 10, 99.9)
 
 now every time we display an instance of `myFancyType` in the console, we get a nice representation (note that that's not true for `print(obj)`!).
 
+
+!!! warning "Docs display"
+    Ooopss... it looks like the `Panel` display in the example above is not working out in the Docs. It will look fine in your REPL though!
+
 ## Termshow
 Very nice, but what if I don't have access to where the types are created (perhaps they are in another package) but still want to have the nice display? One way is to use `termshow`:
 ```@example repr
@@ -54,7 +58,7 @@ But wait, there's more!
 termshow(termshow)  # or any other function
 ```
 
-Fancy right? It shows the function, various methods for it and it's docstrings (by parsin the Markdown). It works with methods too
+Fancy right? It shows the function, various methods for it and it's docstrings (by parsin the Markdown). It works with types too
 ```@example repr
 import Term: Panel
 termshow(Panel)
@@ -66,7 +70,7 @@ termshow(Dict(:x => 1, :y => 2))
 termshow(zeros(3, 3))
 ```
 
-### install_term_repr
+### install term repr
 Okay, `termshow` is pretty cool (even if I say so myself), but we need to call it every time we need to display something. I just want to type a variable name in the REPL (devs are lazy you know). Well, there's a solution for that too of course:
 ```@example repr
 install_term_repr()

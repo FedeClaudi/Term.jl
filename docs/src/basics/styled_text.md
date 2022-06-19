@@ -115,7 +115,7 @@ Term provides a higlighting functionality to automatically style text (e.g. colo
 ```@example h
 import Term: load_code_and_highlight, highlight_syntax, highlight, tprint
 
-tprint(highlight("This text has 1 2 3 numbers, a ::Int type and a :symbol"))
+tprint(highlight("This text has 1 2 3 numbers, a ::Int type and a :symbol"); highlight=false)
 ```
 
 pretty easy. Highlighting happens automatically when calling tprint:

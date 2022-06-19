@@ -68,6 +68,7 @@ makedocs(;
             "api/api_repr.md",
             "api/api_segments.md",
             "api/api_style.md",
+            "api/api_tables.md",
             "api/api_tprint.md",
             "api/api_trees.md",
         ],
