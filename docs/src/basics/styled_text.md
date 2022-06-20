@@ -143,9 +143,9 @@ end
 ```
 
 or just load and highlight a file (showing lines in a specific range):
-```@example h
+```Julia
 
-load_code_and_highlight("./src/highlight.jl", 125; δ=5) |> tprint
+load_code_and_highlight(".../src/highlight.jl", 125; δ=5) |> tprint
 ```
 
 

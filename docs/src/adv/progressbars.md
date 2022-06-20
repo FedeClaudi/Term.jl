@@ -234,7 +234,7 @@ done!
 ## For each progress
 Want to just wrap an iterable in a progress bar rendering? Check this out.
 
-``` julia
+```Julia
 using Term
 using Term.Progress
 
@@ -248,10 +248,6 @@ end
 
 The loop above will render a progress bar for each iteration of the outer loop, and a progress bar for each iteration of the inner loop - easy.
 
-```@example
-import Term: termshow, foreachprogress # hide
-termshow(foreachprogress)
-```
 
 ## ProgressLogging
 I know that some of you will be thinking: hold on, Julia already had a perfectly functioning progress API with `ProgressLogging.jl`, can't we just use that? Long story short, yes you can. But `Term`'s API gives you so much more control over what kind information to display and what it should look like. Nonetheless, many of you will want to use `ProgressLogging` in conjuction with Term, so we've made it possible, you just need to use Term's logger (see [Logger](@ref LoggingDoc)):

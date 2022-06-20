@@ -2,7 +2,7 @@
 Okay, so far so good. We can use macros like `@red` and the `tprint` function to print colored strings. But so far we've only been using few named colors, but..
 
 ```@example
-import Term: rint # hide
+import Term: rint, tprint # hide
 function rainbow_maker() # hide
     text = "there's a whole rainbow\n of colors out there" # hide
     _n = Int(length(text)/2)  # hide
