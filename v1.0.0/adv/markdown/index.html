@@ -36,45 +36,26 @@ This is a paragraph of text. This is a list:
 <span class="sgr37"><span class="sgr1">  • </span></span>two</code></pre><p>Anything that goes into a Julia&#39;s Markdown object can be rendered nicely.</p><h3 id="Maths"><a class="docs-heading-anchor" href="#Maths">Maths</a><a id="Maths-1"></a><a class="docs-heading-anchor-permalink" href="#Maths" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
 You markdown can include in-line latex ``\sqrt(\gamma)`` and maths in a new line too:
 
-# this is where you&#39;d put the math, but it doesn&#39;t work in Documenter - sorry
+
+!!! warning
+    this is where you&#39;d put multi-line math, but it doesn&#39;t work in Documenter - sorry.
+    Have a go in your own REPL!
 &quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">You markdown can include in-line latex <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">√(γ)</span></span> and maths in a new line too:
 
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>   <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">this is where you&#39;d put the math, but it doesn&#39;t work in Documenter -     </span></span><span class="sgr2">┃</span>
-<span class="sgr2">┃</span>   sorry                                                                     <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span></code></pre><h3 id="Code"><a class="docs-heading-anchor" href="#Code">Code</a><a id="Code-1"></a><a class="docs-heading-anchor-permalink" href="#Code" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">╭──── </span>Warning<span class="sgr2"> ─────────────────────────────────────────────────────────╮</span>
+    <span class="sgr2">│</span></span>  this is where you&#39;d put multi-line math, but it doesn&#39;t work in     <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>  Documenter -                                                        <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>  sorry. Have a go in your own REPL!                                  <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">╰──────────────────────────────────────────────────────────────────────╯</span></span></code></pre><h3 id="Code"><a class="docs-heading-anchor" href="#Code">Code</a><a id="Code-1"></a><a class="docs-heading-anchor-permalink" href="#Code" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
 
-
-# this is where you&#39;d put the math, but it doesn&#39;t work in Documenter - sorry
-# ```julia
-# function say_hi(x)
-#    print(&quot;Hellow World&quot;)
-# end
-# ```
-&quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>   <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">this is where you&#39;d put the math, but it doesn&#39;t work in Documenter -     </span></span><span class="sgr2">┃</span>
-<span class="sgr2">┃</span>   sorry                                                                     <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                                 <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">```julia</span></span>                                 <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                            <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">function say_hi(x)</span></span>                            <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                          <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">print(&quot;Hellow World&quot;)</span></span>                           <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                                   <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">end</span></span>                                    <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                                   <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">```</span></span>                                    <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span></code></pre><h3 id="Quotes-and-admonitions"><a class="docs-heading-anchor" href="#Quotes-and-admonitions">Quotes and admonitions</a><a id="Quotes-and-admonitions-1"></a><a class="docs-heading-anchor-permalink" href="#Quotes-and-admonitions" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
+!!! warning
+    this is where you&#39;d put multi-line code, but it doesn&#39;t work in Documenter - sorry.
+    Have a go in your own REPL!
+&quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">╭──── </span>Warning<span class="sgr2"> ─────────────────────────────────────────────────────────╮</span>
+    <span class="sgr2">│</span></span>  this is where you&#39;d put multi-line code, but it doesn&#39;t work in     <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>  Documenter -                                                        <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>  sorry. Have a go in your own REPL!                                  <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">╰──────────────────────────────────────────────────────────────────────╯</span></span></code></pre><h3 id="Quotes-and-admonitions"><a class="docs-heading-anchor" href="#Quotes-and-admonitions">Quotes and admonitions</a><a id="Quotes-and-admonitions-1"></a><a class="docs-heading-anchor-permalink" href="#Quotes-and-admonitions" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
 You can use &quot;quotes&quot; to highlight a section:
 
 &gt; Multi-line quotes can be helpful to make a
@@ -167,4 +148,4 @@ and ordered lists too:
                  <span class="sgr2">│</span> Row <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span><span class="sgr38_2" style="color:#90caf9">1</span><span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span>   <span class="sgr2">│</span>   Column <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span><span class="sgr38_2" style="color:#90caf9">2</span><span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span> <span class="sgr2">│</span>            <span class="sgr2">│</span>
                  <span class="sgr2">├───────────┼──────────────┼────────────┤</span>
                  <span class="sgr2">│</span> <span class="sgr3">Row</span> 2     <span class="sgr2">│</span>        <span class="sgr1">Row</span> 2 <span class="sgr2">│</span>  Column <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">3</span></span>  <span class="sgr2">│</span>
-                 <span class="sgr2">╰───────────┴──────────────┴────────────╯</span></code></pre><p>and more (links, footnoes, headers of different levels, etc.)</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../introspection/">« Introspection</a><a class="docs-footer-nextpage" href="../../api/api_term/">Term »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Monday 20 June 2022 08:59">Monday 20 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+                 <span class="sgr2">╰───────────┴──────────────┴────────────╯</span></code></pre><p>and more (links, footnoes, headers of different levels, etc.)</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../introspection/">« Introspection</a><a class="docs-footer-nextpage" href="../../api/api_term/">Term »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Monday 20 June 2022 09:41">Monday 20 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
