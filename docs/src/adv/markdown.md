@@ -52,7 +52,6 @@ tprint(md"""
 !!! warning
     this is where you'd put multi-line code, but it doesn't work in Documenter - sorry.
     Have a go in your own REPL!
-```
 """)
 ```
 
