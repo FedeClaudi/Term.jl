@@ -36,135 +36,21 @@ This is a paragraph of text. This is a list:
 <span class="sgr37"><span class="sgr1">  • </span></span>two</code></pre><p>Anything that goes into a Julia&#39;s Markdown object can be rendered nicely.</p><h3 id="Maths"><a class="docs-heading-anchor" href="#Maths">Maths</a><a id="Maths-1"></a><a class="docs-heading-anchor-permalink" href="#Maths" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
 You markdown can include in-line latex ``\sqrt(\gamma)`` and maths in a new line too:
 
-# this is where you&#39;d put the math, but it doesn&#39;t work in Documenter - sorry
-&quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">You markdown can include in-line latex <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">√(γ)</span></span> and maths in a new line too:
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>   <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">this is where you&#39;d put the math, but it doesn&#39;t work in Documenter -     </span></span><span class="sgr2">┃</span>
-<span class="sgr2">┃</span>   sorry                                                                     <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span></code></pre><h3 id="Code"><a class="docs-heading-anchor" href="#Code">Code</a><a id="Code-1"></a><a class="docs-heading-anchor-permalink" href="#Code" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
-
-
-# this is where you&#39;d put the math, but it doesn&#39;t work in Documenter - sorry
-# ```julia
-# function say_hi(x)
-#    print(&quot;Hellow World&quot;)
-# end
-# ```
-&quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>   <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">this is where you&#39;d put the math, but it doesn&#39;t work in Documenter -     </span></span><span class="sgr2">┃</span>
-<span class="sgr2">┃</span>   sorry                                                                     <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                                 <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">```julia</span></span>                                 <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                            <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">function say_hi(x)</span></span>                            <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                          <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">print(&quot;Hellow World&quot;)</span></span>                           <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                                   <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">end</span></span>                                    <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
-
-<span class="sgr2">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span class="sgr2">┃</span>                                   <span class="sgr38_2" style="color:#9fa8da"><span class="sgr1">```</span></span>                                    <span class="sgr2">┃</span>
-<span class="sgr2">┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span></code></pre><h3 id="Quotes-and-admonitions"><a class="docs-heading-anchor" href="#Quotes-and-admonitions">Quotes and admonitions</a><a id="Quotes-and-admonitions-1"></a><a class="docs-heading-anchor-permalink" href="#Quotes-and-admonitions" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
-You can use &quot;quotes&quot; to highlight a section:
-
-&gt; Multi-line quotes can be helpful to make a
-&gt; paragram stand out, so that users won&#39;t miss it!
-&gt; You can use **other inline syntax** in you `quotes` too.
-
-but if you really need to grab someone&#39;s attention, use admonitions:
-
-!!! note
-    You can use different levels
 
 !!! warning
-    to send different messages
-
-!!! danger
-    to your reader
-
-!!! tip &quot;Wow!&quot;
-    Turns out that admonitions can be pretty useful!
-    What will you use them for?
-&quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">You can use &quot;quotes&quot; to highlight a section:
-
-  <span class="sgr38_2" style="color:#5a74f2">&gt;</span> <span class="sgr37"><span class="sgr1">“</span></span>Multi-line quotes can be helpful to make a  paragram stand out, so that
-  <span class="sgr38_2" style="color:#6b77b0"><span class="sgr2">┃</span></span> users
-  <span class="sgr38_2" style="color:#6b77b0"><span class="sgr2">┃</span></span> won&#39;t miss it! You can use <span class="sgr1">other inline syntax</span> in you <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span><span class="sgr38_2" style="color:#dedede">quotes</span><span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span> too.</span><span class="sgr37"><span class="sgr1">”</span></span>
-
-but if you really need to grab someone&#39;s attention, use admonitions:
-
-    <span class="sgr34"><span class="sgr2">╭──── </span>Note<span class="sgr2"> ────────────────────────────────────────────────────────────╮</span>
-    <span class="sgr2">│</span></span>  You can use different levels                                        <span class="sgr34"><span class="sgr2">│</span></span>
-    <span class="sgr34"><span class="sgr2">╰──────────────────────────────────────────────────────────────────────╯</span></span>
+    this is where you&#39;d put multi-line math, but it doesn&#39;t work in Documenter - sorry.
+    Have a go in your own REPL!
+&quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">You markdown can include in-line latex <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">√(γ)</span></span> and maths in a new line too:
 
     <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">╭──── </span>Warning<span class="sgr2"> ─────────────────────────────────────────────────────────╮</span>
-    <span class="sgr2">│</span></span>  to send different messages                                          <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
-    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">╰──────────────────────────────────────────────────────────────────────╯</span></span>
+    <span class="sgr2">│</span></span>  this is where you&#39;d put multi-line math, but it doesn&#39;t work in     <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>  Documenter -                                                        <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>  sorry. Have a go in your own REPL!                                  <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">│</span></span>
+    <span class="sgr38_2" style="color:#fff59d"><span class="sgr2">╰──────────────────────────────────────────────────────────────────────╯</span></span></code></pre><h3 id="Code"><a class="docs-heading-anchor" href="#Code">Code</a><a id="Code-1"></a><a class="docs-heading-anchor-permalink" href="#Code" title="Permalink"></a></h3><pre><code class="language- hljs">tprint(md&quot;&quot;&quot;
 
-    <span class="sgr31"><span class="sgr2">╭──── </span>Danger<span class="sgr2"> ──────────────────────────────────────────────────────────╮</span>
-    <span class="sgr2">│</span></span>  to your reader                                                      <span class="sgr31"><span class="sgr2">│</span></span>
-    <span class="sgr31"><span class="sgr2">╰──────────────────────────────────────────────────────────────────────╯</span></span>
-
-    <span class="sgr32"><span class="sgr2">╭──── </span>Wow!<span class="sgr2"> ────────────────────────────────────────────────────────────╮</span>
-    <span class="sgr2">│</span></span>  Turns out that admonitions can be pretty useful! What will you      <span class="sgr32"><span class="sgr2">│</span></span>
-    <span class="sgr32"><span class="sgr2">│</span></span>  use them for?                                                       <span class="sgr32"><span class="sgr2">│</span></span>
-    <span class="sgr32"><span class="sgr2">╰──────────────────────────────────────────────────────────────────────╯</span></span></code></pre><h3 id="Lists"><a class="docs-heading-anchor" href="#Lists">Lists</a><a id="Lists-1"></a><a class="docs-heading-anchor-permalink" href="#Lists" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
-Of course you can have classic lists:
-* item one
-* item two
-* And a sublist:
-    + sub-item one
-    + sub-item two
-
-and ordered lists too:
-1. item one
-2. item two
-3. item three
-
-&quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Of course you can have classic lists:
-
-<span class="sgr37"><span class="sgr1">  • </span></span>item one
-<span class="sgr37"><span class="sgr1">  • </span></span>item two
-<span class="sgr37"><span class="sgr1">  • </span></span>And a sublist:
-   <span class="sgr37"><span class="sgr1">  • </span></span>sub-item one
-   <span class="sgr37"><span class="sgr1">  • </span></span>sub-item two
-
-
-
-and ordered lists too:
-
-<span class="sgr1">  1. </span>item one
-<span class="sgr1">  2. </span>item two
-<span class="sgr1">  3. </span>item three</code></pre><h3 id="Tables"><a class="docs-heading-anchor" href="#Tables">Tables</a><a id="Tables-1"></a><a class="docs-heading-anchor-permalink" href="#Tables" title="Permalink"></a></h3><pre><code class="language-julia hljs">tprint(md&quot;&quot;&quot;
-!!! note &quot;Tables&quot;
-    You can use the [Markdown table syntax](https://www.markdownguide.org/extended-syntax/#tables)
-    to insert tables - Term.jl will convert them to Table object!
-
-| Term | handles | tables|
-|:---------- | ---------- |:------------:|
-| Row `1`    | Column `2` |              |
-| *Row* 2    | **Row** 2  | Column ``3`` |
-&quot;&quot;&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">    <span class="sgr34"><span class="sgr2">╭──── </span>Tables<span class="sgr2"> ──────────────────────────────────────────────────────────╮</span>
-    <span class="sgr2">│</span></span>  You can use the <span class="sgr37"><span class="sgr1">Markdown table syntax</span>                               </span><span class="sgr34"><span class="sgr2">│</span></span>
-    <span class="sgr34"><span class="sgr2">│</span></span>  <span class="sgr2">(https://www.markdownguide.org/extended-syntax/#tables)</span><span class="sgr37"> to insert   </span><span class="sgr34"><span class="sgr2">│</span></span>
-    <span class="sgr34"><span class="sgr2">│</span></span>  tables -                                                            <span class="sgr34"><span class="sgr2">│</span></span>
-    <span class="sgr34"><span class="sgr2">│</span></span>  Term.jl will convert them to Table object!                          <span class="sgr34"><span class="sgr2">│</span></span>
-    <span class="sgr34"><span class="sgr2">╰──────────────────────────────────────────────────────────────────────╯</span></span>
-
-                 <span class="sgr2">╭───────────┬──────────────┬────────────╮</span>
-                 <span class="sgr2">│</span><span class="sgr33"><span class="sgr1"> Term      </span></span><span class="sgr2">│</span><span class="sgr33"><span class="sgr1">      handles </span></span><span class="sgr2">│</span><span class="sgr33"><span class="sgr1">   tables   </span></span><span class="sgr2">│</span>
-                 <span class="sgr2">├───────────┼──────────────┼────────────┤</span>
-                 <span class="sgr2">│</span> Row <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span><span class="sgr38_2" style="color:#90caf9">1</span><span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span>   <span class="sgr2">│</span>   Column <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span><span class="sgr38_2" style="color:#90caf9">2</span><span class="sgr38_2" style="color:#fff59d"><span class="sgr3">`</span></span> <span class="sgr2">│</span>            <span class="sgr2">│</span>
-                 <span class="sgr2">├───────────┼──────────────┼────────────┤</span>
-                 <span class="sgr2">│</span> <span class="sgr3">Row</span> 2     <span class="sgr2">│</span>        <span class="sgr1">Row</span> 2 <span class="sgr2">│</span>  Column <span class="sgr38_2" style="color:#fff59d"><span class="sgr3">3</span></span>  <span class="sgr2">│</span>
-                 <span class="sgr2">╰───────────┴──────────────┴────────────╯</span></code></pre><p>and more (links, footnoes, headers of different levels, etc.)</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../introspection/">« Introspection</a><a class="docs-footer-nextpage" href="../../api/api_term/">Term »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Monday 20 June 2022 07:53">Monday 20 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+!!! warning
+    this is where you&#39;d put multi-line code, but it doesn&#39;t work in Documenter - sorry.
+    Have a go in your own REPL!</code></pre><p>&quot;&quot;&quot;)</p><pre><code class="nohighlight hljs">
+### Quotes and admonitions</code></pre><p>@example md tprint(md&quot;&quot;&quot; You can use &quot;quotes&quot; to highlight a section:</p><blockquote><p>Multi-line quotes can be helpful to make a  paragram stand out, so that users won&#39;t miss it! You can use <strong>other inline syntax</strong> in you <code>quotes</code> too.</p></blockquote><p>but if you really need to grab someone&#39;s attention, use admonitions:</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>You can use different levels</p></div></div><div class="admonition is-warning"><header class="admonition-header">Warning</header><div class="admonition-body"><p>to send different messages</p></div></div><div class="admonition is-danger"><header class="admonition-header">Danger</header><div class="admonition-body"><p>to your reader</p></div></div><div class="admonition is-success"><header class="admonition-header">Wow!</header><div class="admonition-body"><p>Turns out that admonitions can be pretty useful! What will you use them for?</p></div></div><p>&quot;&quot;&quot;)</p><pre><code class="nohighlight hljs">
+### Lists</code></pre><p>@example md tprint(md&quot;&quot;&quot; Of course you can have classic lists:</p><ul><li>item one</li><li>item two</li><li>And a sublist:<ul><li>sub-item one</li><li>sub-item two</li></ul></li></ul><p>and ordered lists too:</p><ol><li>item one</li><li>item two</li><li>item three</li></ol><p>&quot;&quot;&quot;)</p><pre><code class="nohighlight hljs">
+### Tables</code></pre><p>@example md tprint(md&quot;&quot;&quot;</p><div class="admonition is-info"><header class="admonition-header">Tables</header><div class="admonition-body"><p>You can use the <a href="https://www.markdownguide.org/extended-syntax/#tables">Markdown table syntax</a> to insert tables - Term.jl will convert them to Table object!</p></div></div><table><tr><th style="text-align: left">Term</th><th style="text-align: right">handles</th><th style="text-align: center">tables</th></tr><tr><td style="text-align: left">Row <code>1</code></td><td style="text-align: right">Column <code>2</code></td><td style="text-align: center"></td></tr><tr><td style="text-align: left"><em>Row</em> 2</td><td style="text-align: right"><strong>Row</strong> 2</td><td style="text-align: center">Column <span>$3$</span></td></tr></table><p>&quot;&quot;&quot;) ```</p><p>and more (links, footnoes, headers of different levels, etc.)</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../introspection/">« Introspection</a><a class="docs-footer-nextpage" href="../../api/api_term/">Term »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.19 on <span class="colophon-date" title="Monday 20 June 2022 09:13">Monday 20 June 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
