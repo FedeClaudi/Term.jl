@@ -63,3 +63,7 @@ and set it as the new theme to be used by Term:
 ```@example theme
 set_theme(newtheme)
 ```
+
+```@example theme
+set_theme(Theme()) # hide
+```

@@ -36,7 +36,10 @@ Anything that goes into a Julia's Markdown object can be rendered nicely.
 tprint(md"""
 You markdown can include in-line latex ``\sqrt(\gamma)`` and maths in a new line too:
 
-# this is where you'd put the math, but it doesn't work in Documenter - sorry
+
+!!! warning
+    this is where you'd put multi-line math, but it doesn't work in Documenter - sorry.
+    Have a go in your own REPL!
 """)
 
 ```
@@ -46,13 +49,10 @@ You markdown can include in-line latex ``\sqrt(\gamma)`` and maths in a new line
 ```@example md
 tprint(md"""
 
-
-# this is where you'd put the math, but it doesn't work in Documenter - sorry
-# ```julia
-# function say_hi(x)
-#    print("Hellow World")
-# end
-# ```
+!!! warning
+    this is where you'd put multi-line code, but it doesn't work in Documenter - sorry.
+    Have a go in your own REPL!
+```
 """)
 ```
 
