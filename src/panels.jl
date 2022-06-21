@@ -148,13 +148,14 @@ end
         padding::Padding;
         height::Union{Nothing,Int} = nothing,
         width::Union{Nothing,Int} = nothing,
+        trim::Bool = true,
         kwargs...,
-        )
+    )
 
 Construct a `Panel` fitting the content's width.
 
 !!! warning
-    If the content is larger than the console terminal's width, it will get trimmed to avoid overflow.
+    If the content is larger than the console terminal's width, it will get trimmed to avoid overflow, unless `trim=false` is given.
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable},
@@ -163,6 +164,7 @@ function Panel(
     height::Union{Nothing,Int} = nothing,
     width::Union{Nothing,Int} = nothing,
     background::Union{Nothing,String} = nothing,
+    trim::Bool = true,
     kwargs...,
 )
     content =
@@ -178,13 +180,15 @@ function Panel(
     )
 
     # if panel is larger than console, fit content to panel
-    panel_measure.w > console_width() && return Panel(
-        content,
-        Val(false),
-        padding;
-        width = min(panel_measure.w, console_width() - 1),
-        kwargs...,
-    )
+    if panel_measure.w > console_width() && trim
+        return Panel(
+            content,
+            Val(false),
+            padding;
+            width = min(panel_measure.w, console_width() - 1),
+            kwargs...,
+        )
+    end
 
     Δw = padding.left + padding.right + 2
     Δh = padding.top + padding.bottom
