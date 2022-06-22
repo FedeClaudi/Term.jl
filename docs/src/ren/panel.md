@@ -4,7 +4,7 @@ Okay, time to move beyond simple text. It's time for:
 import Term: Panel # hide
 print(# hide
     Panel(# hide
-        "[red]awesome[/red]", # hide
+        "{red}awesome{/red}", # hide
         title="Term's", # hide
         title_style="bold green", # hide
         style="gold1 bold", # hide
@@ -19,10 +19,10 @@ print(# hide
 
 Simply put, a `Panel` shows a piece of content (generally a styled string, but it can be any `Renderable` really) surrounded by a box. Simple but effective.
 
-Well not that simple actually because [`Term.panel.Panel`](@ref) is the first renderable that allows you lots of options to personalize its appearance. For instance the panel printed above is given by:
+Well not that simple actually because [`Term.Panels.Panel`](@ref) is the first renderable that allows you lots of options to personalize its appearance. For instance the panel printed above is given by:
 ```julia
     Panel(
-        "[red]awesome[/red]",
+        "{red}awesome{/red}",
         title="Term's",
         title_style="bold green",
         style="gold1 bold",
@@ -79,17 +79,33 @@ print(
     Panel("the text is here!"; width = 66, justify = :right),
 )
 print("\n")
+```
+You can justify the panel's content to `:left, :center, :right`!
 
-print(
-    Panel("Titles have style too!!"; width = 60, justify = :center, title="My Title", title_style="red bold", title_justify=:right, subtitle="Made with Term", subtitle_style="dim", subtitle_justify=:left)
+```@example panel
+    Panel("Titles have style too!!"; width = 60, justify = :center, title="My Title", title_style="red bold", title_justify=:right, subtitle="Made with Term", subtitle_style="dim", subtitle_justify=:left
+)
+```
+And style the title and subtitle, or the whole background too:
+```@example panel
+import Term: highlight_syntax, apply_style, do_by_line, fillin
+
+syntax_with_bg(t) = do_by_line(ln -> apply_style(ln, "on_red"), fillin(t) |> highlight_syntax)
+
+Panel(
+    syntax_with_bg("""
+function show_off(x)
+    print(x)
+end
+"""); 
+    background="on_red"
 )
 
 ```
 
 By the way, `Panels` are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!
 ```@example panel
-print(
-    Panel(
+Panel(
         Panel(width=18, style="green"),
         Panel(width=18, style="white"),
         Panel(width=18, style="red"),
@@ -98,48 +114,56 @@ print(
         title_justify=:left,
         title_style="bold red"
     )
-)
+
 ```
 
 ## Size & fitting
-By default `Panel`s are created to be 88 in width (or less if you have a small terminal) and as high as required to fit your content (+2 for the top and bottom line). If you content is narrowe than the panel's width, then all is good (and you can use `justify` to place it as you like). If not, there's two options: reshape your text to fit in the panel or enlarge the panel to envelop your content. The first is used when the content is a text type, the latter if its another renderable:
-
-
-```@example panel
-
-reshaped = Panel("very long text"^24)
-
-print(
-    reshaped,
-    Panel(reshaped)
-)
-```
-
-If you want to though, you can set the size to be whatever you like:
-```@example panel
-print(
-    Panel(; width=22, height=9)
-)
-```
-
-Sometimes though, you just want your panel to snugly envelop your content without extra space and without having to specify the width. Easy:
+By default `Panel` tries to fit your content:
 
 ```@example panel
-
-p = Panel(; width=22, height=4)
-print(
-    Panel(p; fit=true)
-)
+print(Panel("."^10))
+print(Panel("."^30))
+print(Panel("."^60))
 ```
+
+but you can change this by passing a `width` value. In fact you can se a height too:
+```@example panel
+Panel("."^10; height=5, width=20)
+```
+
+Alternatively, you can use `fit=false`. 
+```@example panel
+Panel("."^10; fit=false)
+```
+this will make all panels have the same width (uless you specify a width). The main difference is that if the content is larger than the panel, it will be truncated, which is not what happens if `fit=true`"
+```@example panel
+p1 = Panel("."^10; height=5, width=60)
+print(Panel(p1; height=2, width=30))  # fit=true -> expand out panel, width/height ignored
+print(Panel(p1; height=10, width=30, fit=false))  # fit=false -> truncate the content
+print(Panel("very long text"^20; height=10, width=30, fit=false))  # text is reshaped to fit the panel
+```
+
 
 ## Padding
-You'll notice in the example above that there's still some space around our nested panel, even though we wanted `fit=true`, why is that? Well, `Panel` by default applies some `Padding` around your content. You can control how much padding you want:
-```@example panel
+You'll notice in the example above that there's still some space between the panel's borders and its content. That's padding. You can change how much padding to have to the left, right, top and bottom (in number of spaces/lines):
 
+```@example panel
+inner = Panel(height=4, width=8, background="on_#262626", style="bold red")
 print(
-    Panel(p; fit=true, padding=(0, 0, 0, 0)),
-    Panel(p; fit=true, padding=(3, 3, 3, 3)),
+    Panel(inner; fit=false, padding=(0, 0, 0, 0)),
+    Panel(inner; fit=false, padding=(3, 1, 3, 1)),
+    Panel(inner; fit=false, padding=(20, 3, 3, 1)),
 )
 ```
 
 The syntax is `(left, right, top, bottom)` and the default is `(2, 2, 0, 0)`.
+
+
+# [TextBox](@id TBoxDoc)
+Sometimes you want to have the benefits of `Panel` (you can control the height, width, padding, justification, titles...) without actually showing the panel itself. Introduce: `TextBox`.
+```@example
+using Term: TextBox
+TextBox("A very long piece of text"^10; title="TEXT", width=30, fit=false)
+```
+
+Easy peasy!

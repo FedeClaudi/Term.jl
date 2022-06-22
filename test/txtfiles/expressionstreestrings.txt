@@ -1,0 +1,8 @@
+Term.panel.Panel <: AbstractRenderable [2msize: Measure (w: 88, h: 17)[0m
+Term.panel.Panel <: AbstractRenderable [2msize: Measure (w: 88, h: 18)[0m
+Term.panel.Panel <: AbstractRenderable [2msize: Measure (w: 88, h: 16)[0m
+Term.panel.Panel <: AbstractRenderable [2msize: Measure (w: 88, h: 17)[0m
+Term.panel.Panel <: AbstractRenderable [2msize: Measure (w: 88, h: 10)[0m
+Term.panel.Panel <: AbstractRenderable [2msize: Measure (w: 88, h: 20)[0m
+Term.panel.Panel <: AbstractRenderable [2msize: Measure (w: 88, h: 20)[0m
+Term.panel.Panel <: AbstractRenderable [2msize: Measure (w: 88, h: 10)[0m

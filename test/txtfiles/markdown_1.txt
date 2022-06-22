@@ -1,0 +1,5 @@
+This is a test function for math syntax[0m
+
+
+     {#FFF59D italic}α² - √9 ∈ [1, 2, 3] ∪ [4, 5, 6]{/#FFF59D italic}
+[0m

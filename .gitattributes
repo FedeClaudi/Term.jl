@@ -1,0 +1,10 @@
+dev/* linguist-documentation=true
+docs/* linguist-documentation=true
+test/txtfiles/* linguist-documentation=true
+
+
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.md linguist-detectable=false
+*.txt linguist-detectable=false
+*.js linguist-detectable=false

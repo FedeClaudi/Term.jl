@@ -16,6 +16,7 @@ vertically.
 """
 
 using Term
+using Term.Layout
 
 # with strings
 s1 = @red "one string"
@@ -25,7 +26,7 @@ println(s1 * " " * s2)
 println(s1 / s2)
 
 # with panels (and text boxes)
-p1 = Panel("content [blue]content[/blue] "^10; width = 40)
+p1 = Panel("content {blue}content{/blue} "^10; width = 40)
 tb1 = TextBox("this is a text boox! "^5; width = 66)
 
 println(p1 * tb1)
@@ -38,7 +39,7 @@ println(s1 / p1 / s2 / tb1)
 Now, stacking things is great, but want if you want some space between them?
 `Spacer` lets you create an empty space with set width and height
 """
-space = Spacer(20, p1.measure.h)  # create empty space with same height as p1!
+space = Spacer(p1.measure.h, 20)  # create empty space with same height as p1!
 
 # horizzontally stack everything and print!
 top = p1 * space * p1
@@ -61,6 +62,6 @@ println(
         title_style = "bold red",
         style = "red dim",
         title_justify = :left,
-        fit=true
+        fit = true,
     ),
 )

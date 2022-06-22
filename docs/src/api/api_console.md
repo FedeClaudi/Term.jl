@@ -1,6 +1,6 @@
-# Console
+# Consoles
 ```@meta
-CurrentModule = Term.consoles
+CurrentModule = Term.Consoles
 ```
 
 
@@ -10,5 +10,5 @@ Pages   = ["api_console.md"]
 
 
 ```@autodocs
-Modules = [consoles]
+Modules = [Consoles]
 ```

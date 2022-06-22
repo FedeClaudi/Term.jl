@@ -1,33 +1,71 @@
 # Layout renderables
-We've already [seen the layout elements](@ref content_layout) in detail, but we'll just remind you of them here.
-There's three types of renderabels whick mainly aime with getting the right layout for your renderables: `Spacer`, `vLine` and `hLine`.  
 
+In this section we'll look at a few renderable types that are useful layout elements: they can be used to insert lines to demarkate different section, create some space or even as place holders for when you want to create a layout but don't have some content yet. 
+
+!!! note "Layout syntax"
+    Here we make use of the layout operators `*` and `/` to horizontally and vertically stack renderables. Have a look at the `Layout` section for more details!
+
+## Spacer
 `Spacer` creates a *box* of empty text with a given width and height. This can be useful for instance if you're stacking two other renderables but want some space between them:
-```@example
-import Term: Panel, Spacer
+```@example layout
+import Term: Panel
+import Term.Layout: Spacer
 
-
-p = Panel(; width=10, height=3)
-space = Spacer(5, 3)
+p = Panel(height=3, width=10)
+space = Spacer(3, 5)
 print(p * space * p)
 print(p * p)
 ```
 
-`vLine` and `hLine` are more useful to create a separation between two separate peices of content:
-```@example
+## Vertical line
+`vLine` does one simple thing: creates a vertical line. You can style it and like for `Panel` you can use different `Boxes` to obtain different looks:
+```@example layout
 
-import Term: TextBox, vLine, hLine
-
-
-my_long_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut..."
-
-tb = TextBox(my_long_text; width=22)
-line = " " /vLine(tb.measure.h-2; style="dim bold")
-
-top = tb * line * tb
-
-tb2 = TextBox(my_long_text; width=top.measure.w)
-hline = hLine(top.measure.w; style="dim", box=:DOUBLE)
-
-print(top / hline / tb2)
+import Term.Layout: vLine
+space = Spacer(10, 5)
+vLine(10; style="red") * space * vLine(10; style="blue") * space * vLine(10; style="green", box=:DOUBLE)
 ```
+
+and you can pass another `Renderable` as argument to create a line as tall as it:
+```@example layout
+import Term: Panel
+p = Panel(height=3, width=15)
+l = vLine(p)
+l * p * l
+```
+
+## Horizontal line
+Similar to `vLine` (surprising I know), but horizontal:
+```@example layout
+import Term.Layout: hLine
+
+h1 = hLine(10; style="red")
+h2 = hLine(10; style="blue")
+h3 = hLine(p; style="green", box=:DOUBLE)
+h1 / h2 / h3 / p
+```
+
+But! You can use some text to add a "title" to the center of your line:
+```@example layout
+
+hLine(100, "{bold white}wow{/bold white}")
+```
+
+which can be nice some times. 
+
+
+## PlaceHolder
+Does what it says on the tin. It's a convenience thing to create a renderable with a given size that you can use while you think about how to create a layout:
+
+```@example layout
+import Term.Layout: PlaceHolder
+
+p1 = PlaceHolder(10, 35)
+p2 = PlaceHolder(10, 35; style="red")
+p3 = PlaceHolder(10, 75; style="blue")
+
+(p1 * " "^5 * p2) / " " / p3
+```
+
+
+For more complex layout situations, `Grid` and `Compositor` are your friends. These are a bit more involved so we'll describe them more in detail in a dedicated `Layout` section below. 

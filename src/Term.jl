@@ -1,109 +1,133 @@
 module Term
+
+const DEBUG_ON = Ref(false)
+
+default_width(io = stdout) = min(88, displaysize(stdout)[2] - 4)
+default_stacktrace_width(io = stdout) = min(140, displaysize(stdout)[2] - 4)
+
+const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
+
 # general utils
 include("__text_utils.jl")
 include("_ansi.jl")
 include("_utils.jl")
+include("_text_reshape.jl")
+include("link.jl")
 
 # don't import other modules
-include("measure.jl")
-include("color.jl")
+include("measures.jl")
+include("colors.jl")
 include("theme.jl")
 include("highlight.jl")
 
+const TERM_THEME = Ref(Theme())
+
+function update! end
+
 # rely on other modules
 include("style.jl")
-include("segment.jl")
+include("segments.jl")
 include("macros.jl")
 
 # renderables, rely heavily on other modules
-include("box.jl")
+include("boxes.jl")
 include("console.jl")
 include("renderables.jl")
 include("layout.jl")
-include("panel.jl")
+include("panels.jl")
 include("errors.jl")
-include("logging.jl")
 include("tprint.jl")
 include("progress.jl")
-include("tree.jl")
-include("logo.jl")
-include("inspect.jl")
+include("logs.jl")
+include("trees.jl")
+include("dendograms.jl")
+include("introspection.jl")
+include("tables.jl")
+include("markdown.jl")
+include("repr.jl")
+include("compositors.jl")
+include("grid.jl")
 
 export RenderableText, Panel, TextBox
-export Spacer, vLine, hLine
-export theme, highlight
-export inspect, typestree
+export TERM_THEME, highlight
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
-export install_stacktrace
-export install_term_logger, uninstall_term_logger
-export track
-export Tree
+export install_term_stacktrace,
+    install_term_logger, uninstall_term_logger, install_term_repr
+export vLine, hLine
+export @with_repr, termshow
+export Compositor, update!
+export grid
 
 # ----------------------------------- base ----------------------------------- #
-using .measure: measure
-using .measure: Measure
+using .Measures
 
 # ----------------------------------- style ---------------------------------- #
 
-using .color: NamedColor, BitColor, RGBColor, get_color
+using .Colors: NamedColor, BitColor, RGBColor, get_color
 
-using .style: apply_style
+using .Style: apply_style
 
-using .segment: Segment
+using .Segments: Segment
+
+# -------------------------------- renderables ------------------------------- #
+using .Boxes
+
+using .Consoles: console_height, console_width
+
+using .Renderables: AbstractRenderable, Renderable, RenderableText
+
+using .Layout
+
+using .Panels: Panel, TextBox
+
+# define additional methods for measure functions
+
+Measures.width(seg::Segment) = seg.measure.w
+Measures.width(ren::AbstractRenderable) = ren.measure.w
+
+Measures.height(seg::Segment) = seg.measure.h
+Measures.height(ren::AbstractRenderable) = ren.measure.h
 
 """
     Measure(seg::Segment) 
 
 gives the measure of a segment
 """
-measure.Measure(seg::Segment) = seg.measure
+Measures.Measure(seg::Segment) = seg.measure
 
 """
     Measure(segments::Vector{Segment})
 
 gives the measure of a vector of segments
 """
-function measure.Measure(segments::Vector{Segment})
-    return Measure(
-        max([seg.measure.w for seg in segments]...),
-        sum([seg.measure.h for seg in segments]),
-    )
-end
-
-# -------------------------------- renderables ------------------------------- #
-using .box
-
-using .consoles: Console, console, err_console, console_height, console_width
-
-using .renderables: AbstractRenderable, Renderable, RenderableText
-
-using .layout: Padding, vstack, hstack, Spacer, vLine, hLine, pad
-
-using .panel: Panel, TextBox
-
-# define additional methods for measure functions
-measure.width(text::AbstractString) = Measure(text).w
-measure.width(seg::Segment) = seg.measure.w
-measure.width(ren::AbstractRenderable) = ren.measure.w
-
-measure.height(text::AbstractString) = Measure(text).h
-measure.height(seg::Segment) = seg.measure.h
-measure.height(ren::AbstractRenderable) = ren.measure.h
+Measures.Measure(segments::Vector{Segment}) =
+    Measure(sum(Measures.height.(segments)), maximum(Measures.width.(segments)))
 
 # ---------------------------------- others ---------------------------------- #
-using .errors: install_stacktrace
+using .Errors: install_term_stacktrace
 
-using .logging: install_term_logger, uninstall_term_logger, TermLogger
+using .Logs: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
 
-using .progress: ProgressBar, update, track
+using .Progress: ProgressBar, ProgressJob, with, @track
 
-using .tree: Tree
+using .Trees: Tree
 
-using .introspection: inspect, typestree
+using .Dendograms: Dendogram
 
+using .Introspection: inspect, typestree, expressiontree
+
+using .Tables: Table
+
+using .Compositors: Compositor, update!
+
+using .TermMarkdown: parse_md
+
+using .Repr: @with_repr, termshow, install_term_repr
+
+using .Grid
 
 end

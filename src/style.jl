@@ -1,26 +1,32 @@
-module style
+module Style
+
 import Parameters: @with_kw
 
-import Term: unspace_commas,
-            NAMED_MODES,
-            has_markup,
-            OPEN_TAG_REGEX,
-            replace_text,
-            get_last_ANSI_code,
-            CODES,
-            ANSICode,
-            tview
+import Term:
+    unspace_commas,
+    NAMED_MODES,
+    has_markup,
+    OPEN_TAG_REGEX,
+    replace_text,
+    get_last_ANSI_code,
+    CODES,
+    ANSICode,
+    tview,
+    do_by_line
 
-
-import ..color: AbstractColor,
-            NamedColor,
-            is_color,
-            is_background,
-            get_color,
-            is_hex_color,
-            hex2rgb
+import ..Colors:
+    AbstractColor, NamedColor, is_color, is_background, get_color, is_hex_color, hex2rgb
 
 export apply_style
+
+apply_style(text::String, style::String) =
+    if occursin('\n', text)
+        do_by_line(ln -> apply_style(ln, style), text)
+    else
+        apply_style("{" * style * "}" * text * "{/" * style * "}")
+    end
+
+apply_style(c::Char, style::String) = apply_style(string(c), style)
 
 """
 Check if a string is a mode name
@@ -36,17 +42,17 @@ is_mode(string) = string ∈ NAMED_MODES
 Holds information about the style specification set out by a `MarkupTag`.
 """
 @with_kw mutable struct MarkupStyle
-    default::Bool                               = false
-    bold::Bool                                  = false
-    dim::Bool                                   = false
-    italic::Bool                                = false
-    underline::Bool                             = false
-    blink::Bool                                 = false
-    inverse::Bool                               = false
-    hidden::Bool                                = false
-    striked::Bool                               = false
-    color::Union{Nothing,AbstractColor}         = nothing
-    background::Union{Nothing,AbstractColor}    = nothing
+    default::Bool = false
+    bold::Bool = false
+    dim::Bool = false
+    italic::Bool = false
+    underline::Bool = false
+    blink::Bool = false
+    inverse::Bool = false
+    hidden::Bool = false
+    striked::Bool = false
+    color::Union{Nothing,AbstractColor} = nothing
+    background::Union{Nothing,AbstractColor} = nothing
 end
 
 """
@@ -55,10 +61,8 @@ end
 Builds a MarkupStyle definition from a MarkupTag.
 """
 function MarkupStyle(markup)
-    codes = split(unspace_commas(markup))
-
     style = MarkupStyle()
-    for code in codes
+    for code in split(unspace_commas(markup))
         if is_mode(code)
             setproperty!(style, Symbol(code), true)
         elseif is_color(code)
@@ -66,14 +70,13 @@ function MarkupStyle(markup)
         elseif is_background(code)
             style.background = get_color(code; bg = true)
         elseif code != "nothing"
-            @debug "Code type not recognized: $code" tag tag.markup typeof(code)
+            @debug "Code type not recognized: $code"
         end
     end
     return style
 end
 
 # -------------------------------- apply style ------------------------------- #
-
 
 """
     get_style_codes(style::MarkupStyle)
@@ -85,26 +88,20 @@ function get_style_codes(style::MarkupStyle)
     style_init, style_finish = "", ""
     for attr in fieldnames(MarkupStyle)
         value = getfield(style, attr)
-        # BACKGROUND
         if attr == :background
-            if !isnothing(value)
-                code = ANSICode(value; bg = true)
-            else
-                code = nothing
-            end
-
-            # COLOR
+            code = isnothing(value) ? nothing : ANSICode(value; bg = true)
         elseif attr == :color
             if !isnothing(value)
-                code = ANSICode(value; bg = false)
+                try
+                    code = ANSICode(value; bg = false)
+                catch
+                    continue
+                end
             else
                 code = nothing
             end
-
-            # MODES
-        elseif attr != :tag && value == true
+        elseif attr != :tag && value == true  # MODES
             code = CODES[attr]
-
         else
             if value != false && attr != :tag
                 @debug "Attr/value not recognized or not set" attr value
@@ -136,29 +133,38 @@ function apply_style(text)::String
     while has_markup(text)
         # get opening markup tag
         open_match = match(OPEN_TAG_REGEX, text)
-        markup = open_match.match[2:end-1]
+        markup = open_match.match[2:(end - 1)]
 
         # get style codes
         ansi_open, ansi_close = get_style_codes(MarkupStyle(markup))
 
         # replace markup with ANSI codes
-        text = replace_text(text, max(open_match.offset-1, 0), open_match.offset + length(markup)+1, ansi_open)
+        text = replace_text(
+            text,
+            max(open_match.offset - 1, 0),
+            open_match.offset + length(markup) + 1,
+            ansi_open,
+        )
 
         # get closing tag (including [/] or missing close)
-        close_rx = r"(?<!\[)\[(?!\[)\/" * markup * r"\]"
+        close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
 
         if !occursin(close_rx, text)
-            text = text * "[/" * markup * "]"
+            text = text * "{/" * markup * "}"
         end
-
-        # @assert occursin(close_rx, text) "Did not find closing regex tag for $markup starting at position $(open_match.offset) in '$text'"
         close_match = match(close_rx, text)
 
         # check if there was previous ansi style info
-        prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset-1))
+        prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset - 1))
         prev_style = occursin(prev_style, ansi_close) ? "" : prev_style
+
         # replace close tag
-        text = replace_text(text, close_match.offset-1, close_match.offset + length(markup)+2, ansi_close * prev_style)
+        text = replace_text(
+            text,
+            close_match.offset - 1,
+            close_match.offset + length(markup) + 2,
+            ansi_close * prev_style,
+        )
     end
     return text
 end

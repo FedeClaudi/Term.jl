@@ -1,225 +1,171 @@
-"""
-    _highlight(x)
+import Base.StackTraces: StackFrame
+import MyterialColors: pink, indigo_light
 
-Apply style to `x` based on its type.
-"""
-function _highlight end
-
-_highlight(x::Union{Symbol,AbstractString}) = "[$(theme.symbol)]$x[/$(theme.symbol)]"
-_highlight(x::Number) = "[$(theme.number)]$x[/$(theme.number)]"
-_highlight(x::DataType) = "[$(theme.type) dim]::$(x)[/$(theme.type) dim]"
-_highlight(x::UnitRange) = _highlight(string(x))
-function _highlight(x::Union{AbstractArray,AbstractVector,AbstractMatrix})
-    return "[$(theme.number)]$x[/$(theme.number)]"
-end
-_highlight(x::Function) = "[$(theme.function)]$x[/$(theme.function)]"
-
-function _highlight(x)
-    return _highlight(string(x))
+function render_frame_info(pointer::Ptr{Nothing}; show_source = true)
+    frame = StackTraces.lookup(pointer)[1]
+    return render_frame_info(frame; show_source = show_source)
+    return RenderableText("   " * string(frame); width = default_stacktrace_width() - 12)
 end
 
-"""
-    _highlight_with_type(x)
-
-Apply style to x and and mark its type.
-"""
-_highlight_with_type(x) = "$(_highlight(x))$(_highlight(typeof(x)))"
-
-"""
-    _highlight_numbers(x::AbstractString) 
-
-Add style to each number in a string
-"""
-function _highlight_numbers(x::AbstractString)
-    for match in collect(eachmatch(r"[0-9]", x))
-        x = replace(x, match.match => "[blue]$(match.match)[/blue]")
-    end
-    return x
-end
-
-"""
-    style_error(io::IO, er)
-
-Create a style error panel.
-
-Creates a `Panel` with an error message and optional hints.
-"""
-function style_error(io::IO, er)
-    if haskey(ErrorsExplanations, typeof(er))
-        info_msg = ErrorsExplanations[typeof(er)]
-    else
-        info_msg = nothing
-    end
-
-    WIDTH = _width()
-    main_message, message = error_message(io, er) 
-    # @info "Got styled error" main_message info_msg isnothing(info_msg) typeof(message)
-
-    # create panel and text
-    if !isnothing(info_msg) &&  Measure(message).w > 0
-        panel = Panel(
-            main_message / message,
-            hLine(WIDTH - 8; style = "red dim"),
-            RenderableText(
-                "[bold yellow italic underline]hint:[/bold yellow italic underline] [bright_red]$(typeof(er))[/bright_red] " *
-                info_msg;
-                width = WIDTH - 4,
-            );
-            title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
-            title_style = "default red",
-            style = "dim red",
-            width = WIDTH,
-            title_justify = :left,
-        )
-    else
-        panel = Panel(
-            main_message;
-            title = "ERROR: [bold indian_red]$(typeof(er))[/bold indian_red]",
-            title_style = "default red",
-            style = "dim red",
-            width = WIDTH,
-            title_justify = :left,
-        )
-    end
-    text = RenderableText(
-        "\n[bold indian_red]$(typeof(er)):[/bold indian_red] $main_message"
+function render_frame_info(frame::StackFrame; show_source = true)
+    func = sprint(StackTraces.show_spec_linfo, frame)
+    func = replace(
+        func,
+        r"(?<group>^[^(]+)" =>
+            SubstitutionString("{#ffc44f}" * s"\g<0>" * "{/#ffc44f}"),
     )
+    # func = highlight(reshape_text(func, 70))
+    func = reshape_text(highlight(func), 70) |> remove_markup |> lstrip
 
-    return panel, text
-end
+    # get other information about the function 
+    inline = frame.inlined ? RenderableText("   inlined"; style = "bold dim white") : ""
+    c = frame.from_c ? RenderableText("   from C"; style = "bold dim white") : ""
 
-"""
-    backtrace_subpanel(line::String, WIDTH::Int, title::String)
-
-Create a subpanel for stacktrace, showing source code.
-"""
-function backtrace_subpanel(line::String, WIDTH::Int, title::String)
-    # @info "getting subpanel"
-    # get path to file and line number
-    file = split(split_lines(line)[2], " [bold dim]")[1][13:end]
-    file, lineno = split(file, ":")
-    lineno = parse(Int, lineno)
-    # @info "got file and lines" file lineno
-
-    # read and highlight text
-    code = ""
-    try
-        code = load_code_and_highlight(file, lineno; δ = 2)
-        if length(code) > 0
-            code = TextBox(code; width = WIDTH-10, padding=(0, 0, 0, 0))
-            code = Spacer(8, code.measure.h) * code
+    # get name of module
+    m = Base.parentmodule(frame)
+    if m !== nothing
+        while parentmodule(m) !== m
+            pm = parentmodule(m)
+            pm == Main && break
+            m = pm
         end
-    catch SystemError  # file not found
-        # @warn "Failed to get code"
-        code = ""
     end
+    m = !isnothing(m) ? string(m) : nothing
 
-    # @info "line&code" line code
-    panel = Panel(
-        "\n",
-        chomp(line),
-        code;
-        title = title,
-        fit = true,
-        style = "dim blue",
-        title_style = "default bold bright_yellow",
-    )
-    # @info "Created backtrace subpanel"
-    return panel
-end
-
-"""
-    style_backtrace(io::IO, t::Vector)
-
-Create a Panel with styled error backtrace information.
-"""
-function style_backtrace(io::IO, t::Vector)
-    # @info "styling backtrace"
-    WIDTH = _width()
+    # get other info
+    file = Base.fixup_stdlib_path(string(frame.file))
 
     # create text
-    stack_lines::Vector{String} = []
-    for (n, frame) in enumerate(t)
-        if typeof(frame) ∉ (Ptr, InterpreterIP)
-            func_line = "[light_yellow3]($n)[/light_yellow3] [sky_blue3]$(frame.func)[/sky_blue3]"
-            file_line = "       [dim]$(frame.file):$(frame.line) [bold dim](line: $(frame.line))[/bold dim][/dim]"
-            push!(stack_lines, func_line * "\n" * file_line)
-        end
+    func_line = hstack(func, inline, c; pad = 1)
+
+    if !isnothing(m)
+        func_line /= " {$pink dim}────{/$pink dim} {#9bb3e0}In module {$pink bold}$(m){/$pink bold}  {$pink dim}────{/$pink dim}{/#9bb3e0}"
     end
 
-    # trim excedingly long stack traces
-    if length(stack_lines) > 10
-        stack_lines = vcat(
-            stack_lines[1:5],
-            "\n[dim bright_blue]        ... skipped $(length(stack_lines)-11) levels in stack trace ...\n",
-            stack_lines[(end - 5):end],
+    if length(string(frame.file)) > 0
+        file_line = RenderableText(
+            "{dim}$(file):{bold white}$(frame.line){/bold white}{/dim}";
+            width = default_stacktrace_width() - 12,
         )
-    end
+        out = func_line / file_line
+        if show_source
+            error_source = nothing
+            try
+                error_source = load_code_and_highlight(string(frame.file), frame.line)
+            catch
+                error_source = nothing
+            end
 
-    # create layout
-    # @info "creating stack panels" length(stack_lines)
-    if length(stack_lines) > 0
-        if length(stack_lines) > 1
-            error_line = backtrace_subpanel(stack_lines[1], WIDTH - 8, "error in")
-        else
-            error_line = ""
+            out = if isnothing(error_source) || length(error_source) == 0
+                out
+            else
+                lvstack(
+                    out,
+                    "   " * Panel(
+                        error_source;
+                        fit = true,
+                        style = "white dim",
+                        width = 44,
+                        subtitle_justify = :center,
+                        subtitle = "error line",
+                        subtitle_style = "default white #fa6673",
+                    );
+                    pad = 1,
+                )
+            end
         end
-
-        # @info "error line ready" error_line length(stack_lines)
-        if length(stack_lines) > 3
-            above = TextBox(join(stack_lines[2:(end - 1)], "\n"); width = WIDTH - 8)
-        elseif length(stack_lines) > 2
-            above = TextBox(stack_lines[2]; width = WIDTH - 8)
-        else
-            above = ""
-        end
-        # @info "above ready"
-
-        offending = backtrace_subpanel(stack_lines[end], WIDTH - 8, "caused by")
-        # @info "offending ready" offending
-        stack = error_line / above / offending
-        # @info "stacked" stack
+        return out
     else
-        stack = "[dim]No stack trace[/dim]"
-    end
-
-    # create output
-    # @info "creating panel"
-    try
-        panel = Panel(
-            stack;
-            title = "StackTrace",
-            style = "yellow dim",
-            title_style = "default yellow",
-            title_justify = :left,
-            width = WIDTH,
-        )
-        # @info "panel ready"
-        return panel
-    catch err
-        @warn "failed to crate panel" err
-        println(stack)
-        return stack
+        return RenderableText("   " * func; width = default_stacktrace_width() - 4)
     end
 end
 
-"""
-    style_stacktrace_simple(stack::Vector)
-
-Simply style a stacktrace. Just adding a miniumum of color.
-"""
-function style_stacktrace_simple(stack::Vector)
-    lines::Vector{String} = []
-    for (n, frame) in enumerate(stack)
-        if typeof(frame) ∉ (Ptr.Ptr{Nothing}, InterpreterIP)
-            push!(
-                lines,
-                apply_style(
-                    "[bright_blue dim]($n)[/bright_blue dim] [yellow]$(frame.func)[/yellow] - [dim]$(line.file):$(line.line)[/dim]",
-                ),
-            )
-        end
+function render_backtrace_frame(
+    num::RenderableText,
+    info::AbstractRenderable;
+    as_panel = true,
+    kwargs...,
+)
+    content = hstack(num, info, pad = 2)
+    p = if as_panel
+        Panel(
+            content;
+            padding = (2, 2, 1, 1),
+            style = "#9bb3e0",
+            fit = true,
+            width = default_stacktrace_width() - 20,
+            kwargs...,
+        )
+    else
+        "   " * content
     end
 
-    return join(lines, "\n")
+    return p / " "
+end
+
+function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 30)
+    length(bt) == 0 && return RenderableText("")
+
+    if reverse_backtrace
+        bt = reverse(bt)
+    end
+
+    content::Vector = []
+    added_skipped_message = false
+    N = length(bt)
+    for (num, frame) in enumerate(bt)
+        numren = RenderableText("($(num))"; style = "#52c4ff bold dim")
+        info = render_frame_info(frame; show_source = num in (1, length(bt)))
+
+        if num == 1
+            push!(
+                content,
+                render_backtrace_frame(
+                    numren,
+                    info;
+                    subtitle = reverse_backtrace ? "TOP LEVEL" : "ERROR LINE",
+                    subtitle_style = reverse_backtrace ? "white" : "bold white",
+                    subtitle_justify = :right,
+                ),
+            )
+
+        elseif num == length(bt)
+            push!(
+                content,
+                render_backtrace_frame(
+                    numren,
+                    info;
+                    subtitle = reverse_backtrace ? "ERROR LINE" : "TOP LEVEL",
+                    subtitle_style = reverse_backtrace ? "bold white" : "white",
+                    subtitle_justify = :right,
+                ),
+            )
+
+        else
+            if num > max_n_frames && num < length(bt) - 5
+                if added_skipped_message == false
+                    skipped_line = hLine(
+                        content[1].measure.w,
+                        "{blue dim bold}$(N - max_n_frames - 2){/blue dim bold}{blue dim} frames skipped{/blue dim}";
+                        style = "blue dim",
+                    )
+                    push!(content, skipped_line)
+                    added_skipped_message = true
+                end
+            else
+                push!(content, render_backtrace_frame(numren, info; as_panel = false))
+            end
+        end
+    end
+    return Panel(
+        lvstack(content...);
+        padding = (2, 2, 2, 1),
+        subtitle = "Error Stack",
+        style = "#ff8a4f dim",
+        subtitle_style = "bold #ff8a4f default",
+        title = "Error Stack",
+        title_style = "bold #ff8a4f default",
+        fit = true,
+        width = default_stacktrace_width(),
+    )
 end

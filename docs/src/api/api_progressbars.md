@@ -1,7 +1,7 @@
 # ProgressBars
 
 ```@meta
-CurrentModule = Term.progress
+CurrentModule = Term.Progress
 ```
 
 
@@ -10,5 +10,5 @@ Pages   = ["api_progress.md"]
 ```
 
 ```@autodocs
-Modules = [progress]
+Modules = [Progress]
 ```
