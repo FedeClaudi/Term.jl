@@ -213,7 +213,6 @@ function get_title_row(
         line =
             open *
             get_lrow(box, lw - tl, row) *
-            close *
             title *
             get_rrow(box, rw - tr, row) *
             close

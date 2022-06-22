@@ -32,15 +32,17 @@ function style_at_each_line(text)
     for (i, line) in enumerate(lines)
         for tag in eachmatch(OPEN_TAG_REGEX, line)
             markup = tag.match[2:(end - 1)]
-            close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
-            close_tag = match(close_rx, text)
+            # close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
+            # close_tag = match(close_rx, line)
+            isclosed = occursin("{/"*markup*"}", line)
+            # @info "isclosed", isclosed
 
-            if isnothing(close_tag) && i < length(lines)
+            if !isclosed && i < length(lines)
                 lines[i + 1] = "{$markup}" * lines[i + 1]
             end
         end
     end
-    return join(lines, '\n')
+    return join(lines, "\e[0m\n")
 end
 
 """
@@ -141,4 +143,5 @@ function reshape_text(text::AbstractString, width::Int)
 
     out = apply_style(style_at_each_line(String(chars)))
     # do_by_line(ln -> ln * "\e[0m", out)
+    # String(chars)
 end
