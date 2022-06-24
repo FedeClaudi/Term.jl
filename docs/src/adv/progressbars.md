@@ -6,8 +6,8 @@
 
 
 ## Overview
-Progress bars! We all love progress bars, and julia has some great [progress bars](https://juliapackages.com/p/progressbars) packages. 
-But this is `Term`, and `Term` too has its own progress bars API. We think you'll like it. If not, worry not! `Term`'s progress bars play well `ProgressLogging.jl`, scroll to the bottomof this page!
+Progress bars! We all love progress bars, and Julia has some great [progress bars](https://juliapackages.com/p/progressbars) packages. 
+But this is `Term`, and `Term` too has its own progress bars API. We think you'll like it. If not, worry not! `Term`'s progress bars play well `ProgressLogging.jl`, scroll to the bottom of this page!
 
 !!! warning
     Progress bars do some terminal magic that doesn't play well with how the docs are rendered here. If you want to see what progress bars actually look like, 
@@ -42,7 +42,7 @@ and then we add a "job"
 job = addjob!(pbar; N=5)
 ```
 
-what's that? `Term`'s `ProgressBar`s can handle multiple "jobs" simultaneously. So if you have multiple things you want to keep track of (e.g. multiple nested loops), you can have a job for each. Next we start the peogress bar:
+what's that? `Term`'s `ProgressBar`s can handle multiple "jobs" simultaneously. So if you have multiple things you want to keep track of (e.g. multiple nested loops), you can have a job for each. Next we start the progress bar:
 ```Julia
 start!(pbar)
 ```
@@ -79,9 +79,9 @@ end
 !!! info "`println` vs `print`"
     You'll notice we've used `println` in the example above. Currently, using `print` will break the layout and the text won't be printed correctly. Please use `println` while using `ProgressBar`!
 
-`with` takes care of it all. It starts the progress bar and stops it too! No matter what happens in the code inside the `do` block, `with` will stop the progress bar so we can use it with no fear. It also removes the need to explicitly call `start!/stop!`, which helps. We recomend that you always use `with`. 
+`with` takes care of it all. It starts the progress bar and stops it too! No matter what happens in the code inside the `do` block, `with` will stop the progress bar so we can use it with no fear. It also removes the need to explicitly call `start!/stop!`, which helps. We recommend that you always use `with`. 
 
-So with `with` we loose some of the boiler plate, but it's still a bit too much isn'it? It's cool if you
+So with `with` we loose some of the boiler plate, but it's still a bit too much isn't it? It's cool if you
 need something specific, but if you want a simple progress bar to monitor progress in a loop perhaps you want something simpler. That's where `@track` comes in:
 
 ```@example prog
@@ -109,7 +109,7 @@ with(pbar) do
 end
 ```
 
-What's up witht that `columns=:spinner`? Read below. By the way, there's a few different kind of spinners
+What's up with that `columns=:spinner`? Read below. By the way, there's a few different kind of spinners
 
 ```@example prog
 import Term.Progress: SPINNERS
@@ -250,7 +250,7 @@ The loop above will render a progress bar for each iteration of the outer loop, 
 
 
 ## ProgressLogging
-I know that some of you will be thinking: hold on, Julia already had a perfectly functioning progress API with `ProgressLogging.jl`, can't we just use that? Long story short, yes you can. But `Term`'s API gives you so much more control over what kind information to display and what it should look like. Nonetheless, many of you will want to use `ProgressLogging` in conjuction with Term, so we've made it possible, you just need to use Term's logger (see [Logger](@ref LoggingDoc)):
+I know that some of you will be thinking: hold on, Julia already had a perfectly functioning progress API with `ProgressLogging.jl`, can't we just use that? Long story short, yes you can. But `Term`'s API gives you so much more control over what kind information to display and what it should look like. Nonetheless, many of you will want to use `ProgressLogging` in conjunction with Term, so we've made it possible, you just need to use Term's logger (see [Logger](@ref LoggingDoc)):
 
 
 ```Julia

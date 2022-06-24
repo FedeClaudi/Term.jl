@@ -33,7 +33,7 @@ Table(data; header_style=["bold green", "dim"])
 ```
 
 
-you can also set what the hader should be and if it should be left-center-right justified:
+you can also set what the header should be and if it should be left-center-right justified:
 ```@example tb
 Table(data; header=["A", "B"], header_justify=[:left, :right])
 ```
@@ -78,7 +78,7 @@ Table(data; vertical_justify= :bottom)
 ```
 
 ### Padding
-Fially, you can use `hpad` and `vpad` to adjust the padding of the table:
+Finally, you can use `hpad` and `vpad` to adjust the padding of the table:
 ```@example tb
 t = 1:3
 data = hcat(t, rand(Int8, length(t)))

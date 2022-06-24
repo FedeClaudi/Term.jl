@@ -12,7 +12,7 @@ structured visual displays in your terminal.
 
 
 !!! warning "Version 1.0"
-    If you're an early adopter of Term, I have some bad news for you (and some good). Version `1.0` introduces some breaking changes. I know, I know. But it's worth it I promise, it also has a ton of new features and improvements. The main thing you need to look out for is the markup syntax. Instead of `[...] content [/...]` now you need to use `{...} content {/...}`. That's right, curly braces instad of square. It's not a huge change!
+    If you're an early adopter of Term, I have some bad news for you (and some good). Version `1.0` introduces some breaking changes. I know, I know. But it's worth it I promise, it also has a ton of new features and improvements. The main thing you need to look out for is the markup syntax. Instead of `[...] content [/...]` now you need to use `{...} content {/...}`. That's right, curly braces instead of square. It's not a huge change!
 
 !!! warning "OS concerns"
     `Term` has been tested extensively so far, but only on Mac. If you're using a Linux or Windows machine you might find some bugs that have eluded us so far. Please get in touch so that we can fix them!

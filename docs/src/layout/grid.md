@@ -23,7 +23,7 @@ grid(panels; pad=2)  # specify padding
 grid(panels; pad=(8, 1))  # hpad & vpad
 ```
 
-You can also specify the apsect ratio of the grid:
+You can also specify the aspect ratio of the grid:
 ```@example grid
 grid(panels; aspect=1)
 ```

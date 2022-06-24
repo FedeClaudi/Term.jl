@@ -135,7 +135,7 @@ Alternatively, you can use `fit=false`.
 ```@example panel
 Panel("."^10; fit=false)
 ```
-this will make all panels have the same width (uless you specify a width). The main difference is that if the content is larger than the panel, it will be truncated, which is not what happens if `fit=true`"
+this will make all panels have the same width (unless you specify a width). The main difference is that if the content is larger than the panel, it will be truncated, which is not what happens if `fit=true`"
 ```@example panel
 p1 = Panel("."^10; height=5, width=60)
 print(Panel(p1; height=2, width=30))  # fit=true -> expand out panel, width/height ignored
