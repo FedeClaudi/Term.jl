@@ -1,6 +1,6 @@
 # Layout renderables
 
-In this section we'll look at a few renderable types that are useful layout elements: they can be used to insert lines to demarkate different section, create some space or even as place holders for when you want to create a layout but don't have some content yet. 
+In this section we'll look at a few renderable types that are useful layout elements: they can be used to insert lines to demarcate different section, create some space or even as place holders for when you want to create a layout but don't have some content yet. 
 
 !!! note "Layout syntax"
     Here we make use of the layout operators `*` and `/` to horizontally and vertically stack renderables. Have a look at the `Layout` section for more details!

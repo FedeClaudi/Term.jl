@@ -85,14 +85,14 @@ tprint(
 that's right, `Term.jl` can also color the background of your text (by adding `on_C` to your color `C` you set it as the background, see `colors` page). As you can see you can pass multiple style information tags as space separated words within the `"{...}"`. Also, you might have noticed, `Term` can also handle nested style tags!
 
 !!! info "Where did my brackets go!?!?"
-    Perhaps you've tried something like `tprint("This is {my} text")` and got suprised when the output was `"This is text"`. If so, read on. What happend there is that `Term.jl` interprets anything with single squared parentheses (`{...}`) as style information
+    Perhaps you've tried something like `tprint("This is {my} text")` and got surprised when the output was `"This is text"`. If so, read on. What happened there is that `Term.jl` interprets anything with single squared parentheses (`{...}`) as style information
     and removes that from your text output. So in the example it treated `{my}` as a markup style tag and removed it from the text, but `my` is not a valid style so it was ultimately ignored. If you want to use `[]` in your text, you simply need to use double brackets: `tprint("This is {{my}} text")` will print `"This is {my} text"` as expected. 
 
 
 If you just want to **use** `Term.jl`'s style functionality, just make sure to read the admonition below. If you're curious about what's happening under the hood, read on below!
 
 !!! warning "A note on style tags"
-    The style tags used by `Term.jl` have an opening `"{style}"` and closing `"{/style}"` syntax. The style is applied to everything inbetween. For `"{/style]"` to close `"{style]"` the text in the parentheses must match exactly (excuding `/`), up to the number and position of spaces and the words order. So:
+    The style tags used by `Term.jl` have an opening `"{style}"` and closing `"{/style}"` syntax. The style is applied to everything in between. For `"{/style]"` to close `"{style]"` the text in the parentheses must match exactly (excuding `/`), up to the number and position of spaces and the words order. So:
     ```julia
     "{red} wohoo {/red}"  # works
     "{red} wohoo {/red }" # doesn't
@@ -111,7 +111,7 @@ If you just want to **use** `Term.jl`'s style functionality, just make sure to r
 
 
 ## Highlighting
-Term provides a higlighting functionality to automatically style text (e.g. coloring numbers, code snippets etc.) The usage is very simple
+Term provides a highlighting functionality to automatically style text (e.g. coloring numbers, code snippets etc.) The usage is very simple
 ```@example h
 import Term: load_code_and_highlight, highlight_syntax, highlight, tprint
 
