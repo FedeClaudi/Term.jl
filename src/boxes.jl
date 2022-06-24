@@ -211,11 +211,7 @@ function get_title_row(
         tl, tr = get_lr_widths(textlen(title))
         lw, rw = get_lr_widths(width)
         line =
-            open *
-            get_lrow(box, lw - tl, row) *
-            title *
-            get_rrow(box, rw - tr, row) *
-            close
+            open * get_lrow(box, lw - tl, row) * title * get_rrow(box, rw - tr, row) * close
         return Segment(line * "\e[0m")
     end
 end

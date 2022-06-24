@@ -34,7 +34,7 @@ function style_at_each_line(text)
             markup = tag.match[2:(end - 1)]
             # close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
             # close_tag = match(close_rx, line)
-            isclosed = occursin("{/"*markup*"}", line)
+            isclosed = occursin("{/" * markup * "}", line)
             # @info "isclosed", isclosed
 
             if !isclosed && i < length(lines)
