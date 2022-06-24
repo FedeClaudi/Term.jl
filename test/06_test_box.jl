@@ -73,7 +73,8 @@ import Term: Segment
         style = "red",
     )
     @test center.measure.w == 22
-    @test center.text == "\e[31m╭───────\e[39m \e[34mtest\e[39m\e[31m ───────╮\e[39m\e[0m"
+    @test center.text ==
+          "\e[31m╭─────── \e[34mtest\e[39m\e[31m\e[31m ───────╮\e[39m\e[0m\e[39m\e[31m"
 
     for width in (15, 21, 33, 58), justify in (:left, :center, :right)
         line = get_title_row(

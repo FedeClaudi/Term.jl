@@ -1,17 +1,17 @@
-This is an example of markdown content rendered in Term.jl. 
-You can use markdown syntax to make words [1mbold[22m and [3mitalic[23m[22m 
-or insert [38;2;255;245;157m[3m`[39m[22m[23m[38;2;255;245;157m[38;2;222;222;222mliterals[39m[38;2;255;245;157m[3m`[39m[23m[38;2;255;245;157m.[0m
+This is an example of markdown content rendered in Term.jl. [0m
+You can use markdown syntax to make words [1mbold[22m[0m and [3mitalic[23m[0m [0m
+or insert [38;2;255;245;157m[3m`[39m[0m[23m[38;2;255;245;157m[38;2;222;222;222mliterals[39m[38;2;255;245;157m[3m`[39m[23m[38;2;255;245;157m.[0m
 
-You markdown can include in-line latex [38;2;255;245;157m[3mŁaTeX  
-frac{{1}}{{2}}[39m[23m[38;2;255;245;157m and maths in a new line too:[0m
+You markdown can include in-line latex [38;2;255;245;157m[3mŁaTeX  [0m
+[3m[38;2;255;245;157mfrac{{1}}{{2}}[39m[23m[38;2;255;245;157m and maths in a new line too:[23m[0m[39m[3m[0m
 
 
-     [38;2;255;245;157m[3mf(a) = \frac{2\pi}\int_^{2\pi} 
-(\alpha+R\cos(\theta))d\theta[39m[23m[38;2;255;245;157m[3m[3m[3m[3m
+     [38;2;255;245;157m[3mf(a) = \frac{2\pi}\int_^{2\pi} [0m
+[3m[38;2;255;245;157m(\alpha+R\cos(\theta))d\theta[39m[23m[38;2;255;245;157m[3m[3m[0m[0m[23m[0m[39m[3m
 [0m
 
-You can also have links: [37m[1mJulia[39m[22m[37m [2m(http://www.julialang.org)[22m[37m 
-and footnotes [38;2;154;172;219m[1][39m[37m for your content [38;2;154;172;219m[named][39m[37m.[0m
+You can also have links: [37m[1mJulia[39m[22m[37m [2m(http://www.julialang.org)[22m[37m [0m
+and footnotes [38;2;154;172;219m[1][39m[0m for your content [38;2;154;172;219m[named][39m[0m.[0m
 
 And, of course, you can show some code too:[0m
 
@@ -25,12 +25,12 @@ And, of course, you can show some code too:[0m
 
 You can use "quotes" to highlight a section:[0m
 
-  [38;2;90;116;242m>[39m [1m[37m“[22m[39mMulti-line quotes can be helpful to make a  paragram stand 
-  [2m[38;2;107;119;176m┃[22m[39m[0m out, so that users                                          
-  [2m[38;2;107;119;176m┃[22m[39m[0m won't miss it! You can use [1mother inline syntax[22m in you       
-  [2m[38;2;107;119;176m┃[22m[39m[0m [38;2;255;245;157m[3m`[39m[22m[23m[38;2;255;245;157m[38;2;222;222;222mquotes[39m[38;2;255;245;157m[3m`[39m[23m[38;2;255;245;157m too.[0m[1m[37m”[22m[39m[0m[0m                                              
+  [38;2;90;116;242m>[39m [1m[37m“[22m[39mMulti-line quotes can be helpful to make a  paragram stand [0m
+  [2m[38;2;107;119;176m┃[22m[39m[0m out, so that users won't miss it! You can use [1mother inline [0m 
+  [2m[38;2;107;119;176m┃[22m[39m[0m syntax[22m in you [0m                                              
+  [2m[38;2;107;119;176m┃[22m[39m[0m [38;2;255;245;157m[3m`[39m[0m[23m[38;2;255;245;157m[38;2;222;222;222mquotes[39m[38;2;255;245;157m[3m`[39m[23m[38;2;255;245;157m too.[0m[1m[37m”[22m[39m[0m[0m                                              
 
-but if you really need to grab someone's attention, use 
+but if you really need to grab someone's attention, use [0m
 admonitions:[0m
 
     [2m[34m╭──── [22m[34mNote[22m[39m[34m[2m[34m ────────────────────────────────────────────╮[22m[39m[0m[22m[39m[34m
@@ -46,7 +46,7 @@ admonitions:[0m
     [2m[31m╰──────────────────────────────────────────────────────╯[22m[39m[0m
 
     [2m[32m╭──── [22m[32mWow![22m[39m[32m[2m[32m ────────────────────────────────────────────╮[22m[39m[0m[22m[39m[32m
-    [0m[2m[32m│[22m[39m[0m  Turns out that admonitions can be pretty useful!    [0m[2m[32m│[22m[39m[0m
+    [0m[2m[32m│[22m[39m[0m  Turns out that admonitions can be pretty useful! [0m   [0m[2m[32m│[22m[39m[0m
     [0m[2m[32m│[22m[39m[0m  What will you use them for?[0m                         [0m[2m[32m│[22m[39m[0m
     [2m[32m╰──────────────────────────────────────────────────────╯[22m[39m[0m
 
@@ -70,10 +70,11 @@ and ordered lists too:[0m
 
 
     [2m[34m╭──── [22m[34mTables[22m[39m[34m[2m[34m ──────────────────────────────────────────╮[22m[39m[0m[22m[39m[34m
-    [0m[2m[34m│[22m[39m[0m  You can use the [37m[1mMarkdown table syntax[39m[22m[37m               [0m[2m[34m│[22m[39m[0m
-    [0m[2m[34m│[22m[39m[0m  [2m(https://www.markdownguide.org/extended-syntax/     [0m[2m[34m│[22m[39m[0m
-    [0m[2m[34m│[22m[39m[0m  #tables)[22m[37m to insert tables -                         [0m[2m[34m│[22m[39m[0m
-    [0m[2m[34m│[22m[39m[0m  Term.jl will convert them to Table object![0m          [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  You can use the [37m[1mMarkdown table syntax[39m[22m[37m [0m              [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  [2m(https://www.markdownguide.org/extended-syntax/[0m     [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  #tables)[22m[37m to insert tables - Term.jl will [0m           [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  convert [0m                                            [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  them to Table object![0m                               [0m[2m[34m│[22m[39m[0m
     [2m[34m╰──────────────────────────────────────────────────────╯[22m[39m[0m
 
          [2m╭───────────┬──────────────┬────────────╮[22m          
@@ -90,5 +91,5 @@ This is where you print the content of your foot notes:[0m
 
 [38;2;154;172;219m[1][39m: Numbered footnote text.[0m
 
-[38;2;154;172;219m[note][39m: Named footnote text containing several toplevel 
+[38;2;154;172;219m[note][39m: Named footnote text containing several toplevel [0m
 elements.[0m                                               
