@@ -44,21 +44,19 @@ function termshow end
 Generic method for any object not caught my dedicated methods.
 Creates a `Panel` with the object's fields and contents.
 """
-function termshow(io::IO, obj)
-    return print(
-        io,
-        Panel(
-            repr_get_obj_fields_display(obj);
-            fit = true,
-            subtitle = escape_brackets(string(typeof(obj))),
-            subtitle_justify = :right,
-            width = 40,
-            justify = :center,
-            style = TERM_THEME[].repr_panel_style,
-            subtitle_style = TERM_THEME[].repr_name_style,
-        ),
-    )
-end
+termshow(io::IO, obj) = print(
+    io,
+    Panel(
+        repr_get_obj_fields_display(obj);
+        fit = true,
+        subtitle = escape_brackets(string(typeof(obj))),
+        subtitle_justify = :right,
+        width = 40,
+        justify = :center,
+        style = TERM_THEME[].repr_panel_style,
+        subtitle_style = TERM_THEME[].repr_name_style,
+    ),
+)
 
 termshow(obj; kwargs...) = termshow(stdout, obj; kwargs...)
 
@@ -130,9 +128,9 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
         push!(vals, RenderableText("⋮"; style = theme.repr_values_style))
         push!(vtypes, RenderableText("⋮"; style = theme.repr_type_style * " dim"))
 
-        vstack(RenderableText.(repeat(["=>"], length(k) - 1); style = "red bold")...)
+        vstack(RenderableText.(fill("=>", length(k) - 1); style = "red bold")...)
     else
-        vstack(RenderableText.(repeat(["=>"], length(k)); style = "red bold")...)
+        vstack(RenderableText.(fill("=>", length(k)); style = "red bold")...)
     end
 
     # prepare other renderables

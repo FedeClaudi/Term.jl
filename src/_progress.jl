@@ -333,9 +333,9 @@ end
 # ---------------------------------------------------------------------------- #
 
 function get_columns(columnsset::Symbol)::Vector{DataType}
-    return if columnsset == :minimal
+    return if columnsset ≡ :minimal
         [DescriptionColumn, ProgressColumn]
-    elseif columnsset == :default
+    elseif columnsset ≡ :default
         [
             DescriptionColumn,
             SeparatorColumn,
@@ -344,9 +344,9 @@ function get_columns(columnsset::Symbol)::Vector{DataType}
             CompletedColumn,
             PercentageColumn,
         ]
-    elseif columnsset == :spinner
+    elseif columnsset ≡ :spinner
         [DescriptionColumn, SpaceColumn, SpinnerColumn, SpaceColumn, CompletedColumn]
-    elseif columnsset == :detailed
+    elseif columnsset ≡ :detailed
         # extensive
         [
             DescriptionColumn,

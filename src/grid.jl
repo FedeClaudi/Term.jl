@@ -16,7 +16,7 @@ include("_compositor.jl")
 
 """
     grid(
-        rens::Union{AbstractVector,NamedTuple};
+        rens::Union{Tuple,AbstractVector,NamedTuple};
         placeholder::Union{Nothing,AbstractRenderable} = nothing,
         placeholder_size::Union{Nothing,Tuple} = nothing,
         aspect::Union{Nothing,Number,NTuple} = nothing,
@@ -31,7 +31,7 @@ layout (number of rows, number of columns, or one left free with `nothing`).
 Complex layout is supported using compositor expressions.
 """
 function grid(
-    rens::Union{AbstractVector,NamedTuple};
+    rens::Union{Tuple,AbstractVector,NamedTuple};
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
     placeholder_size::Union{Nothing,Tuple} = nothing,
     aspect::Union{Nothing,Number,NTuple} = nothing,
@@ -41,7 +41,13 @@ function grid(
 )
     ph_style = show_placeholder ? "" : "hidden"
 
-    rens_seq = rens isa NamedTuple ? collect(values(rens)) : rens
+    rens_seq = if rens isa NamedTuple
+        collect(values(rens))
+    elseif rens isa Tuple
+        collect(rens)
+    else
+        rens
+    end
 
     if layout isa Expr
         sizes = size.(rens_seq)
@@ -52,7 +58,7 @@ function grid(
         kw = Dict{Symbol,Any}()
         n = 0
         for (i, e) in enumerate(get_elements_and_sizes(layout; placeholder_size = ph_size))
-            kw[nm] = if (nm = e.args[1]) === :_
+            kw[nm] = if (nm = e.args[1]) ≡ :_
                 compositor_placeholder(nm, ph_size..., ph_style)
             elseif haskey(kw, nm)
                 kw[nm]  # repeated element
@@ -76,7 +82,7 @@ function grid(
         r == 0 || (ncols += 1)
     end
     fill_in = something(placeholder, PlaceHolder(first(rens); style = ph_style))
-    rens_all = vcat(rens_seq, repeat([fill_in], nrows * ncols - length(rens)))
+    rens_all = vcat(rens_seq, fill(fill_in, nrows * ncols - length(rens)))
     return grid(reshape(rens_all, nrows, ncols); pad = pad)
 end
 
@@ -121,7 +127,7 @@ function grid(rens::AbstractMatrix; pad::Union{Tuple,Integer} = 0)
         col in eachrow(rens)
     )
     if vpad > 0
-        vspace = vpad > 1 ? vstack(repeat([" "], vpad)...) : " "
+        vspace = vpad > 1 ? vstack(fill(" ", vpad)...) : " "
         cat = (a, b) -> a / vspace / b
     else
         cat = (a, b) -> a / b

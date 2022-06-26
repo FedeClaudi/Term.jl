@@ -97,8 +97,9 @@ end
     @test size(grid(panels[1:9]).measure) == (3h, 3w)  # 9 best fits onto a (3, 3) grid with unit ar
 end
 
-@testset "Grid - named tuple" begin
+@testset "Grid - types" begin
     @test grid((a = Panel(), b = Panel())) isa Renderable
+    @test grid((Panel(), Panel())) isa Renderable
 end
 
 @testset "Grid - complex layout" begin
