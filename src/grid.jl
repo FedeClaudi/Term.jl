@@ -21,14 +21,28 @@ include("_compositor.jl")
         placeholder_size::Union{Nothing,Tuple} = nothing,
         aspect::Union{Nothing,Number,NTuple} = nothing,
         layout::Union{Nothing,Tuple,Expr} = nothing,
+        show_placeholder::Bool = false,
         pad::Union{Tuple,Integer} = 0,
+        order::Symbol = :row,
     )
 
-Construct a grid from an `AbstractVector`.
+# Description
+
+Construct a grid from an iterable (`AbstractVector`, `Tuple`, `NamedTuple`).
 
 Lays out the renderables to create a grid with the desired aspect ratio or
 layout (number of rows, number of columns, or one left free with `nothing`).
 Complex layout is supported using compositor expressions.
+
+# Arguments
+
+`placeholder`: placeholder for empty grid components.
+`placeholder_size`: size of the auto-placeholder.
+`aspect`: target grid aspect ratio.
+`layout`: tuple (rows, cols) final size or complex expression.
+`show_placeholder`: display/hide placeholder(s).
+`pad`: additional padding between layout components.
+`order`: `:row` for row major input iteration (default) or `:col` for column major.
 """
 function grid(
     rens::Union{Tuple,AbstractVector,NamedTuple};
@@ -38,9 +52,8 @@ function grid(
     layout::Union{Nothing,Tuple,Expr} = nothing,
     show_placeholder::Bool = false,
     pad::Union{Tuple,Integer} = 0,
+    order::Symbol = :row,
 )
-    ph_style = show_placeholder ? "" : "hidden"
-
     rens_seq = if rens isa NamedTuple
         collect(values(rens))
     elseif rens isa Tuple
@@ -48,6 +61,8 @@ function grid(
     else
         rens
     end
+
+    ph_style = show_placeholder ? "" : "hidden"
 
     if layout isa Expr
         sizes = size.(rens_seq)
@@ -81,9 +96,19 @@ function grid(
         ncols, r = divrem(length(rens), nrows)
         r == 0 || (ncols += 1)
     end
+
     fill_in = something(placeholder, PlaceHolder(first(rens); style = ph_style))
     rens_all = vcat(rens_seq, fill(fill_in, nrows * ncols - length(rens)))
-    return grid(reshape(rens_all, nrows, ncols); pad = pad)
+
+    sz, permute = if order ≡ :row
+        (ncols, nrows), true
+    elseif order ≡ :col
+        (nrows, ncols), false
+    else
+        throw(ArgumentError("`$order` not understood"))
+    end
+
+    return grid(reshape(rens_all, sz...) |> (permute ? permutedims : identity); pad = pad)
 end
 
 """
@@ -112,7 +137,7 @@ function grid(
 end
 
 """
-    grid(rens::AbstractMatrix; pad::Union{Nothing,Integer} = 0))
+    grid(rens::AbstractMatrix; pad::Union{Tuple,Integer} = 0))
 
 Construct a grid from an `AbstractMatrix`.
 """
