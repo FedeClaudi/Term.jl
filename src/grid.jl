@@ -16,7 +16,7 @@ include("_compositor.jl")
 
 """
     grid(
-        rens::Union{Tuple,AbstractVector,NamedTuple};
+        rens::Union{AbstractVector,Tuple,NamedTuple};
         placeholder::Union{Nothing,AbstractRenderable} = nothing,
         placeholder_size::Union{Nothing,Tuple} = nothing,
         aspect::Union{Nothing,Number,NTuple} = nothing,
@@ -45,7 +45,7 @@ Complex layout is supported using compositor expressions.
 `order`: `:row` for row major input iteration (default) or `:col` for column major.
 """
 function grid(
-    rens::Union{Tuple,AbstractVector,NamedTuple};
+    rens::Union{AbstractVector,Tuple,NamedTuple};
     placeholder::Union{Nothing,AbstractRenderable} = nothing,
     placeholder_size::Union{Nothing,Tuple} = nothing,
     aspect::Union{Nothing,Number,NTuple} = nothing,
