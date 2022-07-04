@@ -1,11 +1,8 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 
-function render_frame_info(pointer::Ptr{Nothing}; show_source = true)
-    frame = StackTraces.lookup(pointer)[1]
-    return render_frame_info(frame; show_source = show_source)
-    return RenderableText("   " * string(frame); width = default_stacktrace_width() - 12)
-end
+render_frame_info(pointer::Union{Ptr{Nothing},Base.InterpreterIP}; show_source = true) =
+    render_frame_info(first(StackTraces.lookup(pointer)); show_source = show_source)
 
 function render_frame_info(frame::StackFrame; show_source = true)
     func = sprint(StackTraces.show_spec_linfo, frame)

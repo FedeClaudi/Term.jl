@@ -326,7 +326,7 @@ function render(
 )::Panel
 
     # create top/bottom rows with titles
-    box = eval(box)  # get box object from symbol
+    box = BOXES[box]  # get box object from symbol
     top = get_title_row(
         :top,
         box,
@@ -353,17 +353,9 @@ function render(
 
     # get an empty padding line
     empty = if isnothing(background)
-        [Segment(left * " "^(panel_measure.w - 2) * right;)]
+        [Segment(left * " "^(panel_measure.w - 2) * right)]
     else
-        [
-            Segment(
-                left *
-                "{$background}" *
-                " "^(panel_measure.w - 2) *
-                "{/$background}" *
-                right;
-            ),
-        ]
+        [Segment(left * "{$background}" * " "^(panel_measure.w - 2) * "{/$background}" * right)]
     end
 
     # add lines with content fn
@@ -383,24 +375,23 @@ function render(
     end
 
     # create segments
-    initial_segments::Vector{Segment} = [
+    initial_segments = Segment[
         top,                                        # top border
         repeat(empty, padding.top)...,              # top padding
     ]
 
     # content
-    content_sgs::Vector{Segment} =
-        content.measure.w > 0 ? map(s -> makecontent_line(s.text), content.segments) : []
+    content_sgs =
+        content.measure.w > 0 ? map(s -> makecontent_line(s.text), content.segments) :
+        Segment[]
 
-    final_segments::Vector{Segment} = [
+    final_segments = Segment[
         repeat(empty, n_extra)...,                  # lines to reach target height
         repeat(empty, padding.bottom)...,           # bottom padding
         bottom * "\e[0m",                           # bottom border
     ]
 
-    segments = vcat(initial_segments, content_sgs, final_segments)
-
-    return Panel(segments, panel_measure)
+    return Panel(vcat(initial_segments, content_sgs, final_segments), panel_measure)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -418,8 +409,8 @@ TextBox(args...; kwargs...) = Panel(args...; box = get(kwargs, :box, :NONE), kwa
 
 Trim a string or renderable to a max width.
 """
-function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::Int)
-    return if ren isa AbstractString || ren isa RenderableText
+trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::Int) =
+    if ren isa AbstractString || ren isa RenderableText
         ren = ren isa RenderableText ? join(getfield.(ren.segments, :text), "\n") : ren
         reshape_text(ren, width)
     else
@@ -430,6 +421,5 @@ function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::I
         )
         lvstack(segs)
     end
-end
 
 end

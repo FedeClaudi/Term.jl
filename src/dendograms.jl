@@ -3,7 +3,7 @@ module Dendograms
 import Term: fint, rint, cint, str_trunc, loop_firstlast, highlight, textlen
 
 import ..Renderables: AbstractRenderable
-import ..Boxes: get_rrow, get_lrow, get_row, SQUARE
+import ..Boxes: get_rrow, get_lrow, get_row, BOXES
 import ..Style: apply_style
 import ..Segments: Segment
 import ..Measures: Measure
@@ -97,13 +97,15 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
 
     # get tree structure line
     if length(leaves) > 1
-        widths = repeat([CELLWIDTH + 1 + SPACING], length(leaves) - 1)
-
-        line = get_row(SQUARE, widths, :top)
-        line = pad(replace_line_midpoint(line)[1], width, :center)
+        widths = fill(CELLWIDTH + 1 + SPACING, length(leaves) - 1)
+        line = pad(
+            replace_line_midpoint(get_row(BOXES[:SQUARE], widths, :top))[1],
+            width,
+            :center,
+        )
     else
         widths = [CELLWIDTH]
-        line = pad(string(SQUARE.bottom.vertical), CELLWIDTH, :center)
+        line = pad(string(BOXES[:SQUARE].bottom.vertical), CELLWIDTH, :center)
     end
 
     # get title
@@ -130,7 +132,7 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
                 ),
                 Segment(" " * pad("⋀", width - 1, :center), "green bold"),
                 Segment(
-                    " " * pad(string(SQUARE.bottom.vertical), width - 1, :center),
+                    " " * pad(string(BOXES[:SQUARE].bottom.vertical), width - 1, :center),
                     "green dim",
                 ),
             ],
@@ -218,15 +220,13 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
     end
 
     # get elements of linking line
-    line = get_row(SQUARE, widths, :top)
+    line = get_row(BOXES[:SQUARE], widths, :top)
     line, midpoint = replace_line_midpoint(line; widths = widths .+ 1)
 
-    if shifttitle
-        title =
-            pad(apply_style(title, salmon_light * " dim"), textwidth(line) - 5, :center) *
-            " "^5
+    title = if shifttitle
+        pad(apply_style(title, salmon_light * " dim"), textwidth(line) - 5, :center) * " "^5
     else
-        title = pad(apply_style(title, salmon_light), textwidth(line), :center)
+        pad(apply_style(title, salmon_light), textwidth(line), :center)
     end
     space = " "^(dendos[1].midpoint)
 
@@ -236,7 +236,7 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
     title = pad(title, width, :left)
 
     # create dendogram's segments
-    segments::Vector{Segment} = [
+    segments = Segment[
         Segment(space * title),
         Segment(space * line, LINES_STYLE),
         *(dendos...).segments...,
@@ -253,9 +253,9 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
                 Segment(" "^l(pretitle) * pretitle * " "^r(pretitle), PRETITLE_STYLE),
                 Segment(" "^l("⋀") * "⋀" * " "^r("⋀"), "green bold"),
                 Segment(
-                    " "^l(SQUARE.bottom.vertical) *
-                    SQUARE.bottom.vertical *
-                    " "^r(SQUARE.bottom.vertical),
+                    " "^l(BOXES[:SQUARE].bottom.vertical) *
+                    BOXES[:SQUARE].bottom.vertical *
+                    " "^r(BOXES[:SQUARE].bottom.vertical),
                     "green dim",
                 ),
             ],
@@ -295,8 +295,9 @@ function replace_line_midpoint(line::String; widths = nothing)
     w1 = prevind(line, rint(ncodeunits(line) / 2) - 1)
     w2 = nextind(line, rint(ncodeunits(line) / 2) + 1)
 
-    char = SQUARE.bottom.vertical
-    isnothing(widths) || (textwidth(line[1:w1]) in widths && (char = SQUARE.row.vertical))
+    char = BOXES[:SQUARE].bottom.vertical
+    isnothing(widths) ||
+        (textwidth(line[1:w1]) in widths && (char = BOXES[:SQUARE].row.vertical))
     line = line[1:w1] * char * line[w2:end]
     return line, length(line[1:w1])
 end

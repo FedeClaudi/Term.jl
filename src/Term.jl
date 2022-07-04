@@ -98,12 +98,16 @@ gives the measure of a segment
 Measures.Measure(seg::Segment) = seg.measure
 
 """
-    Measure(segments::Vector{Segment})
+    Measure(segments::AbstractVector)
 
 gives the measure of a vector of segments
 """
-Measures.Measure(segments::Vector{Segment}) =
-    Measure(sum(Measures.height.(segments)), maximum(Measures.width.(segments)))
+Measures.Measure(segments::AbstractVector) =
+    if length(segments) == 0
+        Measure(0, 0)  # nothing we can do here
+    else
+        Measure(sum(Measures.height.(segments)), maximum(Measures.width.(segments)))
+    end
 
 # ---------------------------------- others ---------------------------------- #
 using .Errors: install_term_stacktrace
