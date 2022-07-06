@@ -25,6 +25,8 @@ export @with_repr, termshow, install_term_repr
 include("_repr.jl")
 include("_inspect.jl")
 
+plural(word::AbstractString, n) = n == 1 ? word : word * 's'
+
 """
     termshow
 
@@ -140,6 +142,7 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
     _keys_renderables = cvstack(ktypes...) * line * space * cvstack(k...)
     _values_renderables = cvstack(vals...) * space * line * cvstack(vtypes...)
 
+    m = length(keys(obj))
     return print(
         io,
         Panel(
@@ -152,7 +155,7 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
             style = theme.repr_panel_style,
             title_style = theme.repr_name_style,
             padding = (2, 2, 1, 1),
-            subtitle = "{bold white}$(length(keys(obj))){/bold white}{default} items{/default}",
+            subtitle = "{bold white}$m{/bold white}{default} $(plural("item", m)){/default}",
             subtitle_justify = :right,
         ),
     )
@@ -182,18 +185,21 @@ termshow(io::IO, mtx::AbstractMatrix; kwargs...) = print(
 
 Show a vector's content as a 1D table visualization.
 """
-termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
-    io,
-    repr_panel(
-        vec,
-        vec2content(vec),
-        "{bold white}$(length(vec)){/bold white}{default} items{/default}";
-        justify = :left,
-        width = nothing,
-        fit = true,
-        title = nothing,
-    ),
-)
+function termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...)
+    m = length(vec)
+    print(
+        io,
+        repr_panel(
+            vec,
+            vec2content(vec),
+            "{bold white}$m{/bold white}{default} $(plural("item", m)){/default}";
+            justify = :left,
+            width = nothing,
+            fit = true,
+            title = nothing,
+        ),
+    )
+end
 
 """
 ---
@@ -207,7 +213,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
 
     panels::Vector{Union{Panel,Spacer}} = []
     for (n, i) in enumerate(I)
-        i_string = join([string(i) for i in Tuple(i)], ", ")
+        i_string = join(string.(Tuple(i)), ", ")
         push!(
             panels,
             Panel(
@@ -224,11 +230,11 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
         push!(panels, Spacer(2, 1))
     end
 
-    if length(I0) > length(I)
+    if (m = length(I0) - length(I)) > 0
         push!(
             panels,
             Panel(
-                "{dim bright_blue bold underline}$(length(I0) - length(I)){/dim bright_blue bold underline}{dim bright_blue} frames omitted{/dim bright_blue}";
+                "{dim bright_blue bold underline}$m{/dim bright_blue bold underline}{dim bright_blue} $(plural("frame", m)) omitted{/dim bright_blue}";
                 width = panels[end - 1].measure.w,
                 style = "dim yellow",
             ),
@@ -278,10 +284,10 @@ function termshow(io::IO, obj::DataType; kwargs...)
     doc, _ = get_docstring(obj)
     doc = parse_md(doc; width = min(100, console_width()))
     doc = split_lines(doc)
-    if length(doc) > 100
+    if (m = length(doc) - 100) > 0
         doc = [
             doc[1:min(100, length(doc))]...,
-            "{dim bright_blue}$(length(doc)-100) lines omitted...{/dim bright_blue}",
+            "{dim bright_blue}$m $(plural("line", m)) omitted...{/dim bright_blue}",
         ]
     end
     doc = join(doc, "\n")
@@ -317,21 +323,24 @@ function termshow(
         _methods,
     )
     counts = RenderableText.("(" .* string.(1:length(_methods)) .* ") "; style = "bold dim")
-    length(_methods) < N - 1 && push!(
-        _methods,
-        "\n{bold dim bright_blue}$(N - length(_methods)-1){/bold dim bright_blue}{dim bright_blue} methods omitted...{/dim bright_blue}",
-    )
+    if (m = N - length(_methods) - 1) > 0
+        push!(
+            _methods,
+            "\n{bold dim bright_blue}$m{/bold dim bright_blue}{dim bright_blue} $(plural("method", m)) omitted...{/dim bright_blue}",
+        )
+    end
     methods_contents = if N > 1
         rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...)
     else
-        split_lines(string(methods(fun)))[1]
+        fun |> methods |> string |> split_lines |> first
     end
 
+    m = N - 1
     panel =
         "   " * repr_panel(
             nothing,
             methods_contents,
-            "{white bold}$(N-1){/white bold} methods",
+            "{white bold}$m{/white bold} $(plural("method", m))",
             title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
             width = width,
             fit = false,
@@ -341,10 +350,10 @@ function termshow(
     doc, _ = get_docstring(fun)
     doc = parse_md(doc; width = panel.measure.w - 4)
     doc = split_lines(doc)
-    if length(doc) > 100
+    if (m = length(doc) - 100) > 0
         doc = [
             doc[1:min(100, length(doc))]...,
-            "{dim bright_blue}$(length(doc)-100) lines omitted...{/dim bright_blue}",
+            "{dim bright_blue}$m $(plural("line", m)) omitted...{/dim bright_blue}",
         ]
     end
     print(io, panel)
