@@ -53,9 +53,9 @@ struct TermLogger <: AbstractLogger
     theme::Theme
     pbar::ProgressBar
 end
-TermLogger(theme::Theme) = TermLogger(stderr, theme)
+TermLogger(theme::Theme = TERM_THEME[]) = TermLogger(stderr, theme)
 
-function TermLogger(io::IO, theme::Theme)
+function TermLogger(io::IO, theme::Theme = TERM_THEME[])
     return TermLogger(
         io,
         theme,
