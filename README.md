@@ -19,3 +19,9 @@ Install with:
 julia> ]  # enters the pkg interface
 pkg> add Term
 ```
+
+
+### Supporting Term
+If you like my work on Term so far and want to show support and help with Term's future development, please consider showing your support!
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C5E36Z2)
