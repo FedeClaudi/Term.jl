@@ -435,6 +435,7 @@ function trim_renderable(ren::AbstractRenderable, width::Int)
 end
 
 
+
 trim_renderable(ren::AbstractString, width::Int) = reshape_text(ren, width)
 
 
