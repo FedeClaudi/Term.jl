@@ -1,6 +1,6 @@
 module Panels
 
-import Term: reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width
+import Term: reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
@@ -164,26 +164,32 @@ function Panel(
     width::Union{Nothing,Int} = nothing,
     background::Union{Nothing,String} = nothing,
     kwargs...,
-)
+)   
+    
+    # if panel is larger than console, fit content to panel
+    _width = isnothing(width) ? (content isa AbstractString ? textwidth(content) : content.measure.w) : width
+    _panel_width = _width + padding.left + padding.right + 2
+    _panel_width > console_width() && return Panel(
+            content,
+            Val(false),
+            padding;
+            width = min(_panel_width, console_width() - 1),
+            background=background,
+            kwargs...,
+    )
+
+    # create content
     content =
         content isa AbstractRenderable ? content :
-        RenderableText(fillin(content; bg = background))
+        RenderableText(content, width = width, background=background)
 
+    # estimate panel size
     content_measure = content.measure
     height = something(height, 0)
     width = something(width, 0)
     panel_measure = Measure(
         max(height, content_measure.h + padding.top + padding.bottom + 2),
         max(width, content_measure.w + padding.left + padding.right + 2),
-    )
-
-    # if panel is larger than console, fit content to panel
-    panel_measure.w > console_width() && return Panel(
-        content,
-        Val(false),
-        padding;
-        width = min(panel_measure.w, console_width() - 1),
-        kwargs...,
     )
 
     Δw = padding.left + padding.right + 2
@@ -237,7 +243,7 @@ function Panel(
     # get panel height
     content =
         content isa AbstractRenderable ? content :
-        RenderableText(fillin(content; bg = background))
+        RenderableText(content, width = width, background=background)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
 
@@ -414,18 +420,23 @@ TextBox(args...; kwargs...) = Panel(args...; box = get(kwargs, :box, :NONE), kwa
 
 Trim a string or renderable to a max width.
 """
-function trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::Int)
-    return if ren isa AbstractString || ren isa RenderableText
-        ren = ren isa RenderableText ? join(getfield.(ren.segments, :text), "\n") : ren
-        reshape_text(ren, width)
+function trim_renderable(ren::AbstractRenderable, width::Int)
+    text = getfield.(ren.segments, :text)
+
+    return if ren isa RenderableText
+        reshape_text.(text, width) |> lvstack
     else
-        texts = rstrip.(getfield.(ren.segments, :text))
         segs = map(
             s -> get_width(s) > width ? pad(str_trunc(s, width), width, :left) : s,
-            texts,
+            text,
         )
         lvstack(segs)
     end
 end
+
+
+trim_renderable(ren::AbstractString, width::Int) = reshape_text(ren, width)
+
+
 
 end

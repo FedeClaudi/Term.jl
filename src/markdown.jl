@@ -164,6 +164,7 @@ function parse_md(
     else
         txt = fillin(reshape_text(syntax, width - 20))
         txt = apply_style(txt, "on_#262626")
+        
         panel = Panel(
             txt;
             style = "white dim on_#262626",

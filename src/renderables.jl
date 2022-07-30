@@ -120,6 +120,7 @@ function RenderableText(
     text::AbstractString;
     style::Union{Nothing,String} = nothing,
     width::Union{Nothing,Int} = nothing,
+    background::Union{Nothing,String} = nothing,
 )
     text = apply_style(text)
 
@@ -128,7 +129,7 @@ function RenderableText(
         width = min(console_width(stdout) - 1, width)
         text = reshape_text(text, width)
     end
-    text = fillin(text)
+    text = fillin(text, bg=background)
 
     # create renderable
     segments = if isnothing(style)

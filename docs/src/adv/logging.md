@@ -59,3 +59,7 @@ end # hide
 
 !!! tip
     You can rever to the original logger using `uninstall_term_logger`.
+
+
+!!! tip "Term and other log outputs"
+    See [here](https://discourse.julialang.org/t/term-jl-logging-sending-messages-to-multiple-locations/84841) for some info on how to use Term's logger in conjuction with other logging outputs.
