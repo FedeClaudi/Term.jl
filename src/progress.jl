@@ -196,6 +196,7 @@ Stop a running job.
 function stop!(job::ProgressJob)
     job.stoptime = now()
     job.finished = true
+    sleep(0.05)
     return nothing
 end
 
@@ -366,6 +367,7 @@ function addjob!(
     start && start!(job)
     push!(pbar.jobs, job)
     pbar.paused = false
+    render(job, pbar)
     return job
 end
 
@@ -522,7 +524,6 @@ function render(pbar::ProgressBar)
     cleartoend(iob)
 
     # render the progressbars
-    # @info pbar.renderstatus.hline
     write(iob, pbar.renderstatus.hline)
     for (last, job) in loop_last(pbar.jobs)
         contents = render(job, pbar)
@@ -532,8 +533,6 @@ function render(pbar::ProgressBar)
 
     # restore position and write
     move_to_line(iob, pbar.renderstatus.scrollline)
-    # write(stdout, take!(iob))
-
     return print(String(take!(iob)))
 end
 
@@ -575,7 +574,7 @@ function with(expr, pbar::ProgressBar)
             sleep(pbar.Δt)
         end
         stop!(pbar)
-        var = fetch(task)
+        val = fetch(task)
     catch err
         stop!(pbar)
         rethrow()

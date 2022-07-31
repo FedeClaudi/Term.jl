@@ -101,6 +101,7 @@ function Panel(;
     # make panel
     return Panel(
         content;
+        fit=fit,
         panel_measure = panel_measure,
         content_measure = content_measure,
         Δw = padding.left + padding.right + 2,
@@ -111,6 +112,7 @@ function Panel(;
         kwargs...,
     )
 end
+
 
 """
 ---
@@ -133,10 +135,24 @@ function Panel(
     content::Union{AbstractString,AbstractRenderable};
     fit::Bool = true,
     padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+    width::Int = default_width(),
     kwargs...,
 )
     padding = padding isa Padding ? padding : Padding(padding...)
-    return Panel(content, Val(fit), padding; kwargs...)
+
+    # estimate content and panel size 
+    content_width = content isa AbstractString ? textwidth(content) : content.measure.w
+    panel_width = if fit
+        content_width + padding.left + padding.right + 2
+    else
+        width
+    end
+
+    # if too large, set fit=false
+    fit && (fit = panel_width <= console_width())
+    fit && (width = panel_width)
+
+    return Panel(content, Val(fit), padding; width=width, kwargs...)
 end
 
 """
@@ -161,44 +177,30 @@ function Panel(
     ::Val{true},
     padding::Padding;
     height::Union{Nothing,Int} = nothing,
-    width::Union{Nothing,Int} = nothing,
+    width::Int,
     background::Union{Nothing,String} = nothing,
     kwargs...,
 )   
     
-    # if panel is larger than console, fit content to panel
-    _width = isnothing(width) ? (content isa AbstractString ? textwidth(content) : content.measure.w) : width
-    _panel_width = _width + padding.left + padding.right + 2
-    _panel_width > console_width() && return Panel(
-            content,
-            Val(false),
-            padding;
-            width = min(_panel_width, console_width() - 1),
-            background=background,
-            kwargs...,
-    )
+    Δw = padding.left + padding.right + 2
+    Δh = padding.top + padding.bottom
 
     # create content
     content =
         content isa AbstractRenderable ? content :
-        RenderableText(content, width = width, background=background)
+        RenderableText(content, width = width-Δw-2, background=background)
+
 
     # estimate panel size
-    content_measure = content.measure
-    height = something(height, 0)
-    width = something(width, 0)
     panel_measure = Measure(
-        max(height, content_measure.h + padding.top + padding.bottom + 2),
-        max(width, content_measure.w + padding.left + padding.right + 2),
+        max(something(height, 0), content.measure.h + padding.top + padding.bottom + 2),
+        max(width, content.measure.w + padding.left + padding.right + 2),
     )
-
-    Δw = padding.left + padding.right + 2
-    Δh = padding.top + padding.bottom
 
     return render(
         content;
         panel_measure = panel_measure,
-        content_measure = content_measure,
+        content_measure = content.measure,
         Δw = Δw,
         Δh = Δh,
         padding = padding,
@@ -238,12 +240,12 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # if the content is too large, resize it to fit the panel's width.
-    get_width(content) > width - Δw + 1 && (content = trim_renderable(content, width - Δw))
+    get_width(content) > width - Δw + 1 && (content = trim_renderable(content, width - Δw - 1))
 
     # get panel height
     content =
         content isa AbstractRenderable ? content :
-        RenderableText(content, width = width, background=background)
+        RenderableText(content, width = width-Δw-1, background=background)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
 
@@ -326,7 +328,7 @@ function render(
     background = nothing,
     kwargs...,
 )::Panel
-
+    # @info "calling render" panel_measure content_measure
     # create top/bottom rows with titles
     box = eval(box)  # get box object from symbol
     top = get_title_row(
@@ -367,6 +369,7 @@ function render(
             ),
         ]
     end
+    # @info "rendering" panel_measure Δw
 
     # add lines with content fn
     function makecontent_line(cline)::Segment
