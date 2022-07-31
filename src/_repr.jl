@@ -53,7 +53,7 @@ function repr_panel(
     width = min(console_width() - 10, default_width()),
     justify = :center,
     kwargs...,
-)
+)   
     p = Panel(
         content;
         fit = true,

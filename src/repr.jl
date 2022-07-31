@@ -191,7 +191,6 @@ termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
         vec2content(vec),
         "{bold white}$(length(vec)){/bold white}{default} items{/default}";
         justify = :left,
-        width = nothing,
         fit = true,
         title = nothing,
     ),
@@ -302,7 +301,7 @@ Show a function's methods and docstring.
 function termshow(
     io::IO,
     fun::Function;
-    width = min(console_width() - 10, default_width(io)),
+    width = min(console_width(), default_width(io)),
 )   
     # get methods
     _methods = split_lines(string(methods(fun)))
@@ -324,7 +323,9 @@ function termshow(
         "\n{bold dim bright_blue}$(N - length(_methods)-1){/bold dim bright_blue}{dim bright_blue} methods omitted...{/dim bright_blue}",
     )
     methods_contents = if N > 1
-        rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...)
+        methods_texts = RenderableText.(highlight.(_methods); width=width-10)
+        # rvstack(counts...) * lvstack(...)
+        join(string.(map(i -> counts[i] * methods_texts[i], 1:length(counts))), '\n')
     else
         split_lines(string(methods(fun)))[1]
     end
@@ -335,9 +336,10 @@ function termshow(
             methods_contents,
             "{white bold}$(N-1){/white bold} methods",
             title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
-            width = width,
+            width = width-8,
             fit = false,
         )
+    # @info "made panel" panel.measure methods_contents.measure width
 
     # get docstring 
     doc, _ = get_docstring(fun)
@@ -351,7 +353,7 @@ function termshow(
     end
     print(io, panel)
     print(io, hLine(panel.measure.w, "Docstring"; style = "green dim", box = :HEAVY))
-    print(io, "   " * RenderableText(join(doc, "\n")))
+    print(io, "   " * RenderableText(join(doc, "\n"), width=width-8))
 end
 
 # ---------------------------------------------------------------------------- #

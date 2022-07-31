@@ -7,7 +7,8 @@ import Term:
     fillin,
     join_lines,
     unescape_brackets_with_space,
-    DEBUG_ON
+    DEBUG_ON,
+    textwidth
 
 import ..Style: get_style_codes, MarkupStyle, apply_style
 import Term: highlight as highlighter
@@ -85,8 +86,7 @@ Base.convert(::Renderable, x) = Renderable(x)
 
 Convenience method to construct a RenderableText
 """
-Renderable(str::AbstractString; width::Union{Nothing,Int} = nothing) =
-    RenderableText(str; width = width)
+Renderable(str::AbstractString) = RenderableText(str)
 
 Renderable(ren::AbstractRenderable) = ren
 Renderable() = Renderable(Vector{Segment}[], Measure(0, 0))
@@ -119,7 +119,7 @@ If a `width` is passed the text is resized to match the width.
 function RenderableText(
     text::AbstractString;
     style::Union{Nothing,String} = nothing,
-    width::Union{Nothing,Int} = nothing,
+    width::Int = min(textwidth(text), console_width()),
     background::Union{Nothing,String} = nothing,
 )
     text = apply_style(text)
@@ -153,7 +153,7 @@ Construct a RenderableText by possibly re-shaping a RenderableText
 function RenderableText(
     rt::RenderableText;
     style::Union{Nothing,String} = nothing,
-    width::Union{Nothing,Int} = nothing,
+    width::Int = console_width(),
 )
     return if rt.style == style && rt.measure.w == width
         rt

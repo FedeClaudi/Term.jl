@@ -100,7 +100,7 @@ function render_backtrace_frame(
         "   " * content
     end
 
-    return p / " "
+    return p  #  / " "
 end
 
 function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 30)
@@ -165,7 +165,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         subtitle_style = "bold #ff8a4f default",
         title = "Error Stack",
         title_style = "bold #ff8a4f default",
-        fit = true,
+        fit = false,
         width = default_stacktrace_width(),
     )
 end

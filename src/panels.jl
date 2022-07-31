@@ -37,7 +37,7 @@ mutable struct Panel <: AbstractPanel
     function Panel(x1, x2; kwargs...)
         # this is necessary to handle the special case in which 2 objs are passed
         # but they are not segments/measure
-        return if x1 isa Vector
+        return if x1 isa Vector && x2 isa Measure
             new(x1, x2)
         else
             Panel(vstack(x1, x2); kwargs...)
@@ -152,6 +152,7 @@ function Panel(
     fit && (fit = panel_width <= console_width())
     fit && (width = panel_width)
 
+    # @info "Ready to make panel" content_width panel_width width fit
     return Panel(content, Val(fit), padding; width=width, kwargs...)
 end
 
@@ -329,6 +330,7 @@ function render(
     kwargs...,
 )::Panel
     # @info "calling render" panel_measure content_measure
+
     # create top/bottom rows with titles
     box = eval(box)  # get box object from symbol
     top = get_title_row(
@@ -404,7 +406,6 @@ function render(
     ]
 
     segments = vcat(initial_segments, content_sgs, final_segments)
-
     return Panel(segments, panel_measure)
 end
 
@@ -429,6 +430,7 @@ function trim_renderable(ren::AbstractRenderable, width::Int)
     return if ren isa RenderableText
         reshape_text.(text, width) |> lvstack
     else
+        # @info "trimming ren" ren.measure width text
         segs = map(
             s -> get_width(s) > width ? pad(str_trunc(s, width), width, :left) : s,
             text,
@@ -439,8 +441,7 @@ end
 
 
 
-trim_renderable(ren::AbstractString, width::Int) = reshape_text(ren, width)
-
-
-
+trim_renderable(ren::AbstractString, width::Int) = begin
+    reshape_text(ren, width)
+end
 end

@@ -47,6 +47,7 @@ function parse_md(text::Markdown.MD; width = default_width(), kwargs...)::String
     return join(elements, "\n\n")
 end
 
+
 """
     parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...) where {l}
 
