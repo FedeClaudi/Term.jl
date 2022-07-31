@@ -129,7 +129,7 @@ function RenderableText(
         width = min(console_width(stdout) - 1, width)
         text = reshape_text(text, width)
     end
-    text = fillin(text, bg=background)
+    text = fillin(text, bg = background)
 
     # create renderable
     segments = if isnothing(style)

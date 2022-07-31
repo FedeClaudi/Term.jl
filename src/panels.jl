@@ -1,6 +1,7 @@
 module Panels
 
-import Term: reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi
+import Term:
+    reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
@@ -101,7 +102,7 @@ function Panel(;
     # make panel
     return Panel(
         content;
-        fit=fit,
+        fit = fit,
         panel_measure = panel_measure,
         content_measure = content_measure,
         Δw = padding.left + padding.right + 2,
@@ -112,7 +113,6 @@ function Panel(;
         kwargs...,
     )
 end
-
 
 """
 ---
@@ -153,7 +153,7 @@ function Panel(
     fit && (width = panel_width)
 
     # @info "Ready to make panel" content_width panel_width width fit
-    return Panel(content, Val(fit), padding; width=width, kwargs...)
+    return Panel(content, Val(fit), padding; width = width, kwargs...)
 end
 
 """
@@ -181,16 +181,14 @@ function Panel(
     width::Int,
     background::Union{Nothing,String} = nothing,
     kwargs...,
-)   
-    
+)
     Δw = padding.left + padding.right + 2
     Δh = padding.top + padding.bottom
 
     # create content
     content =
         content isa AbstractRenderable ? content :
-        RenderableText(content, width = width-Δw-2, background=background)
-
+        RenderableText(content, width = width - Δw - 2, background = background)
 
     # estimate panel size
     panel_measure = Measure(
@@ -241,12 +239,13 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # if the content is too large, resize it to fit the panel's width.
-    get_width(content) > width - Δw + 1 && (content = trim_renderable(content, width - Δw - 1))
+    get_width(content) > width - Δw + 1 &&
+        (content = trim_renderable(content, width - Δw - 1))
 
     # get panel height
     content =
         content isa AbstractRenderable ? content :
-        RenderableText(content, width = width-Δw-1, background=background)
+        RenderableText(content, width = width - Δw - 1, background = background)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
 
@@ -438,8 +437,6 @@ function trim_renderable(ren::AbstractRenderable, width::Int)
         lvstack(segs)
     end
 end
-
-
 
 trim_renderable(ren::AbstractString, width::Int) = begin
     reshape_text(ren, width)

@@ -18,8 +18,9 @@ export console_height,
     change_scroll_region,
     savecursor,
     restorecursor,
-    Console, 
-    enable, disable
+    Console,
+    enable,
+    disable
 
 const STDOUT = stdout
 const STDERR = stderr
@@ -125,13 +126,10 @@ Get the current console width.
 """
 console_width(io::IO = stdout) = something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2])
 
-
-
 struct Console
     width
     height
 end
-
 
 function enable(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = console.width

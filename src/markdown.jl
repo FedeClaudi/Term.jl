@@ -47,7 +47,6 @@ function parse_md(text::Markdown.MD; width = default_width(), kwargs...)::String
     return join(elements, "\n\n")
 end
 
-
 """
     parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...) where {l}
 
@@ -165,7 +164,7 @@ function parse_md(
     else
         txt = fillin(reshape_text(syntax, width - 20))
         txt = apply_style(txt, "on_#262626")
-        
+
         panel = Panel(
             txt;
             style = "white dim on_#262626",

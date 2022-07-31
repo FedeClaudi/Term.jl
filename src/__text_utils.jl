@@ -341,7 +341,7 @@ function str_trunc(text::AbstractString, width::Int; trailing_dots = "...")
     textlen(text) ≤ width && return text
 
     trunc = reshape_text(text, width - 3)
-    out = first(split_lines(trunc)) 
+    out = first(split_lines(trunc))
     out[end] != ' ' && (out *= trailing_dots)
     # @assert textlen(out) ≤ width - 3
     return out

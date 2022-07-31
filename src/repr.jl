@@ -298,11 +298,7 @@ end
 
 Show a function's methods and docstring.
 """
-function termshow(
-    io::IO,
-    fun::Function;
-    width = min(console_width(), default_width(io)),
-)   
+function termshow(io::IO, fun::Function; width = min(console_width(), default_width(io)))
     # get methods
     _methods = split_lines(string(methods(fun)))
     N = length(_methods)
@@ -323,7 +319,7 @@ function termshow(
         "\n{bold dim bright_blue}$(N - length(_methods)-1){/bold dim bright_blue}{dim bright_blue} methods omitted...{/dim bright_blue}",
     )
     methods_contents = if N > 1
-        methods_texts = RenderableText.(highlight.(_methods); width=width-10)
+        methods_texts = RenderableText.(highlight.(_methods); width = width - 10)
         # rvstack(counts...) * lvstack(...)
         join(string.(map(i -> counts[i] * methods_texts[i], 1:length(counts))), '\n')
     else
@@ -336,7 +332,7 @@ function termshow(
             methods_contents,
             "{white bold}$(N-1){/white bold} methods",
             title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
-            width = width-8,
+            width = width - 8,
             fit = false,
         )
     # @info "made panel" panel.measure methods_contents.measure width
@@ -353,7 +349,7 @@ function termshow(
     end
     print(io, panel)
     print(io, hLine(panel.measure.w, "Docstring"; style = "green dim", box = :HEAVY))
-    print(io, "   " * RenderableText(join(doc, "\n"), width=width-8))
+    print(io, "   " * RenderableText(join(doc, "\n"), width = width - 8))
 end
 
 # ---------------------------------------------------------------------------- #
