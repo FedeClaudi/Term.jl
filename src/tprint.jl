@@ -3,11 +3,10 @@ module Tprint
 import Term: unescape_brackets, escape_brackets, has_markup, reshape_text
 import Term: highlight as highlighter
 
-import ..Renderables: AbstractRenderable
+import ..Renderables: AbstractRenderable, trim_renderable
 import ..Style: apply_style
 import ..Layout: hstack
 import ..Consoles: console_width
-import ..Panels: trim_renderable
 
 export tprint, tprintln
 

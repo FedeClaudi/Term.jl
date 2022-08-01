@@ -504,6 +504,7 @@ hstack(renderables::Union{Vector,Tuple}; kwargs...) = hstack(renderables...; kwa
 
 Base.:/(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(r1, r2)
 Base.:/(rr::Tuple{RenderablesUnion,RenderablesUnion}) = vstack(rr...)
+Base.:/(rr...) = vstack(rr...)
 
 Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)
@@ -784,5 +785,7 @@ end
 
 PlaceHolder(ren::AbstractRenderable; kwargs...) =
     PlaceHolder(ren.measure.h, ren.measure.w; kwargs...)
+
+
 
 end

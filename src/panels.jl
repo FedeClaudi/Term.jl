@@ -3,7 +3,7 @@ module Panels
 import Term:
     reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi
 
-import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
+import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
 import ..Layout: pad, vstack, Padding, lvstack
 import ..Style: apply_style
 import ..Segments: Segment
@@ -414,31 +414,5 @@ end
 
 TextBox(args...; kwargs...) = Panel(args...; box = get(kwargs, :box, :NONE), kwargs...)
 
-# ---------------------------------------------------------------------------- #
-#                                     MISC.                                    #
-# ---------------------------------------------------------------------------- #
 
-"""
-    trim_renderable(ren::Union{String, AbstractRenderable}, width::Int)
-
-Trim a string or renderable to a max width.
-"""
-function trim_renderable(ren::AbstractRenderable, width::Int)
-    text = getfield.(ren.segments, :text)
-
-    return if ren isa RenderableText
-        reshape_text.(text, width) |> lvstack
-    else
-        # @info "trimming ren" ren.measure width text
-        segs = map(
-            s -> get_width(s) > width ? pad(str_trunc(s, width), width, :left) : s,
-            text,
-        )
-        lvstack(segs)
-    end
-end
-
-trim_renderable(ren::AbstractString, width::Int) = begin
-    reshape_text(ren, width)
-end
 end
