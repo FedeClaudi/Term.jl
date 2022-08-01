@@ -145,3 +145,38 @@ function reshape_text(text::AbstractString, width::Int)
     # do_by_line(ln -> ln * "\e[0m", out)
     # String(chars)
 end
+
+
+
+"""
+    justify(text::AbstractString, width::Int)::String
+
+Justify a piece of text spreading out text to fill in a given width.
+"""
+function justify(text::AbstractString, width::Int)::String
+    occursin('\n', text) && (return do_by_line(ln -> justify(ln, width), text))
+
+    text = rstrip(text)
+    textlen(text) ≤ (width*.6) && return text
+    n_spaces = width - textlen(text)
+    n_spaces == 0 && (return text)
+
+    spaces_locs = map(
+        m -> m[1], findall(" ",  text)
+    )
+    length(spaces_locs) < 2 && (return text)
+    spaces_locs = spaces_locs[1:end-1]
+    n_locs = length(spaces_locs)
+    space_per_loc = div(n_spaces, n_locs)
+
+    inserted = 0
+    for loc in spaces_locs
+        n_to_insert = inserted < (n_spaces) ? space_per_loc : n_spaces - inserted
+        to_insert = " "^n_to_insert
+        text = replace_text(text, loc + inserted, loc + inserted, to_insert)
+        inserted += n_to_insert
+    end
+    return text
+end
+
+

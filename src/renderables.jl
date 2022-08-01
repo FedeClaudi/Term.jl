@@ -9,7 +9,9 @@ import Term:
     unescape_brackets_with_space,
     DEBUG_ON,
     textwidth,
-    str_trunc
+    str_trunc,
+    justify,
+    textlen
 
 import Term: highlight as highlighter
 import ..Consoles: console_width
@@ -134,17 +136,16 @@ If a `width` is passed the text is resized to match the width.
 function RenderableText(
     text::AbstractString;
     style::Union{Nothing,String} = nothing,
-    width::Int = min(textwidth(text), console_width()),
+    width::Int = min(textwidth(text), console_width(stdout)),
     background::Union{Nothing,String} = nothing,
 )
     text = apply_style(text)
 
     # reshape text
-    if !isnothing(width)
-        width = min(console_width(stdout) - 1, width)
-        text = reshape_text(text, width)
+    if textlen(text) > width
+        text = reshape_text(text, width-1)
+        text = fillin(text, bg = background)
     end
-    text = fillin(text, bg = background)
 
     # create renderable
     segments = if isnothing(style)

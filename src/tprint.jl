@@ -36,7 +36,7 @@ Apply style to a string and print it
 """
 function tprint(io::IO, x::AbstractString; highlight = true)
     x = (highlight ? apply_style ∘ highlighter : apply_style)(x)
-    x = reshape_text(x, console_width())
+    x = reshape_text(x, console_width(io))
     print(io, x)
 end
 
@@ -49,7 +49,8 @@ Print an `AbstractRenderable`.
 Equivalent to `println(x)`
 """
 function tprint(io::IO, x::AbstractRenderable; highlight = true)
-    x = trim_renderable(x, console_width())
+    w = console_width()
+    x = x.measure.w > console_width() ? trim_renderable(x, w) : x
     print(io, x; highlight = highlight)
 end
 

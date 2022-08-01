@@ -284,7 +284,7 @@ Panel(renderables::Vector{RenderablesUnion}; kwargs...) =
 
 Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
 
-Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
+Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwargs...)
 
 # ---------------------------------- render ---------------------------------- #
 
@@ -328,8 +328,7 @@ function render(
     background = nothing,
     kwargs...,
 )::Panel
-    # @info "calling render" panel_measure content_measure
-
+    # @info "calling render" content content_measure
     # create top/bottom rows with titles
     box = eval(box)  # get box object from symbol
     top = get_title_row(
@@ -374,13 +373,17 @@ function render(
 
     # add lines with content fn
     function makecontent_line(cline)::Segment
-        line = pad(apply_style(cline), panel_measure.w - Δw, justify; bg = background)
-        line = pad(line, padding.left, padding.right; bg = background)
+        line = pad(rstrip(apply_style(cline)), panel_measure.w - Δw, justify; bg = background)
+        line = pad(
+            line, 
+            padding.left, 
+            padding.right; 
+            bg = background
+        )
 
         # make line
         return Segment(left * line * right)
     end
-
     # check if we need extra lines at the bottom to reach target height
     n_extra = if content_measure.h < panel_measure.h - Δh - 2
         panel_measure.h - content_measure.h - Δh - 2

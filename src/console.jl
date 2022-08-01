@@ -127,9 +127,11 @@ Get the current console width.
 console_width(io::IO = stdout) = something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2])
 
 struct Console
-    width
     height
+    width
 end
+
+Console(width) = Console(console_height(), width)
 
 function enable(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = console.width
