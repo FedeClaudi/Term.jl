@@ -141,7 +141,7 @@ Optionally `justify`  can be used to set the text justification style ∈ (:left
 function RenderableText(
     text::AbstractString;
     style::Union{Nothing,String} = nothing,
-    width::Int = min(textwidth(text), console_width(stdout)),
+    width::Int = min(textlen(text), console_width(stdout)),
     background::Union{Nothing,String} = nothing,
     justify::Symbol=:left,
 )
@@ -160,6 +160,8 @@ function RenderableText(
         ln -> Segment(style_init * ln * style_finish), 
         split(text, "\n")
     )
+
+    # @info "made abstract ren" segments[1]
     return RenderableText(segments, Measure(segments), style)
 end
 
@@ -202,7 +204,7 @@ end
 
 
 function trim_renderable(ren::RenderableText, width::Int)::RenderableText
-    @info "Trimming text"
+    # @info "Trimming text"
     text = join(getfield.(ren.segments, :text))
     return RenderableText(text, width=width)
 

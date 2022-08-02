@@ -54,9 +54,10 @@ function repr_panel(
     justify = :center,
     kwargs...,
 )
+
     p = Panel(
         content;
-        fit = true,
+        fit = false,
         title = isnothing(obj) ? obj : escape_brackets(string(typeof(obj))),
         title_justify = :left,
         width = width,

@@ -1,7 +1,7 @@
 module Panels
 
 import Term:
-    reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi, get_bg_color
+    reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi, get_bg_color, textlen
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
 import ..Layout: pad, vstack, Padding, lvstack
@@ -154,7 +154,7 @@ function Panel(
     padding = padding isa Padding ? padding : Padding(padding...)
 
     # estimate content and panel size 
-    content_width = content isa AbstractString ? textwidth(content) : content.measure.w
+    content_width = content isa AbstractString ? textlen(content) : content.measure.w
     panel_width = if fit
         content_width + padding.left + padding.right + 2
     else
@@ -211,7 +211,7 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # create content
-    content = content_as_renderable(content, width, Δw, justify, background)
+    content = content_as_renderable(content, width+1, Δw, justify, background)
         
     # estimate panel size
     panel_measure = Measure(
@@ -219,6 +219,7 @@ function Panel(
         max(width, content.measure.w + padding.left + padding.right + 2),
     )
 
+    # @info "Creating fitted panel" content.measure panel_measure content
     return render(
         content;
         panel_measure = panel_measure,
@@ -281,6 +282,7 @@ function Panel(
         end
     end
 
+    # @info "creating not fitted panel" content.measure panel_measure width Δw 
     return render(
         content;
         panel_measure = panel_measure,
@@ -315,8 +317,13 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
 Create a Panel's content line.
 """
 function makecontent_line(cline, panel_measure, justify, background, padding, left, right, Δw)::Segment
-    line = pad(rstrip(apply_style(cline)), panel_measure.w - Δw, justify; bg = background)
-    # line = cline
+    line = apply_style(cline) |> rstrip
+    line = if panel_measure.w - textlen(line) > 2
+        pad(cline, panel_measure.w - Δw, justify; bg = background)
+    else
+        line * " "
+    end
+
     line = pad(
         line, 
         padding.left, 
