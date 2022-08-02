@@ -45,7 +45,7 @@ function Base.string(renderable::AbstractRenderable, width::Int)::String
     return if renderable.measure.w <= width
         string(renderable)
     else
-        string(trim_renderable(renderable, width))
+        string(trim_renderable(renderable, width)) * "\e[0m"
     end
 end
 
@@ -201,16 +201,15 @@ function trim_renderable(ren::AbstractRenderable, width::Int)::AbstractRenderabl
 end
 
 
-# function trim_renderable(ren::AbstractRenderable, width::Int)::AbstractRenderable
-#     text = getfield.(ren.segments, :text)
+function trim_renderable(ren::RenderableText, width::Int)::RenderableText
+    @info "Trimming text"
+    text = join(getfield.(ren.segments, :text))
+    return RenderableText(text, width=width)
 
-    
-#     /(reshape_text.(text, width)...)
+end
 
-# end
-
-trim_renderable(ren::AbstractString, width::Int)::String = begin
-    reshape_text(ren, width)
+trim_renderable(text::AbstractString, width::Int) = begin
+    text_to_width(text, width)
 end
 
 

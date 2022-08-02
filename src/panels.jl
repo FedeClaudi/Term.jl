@@ -162,11 +162,22 @@ function Panel(
     end
 
     # if too large, set fit=false
-    fit && (fit = panel_width <= console_width())
-    fit && (width = panel_width)
+    (fit && !isa(content, AbstractString)) && (fit = panel_width <= console_width())
+    fit && (width = min(panel_width, console_width()))
 
     # @info "Ready to make panel" content_width panel_width width fit
     return Panel(content, Val(fit), padding; width = width, kwargs...)
+end
+
+"""
+    content_as_renderable(content, width, Δw, justify)
+
+Convert any input content to a renderable
+"""
+content_as_renderable(content, width, Δw, justify, background) = if content isa AbstractRenderable
+    get_width(content) > width - Δw + 1 ?  trim_renderable(content, width - Δw - 1) : content
+else  # string or RenderableTet
+    RenderableText(content, width = width - Δw - 1, background = background, justify=justify)
 end
 
 """
@@ -200,10 +211,8 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # create content
-    content =
-        content isa AbstractRenderable ? content :
-        RenderableText(content, width = width - Δw - 2, background = background, justify=justify)
-
+    content = content_as_renderable(content, width, Δw, justify, background)
+        
     # estimate panel size
     panel_measure = Measure(
         max(something(height, 0), content.measure.h + padding.top + padding.bottom + 2),
@@ -255,13 +264,7 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # if the content is too large, resize it to fit the panel's width.
-    get_width(content) > width - Δw + 1 &&
-        (content = trim_renderable(content, width - Δw - 1))
-
-    # get panel height
-    content =
-        content isa AbstractRenderable ? content :
-        RenderableText(content, width = width - Δw - 1, background = background, justify=justify)
+    content = content_as_renderable(content, width, Δw, justify, background)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
 
@@ -313,6 +316,7 @@ Create a Panel's content line.
 """
 function makecontent_line(cline, panel_measure, justify, background, padding, left, right, Δw)::Segment
     line = pad(rstrip(apply_style(cline)), panel_measure.w - Δw, justify; bg = background)
+    # line = cline
     line = pad(
         line, 
         padding.left, 
@@ -367,6 +371,7 @@ function render(
 )::Panel
     background = get_bg_color(background)
     # @info "calling render" content content_measure background
+    # println("Content\n", content)
 
     # create top/bottom rows with titles
     box = eval(box)  # get box object from symbol
