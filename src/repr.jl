@@ -341,7 +341,7 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
 
     # get docstring 
     doc, _ = get_docstring(fun)
-    doc = parse_md(doc; width = panel.measure.w)
+    doc = parse_md(doc; width = panel.measure.w-4)
     doc = split_lines(doc)
     if length(doc) > 100
         doc = [
@@ -351,7 +351,7 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
     end
     print(io, panel)
     print(io, hLine(panel.measure.w, "Docstring"; style = "green dim", box = :HEAVY))
-    print(io, "   " * RenderableText(join(doc, "\n"), width = width))
+    print(io, "   " * RenderableText(join(doc, "\n"), width = width-4))
     # println(io, join(doc, "\n"))
 end
 

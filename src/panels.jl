@@ -1,7 +1,7 @@
 module Panels
 
 import Term:
-    reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi
+    reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi, get_bg_color
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
 import ..Layout: pad, vstack, Padding, lvstack
@@ -30,6 +30,20 @@ abstract type AbstractPanel <: AbstractRenderable end
     │ my panel │
     ╰──────────╯
 ```
+
+---
+
+When constructing a Panel, several keyword arguments can be used to set
+its appearance:
+- box::Symbol sets the `Box` type for the Panel's border
+- style::String  sets the box's style (e.g., color)
+- title::Union{String,Nothing}  sets the Panel's title
+- title_style::Union{Nothing,String} sets the title's style
+- title_justify::Symbol     sets the location of the title
+- subtitle::Union{String,Nothing}  sets the Panel's subtitle
+- subtitle_style::Union{Nothing,String}  sets the subtitle's style
+- subtitle_justify::Symbol  sets the location of the subtitle
+- justify::Symbol sets text's alignment (:left, :rigth, :center, :justify)
 """
 mutable struct Panel <: AbstractPanel
     segments::Vector
@@ -48,9 +62,9 @@ end
 
 Base.size(p::Panel) = size(p.measure)
 
+
 """
 ---
-
     Panel(; 
         fit::Bool = false,
         height::Int = 2,
@@ -60,7 +74,6 @@ Base.size(p::Panel) = size(p.measure)
     )
 
 Construct a `Panel` with no content.
-
 
 ### Examples
 ```
@@ -180,6 +193,7 @@ function Panel(
     height::Union{Nothing,Int} = nothing,
     width::Int,
     background::Union{Nothing,String} = nothing,
+    justify::Symbol=:left,
     kwargs...,
 )
     Δw = padding.left + padding.right + 2
@@ -188,7 +202,7 @@ function Panel(
     # create content
     content =
         content isa AbstractRenderable ? content :
-        RenderableText(content, width = width - Δw - 2, background = background)
+        RenderableText(content, width = width - Δw - 2, background = background, justify=justify)
 
     # estimate panel size
     panel_measure = Measure(
@@ -204,6 +218,7 @@ function Panel(
         Δh = Δh,
         padding = padding,
         background = background,
+        justify=justify,
         kwargs...,
     )
 end
@@ -233,6 +248,7 @@ function Panel(
     height::Union{Nothing,Int} = nothing,
     width::Int = default_width(),
     background::Union{Nothing,String} = nothing,
+    justify::Symbol=:left,
     kwargs...,
 )
     Δw = padding.left + padding.right + 2
@@ -245,7 +261,7 @@ function Panel(
     # get panel height
     content =
         content isa AbstractRenderable ? content :
-        RenderableText(content, width = width - Δw - 1, background = background)
+        RenderableText(content, width = width - Δw - 1, background = background, justify=justify)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
 
@@ -270,6 +286,7 @@ function Panel(
         Δh = Δh,
         padding = padding,
         background = background,
+        justify=justify,
         kwargs...,
     )
 end
@@ -288,6 +305,25 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
 
 # ---------------------------------- render ---------------------------------- #
 
+
+"""
+    makecontent_line(cline, panel_measure, justify, background, padding, left, right)::Segment
+
+Create a Panel's content line.
+"""
+function makecontent_line(cline, panel_measure, justify, background, padding, left, right, Δw)::Segment
+    line = pad(rstrip(apply_style(cline)), panel_measure.w - Δw, justify; bg = background)
+    line = pad(
+        line, 
+        padding.left, 
+        padding.right; 
+        bg = background
+    )
+
+    # make line
+    return Segment(left * line * right)
+end
+
 """
     render(
         content;
@@ -300,6 +336,7 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
         subtitle_style::Union{Nothing,String} = nothing,
         subtitle_justify::Symbol = :left,
         justify::Symbol = :left,
+        text_justify::Bool=false,
         panel_measure::Measure,
         content_measure::Measure,
         Δw::Int,
@@ -328,7 +365,9 @@ function render(
     background = nothing,
     kwargs...,
 )::Panel
-    # @info "calling render" content content_measure
+    background = get_bg_color(background)
+    # @info "calling render" content content_measure background
+
     # create top/bottom rows with titles
     box = eval(box)  # get box object from symbol
     top = get_title_row(
@@ -371,19 +410,6 @@ function render(
     end
     # @info "rendering" panel_measure Δw
 
-    # add lines with content fn
-    function makecontent_line(cline)::Segment
-        line = pad(rstrip(apply_style(cline)), panel_measure.w - Δw, justify; bg = background)
-        line = pad(
-            line, 
-            padding.left, 
-            padding.right; 
-            bg = background
-        )
-
-        # make line
-        return Segment(left * line * right)
-    end
     # check if we need extra lines at the bottom to reach target height
     n_extra = if content_measure.h < panel_measure.h - Δh - 2
         panel_measure.h - content_measure.h - Δh - 2
@@ -399,7 +425,9 @@ function render(
 
     # content
     content_sgs::Vector{Segment} =
-        content.measure.w > 0 ? map(s -> makecontent_line(s.text), content.segments) : []
+        content.measure.w > 0 ? map(
+            s -> makecontent_line(s.text, panel_measure, justify, background, padding, left, right, Δw), content.segments
+        ) : []
 
     final_segments::Vector{Segment} = [
         repeat(empty, n_extra)...,                  # lines to reach target height
