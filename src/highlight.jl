@@ -123,7 +123,7 @@ end
 
 Load a file, get the code and format it. Return styled text
 """
-function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
+function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)::String
     η = countlines(path)
     @assert lineno > 0 "lineno must be ≥1"
     @assert lineno ≤ η "lineno $lineno too high for file with $(η) lines"

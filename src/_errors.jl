@@ -45,8 +45,10 @@ function render_frame_info(frame::StackFrame; show_source = true)
     if length(string(frame.file)) > 0
         file_line = RenderableText(
             "{dim}$(file):{bold white}$(frame.line){/bold white}{/dim}";
-            width = default_stacktrace_width() - 12,
+            width = default_stacktrace_width() - 30,
         )
+
+
         out = func_line / file_line
         if show_source
             error_source = nothing
@@ -59,21 +61,25 @@ function render_frame_info(frame::StackFrame; show_source = true)
             out = if isnothing(error_source) || length(error_source) == 0
                 out
             else
+                code_error_panel = "   " * Panel(
+                    error_source;
+                    fit = false,
+                    style = "white dim",
+                    width = min(60, default_stacktrace_width() - 30),
+                    subtitle_justify = :center,
+                    subtitle = "error line",
+                    subtitle_style = "default white #fa6673",
+                )
+
                 lvstack(
                     out,
-                    "   " * Panel(
-                        error_source;
-                        fit = true,
-                        style = "white dim",
-                        width = 44,
-                        subtitle_justify = :center,
-                        subtitle = "error line",
-                        subtitle_style = "default white #fa6673",
-                    );
-                    pad = 1,
+                    code_error_panel;
+                    pad =0,
                 )
+
             end
         end
+
         return out
     else
         return RenderableText("   " * func; width = default_stacktrace_width() - 4)
@@ -86,14 +92,14 @@ function render_backtrace_frame(
     as_panel = true,
     kwargs...,
 )
-    content = hstack(num, info, pad = 2)
+    content = hstack(num, info, pad = 1)
     p = if as_panel
         Panel(
             content;
             padding = (2, 2, 1, 1),
             style = "#9bb3e0",
-            fit = true,
-            width = default_stacktrace_width() - 20,
+            fit = false,
+            width = default_stacktrace_width()-10,
             kwargs...,
         )
     else
@@ -157,8 +163,9 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
             end
         end
     end
+
     return Panel(
-        lvstack(content...);
+        cvstack(content...);
         padding = (2, 2, 2, 1),
         subtitle = "Error Stack",
         style = "#ff8a4f dim",
@@ -166,6 +173,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         title = "Error Stack",
         title_style = "bold #ff8a4f default",
         fit = false,
+        justifty=:center,
         width = default_stacktrace_width(),
     )
 end

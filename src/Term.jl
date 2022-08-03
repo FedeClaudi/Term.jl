@@ -7,7 +7,7 @@ const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
 
 default_width(io = stdout) =
     min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
-default_stacktrace_width(io = stdout) =
+default_stacktrace_width(io = stderr) =
     min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9

@@ -165,7 +165,7 @@ function Panel(
     (fit && !isa(content, AbstractString)) && (fit = panel_width <= console_width())
     fit && (width = min(panel_width, console_width()))
 
-    # @info "Ready to make panel" content_width panel_width width fit
+    # @info "Ready to make panel" content content_width panel_width width fit
     return Panel(content, Val(fit), padding; width = width, kwargs...)
 end
 
@@ -174,9 +174,11 @@ end
 
 Convert any input content to a renderable
 """
-content_as_renderable(content, width, Δw, justify, background) = if content isa AbstractRenderable
+function content_as_renderable(content::AbstractRenderable, width, Δw, justify, background) 
     get_width(content) > width - Δw + 1 ?  trim_renderable(content, width - Δw - 1) : content
-else  # string or RenderableTet
+end
+
+function content_as_renderable(content, width, Δw, justify, background) 
     RenderableText(content, width = width - Δw - 1, background = background, justify=justify)
 end
 
