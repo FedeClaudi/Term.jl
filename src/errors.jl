@@ -234,6 +234,16 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
+            
+            if default_stacktrace_width() < 70
+                println(io)
+                @warn "Term.jl: can't render error message, console too narrow. Using default stacktrace"
+                Base.show_backtrace(io, bt)
+                print(io, '\n'^3)
+                Base.showerror(io, er)
+                return
+            end
+
             try
                 println("\n")
                 ename = string(typeof(er))
@@ -259,10 +269,10 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                         title_justify = :center,
                         fit=false,
                 ) |> print
-
-                            catch err
-                @error "ERROR: " exception = err
-                @warn "Term.jl: failed to render error message" err
+            catch cought_err
+                @error "Term.jl: error while rendering error message: " exception = cought_err
+                Base.show_backtrace(io, bt)
+                print(io, '\n'^3)
                 Base.showerror(io, er)
             end
         end
