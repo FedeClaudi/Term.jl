@@ -45,7 +45,8 @@ function Base.string(renderable::AbstractRenderable, width::Int)::String
     return if renderable.measure.w <= width
         string(renderable)
     else
-        string(trim_renderable(renderable, width)) * "\e[0m"
+        # string(trim_renderable(renderable, width)) * "\e[0m"
+        string(RenderableText(string(renderable), width=width))
     end
 end
 

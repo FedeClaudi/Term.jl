@@ -174,13 +174,10 @@ end
 
 Convert any input content to a renderable
 """
-function content_as_renderable(content::AbstractRenderable, width, Δw, justify, background) 
-    get_width(content) > width - Δw + 1 ?  trim_renderable(content, width - Δw - 1) : content
+function content_as_renderable(content, width, Δw, justify, background) 
+    RenderableText(string(content), width = width - Δw, background = background, justify=justify)
 end
 
-function content_as_renderable(content, width, Δw, justify, background) 
-    RenderableText(content, width = width - Δw - 1, background = background, justify=justify)
-end
 
 """
 ---
@@ -272,16 +269,19 @@ function Panel(
     panel_measure = Measure(height, width)
 
     # if the content is too tall, exclude some lines
-    if content.measure.h > height - Δh - 1
-        content = if content.measure.h - height - Δh - 2 > 0
-            segments = [
-                content.segments[1:(height - Δh - 3)]...
-                Segment("... content omitted ...", "dim")
+    if content.measure.h > height - Δh
+        lines_to_drop = content.measure.h - height + Δh + 3
+        omit_msg = RenderableText("... content omitted ...", style="dim", width=content.measure.w, justify=:center)
+
+        segments = if lines_to_drop < content.measure.h 
+            Segment[
+                content.segments[1:end-lines_to_drop]...
+                omit_msg.segments[1]
             ]
-            Renderable(segments, Measure(segments))
         else
-            RenderableText("")
+            [omit_msg.segments[1]]
         end
+        content = Renderable(segments, Measure(segments))
     end
 
     # @info "creating not fitted panel" content.measure panel_measure width Δw 
@@ -430,7 +430,6 @@ function render(
     else
         0
     end
-
     # create segments
     initial_segments::Vector{Segment} = [
         top,                                        # top border

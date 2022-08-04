@@ -1,9 +1,9 @@
 module Tprint
 
-import Term: unescape_brackets, escape_brackets, has_markup, reshape_text
+import Term: unescape_brackets, escape_brackets, has_markup, reshape_text, Measure
 import Term: highlight as highlighter
 
-import ..Renderables: AbstractRenderable, trim_renderable
+import ..Renderables: AbstractRenderable, trim_renderable, RenderableText
 import ..Style: apply_style
 import ..Layout: hstack
 import ..Consoles: console_width
@@ -36,7 +36,10 @@ Apply style to a string and print it
 """
 function tprint(io::IO, x::AbstractString; highlight = true)
     x = (highlight ? apply_style ∘ highlighter : apply_style)(x)
-    x = reshape_text(x, console_width(io))
+    # x = reshape_text(x, console_width(io))
+    x = Measure(x).w <= console_width(io) ? x : string(
+        RenderableText(string, width = console_width(io))
+    )
     print(io, x)
 end
 
