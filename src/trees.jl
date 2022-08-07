@@ -157,9 +157,9 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Vector
 end
 
 """
-    Tree(data::Union{Dict, Pair}; level=0, title::String="tree", kwargs...)
+    Tree(data::Union{AbstractDict, Pair}; level=0, title::String="tree", kwargs...)
 
-Construct a `Tree` out of a `Dict`. Recursively handle nested `Dict`s.
+Construct a `Tree` out of a `Dict` or `OrderedDict`. Recursively handle nested `Dict`s.
 """
 function Tree(
     data::Union{AbstractDict,Pair,Vector};
