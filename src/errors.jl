@@ -39,7 +39,6 @@ const ErrorsExplanations = Dict(
     UndefVarError => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
 )
 
-_width() = min(console_width(stderr), 100)
 
 # ----------------------- error type specific messages ----------------------- #
 
@@ -260,15 +259,15 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                 end
                 
                 # print error message and description
-                Panel(
-                        error_message(er)[1];
-                        width = default_stacktrace_width(),
-                        title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
-                        padding = (2, 2, 1, 1),
-                        style = "dim red",
-                        title_justify = :center,
-                        fit=false,
-                ) |> print
+                # Panel(
+                #         error_message(er)[1];
+                #         width = default_stacktrace_width(),
+                #         title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
+                #         padding = (2, 2, 1, 1),
+                #         style = "dim red",
+                #         title_justify = :center,
+                #         fit=false,
+                # ) |> print
             catch cought_err
                 @error "Term.jl: error while rendering error message: " exception = cought_err
                 Base.show_backtrace(io, bt)

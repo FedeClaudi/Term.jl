@@ -72,7 +72,7 @@ function asleaf end
 asleaf(x) = str_trunc(highlight(string(x)), TERM_THEME[].tree_max_width)
 asleaf(x::Nothing) = nothing
 asleaf(x::AbstractVector) =
-    str_trunc((escape_brackets ∘ string)(x), TERM_THEME[].tree_max_width)
+    str_trunc(string(x), TERM_THEME[].tree_max_width)
 asleaf(x::AbstractString) = str_trunc(highlight(x, :string), TERM_THEME[].tree_max_width)
 
 """
@@ -94,7 +94,7 @@ It renders as a hierarchical structure with lines (guides) connecting the variou
 """
 @kwdef struct Tree <: AbstractRenderable
     segments::Union{Nothing,Vector{Segment}} = nothing
-    measure::Union{Nothing,Measure} = nothing
+    measure::Measure = Measure(segments)
 
     name::String
     level::Int
@@ -115,9 +115,7 @@ function Base.show(io::IO, tree::Tree)
     if io != stdout
         print(io, "Tree: $(length(tree.nodes)) nodes, $(length(tree.leaves)) leaves")
     else
-        for seg in tree.segments
-            println(io, seg)
-        end
+        println.(io, tree.segments)
     end
 end
 
@@ -151,15 +149,15 @@ end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Vector)
     for _v in v
-        _k = _v isa Dict ? collect(keys(_v))[1] : (v isa Pair ? _v.first : v)
+        _k = _v isa Union{Dict, OrderedDict} ? collect(keys(_v))[1] : (v isa Pair ? _v.first : v)
         addnode!(nodes, leaves, level + 1, _k, _v)
     end
 end
 
 """
-    Tree(data::Union{Dict, Pair}; level=0, title::String="tree", kwargs...)
+    Tree(data::Union{AbstractDict, Pair}; level=0, title::String="tree", kwargs...)
 
-Construct a `Tree` out of a `Dict`. Recursively handle nested `Dict`s.
+Construct a `Tree` out of a `AbstractDict`. Recursively handle nested `AbstractDict`s.
 """
 function Tree(
     data::Union{AbstractDict,Pair,Vector};
@@ -322,13 +320,13 @@ Apply style for the type whose hierarchy Tree we are making
 style_T(T) = "{orange1 italic underline}$T{/orange1 italic underline}"
 
 """
-    make_hierarchy_dict(x::Vector{DataType}, T::DataType, Tsubs::Dict)::Dict
+    make_hierarchy_dict(x::Vector{DataType}, T::DataType, Tsubs::AbstractDict)::AbstractDict
 
 Recursively create a dictionary with the types hierarchy for `T`.
 `Tsubs` carries information about T's subtypes.
-The Dict is made backwards. From  the deepest levels up.
+The AbstractDict is made backwards. From  the deepest levels up.
 """
-function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::Dict)::Dict
+function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::AbstractDict)::AbstractDict
     data = Dict()
     prev = ""
     for (n, y) in enumerate(x)

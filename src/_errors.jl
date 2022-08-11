@@ -4,7 +4,7 @@ import MyterialColors: pink, indigo_light
 function render_frame_info(pointer::Ptr{Nothing}; show_source = true)
     frame = StackTraces.lookup(pointer)[1]
     return render_frame_info(frame; show_source = show_source)
-    return RenderableText("   " * string(frame); width = default_stacktrace_width() - 12)
+    # return RenderableText("   " * string(frame); width = default_stacktrace_width() - 12)
 end
 
 function render_frame_info(frame::StackFrame; show_source = true)
@@ -14,8 +14,7 @@ function render_frame_info(frame::StackFrame; show_source = true)
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{#ffc44f}" * s"\g<0>" * "{/#ffc44f}"),
     )
-    # func = highlight(reshape_text(func, 70))
-    func = reshape_text(highlight(func), 70) |> remove_markup |> lstrip
+    func = reshape_text(highlight(func), default_stacktrace_width()) |> remove_markup |> lstrip
 
     # get other information about the function 
     inline = frame.inlined ? RenderableText("   inlined"; style = "bold dim white") : ""
@@ -79,7 +78,6 @@ function render_frame_info(frame::StackFrame; show_source = true)
 
             end
         end
-
         return out
     else
         return RenderableText("   " * func; width = default_stacktrace_width() - 4)
@@ -93,7 +91,7 @@ function render_backtrace_frame(
     kwargs...,
 )
     content = hstack(num, info, pad = 1)
-    p = if as_panel
+    return if as_panel
         Panel(
             content;
             padding = (2, 2, 1, 1),
@@ -103,10 +101,8 @@ function render_backtrace_frame(
             kwargs...,
         )
     else
-        "   " * content
+        RenderableText(string(content), width=default_stacktrace_width()-10)
     end
-
-    return p  #  / " "
 end
 
 function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 30)
@@ -116,7 +112,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         bt = reverse(bt)
     end
 
-    content::Vector = []
+    content = AbstractRenderable[]
     added_skipped_message = false
     N = length(bt)
     for (num, frame) in enumerate(bt)
@@ -164,8 +160,14 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         end
     end
 
+    # println(lvstack(content[1:20]))
+    # println(lvstack(content[1:22]))
+    # println.(map(
+    #     v -> v.measure, content
+    # ))
+    # println(cvstack(content).measure, default_stacktrace_width())
     return Panel(
-        cvstack(content...);
+        content...;
         padding = (2, 2, 2, 1),
         subtitle = "Error Stack",
         style = "#ff8a4f dim",

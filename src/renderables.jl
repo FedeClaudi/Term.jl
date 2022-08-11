@@ -11,7 +11,8 @@ import Term:
     textwidth,
     str_trunc,
     text_to_width,
-    get_bg_color
+    get_bg_color,
+    textlen
 
 import Term: highlight as highlighter
 import ..Consoles: console_width
@@ -195,6 +196,7 @@ end
 Trim a string or renderable to a max width.
 """
 function trim_renderable(ren::AbstractRenderable, width::Int)::AbstractRenderable
+    # @info "Trimming renderable" ren
     text = getfield.(ren.segments, :text)
     segs = Segment.(map(
         s -> get_width(s) > width ? str_trunc(s, width) : s,
@@ -205,13 +207,13 @@ end
 
 
 function trim_renderable(ren::RenderableText, width::Int)::RenderableText
-    # @info "Trimming text"
+    # @info "Trimming text renderable" ren
     text = join(getfield.(ren.segments, :text))
     return RenderableText(text, width=width)
-
 end
 
 trim_renderable(text::AbstractString, width::Int) = begin
+    # @info "Trimming text" text
     text_to_width(text, width)
 end
 

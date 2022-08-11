@@ -1,12 +1,13 @@
 module Tprint
 
-import Term: unescape_brackets, escape_brackets, has_markup, reshape_text, Measure
+import Term: unescape_brackets, escape_brackets, has_markup, reshape_text
 import Term: highlight as highlighter
-
+import ..Measures: Measure
 import ..Renderables: AbstractRenderable, trim_renderable, RenderableText
 import ..Style: apply_style
 import ..Layout: hstack
 import ..Consoles: console_width
+
 
 export tprint, tprintln
 
