@@ -37,6 +37,20 @@ end
           "\e[38;2;155;179;224m╭──────────────────────────────────────╮\e[39m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m                T()\e[38;2;187;134;219m::T\e[39m                \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[38;2;155;179;224m╰──────────────────────────────── \e[38;2;227;172;141mT\e[39m\e[38;2;155;179;224m\e[38;2;155;179;224m ───╯\e[39m\e[0m\e[39m\e[38;2;155;179;224m\e[0m\n"
 end
 
+@testset "REPR @with_repr with doc" begin
+    # just check that creating a @with_repr is ok
+    @with_repr begin
+        """docs"""
+        struct Rocket2
+            width::Int
+            height::Int
+            mass::Float64
+
+            manufacturer::String
+        end
+    end
+end
+
 objs = if VERSION >= v"1.7.1"
     (
         (1, [1, 2, 3]),

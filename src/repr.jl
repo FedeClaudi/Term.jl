@@ -405,14 +405,15 @@ end
 ```
 """
 function with_repr(typedef::Expr)
+
     tn = typename(typedef) # the name of the type
     showfn = :(Base.show(io::IO, ::MIME"text/plain", obj::$tn) = termshow(io, obj))
-
     quote
-        $typedef
+        Core.@__doc__ $typedef
         $showfn
     end
 end
+
 
 """
 with_repr(typedef::Expr)
@@ -431,8 +432,9 @@ y
 end
 ```
 """
-macro with_repr(typedef)
+macro with_repr(typedef::Expr)
     return esc(with_repr(typedef))
 end
+
 
 end
