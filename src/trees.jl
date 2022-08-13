@@ -83,6 +83,7 @@ End items in a `Tree`. No sub-trees.
 struct Leaf
     name::Union{Nothing,String}
     text::Union{Nothing,String}
+    idx::Int  # rendering index
 end
 
 # ----------------------------------- tree ----------------------------------- #
@@ -100,6 +101,7 @@ It renders as a hierarchical structure with lines (guides) connecting the variou
     level::Int
     nodes::Vector{Tree}
     leaves::Vector{Leaf}
+    idx::Int = 0  # rendering index for tree that are nodes in a lager tree
 
     title_style::String = TERM_THEME[].tree_title_style
     node_style::String = TERM_THEME[].tree_node_style
@@ -113,7 +115,7 @@ Show/render a `Tree`
 """
 function Base.show(io::IO, tree::Tree)
     if io != stdout
-        print(io, "Tree: $(length(tree.nodes)) nodes, $(length(tree.leaves)) leaves")
+        print(io, "Tree: $(length(tree.nodes)) nodes, $(length(tree.leaves)) leaves | Idx: $(tree.idx)")
     else
         println.(io, tree.segments)
     end
@@ -129,6 +131,7 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Abstra
             v;
             level = level + 1,
             title = str_trunc(string(k), TERM_THEME[].tree_max_width),
+            idx = length(nodes) + length(leaves) + 1,
         ),
     )
 end
@@ -139,12 +142,14 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Pair)
     else
         str_trunc(string(v.first), TERM_THEME[].tree_max_width)
     end
-    return push!(leaves, Leaf(k, asleaf(v.second)))
+    idx = length(nodes) + length(leaves) + 1
+    return push!(leaves, Leaf(k, asleaf(v.second), idx))
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Any)
     k = isnothing(k) ? nothing : str_trunc(string(k), TERM_THEME[].tree_max_width)
-    return push!(leaves, Leaf(k, asleaf(v)))
+    idx = length(nodes) + length(leaves) + 1
+    return push!(leaves, Leaf(k, asleaf(v), idx))
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Vector)
@@ -172,7 +177,7 @@ function Tree(
 
     # go over all entries
     for (k, v) in zip(keys(data), values(data))
-        addnode!(nodes, leaves, level, k, v)
+        addnode!(nodes, leaves, level, k, v,)
     end
 
     # if we're handling the first tree, render it. Otherwise parse nested trees.
@@ -258,43 +263,43 @@ function render(
     end
     tree.level == 0 && _add(prevguides * guides.vline)
 
-    # render sub-trees
-    for (last, node) in loop_last(tree.nodes)
-        # check if it's the last entry in the tree
-        lasttree = last && !hasleaves
 
-        # get the appropriate guides
-        prev = prevguides * (lasttree ? guides.space : guides.vline)
+    # get all nodes and sub-trees in order for rendering
+    elements = vcat(tree.nodes, tree.leaves)
+    idxs = getfield.(elements, :idx)
+    elements = elements[sortperm(idxs)]
+    # @info "rendering $(length(elements)) elements" elements
 
-        append!(
-            segments,
-            render(
-                node;
-                prevguides = prev,
-                lasttree = lasttree,
-                waslast = vcat(waslast, lasttree),
-                guides = guides,
-            ),
-        )
-        hasleaves && length(node.leaves) > 0 && _add(prevguides * guides.vline)
-    end
+    for (last, elem) in loop_last(elements)
+        if elem isa Tree
+            prev = prevguides * (last ? guides.space : guides.vline)
 
-    # render leaves
-    if hasleaves
-        for (last, leaf) in loop_last(tree.leaves)
-            seg = last ? guides.leaf : guides.branch
-            if isnothing(leaf.text)
-                k = isnothing(leaf.name) ? "" : highlight(leaf.name)
-                v = ""
-            else
-                k = if isnothing(leaf.name)
-                    ""
+            append!(
+                segments,
+                render(
+                    elem;
+                    prevguides = prev,
+                    lasttree = last,
+                    waslast = vcat(waslast, last), # vcat(waslast, lasttree),
+                    guides = guides,
+                ),
+            )
+            # hasleaves && length(elem.leaves) > 0 && _add(prevguides * guides.vline)
+        elseif elem isa Leaf
+            # @info "rendering leaf $(elem.idx): $(elem.name) > $(elem.text)"
+                seg = last ? guides.leaf : guides.branch
+                if isnothing(elem.text)
+                    k = isnothing(elem.name) ? "" : highlight(elem.name)
+                    v = ""
                 else
-                    "{$(tree.leaf_style)}$(leaf.name){/$(tree.leaf_style)}: "
+                    k = if isnothing(elem.name)
+                        ""
+                    else
+                        "{$(tree.leaf_style)}$(elem.name){/$(tree.leaf_style)}: "
+                    end
+                    v = elem.text
                 end
-                v = leaf.text
-            end
-            _add(prevguides * seg * k * v)
+                _add(prevguides * seg * k * v)
         end
     end
 
@@ -309,6 +314,7 @@ function render(
     else
         return segments
     end
+    
 end
 
 # ---------------------------------------------------------------------------- #

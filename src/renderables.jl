@@ -40,9 +40,14 @@ info(r::AbstractRenderable)::String =
 
 Creates a string representation of a renderable
 """
-Base.string(r::AbstractRenderable)::String = join([seg.text for seg in r.segments], "\n")
+Base.string(r::AbstractRenderable)::String = return if isnothing(r.segments)
+    "" 
+    else
+        join([seg.text for seg in r.segments], "\n")
+    end
 
 function Base.string(renderable::AbstractRenderable, width::Int)::String 
+    isnothing(renderable.measure) && (return string(renderable))
     return if renderable.measure.w <= width
         string(renderable)
     else
