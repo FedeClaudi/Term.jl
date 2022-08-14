@@ -26,7 +26,7 @@ println(s1 * " " * s2)
 println(s1 / s2)
 
 # with panels (and text boxes)
-p1 = Panel("content {blue}content{/blue} "^10; fit=false, width = 40)
+p1 = Panel("content {blue}content{/blue} "^10; fit = false, width = 40)
 tb1 = TextBox("this is a text boox! "^5; width = 66)
 
 println(p1 * tb1)

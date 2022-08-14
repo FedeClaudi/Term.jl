@@ -14,7 +14,8 @@ function render_frame_info(frame::StackFrame; show_source = true)
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{#ffc44f}" * s"\g<0>" * "{/#ffc44f}"),
     )
-    func = reshape_text(highlight(func), default_stacktrace_width()) |> remove_markup |> lstrip
+    func =
+        reshape_text(highlight(func), default_stacktrace_width()) |> remove_markup |> lstrip
 
     # get other information about the function 
     inline = frame.inlined ? RenderableText("   inlined"; style = "bold dim white") : ""
@@ -47,7 +48,6 @@ function render_frame_info(frame::StackFrame; show_source = true)
             width = default_stacktrace_width() - 30,
         )
 
-
         out = func_line / file_line
         if show_source
             error_source = nothing
@@ -60,22 +60,18 @@ function render_frame_info(frame::StackFrame; show_source = true)
             out = if isnothing(error_source) || length(error_source) == 0
                 out
             else
-                code_error_panel = "   " * Panel(
-                    error_source;
-                    fit = false,
-                    style = "white dim",
-                    width = min(60, default_stacktrace_width() - 30),
-                    subtitle_justify = :center,
-                    subtitle = "error line",
-                    subtitle_style = "default white #fa6673",
-                )
+                code_error_panel =
+                    "   " * Panel(
+                        error_source;
+                        fit = false,
+                        style = "white dim",
+                        width = min(60, default_stacktrace_width() - 30),
+                        subtitle_justify = :center,
+                        subtitle = "error line",
+                        subtitle_style = "default white #fa6673",
+                    )
 
-                lvstack(
-                    out,
-                    code_error_panel;
-                    pad =0,
-                )
-
+                lvstack(out, code_error_panel; pad = 0)
             end
         end
         return out
@@ -97,11 +93,11 @@ function render_backtrace_frame(
             padding = (2, 2, 1, 1),
             style = "#9bb3e0",
             fit = false,
-            width = default_stacktrace_width()-12,
+            width = default_stacktrace_width() - 12,
             kwargs...,
         )
     else
-        "   " * RenderableText(string(content), width=default_stacktrace_width()-18)
+        "   " * RenderableText(string(content), width = default_stacktrace_width() - 18)
     end
 end
 
@@ -167,7 +163,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
     # ))
     # println(cvstack(content).measure, default_stacktrace_width())
     return Panel(
-        lvstack(content..., pad=1);
+        lvstack(content..., pad = 1);
         padding = (2, 2, 2, 1),
         subtitle = "Error Stack",
         style = "#ff8a4f dim",
@@ -175,7 +171,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         title = "Error Stack",
         title_style = "bold #ff8a4f default",
         fit = false,
-        justifty=:center,
+        justifty = :center,
         width = default_stacktrace_width(),
     )
 end

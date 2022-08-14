@@ -8,7 +8,6 @@ import ..Style: apply_style
 import ..Layout: hstack
 import ..Consoles: console_width
 
-
 export tprint, tprintln
 
 """
@@ -38,9 +37,9 @@ Apply style to a string and print it
 function tprint(io::IO, x::AbstractString; highlight = true)
     x = (highlight ? apply_style ∘ highlighter : apply_style)(x)
     # x = reshape_text(x, console_width(io))
-    x = Measure(x).w <= console_width(io) ? x : string(
-        RenderableText(string, width = console_width(io))
-    )
+    x =
+        Measure(x).w <= console_width(io) ? x :
+        string(RenderableText(string, width = console_width(io)))
     print(io, x)
 end
 

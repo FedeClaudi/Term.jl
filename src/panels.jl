@@ -1,9 +1,18 @@
 module Panels
 
 import Term:
-    reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width, remove_ansi, get_bg_color, textlen
+    reshape_text,
+    join_lines,
+    fillin,
+    str_trunc,
+    ltrim_str,
+    default_width,
+    remove_ansi,
+    get_bg_color,
+    textlen
 
-import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
+import ..Renderables:
+    AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
 import ..Layout: pad, vstack, Padding, lvstack
 import ..Style: apply_style
 import ..Segments: Segment
@@ -61,7 +70,6 @@ mutable struct Panel <: AbstractPanel
 end
 
 Base.size(p::Panel) = size(p.measure)
-
 
 """
 ---
@@ -162,10 +170,10 @@ function Panel(
     end
 
     # if too large, set fit=false
-    fit = fit ? 
-            (!isa(content, AbstractString) ? panel_width <= console_width() : true) : 
-            false
-    width = fit ?  min(panel_width, console_width()) : width
+    fit =
+        fit ? (!isa(content, AbstractString) ? panel_width <= console_width() : true) :
+        false
+    width = fit ? min(panel_width, console_width()) : width
 
     # @info "Ready to make panel" content content_width panel_width width console_width() fit
     return Panel(content, Val(fit), padding; width = width, kwargs...)
@@ -176,24 +184,23 @@ end
 
 Convert any input content to a renderable
 """
-function content_as_renderable(content::AbstractRenderable, width, Δw, justify, background) 
+function content_as_renderable(content::AbstractRenderable, width, Δw, justify, background)
     RenderableText(
-        string(content), 
-        width = width - Δw, 
-        background = background, 
-        justify=justify
+        string(content),
+        width = width - Δw,
+        background = background,
+        justify = justify,
     )
 end
 
-function content_as_renderable(content::AbstractString, width, Δw, justify, background) 
+function content_as_renderable(content::AbstractString, width, Δw, justify, background)
     RenderableText(
-        string(content), 
-        width = width - Δw, 
-        background = background, 
-        justify=justify
+        string(content),
+        width = width - Δw,
+        background = background,
+        justify = justify,
     )
 end
-
 
 """
 ---
@@ -219,7 +226,7 @@ function Panel(
     height::Union{Nothing,Int} = nothing,
     width::Int,
     background::Union{Nothing,String} = nothing,
-    justify::Symbol=:left,
+    justify::Symbol = :left,
     kwargs...,
 )
     Δw = padding.left + padding.right + 2
@@ -227,7 +234,7 @@ function Panel(
 
     # create content
     content = content_as_renderable(content, width, Δw, justify, background)
-        
+
     # estimate panel size
     panel_measure = Measure(
         max(something(height, 0), content.measure.h + padding.top + padding.bottom + 2),
@@ -243,7 +250,7 @@ function Panel(
         Δh = Δh,
         padding = padding,
         background = background,
-        justify=justify,
+        justify = justify,
         kwargs...,
     )
 end
@@ -273,7 +280,7 @@ function Panel(
     height::Union{Nothing,Int} = nothing,
     width::Int = default_width(),
     background::Union{Nothing,String} = nothing,
-    justify::Symbol=:left,
+    justify::Symbol = :left,
     kwargs...,
 )
     Δw = padding.left + padding.right + 2
@@ -287,11 +294,16 @@ function Panel(
     # if the content is too tall, exclude some lines
     if content.measure.h > height - Δh
         lines_to_drop = content.measure.h - height + Δh + 3
-        omit_msg = RenderableText("... content omitted ...", style="dim", width=content.measure.w, justify=:center)
+        omit_msg = RenderableText(
+            "... content omitted ...",
+            style = "dim",
+            width = content.measure.w,
+            justify = :center,
+        )
 
-        segments = if lines_to_drop < content.measure.h 
+        segments = if lines_to_drop < content.measure.h
             Segment[
-                content.segments[1:end-lines_to_drop]...
+                content.segments[1:(end - lines_to_drop)]...
                 omit_msg.segments[1]
             ]
         else
@@ -309,7 +321,7 @@ function Panel(
         Δh = Δh,
         padding = padding,
         background = background,
-        justify=justify,
+        justify = justify,
         kwargs...,
     )
 end
@@ -328,13 +340,21 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
 
 # ---------------------------------- render ---------------------------------- #
 
-
 """
     makecontent_line(cline, panel_measure, justify, background, padding, left, right)::Segment
 
 Create a Panel's content line.
 """
-function makecontent_line(cline, panel_measure, justify, background, padding, left, right, Δw)::Segment
+function makecontent_line(
+    cline,
+    panel_measure,
+    justify,
+    background,
+    padding,
+    left,
+    right,
+    Δw,
+)::Segment
     line = apply_style(cline) |> rstrip
     line = if panel_measure.w - textlen(line) > 2
         pad(cline, panel_measure.w - Δw, justify; bg = background)
@@ -342,12 +362,7 @@ function makecontent_line(cline, panel_measure, justify, background, padding, le
         line * " "
     end
 
-    line = pad(
-        line, 
-        padding.left, 
-        padding.right; 
-        bg = background
-    )
+    line = pad(line, padding.left, padding.right; bg = background)
 
     # make line
     return Segment(left * line * right)
@@ -454,8 +469,19 @@ function render(
 
     # content
     content_sgs::Vector{Segment} =
-        content.measure.w > 0 ? map(
-            s -> makecontent_line(s.text, panel_measure, justify, background, padding, left, right, Δw), content.segments
+        content.measure.w > 0 ?
+        map(
+            s -> makecontent_line(
+                s.text,
+                panel_measure,
+                justify,
+                background,
+                padding,
+                left,
+                right,
+                Δw,
+            ),
+            content.segments,
         ) : []
 
     final_segments::Vector{Segment} = [
@@ -473,6 +499,5 @@ end
 # ---------------------------------------------------------------------------- #
 
 TextBox(args...; kwargs...) = Panel(args...; box = get(kwargs, :box, :NONE), kwargs...)
-
 
 end

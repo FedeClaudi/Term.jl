@@ -79,7 +79,7 @@ function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...
                 width = width,
                 justify = :center,
                 padding = (2, 2, 0, 0),
-                fit=false
+                fit = false,
             ),
         )
     end
@@ -171,7 +171,7 @@ function parse_md(
             width = width - 4,
             background = "on_#262626",
             subtitle_justify = :right,
-            fit=false,
+            fit = false,
         )
 
         return string("    " * panel)
@@ -338,7 +338,7 @@ function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::
             title_style = has_title ? style * " default" : "",
             style = style * " dim",
             width = width - 4,
-            fit=false,
+            fit = false,
         ),
     )
 end

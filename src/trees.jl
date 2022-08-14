@@ -71,8 +71,7 @@ function asleaf end
 
 asleaf(x) = str_trunc(highlight(string(x)), TERM_THEME[].tree_max_width)
 asleaf(x::Nothing) = nothing
-asleaf(x::AbstractVector) =
-    str_trunc(string(x), TERM_THEME[].tree_max_width)
+asleaf(x::AbstractVector) = str_trunc(string(x), TERM_THEME[].tree_max_width)
 asleaf(x::AbstractString) = str_trunc(highlight(x, :string), TERM_THEME[].tree_max_width)
 
 """
@@ -115,7 +114,10 @@ Show/render a `Tree`
 """
 function Base.show(io::IO, tree::Tree)
     if io != stdout
-        print(io, "Tree: $(length(tree.nodes)) nodes, $(length(tree.leaves)) leaves | Idx: $(tree.idx)")
+        print(
+            io,
+            "Tree: $(length(tree.nodes)) nodes, $(length(tree.leaves)) leaves | Idx: $(tree.idx)",
+        )
     else
         println.(io, tree.segments)
     end
@@ -154,7 +156,9 @@ end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Vector)
     for _v in v
-        _k = _v isa Union{Dict, OrderedDict} ? collect(keys(_v))[1] : (v isa Pair ? _v.first : v)
+        _k =
+            _v isa Union{Dict,OrderedDict} ? collect(keys(_v))[1] :
+            (v isa Pair ? _v.first : v)
         addnode!(nodes, leaves, level + 1, _k, _v)
     end
 end
@@ -177,7 +181,7 @@ function Tree(
 
     # go over all entries
     for (k, v) in zip(keys(data), values(data))
-        addnode!(nodes, leaves, level, k, v,)
+        addnode!(nodes, leaves, level, k, v)
     end
 
     # if we're handling the first tree, render it. Otherwise parse nested trees.
@@ -263,7 +267,6 @@ function render(
     end
     tree.level == 0 && _add(prevguides * guides.vline)
 
-
     # get all nodes and sub-trees in order for rendering
     elements = vcat(tree.nodes, tree.leaves)
     idxs = getfield.(elements, :idx)
@@ -287,19 +290,19 @@ function render(
             # hasleaves && length(elem.leaves) > 0 && _add(prevguides * guides.vline)
         elseif elem isa Leaf
             # @info "rendering leaf $(elem.idx): $(elem.name) > $(elem.text)"
-                seg = last ? guides.leaf : guides.branch
-                if isnothing(elem.text)
-                    k = isnothing(elem.name) ? "" : highlight(elem.name)
-                    v = ""
+            seg = last ? guides.leaf : guides.branch
+            if isnothing(elem.text)
+                k = isnothing(elem.name) ? "" : highlight(elem.name)
+                v = ""
+            else
+                k = if isnothing(elem.name)
+                    ""
                 else
-                    k = if isnothing(elem.name)
-                        ""
-                    else
-                        "{$(tree.leaf_style)}$(elem.name){/$(tree.leaf_style)}: "
-                    end
-                    v = elem.text
+                    "{$(tree.leaf_style)}$(elem.name){/$(tree.leaf_style)}: "
                 end
-                _add(prevguides * seg * k * v)
+                v = elem.text
+            end
+            _add(prevguides * seg * k * v)
         end
     end
 
@@ -314,7 +317,6 @@ function render(
     else
         return segments
     end
-    
 end
 
 # ---------------------------------------------------------------------------- #

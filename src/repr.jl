@@ -334,13 +334,13 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
             title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
             width = width - 8,
             fit = false,
-            justify=:left
+            justify = :left,
         )
     # @info "made panel" panel.measure  width console_width(io)
 
     # get docstring 
     doc, _ = get_docstring(fun)
-    doc = parse_md(doc; width = panel.measure.w-4)
+    doc = parse_md(doc; width = panel.measure.w - 4)
     doc = split_lines(doc)
     if length(doc) > 100
         doc = [
@@ -350,7 +350,7 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
     end
     print(io, panel)
     print(io, hLine(panel.measure.w, "Docstring"; style = "green dim", box = :HEAVY))
-    print(io, "   " * RenderableText(join(doc, "\n"), width = width-4))
+    print(io, "   " * RenderableText(join(doc, "\n"), width = width - 4))
 end
 
 # ---------------------------------------------------------------------------- #
@@ -405,7 +405,6 @@ end
 ```
 """
 function with_repr(typedef::Expr)
-
     tn = typename(typedef) # the name of the type
     showfn = :(Base.show(io::IO, ::MIME"text/plain", obj::$tn) = termshow(io, obj))
     quote
@@ -413,7 +412,6 @@ function with_repr(typedef::Expr)
         $showfn
     end
 end
-
 
 """
 with_repr(typedef::Expr)
@@ -435,6 +433,5 @@ end
 macro with_repr(typedef::Expr)
     return esc(with_repr(typedef))
 end
-
 
 end

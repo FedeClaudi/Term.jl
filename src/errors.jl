@@ -39,7 +39,6 @@ const ErrorsExplanations = Dict(
     UndefVarError => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
 )
 
-
 # ----------------------- error type specific messages ----------------------- #
 
 # ! ARGUMENT ERROR
@@ -156,18 +155,14 @@ function error_message(er::MethodError; kwargs...)
         "\n",
     )
     main_line = "No method matching `$name` with arguments types:" / _args
-    
+
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
 
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
         candidates = map(c -> method_error_candidate(name, c), _candidates)
-        main_line /= lvstack(
-            "", 
-            "Alternative candidates:", 
-            candidates...
-        )
+        main_line /= lvstack("", "Alternative candidates:", candidates...)
     else
         main_line = main_line / " " / "{dim}No alternative candidates found"
     end
@@ -233,7 +228,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
-            
+
             if default_stacktrace_width() < 70
                 println(io)
                 @warn "Term.jl: can't render error message, console too narrow. Using default stacktrace"
@@ -246,8 +241,10 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
             try
                 println("\n")
                 ename = string(typeof(er))
-                print(hLine("{default bold red}$ename{/default bold red}"; style = "dim red"))
-                
+                print(
+                    hLine("{default bold red}$ename{/default bold red}"; style = "dim red"),
+                )
+
                 # print error stacktrace
                 if length(bt) > 0
                     rendered_bt = render_backtrace(
@@ -257,19 +254,20 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                     )
                     print(rendered_bt)
                 end
-                
+
                 # print error message and description
                 Panel(
-                        error_message(er)[1];
-                        width = default_stacktrace_width(),
-                        title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
-                        padding = (2, 2, 1, 1),
-                        style = "dim red",
-                        title_justify = :center,
-                        fit=false,
+                    error_message(er)[1];
+                    width = default_stacktrace_width(),
+                    title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
+                    padding = (2, 2, 1, 1),
+                    style = "dim red",
+                    title_justify = :center,
+                    fit = false,
                 ) |> print
             catch cought_err
-                @error "Term.jl: error while rendering error message: " exception = cought_err
+                @error "Term.jl: error while rendering error message: " exception =
+                    cought_err
                 Base.show_backtrace(io, bt)
                 print(io, '\n'^3)
                 Base.showerror(io, er)

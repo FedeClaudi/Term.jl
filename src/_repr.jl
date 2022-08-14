@@ -54,7 +54,6 @@ function repr_panel(
     justify = :center,
     kwargs...,
 )
-
     p = Panel(
         content;
         fit = false,

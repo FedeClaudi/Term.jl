@@ -41,18 +41,18 @@ info(r::AbstractRenderable)::String =
 Creates a string representation of a renderable
 """
 Base.string(r::AbstractRenderable)::String = return if isnothing(r.segments)
-    "" 
-    else
-        join([seg.text for seg in r.segments], "\n")
-    end
+    ""
+else
+    join([seg.text for seg in r.segments], "\n")
+end
 
-function Base.string(renderable::AbstractRenderable, width::Int)::String 
+function Base.string(renderable::AbstractRenderable, width::Int)::String
     isnothing(renderable.measure) && (return string(renderable))
     return if renderable.measure.w <= width
         string(renderable)
     else
         # string(trim_renderable(renderable, width)) * "\e[0m"
-        string(RenderableText(string(renderable), width=width))
+        string(RenderableText(string(renderable), width = width))
     end
 end
 
@@ -86,8 +86,6 @@ end
 # -------------------------------- union type -------------------------------- #
 RenderablesUnion = Union{AbstractString,AbstractRenderable}
 
-
-
 # ------------------------- generic renderable object ------------------------ #
 
 """
@@ -101,11 +99,7 @@ mutable struct Renderable <: AbstractRenderable
     measure::Measure
 end
 
-
-
-
 Base.convert(::Renderable, x) = Renderable(x)
-
 
 """
     Renderable(
@@ -150,13 +144,12 @@ function RenderableText(
     style::Union{Nothing,String} = nothing,
     width::Int = min(Measure(text).w, console_width(stdout)),
     background::Union{Nothing,String} = nothing,
-    justify::Symbol=:left,
+    justify::Symbol = :left,
 )
     # @info "Construcing RenderableText" text width 
     # reshape text
-    text = apply_style(text) 
+    text = apply_style(text)
     text = text_to_width(text, width, justify; background = background) |> chomp
-
 
     style = isnothing(style) ? "" : style
     background = isnothing(background) ? "" : get_bg_color(background)
@@ -164,10 +157,7 @@ function RenderableText(
 
     style_init, style_finish = get_style_codes(MarkupStyle(style))
 
-    segments = map(
-        ln -> Segment(style_init * ln * style_finish), 
-        split(text, "\n")
-    )
+    segments = map(ln -> Segment(style_init * ln * style_finish), split(text, "\n"))
 
     return RenderableText(segments, Measure(segments), style)
 end
@@ -190,7 +180,6 @@ function RenderableText(
     end
 end
 
-
 # ---------------------------------------------------------------------------- #
 #                                     MISC.                                    #
 # ---------------------------------------------------------------------------- #
@@ -203,24 +192,19 @@ Trim a string or renderable to a max width.
 function trim_renderable(ren::AbstractRenderable, width::Int)::AbstractRenderable
     # @info "Trimming renderable" ren
     text = getfield.(ren.segments, :text)
-    segs = Segment.(map(
-        s -> get_width(s) > width ? str_trunc(s, width) : s,
-        text,
-    ))
+    segs = Segment.(map(s -> get_width(s) > width ? str_trunc(s, width) : s, text))
     return Renderable(segs, Measure(segs))
 end
-
 
 function trim_renderable(ren::RenderableText, width::Int)::RenderableText
     # @info "Trimming text renderable" ren
     text = join(getfield.(ren.segments, :text))
-    return RenderableText(text, width=width)
+    return RenderableText(text, width = width)
 end
 
 trim_renderable(text::AbstractString, width::Int) = begin
     # @info "Trimming text" text
     text_to_width(text, width)
 end
-
 
 end

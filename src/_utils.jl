@@ -85,7 +85,6 @@ function calc_nrows_ncols(n, aspect::Union{Nothing,Number,NTuple} = nothing)
     return rows, cols
 end
 
-
 """
     get_bg_color(style::String)
 

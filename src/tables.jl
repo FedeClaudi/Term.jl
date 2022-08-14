@@ -387,19 +387,10 @@ function cell(
         str_trunc(x, w - hor_pad),
     )
 
-    c = vertical_pad(
-        content,
-        h,
-        vertical_justify,
-    )
+    c = vertical_pad(content, h, vertical_justify)
     # @info "cell" Measure(c) Measure(content) RenderableText(c).measure
 
-
-    return vertical_pad(
-        content,
-        h,
-        vertical_justify,
-    )
+    return vertical_pad(content, h, vertical_justify)
 end
 
 """

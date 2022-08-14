@@ -144,8 +144,6 @@ function reshape_text(text::AbstractString, width::Int)
     apply_style(style_at_each_line(String(chars)))
 end
 
-
-
 """
     justify(text::AbstractString, width::Int)::String
 
@@ -158,22 +156,18 @@ function justify(text::AbstractString, width::Int)::String
 
     # cleanup text
     text = strip(text)
-    text = endswith(text, "\e[0m") ? text[1:end-4] : text
+    text = endswith(text, "\e[0m") ? text[1:(end - 4)] : text
     text = strip(text)
     n_spaces = width - textlen(text)
     (n_spaces < 2 || textlen(text) ≤ 0.5width) && (return returnfn(text))
 
-
     # get number of ' ' and their location in the string
-    spaces_locs = map(
-        m -> m[1], findall(" ",  text)
-    )
-    spaces_locs = length(spaces_locs) < 2 ? spaces_locs : spaces_locs[1:end-1]
+    spaces_locs = map(m -> m[1], findall(" ", text))
+    spaces_locs = length(spaces_locs) < 2 ? spaces_locs : spaces_locs[1:(end - 1)]
     n_locs = length(spaces_locs)
     n_locs < 1 && (return returnfn(text))
     space_per_loc = div(n_spaces, n_locs)
     space_per_loc == 0 && (return returnfn(text))
-
 
     inserted = 0
     for (last, loc) in loop_last(spaces_locs)
@@ -185,18 +179,21 @@ function justify(text::AbstractString, width::Int)::String
     return returnfn(text)
 end
 
-
-
 """
     text_to_width(text::AbstractString, width::Int)::String
 
 Cast a text to have a given width by reshaping, it and padding.
 It includes an option to justify the text (:left, :right, :center, :justify).
 """
-function text_to_width(text::AbstractString, width::Int, justify::Symbol; background=nothing)::String
+function text_to_width(
+    text::AbstractString,
+    width::Int,
+    justify::Symbol;
+    background = nothing,
+)::String
     # reshape text
     if Measure(text).w > width
-        text = reshape_text(text, width-1)
+        text = reshape_text(text, width - 1)
     end
     return pad(text, width, justify)
 end

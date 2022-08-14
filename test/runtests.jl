@@ -13,7 +13,6 @@ include("__test_utils.jl")
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
-
 import Term.Consoles: Console, enable, disable
 con = Console(80)
 enable(con)
