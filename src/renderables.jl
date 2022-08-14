@@ -148,13 +148,14 @@ Optionally `justify`  can be used to set the text justification style ∈ (:left
 function RenderableText(
     text::AbstractString;
     style::Union{Nothing,String} = nothing,
-    width::Int = min(textlen(text), console_width(stdout)),
+    width::Int = min(Measure(text).w, console_width(stdout)),
     background::Union{Nothing,String} = nothing,
     justify::Symbol=:left,
 )
+    # @info "Construcing RenderableText" text width 
     # reshape text
-    text = apply_style(text)
-    text = text_to_width(text, width, justify; background = background)
+    text = apply_style(text) 
+    text = text_to_width(text, width, justify; background = background) |> chomp
 
 
     style = isnothing(style) ? "" : style
@@ -168,7 +169,6 @@ function RenderableText(
         split(text, "\n")
     )
 
-    # @info "made abstract ren" segments[1]
     return RenderableText(segments, Measure(segments), style)
 end
 

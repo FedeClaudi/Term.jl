@@ -146,7 +146,7 @@ the presence and style of titles, box type etc... see [render](@ref) below.
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable};
-    fit::Bool = true,
+    fit::Bool = false,
     padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
     width::Int = default_width(),
     kwargs...,
@@ -162,10 +162,12 @@ function Panel(
     end
 
     # if too large, set fit=false
-    (fit && !isa(content, AbstractString)) && (fit = panel_width <= console_width())
-    fit && (width = min(panel_width, console_width()))
+    fit = fit ? 
+            (!isa(content, AbstractString) ? panel_width <= console_width() : true) : 
+            false
+    width = fit ?  min(panel_width, console_width()) : width
 
-    # @info "Ready to make panel" content content_width panel_width width fit
+    # @info "Ready to make panel" content content_width panel_width width console_width() fit
     return Panel(content, Val(fit), padding; width = width, kwargs...)
 end
 
@@ -174,8 +176,22 @@ end
 
 Convert any input content to a renderable
 """
-function content_as_renderable(content, width, Δw, justify, background) 
-    RenderableText(string(content), width = width - Δw, background = background, justify=justify)
+function content_as_renderable(content::AbstractRenderable, width, Δw, justify, background) 
+    RenderableText(
+        string(content), 
+        width = width - Δw, 
+        background = background, 
+        justify=justify
+    )
+end
+
+function content_as_renderable(content::AbstractString, width, Δw, justify, background) 
+    RenderableText(
+        string(content), 
+        width = width - Δw, 
+        background = background, 
+        justify=justify
+    )
 end
 
 
@@ -210,7 +226,7 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # create content
-    content = content_as_renderable(content, width+1, Δw, justify, background)
+    content = content_as_renderable(content, width, Δw, justify, background)
         
     # estimate panel size
     panel_measure = Measure(

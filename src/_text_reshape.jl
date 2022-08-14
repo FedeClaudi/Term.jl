@@ -195,7 +195,7 @@ It includes an option to justify the text (:left, :right, :center, :justify).
 """
 function text_to_width(text::AbstractString, width::Int, justify::Symbol; background=nothing)::String
     # reshape text
-    if textlen(text) > width
+    if Measure(text).w > width
         text = reshape_text(text, width-1)
     end
     return pad(text, width, justify)

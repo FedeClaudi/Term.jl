@@ -175,7 +175,6 @@ function vertical_pad(text::AbstractString, target_height::Int, method::Symbol):
     h = height(text)
     h ≥ target_height && return text
 
-    space = ' '^(width(text))
     npads = target_height - h
     return if method == :bottom
         vertical_pad(text, npads, 0)
@@ -481,7 +480,7 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     end
 
     # combine segments
-    segments = [Segment(s1.text * ' '^pad * s2.text) for (s1, s2) in zip(s1, s2)]
+    segments = [Segment(ss1.text * ' '^pad * ss2.text) for (ss1, ss2) in zip(s1, s2)]
 
     return Renderable(segments, Measure(segments))
 end

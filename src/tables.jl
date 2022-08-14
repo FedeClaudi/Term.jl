@@ -207,6 +207,7 @@ function Table(
             heights[I],
             vertical_justify,
         )
+
         if l == 1 && show_header
             bottom = if nrows < 2
                 :bottom
@@ -351,6 +352,7 @@ function table_row(
     end
 
     # create row
+    # @info "row" Measure(cells[1]) Measure(m) cells[1]*m
     mid = if length(widths) > 1
         l * foldl((a, b) -> a * m * b, cells[1:end]) * r
     else
@@ -380,11 +382,21 @@ function cell(
     style::String,
     vertical_justify::Symbol,
 )
+    content = do_by_line(
+        y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
+        str_trunc(x, w - hor_pad),
+    )
+
+    c = vertical_pad(
+        content,
+        h,
+        vertical_justify,
+    )
+    # @info "cell" Measure(c) Measure(content) RenderableText(c).measure
+
+
     return vertical_pad(
-        do_by_line(
-            y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
-            str_trunc(x, w - hor_pad),
-        ),
+        content,
         h,
         vertical_justify,
     )

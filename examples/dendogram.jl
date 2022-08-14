@@ -27,7 +27,7 @@ just link individual elements together.
 
 import Term.Dendograms: link
 print("\n"^2)
-print(link(mydendo, otherdendo; title = "[red]superdendo[/red]"))
+print(link(mydendo, otherdendo; title = "{red}superdendo{/red}"))
 
 """
 and so on...

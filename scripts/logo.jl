@@ -38,6 +38,7 @@ function make_logo()
         padding = (2, 2, 0, 0),
         subtitle = "{italic default}Term",
         subtitle_style = "bold #389826",
+        fit=false
     )
 
     indigo = "#42A5F5"
@@ -88,7 +89,7 @@ function make_logo()
             subtitle = "https://github.com/FedeClaudi/Term.jl",
             subtitle_justify = :right,
             subtitle_style = "dim",
-            fit = true,
+            fit = false,
         ) / "" / (Spacer(2, 12) * msg)
 
     return logo
