@@ -39,7 +39,7 @@ function tprint(io::IO, x::AbstractString; highlight = true)
     # x = reshape_text(x, console_width(io))
     x =
         Measure(x).w <= console_width(io) ? x :
-        string(RenderableText(string, width = console_width(io)))
+        string(RenderableText(string(x), width = console_width(io)))
     print(io, x)
 end
 

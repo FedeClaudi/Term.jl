@@ -47,6 +47,7 @@ end
 
     if !Sys.iswindows()
         for (i, t) in enumerate(compositors)
+            # tofile(string(t), "./txtfiles/compositor_$i.txt")
             @test fromfile("./txtfiles/compositor_$i.txt") == cleanstring(t)
 
             # coverage

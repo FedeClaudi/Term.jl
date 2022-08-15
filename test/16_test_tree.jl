@@ -45,11 +45,11 @@ tree_dict_4 = Dict(
 
     @testtree(Tree(tree_dict_1), 9, 15)
 
-    @testtree(Tree(tree_dict_2), 11, 18)
+    @testtree(Tree(tree_dict_2), 10, 18)
 
-    @testtree(Tree(tree_dict_3), 13, 33)
+    @testtree(Tree(tree_dict_3), 12, 33)
 
-    @testtree(Tree(tree_dict_4), 19, 33)
+    @testtree(Tree(tree_dict_4), 16, 33)
 
     # styling
     for guides_type in (:standardtree, :boldtree, :asciitree)

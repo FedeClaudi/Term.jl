@@ -1,6 +1,6 @@
 import Term.Measures: default_size
 import Term.Layout: PlaceHolder
-import Term: Renderable
+import Term: Renderable, AbstractRenderable
 
 @testset "Grid - simple" begin
     h, w = default_size()

@@ -39,7 +39,7 @@ end
 @testset "\e[34mCONSOLE" begin
     @test console_height() == displaysize(stdout)[1]
 
-    @test console_width() == displaysize(stdout)[2]
+    @test console_width() == TEST_CONSOLE_WIDTH
 
     @test sprint(cursor_position) == "\e[6n"
     @test sprint(up) == "\e[1A"
