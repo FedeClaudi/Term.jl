@@ -110,7 +110,7 @@ function Panel(;
         # hardcoded size of empty 'fitted' panel
         Measure(2, 3)
     else
-        Measure(height, width)
+        Measure(height-1, width)
     end
 
     # get empty content measure
@@ -162,7 +162,7 @@ function Panel(
     padding = padding isa Padding ? padding : Padding(padding...)
 
     # estimate content and panel size 
-    content_width = content isa AbstractString ? textlen(content) : content.measure.w
+    content_width = content isa AbstractString ? Measure(content).w : content.measure.w
     panel_width = if fit
         content_width + padding.left + padding.right + 2
     else
@@ -184,23 +184,24 @@ end
 
 Convert any input content to a renderable
 """
-function content_as_renderable(content::AbstractRenderable, width, Δw, justify, background)
-    RenderableText(
+function content_as_renderable(content, width, Δw, justify, background)
+    rt = RenderableText(
         string(content),
         width = width - Δw,
         background = background,
         justify = justify,
     )
+    return rt
 end
 
-function content_as_renderable(content::AbstractString, width, Δw, justify, background)
-    RenderableText(
-        string(content),
-        width = width - Δw,
-        background = background,
-        justify = justify,
-    )
-end
+# function content_as_renderable(content::AbstractString, width, Δw, justify, background)
+#     RenderableText(
+#         string(content),
+#         width = width - Δw,
+#         background = background,
+#         justify = justify,
+#     )
+# end
 
 """
 ---
@@ -491,7 +492,7 @@ function render(
     ]
 
     segments = vcat(initial_segments, content_sgs, final_segments)
-    return Panel(segments, panel_measure)
+    return Panel(segments, Measure(segments))
 end
 
 # ---------------------------------------------------------------------------- #

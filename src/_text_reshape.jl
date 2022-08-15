@@ -195,5 +195,5 @@ function text_to_width(
     if Measure(text).w > width
         text = reshape_text(text, width - 1)
     end
-    return pad(text, width, justify)
+    return pad(text, width, justify, bg=background)
 end

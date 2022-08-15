@@ -23,26 +23,38 @@ import Term: fillin
     @test (seg * seg).text == "testtest"
 end
 
-@testset "\e[34mRenderables - Renderable" begin
+@testset "\e[34mRenderables - RenderableText basic" begin
     lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
     r = RenderableText(lorem)
 
-    @test size(r.measure) == (1, length(lorem))
+    @test size(r.measure) == (2, TEST_CONSOLE_WIDTH)
 
     r2 = RenderableText(r)
-    @test size(r.measure) == (1, length(lorem))
+    @test size(r.measure) == (2, TEST_CONSOLE_WIDTH)
 
     width = 22
     r = RenderableText(lorem; width = width)
     @test string(r) ==
-          "Lorem ipsum dolor sit \e[0m\namet, consectetur \e[0m    \nadipiscing elit, sed \e[0m \ndo eiusmod tempor \e[0m    \nincididunt ut labore  "
+        "Lorem ipsum dolor     \nsit amet,             \nconsectetur           \nadipiscing elit, sed  \ndo eiusmod tempor     \nincididunt ut labore  "
     @test r.measure.w == width
 
     r = RenderableText(lorem; width = width, style = "red")
     @test string(r) ==
-          "\e[31mLorem ipsum dolor sit \e[0m\e[39m\n\e[31mamet, consectetur \e[0m    \e[39m\n\e[31madipiscing elit, sed \e[0m \e[39m\n\e[31mdo eiusmod tempor \e[0m    \e[39m\n\e[31mincididunt ut labore  \e[39m"
+        "\e[31mLorem ipsum dolor     \e[39m\n\e[31msit amet,             \e[39m\n\e[31mconsectetur           \e[39m\n\e[31madipiscing elit, sed  \e[39m\n\e[31mdo eiusmod tempor     \e[39m\n\e[31mincididunt ut labore  \e[39m"
     @test r.measure.w == width
 
     @test string(RenderableText("a string")) == "a string"
     @test string(RenderableText("a\nstring")) == "a     \nstring"
+end
+
+
+@testset "\e[34mRenderables - RenderableText basic" begin
+    lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
+    width = 30
+    r = RenderableText(lorem, width=width, justify=:right)
+    @test string(r) == "  Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, \n        sed do eiusmod tempor \n          incididunt ut labore"
+
+
+    r = RenderableText(lorem, width=width, justify=:center, background="on_red")
+    @test string(r) == "\e[41m\e[41m \e[49m\e[41mLorem ipsum dolor sit amet, \e[41m \e[49m\e[41m\e[49m\n\e[41m\e[41m\e[49m\e[41mconsectetur adipiscing elit, \e[41m \e[49m\e[41m\e[49m\n\e[41m\e[41m    \e[49m\e[41msed do eiusmod tempor \e[41m    \e[49m\e[41m\e[49m\n\e[41m\e[41m     \e[49m\e[41mincididunt ut labore\e[41m     \e[49m\e[41m\e[49m"
 end

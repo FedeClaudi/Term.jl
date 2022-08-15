@@ -14,7 +14,9 @@ using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
 import Term.Consoles: Console, enable, disable
-con = Console(80)
+
+const TEST_CONSOLE_WIDTH = 80
+con = Console(TEST_CONSOLE_WIDTH)
 enable(con)
 
 macro runner(fn)
@@ -29,13 +31,13 @@ macro runner(fn)
 end
 
 @runner "01_test_text_utils.jl"
-# @runner "02_test_ansi.jl"
-# @runner "03_test_measure.jl"
-# @runner "04_test_style.jl"
-# @runner "05_test_macros.jl"
-# @runner "06_test_box.jl"
-# @runner "07_test_renderables.jl"
-# @runner "08_test_panel.jl"
+@runner "02_test_ansi.jl"
+@runner "03_test_measure.jl"
+@runner "04_test_style.jl"
+@runner "05_test_macros.jl"
+@runner "06_test_box.jl"
+@runner "07_test_renderables.jl"
+@runner "08_test_panel.jl"
 # @runner "09_test_layout.jl"
 # @runner "10_test_inspect.jl"
 # @runner "11_test_theme.jl"
