@@ -22,7 +22,7 @@ import ..Consoles: console_width, console_height, change_scroll_region, move_to_
 import ..Renderables: AbstractRenderable
 import ..Style: apply_style
 import ..Tprint: tprintln
-import ..Boxes: ROUNDED
+import ..Boxes: BOXES
 import ..Progress:
     ProgressBar,
     ProgressJob,
@@ -53,9 +53,9 @@ struct TermLogger <: AbstractLogger
     theme::Theme
     pbar::ProgressBar
 end
-TermLogger(theme::Theme) = TermLogger(stderr, theme)
+TermLogger(theme::Theme = TERM_THEME[]) = TermLogger(stderr, theme)
 
-function TermLogger(io::IO, theme::Theme)
+function TermLogger(io::IO, theme::Theme = TERM_THEME[])
     return TermLogger(
         io,
         theme,
@@ -87,8 +87,8 @@ Print the final line of a log message with style and date info
 """
 function print_closing_line(color::String, width::Int = 48)
     tprintln(
-        "  {$color bold dim}$(ROUNDED.bottom.left)" *
-        "$(ROUNDED.row.mid)"^(width) *
+        "  {$color bold dim}$(BOXES[:ROUNDED].bottom.left)" *
+        "$(BOXES[:ROUNDED].row.mid)"^(width) *
         "{/$color bold dim}",
     )
     _date = Dates.format(Dates.now(), "e, dd u yyyy")
@@ -190,7 +190,7 @@ function Logging.handle_message(
     end
 
     outline_markup = "$color dim"
-    vert = "{$outline_markup}" * ROUNDED.mid.left * "{/$outline_markup}"
+    vert = "{$outline_markup}" * BOXES[:ROUNDED].mid.left * "{/$outline_markup}"
 
     # style message
     msg = if msg isa AbstractString

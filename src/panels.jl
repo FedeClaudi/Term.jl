@@ -212,13 +212,14 @@ end
         padding::Padding;
         height::Union{Nothing,Int} = nothing,
         width::Union{Nothing,Int} = nothing,
+        trim::Bool = true,
         kwargs...,
-        )
+    )
 
 Construct a `Panel` fitting the content's width.
 
 !!! warning
-    If the content is larger than the console terminal's width, it will get trimmed to avoid overflow.
+    If the content is larger than the console terminal's width, it will get trimmed to avoid overflow, unless `trim=false` is given.
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable},
@@ -415,7 +416,7 @@ function render(
     # println("Content\n", content)
 
     # create top/bottom rows with titles
-    box = eval(box)  # get box object from symbol
+    box = BOXES[box]  # get box object from symbol
     top = get_title_row(
         :top,
         box,
@@ -442,17 +443,9 @@ function render(
 
     # get an empty padding line
     empty = if isnothing(background)
-        [Segment(left * " "^(panel_measure.w - 2) * right;)]
+        [Segment(left * " "^(panel_measure.w - 2) * right)]
     else
-        [
-            Segment(
-                left *
-                "{$background}" *
-                " "^(panel_measure.w - 2) *
-                "{/$background}" *
-                right;
-            ),
-        ]
+        [Segment(left * "{$background}" * " "^(panel_measure.w - 2) * "{/$background}" * right)]
     end
     # @info "rendering" panel_measure Δw
 
@@ -463,7 +456,7 @@ function render(
         0
     end
     # create segments
-    initial_segments::Vector{Segment} = [
+    initial_segments = Segment[
         top,                                        # top border
         repeat(empty, padding.top)...,              # top padding
     ]
@@ -485,7 +478,8 @@ function render(
             content.segments,
         ) : []
 
-    final_segments::Vector{Segment} = [
+
+    final_segments = Segment[
         repeat(empty, n_extra)...,                  # lines to reach target height
         repeat(empty, padding.bottom)...,           # bottom padding
         bottom * "\e[0m",                           # bottom border

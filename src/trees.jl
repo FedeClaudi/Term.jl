@@ -166,7 +166,7 @@ end
 """
     Tree(data::Union{AbstractDict, Pair}; level=0, title::String="tree", kwargs...)
 
-Construct a `Tree` out of a `AbstractDict`. Recursively handle nested `AbstractDict`s.
+Construct a `Tree` out of a `Dict` or `OrderedDict`. Recursively handle nested `Dict`s.
 """
 function Tree(
     data::Union{AbstractDict,Pair,Vector};

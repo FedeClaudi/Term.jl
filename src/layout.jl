@@ -64,10 +64,10 @@ function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothi
     lw ≥ target_width && return text
 
     npads = target_width - lw
-    if method == :left
+    if method ≡ :left
         p = isnothing(bg) ? ' '^npads : "{$bg}" * ' '^npads * "{/$bg}"
         return text * p
-    elseif method == :right
+    elseif method ≡ :right
         p = isnothing(bg) ? ' '^npads : "{$bg}" * ' '^npads * "{/$bg}"
         return p * text
     else
@@ -89,15 +89,15 @@ end
 
 Pad a string by a fixed ammount to the left and to the right.
 """
-function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing)
-    return if isnothing(bg)
+pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing) =
+    if isnothing(bg)
         ' '^max(0, left) * text * ' '^max(0, right)
     else
         l = "{$bg}" * ' '^max(0, left) * "{/$bg}"
         r = "{$bg}" * ' '^max(0, right) * "{/$bg}"
         l * text * r
     end
-end
+
 """
 ---
     pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0)
@@ -115,8 +115,7 @@ Pad an `AbstractRenderable` by padding each of its segments.
 """
 function pad(ren::AbstractRenderable, left::Int, right::Int)
     segments = pad(ren.segments, left, right)
-    measure = Measure(segments)
-    return Renderable(segments, measure)
+    return Renderable(segments, Measure(segments))
 end
 
 """
@@ -137,8 +136,7 @@ julia> pad(RenderableText("ciao"); width=10)
 ```
 """
 function pad(ren::AbstractRenderable; width::Int)
-    npads = width - ren.measure.w
-    nl, nr = get_lr_widths(npads)
+    nl, nr = get_lr_widths(width - ren.measure.w)
     return pad(ren, nl, nr)
 end
 
@@ -158,8 +156,7 @@ end
 In place version for padding a renderable to achieve a given width.
 """
 function pad!(ren::AbstractRenderable; width::Int)
-    npads = width - ren.measure.w
-    nl, nr = get_lr_widths(npads)
+    nl, nr = get_lr_widths(width - ren.measure.w)
     return pad!(ren, nl, nr)
 end
 
@@ -177,9 +174,9 @@ function vertical_pad(text::AbstractString, target_height::Int, method::Symbol):
     h ≥ target_height && return text
 
     npads = target_height - h
-    return if method == :bottom
+    return if method ≡ :bottom
         vertical_pad(text, npads, 0)
-    elseif method == :top
+    elseif method ≡ :top
         vertical_pad(text, 0, npads)
     else
         above, below = get_lr_widths(npads)
@@ -194,7 +191,7 @@ Vertical pad a string by a fixed ammount to above and below.
 """
 function vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
     space = ' '^(width(text))
-    return string(vstack(repeat([space], above)..., text, repeat([space], below)...))
+    return string(vstack(fill(space, above)..., text, fill(space, below)...))
 end
 
 """
@@ -204,8 +201,8 @@ Pad a renderable's segments to the above and the below.
 """
 function vertical_pad(segments::AbstractVector{Segment}, above::Int = 0, below::Int = 0)
     space = ' '^(segments[1].measure.w)
-    above::Vector{Segment} = repeat([Segment(space)], above)
-    below::Vector{Segment} = repeat([Segment(space)], below)
+    above::Vector{Segment} = fill(Segment(space), above)
+    below::Vector{Segment} = fill(Segment(space), below)
     return [above..., segments..., below...]
 end
 
@@ -216,8 +213,7 @@ Pad a renderable, vertically.
 """
 function vertical_pad(ren::AbstractRenderable, above::Int, below::Int)
     segments = vertical_pad(ren.segments, above, below)
-    measure = Measure(segments)
-    return Renderable(segments, measure)
+    return Renderable(segments, Measure(segments))
 end
 
 """
@@ -226,8 +222,7 @@ vertical_pad(ren::AbstractRenderable; height::Int)
 Vertical pad a renderable to achieve a target height.
 """
 function vertical_pad(ren::AbstractRenderable; height::Int)
-    npads = height - ren.measure.h
-    nl, nr = get_lr_widths(npads)
+    nl, nr = get_lr_widths(height - ren.measure.h)
     return vertical_pad(ren, nl, nr)
 end
 
@@ -247,8 +242,7 @@ end
 In place version for padding a renderable to achieve a given width.
 """
 function vertical_pad!(ren::AbstractRenderable; height::Int)
-    npads = height - ren.measure.h
-    nl, nr = get_lr_widths(npads)
+    nl, nr = get_lr_widths(height - ren.measure.h)
     return vertical_pad!(ren, nl, nr)
 end
 
@@ -281,7 +275,7 @@ print(p1/p2)
 function leftalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
-    width = max(map(r -> r.measure.w, renderables)...)
+    width = maximum(map(r -> r.measure.w, renderables))
     renderables = map(r -> pad(r, 0, width - r.measure.w), renderables)
     return renderables
 end
@@ -307,7 +301,7 @@ print(p1/p2)
 function leftalign!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
-    width = max(map(r -> r.measure.w, renderables)...)
+    width = maximum(map(r -> r.measure.w, renderables))
     for ren in renderables
         pad!(ren, 0, width - ren.measure.w)
     end
@@ -338,7 +332,7 @@ print(p1/p2)
 function center(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
-    width = max(map(r -> r.measure.w, renderables)...)
+    width = maximum(map(r -> r.measure.w, renderables))
     renderables = map(r -> pad(r; width = width), renderables)
     return renderables
 end
@@ -365,7 +359,7 @@ print(p1/p2)
 function center!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
-    width = max(map(r -> r.measure.w, renderables)...)
+    width = maximum(map(r -> r.measure.w, renderables))
     for ren in renderables
         pad!(ren; width = width)
     end
@@ -396,7 +390,7 @@ print(p1/p2)
 function rightalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
-    width = max(map(r -> r.measure.w, renderables)...)
+    width = maximum(map(r -> r.measure.w, renderables))
     renderables = map(r -> pad(r, width - r.measure.w, 0), renderables)
     return renderables
 end
@@ -421,7 +415,7 @@ print(p1/p2)
 function rightalign!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
-    width = max(map(r -> r.measure.w, renderables)...)
+    width = maximum(map(r -> r.measure.w, renderables))
 
     for ren in renderables
         pad!(ren, width - ren.measure.w, 0)
@@ -432,31 +426,32 @@ end
 #                                   STACKING                                   #
 # ---------------------------------------------------------------------------- #
 
-vstack(s1::String, s2::String; pad::Int = 0) = s1 * "\n"^(pad + 1) * s2
+vstack(s1::String, s2::String; pad::Int = 0) = s1 * '\n'^(pad + 1) * s2
 
 """ 
     vstack(renderables...)
 
 Vertically stack a variable number of renderables to give a new renderable
 """
-function vstack(renderables...; pad::Int = 0)
+function vstack(renderables::RenderablesUnion...; pad::Int = 0)
     renderables = leftalign(renderables...)
-
-    segments::Vector{Segment} = []
-    if pad > 0
-        renderables = foldl((a, b) -> a / ("\n"^pad) / b, renderables)
-        segments = renderables.segments
+    segments = if pad > 0
+        foldl((a, b) -> a / ('\n'^pad) / b, renderables).segments
     else
-        segments = vcat(getfield.(renderables, :segments)...)
+        vcat(
+            map(
+                r -> r isa AbstractRenderable ? getfield(r, :segments) : Segment(r),
+                renderables,
+            )...,
+        )
     end
-    measure = Measure(segments)
-    return Renderable(segments, measure)
+    return Renderable(segments, Measure(segments))
 end
 
 vstack(renderables::Union{Vector,Tuple}; kwargs...) = vstack(renderables...; kwargs...)
 
 """
-    hstack(r1::RenderablesUnion, r2::RenderablesUnion)
+    hstack(r1::RenderablesUnion, r2::RenderablesUnion   )
 
 Horizontally stack two renderables to give a new renderable.
 """
@@ -472,9 +467,9 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     # make sure both renderables have the same number of segments
     if h1 > h2
         s1 = r1.segments
-        s2 = vcat(r2.segments, [Segment(' '^(r2.measure.w)) for i in 1:(Δh)])
+        s2 = vcat(r2.segments, fill(Segment(' '^(r2.measure.w)), Δh))
     elseif h1 < h2
-        s1 = vcat(r1.segments, [Segment(' '^(r1.measure.w)) for i in 1:(Δh)])
+        s1 = vcat(r1.segments, fill(Segment(' '^(r1.measure.w)), Δh))
         s2 = r2.segments
     else
         s1, s2, = r1.segments, r2.segments
@@ -493,10 +488,8 @@ Horizonatlly stack a variable number of renderables.
 """
 function hstack(renderables...; pad::Int = 0)
     renderable = Renderable()
-
     for (i, ren) in enumerate(renderables)
-        _pad = i == 1 ? 0 : pad
-        renderable = hstack(renderable, ren; pad = _pad)
+        renderable = hstack(renderable, ren; pad = i == 1 ? 0 : pad)
     end
     return renderable
 end
@@ -524,30 +517,24 @@ Base.:*(r1::AbstractRenderable, r2::AbstractString) = hstack(r1, r2)
 
 Left align renderables and then vertically stack.
 """
-function lvstack(renderables::RenderablesUnion...; kwargs...)::Renderable
-    renderables = leftalign(renderables...)
-    return vstack(renderables...; kwargs...)
-end
+lvstack(renderables::RenderablesUnion...; kwargs...)::Renderable =
+    vstack(leftalign(renderables...)...; kwargs...)
 
 """
     lvstack(renderables::RenderablesUnion...)
 
 Center align renderables and then vertically stack.
 """
-function cvstack(renderables::RenderablesUnion...; kwargs...)::Renderable
-    renderables = center(renderables...)
-    return vstack(renderables...; kwargs...)
-end
+cvstack(renderables::RenderablesUnion...; kwargs...)::Renderable =
+    vstack(center(renderables...)...; kwargs...)
 
 """
     lvstack(renderables::RenderablesUnion...)
 
 Right align renderables and then vertically stack.
 """
-function rvstack(renderables::RenderablesUnion...; kwargs...)::Renderable
-    renderables = rightalign(renderables...)
-    return vstack(renderables...; kwargs...)
-end
+rvstack(renderables::RenderablesUnion...; kwargs...)::Renderable =
+    vstack(rightalign(renderables...)...; kwargs...)
 
 rvstack(renderables::Union{Tuple,Vector}; kwargs...) = rvstack(renderables...; kwargs...)
 cvstack(renderables::Union{Tuple,Vector}; kwargs...) = cvstack(renderables...; kwargs...)
@@ -570,10 +557,8 @@ mutable struct Spacer <: AbstractLayoutElement
 end
 
 function Spacer(height::Int, width::Int; char::Char = ' ')
-    line = char^width
-    seg = Segment(line)
-    segments = repeat([seg], height)
-    return Spacer(segments, Measure(height, seg.measure.w))
+    seg = Segment(char^width)
+    return Spacer(fill(seg, height), Measure(height, seg.measure.w))
 end
 
 Spacer(height::Number, width::Number; char::Char = ' ') =
@@ -601,10 +586,9 @@ function vLine(
     box::Symbol = :ROUNDED,
     char::Union{Char,Nothing} = nothing,
 )
-    char = isnothing(char) ? getfield(Boxes, box).head.left : char
+    char = isnothing(char) ? BOXES[box].head.left : char
     line = apply_style("{" * style * "}" * char * "{/" * style * "}\e[0m")
-    segments = repeat([Segment(line)], height)
-    return vLine(segments, Measure(height, 1))
+    return vLine(fill(Segment(line), height), Measure(height, 1))
 end
 
 """
@@ -619,9 +603,8 @@ vLine(ren::AbstractRenderable; kwargs...) = vLine(ren.measure.h; kwargs...)
 
 Create a `vLine` as tall as the `stdout` console.
 """
-function vLine(; style::String = "default", box::Symbol = :ROUNDED)
-    return vLine(console_height(stdout); style = style, box = box)
-end
+vLine(; style::String = "default", box::Symbol = :ROUNDED) =
+    vLine(console_height(stdout); style = style, box = box)
 
 # ----------------------------------- hLine ---------------------------------- #
 
@@ -640,11 +623,8 @@ end
 
 Create a styled `hLine` of given width.
 """
-function hLine(width::Int; style::String = "default", box::Symbol = :ROUNDED)
-    char = eval(box).row.mid
-    segments = [Segment(char^width * "\e[0m", style)]
-    return hLine(segments, Measure(1, width))
-end
+hLine(width::Int; style::String = "default", box::Symbol = :ROUNDED) =
+    hLine([Segment(BOXES[box].row.mid^width * "\e[0m", style)], Measure(1, width))
 
 """
     hLine(width::Number, text::String; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
@@ -657,7 +637,7 @@ function hLine(
     style::String = "default",
     box::Symbol = :ROUNDED,
 )
-    box = eval(box)
+    box = BOXES[box]
     text = apply_style(text) * "\e[0m"
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)

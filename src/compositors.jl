@@ -80,7 +80,7 @@ function Compositor(
     )
 
     placeholders = Dict(
-        n => compositor_placeholder(e.args..., n === :_ ? "hidden" : c) for
+        n => compositor_placeholder(e.args..., n ≡ :_ ? "hidden" : c) for
         (n, c, e) in zip(names, colors, elements)
     )
 

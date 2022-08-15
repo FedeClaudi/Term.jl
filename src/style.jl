@@ -88,9 +88,9 @@ function get_style_codes(style::MarkupStyle)
     style_init, style_finish = "", ""
     for attr in fieldnames(MarkupStyle)
         value = getfield(style, attr)
-        if attr == :background
+        if attr ≡ :background
             code = isnothing(value) ? nothing : ANSICode(value; bg = true)
-        elseif attr == :color
+        elseif attr ≡ :color
             if !isnothing(value)
                 try
                     code = ANSICode(value; bg = false)

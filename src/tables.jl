@@ -95,7 +95,7 @@ function Table(
 
     # prepare some variables
     header_justify = something(header_justify, columns_justify)
-    box = eval(box)
+    box = BOXES[box]
 
     # table info
     rows = TablesPkg.rows(tb)
@@ -104,7 +104,7 @@ function Table(
     N_rows = length(rows) + 2
 
     # make sure arguemnts combination is valud
-    valid = assert_table_arguments(
+    assert_table_arguments(
         N_cols,
         N_rows,
         show_header,
@@ -119,8 +119,7 @@ function Table(
         footer_justify,
         hpad,
         vpad,
-    )
-    valid || return nothing
+    ) || return nothing
 
     # columns style
     columns_style, columns_justify, hpad =
@@ -140,7 +139,7 @@ function Table(
             footer = string(footer) * ": " .* string.(footer_entries)
         catch
             @warn "Could not apply function $footer to table - types mismatch?"
-            footer = repeat(["couldn't apply"], N_cols)
+            footer = fill("couldn't apply", N_cols)
         end
     end
 
@@ -310,15 +309,11 @@ Table(data::AbstractDict; kwargs...)
 Construct `Table` from a `Dict`.
 The Dict's keys make up the table header if none is assigned.
 """
-function Table(data::AbstractDict; header = nothing, kwargs...)
-    kwargs = Dict(kwargs...)
-
-    # header = pop!(kwargs, :header, string.(collect(keys(data))))
-    header = isnothing(header) ? string.(collect(keys(data))) : header
-
-    data = hcat(values(data)...)
-    return Table(data; header = header, kwargs...)
-end
+Table(data::AbstractDict; header = nothing, kwargs...) = Table(
+    hcat(values(data)...);
+    header = isnothing(header) ? string.(collect(keys(data))) : header,
+    kwargs...,
+)
 
 """
     table_row(cells, widths, box, top_level, mid_level, bottom_level, box_style, row_height)
@@ -348,7 +343,7 @@ function table_row(
     r = vLine(row_height; style = box_style, char = mid_level.right)
 
     if row_height == 1
-        l, m, r = string(l), string(m), string(r)
+        l, m, r = string.((l, m, r))
     end
 
     # create row
@@ -361,10 +356,9 @@ function table_row(
     bottom = apply_style(get_row(box, widths, bottom_level), box_style)
 
     return if !isnothing(top_level)
-        top = apply_style(get_row(box, widths, top_level), box_style)
-        string(vstack(top, mid, bottom))
+        string(vstack(apply_style(get_row(box, widths, top_level), box_style), mid, bottom))
     else
-        compact ? string(mid) : string(vstack(mid, bottom))
+        string(compact ? mid : vstack(mid, bottom))
     end
 end
 
@@ -373,7 +367,7 @@ end
 
 Create a Table's row's cell from a string - apply styling and vertical/horizontal justification.
 """
-function cell(
+cell(
     x::AbstractString,
     hor_pad::Int,
     h::Int,
@@ -381,6 +375,13 @@ function cell(
     justify::Symbol,
     style::String,
     vertical_justify::Symbol,
+) = vertical_pad(
+    do_by_line(
+        y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
+        str_trunc(x, w - hor_pad),
+    ),
+    h,
+    vertical_justify,
 )
     content = do_by_line(
         y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
@@ -393,12 +394,13 @@ function cell(
     return vertical_pad(content, h, vertical_justify)
 end
 
+
 """
     cell(x::AbstractString, hor_pad::Int, h::Int, w::Int, justify::Symbol, style::String, vertical_justify::Symbol)
 
 Create a Table's row's cell from a renderable - apply styling and vertical/horizontal justification.
 """
-function cell(
+cell(
     x::AbstractRenderable,
     hor_pad::Int,
     h::Int,
@@ -406,9 +408,7 @@ function cell(
     justify::Symbol,
     style::String,
     vertical_justify::Symbol,
-)
-    return vertical_pad(do_by_line(y -> pad(y, w, justify), string(x)), h, vertical_justify)
-end
+) = vertical_pad(do_by_line(y -> pad(y, w, justify), string(x)), h, vertical_justify)
 
 """
     make_row_cells(
@@ -422,7 +422,7 @@ end
 
 Create a row's cell from a vector of 'entries' (renderables or strings).
 """
-function make_row_cells(
+make_row_cells(
     entries::Union{Tuple,Vector},
     style::Vector{String},
     justify::Vector{Symbol},
@@ -430,21 +430,17 @@ function make_row_cells(
     hor_pad::Vector{Int},
     height::Int,
     vertical_justify::Symbol,
+) = map(
+    i -> cell(
+        entries[i],
+        hor_pad[i],
+        height,
+        widths[i],
+        justify[i],
+        style[i],
+        vertical_justify,
+    ),
+    1:length(entries),
 )
-    N = length(entries)
-    cells = map(
-        i -> cell(
-            entries[i],
-            hor_pad[i],
-            height,
-            widths[i],
-            justify[i],
-            style[i],
-            vertical_justify,
-        ),
-        1:N,
-    )
-    return cells
-end
 
 end

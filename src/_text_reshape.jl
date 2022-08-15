@@ -41,7 +41,6 @@ function style_at_each_line(text)
             end
         end
     end
-    # return join(lines, "\e[0m\n")
     return join(lines, "\n")
 end
 

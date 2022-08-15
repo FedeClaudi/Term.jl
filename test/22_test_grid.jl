@@ -16,7 +16,7 @@ import Term: Renderable, AbstractRenderable
 
     # test passing renderables
     h, w = 5, 10
-    rens = repeat([PlaceHolder(h, w)], 9)
+    rens = fill(PlaceHolder(h, w), 9)
 
     @test size(grid(rens).measure) == (3h, 3w)
     @test size(grid(rens; aspect = 1).measure) == (3h, 3w)
@@ -88,17 +88,19 @@ end
 
     # vector, explicit
     @test size(grid(panels; layout = (2, 4)).measure) == (2h, 4w)
+    @test size(grid(panels; layout = (2, 4), order = :row).measure) == (2h, 4w)
 
     # best fit
-    panels = repeat([Panel(height = h, width = w)], 9)
+    panels = fill(Panel(height = h, width = w), 9)
 
     @test size(grid(panels[1:4]).measure) == (2h, 2w)  # 4 best fits onto a (2, 2) grid with unit ar
     @test size(grid(panels[1:6]).measure) == (2h, 3w)  # 6 best fits onto a (2, 3) grid with 4:3 ar
     @test size(grid(panels[1:9]).measure) == (3h, 3w)  # 9 best fits onto a (3, 3) grid with unit ar
 end
 
-@testset "Grid - named tuple" begin
+@testset "Grid - types" begin
     @test grid((a = Panel(), b = Panel())) isa Renderable
+    @test grid((Panel(), Panel())) isa Renderable
 end
 
 @testset "Grid - complex layout" begin

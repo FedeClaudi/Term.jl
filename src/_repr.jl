@@ -34,8 +34,8 @@ end
 
 Get the name of a type as an expression
 """
-function typename(typedef::Expr)
-    return if typedef.args[2] isa Symbol
+typename(typedef::Expr) =
+    if typedef.args[2] isa Symbol
         typedef.args[2]
     elseif typedef.args[2].args[1] isa Symbol
         typedef.args[2].args[1]
@@ -44,17 +44,15 @@ function typename(typedef::Expr)
     else
         error("Could not parse type-head from: $typedef")
     end
-end
 
-function repr_panel(
+repr_panel(
     obj,
     content,
     subtitle;
     width = min(console_width() - 10, default_width()),
     justify = :center,
     kwargs...,
-)
-    p = Panel(
+) = Panel(
         content;
         fit = false,
         title = isnothing(obj) ? obj : escape_brackets(string(typeof(obj))),
@@ -69,8 +67,7 @@ function repr_panel(
         kwargs...,
     )
 
-    return p
-end
+
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w)
     shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)

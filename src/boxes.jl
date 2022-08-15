@@ -6,10 +6,7 @@ import ..Style: apply_style
 import ..Segments: Segment
 
 export get_row, get_title_row
-export NONE, ASCII, ASCII2, ASCII_DOUBLE_HEAD
-export SQUARE, SQUARE_DOUBLE_HEAD, MINIMAL, MINIMAL_HEAVY_HEAD
-export MINIMAL_DOUBLE_HEAD, SIMPLE, SIMPLE_HEAD, SIMPLE_HEAVY, HORIZONTALS, ROUNDED, HEAVY
-export HEAVY_EDGE, HEAVY_HEAD, DOUBLE, DOUBLE_EDGE
+export BOXES
 
 # ---------------------------------------------------------------------------- #
 #                                      BOX                                     #
@@ -63,7 +60,6 @@ Construct a `Box` objet out of a box string.
 """
 function Box(box_name::String, box::String)
     top, head, head_row, mid, row, foot_row, foot, bottom = split(box, "\n")
-
     return Box(
         box_name,
         BoxLine(chars(top)...),
@@ -78,7 +74,7 @@ function Box(box_name::String, box::String)
 end
 
 function Base.show(io::IO, box::Box)
-    if io == stdout
+    if io ≡ stdout
         print(io, "Box ($(box.name))\n$(fit(box, [1, 3, 1]))")
     else
         print(io, "Box\e[2m($(box.name))\e[0m")
@@ -125,7 +121,6 @@ See also [`get_row`](@ref), [`get_rrow`](@ref).
 """
 function get_lrow(box::Box, width::Int, level::Symbol; with_left = true)::String
     level = getfield(box, level)
-
     return if with_left
         level.left * level.mid^(width - 1)
     else
@@ -141,7 +136,6 @@ See also [`get_row`](@ref), [`get_lrow`](@ref).
 """
 function get_rrow(box::Box, width::Int, level::Symbol; with_right = true)::String
     level = getfield(box, level)
-
     return if with_right
         level.mid^(width - 1) * level.right
     else
@@ -196,17 +190,13 @@ function get_title_row(
         end
     end
     title = space * topen * title * tclose * space
-    if justify == :left
+    if justify ≡ :left
         line = open * boxline.left * boxline.mid^4 * title
         line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
-        return Segment(line * "\e[0m")
-
-    elseif justify == :right
+    elseif justify ≡ :right
         pre_len = width - textlen(title) - 4
         line = open * get_lrow(box, pre_len, row)
         line *= title * boxline.mid^3 * boxline.right * close
-        return Segment(line * "\e[0m")
-
     else  # justify :center
         tl, tr = get_lr_widths(textlen(title))
         lw, rw = get_lr_widths(width)
@@ -214,6 +204,7 @@ function get_title_row(
             open * get_lrow(box, lw - tl, row) * title * get_rrow(box, rw - tr, row) * close
         return Segment(line * "\e[0m")
     end
+    return Segment(line * "\e[0m")
 end
 
 """
@@ -239,269 +230,254 @@ fit(box::Box, widths::Vector{Int}) = join_lines([
 #                                   Box types                                  #
 # ---------------------------------------------------------------------------- #
 
-NONE = Box(
-    "NONE",
-    """
-        
-        
-        
-        
-        
-        
-        
-        
-    """,
+const BOXES = (
+    NONE = Box(
+        "NONE",
+        """
+            
+            
+            
+            
+            
+            
+            
+            
+        """,
+    ),
+    ASCII = Box(
+        "ASCII",
+        """
+        +--+
+        | ||
+        |-+|
+        | ||
+        |-+|
+        |-+|
+        | ||
+        +--+
+        """,
+    ),
+    ASCII2 = Box(
+        "ASCII2",
+        """
+        +-++
+        | ||
+        +-++
+        | ||
+        +-++
+        +-++
+        | ||
+        +-++
+        """,
+    ),
+    ASCII_DOUBLE_HEAD = Box(
+        "ASCII_DOUBLE_HEAD",
+        """
+        +-++
+        | ||
+        +=++
+        | ||
+        +-++
+        +-++
+        | ||
+        +-++
+        """,
+    ),
+    SQUARE = Box(
+        "SQUARE",
+        """
+        ┌─┬┐
+        │ ││
+        ├─┼┤
+        │ ││
+        ├─┼┤
+        ├─┼┤
+        │ ││
+        └─┴┘
+        """,
+    ),
+    SQUARE_DOUBLE_HEAD = Box(
+        "SQUARE_DOUBLE_HEAD",
+        """
+        ┌─┬┐
+        │ ││
+        ╞═╪╡
+        │ ││
+        ├─┼┤
+        ├─┼┤
+        │ ││
+        └─┴┘
+        """,
+    ),
+    MINIMAL = Box(
+        "MINIMAL",
+        """
+          ╷ 
+          │ 
+        ╶─┼╴
+          │ 
+        ╶─┼╴
+        ╶─┼╴
+          │ 
+          ╵ 
+        """,
+    ),
+    MINIMAL_HEAVY_HEAD = Box(
+        "MINIMAL_HEAVY_HEAD",
+        """
+          ╷ 
+          │ 
+        ╺━┿╸
+          │ 
+        ╶─┼╴
+        ╶─┼╴
+          │ 
+          ╵ 
+        """,
+    ),
+    MINIMAL_DOUBLE_HEAD = Box(
+        "MINIMAL_DOUBLE_HEAD",
+        """
+          ╷ 
+          │ 
+         ═╪ 
+          │ 
+         ─┼ 
+         ─┼ 
+          │ 
+          ╵ 
+        """,
+    ),
+    SIMPLE = Box(
+        "SIMPLE",
+        """
+            
+            
+         ── 
+            
+            
+         ── 
+            
+            
+        """,
+    ),
+    SIMPLE_HEAD = Box(
+        "SIMPLE_HEAD",
+        """
+            
+            
+         ── 
+            
+            
+            
+            
+            
+        """,
+    ),
+    SIMPLE_HEAVY = Box(
+        "SIMPLE_HEAVY",
+        """
+            
+            
+         ━━ 
+            
+            
+         ━━ 
+            
+            
+        """,
+    ),
+    HORIZONTALS = Box(
+        "HORIZONTALS",
+        """
+         ── 
+            
+         ── 
+            
+         ── 
+         ── 
+            
+         ── 
+        """,
+    ),
+    ROUNDED = Box(
+        "ROUNDED",
+        """
+        ╭─┬╮
+        │ ││
+        ├─┼┤
+        │ ││
+        ├─┼┤
+        ├─┼┤
+        │ ││
+        ╰─┴╯
+        """,
+    ),
+    HEAVY = Box(
+        "HEAVY",
+        """
+        ┏━┳┓
+        ┃ ┃┃
+        ┣━╋┫
+        ┃ ┃┃
+        ┣━╋┫
+        ┣━╋┫
+        ┃ ┃┃
+        ┗━┻┛
+        """,
+    ),
+    HEAVY_EDGE = Box(
+        "HEAVY_EDGE",
+        """
+        ┏━┯┓
+        ┃ │┃
+        ┠─┼┨
+        ┃ │┃
+        ┠─┼┨
+        ┠─┼┨
+        ┃ │┃
+        ┗━┷┛
+        """,
+    ),
+    HEAVY_HEAD = Box(
+        "HEAVY_HEAD",
+        """
+        ┏━┳┓
+        ┃ ┃┃
+        ┡━╇┩
+        │ ││
+        ├─┼┤
+        ├─┼┤
+        │ ││
+        └─┴┘
+        """,
+    ),
+    DOUBLE = Box(
+        "DOUBLE",
+        """
+        ╔═╦╗
+        ║ ║║
+        ╠═╬╣
+        ║ ║║
+        ╠═╬╣
+        ╠═╬╣
+        ║ ║║
+        ╚═╩╝
+        """,
+    ),
+    DOUBLE_EDGE = Box(
+        "DOUBLE_EDGE",
+        """
+        ╔═╤╗
+        ║ │║
+        ╟─┼╢
+        ║ │║
+        ╟─┼╢
+        ╟─┼╢
+        ║ │║
+        ╚═╧╝
+        """,
+    ),
 )
 
-ASCII = Box(
-    "ASCII",
-    """
-    +--+
-    | ||
-    |-+|
-    | ||
-    |-+|
-    |-+|
-    | ||
-    +--+
-    """,
-)
-
-ASCII2 = Box(
-    "ASCII2",
-    """
-    +-++
-    | ||
-    +-++
-    | ||
-    +-++
-    +-++
-    | ||
-    +-++
-    """,
-)
-
-ASCII_DOUBLE_HEAD = Box(
-    "ASCII_DOUBLE_HEAD",
-    """
-    +-++
-    | ||
-    +=++
-    | ||
-    +-++
-    +-++
-    | ||
-    +-++
-    """,
-)
-
-SQUARE = Box(
-    "SQUARE",
-    """
-    ┌─┬┐
-    │ ││
-    ├─┼┤
-    │ ││
-    ├─┼┤
-    ├─┼┤
-    │ ││
-    └─┴┘
-    """,
-)
-
-SQUARE_DOUBLE_HEAD = Box(
-    "SQUARE_DOUBLE_HEAD",
-    """
-    ┌─┬┐
-    │ ││
-    ╞═╪╡
-    │ ││
-    ├─┼┤
-    ├─┼┤
-    │ ││
-    └─┴┘
-    """,
-)
-
-MINIMAL = Box(
-    "MINIMAL",
-    """
-      ╷ 
-      │ 
-    ╶─┼╴
-      │ 
-    ╶─┼╴
-    ╶─┼╴
-      │ 
-      ╵ 
-    """,
-)
-
-MINIMAL_HEAVY_HEAD = Box(
-    "MINIMAL_HEAVY_HEAD",
-    """
-      ╷ 
-      │ 
-    ╺━┿╸
-      │ 
-    ╶─┼╴
-    ╶─┼╴
-      │ 
-      ╵ 
-    """,
-)
-
-MINIMAL_DOUBLE_HEAD = Box(
-    "MINIMAL_DOUBLE_HEAD",
-    """
-      ╷ 
-      │ 
-     ═╪ 
-      │ 
-     ─┼ 
-     ─┼ 
-      │ 
-      ╵ 
-    """,
-)
-
-SIMPLE = Box(
-    "SIMPLE",
-    """
-        
-        
-     ── 
-        
-        
-     ── 
-        
-        
-    """,
-)
-
-SIMPLE_HEAD = Box(
-    "SIMPLE_HEAD",
-    """
-        
-        
-     ── 
-        
-        
-        
-        
-        
-    """,
-)
-
-SIMPLE_HEAVY = Box(
-    "SIMPLE_HEAVY",
-    """
-        
-        
-     ━━ 
-        
-        
-     ━━ 
-        
-        
-    """,
-)
-
-HORIZONTALS = Box(
-    "HORIZONTALS",
-    """
-     ── 
-        
-     ── 
-        
-     ── 
-     ── 
-        
-     ── 
-    """,
-)
-
-ROUNDED = Box(
-    "ROUNDED",
-    """
-    ╭─┬╮
-    │ ││
-    ├─┼┤
-    │ ││
-    ├─┼┤
-    ├─┼┤
-    │ ││
-    ╰─┴╯
-    """,
-)
-
-HEAVY = Box(
-    "HEAVY",
-    """
-    ┏━┳┓
-    ┃ ┃┃
-    ┣━╋┫
-    ┃ ┃┃
-    ┣━╋┫
-    ┣━╋┫
-    ┃ ┃┃
-    ┗━┻┛
-    """,
-)
-
-HEAVY_EDGE = Box(
-    "HEAVY_EDGE",
-    """
-    ┏━┯┓
-    ┃ │┃
-    ┠─┼┨
-    ┃ │┃
-    ┠─┼┨
-    ┠─┼┨
-    ┃ │┃
-    ┗━┷┛
-    """,
-)
-
-HEAVY_HEAD = Box(
-    "HEAVY_HEAD",
-    """
-    ┏━┳┓
-    ┃ ┃┃
-    ┡━╇┩
-    │ ││
-    ├─┼┤
-    ├─┼┤
-    │ ││
-    └─┴┘
-    """,
-)
-
-DOUBLE = Box(
-    "DOUBLE",
-    """
-    ╔═╦╗
-    ║ ║║
-    ╠═╬╣
-    ║ ║║
-    ╠═╬╣
-    ╠═╬╣
-    ║ ║║
-    ╚═╩╝
-    """,
-)
-
-DOUBLE_EDGE = Box(
-    "DOUBLE_EDGE",
-    """
-    ╔═╤╗
-    ║ │║
-    ╟─┼╢
-    ║ │║
-    ╟─┼╢
-    ╟─┼╢
-    ║ │║
-    ╚═╧╝
-    """,
-)
 end

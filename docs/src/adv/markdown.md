@@ -114,4 +114,4 @@ tprint(md"""
 ```
 
 
-and more (links, footnoes, headers of different levels, etc.)
+and more (links, footnotes, headers of different levels, etc.)

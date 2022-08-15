@@ -57,7 +57,7 @@ Compositor(layout)
 
 `Compositor` parses the expression, creates the place holders and then creates the layout. You just sit back and relax!.
 
-Now, you have a lot of freedom of what goes into the expression, but you need to respect the rule that renderables are specified by a single chacter name and a size. Other than that, go crazy and use all the syntax for stacking renderables you like!
+Now, you have a lot of freedom of what goes into the expression, but you need to respect the rule that renderables are specified by a single character name and a size. Other than that, go crazy and use all the syntax for stacking renderables you like!
 ```@example compositor
 layout = :(
         vstack(

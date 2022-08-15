@@ -27,7 +27,7 @@ function calc_columns_widths(
     data_widths = collect(map(c -> max(width.(tb[c])...), sch.names))
     footers_widths = isnothing(footer) ? zeros(N_cols) : collect(width.(footer))
     widths = hcat(headers_widths, data_widths, footers_widths)
-    hpad = isa(hpad, Int) ? repeat([hpad], N_rows) : hpad
+    hpad = isa(hpad, Int) ? fill(hpad, N_rows) : hpad
     widths = Int.([mapslices(x -> max(x...), widths; dims = 2)...] .+ hpad * 2)
     return widths
 end
@@ -41,7 +41,7 @@ function rows_heights(N_rows::Int, show_header::Bool, header, rows_values, foote
     headers_height = show_header ? max(height.(header)...) : 0
     data_heights = collect(map(r -> max(height.(r)...), rows_values))
     footers_height = isnothing(footer) ? 0 : max(height.(footer)...)
-    vpad = isa(vpad, Int) ? repeat([vpad], N_rows) : vpad
+    vpad = isa(vpad, Int) ? fill(vpad, N_rows) : vpad
     heights = [headers_height, data_heights..., footers_height] .+ vpad .* 2
     return heights
 end
@@ -52,7 +52,7 @@ end
 Expand single `Table` arguments into a vector if necessary.
 """
 expand(v::Vector, N::Int) = v
-expand(v::Union{Symbol,String,Int}, N::Int) = repeat([v], N)
+expand(v::Union{Symbol,String,Int}, N::Int) = fill(v, N)
 
 """
     assert_table_arguments

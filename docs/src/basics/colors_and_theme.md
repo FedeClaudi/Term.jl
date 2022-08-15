@@ -37,7 +37,7 @@ tprint("Some {$indigo}color!{/$indigo}"; highlight=false)
 ## Under the hood
 What `Term` is doing here is taking each bit of style information in the markup tag (each word or each `(...)` within `{...}`) and constructing style codes with an `ANSICode` object.
 
-If the style informaton represents a color, `Term` first represents it as a `AbstractColor` type: `NamedColor` or `BitColor` or `RGBColor`.  
+If the style information represents a color, `Term` first represents it as a `AbstractColor` type: `NamedColor` or `BitColor` or `RGBColor`.  
 
 `NamedColor` objects represent simple colors like `red` and `blue`, `BitColor` represent 16-bit colors like `dark_goldenrod` and `RGBColor`, surprisingly, represents rgb-style colors. There's no method to represent hex colors as these are converted into rgb first. 
 
@@ -46,7 +46,7 @@ The distinction between `NamedColor`, `BitColor` and `RGBColor` is necessary bec
 
 # [Panel](@id ThemeDocs)
 Term defines a `Theme` type that carries styling information used throughout. 
-It tells `highlight` what color thigns should be, it stores the colros of elements of [Tree](@ref TreeDoc), and of the [Repr functionality](@ref ReprDoc).
+It tells `highlight` what color things should be, it stores the colors of elements of [Tree](@ref TreeDoc), and of the [Repr functionality](@ref ReprDoc).
 
 ```@example theme
 import Term: Theme, set_theme, TERM_THEME
