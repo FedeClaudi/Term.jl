@@ -217,7 +217,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
                 matrix2content(arr[:, :, i]; max_w = 60, max_items = 25, max_D = 5);
                 subtitle = "[:, :, $i_string]",
                 subtitle_justify = :right,
-                width = 22,
+                width = 60,
                 style = "dim yellow",
                 subtitle_style = "default",
                 title = "($n)",
@@ -244,6 +244,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
             arr,
             vstack(panels...),
             "{white}" * join(string.(size(arr)), " × ") * "{/white}",
+            fit=true,
         ),
     )
 end

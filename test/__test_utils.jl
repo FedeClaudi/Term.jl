@@ -35,7 +35,7 @@ file and compare to the obj.
 function compare_to_string(obj, filename::String)
     filepath = "./txtfiles/$filename.txt"
     if TEST_DEBUG_MODE
-        print(obj)
+        tprint(obj)
         tofile(string(obj), filepath)
         return string(obj)
     else
@@ -48,7 +48,7 @@ end
 function compare_to_string(txt::AbstractString, filename::String)
     filepath = "./txtfiles/$filename.txt"
     if TEST_DEBUG_MODE
-        print(txt)
+        tprint(txt)
         tofile(txt, filepath)
         return txt
     else

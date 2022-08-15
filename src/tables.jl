@@ -367,7 +367,7 @@ end
 
 Create a Table's row's cell from a string - apply styling and vertical/horizontal justification.
 """
-cell(
+function cell(
     x::AbstractString,
     hor_pad::Int,
     h::Int,
@@ -375,22 +375,11 @@ cell(
     justify::Symbol,
     style::String,
     vertical_justify::Symbol,
-) = vertical_pad(
-    do_by_line(
-        y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
-        str_trunc(x, w - hor_pad),
-    ),
-    h,
-    vertical_justify,
-)
+) 
     content = do_by_line(
         y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
         str_trunc(x, w - hor_pad),
     )
-
-    c = vertical_pad(content, h, vertical_justify)
-    # @info "cell" Measure(c) Measure(content) RenderableText(c).measure
-
     return vertical_pad(content, h, vertical_justify)
 end
 
