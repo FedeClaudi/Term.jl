@@ -211,7 +211,6 @@ end
     @test string(Panel(title = "test", width = 50, title_justify = :right)) ==
           "\e[22m╭─────────────────────────────────────── test\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
 
-
     p = Panel(
         title = "test",
         title_justify = :left,
@@ -252,7 +251,6 @@ id est laborum.""",
     @testpanel(Panel(pts2; fit = false, width = 44), nothing, 44)
     @testpanel(Panel(pts2; fit = false, width = 51), nothing, 51)
     @testpanel(Panel(pts2; fit = false, width = 67), nothing, 67)
-
 
     circle = """
           oooo    

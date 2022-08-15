@@ -129,7 +129,6 @@ id est laborum."""
 
     str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, \nconsectetur adipiscing elit,\ned do e\e[31miusmod tempor incididunt\e[39m \nut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna \n\e[1maliqua.\e[22m\e[39m Ut enim ad minim\e[22m\e[1m\nveniam, quis\e[32m nostrud \n\e[32mexercitation \e[40mullamco laboris \n\e[40m\e[32mnisi ut aliquip ex \e[49m\e[32m\e[39m\e[39m\e[32m\e[49m\e[40m\e[39m\e[40m\nea commodo consequat.\e[34m Duis aute \n\e[34mirure dolor in\e[39m reprehenderit \e[39m\e[34m\nin voluptate velit\e[39m\e[3m esse \e[3mcillum \n\e[3mdolore\e[23m\e[31m eu\e[39m\e[23m\e[3m\e[32m fugiat \e[23m\e[3m{/green}nulla \e[23m\npariatur. Excepteur\e[31m sint\e[39m\e[34m \n\e[34moccaecat cupidatat \e[39mnon proident, \e[39m\e[34m\nsunt in culpa qui \e[3mofficia\e[23m \ndeserunt mollit anim \nid est laborum."
 
-
     logo_str = """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
 
     Term provides a simple {italic green4 bold}markup language{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline} to your text.
@@ -142,7 +141,7 @@ id est laborum."""
     strings = [
         (
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit, sed \ndo eiusmod tempor incididunt ut \nlabore et dolore magna aliqua."
+            "Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit, sed \ndo eiusmod tempor incididunt ut \nlabore et dolore magna aliqua.",
         ),
         (
             "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",

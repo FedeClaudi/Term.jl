@@ -375,14 +375,13 @@ function cell(
     justify::Symbol,
     style::String,
     vertical_justify::Symbol,
-) 
+)
     content = do_by_line(
         y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
         str_trunc(x, w - hor_pad),
     )
     return vertical_pad(content, h, vertical_justify)
 end
-
 
 """
     cell(x::AbstractString, hor_pad::Int, h::Int, w::Int, justify::Symbol, style::String, vertical_justify::Symbol)

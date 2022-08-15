@@ -197,7 +197,6 @@ termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
     ),
 )
 
-
 """
 ---
     termshow(io::IO, arr::AbstractArray; kwargs...)
@@ -244,7 +243,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
             arr,
             vstack(panels...),
             "{white}" * join(string.(size(arr)), " × ") * "{/white}",
-            fit=true,
+            fit = true,
         ),
     )
 end

@@ -53,21 +53,19 @@ repr_panel(
     justify = :center,
     kwargs...,
 ) = Panel(
-        content;
-        fit = false,
-        title = isnothing(obj) ? obj : escape_brackets(string(typeof(obj))),
-        title_justify = :left,
-        width = width,
-        justify = justify,
-        style = TERM_THEME[].repr_panel_style,
-        title_style = TERM_THEME[].repr_name_style,
-        padding = (2, 1, 1, 1),
-        subtitle = subtitle,
-        subtitle_justify = :right,
-        kwargs...,
-    )
-
-
+    content;
+    fit = false,
+    title = isnothing(obj) ? obj : escape_brackets(string(typeof(obj))),
+    title_justify = :left,
+    width = width,
+    justify = justify,
+    style = TERM_THEME[].repr_panel_style,
+    title_style = TERM_THEME[].repr_name_style,
+    padding = (2, 1, 1, 1),
+    subtitle = subtitle,
+    subtitle_justify = :right,
+    kwargs...,
+)
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w)
     shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)

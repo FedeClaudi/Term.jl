@@ -478,7 +478,6 @@ function render(
             content.segments,
         ) : []
 
-
     final_segments = Segment[
         repeat(empty, n_extra)...,                  # lines to reach target height
         repeat(empty, padding.bottom)...,           # bottom padding
