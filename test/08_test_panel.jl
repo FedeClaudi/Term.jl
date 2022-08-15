@@ -15,35 +15,19 @@ end
     @testpanel(Panel("MYTEXT"; height = 10, width = 60), 10, 60)
     @testpanel(Panel("MYTEXT"; width = 60), 3, 60)
     @testpanel(Panel("MYTEXT"), 3, TEST_CONSOLE_WIDTH)
-    @testpanel(Panel("MYTEXT", fit=true), 3, 12)
+    @testpanel(Panel("MYTEXT", fit = true), 3, 12)
 
     @testpanel(Panel("MYTEXT"; height = 10, width = 60, padding = (4, 4, 2, 2)), 10, 60)
     @testpanel(Panel("MYTEXT"; width = 60, padding = (4, 4, 2, 2)), 7, 60)
     @testpanel(Panel("MYTEXT"; padding = (4, 4, 2, 2)), 7, TEST_CONSOLE_WIDTH)
-    @testpanel(Panel("MYTEXT"; padding = (4, 4, 2, 2), fit=true), 7, 16)
+    @testpanel(Panel("MYTEXT"; padding = (4, 4, 2, 2), fit = true), 7, 16)
 end
 
 @testset "\e[34mPanel - fit overflow" begin
     inside = Panel("MYTEXT"^50; height = 10)
     @testpanel(inside, 10, 80)
-    @testpanel(
-        Panel(
-            inside /
-            inside,
-            fit = true
-        ),
-        52,
-        TEST_CONSOLE_WIDTH,
-    )
-    @testpanel(
-        Panel(
-            inside /
-            inside,
-            fit = false
-        ),
-        52,
-        TEST_CONSOLE_WIDTH,
-    )
+    @testpanel(Panel(inside / inside, fit = true), 52, TEST_CONSOLE_WIDTH,)
+    @testpanel(Panel(inside / inside, fit = false), 52, TEST_CONSOLE_WIDTH,)
 end
 
 @testset "\e[34mPANEL - fit - measure" begin
@@ -68,7 +52,6 @@ end
     end
 end
 
-
 @testset "\e[34mPANEL - nofit - measure" begin
     for style in ("default", "red", "on_blue")
         @testpanel(Panel("t"; style = style, fit = false), 3, TEST_CONSOLE_WIDTH)
@@ -91,19 +74,19 @@ end
             @testpanel(Panel("°"^1500; _nofit...), 23, TEST_CONSOLE_WIDTH)
 
             # ------------------------------- nested panels ------------------------------ #
-            @testpanel(Panel(Panel("test", fit=true); _nofit...), 5, TEST_CONSOLE_WIDTH)
+            @testpanel(Panel(Panel("test", fit = true); _nofit...), 5, TEST_CONSOLE_WIDTH)
 
             # @testpanel(Panel(Panel(Panel("°", fit=true); _nofit...); _nofit...), nothing, TEST_CONSOLE_WIDTH)
 
             # NOTE: using a panel with arbitrary long text can fail testing on wide terminals, since
             # the final `height` can vary (github.com/FedeClaudi/Term.jl/issues/112)
+            @testpanel(Panel(Panel("°"^250); _nofit...), 18, TEST_CONSOLE_WIDTH)
+
             @testpanel(
-                Panel(Panel("°"^250); _nofit...),
-                18,
+                Panel(Panel("test"; _kw...); fit = false),
+                nothing,
                 TEST_CONSOLE_WIDTH
             )
-
-            @testpanel(Panel(Panel("test"; _kw...); fit = false), nothing, TEST_CONSOLE_WIDTH)
 
             # @testpanel(
             #     Panel(Panel(Panel("°"; fit=true, _kw...); _kw...); fit = false),
@@ -119,7 +102,11 @@ end
             # )
 
             @testpanel(
-                Panel(Panel("t1"; fit=true, _kw...), Panel("t2"; fit=true, _kw...); fit = false),
+                Panel(
+                    Panel("t1"; fit = true, _kw...),
+                    Panel("t2"; fit = true, _kw...);
+                    fit = false,
+                ),
                 8,
                 TEST_CONSOLE_WIDTH
             )
@@ -155,12 +142,12 @@ end
         @testpanel(Panel("°"^1500; _kw...), nothing, TEST_CONSOLE_WIDTH)
 
         # ------------------------------- nested panels ------------------------------ #
-        @testpanel(Panel(Panel("test", fit=true); _kw...), 5, 16)
+        @testpanel(Panel(Panel("test", fit = true); _kw...), 5, 16)
 
-        @testpanel(Panel(Panel(Panel("°", fit=true); _kw...); _kw...), 7, 19)
+        @testpanel(Panel(Panel(Panel("°", fit = true); _kw...); _kw...), 7, 19)
 
         @testpanel(
-            Panel(Panel("°"^250, fit=true); _kw...),
+            Panel(Panel("°"^250, fit = true); _kw...),
             # WIDE_TERM ? nothing : 8,
             18,
             TEST_CONSOLE_WIDTH
@@ -168,11 +155,7 @@ end
 
         @testpanel(Panel(Panel("test"; _kw...); fit = true), 5, 16)
 
-        @testpanel(
-            Panel(Panel(Panel("°"; _kw...); _kw...); fit = true),
-            7,
-            19,
-        )
+        @testpanel(Panel(Panel(Panel("°"; _kw...); _kw...); fit = true), 7, 19,)
 
         # @testpanel(
         #     Panel(Panel("°"^250; justify = justify); fit = true),
@@ -180,15 +163,7 @@ end
         #     console_width() - 1,
         # )
 
-        @testpanel(
-            Panel(
-                Panel("t1"; _kw...),
-                Panel("t2"; _kw...);
-                fit = true,
-            ),
-            8,
-            14,
-        )
+        @testpanel(Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = true), 8, 14,)
 
         _kw = (fit = true, width = 30, height = 8)
         @testpanel(Panel(Panel("test"; width = 22); _kw...), 8, 28)
@@ -208,8 +183,8 @@ end
             title_style = "italic red",
         ),
     ) ==
-    "\e[22m╭──── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
-    
+          "\e[22m╭──── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
+
     @test string(
         Panel(
             title = "test",
@@ -218,7 +193,7 @@ end
             title_style = "italic red",
         ),
     ) ==
-    "\e[22m╭──────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
+          "\e[22m╭──────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
 
     @test string(
         Panel(
@@ -228,14 +203,14 @@ end
             title_style = "italic red",
         ),
     ) ==
-    "\e[22m╭───────────────────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
+          "\e[22m╭───────────────────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
 
     @test string(Panel(title = "test", width = 50, title_justify = :left)) ==
-        "\e[22m╭──── test\e[22m ──────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(title = "test", width = 50, title_justify = :center)) ==      
-        "\e[22m╭───────────────────── test\e[22m ─────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
+          "\e[22m╭──── test\e[22m ──────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
+    @test string(Panel(title = "test", width = 50, title_justify = :center)) ==
+          "\e[22m╭───────────────────── test\e[22m ─────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(Panel(title = "test", width = 50, title_justify = :right)) ==
-        "\e[22m╭─────────────────────────────────────── test\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
+          "\e[22m╭─────────────────────────────────────── test\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
 
     p = Panel(
         title = "test",
@@ -245,7 +220,7 @@ end
         width = 22,
     )
     @test string(p) ==
-    "\e[22m╭──── test\e[22m ──────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────── aaaaa\e[22m ───╯\e[22m\e[0m\e[22m\e[0m"
+          "\e[22m╭──── test\e[22m ──────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────── aaaaa\e[22m ───╯\e[22m\e[0m\e[22m\e[0m"
 end
 
 @testset "PANEL - compare to string" begin
@@ -287,7 +262,7 @@ id est laborum.""",
           oooo    """
     p = Panel(circle; fit = true, padding = (2, 2, 0, 0))
     @test string(p) ==
-    "\e[22m╭────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────╯\e[22m\e[0m"
+          "\e[22m╭────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────╯\e[22m\e[0m"
 
     p = Panel(
         "test"^25;
@@ -385,7 +360,7 @@ asdsasdasdsadasdsa
 ads
     """,
         "on_blue",
-    ); background = "on_red", fit=true)
+    ); background = "on_red", fit = true)
 
     @test string(p) ==
           "\e[22m╭──────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    asasd\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdasadas\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdsasdasdsadasdsa\e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44mads\e[49m\e[41m               \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    \e[49m\e[41m              \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────╯\e[22m\e[0m"

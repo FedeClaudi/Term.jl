@@ -110,7 +110,7 @@ function Panel(;
         # hardcoded size of empty 'fitted' panel
         Measure(2, 3)
     else
-        Measure(height-1, width)
+        Measure(height - 1, width)
     end
 
     # get empty content measure

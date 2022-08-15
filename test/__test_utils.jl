@@ -27,7 +27,6 @@ fromfile(filepath) = replace_multi(read(filepath, String), "\\n" => "\n", "\\e" 
 
 fromfilelines(filepath) = lines = readlines(filepath)
 
-
 """
 If in testing debug mode: print the renderable `obj`
 and save the string to file, if not, load the string from
@@ -58,8 +57,6 @@ function compare_to_string(txt::AbstractString, filename::String)
         return correct
     end
 end
-
-
 
 same_widths(text::String) = length(unique(textlen.(split_lines(text)))) == 1
 

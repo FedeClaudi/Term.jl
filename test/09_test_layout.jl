@@ -99,7 +99,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-    "\e[22m╭───╮\e[22m          \n\e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m          \n\e[22m╰───╯\e[22m\e[0m          \n\e[22m╭────────╮\e[22m     \n\e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m     \n\e[22m╰────────╯\e[22m\e[0m     \n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "\e[22m╭───╮\e[22m          \n\e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m          \n\e[22m╰───╯\e[22m\e[0m          \n\e[22m╭────────╮\e[22m     \n\e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m     \n\e[22m╰────────╯\e[22m\e[0m     \n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 
@@ -108,7 +108,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-    "     \e[22m╭───╮\e[22m     \n     \e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m     \n     \e[22m╰───╯\e[22m\e[0m     \n  \e[22m╭────────╮\e[22m   \n  \e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m   \n  \e[22m╰────────╯\e[22m\e[0m   \n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "     \e[22m╭───╮\e[22m     \n     \e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m     \n     \e[22m╰───╯\e[22m\e[0m     \n  \e[22m╭────────╮\e[22m   \n  \e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m   \n  \e[22m╰────────╯\e[22m\e[0m   \n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 
@@ -117,7 +117,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-    "          \e[22m╭───╮\e[22m\n          \e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n          \e[22m╰───╯\e[22m\e[0m\n     \e[22m╭────────╮\e[22m\n     \e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m\n     \e[22m╰────────╯\e[22m\e[0m\n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "          \e[22m╭───╮\e[22m\n          \e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n          \e[22m╰───╯\e[22m\e[0m\n     \e[22m╭────────╮\e[22m\n     \e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m\n     \e[22m╰────────╯\e[22m\e[0m\n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 end
@@ -235,7 +235,7 @@ end
     @test string(ph) == "\e[2m╲ ╲ \e[22m\n\e[2m ╲ ╲\e[22m"
 
     @test string(PlaceHolder(12, 25)) ==
-        "\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m"
+          "\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ \e[22m"
 
     p = Panel(height = 4, width = 8)
     @test size(PlaceHolder(p).measure) == size(p.measure)
@@ -252,5 +252,5 @@ end
     @test string(vstack(p1, p2, p3; pad = 0)) ==
           "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
     @test string(vstack(p1, p2, p3; pad = 3)) ==
-    "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
+          "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
 end

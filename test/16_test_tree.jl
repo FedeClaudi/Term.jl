@@ -77,7 +77,6 @@ tree_dict_4 = Dict(
     @test_nothrow Tree(Float64)
     @test_nothrow Tree(AbstractFloat)
 
-
     # compare to string
     compare_to_string(Tree(tree_dict), "tree_1")
     compare_to_string(Tree(tree_dict_1), "tree_2")
