@@ -35,7 +35,7 @@ file and compare to the obj.
 function compare_to_string(obj, filename::String)
     filepath = "./txtfiles/$filename.txt"
     if TEST_DEBUG_MODE
-        tprint(obj)
+        println(obj)
         tofile(string(obj), filepath)
         return string(obj)
     else

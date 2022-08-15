@@ -1,4 +1,4 @@
-[41m[41m [49m[41mLorem ipsum dolor sit amet, [41m [49m[41m[49m
-[41m[41m[49m[41mconsectetur adipiscing elit, [41m [49m[41m[49m
-[41m[41m    [49m[41msed do eiusmod tempor [41m    [49m[41m[49m
-[41m[41m     [49m[41mincididunt ut labore[41m     [49m[41m[49m
+  Lorem ipsum dolor sit amet, 
+ consectetur adipiscing elit, 
+        sed do eiusmod tempor 
+          incididunt ut labore
