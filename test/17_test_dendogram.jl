@@ -5,15 +5,13 @@ import Term.Dendograms: link, Dendogram
     otherdendo = Dendogram("head", "these", "are", "colorful", "leaves")
     smalldendo = Dendogram("head", [1, 2])
 
-    @test string(mydendo) ==
-          "                     \e[38;2;255;171;145mawesome\e[39m                      \n\e[1m\e[2m\e[38;2;144;202;249m     ┌────────────┬──────┴─────┬────────────┐     \e[22m\e[22m\e[39m\n\e[38;2;176;190;197m   this          is            a       dendogram! \e[39m"
-
+    compare_to_string(mydendo, "dendogram_1")
+    
     large = link(mydendo, otherdendo; title = "{red}superdendo{/red}")
-    @test string(large) ==
-          "                                             \e[38;2;255;171;145m\e[31msuperdendo\e[39m\e[38;2;255;171;145m\e[39m                                             \n\e[1m\e[2m\e[38;2;144;202;249m                         ┌────────────────────────┴───────────────────────┐                         \e[22m\e[22m\e[39m\n                     \e[38;2;255;171;145mawesome\e[39m                                             \e[38;2;255;171;145mhead\e[39m                       \n\e[1m\e[2m\e[38;2;144;202;249m     ┌────────────┬──────┴─────┬────────────┐     \e[22m\e[22m\e[39m\e[1m\e[2m\e[38;2;144;202;249m     ┌────────────┬──────┴─────┬────────────┐     \e[22m\e[22m\e[39m\n\e[38;2;176;190;197m   this          is            a       dendogram! \e[39m\e[38;2;176;190;197m   these         are       colorful      leaves   \e[39m"
+    compare_to_string(large, "dendogram_2")
 
-    # nested = link(smalldendo, link(smalldendo, link(smalldendo, smalldendo; title="a level"); title="another level"); title="first level")
-    # @test string(nested) == fromfile("./txtfiles/dendogram_nested.txt")
+    nested = link(smalldendo, link(smalldendo, link(smalldendo, smalldendo; title="a level"); title="another level"); title="first level")
+    compare_to_string(nested, "dendogram_3")
 
     D = link(mydendo, mydendo, mydendo)
     @test D.measure.w == 150

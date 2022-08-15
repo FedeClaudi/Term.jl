@@ -51,10 +51,10 @@ end
 @testset "\e[34mRenderables - RenderableText basic" begin
     lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
     width = 30
+    
     r = RenderableText(lorem, width=width, justify=:right)
-    @test string(r) == "  Lorem ipsum dolor sit amet, \n consectetur adipiscing elit, \n        sed do eiusmod tempor \n          incididunt ut labore"
-
+    compare_to_string(r, "renderable_text_1")
 
     r = RenderableText(lorem, width=width, justify=:center, background="on_red")
-    @test string(r) == "\e[41m\e[41m \e[49m\e[41mLorem ipsum dolor sit amet, \e[41m \e[49m\e[41m\e[49m\n\e[41m\e[41m\e[49m\e[41mconsectetur adipiscing elit, \e[41m \e[49m\e[41m\e[49m\n\e[41m\e[41m    \e[49m\e[41msed do eiusmod tempor \e[41m    \e[49m\e[41m\e[49m\n\e[41m\e[41m     \e[49m\e[41mincididunt ut labore\e[41m     \e[49m\e[41m\e[49m"
+    compare_to_string(r, "renderable_text_1")
 end

@@ -2,6 +2,10 @@ install_term_repr()
 import Term.Consoles: clear
 import Term: default_width
 
+
+sprint_termshow(io::IO, x) = termshow(io, x; width = 60)
+
+
 @testset "REPR renderable repr" begin
     p = string(Panel())
     w = TEST_CONSOLE_WIDTH
@@ -24,16 +28,14 @@ end
     io = IOBuffer()
     show(IOContext(io), "text/plain", obj)
     s = String(take!(io))
-    tofile(s, "./txtfiles/termshow_panel.txt")
-
-    correct_s = fromfile("./txtfiles/termshow_panel.txt")
+    
+    correct_s = compare_to_string(s, "termshow_panel")
     @test s == correct_s
     @test sprint(termshow, obj) == correct_s
 
     termshow(devnull, Rocket)  # coverage
 
     @with_repr struct T end
-
     @test sprint(termshow, T()) ==
     "\e[38;2;155;179;224m╭──────────╮\e[39m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m  T()\e[38;2;187;134;219m::T\e[39m  \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[38;2;155;179;224m╰──── \e[38;2;227;172;141mT\e[39m\e[38;2;155;179;224m\e[38;2;155;179;224m ───╯\e[39m\e[0m\e[39m\e[38;2;155;179;224m\e[0m\n"
 end
@@ -71,27 +73,17 @@ else
     )
 end
 
-# ! Save to text file for later comparison
-sprint_termshow(io::IO, x) = termshow(io, x; width = 60)
-# for (i, t) in objs
-#     t = sprint(sprint_termshow, t)
-#     tofile(string(t), "./txtfiles/termshow_$i.txt")
-#     # termshow(t; width=60)
-# end
-
 @testset "TERMSHOW for types" begin
     for (i, t) in objs
         t = sprint(sprint_termshow, t)
-        @test fromfile("./txtfiles/termshow_$i.txt") == t
+        compare_to_string(t, "termshow_$i")
     end
 end
 
 @testset "Term automatic repr" begin
     repr_show(io, x) = show(io, MIME("text/plain"), x)
     @test sprint(repr_show, 1) == "\e[38;2;144;202;249m1\e[39m"
-    # TODO save these to file too
-    # @test sprint(repr_show, Dict(1 => :x)) == "\e[38;2;155;179;224m╭──── \e[38;2;227;172;141mDict {Int64, Symbol} \e[39m\e[38;2;155;179;224m\e[38;2;155;179;224m ──────╮\e[39m\e[0m\e[39m\e[38;2;155;179;224m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m                                 \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m  \e[2m\e[38;2;187;134;219m {Int64} \e[22m\e[39m\e[2m\e[38;2;126;157;217m│\e[22m\e[39m\e[0m \e[1m\e[38;2;224;219;121m1" ⋯ 22 bytes ⋯ "\e[22m\e[39m \e[1m\e[38;2;179;212;255mx\e[22m\e[39m \e[2m\e[38;2;126;157;217m│\e[22m\e[39m\e[0m\e[2m\e[38;2;187;134;219m {Symbol} \e[22m\e[39m  \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m                                 \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[38;2;155;179;224m╰───────────────────── \e[1m\e[37m1\e[22m\e[39m\e[22m items\e[22m\e[39m\e[38;2;155;179;224m ───╯\e[39m\e[0m\e[39m\e[0m\n"
-
-    # @test sprint(repr_show, :(x + y)) ==
-    # "\e[38;2;155;179;224m╭─────────────────────────────────╮\e[39m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m              \e[32mx \e[38;2;239;83;80m+\e[39m\e[32m y\e[39m              \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m  \e[22m─────────────────────────────\e[0m\e[22m  \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m  \e[1m\e[38;2;224;219;121mhead\e[22m\e[39m\e[38;2;" ⋯ 145 bytes ⋯ "0m\e[38;2;155;179;224m│\e[39m\e[0m  \e[1m\e[38;2;224;219;121margs\e[22m\e[39m\e[38;2;187;134;219m::Vector\e[39m\e[38;2;187;134;219m\e[2m\e[38;2;126;157;217m│\e[22m\e[39m\e[0m \e[38;2;179;212;255mAny[:+, :x, :y]\e[39m  \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[38;2;155;179;224m╰──────────────────────── \e[38;2;227;172;141mExpr\e[39m\e[38;2;155;179;224m\e[38;2;155;179;224m ───╯\e[39m\e[0m\e[39m\e[38;2;155;179;224m\e[0m\n"
+    
+    compare_to_string(sprint(repr_show, Dict(1 => :x)), "automatic_repr_1")
+    compare_to_string(sprint(repr_show, :(x + y)), "automatic_repr_2")
 end

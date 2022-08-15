@@ -27,6 +27,40 @@ fromfile(filepath) = replace_multi(read(filepath, String), "\\n" => "\n", "\\e" 
 
 fromfilelines(filepath) = lines = readlines(filepath)
 
+
+"""
+If in testing debug mode: print the renderable `obj`
+and save the string to file, if not, load the string from
+file and compare to the obj.
+"""
+function compare_to_string(obj, filename::String)
+    filepath = "./txtfiles/$filename.txt"
+    if TEST_DEBUG_MODE
+        print(obj)
+        tofile(string(obj), filepath)
+        return string(obj)
+    else
+        correct = fromfile(filepath)
+        @test string(obj) == correct
+        return correct
+    end
+end
+
+function compare_to_string(txt::AbstractString, filename::String)
+    filepath = "./txtfiles/$filename.txt"
+    if TEST_DEBUG_MODE
+        print(txt)
+        tofile(txt, filepath)
+        return txt
+    else
+        correct = fromfile(filepath)
+        @test txt == correct
+        return correct
+    end
+end
+
+
+
 same_widths(text::String) = length(unique(textlen.(split_lines(text)))) == 1
 
 function check_widths(text, width)

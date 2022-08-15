@@ -99,16 +99,9 @@ This is where you print the content of your foot notes:
 
 """
 
-for (i, m) in enumerate([m1, m2, m3])
-    # tprintln(parse_md(m; width=60))
-    # tprint(m)
-    t = parse_md(m; width = 60)
-    tofile(string(t), "./txtfiles/markdown_$i.txt")
-end
-
 @testset "Test Markdown Strings" begin
     for (i, m) in enumerate([m1, m2, m3])
         t = parse_md(m; width = 60)
-        @test fromfile("./txtfiles/markdown_$i.txt") == t
+        compare_to_string(t, "markdown_$i")
     end
 end

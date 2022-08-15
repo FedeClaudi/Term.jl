@@ -76,4 +76,11 @@ tree_dict_4 = Dict(
     # test with no errors
     @test_nothrow Tree(Float64)
     @test_nothrow Tree(AbstractFloat)
+
+
+    # compare to string
+    compare_to_string(Tree(tree_dict), "tree_1")
+    compare_to_string(Tree(tree_dict_1), "tree_2")
+    compare_to_string(Tree(tree_dict_2), "tree_3")
+    compare_to_string(Tree(tree_dict_3), "tree_4")
 end

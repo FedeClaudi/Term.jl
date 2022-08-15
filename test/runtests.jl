@@ -15,6 +15,7 @@ const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
 import Term.Consoles: Console, enable, disable
 
+const TEST_DEBUG_MODE = false  # renderables are saved as strings
 const TEST_CONSOLE_WIDTH = 80
 con = Console(TEST_CONSOLE_WIDTH)
 enable(con)
