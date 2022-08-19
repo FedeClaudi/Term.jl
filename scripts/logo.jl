@@ -38,7 +38,6 @@ function make_logo()
         padding = (2, 2, 0, 0),
         subtitle = "{italic default}Term",
         subtitle_style = "bold #389826",
-        fit = false,
     )
 
     indigo = "#42A5F5"

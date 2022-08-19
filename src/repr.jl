@@ -1,5 +1,6 @@
 module Repr
 using InteractiveUtils
+import Markdown
 
 import Term:
     str_trunc,
@@ -324,7 +325,6 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
     end
     methods_contents = if N > 1
         methods_texts = RenderableText.(highlight.(_methods); width = width - 20)
-        # rvstack(counts...) * lvstack(...)
         join(string.(map(i -> counts[i] * methods_texts[i], 1:length(counts))), '\n')
     else
         fun |> methods |> string |> split_lines |> first
@@ -345,6 +345,9 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
 
     # get docstring 
     doc, _ = get_docstring(fun)
+    panel.measure.w < 45 && begin   # handle narrow console 
+        doc = replace(string(doc), "```"=> " ") |> Markdown.MD
+    end
     doc = parse_md(doc; width = panel.measure.w - 4)
     doc = split_lines(doc)
     if (m = length(doc) - 100) > 0
