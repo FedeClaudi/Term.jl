@@ -35,6 +35,7 @@ file and compare to the obj.
 function compare_to_string(obj, filename::String)
     filepath = "./txtfiles/$filename.txt"
     if TEST_DEBUG_MODE
+        @info "TEST DEBUG" filename typeof(obj)
         println(obj)
         tofile(string(obj), filepath)
         return string(obj)
@@ -48,6 +49,7 @@ end
 function compare_to_string(txt::AbstractString, filename::String)
     filepath = "./txtfiles/$filename.txt"
     if TEST_DEBUG_MODE
+        @info "TEST DEBUG" filename
         tprint(txt)
         tofile(txt, filepath)
         return txt
@@ -57,6 +59,26 @@ function compare_to_string(txt::AbstractString, filename::String)
         return correct
     end
 end
+
+"""
+Evaluate `expr` capturing the output as a string and comparing to 
+a saved text at filename.
+"""
+function compare_to_string(expr::Expr, filename::String)
+    out = @capture_out eval(expr)
+    filepath = "./txtfiles/$filename.txt"
+    if TEST_DEBUG_MODE
+        @info "TEST DEBUG" filename
+        tprint(out)
+        tofile(out, filepath)
+        return out
+    else
+        correct = fromfile(filepath)
+        @test out == correct
+        return correct
+    end
+end
+
 
 same_widths(text::String) = length(unique(textlen.(split_lines(text)))) == 1
 

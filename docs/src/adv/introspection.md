@@ -1,5 +1,8 @@
 # Introspection
-Introspection refers to code that looks into another bit of code (or itself) to give you more details about it. The easiest way, with Term, is to use the [Term Repr](@ref ReprDoc) functionality and use `termshow` to get all the details you need. But there's dedicated code to analyse `Expr` objects in more details
+Introspection refers to code that looks into another bit of code (or itself) to give you more details about it. 
+
+!!! tip "Check out REPR"
+    The easiest way to do introspection with Term is to use the [Term Repr](@ref ReprDoc) functionality including functions such as  `termshow` and `@showme` to get all the details you need about your Julia code. Head over there to find out more. This section highlights methods to inspect types and expressions.
 
 ## `typestree`
 As you know, one of Julia's defining features is its hierarchical types structure. Sometimes, you want to get an overview of this hierarchy but there isn't always a convenient way achieve that... or is there...
