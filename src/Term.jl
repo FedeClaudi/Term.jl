@@ -60,7 +60,7 @@ export tprint, tprintln
 export install_term_stacktrace,
     install_term_logger, uninstall_term_logger, install_term_repr
 export vLine, hLine
-export @with_repr, termshow
+export @with_repr, termshow, @showme
 export Compositor, update!
 export grid
 
@@ -134,7 +134,7 @@ using .Compositors: Compositor, update!
 
 using .TermMarkdown: parse_md
 
-using .Repr: @with_repr, termshow, install_term_repr
+using .Repr: @with_repr, termshow, install_term_repr, @showme
 
 using .Grid
 

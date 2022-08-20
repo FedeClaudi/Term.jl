@@ -123,3 +123,42 @@ function vec2content(vec::Union{Tuple,AbstractVector})
     # content = rvstack(counts...) * Spacer(length(counts), 3) * cvstack(vec_items)
     return content
 end
+
+
+style_function_methods(fun; kwargs...) = style_function_methods(fun, methods(fun); kwargs...)
+
+style_function_methods(fun, _methods::Base.MethodList; kwargs...) = style_function_methods(fun, string(_methods); kwargs...)
+
+"""
+Create a styled list of methods for a function.
+Accepts `string(methods(function))` as argument.
+"""
+function style_function_methods(fun, methods::String; max_n=11, width=default_width())
+    _methods = split_lines(methods)
+    N = length(_methods)
+
+    _methods = length(_methods) > 1 ? _methods[2:min(max_n, N)] : []
+    _methods = map(m -> join(split(join(split(m, "]")[2:end]), " in ")[1]), _methods)
+    _methods = map(
+        m -> replace(
+            m,
+            string(fun) => "{bold #a5c6d9}$(string(fun)){/bold #a5c6d9}";
+            count = 1,
+        ),
+        _methods,
+    )
+    counts = RenderableText.("(" .* string.(1:length(_methods)) .* ") "; style = "bold dim")
+    if (m = N - length(_methods) - 1) > 0
+        push!(
+            _methods,
+            "\n{bold dim bright_blue}$m{/bold dim bright_blue}{dim bright_blue} $(plural("method", m)) omitted...{/dim bright_blue}",
+        )
+    end
+    methods_contents = if N > 1
+        methods_texts = RenderableText.(highlight.(_methods); width = width - 20)
+        join(string.(map(i -> counts[i] * methods_texts[i], 1:length(counts))), '\n')
+    else
+        fun |> methods |> string |> split_lines |> first
+    end
+    return methods_contents, N
+end
