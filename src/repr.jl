@@ -3,7 +3,6 @@ using InteractiveUtils
 import Markdown
 import CodeTracking: @code_string, @which, code_string
 
-
 import Term:
     str_trunc,
     escape_brackets,
@@ -305,7 +304,7 @@ Show a function's methods and docstring.
 """
 function termshow(io::IO, fun::Function; width = min(console_width(io), default_width(io)))
     # get methods
-    methods_contents, N = style_function_methods(fun; width=width)
+    methods_contents, N = style_function_methods(fun; width = width)
 
     m = N - 1
     panel =
@@ -323,7 +322,7 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
     # get docstring 
     doc, _ = get_docstring(fun)
     panel.measure.w < 45 && begin   # handle narrow console 
-        doc = replace(string(doc), "```"=> " ") |> Markdown.MD
+        doc = replace(string(doc), "```" => " ") |> Markdown.MD
     end
     doc = parse_md(doc; width = panel.measure.w - 4)
     doc = split_lines(doc)
@@ -419,23 +418,13 @@ macro with_repr(typedef::Expr)
     return esc(with_repr(typedef))
 end
 
-
-
-
-
-
 # ---------------------------------------------------------------------------- #
 #                                    SHOW ME                                   #
 # ---------------------------------------------------------------------------- #
 
-
-    
-    
-
-macro showme(expr, show_all_methods=false)        
+macro showme(expr, show_all_methods = false)
     width = min(console_width(), 120)
-    hLine(width, style="dim") |> tprint
-
+    hLine(width, style = "dim") |> tprint
 
     # print info msg
     info_msg = String["""
@@ -455,13 +444,12 @@ macro showme(expr, show_all_methods=false)
     for i in 2:length(expr.args)
         arg = expr.args[i]
         arg = arg isa AbstractString ? "\"$arg\"" : arg
-        "     {blue}⨀{/blue} {white italic}$arg{/white italic}{$_type_color}::$(typeof(arg)){/$_type_color}" |> tprintln
+        "     {blue}⨀{/blue} {white italic}$arg{/white italic}{$_type_color}::$(typeof(arg)){/$_type_color}" |>
+        tprintln
     end
 
     print("\n")
 
-    
-    
     quote
         code_source = @code_string $expr
         Markdown.parse("###### Method definition") |> tprintln
@@ -469,11 +457,9 @@ macro showme(expr, show_all_methods=false)
         ```
         $code_source
         ```
-        """
-        )
-        code = parse_md(code_source;  width=$width + 2, lpad=false) |> string
+        """)
+        code = parse_md(code_source; width = $width + 2, lpad = false) |> string
 
-        
         method = @which $expr
         source = "{dim}$(method.file):$(method.line){/dim} "
 
@@ -481,21 +467,18 @@ macro showme(expr, show_all_methods=false)
 
         if $show_all_methods
             println()
-            tprintln("    " * Panel(
-                style_function_methods(eval(method.name); max_n=100)[1],
-                title = "all methods", style="dim", padding=(4, 4, 1, 1),
-                title_style="default",
-                width=$width-4
-                )
+            tprintln(
+                "    " * Panel(
+                    style_function_methods(eval(method.name); max_n = 100)[1],
+                    title = "all methods",
+                    style = "dim",
+                    padding = (4, 4, 1, 1),
+                    title_style = "default",
+                    width = $width - 4,
+                ),
             )
         end
     end
 end
 
-
-
-
 end
-
-
-

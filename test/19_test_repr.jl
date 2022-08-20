@@ -86,7 +86,6 @@ import Term: default_width
 #     compare_to_string(sprint(repr_show, :(x + y)), "automatic_repr_2")
 # end
 
-
 @testset "@showme" begin
     compare_to_string(:(@showme tprint(stdout, "test")), "automatic_repr_showme_1")
 end

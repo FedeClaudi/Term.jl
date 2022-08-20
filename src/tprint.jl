@@ -37,7 +37,8 @@ Apply style to a string and print it
 function tprint(io::IO, x::AbstractString; highlight = true)
     x = (highlight ? apply_style ∘ highlighter : apply_style)(x)
 
-    x = Measure(x).w <= console_width(io) ? x :
+    x =
+        Measure(x).w <= console_width(io) ? x :
         string(RenderableText(string(x), width = console_width(io)))
     print(io, x)
 end

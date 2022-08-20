@@ -5,7 +5,6 @@ using Term
 using Test
 import Term: console_width
 
-
 const RNG = StableRNG(1337)
 
 include("__test_utils.jl")

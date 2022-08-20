@@ -124,16 +124,17 @@ function vec2content(vec::Union{Tuple,AbstractVector})
     return content
 end
 
+style_function_methods(fun; kwargs...) =
+    style_function_methods(fun, methods(fun); kwargs...)
 
-style_function_methods(fun; kwargs...) = style_function_methods(fun, methods(fun); kwargs...)
-
-style_function_methods(fun, _methods::Base.MethodList; kwargs...) = style_function_methods(fun, string(_methods); kwargs...)
+style_function_methods(fun, _methods::Base.MethodList; kwargs...) =
+    style_function_methods(fun, string(_methods); kwargs...)
 
 """
 Create a styled list of methods for a function.
 Accepts `string(methods(function))` as argument.
 """
-function style_function_methods(fun, methods::String; max_n=11, width=default_width())
+function style_function_methods(fun, methods::String; max_n = 11, width = default_width())
     _methods = split_lines(methods)
     N = length(_methods)
 

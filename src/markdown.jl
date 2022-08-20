@@ -39,7 +39,6 @@ function parse_md end
 parse_md(text::String) = parse_md(Markdown.parse(text))
 parse_md(x; kwargs...)::String = string(x)
 
-
 """
     parse_md(text::Markdown.MD; kwargs...)::String
 
@@ -351,7 +350,6 @@ function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::
         ),
     )
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                              RENDERABLE & TPRINT                             #

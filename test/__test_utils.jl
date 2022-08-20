@@ -79,7 +79,6 @@ function compare_to_string(expr::Expr, filename::String)
     end
 end
 
-
 same_widths(text::String) = length(unique(textlen.(split_lines(text)))) == 1
 
 function check_widths(text, width)
