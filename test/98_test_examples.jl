@@ -4,7 +4,6 @@
     @suppress_out begin
         include("../examples/custom_repr.jl")
         include("../examples/dendogram.jl")
-        include("../examples/layout.jl")
         include("../examples/markdown_rendering.jl")
         include("../examples/tree.jl")
         include("../examples/tables.jl")
