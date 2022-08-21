@@ -41,6 +41,7 @@ function compare_to_string(obj, filename::String)
         return string(obj)
     else
         correct = fromfile(filepath)
+        IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
         @test string(obj) == correct
         return correct
     end
@@ -55,6 +56,7 @@ function compare_to_string(txt::AbstractString, filename::String)
         return txt
     else
         correct = fromfile(filepath)
+        IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
         @test txt == correct
         return correct
     end
@@ -74,6 +76,7 @@ function compare_to_string(expr::Expr, filename::String)
         return out
     else
         correct = fromfile(filepath)
+        IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
         @test out == correct
         return correct
     end
