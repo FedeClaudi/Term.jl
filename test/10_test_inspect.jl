@@ -1,8 +1,6 @@
 import Term: inspect, expressiontree, typestree, Dendogram, Tree
 import Term.Consoles: console_width
 
-println("\nTesting logging, stdout temporarily disabled")
-# @suppress_out begin
 
 # define expressions
 e1 = :(2x + 3y + 2)
@@ -46,4 +44,10 @@ end
             expressiontree(:(1 + 2.0))
         end
     end
+end
+
+
+
+@testset "Introspect types and modules" begin
+    @compare_to_string :(inspect(Panel)) "inspect_panel"
 end

@@ -45,12 +45,13 @@ include("progress.jl")
 include("logs.jl")
 include("trees.jl")
 include("dendograms.jl")
-include("introspection.jl")
 include("tables.jl")
 include("markdown.jl")
 include("repr.jl")
 include("compositors.jl")
 include("grid.jl")
+include("introspection.jl")
+
 
 export RenderableText, Panel, TextBox
 export TERM_THEME, highlight
@@ -63,6 +64,7 @@ export vLine, hLine
 export @with_repr, termshow, @showme
 export Compositor, update!
 export grid
+export inspect
 
 # ----------------------------------- base ----------------------------------- #
 using .Measures
@@ -126,7 +128,7 @@ using .Trees: Tree
 
 using .Dendograms: Dendogram
 
-using .Introspection: inspect, typestree, expressiontree
+using .Introspection: inspect, typestree, expressiontree, inspect
 
 using .Tables: Table
 

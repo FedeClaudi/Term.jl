@@ -1,8 +1,9 @@
 module Introspection
 
 using InteractiveUtils
+import InteractiveUtils: supertypes as getsupertypes
 
-import MyterialColors: orange, grey_dark, light_green
+import MyterialColors: pink, pink_light, orange, grey_dark, light_green
 
 import Term:
     highlight,
@@ -12,11 +13,17 @@ import Term:
     split_lines,
     do_by_line,
     expr2string,
-    default_width
+    default_width,
+    TERM_THEME,
+    highlight_syntax
 
+import ..Renderables: RenderableText
 import ..Panels: Panel
 import ..Dendograms: Dendogram
 import ..Trees: Tree
+import ..Layout: hLine
+import ..Tprint: tprintln
+import ..Repr: termshow
 
 include("_inspect.jl")
 
@@ -89,5 +96,56 @@ function inspect(io::IO, expr::Expr)
         ),
     )
 end
+
+
+
+# ---------------------------------------------------------------------------- #
+#                             INTROSPECT DATATYPES                             #
+# ---------------------------------------------------------------------------- #
+
+"""
+    inspect(T::DataType; documentation::Bool=false, constructors::Bool=true, methods::Bool=true, supertypes::Bool=true)
+
+Inspect a `DataType` to show info such as docstring, constructors and methods.
+Flags can be used to choose the level of detail in the information presented:
+ - documentation: show docstring with `termshow`
+ - constructors: show `T` constructors
+ - methods: show methods using `T` in their signature
+ - supertypes: show methods using `T`'s supertypes in their signature
+"""
+function inspect(T::DataType; documentation::Bool=false, constructors::Bool=true, methods::Bool=true, supertypes::Bool=true)
+    hLine("inspecting: $T", style="bold white") |> print
+
+    documentation && begin
+        termshow(T)
+        print("\n"^3)
+    end
+
+    # types hierarchy
+    "{bold white}○ Types hierarchy:" |> tprintln
+    "   " * Tree(T) |> print
+
+    # constructors
+    constructors && begin
+        "\n{bold white}○ {$pink}$T{/$pink} constructors:" |> tprintln
+        t_name = split(string(T), '.')[end]
+        print.(style_methods(Base.methods(T), t_name))
+    end
+
+    # methods with T and supertypes
+    methods && begin
+        for dt in getsupertypes(T)[1:end-1]
+            _methods = methodswith(dt) 
+            length(_methods) == 0 && continue
+            dt_name = split(string(dt), '.')[end]
+
+            "\n{bold white}○ Methods for $dt:" |> tprintln
+            print.(style_methods(_methods, dt_name))
+            supertypes || break
+        end
+    end
+    nothing
+end
+
 
 end
