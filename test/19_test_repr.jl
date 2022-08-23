@@ -97,6 +97,7 @@ end
     @compare_to_string(
         :(@showme tprint(stdout, "test")),
         "automatic_repr_showme_1",
-        fn ,
+        fn,
+        2,  # skip the last two lines
     )
 end

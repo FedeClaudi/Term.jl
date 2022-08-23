@@ -93,7 +93,7 @@ If `TEST_DEBUG_MODE=true`, instead of comparing to a file, save the
 obj's string to the file for future comparison. Also print out
 the output for visual inspection.
 """
-macro compare_to_string(obj, filename, fn = x -> x)
+macro compare_to_string(obj, filename, fn = x -> x, skip=nothing)
     __f = string(__source__.file)
     __l = string(__source__.line)
     quote
@@ -103,6 +103,11 @@ macro compare_to_string(obj, filename, fn = x -> x)
             $obj
         end |> string
         txt = $fn(txt)
+
+        !isnothing($skip) && (
+            txt = join(split(txt, '\n')[1:end-skip], '\n')
+        )
+
         filepath = "./txtfiles/$($filename).txt"
 
         if TEST_DEBUG_MODE

@@ -375,8 +375,8 @@ function Tree(T::DataType)::Tree
 
     return Tree(
         data;
-        # title=string(supertypes(T)[end]),
-        title = "Any",
+        title=string(supertypes(T)[end-1]),
+        # title = "Any",
         title_style = "bright_green italic",
         guides_style = "green dim",
     )
