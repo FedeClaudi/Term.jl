@@ -105,7 +105,7 @@ macro compare_to_string(obj, filename, fn = x -> x, skip=nothing)
         txt = $fn(txt)
 
         !isnothing($skip) && (
-            txt = join(split(txt, '\n')[1:end-skip], '\n')
+            txt = join(split(txt, '\n')[1:end-$sskip], '\n')
         )
 
         filepath = "./txtfiles/$($filename).txt"
