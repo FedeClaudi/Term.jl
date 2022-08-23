@@ -78,7 +78,7 @@ for windows.
 function load_from_txt(filename)
     filepath = "./txtfiles/$(filename).txt"
     correct = fromfile(filepath)
-    IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
+    # IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
     correct
 end
 
