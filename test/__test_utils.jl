@@ -54,8 +54,8 @@ function highlight_diff(s1::String, s2::String)
     i = 1
     while i < (min(length(c1), length(c2)) - 50)
         "{dim}Characters $i-$(i+50){/dim}" |> tprintln
-        "{bold yellow}(1){/bold yellow}" * join(c1[i:(i + 50)]) |> join |> tprintln
-        "{bold yellow}(2){/bold yellow}" * join(c1[i:(i + 50)]) |> join |> tprintln
+        tprintln("{bold red}(1){/bold red}  - " * join(c1[i:(i + 50)]) |> join, highlight=false)
+        tprintln("{bold red}(2){/bold red}  - " * join(c2[i:(i + 50)]) |> join, highlight=false)
         hLine(style = "dim") |> tprint
         print("\n")
         i += 50
