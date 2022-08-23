@@ -51,24 +51,9 @@ If in testing debug mode: print the renderable `obj`
 and save the string to file, if not, load the string from
 file and compare to the obj.
 """
-function compare_to_string(obj, filename::String)
+function compare_to_string(txt::AbstractString, filename::String, fn::Function = (x) -> x)
     filepath = "./txtfiles/$filename.txt"
-    if TEST_DEBUG_MODE
-        @info "TEST DEBUG" filename typeof(obj)
-        println(obj)
-        tofile(string(obj), filepath)
-        return string(obj)
-    else
-        correct = fromfile(filepath)
-        IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
-        highlight_diff(txt, correct)
-        @test string(obj) == correct
-        return correct
-    end
-end
-
-function compare_to_string(txt::AbstractString, filename::String)
-    filepath = "./txtfiles/$filename.txt"
+    txt = fn(txt)
     if TEST_DEBUG_MODE
         @info "TEST DEBUG" filename
         tprint(txt)
@@ -77,32 +62,21 @@ function compare_to_string(txt::AbstractString, filename::String)
     else
         correct = fromfile(filepath)
         IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
+
         highlight_diff(txt, correct)
+
         @test txt == correct
         return correct
     end
 end
 
-"""
-Evaluate `expr` capturing the output as a string and comparing to 
-a saved text at filename.
-"""
-function compare_to_string(expr::Expr, filename::String, fn::Function = (x) -> x)
+compare_to_string(obj, filename::String) = compare_to_string(string(obj), filename)
+compare_to_string(expr::Expr, filename::String, fn::Function = (x) -> x) = begin
     out = @capture_out eval(expr)
-    filepath = "./txtfiles/$filename.txt"
-    if TEST_DEBUG_MODE
-        @info "TEST DEBUG" filename
-        tprint(out)
-        tofile(out, filepath)
-        return out
-    else
-        correct = fromfile(filepath)
-        IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
-        highlight_diff(txt, correct)
-        @test fn(out) == correct
-        return correct
-    end
+    compare_to_string(out, filename, fn)
 end
+
+# ----------------------------------- misc ----------------------------------- #
 
 same_widths(text::String) = length(unique(textlen.(split_lines(text)))) == 1
 
