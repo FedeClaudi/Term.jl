@@ -89,11 +89,14 @@ end
 end
 
 @testset "@showme" begin
-    loc = "/Users/federicoclaudi/Documents/Github/Term.jl/src/"
-    rem = "             /home/runner/work/Term.jl/Term.jl/src/"
+    # fix for different path on remote CI
+    loc = "\e[2m/Users/federicoclaudi/Documents/Github/Term.jl/src/"
+    rem = "             \e[2m/home/runner/work/Term.jl/Term.jl/src/"
+    fn(x) = replace(x, rem => loc)
+
     @compare_to_string(
         :(@showme tprint(stdout, "test")),
         "automatic_repr_showme_1",
-        (x) -> replace(x, rem => loc),
+        fn ,
     )
 end
