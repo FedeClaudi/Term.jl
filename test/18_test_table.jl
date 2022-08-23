@@ -52,6 +52,7 @@ tbls = [t1, t2, t3, t4, t5, t6, t7, t8]
 @testset "TABLE" begin
     for (i, t) in enumerate(tbls)
         name = string("table_$i")
-        @compare_to_string(cleanstring(t), name)
+
+        IS_WIN || @compare_to_string(cleanstring(t), name)
     end
 end

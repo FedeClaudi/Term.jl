@@ -94,10 +94,12 @@ end
     rem = "             \e[2m/home/runner/work/Term.jl/Term.jl/src/"
     fn(x) = replace(x, rem => loc)
 
-    @compare_to_string(
-        :(@showme tprint(stdout, "test")),
-        "automatic_repr_showme_1",
-        fn,
-        2,  # skip the last two lines
-    )
+    IS_WIN || begin
+        @compare_to_string(
+            :(@showme tprint(stdout, "test")),
+            "automatic_repr_showme_1",
+            fn,
+            2,  # skip the last two lines
+        )
+    end
 end

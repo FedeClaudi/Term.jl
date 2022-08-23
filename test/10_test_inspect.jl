@@ -1,7 +1,6 @@
 import Term: inspect, expressiontree, typestree, Dendogram, Tree
 import Term.Consoles: console_width
 
-
 # define expressions
 e1 = :(2x + 3y + 2)
 e2 = :(2x + 3 + 2 + 2y)
@@ -45,8 +44,6 @@ end
         end
     end
 end
-
-
 
 @testset "Introspect types and modules" begin
     # @compare_to_string :(inspect(Panel)) "inspect_panel"

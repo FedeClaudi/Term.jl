@@ -97,8 +97,6 @@ function inspect(io::IO, expr::Expr)
     )
 end
 
-
-
 # ---------------------------------------------------------------------------- #
 #                             INTROSPECT DATATYPES                             #
 # ---------------------------------------------------------------------------- #
@@ -113,8 +111,14 @@ Flags can be used to choose the level of detail in the information presented:
  - methods: show methods using `T` in their signature
  - supertypes: show methods using `T`'s supertypes in their signature
 """
-function inspect(T::DataType; documentation::Bool=false, constructors::Bool=true, methods::Bool=true, supertypes::Bool=true)
-    hLine("inspecting: $T", style="bold white") |> print
+function inspect(
+    T::DataType;
+    documentation::Bool = false,
+    constructors::Bool = true,
+    methods::Bool = true,
+    supertypes::Bool = true,
+)
+    hLine("inspecting: $T", style = "bold white") |> print
 
     documentation && begin
         termshow(T)
@@ -134,8 +138,8 @@ function inspect(T::DataType; documentation::Bool=false, constructors::Bool=true
 
     # methods with T and supertypes
     methods && begin
-        for dt in getsupertypes(T)[1:end-1]
-            _methods = methodswith(dt) 
+        for dt in getsupertypes(T)[1:(end - 1)]
+            _methods = methodswith(dt)
             length(_methods) == 0 && continue
             dt_name = split(string(dt), '.')[end]
 
@@ -146,6 +150,5 @@ function inspect(T::DataType; documentation::Bool=false, constructors::Bool=true
     end
     nothing
 end
-
 
 end
