@@ -45,11 +45,11 @@ function highlight_diff(s1::String, s2::String)
     end
 
     hLine("STRING DIFFERENCE $(length(c1)) chrs", style = "red") |> tprint
-    hline("FIRST") |> tprint
+    hLine("FIRST", style = "blue") |> tprint
     println(s1)
-    hline("SECOND") |> tprint
+    hLine("SECOND", style = "blue") |> tprint
     println(s1)
-    hline(style = "dim") |> tprint
+    hLine(style = "dim blue") |> tprint
 
     i = 1
     while i < (min(length(c1), length(c2)) - 50)
