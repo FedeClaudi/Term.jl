@@ -87,10 +87,12 @@ tree_dict_order_2 = OrderedDict(2 => 1, 3 => OrderedDict(4 => 2, "a" => 2, "b" =
     @test_nothrow Tree(AbstractFloat)
 
     # compare to string
-    @compare_to_string(Tree(tree_dict), "tree_1")
-    @compare_to_string(Tree(tree_dict_1), "tree_2")
-    @compare_to_string(Tree(tree_dict_2), "tree_3")
-    @compare_to_string(Tree(tree_dict_3), "tree_4")
-    @compare_to_string Tree(tree_dict_order_1) "tree_5"
-    @compare_to_string Tree(tree_dict_order_2) "tree_6"
+    IS_WIN || begin
+        @compare_to_string(Tree(tree_dict), "tree_1")
+        @compare_to_string(Tree(tree_dict_1), "tree_2")
+        @compare_to_string(Tree(tree_dict_2), "tree_3")
+        @compare_to_string(Tree(tree_dict_3), "tree_4")
+        @compare_to_string Tree(tree_dict_order_1) "tree_5"
+        @compare_to_string Tree(tree_dict_order_2) "tree_6"
+    end
 end
