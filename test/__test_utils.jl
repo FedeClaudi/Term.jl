@@ -28,6 +28,25 @@ fromfile(filepath) = replace_multi(read(filepath, String), "\\n" => "\n", "\\e" 
 fromfilelines(filepath) = lines = readlines(filepath)
 
 """
+Highlight different characters between two strings
+"""
+function highlight_diff(s1::String, s2::String)
+    s1 == s2 && return
+    c1, c2 = Any[collect(s1)...], Any[collect(s2)...]
+    length(c1) != length(c2) &&
+        (@warn "Strings have different length: $(length(c1)) vs $(length(c2))")
+
+    for i in 1:min(length(c1), length(c2))
+        a, b = c1[i], c2[i]
+        color = a == b ? "green" : "red"
+        c1[i] = "{$color}$a{/$color}"
+        c2[i] = "{$color}$b{/$color}"
+    end
+    tprintln(join(c1))
+    tprintln(join(c2))
+end
+
+"""
 If in testing debug mode: print the renderable `obj`
 and save the string to file, if not, load the string from
 file and compare to the obj.
@@ -42,6 +61,7 @@ function compare_to_string(obj, filename::String)
     else
         correct = fromfile(filepath)
         IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
+        highlight_diff(txt, correct)
         @test string(obj) == correct
         return correct
     end
@@ -57,6 +77,7 @@ function compare_to_string(txt::AbstractString, filename::String)
     else
         correct = fromfile(filepath)
         IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
+        highlight_diff(txt, correct)
         @test txt == correct
         return correct
     end
@@ -77,6 +98,7 @@ function compare_to_string(expr::Expr, filename::String, fn::Function = (x) -> x
     else
         correct = fromfile(filepath)
         IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
+        highlight_diff(txt, correct)
         @test fn(out) == correct
         return correct
     end
