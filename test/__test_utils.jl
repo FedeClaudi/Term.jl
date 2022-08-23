@@ -66,7 +66,7 @@ end
 Evaluate `expr` capturing the output as a string and comparing to 
 a saved text at filename.
 """
-function compare_to_string(expr::Expr, filename::String, fn::Function=(x)->x)
+function compare_to_string(expr::Expr, filename::String, fn::Function = (x) -> x)
     out = @capture_out eval(expr)
     filepath = "./txtfiles/$filename.txt"
     if TEST_DEBUG_MODE
