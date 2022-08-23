@@ -51,9 +51,11 @@ end
     lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore"
     width = 30
 
-    r = RenderableText(lorem, width = width, justify = :right)
-    @compare_to_string(r, "renderable_text_1")
+    IS_WIN || begin
+        r = RenderableText(lorem, width = width, justify = :right)
+        @compare_to_string(r, "renderable_text_1")
 
-    r = RenderableText(lorem, width = width, justify = :center, background = "on_red")
-    @compare_to_string(r, "renderable_text_2")
+        r = RenderableText(lorem, width = width, justify = :center, background = "on_red")
+        @compare_to_string(r, "renderable_text_2")
+    end
 end
