@@ -102,6 +102,6 @@ This is where you print the content of your foot notes:
 @testset "Test Markdown Strings" begin
     for (i, m) in enumerate([m1, m2, m3])
         t = parse_md(m; width = 60)
-        compare_to_string(t, "markdown_$i")
+        @compare_to_string(t, "markdown_$i")
     end
 end

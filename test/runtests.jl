@@ -4,6 +4,7 @@ using StableRNGs
 using Term
 using Test
 import Term: console_width
+import Term: Tree, Dendogram, Table, Compositor
 
 const RNG = StableRNG(1337)
 

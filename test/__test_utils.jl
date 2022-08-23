@@ -45,47 +45,63 @@ function highlight_diff(s1::String, s2::String)
     end
 
     hLine("STRING DIFFERENCE $(length(c1)) chrs", style = "red") |> tprint
+    hline("FIRST") |> tprint
+    println(s1)
+    hline("SECOND") |> tprint
+    println(s1)
+    hline(style = "dim") |> tprint
 
     i = 1
-    while i < (min(length(c1), length(c2))-50)
+    while i < (min(length(c1), length(c2)) - 50)
         "{dim}Characters $i-$(i+50){/dim}" |> tprintln
-        c1[i:i+50] |> join |> tprintln
-        c2[i:i+50] |> join |> tprintln
+        "{bold yellow}(1){/bold yellow}" * join(c1[i:(i + 50)]) |> join |> tprintln
+        "{bold yellow}(2){/bold yellow}" * join(c1[i:(i + 50)]) |> join |> tprintln
+        hLine(style = "dim") |> tprint
         print("\n")
         i += 50
     end
     hLine(style = "red") |> tprint
 end
 
-
-"""
-If in testing debug mode: print the renderable `obj`
-and save the string to file, if not, load the string from
-file and compare to the obj.
-"""
-function compare_to_string(txt::AbstractString, filename::String, fn::Function = (x) -> x)
-    filepath = "./txtfiles/$filename.txt"
-    txt = fn(txt)
-    if TEST_DEBUG_MODE
-        @info "TEST DEBUG" filename
-        tprint(txt)
-        tofile(txt, filepath)
-        return txt
-    else
-        correct = fromfile(filepath)
-        IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
-
-        highlight_diff(txt, correct)
-
-        @test txt == correct
-        return correct
-    end
+function load_from_txt(filename)
+    filepath = "./txtfiles/$(filename).txt"
+    correct = fromfile(filepath)
+    IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
+    correct
 end
 
-compare_to_string(obj, filename::String) = compare_to_string(string(obj), filename)
-compare_to_string(expr::Expr, filename::String, fn::Function = (x) -> x) = begin
-    out = @capture_out eval(expr)
-    compare_to_string(out, filename, fn)
+"""
+    macro compare_to_string(obj, filename::String, fn::Function=x->x)
+
+Check that the string representation of an object is identical to
+what's saved in a .txt file at `filename`. If `obj` is an expression or
+a renderable first turn it into a string.
+
+If `TEST_DEBUG_MODE=true`, instead of comparing to a file, save the 
+obj's string to the file for future comparison. Also print out
+the output for visual inspection.
+"""
+macro compare_to_string(obj, filename, fn = x -> x)
+    __f = string(__source__.file)
+    __l = string(__source__.line)
+    quote
+        txt = if $obj isa Expr
+            @capture_out eval($obj)
+        else
+            $obj
+        end |> string |> $fn
+        filepath = "./txtfiles/$($filename).txt"
+
+        if TEST_DEBUG_MODE
+            tprint(txt)
+            tofile(txt, filepath)
+        else
+            correct = load_from_txt($filename)
+            txt != correct && (@warn "Failed to match to text" $filename $__f $__l)
+            highlight_diff(txt, correct)
+            @test txt == correct # <-- TEST
+        end
+    end |> esc
 end
 
 # ----------------------------------- misc ----------------------------------- #

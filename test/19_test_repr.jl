@@ -27,7 +27,9 @@ end
     show(IOContext(io), "text/plain", obj)
     s = String(take!(io))
 
-    correct_s = compare_to_string(s, "termshow_panel")
+    @compare_to_string(s, "termshow_panel")
+
+    correct_s = load_from_txt("termshow_panel")
     @test s == correct_s
     @test sprint(termshow, obj) == correct_s
 
@@ -74,7 +76,7 @@ end
 @testset "TERMSHOW for types" begin
     for (i, t) in objs
         t = sprint(sprint_termshow, t)
-        compare_to_string(t, "termshow_$i")
+        @compare_to_string(t, "termshow_$i")
     end
 end
 
@@ -82,12 +84,12 @@ end
     repr_show(io, x) = show(io, MIME("text/plain"), x)
     @test sprint(repr_show, 1) == "\e[38;2;144;202;249m1\e[39m"
 
-    compare_to_string(sprint(repr_show, Dict(1 => :x)), "automatic_repr_1")
-    compare_to_string(sprint(repr_show, :(x + y)), "automatic_repr_2")
+    @compare_to_string(sprint(repr_show, Dict(1 => :x)), "automatic_repr_1")
+    @compare_to_string(sprint(repr_show, :(x + y)), "automatic_repr_2")
 end
 
 @testset "@showme" begin
-    compare_to_string(
+    @compare_to_string(
         :(@showme tprint(stdout, "test")),
         "automatic_repr_showme_1",
         (x) -> replace(

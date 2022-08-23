@@ -5,10 +5,10 @@ import Term.Dendograms: link, Dendogram
     otherdendo = Dendogram("head", "these", "are", "colorful", "leaves")
     smalldendo = Dendogram("head", [1, 2])
 
-    compare_to_string(mydendo, "dendogram_1")
+    @compare_to_string(mydendo, "dendogram_1")
 
     large = link(mydendo, otherdendo; title = "{red}superdendo{/red}")
-    compare_to_string(large, "dendogram_2")
+    @compare_to_string(large, "dendogram_2")
 
     nested = link(
         smalldendo,
@@ -19,7 +19,7 @@ import Term.Dendograms: link, Dendogram
         );
         title = "first level",
     )
-    compare_to_string(nested, "dendogram_3")
+    @compare_to_string(nested, "dendogram_3")
 
     D = link(mydendo, mydendo, mydendo)
     @test D.measure.w == 150

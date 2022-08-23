@@ -52,8 +52,8 @@ end
     width = 30
 
     r = RenderableText(lorem, width = width, justify = :right)
-    compare_to_string(r, "renderable_text_1")
+    @compare_to_string(r, "renderable_text_1")
 
     r = RenderableText(lorem, width = width, justify = :center, background = "on_red")
-    compare_to_string(r, "renderable_text_2")
+    @compare_to_string(r, "renderable_text_2")
 end
