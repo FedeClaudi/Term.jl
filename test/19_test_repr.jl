@@ -89,15 +89,14 @@ end
 end
 
 @testset "@showme" begin
-
     loc = "/Users/federicoclaudi/Documents/Github/Term.jl/src/"
-    rem = "/home/runner/work/Term.jl/Term.jl/src/"
+    rem = "             /home/runner/work/Term.jl/Term.jl/src/"
     @compare_to_string(
         :(@showme tprint(stdout, "test")),
         "automatic_repr_showme_1",
         (x) -> replace(
             x,
-            ' '^(length(loc) - length(rem)) * rem => loc,
+            rem => loc,
         ),
     )
 end

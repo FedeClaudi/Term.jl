@@ -96,7 +96,8 @@ macro compare_to_string(obj, filename, fn = x -> x)
             @capture_out eval($obj)
         else
             $obj
-        end |> string |> $fn
+        end |> string
+        txt = $fn(txt)
         filepath = "./txtfiles/$($filename).txt"
 
         if TEST_DEBUG_MODE
