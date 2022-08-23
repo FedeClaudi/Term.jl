@@ -29,7 +29,7 @@ fromfile(filepath) = replace_multi(read(filepath, String), "\\n" => "\n", "\\e" 
 fromfilelines(filepath) = lines = readlines(filepath)
 
 """
-Highlight different characters between two strings
+Highlight different characters between two strings.
 """
 function highlight_diff(s1::String, s2::String)
     s1 == s2 && return
@@ -65,6 +65,11 @@ function highlight_diff(s1::String, s2::String)
     hLine(style = "red") |> tprint
 end
 
+
+"""
+Load "correct' string from .txt file and correct new lines
+for windows.
+"""
 function load_from_txt(filename)
     filepath = "./txtfiles/$(filename).txt"
     correct = fromfile(filepath)
@@ -95,7 +100,7 @@ macro compare_to_string(obj, filename, fn = x -> x)
         filepath = "./txtfiles/$($filename).txt"
 
         if TEST_DEBUG_MODE
-            tprint(txt)
+            tprint(txt, highlight=false)
             tofile(txt, filepath)
         else
             correct = load_from_txt($filename)
