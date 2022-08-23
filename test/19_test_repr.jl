@@ -27,11 +27,14 @@ end
     show(IOContext(io), "text/plain", obj)
     s = String(take!(io))
 
-    IS_WIN || @compare_to_string(s, "termshow_panel")
+    IS_WIN || begin
+        
+        @compare_to_string(s, "termshow_panel")
 
-    correct_s = load_from_txt("termshow_panel")
-    @test s == correct_s
-    @test sprint(termshow, obj) == correct_s
+        correct_s = load_from_txt("termshow_panel")
+        @test s == correct_s
+        @test sprint(termshow, obj) == correct_s
+    end
 
     termshow(devnull, Rocket)  # coverage
 
