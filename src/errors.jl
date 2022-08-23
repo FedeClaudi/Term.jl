@@ -228,7 +228,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
-            isa(er, StackOverflowError) && (bt=[bt[1:25]..., bt[end-25:end]...])
+            isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
 
             if default_stacktrace_width() < 70
                 println(io)

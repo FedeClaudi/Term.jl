@@ -40,27 +40,10 @@ tree_dict_4 = Dict(
     "nested2" => Dict("n1" => "a", "n2" => 2),
 )
 
+tree_dict_order_1 =
+    OrderedDict(3 => OrderedDict(3 => 8, 1 => "a"), 2 => OrderedDict(3 => 8, 1 => "a"))
 
-tree_dict_order_1 =     OrderedDict(
-    3 => OrderedDict(
-        3 => 8,  
-        1 => "a"
-    ), 
-    2 => OrderedDict(
-        3 => 8,  
-        1 => "a"
-    )
-)
-
-tree_dict_order_2 =     OrderedDict(
-    2 => 1,
-    3 => OrderedDict(
-            4 => 2,
-            "a" => 2,  
-            "b" => 1
-        ), 
-
-    )
+tree_dict_order_2 = OrderedDict(2 => 1, 3 => OrderedDict(4 => 2, "a" => 2, "b" => 1))
 
 @testset "\e[34mTree" begin
     # creation

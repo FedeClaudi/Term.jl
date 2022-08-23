@@ -138,7 +138,6 @@ using .Repr: @with_repr, termshow, install_term_repr, @showme
 
 using .Grid
 
-
 # ---------------------------------------------------------------------------- #
 #                                precompilation                                #
 # ---------------------------------------------------------------------------- #
@@ -150,7 +149,6 @@ using SnoopPrecompile
         Panel("test") * Panel(Panel()) / hLine(20)
     end
 end
-
 
 # precompile(Panel)
 # precompile(Panel, (String,))
