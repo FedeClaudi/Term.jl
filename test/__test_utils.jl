@@ -1,4 +1,5 @@
 import Term: cleantext, chars, textlen, split_lines, replace_multi
+import Term: Table
 
 cleanstring(x) = replace(string(x), "\r\n" => "\n")
 cleansprint(fn, x) = replace(sprint(fn, x), "\r\n" => "\n")
@@ -38,13 +39,17 @@ function highlight_diff(s1::String, s2::String)
 
     for i in 1:min(length(c1), length(c2))
         a, b = c1[i], c2[i]
-        color = a == b ? "green" : "red"
+        color = a == b ? "default" : "bold black on_red"
         c1[i] = "{$color}$a{/$color}"
         c2[i] = "{$color}$b{/$color}"
     end
-    tprintln(join(c1))
-    tprintln(join(c2))
+
+    hLine("STRING DIFFERENCE", style="red") |> tprint
+    # Panel(c1, width=10, justify=:right, title="1", style="dim")  * Panel(c2, width=10, title="2", style="dim") |> tprint
+    Table(hcat(c1, c2), header=["S1", "S2"], style="dim", hpad=1) |> tprint
+    hLine(style="red") |> tprint
 end
+
 
 """
 If in testing debug mode: print the renderable `obj`
