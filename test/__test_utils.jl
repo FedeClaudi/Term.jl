@@ -34,7 +34,7 @@ Highlight different characters between two strings.
 function highlight_diff(s1::String, s2::String)
     s1 == s2 && return
 
-    r(x) = replace(x, ' '=>"⋅")  # replace spaces for visualization
+    r(x) = replace(x, ' ' => "⋅")  # replace spaces for visualization
     c1, c2 = Any[collect(r(s1))...], Any[collect(r(s2))...]
     length(c1) != length(c2) &&
         (@warn "Strings have different length: $(length(c1)) vs $(length(c2))")
@@ -56,15 +56,20 @@ function highlight_diff(s1::String, s2::String)
     i = 1
     while i < (min(length(c1), length(c2)) - 50)
         "{dim}Characters $i-$(i+50){/dim}" |> tprintln
-        tprintln("{bold red}(  obj  ){/bold red}  - " * join(c1[i:(i + 50)]), highlight=false)
-        tprintln("{bold red}(correct){/bold red}  - " * join(c2[i:(i + 50)]), highlight=false)
+        tprintln(
+            "{bold red}(  obj  ){/bold red}  - " * join(c1[i:(i + 50)]),
+            highlight = false,
+        )
+        tprintln(
+            "{bold red}(correct){/bold red}  - " * join(c2[i:(i + 50)]),
+            highlight = false,
+        )
         hLine(style = "dim") |> tprint
         print("\n")
         i += 50
     end
     hLine(style = "red") |> tprint
 end
-
 
 """
 Load "correct' string from .txt file and correct new lines
@@ -101,7 +106,7 @@ macro compare_to_string(obj, filename, fn = x -> x)
         filepath = "./txtfiles/$($filename).txt"
 
         if TEST_DEBUG_MODE
-            tprint(txt, highlight=false)
+            tprint(txt, highlight = false)
             tofile(txt, filepath)
         else
             correct = load_from_txt($filename)
