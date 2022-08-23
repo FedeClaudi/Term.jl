@@ -44,10 +44,17 @@ function highlight_diff(s1::String, s2::String)
         c2[i] = "{$color}$b{/$color}"
     end
 
-    hLine("STRING DIFFERENCE", style="red") |> tprint
-    # Panel(c1, width=10, justify=:right, title="1", style="dim")  * Panel(c2, width=10, title="2", style="dim") |> tprint
-    Table(hcat(c1, c2), header=["S1", "S2"], style="dim", hpad=1) |> tprint
-    hLine(style="red") |> tprint
+    hLine("STRING DIFFERENCE $(length(c1)) chrs", style = "red") |> tprint
+
+    i = 1
+    while i < (min(length(c1), length(c2))-50)
+        "{dim}Characters $i-$(i+50){/dim}" |> tprintln
+        c1[i:i+50] |> join |> tprintln
+        c2[i:i+50] |> join |> tprintln
+        print("\n")
+        i += 50
+    end
+    hLine(style = "red") |> tprint
 end
 
 
