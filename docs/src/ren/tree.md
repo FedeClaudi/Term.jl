@@ -65,6 +65,9 @@ print(
 )
 ```
 
+!!! tip "Entries order"
+    Used `OrderedCollections.OrderedDict` instead of `Dict` if you want to specify the order of entries in the `Tree`.
+
 ## TypeTree
 As you know, Julia allows for hierarchical types structures. Trees are for visualizing hierarchical data structures. So...
 
