@@ -87,5 +87,6 @@ end
 end
 
 @testset "@showme" begin
-    compare_to_string(:(@showme tprint(stdout, "test")), "automatic_repr_showme_1")
+    compare_to_string(:(@showme tprint(stdout, "test")), "automatic_repr_showme_1", 
+    (x)->replace(x, "/home/runner/work/Term.jl/Term.jl/src/"=>"/Users/federicoclaudi/Documents/Github/Term.jl/src"))
 end
