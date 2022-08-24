@@ -29,7 +29,10 @@ end
 
 Construct a Segment out of a string with markup.
 """
-Segment(text) = Segment(apply_style(text), Measure(text))
+Segment(text) = begin
+    text = apply_style(text)
+    Segment(text, Measure(text))
+end
 
 """
     Segment(text::Union{Segment, AbstractString}, markup::AbstractString)

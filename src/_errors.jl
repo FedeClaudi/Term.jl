@@ -1,8 +1,11 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 
-render_frame_info(pointer::Union{Ptr{Nothing},Base.InterpreterIP}; show_source = true) =
-    render_frame_info(first(StackTraces.lookup(pointer)); show_source = show_source)
+function render_frame_info(pointer::Ptr{Nothing}; show_source = true)
+    frame = StackTraces.lookup(pointer)[1]
+    return render_frame_info(frame; show_source = show_source)
+    # return RenderableText("   " * string(frame); width = default_stacktrace_width() - 12)
+end
 
 function render_frame_info(frame::StackFrame; show_source = true)
     func = sprint(StackTraces.show_spec_linfo, frame)
@@ -11,8 +14,8 @@ function render_frame_info(frame::StackFrame; show_source = true)
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{#ffc44f}" * s"\g<0>" * "{/#ffc44f}"),
     )
-    # func = highlight(reshape_text(func, 70))
-    func = reshape_text(highlight(func), 70) |> remove_markup |> lstrip
+    func =
+        reshape_text(highlight(func), default_stacktrace_width()) |> remove_markup |> lstrip
 
     # get other information about the function 
     inline = frame.inlined ? RenderableText("   inlined"; style = "bold dim white") : ""
@@ -42,8 +45,9 @@ function render_frame_info(frame::StackFrame; show_source = true)
     if length(string(frame.file)) > 0
         file_line = RenderableText(
             "{dim}$(file):{bold white}$(frame.line){/bold white}{/dim}";
-            width = default_stacktrace_width() - 12,
+            width = default_stacktrace_width() - 30,
         )
+
         out = func_line / file_line
         if show_source
             error_source = nothing
@@ -56,19 +60,18 @@ function render_frame_info(frame::StackFrame; show_source = true)
             out = if isnothing(error_source) || length(error_source) == 0
                 out
             else
-                lvstack(
-                    out,
+                code_error_panel =
                     "   " * Panel(
                         error_source;
-                        fit = true,
+                        fit = false,
                         style = "white dim",
-                        width = 44,
+                        width = min(60, default_stacktrace_width() - 30),
                         subtitle_justify = :center,
                         subtitle = "error line",
                         subtitle_style = "default white #fa6673",
-                    );
-                    pad = 1,
-                )
+                    )
+
+                lvstack(out, code_error_panel; pad = 0)
             end
         end
         return out
@@ -83,21 +86,19 @@ function render_backtrace_frame(
     as_panel = true,
     kwargs...,
 )
-    content = hstack(num, info, pad = 2)
-    p = if as_panel
+    content = hstack(num, info, pad = 1)
+    return if as_panel
         Panel(
             content;
             padding = (2, 2, 1, 1),
             style = "#9bb3e0",
-            fit = true,
-            width = default_stacktrace_width() - 20,
+            fit = false,
+            width = default_stacktrace_width() - 12,
             kwargs...,
         )
     else
-        "   " * content
+        "   " * RenderableText(string(content), width = default_stacktrace_width() - 18)
     end
-
-    return p / " "
 end
 
 function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 30)
@@ -107,7 +108,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         bt = reverse(bt)
     end
 
-    content::Vector = []
+    content = AbstractRenderable[]
     added_skipped_message = false
     N = length(bt)
     for (num, frame) in enumerate(bt)
@@ -154,15 +155,23 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
             end
         end
     end
+
+    # println(lvstack(content[1:20]))
+    # println(lvstack(content[1:22]))
+    # println.(map(
+    #     v -> v.measure, content
+    # ))
+    # println(cvstack(content).measure, default_stacktrace_width())
     return Panel(
-        lvstack(content...);
+        lvstack(content..., pad = 1);
         padding = (2, 2, 2, 1),
         subtitle = "Error Stack",
         style = "#ff8a4f dim",
         subtitle_style = "bold #ff8a4f default",
         title = "Error Stack",
         title_style = "bold #ff8a4f default",
-        fit = true,
+        fit = false,
+        justifty = :center,
         width = default_stacktrace_width(),
     )
 end

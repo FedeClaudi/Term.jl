@@ -1,11 +1,12 @@
 module Tprint
 
-import Term: unescape_brackets, escape_brackets, has_markup
+import Term: unescape_brackets, escape_brackets, has_markup, reshape_text
 import Term: highlight as highlighter
-
-import ..Renderables: AbstractRenderable
+import ..Measures: Measure
+import ..Renderables: AbstractRenderable, trim_renderable, RenderableText
 import ..Style: apply_style
 import ..Layout: hstack
+import ..Consoles: console_width
 
 export tprint, tprintln
 
@@ -33,8 +34,14 @@ tprint(io::IO, ::MIME"text/html", x; highlight = true) =
 
 Apply style to a string and print it
 """
-tprint(io::IO, x::AbstractString; highlight = true) =
-    print(io, (highlight ? apply_style ∘ highlighter : apply_style)(x))
+function tprint(io::IO, x::AbstractString; highlight = true)
+    x = (highlight ? apply_style ∘ highlighter : apply_style)(x)
+
+    x =
+        Measure(x).w <= console_width(io) ? x :
+        string(RenderableText(string(x), width = console_width(io)))
+    print(io, x)
+end
 
 """
 ---
@@ -44,8 +51,11 @@ Print an `AbstractRenderable`.
 
 Equivalent to `println(x)`
 """
-tprint(io::IO, x::AbstractRenderable; highlight = true) =
+function tprint(io::IO, x::AbstractRenderable; highlight = true)
+    w = console_width()
+    x = x.measure.w > console_width() ? trim_renderable(x, w) : x
     print(io, x; highlight = highlight)
+end
 
 function tprint(io::IO, args...)
     for (n, arg) in enumerate(args)

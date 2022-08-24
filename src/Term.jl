@@ -32,8 +32,12 @@ module Term
 
 const DEBUG_ON = Ref(false)
 
-default_width(io = stdout) = min(88, displaysize(stdout)[2] - 4)
-default_stacktrace_width(io = stdout) = min(140, displaysize(stdout)[2] - 4)
+const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
+const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
+
+default_width(io = stdout) = min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+default_stacktrace_width(io = stderr) =
+    min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
@@ -71,12 +75,12 @@ include("progress.jl")
 include("logs.jl")
 include("trees.jl")
 include("dendograms.jl")
-include("introspection.jl")
 include("tables.jl")
 include("markdown.jl")
 include("repr.jl")
 include("compositors.jl")
 include("grid.jl")
+include("introspection.jl")
 
 export RenderableText, Panel, TextBox
 export TERM_THEME, highlight
@@ -86,9 +90,10 @@ export tprint, tprintln
 export install_term_stacktrace,
     install_term_logger, uninstall_term_logger, install_term_repr
 export vLine, hLine
-export @with_repr, termshow
+export @with_repr, termshow, @showme
 export Compositor, update!
 export grid
+export inspect
 
 # ----------------------------------- base ----------------------------------- #
 using .Measures
@@ -152,7 +157,7 @@ using .Trees: Tree
 
 using .Dendograms: Dendogram
 
-using .Introspection: inspect, typestree, expressiontree
+using .Introspection: inspect, typestree, expressiontree, inspect
 
 using .Tables: Table
 
@@ -160,7 +165,7 @@ using .Compositors: Compositor, update!
 
 using .TermMarkdown: parse_md
 
-using .Repr: @with_repr, termshow, install_term_repr
+using .Repr: @with_repr, termshow, install_term_repr, @showme
 
 using .Grid
 
