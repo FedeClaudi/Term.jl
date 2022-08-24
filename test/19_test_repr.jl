@@ -28,7 +28,6 @@ end
     s = String(take!(io))
 
     IS_WIN || begin
-        
         @compare_to_string(s, "termshow_panel")
 
         correct_s = load_from_txt("termshow_panel")
