@@ -58,7 +58,7 @@ But wait, there's more!
 termshow(termshow)  # or any other function
 ```
 
-Fancy right? It shows the function, various methods for it and it's docstrings (by parsin the Markdown). It works with types too
+Fancy right? It shows the function, various methods for it and it's docstrings (by parsing the Markdown). It works with types too
 ```@example repr
 import Term: Panel
 termshow(Panel)
@@ -81,3 +81,26 @@ now showing anything in the REPL goes through `termshow`
 
 !!! warning "Not for developers!!!"
     If you're writing code just for yourself, go ahead and use `install_term_repr`. Enjoy it. But, if the code you're writing is intended for others you should really avoid doing that. It will modify the behavior of the REPL for them too and that's confusing and possibly error prone. 
+
+
+## @showme
+One of Julia's most loved features is multiple dispatch. However, sometimes it can be hard to know which method gets called by your code and what that method is doing. There's lots of tools out there to help with this, including some built in in Julia's base code. Here we show a nifty little macro that builds upon `CodeTracking` by Tim Holy to directly show you the method your code is calling:
+
+```@example showme
+import Term.Repr: @showme
+
+@showme tprint(stdout, "this is TERM")  # which method is being called?
+```
+
+as you can see, it shows the source code of the particular `tprint` method being called by the combination of arguments, for different arguments different methods will be invoked:
+
+```@example showme
+@showme tprint("this is also TERM")  # different method
+```
+
+You can also list all methods for the function you're calling, should you wish to do so
+```@example showme
+@showme tprint("still TERM") show_all_methods=true
+```
+
+Enjoy.

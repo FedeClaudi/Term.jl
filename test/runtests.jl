@@ -1,10 +1,10 @@
 using Suppressor
+import Suppressor: @capture_out
 using StableRNGs
 using Term
 using Test
 import Term: console_width
-
-Term.DEBUG_ON[] = true
+import Term: Tree, Dendogram, Table, Compositor
 
 const RNG = StableRNG(1337)
 
@@ -12,7 +12,15 @@ include("__test_utils.jl")
 
 using TimerOutputs: TimerOutputs, @timeit
 const TIMEROUTPUT = TimerOutputs.TimerOutput()
-const WIDE_TERM = console_width() ≥ 88
+
+import Term.Consoles: Console, enable, disable
+
+Term.DEBUG_ON[] = true
+const TEST_DEBUG_MODE = false  # renderables are saved as strings
+const TEST_CONSOLE_WIDTH = 80
+const IS_WIN = Sys.iswindows()
+con = Console(TEST_CONSOLE_WIDTH)
+enable(con)
 
 macro runner(fn)
     quote
@@ -53,3 +61,4 @@ end
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println('\n')
+disable(con)

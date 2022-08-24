@@ -58,4 +58,8 @@ end # hide
     Setting up Term's loggers  will change this behavior for any downstream user of your code. While this could be okay, it might be surprising and undesirable for some, so do at your own risk. 
 
 !!! tip
-    You can reverse to the original logger using `uninstall_term_logger`.
+    You can rever to the original logger using `uninstall_term_logger`.
+
+
+!!! tip "Term and other log outputs"
+    See [here](https://discourse.julialang.org/t/term-jl-logging-sending-messages-to-multiple-locations/84841) for some info on how to use Term's logger in conjuction with other logging outputs.

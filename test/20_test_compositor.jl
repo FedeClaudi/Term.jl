@@ -47,7 +47,7 @@ end
 
     if !Sys.iswindows()
         for (i, t) in enumerate(compositors)
-            @test fromfile("./txtfiles/compositor_$i.txt") == cleanstring(t)
+            IS_WIN || @compare_to_string(cleanstring(t), "compositor_$i")
 
             # coverage
             @test Renderable(t) isa RenderableText

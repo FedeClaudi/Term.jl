@@ -39,8 +39,6 @@ const ErrorsExplanations = Dict(
     UndefVarError => "comes up when a variable is used which is either not defined, or, which is not visible in the current variables scope (e.g.: variable defined in function A and used in function B)",
 )
 
-_width() = min(console_width(stderr), 100)
-
 # ----------------------- error type specific messages ----------------------- #
 
 # ! ARGUMENT ERROR
@@ -142,7 +140,7 @@ function error_message(er::MethodError; kwargs...)
         f = er.args[2]
         ft = typeof(f)
         name = ft.name.mt.name
-        arg_types_param = arg_types_param[3:end]
+        # arg_types_param = arg_types_param[3:end]
         kwargs = pairs(er.args[1])
         # er = MethodError(f, er.args[3:end::Int])
     end
@@ -164,12 +162,11 @@ function error_message(er::MethodError; kwargs...)
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
         candidates = map(c -> method_error_candidate(name, c), _candidates)
-        main_line =
-            main_line /
-            lvstack("" / "Alternative candidates:", RenderableText.(candidates)...;)
+        main_line /= lvstack("", "Alternative candidates:", candidates...)
     else
         main_line = main_line / " " / "{dim}No alternative candidates found"
     end
+
     return string(main_line), ""
 end
 
@@ -231,37 +228,49 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
+            isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
+
+            if default_stacktrace_width() < 70
+                println(io)
+                @warn "Term.jl: can't render error message, console too narrow. Using default stacktrace"
+                Base.show_backtrace(io, bt)
+                print(io, '\n'^3)
+                Base.showerror(io, er)
+                return
+            end
+
             try
                 println("\n")
                 ename = string(typeof(er))
-                error =
-                    hLine("{default bold red}$ename{/default bold red}"; style = "dim red")
+                print(
+                    hLine("{default bold red}$ename{/default bold red}"; style = "dim red"),
+                )
+
+                # print error stacktrace
                 if length(bt) > 0
                     rendered_bt = render_backtrace(
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
                     )
-                    error /= rendered_bt
-                    W = rendered_bt.measure.w
-                else
-                    W = default_stacktrace_width()
+                    print(rendered_bt)
                 end
-                err, _ = error_message(er)
-                msg =
-                    "" / Panel(
-                        "{#aec2e8}$(err){/#aec2e8}";
-                        width = W,
-                        title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
-                        padding = (2, 2, 1, 1),
-                        style = "dim red",
-                        title_justify = :center,
-                    )
-                error /= msg
-                print(error)
-            catch err
-                @error "ERROR: " exception = err
-                @warn "Term.jl: failed to render error message" err
+
+                # print error message and description
+                Panel(
+                    error_message(er)[1];
+                    width = default_stacktrace_width(),
+                    title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
+                    padding = (2, 2, 1, 1),
+                    style = "dim red",
+                    title_justify = :center,
+                    fit = false,
+                ) |> print
+            catch cought_err
+                @error "Term.jl: error while rendering error message: " exception =
+                    cought_err
+                Base.show_backtrace(io, bt)
+                print(io, '\n'^3)
                 Base.showerror(io, er)
             end
         end

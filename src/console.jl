@@ -1,5 +1,5 @@
 module Consoles
-
+import Term: ACTIVE_CONSOLE_WIDTH, ACTIVE_CONSOLE_HEIGHT
 export console_height,
     console_width,
     cursor_position,
@@ -17,7 +17,10 @@ export console_height,
     move_to_line,
     change_scroll_region,
     savecursor,
-    restorecursor
+    restorecursor,
+    Console,
+    enable,
+    disable
 
 const STDOUT = stdout
 const STDERR = stderr
@@ -114,13 +117,28 @@ end
 
 Get the current console height.
 """
-console_height(io::IO = stdout) = displaysize(io)[1]
+console_height(io::IO = stdout) = something(ACTIVE_CONSOLE_HEIGHT[], displaysize(io)[1])
 
 """
     console_width()
 
 Get the current console width.
 """
-console_width(io::IO = stdout) = displaysize(io)[2]
+console_width(io::IO = stdout) = something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2])
 
+struct Console
+    height
+    width
+end
+
+Console(width) = Console(console_height(), width)
+
+function enable(console::Console)
+    ACTIVE_CONSOLE_WIDTH[] = console.width
+    nothing
+end
+
+function disable(console::Console)
+    ACTIVE_CONSOLE_WIDTH[] = nothing
+end
 end

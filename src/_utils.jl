@@ -84,3 +84,11 @@ function calc_nrows_ncols(n, aspect::Union{Nothing,Number,NTuple} = nothing)
     end
     return rows, cols
 end
+
+"""
+    get_bg_color(style::String)
+
+Add "on_" to background style info.
+"""
+get_bg_color(style::String) = startswith(style, "on_") ? style : "on_" * style
+get_bg_color(style::Nothing) = style

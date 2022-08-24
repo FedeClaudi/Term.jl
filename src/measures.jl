@@ -34,6 +34,8 @@ function Measure(str::AbstractString)
     return Measure(length(lines), maximum(textwidth.(lines)))
 end
 
+Measure(::Nothing) = Measure(0, 0)
+
 """
 The sum of measures returns a measure with the highest value along each dimension.
 """
