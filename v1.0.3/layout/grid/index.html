@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Grid · Term.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://FedeClaudi.github.io/Term.jl/layout/grid/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">Term.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox"/><label class="tocitem" for="menuitem-2"><span class="docs-label">Basics</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../basics/basics/">Intro</a></li><li><a class="tocitem" href="../../basics/styled_text/">Styled text</a></li><li><a class="tocitem" href="../../basics/colors_and_theme/">Colors</a></li><li><a class="tocitem" href="../../basics/renderables/">Renderables</a></li><li><a class="tocitem" href="../../basics/tprint/">tprint</a></li><li><a class="tocitem" href="../../basics/console/">Console</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox"/><label class="tocitem" for="menuitem-3"><span class="docs-label">Renderables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../ren/intro/">Renderables</a></li><li><a class="tocitem" href="../../ren/text/">RenderableText</a></li><li><a class="tocitem" href="../../ren/panel/">Panel</a></li><li><a class="tocitem" href="../../ren/table/">Table</a></li><li><a class="tocitem" href="../../ren/layout_rens/">Layout renderables</a></li><li><a class="tocitem" href="../../ren/dendogram/">Dendogram</a></li><li><a class="tocitem" href="../../ren/tree/">Tree</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox" checked/><label class="tocitem" for="menuitem-4"><span class="docs-label">Layout</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../layout/">Layout</a></li><li><a class="tocitem" href="../nesting/">Nesting</a></li><li><a class="tocitem" href="../stacking/">Stacking</a></li><li><a class="tocitem" href="../justify/">Justify</a></li><li class="is-active"><a class="tocitem" href>Grid</a></li><li><a class="tocitem" href="../compositor/">Compositor</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-5" type="checkbox"/><label class="tocitem" for="menuitem-5"><span class="docs-label">Advanced</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../adv/adv/">Intro</a></li><li><a class="tocitem" href="../../adv/repr/">Term Repr</a></li><li><a class="tocitem" href="../../adv/progressbars/">Progress bars</a></li><li><a class="tocitem" href="../../adv/logging/">Logging</a></li><li><a class="tocitem" href="../../adv/errors_tracebacks/">Errors</a></li><li><a class="tocitem" href="../../adv/introspection/">Introspection</a></li><li><a class="tocitem" href="../../adv/markdown/">Markdown</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-6" type="checkbox"/><label class="tocitem" for="menuitem-6"><span class="docs-label">API</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../api/api_term/">Term</a></li><li><a class="tocitem" href="../../api/api_boxes/">Boxes</a></li><li><a class="tocitem" href="../../api/api_colors/">Colors</a></li><li><a class="tocitem" href="../../api/api_console/">Consoles</a></li><li><a class="tocitem" href="../../api/api_compositors/">Compositors</a></li><li><a class="tocitem" href="../../api/api_dendograms/">Dendograms</a></li><li><a class="tocitem" href="../../api/api_errors/">Errors</a></li><li><a class="tocitem" href="../../api/api_grid/">Grid</a></li><li><a class="tocitem" href="../../api/api_introspection/">Introspection</a></li><li><a class="tocitem" href="../../api/api_layout/">Layout</a></li><li><a class="tocitem" href="../../api/api_logs/">Logs</a></li><li><a class="tocitem" href="../../api/api_markdown/">Term Markdown</a></li><li><a class="tocitem" href="../../api/api_measures/">Measures</a></li><li><a class="tocitem" href="../../api/api_panels/">Panels</a></li><li><a class="tocitem" href="../../api/api_renderables/">Renderables</a></li><li><a class="tocitem" href="../../api/api_repr/">REPR</a></li><li><a class="tocitem" href="../../api/api_segments/">Segments</a></li><li><a class="tocitem" href="../../api/api_style/">Style</a></li><li><a class="tocitem" href="../../api/api_tables/">Tables</a></li><li><a class="tocitem" href="../../api/api_tprint/">Tprint</a></li><li><a class="tocitem" href="../../api/api_trees/">Trees</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Layout</a></li><li class="is-active"><a href>Grid</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Grid</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/FedeClaudi/Term.jl/blob/master/docs/src/layout/grid.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Grid"><a class="docs-heading-anchor" href="#Grid">Grid</a><a id="Grid-1"></a><a class="docs-heading-anchor-permalink" href="#Grid" title="Permalink"></a></h1><p>Layout renderables (<code>hLine</code>, <code>vLine</code>), nesting, stacking... all very nice. But boy is it a lot of work sometimes to combine it all into a single layout!</p><p>Well that&#39;s were <code>grid</code> comes in (and <code>Compositor</code> too, see the next page). The idea is simple: take a bunch of renderables and make a grid out of them:</p><pre><code class="language-julia hljs">import Term: Panel
+import Term.Grid: grid
+
+
+panels = repeat([Panel(height=6, width=12)], 8)
+
+grid(panels)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯╰──────────╯
+╭──────────╮╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯╰──────────╯
+</code></pre><p>Simple, but effective. <code>grid</code> gives you a lot of options to control the layout:</p><pre><code class="language-julia hljs">grid(panels; pad=2)  # specify padding</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮  ╭──────────╮  ╭──────────╮  ╭──────────╮
+│          │  │          │  │          │  │          │
+│          │  │          │  │          │  │          │
+│          │  │          │  │          │  │          │
+│          │  │          │  │          │  │          │
+╰──────────╯  ╰──────────╯  ╰──────────╯  ╰──────────╯
+                                                      
+                                                      
+╭──────────╮  ╭──────────╮  ╭──────────╮  ╭──────────╮
+│          │  │          │  │          │  │          │
+│          │  │          │  │          │  │          │
+│          │  │          │  │          │  │          │
+│          │  │          │  │          │  │          │
+╰──────────╯  ╰──────────╯  ╰──────────╯  ╰──────────╯
+</code></pre><pre><code class="language-julia hljs">grid(panels; pad=(8, 1))  # hpad &amp; vpad</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮        ╭──────────╮        ╭──────────╮        ╭──────────╮
+│          │        │          │        │          │        │          │
+│          │        │          │        │          │        │          │
+│          │        │          │        │          │        │          │
+│          │        │          │        │          │        │          │
+╰──────────╯        ╰──────────╯        ╰──────────╯        ╰──────────╯
+                                                                        
+╭──────────╮        ╭──────────╮        ╭──────────╮        ╭──────────╮
+│          │        │          │        │          │        │          │
+│          │        │          │        │          │        │          │
+│          │        │          │        │          │        │          │
+│          │        │          │        │          │        │          │
+╰──────────╯        ╰──────────╯        ╰──────────╯        ╰──────────╯
+</code></pre><p>You can also specify the aspect ratio of the grid:</p><pre><code class="language-julia hljs">grid(panels; aspect=1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯
+╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯
+╭──────────╮╭──────────╮<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>
+│          ││          │<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>
+│          ││          │<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>
+│          ││          │<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>
+│          ││          │<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>
+╰──────────╯╰──────────╯<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>
+</code></pre><p>Note that with an aspect ratio of <code>1</code> the best way is to create <code>3</code> columns and <code>3</code> rows, but we only have <code>8</code> renderables! No problem, <code>grid</code> introduces a placeholder for the missing renderables. This is not shown by default, but you can see it with: But you can hide it too:</p><pre><code class="language-julia hljs">grid(panels; aspect=1, show_placeholder=true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯
+╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯
+╭──────────╮╭──────────╮╲ ╲ ╲ ╲ ╲ ╲ 
+│          ││          │ ╲ ╲ ╲ ╲ ╲ ╲
+│          ││          │╲ ╲ ╲ ╲ ╲ ╲ 
+│          ││          │ ╲ ╲ ╲ ╲ ╲ ╲
+│          ││          │╲ ╲ ╲ ╲ ╲ ╲ 
+╰──────────╯╰──────────╯ ╲ ╲ ╲ ╲ ╲ ╲
+</code></pre><p>You can use <code>layout</code> to more directly specify the number of rows and columns in the grid:</p><pre><code class="language-julia hljs">grid(panels; layout=(3, 4), show_placeholder=true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯╰──────────╯
+╭──────────╮╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+│          ││          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯╰──────────╯
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+</code></pre><p>Leaving a <code>nothing</code> argument will auto-magically compute the remaining <code>rows</code> or <code>cols</code> of the layout: You can use <code>layout</code> to more directly specify the number of rows and columns in the grid:</p><pre><code class="language-julia hljs">grid(panels; layout=(3, nothing), show_placeholder=true)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯
+╭──────────╮╭──────────╮╭──────────╮
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+│          ││          ││          │
+╰──────────╯╰──────────╯╰──────────╯
+╭──────────╮╭──────────╮╲ ╲ ╲ ╲ ╲ ╲ 
+│          ││          │ ╲ ╲ ╲ ╲ ╲ ╲
+│          ││          │╲ ╲ ╲ ╲ ╲ ╲ 
+│          ││          │ ╲ ╲ ╲ ╲ ╲ ╲
+│          ││          │╲ ╲ ╲ ╲ ╲ ╲ 
+╰──────────╯╰──────────╯ ╲ ╲ ╲ ╲ ╲ ╲
+</code></pre><p>One can use complex expressions for layouts, using an underscore <code>_</code> to specify empty elements in the layout:</p><pre><code class="language-julia hljs">grid(panels[1:6]; layout=:((a * _ * b) / (_ * _ * c * d) / (_ * e * f)))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>╭──────────╮            
+│          │<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>│          │            
+│          │<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>│          │            
+│          │<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>│          │            
+│          │<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>│          │            
+╰──────────╯<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>╰──────────╯            
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ </span>╭──────────╮╭──────────╮
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲</span>│          ││          │
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ </span>│          ││          │
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲</span>│          ││          │
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ </span>│          ││          │
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲</span>╰──────────╯╰──────────╯
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>╭──────────╮╭──────────╮            
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>│          ││          │            
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>│          ││          │            
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>│          ││          │            
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>│          ││          │            
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>╰──────────╯╰──────────╯            
+</code></pre><p>Repeating elements is supported:</p><pre><code class="language-julia hljs">grid(panels[1:2]; layout=:((α * _ * α) / (_ * _ * β * β)))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────╮<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>╭──────────╮            
+│          │<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>│          │            
+│          │<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>│          │            
+│          │<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>│          │            
+│          │<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ </span>│          │            
+╰──────────╯<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲</span>╰──────────╯            
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ </span>╭──────────╮╭──────────╮
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲</span>│          ││          │
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ </span>│          ││          │
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲</span>│          ││          │
+<span class="sgr8">╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ </span>│          ││          │
+<span class="sgr8"> ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲</span>╰──────────╯╰──────────╯
+</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Note that grid uses <code>vstack</code> and <code>hstack</code> to combine the renderables into the layout you requested. As such, it returns a single renderable, you don&#39;t have access to the individual renderables that went into making the grid any longer. This also means that the grid can be stack with other content to create a larger layout. </p></div></div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../justify/">« Justify</a><a class="docs-footer-nextpage" href="../compositor/">Compositor »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.22 on <span class="colophon-date" title="Wednesday 24 August 2022 01:38">Wednesday 24 August 2022</span>. Using Julia version 1.8.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
