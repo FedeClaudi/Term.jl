@@ -79,7 +79,7 @@ function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...
                 header_text;
                 box = :HEAVY,
                 style = "dim",
-                width = width,
+                width = width-8,
                 justify = :center,
                 padding = (2, 2, 0, 0),
                 fit = false,
@@ -94,7 +94,7 @@ end
 Parse each element in a paragraph
 """
 function parse_md(paragraph::Markdown.Paragraph; width = console_width(), kwargs...)::String
-    out = join(parse_md.(paragraph.content; inline = true))
+    out = join(parse_md.(paragraph.content; inline = true, width=width))
     return reshape_text(out, width) * "\e[0m"
 end
 
@@ -172,7 +172,7 @@ function parse_md(
             style = "white dim on_#262626",
             box = :SQUARE,
             subtitle = length(code.language) > 0 ? code.language : nothing,
-            width = width - 4,
+            width = width - 12,
             background = "on_#262626",
             subtitle_justify = :right,
             fit = false,
@@ -314,7 +314,7 @@ function parse_md(tb::Markdown.Table; width = console_width())::String
                 header_style = "bold yellow",
                 style = "dim",
             );
-            width = width,
+            width = width-8,
         ),
     )
 end
@@ -345,7 +345,7 @@ function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::
             title = has_title ? parse_md(ad.title) : "",
             title_style = has_title ? style * " default" : "",
             style = style * " dim",
-            width = width - 4,
+            width = width - 8,
             fit = false,
         ),
     )

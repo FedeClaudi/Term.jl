@@ -48,6 +48,21 @@ You markdown can include in-line latex ``\sqrt(\gamma)`` and maths in a new line
 
 ### Code
 
+This is what you'd do to show code:
+```julia
+
+tprint("""
+
+"this function is a bit pointless"
+function my_useless_fn(x)
+    println("I don't do much!")
+    return x
+end
+
+""")
+```
+
+
 ```@example md
 tprint(md"""
 
@@ -63,9 +78,8 @@ tprint(md"""
 You can use "quotes" to highlight a section:
 
 > Multi-line quotes can be helpful to make a 
-> paragram stand out, so that users won't miss it!
-> You can use **other inline syntax** in you `quotes` too.
- 
+> paragraph stand out, so that users won't miss it!
+
 but if you really need to grab someone's attention, use admonitions:
 
 !!! note
