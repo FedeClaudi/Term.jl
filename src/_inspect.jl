@@ -32,8 +32,9 @@ function style_methods(
     prevmod = ""
     for (i, m) in enumerate(methods)
         _name = split(string(m), " in ")[1]
-        code = (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name) |> highlight_syntax
-
+        code =
+            (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name) |>
+            highlight_syntax
 
         code = "{dim}" * code * "{/dim}"
         code = replace(

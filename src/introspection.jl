@@ -151,11 +151,7 @@ function inspect(
     nothing
 end
 
-
-function inspect(
-    F::Function;
-    documentation::Bool = false,
-)
+function inspect(F::Function; documentation::Bool = false)
     hLine("inspecting: $F", style = "bold white") |> print
 
     documentation && begin
