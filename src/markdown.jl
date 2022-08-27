@@ -36,6 +36,9 @@ when an element (e.g. a code snippet) is in-line within a larger element
 """
 function parse_md end
 
+parse_md(text::String) = parse_md(Markdown.parse(text))
+parse_md(x; kwargs...)::String = string(x)
+
 """
     parse_md(text::Markdown.MD; kwargs...)::String
 
@@ -66,7 +69,7 @@ function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...
         Dict(1 => :center, 2 => :center, 3 => :center, 4 => :left, 5 => :left, 6 => :left)
 
     style = header_styles[l]
-    header_text = chomp(join(map(ln -> "{$style}$ln{/$style}\n", header.text)))
+    header_text = chomp(join(map(ln -> "{$style}$ln{/$style}\n", header.text))) |> rstrip
     if l > 1
         header_text = reshape_text(header_text, width - 2)
         return pad(header_text, width, header_justify[l])
@@ -79,6 +82,7 @@ function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...
                 width = width,
                 justify = :center,
                 padding = (2, 2, 0, 0),
+                fit = false,
             ),
         )
     end
@@ -154,6 +158,7 @@ function parse_md(
     code::Markdown.Code;
     width = console_width(),
     inline = false,
+    lpad = true,
     kwargs...,
 )::String
     syntax = highlight_syntax(code.code)
@@ -162,19 +167,22 @@ function parse_md(
                syntax *
                "{$yellow_light italic}`{/$yellow_light italic}"
     else
-        txt = fillin(reshape_text(syntax, width - 20))
-        txt = apply_style(txt, "on_#262626")
         panel = Panel(
-            txt;
+            syntax;
             style = "white dim on_#262626",
             box = :SQUARE,
             subtitle = length(code.language) > 0 ? code.language : nothing,
             width = width - 4,
             background = "on_#262626",
             subtitle_justify = :right,
+            fit = false,
         )
 
-        return string("    " * panel)
+        return if lpad
+            string("    " * panel)
+        else
+            string(panel)
+        end
     end
 end
 
@@ -338,11 +346,10 @@ function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::
             title_style = has_title ? style * " default" : "",
             style = style * " dim",
             width = width - 4,
+            fit = false,
         ),
     )
 end
-
-parse_md(x; kwargs...)::String = string(x)
 
 # ---------------------------------------------------------------------------- #
 #                              RENDERABLE & TPRINT                             #

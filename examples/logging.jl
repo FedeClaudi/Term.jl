@@ -19,7 +19,7 @@ a couple more details. However you can now add markdown style to your
 log messages
 """
 
-@warn "tell us if this was [bold red]undexpected![/bold red]"
+@warn "tell us if this was {bold red}undexpected!{/bold red}"
 
 """
 but there's more!

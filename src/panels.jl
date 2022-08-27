@@ -1,8 +1,18 @@
 module Panels
 
-import Term: reshape_text, join_lines, fillin, str_trunc, ltrim_str, default_width
+import Term:
+    reshape_text,
+    join_lines,
+    fillin,
+    str_trunc,
+    ltrim_str,
+    default_width,
+    remove_ansi,
+    get_bg_color,
+    textlen
 
-import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
+import ..Renderables:
+    AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
 import ..Layout: pad, vstack, Padding, lvstack
 import ..Style: apply_style
 import ..Segments: Segment
@@ -29,6 +39,20 @@ abstract type AbstractPanel <: AbstractRenderable end
     │ my panel │
     ╰──────────╯
 ```
+
+---
+
+When constructing a Panel, several keyword arguments can be used to set
+its appearance:
+- box::Symbol sets the `Box` type for the Panel's border
+- style::String  sets the box's style (e.g., color)
+- title::Union{String,Nothing}  sets the Panel's title
+- title_style::Union{Nothing,String} sets the title's style
+- title_justify::Symbol     sets the location of the title
+- subtitle::Union{String,Nothing}  sets the Panel's subtitle
+- subtitle_style::Union{Nothing,String}  sets the subtitle's style
+- subtitle_justify::Symbol  sets the location of the subtitle
+- justify::Symbol sets text's alignment (:left, :rigth, :center, :justify)
 """
 mutable struct Panel <: AbstractPanel
     segments::Vector
@@ -37,7 +61,7 @@ mutable struct Panel <: AbstractPanel
     function Panel(x1, x2; kwargs...)
         # this is necessary to handle the special case in which 2 objs are passed
         # but they are not segments/measure
-        return if x1 isa Vector
+        return if x1 isa Vector && x2 isa Measure
             new(x1, x2)
         else
             Panel(vstack(x1, x2); kwargs...)
@@ -49,7 +73,6 @@ Base.size(p::Panel) = size(p.measure)
 
 """
 ---
-
     Panel(; 
         fit::Bool = false,
         height::Int = 2,
@@ -59,7 +82,6 @@ Base.size(p::Panel) = size(p.measure)
     )
 
 Construct a `Panel` with no content.
-
 
 ### Examples
 ```
@@ -88,7 +110,7 @@ function Panel(;
         # hardcoded size of empty 'fitted' panel
         Measure(2, 3)
     else
-        Measure(height, width)
+        Measure(height - 1, width)
     end
 
     # get empty content measure
@@ -101,6 +123,7 @@ function Panel(;
     # make panel
     return Panel(
         content;
+        fit = fit,
         panel_measure = panel_measure,
         content_measure = content_measure,
         Δw = padding.left + padding.right + 2,
@@ -131,13 +154,54 @@ the presence and style of titles, box type etc... see [render](@ref) below.
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable};
-    fit::Bool = true,
+    fit::Bool = false,
     padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+    width::Int = default_width(),
     kwargs...,
 )
     padding = padding isa Padding ? padding : Padding(padding...)
-    return Panel(content, Val(fit), padding; kwargs...)
+
+    # estimate content and panel size 
+    content_width = content isa AbstractString ? Measure(content).w : content.measure.w
+    panel_width = if fit
+        content_width + padding.left + padding.right + 2
+    else
+        width
+    end
+
+    # if too large, set fit=false
+    fit =
+        fit ? (!isa(content, AbstractString) ? panel_width <= console_width() : true) :
+        false
+    width = fit ? min(panel_width, console_width()) : width
+
+    # @info "Ready to make panel" content content_width panel_width width console_width() fit
+    return Panel(content, Val(fit), padding; width = width, kwargs...)
 end
+
+"""
+    content_as_renderable(content, width, Δw, justify)
+
+Convert any input content to a renderable
+"""
+function content_as_renderable(content, width, Δw, justify, background)
+    rt = RenderableText(
+        string(content),
+        width = width - Δw,
+        background = background,
+        justify = justify,
+    )
+    return rt
+end
+
+# function content_as_renderable(content::AbstractString, width, Δw, justify, background)
+#     RenderableText(
+#         string(content),
+#         width = width - Δw,
+#         background = background,
+#         justify = justify,
+#     )
+# end
 
 """
 ---
@@ -162,45 +226,33 @@ function Panel(
     ::Val{true},
     padding::Padding;
     height::Union{Nothing,Int} = nothing,
-    width::Union{Nothing,Int} = nothing,
+    width::Int,
     background::Union{Nothing,String} = nothing,
-    trim::Bool = true,
+    justify::Symbol = :left,
     kwargs...,
 )
-    content =
-        content isa AbstractRenderable ? content :
-        RenderableText(fillin(content; bg = background))
-
-    content_measure = content.measure
-    height = something(height, 0)
-    width = something(width, 0)
-    panel_measure = Measure(
-        max(height, content_measure.h + padding.top + padding.bottom + 2),
-        max(width, content_measure.w + padding.left + padding.right + 2),
-    )
-
-    # if panel is larger than console, fit content to panel
-    if panel_measure.w > console_width() && trim
-        return Panel(
-            content,
-            Val(false),
-            padding;
-            width = min(panel_measure.w, console_width() - 1),
-            kwargs...,
-        )
-    end
-
     Δw = padding.left + padding.right + 2
     Δh = padding.top + padding.bottom
 
+    # create content
+    content = content_as_renderable(content, width, Δw, justify, background)
+
+    # estimate panel size
+    panel_measure = Measure(
+        max(something(height, 0), content.measure.h + padding.top + padding.bottom + 2),
+        max(width, content.measure.w + padding.left + padding.right + 2),
+    )
+
+    # @info "Creating fitted panel" content.measure panel_measure content
     return render(
         content;
         panel_measure = panel_measure,
-        content_measure = content_measure,
+        content_measure = content.measure,
         Δw = Δw,
         Δh = Δh,
         padding = padding,
         background = background,
+        justify = justify,
         kwargs...,
     )
 end
@@ -230,34 +282,39 @@ function Panel(
     height::Union{Nothing,Int} = nothing,
     width::Int = default_width(),
     background::Union{Nothing,String} = nothing,
+    justify::Symbol = :left,
     kwargs...,
 )
     Δw = padding.left + padding.right + 2
     Δh = padding.top + padding.bottom
 
     # if the content is too large, resize it to fit the panel's width.
-    get_width(content) > width - Δw + 1 && (content = trim_renderable(content, width - Δw))
-
-    # get panel height
-    content =
-        content isa AbstractRenderable ? content :
-        RenderableText(fillin(content; bg = background))
+    content = content_as_renderable(content, width, Δw, justify, background)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
 
     # if the content is too tall, exclude some lines
-    if content.measure.h > height - Δh - 1
-        content = if content.measure.h - height - Δh - 2 > 0
-            segments = [
-                content.segments[1:(height - Δh - 3)]...
-                Segment("... content omitted ...", "dim")
+    if content.measure.h > height - Δh
+        lines_to_drop = content.measure.h - height + Δh + 3
+        omit_msg = RenderableText(
+            "... content omitted ...",
+            style = "dim",
+            width = content.measure.w,
+            justify = :center,
+        )
+
+        segments = if lines_to_drop < content.measure.h
+            Segment[
+                content.segments[1:(end - lines_to_drop)]...
+                omit_msg.segments[1]
             ]
-            Renderable(segments, Measure(segments))
         else
-            RenderableText("")
+            [omit_msg.segments[1]]
         end
+        content = Renderable(segments, Measure(segments))
     end
 
+    # @info "creating not fitted panel" content.measure panel_measure width Δw 
     return render(
         content;
         panel_measure = panel_measure,
@@ -266,6 +323,7 @@ function Panel(
         Δh = Δh,
         padding = padding,
         background = background,
+        justify = justify,
         kwargs...,
     )
 end
@@ -280,9 +338,37 @@ Panel(renderables::Vector{RenderablesUnion}; kwargs...) =
 
 Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
 
-Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
+Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwargs...)
 
 # ---------------------------------- render ---------------------------------- #
+
+"""
+    makecontent_line(cline, panel_measure, justify, background, padding, left, right)::Segment
+
+Create a Panel's content line.
+"""
+function makecontent_line(
+    cline,
+    panel_measure,
+    justify,
+    background,
+    padding,
+    left,
+    right,
+    Δw,
+)::Segment
+    line = apply_style(cline) |> rstrip
+    line = if panel_measure.w - textlen(line) > 2
+        pad(cline, panel_measure.w - Δw, justify; bg = background)
+    else
+        line * " "
+    end
+
+    line = pad(line, padding.left, padding.right; bg = background)
+
+    # make line
+    return Segment(left * line * right)
+end
 
 """
     render(
@@ -296,6 +382,7 @@ Panel(renderables...; kwargs...) = Panel(vstack(renderables...); kwargs...)
         subtitle_style::Union{Nothing,String} = nothing,
         subtitle_justify::Symbol = :left,
         justify::Symbol = :left,
+        text_justify::Bool=false,
         panel_measure::Measure,
         content_measure::Measure,
         Δw::Int,
@@ -324,6 +411,9 @@ function render(
     background = nothing,
     kwargs...,
 )::Panel
+    background = get_bg_color(background)
+    # @info "calling render" content content_measure background
+    # println("Content\n", content)
 
     # create top/bottom rows with titles
     box = BOXES[box]  # get box object from symbol
@@ -357,15 +447,7 @@ function render(
     else
         [Segment(left * "{$background}" * " "^(panel_measure.w - 2) * "{/$background}" * right)]
     end
-
-    # add lines with content fn
-    function makecontent_line(cline)::Segment
-        line = pad(apply_style(cline), panel_measure.w - Δw, justify; bg = background)
-        line = pad(line, padding.left, padding.right; bg = background)
-
-        # make line
-        return Segment(left * line * right)
-    end
+    # @info "rendering" panel_measure Δw
 
     # check if we need extra lines at the bottom to reach target height
     n_extra = if content_measure.h < panel_measure.h - Δh - 2
@@ -373,7 +455,6 @@ function render(
     else
         0
     end
-
     # create segments
     initial_segments = Segment[
         top,                                        # top border
@@ -381,9 +462,21 @@ function render(
     ]
 
     # content
-    content_sgs =
-        content.measure.w > 0 ? map(s -> makecontent_line(s.text), content.segments) :
-        Segment[]
+    content_sgs::Vector{Segment} =
+        content.measure.w > 0 ?
+        map(
+            s -> makecontent_line(
+                s.text,
+                panel_measure,
+                justify,
+                background,
+                padding,
+                left,
+                right,
+                Δw,
+            ),
+            content.segments,
+        ) : []
 
     final_segments = Segment[
         repeat(empty, n_extra)...,                  # lines to reach target height
@@ -391,7 +484,8 @@ function render(
         bottom * "\e[0m",                           # bottom border
     ]
 
-    return Panel(vcat(initial_segments, content_sgs, final_segments), panel_measure)
+    segments = vcat(initial_segments, content_sgs, final_segments)
+    return Panel(segments, Measure(segments))
 end
 
 # ---------------------------------------------------------------------------- #
@@ -399,27 +493,5 @@ end
 # ---------------------------------------------------------------------------- #
 
 TextBox(args...; kwargs...) = Panel(args...; box = get(kwargs, :box, :NONE), kwargs...)
-
-# ---------------------------------------------------------------------------- #
-#                                     MISC.                                    #
-# ---------------------------------------------------------------------------- #
-
-"""
-    trim_renderable(ren::Union{String, AbstractRenderable}, width::Int)
-
-Trim a string or renderable to a max width.
-"""
-trim_renderable(ren::Union{AbstractString,AbstractRenderable}, width::Int) =
-    if ren isa AbstractString || ren isa RenderableText
-        ren = ren isa RenderableText ? join(getfield.(ren.segments, :text), "\n") : ren
-        reshape_text(ren, width)
-    else
-        texts = rstrip.(getfield.(ren.segments, :text))
-        segs = map(
-            s -> get_width(s) > width ? pad(str_trunc(s, width), width, :left) : s,
-            texts,
-        )
-        lvstack(segs)
-    end
 
 end

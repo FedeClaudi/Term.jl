@@ -1,5 +1,7 @@
 module Repr
 using InteractiveUtils
+import Markdown
+import CodeTracking: @code_string, @which, code_string
 
 import Term:
     str_trunc,
@@ -16,11 +18,11 @@ import ..Renderables: RenderableText, info, AbstractRenderable
 import ..Consoles: console_width
 import ..Panels: Panel, TextBox
 import ..Style: apply_style
-import ..Tprint: tprint
+import ..Tprint: tprint, tprintln
 import ..Tables: Table
 import ..TermMarkdown: parse_md
 
-export @with_repr, termshow, install_term_repr
+export @with_repr, termshow, install_term_repr, @showme
 
 include("_repr.jl")
 include("_inspect.jl")
@@ -185,21 +187,17 @@ termshow(io::IO, mtx::AbstractMatrix; kwargs...) = print(
 
 Show a vector's content as a 1D table visualization.
 """
-function termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...)
-    m = length(vec)
-    print(
-        io,
-        repr_panel(
-            vec,
-            vec2content(vec),
-            "{bold white}$m{/bold white}{default} $(plural("item", m)){/default}";
-            justify = :left,
-            width = nothing,
-            fit = true,
-            title = nothing,
-        ),
-    )
-end
+termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
+    io,
+    repr_panel(
+        vec,
+        vec2content(vec),
+        "{bold white}$(length(vec)){/bold white}{default} items{/default}";
+        justify = :left,
+        fit = true,
+        title = nothing,
+    ),
+)
 
 """
 ---
@@ -220,7 +218,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
                 matrix2content(arr[:, :, i]; max_w = 60, max_items = 25, max_D = 5);
                 subtitle = "[:, :, $i_string]",
                 subtitle_justify = :right,
-                width = 22,
+                width = 60,
                 style = "dim yellow",
                 subtitle_style = "default",
                 title = "($n)",
@@ -247,6 +245,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
             arr,
             vstack(panels...),
             "{white}" * join(string.(size(arr)), " × ") * "{/white}",
+            fit = true,
         ),
     )
 end
@@ -303,37 +302,9 @@ end
 
 Show a function's methods and docstring.
 """
-function termshow(
-    io::IO,
-    fun::Function;
-    width = min(console_width() - 10, default_width(io)),
-)
+function termshow(io::IO, fun::Function; width = min(console_width(io), default_width(io)))
     # get methods
-    _methods = split_lines(string(methods(fun)))
-    N = length(_methods)
-
-    _methods = length(_methods) > 1 ? _methods[2:min(11, N)] : []
-    _methods = map(m -> join(split(join(split(m, "]")[2:end]), " in ")[1]), _methods)
-    _methods = map(
-        m -> replace(
-            m,
-            string(fun) => "{bold #a5c6d9}$(string(fun)){/bold #a5c6d9}";
-            count = 1,
-        ),
-        _methods,
-    )
-    counts = RenderableText.("(" .* string.(1:length(_methods)) .* ") "; style = "bold dim")
-    if (m = N - length(_methods) - 1) > 0
-        push!(
-            _methods,
-            "\n{bold dim bright_blue}$m{/bold dim bright_blue}{dim bright_blue} $(plural("method", m)) omitted...{/dim bright_blue}",
-        )
-    end
-    methods_contents = if N > 1
-        rvstack(counts...) * lvstack(RenderableText.(highlight.(_methods))...)
-    else
-        fun |> methods |> string |> split_lines |> first
-    end
+    methods_contents, N = style_function_methods(fun; width = width)
 
     m = N - 1
     panel =
@@ -342,12 +313,17 @@ function termshow(
             methods_contents,
             "{white bold}$m{/white bold} $(plural("method", m))",
             title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
-            width = width,
+            width = width - 8,
             fit = false,
+            justify = :left,
         )
+    # @info "made panel" panel.measure  width console_width(io)
 
     # get docstring 
     doc, _ = get_docstring(fun)
+    panel.measure.w < 45 && begin   # handle narrow console 
+        doc = replace(string(doc), "```" => " ") |> Markdown.MD
+    end
     doc = parse_md(doc; width = panel.measure.w - 4)
     doc = split_lines(doc)
     if (m = length(doc) - 100) > 0
@@ -358,7 +334,7 @@ function termshow(
     end
     print(io, panel)
     print(io, hLine(panel.measure.w, "Docstring"; style = "green dim", box = :HEAVY))
-    print(io, "   " * RenderableText(join(doc, "\n")))
+    print(io, "   " * RenderableText(join(doc, "\n"), width = width - 4))
 end
 
 # ---------------------------------------------------------------------------- #
@@ -415,9 +391,8 @@ end
 function with_repr(typedef::Expr)
     tn = typename(typedef) # the name of the type
     showfn = :(Base.show(io::IO, ::MIME"text/plain", obj::$tn) = termshow(io, obj))
-
     quote
-        $typedef
+        Core.@__doc__ $typedef
         $showfn
     end
 end
@@ -439,8 +414,71 @@ y
 end
 ```
 """
-macro with_repr(typedef)
+macro with_repr(typedef::Expr)
     return esc(with_repr(typedef))
+end
+
+# ---------------------------------------------------------------------------- #
+#                                    SHOW ME                                   #
+# ---------------------------------------------------------------------------- #
+
+macro showme(expr, show_all_methods = false)
+    width = min(console_width(), 120)
+    hLine(width, style = "dim") |> tprint
+
+    # print info msg
+    info_msg = String["""
+    !!! note "@showme"
+        Showing definition for *method* called by: \n
+            $(expr)       
+            
+    ###### Arguments
+
+    """]
+
+    parse_md(info_msg) |> tprintln
+
+    # print args types
+    _type_color = TERM_THEME[].type
+    _string_color = TERM_THEME[].string
+    for i in 2:length(expr.args)
+        arg = expr.args[i]
+        arg = arg isa AbstractString ? "\"$arg\"" : arg
+        "     {blue}⨀{/blue} {white italic}$arg{/white italic}{$_type_color}::$(typeof(arg)){/$_type_color}" |>
+        tprintln
+    end
+
+    print("\n")
+
+    quote
+        code_source = @code_string $expr
+        Markdown.parse("###### Method definition") |> tprintln
+        code_source = Markdown.parse("""
+        ```
+        $code_source
+        ```
+        """)
+        code = parse_md(code_source; width = $width + 2, lpad = false) |> string
+
+        method = @which $expr
+        source = "{dim}$(method.file):$(method.line){/dim} "
+
+        rvstack(code, source) |> tprint
+
+        if $show_all_methods
+            println()
+            tprintln(
+                "    " * Panel(
+                    style_function_methods(eval(method.name); max_n = 100)[1],
+                    title = "all methods",
+                    style = "dim",
+                    padding = (4, 4, 1, 1),
+                    title_style = "default",
+                    width = $width - 4,
+                ),
+            )
+        end
+    end
 end
 
 end

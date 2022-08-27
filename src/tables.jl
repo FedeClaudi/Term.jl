@@ -206,6 +206,7 @@ function Table(
             heights[I],
             vertical_justify,
         )
+
         if l == 1 && show_header
             bottom = if nrows < 2
                 :bottom
@@ -346,6 +347,7 @@ function table_row(
     end
 
     # create row
+    # @info "row" Measure(cells[1]) Measure(m) cells[1]*m
     mid = if length(widths) > 1
         l * foldl((a, b) -> a * m * b, cells[1:end]) * r
     else
@@ -365,7 +367,7 @@ end
 
 Create a Table's row's cell from a string - apply styling and vertical/horizontal justification.
 """
-cell(
+function cell(
     x::AbstractString,
     hor_pad::Int,
     h::Int,
@@ -373,14 +375,13 @@ cell(
     justify::Symbol,
     style::String,
     vertical_justify::Symbol,
-) = vertical_pad(
-    do_by_line(
+)
+    content = do_by_line(
         y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
         str_trunc(x, w - hor_pad),
-    ),
-    h,
-    vertical_justify,
-)
+    )
+    return vertical_pad(content, h, vertical_justify)
+end
 
 """
     cell(x::AbstractString, hor_pad::Int, h::Int, w::Int, justify::Symbol, style::String, vertical_justify::Symbol)

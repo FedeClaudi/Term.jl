@@ -1,4 +1,5 @@
 import Term: cleantext, chars, textlen, split_lines, replace_multi
+import Term: Table
 
 cleanstring(x) = replace(string(x), "\r\n" => "\n")
 cleansprint(fn, x) = replace(sprint(fn, x), "\r\n" => "\n")
@@ -26,6 +27,100 @@ and clean it up
 fromfile(filepath) = replace_multi(read(filepath, String), "\\n" => "\n", "\\e" => "\e")
 
 fromfilelines(filepath) = lines = readlines(filepath)
+
+"""
+Highlight different characters between two strings.
+"""
+function highlight_diff(s1::String, s2::String)
+    s1 == s2 && return
+
+    r(x) = replace(x, ' ' => "⋅")  # replace spaces for visualization
+    c1, c2 = Any[collect(r(s1))...], Any[collect(r(s2))...]
+    length(c1) != length(c2) &&
+        (@warn "Strings have different length: $(length(c1)) vs $(length(c2))")
+
+    for i in 1:min(length(c1), length(c2))
+        a, b = c1[i], c2[i]
+        color = a == b ? "default" : "bold black on_red"
+        c1[i] = "{$color}$a{/$color}"
+        c2[i] = "{$color}$b{/$color}"
+    end
+
+    hLine("STRING DIFFERENCE $(length(c1)) chrs", style = "red") |> tprint
+    hLine("FIRST", style = "blue") |> tprint
+    println(s1)
+    hLine("SECOND", style = "blue") |> tprint
+    println(s1)
+    hLine(style = "dim blue") |> tprint
+
+    i = 1
+    while i < (min(length(c1), length(c2)) - 50)
+        "{dim}Characters $i-$(i+50){/dim}" |> tprintln
+        tprintln(
+            "{bold red}(  obj  ){/bold red}  - " * join(c1[i:(i + 50)]),
+            highlight = false,
+        )
+        tprintln(
+            "{bold red}(correct){/bold red}  - " * join(c2[i:(i + 50)]),
+            highlight = false,
+        )
+        hLine(style = "dim") |> tprint
+        print("\n")
+        i += 50
+    end
+    hLine(style = "red") |> tprint
+end
+
+"""
+Load "correct' string from .txt file and correct new lines
+for windows.
+"""
+function load_from_txt(filename)
+    filepath = "./txtfiles/$(filename).txt"
+    correct = fromfile(filepath)
+    IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
+    correct
+end
+
+"""
+    macro compare_to_string(obj, filename::String, fn::Function=x->x)
+
+Check that the string representation of an object is identical to
+what's saved in a .txt file at `filename`. If `obj` is an expression or
+a renderable first turn it into a string.
+
+If `TEST_DEBUG_MODE=true`, instead of comparing to a file, save the 
+obj's string to the file for future comparison. Also print out
+the output for visual inspection.
+"""
+macro compare_to_string(obj, filename, fn = x -> x, skip = nothing)
+    __f = string(__source__.file)
+    __l = string(__source__.line)
+    quote
+        txt = if $obj isa Expr
+            @capture_out eval($obj)
+        else
+            $obj
+        end |> string
+        txt = $fn(txt)
+
+        !isnothing($skip) && (txt = join(split(txt, '\n')[1:(end - $skip)], '\n'))
+
+        filepath = "./txtfiles/$($filename).txt"
+
+        if TEST_DEBUG_MODE
+            tprint(txt, highlight = false)
+            tofile(txt, filepath)
+        else
+            correct = load_from_txt($filename)
+            txt != correct && (@warn "Failed to match to text" $filename $__f $__l)
+            highlight_diff(txt, correct)
+            @test txt == correct # <-- TEST
+        end
+    end |> esc
+end
+
+# ----------------------------------- misc ----------------------------------- #
 
 same_widths(text::String) = length(unique(textlen.(split_lines(text)))) == 1
 

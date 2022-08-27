@@ -99,7 +99,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-          "\e[22m╭───╮\e[22m          \n\e[22m╰───╯\e[22m\e[0m          \n\e[22m╭────────╮\e[22m     \n\e[22m╰────────╯\e[22m\e[0m     \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "\e[22m╭───╮\e[22m          \n\e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m          \n\e[22m╰───╯\e[22m\e[0m          \n\e[22m╭────────╮\e[22m     \n\e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m     \n\e[22m╰────────╯\e[22m\e[0m     \n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 
@@ -108,7 +108,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-          "     \e[22m╭───╮\e[22m     \n     \e[22m╰───╯\e[22m\e[0m     \n  \e[22m╭────────╮\e[22m   \n  \e[22m╰────────╯\e[22m\e[0m   \n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "     \e[22m╭───╮\e[22m     \n     \e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m     \n     \e[22m╰───╯\e[22m\e[0m     \n  \e[22m╭────────╮\e[22m   \n  \e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m   \n  \e[22m╰────────╯\e[22m\e[0m   \n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 
@@ -117,7 +117,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-          "          \e[22m╭───╮\e[22m\n          \e[22m╰───╯\e[22m\e[0m\n     \e[22m╭────────╮\e[22m\n     \e[22m╰────────╯\e[22m\e[0m\n\e[22m╭─────────────╮\e[22m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "          \e[22m╭───╮\e[22m\n          \e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n          \e[22m╰───╯\e[22m\e[0m\n     \e[22m╭────────╮\e[22m\n     \e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m\n     \e[22m╰────────╯\e[22m\e[0m\n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 end
@@ -166,7 +166,7 @@ end
     end
 
     panel = Panel(height = 5, width = 20)
-    @test hLine().measure.w == displaysize(stdout)[2]
+    @test hLine().measure.w == TEST_CONSOLE_WIDTH
     @test textlen(hLine(panel).segments[1].text) == 20
 end
 
@@ -194,7 +194,7 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 / r2
-    @test size(r.measure) == (6, 50)
+    @test size(r.measure) == (8, 50)
 
     h1, h2 = hLine(22), hLine(33)
     @test size(Measure(h1 / h2)) == (2, 33)
@@ -203,7 +203,7 @@ end
     r2 = RenderableText("."^100; width = 50)
 
     r = r1 * r2
-    @test size(r.measure) == (4, 75)
+    @test size(r.measure) == (5, 75)
 
     # stack other renderables
     h1, h2 = vLine(22), vLine(33)
@@ -216,16 +216,16 @@ end
     p3 = Panel("this {red}panel{/red}"^5; width = 30, fit = false)
 
     testlayout(p2 * p2, p2.measure.w + p2.measure.w, 3)
-    testlayout(p1 / p2, min(88, default_width()), 5)
+    testlayout(p1 / p2, TEST_CONSOLE_WIDTH, 6)
 
     testlayout(p2 * p1, p1.measure.w + p2.measure.w, 3)
-    testlayout(p2 / p1, min(88, default_width()), 5)
+    testlayout(p2 / p1, TEST_CONSOLE_WIDTH, 6)
 
     w = p1.measure.w + p2.measure.w + p3.measure.w
     testlayout(p1 * p2 * p3, w, 5)
-    testlayout(p1 / p2 / p3, min(88, default_width()), 10)
+    testlayout(p1 / p2 / p3, TEST_CONSOLE_WIDTH, 11)
     testlayout(p3 * p1 * p2, w, 5)
-    testlayout(p3 / p1 / p2, min(88, default_width()), 10)
+    testlayout(p3 / p1 / p2, TEST_CONSOLE_WIDTH, 11)
 end
 
 @testset "\e[34mlayout - placeholder" begin
@@ -252,5 +252,5 @@ end
     @test string(vstack(p1, p2, p3; pad = 0)) ==
           "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
     @test string(vstack(p1, p2, p3; pad = 3)) ==
-          "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
+          "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
 end

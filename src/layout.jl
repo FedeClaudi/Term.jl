@@ -2,7 +2,9 @@ module Layout
 
 import Parameters: @with_kw
 
-import Term: rint, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, do_by_line
+import Term:
+    rint, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, do_by_line, get_bg_color
+import Term: justify as justify_text
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..Consoles: console_width, console_height
 import ..Measures: Measure, height, width
@@ -37,7 +39,7 @@ end
     pad(text::AbstractString, target_width::Int, method::Symbol)::String
 
 Pad a string to width: `target_width` by adding empty spaces strings " ".
-Where the spaces are added depends on the justification `method` ∈ (`:left`, `:center`, `:right`).
+Where the spaces are added depends on the justification `method` ∈ (`:left`, `:center`, `:right`, `:justify`).
 
 #### Examples
 
@@ -53,6 +55,7 @@ julia> pad("ciao", 10, :right)
 ```
 """
 function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothing)::String
+    bg = get_bg_color(bg)
     occursin('\n', text) &&
         return do_by_line(ln -> pad(ln, target_width, method; bg = bg), text)
 
@@ -71,7 +74,12 @@ function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothi
         nl, nr = get_lr_widths(npads)
         l = isnothing(bg) ? ' '^nl : "{$bg}" * ' '^nl * "{/$bg}"
         r = isnothing(bg) ? ' '^nr : "{$bg}" * ' '^nr * "{/$bg}"
-        return l * text * r
+        t = l * text * r
+        return if method == :center
+            t
+        else
+            justify_text(t, target_width)
+        end
     end
 end
 
@@ -468,7 +476,7 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     end
 
     # combine segments
-    segments = [Segment(s1.text * ' '^pad * s2.text) for (s1, s2) in zip(s1, s2)]
+    segments = [Segment(ss1.text * ' '^pad * ss2.text) for (ss1, ss2) in zip(s1, s2)]
 
     return Renderable(segments, Measure(segments))
 end
@@ -496,6 +504,7 @@ hstack(renderables::Union{Vector,Tuple}; kwargs...) = hstack(renderables...; kwa
 
 Base.:/(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(r1, r2)
 Base.:/(rr::Tuple{RenderablesUnion,RenderablesUnion}) = vstack(rr...)
+Base.:/(rr...) = vstack
 
 Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)

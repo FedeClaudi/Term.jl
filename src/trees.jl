@@ -71,8 +71,7 @@ function asleaf end
 
 asleaf(x) = str_trunc(highlight(string(x)), TERM_THEME[].tree_max_width)
 asleaf(x::Nothing) = nothing
-asleaf(x::AbstractVector) =
-    str_trunc((escape_brackets ∘ string)(x), TERM_THEME[].tree_max_width)
+asleaf(x::AbstractVector) = str_trunc(string(x), TERM_THEME[].tree_max_width)
 asleaf(x::AbstractString) = str_trunc(highlight(x, :string), TERM_THEME[].tree_max_width)
 
 """
@@ -83,6 +82,7 @@ End items in a `Tree`. No sub-trees.
 struct Leaf
     name::Union{Nothing,String}
     text::Union{Nothing,String}
+    idx::Int  # rendering index
 end
 
 # ----------------------------------- tree ----------------------------------- #
@@ -94,12 +94,13 @@ It renders as a hierarchical structure with lines (guides) connecting the variou
 """
 @kwdef struct Tree <: AbstractRenderable
     segments::Union{Nothing,Vector{Segment}} = nothing
-    measure::Union{Nothing,Measure} = nothing
+    measure::Measure = Measure(segments)
 
     name::String
     level::Int
     nodes::Vector{Tree}
     leaves::Vector{Leaf}
+    idx::Int = 0  # rendering index for tree that are nodes in a lager tree
 
     title_style::String = TERM_THEME[].tree_title_style
     node_style::String = TERM_THEME[].tree_node_style
@@ -113,11 +114,12 @@ Show/render a `Tree`
 """
 function Base.show(io::IO, tree::Tree)
     if io != stdout
-        print(io, "Tree: $(length(tree.nodes)) nodes, $(length(tree.leaves)) leaves")
+        print(
+            io,
+            "Tree: $(length(tree.nodes)) nodes, $(length(tree.leaves)) leaves | Idx: $(tree.idx)",
+        )
     else
-        for seg in tree.segments
-            println(io, seg)
-        end
+        println.(io, tree.segments)
     end
 end
 
@@ -131,6 +133,7 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Abstra
             v;
             level = level + 1,
             title = str_trunc(string(k), TERM_THEME[].tree_max_width),
+            idx = length(nodes) + length(leaves) + 1,
         ),
     )
 end
@@ -141,17 +144,21 @@ function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Pair)
     else
         str_trunc(string(v.first), TERM_THEME[].tree_max_width)
     end
-    return push!(leaves, Leaf(k, asleaf(v.second)))
+    idx = length(nodes) + length(leaves) + 1
+    return push!(leaves, Leaf(k, asleaf(v.second), idx))
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Any)
     k = isnothing(k) ? nothing : str_trunc(string(k), TERM_THEME[].tree_max_width)
-    return push!(leaves, Leaf(k, asleaf(v)))
+    idx = length(nodes) + length(leaves) + 1
+    return push!(leaves, Leaf(k, asleaf(v), idx))
 end
 
 function addnode!(nodes::Vector{Tree}, leaves::Vector{Leaf}, level, k, v::Vector)
     for _v in v
-        _k = _v isa Dict ? collect(keys(_v))[1] : (v isa Pair ? _v.first : v)
+        _k =
+            _v isa Union{Dict,OrderedDict} ? collect(keys(_v))[1] :
+            (v isa Pair ? _v.first : v)
         addnode!(nodes, leaves, level + 1, _k, _v)
     end
 end
@@ -260,41 +267,40 @@ function render(
     end
     tree.level == 0 && _add(prevguides * guides.vline)
 
-    # render sub-trees
-    for (last, node) in loop_last(tree.nodes)
-        # check if it's the last entry in the tree
-        lasttree = last && !hasleaves
+    # get all nodes and sub-trees in order for rendering
+    elements = vcat(tree.nodes, tree.leaves)
+    idxs = getfield.(elements, :idx)
+    elements = elements[sortperm(idxs)]
+    # @info "rendering $(length(elements)) elements" elements
 
-        # get the appropriate guides
-        prev = prevguides * (lasttree ? guides.space : guides.vline)
+    for (last, elem) in loop_last(elements)
+        if elem isa Tree
+            prev = prevguides * (last ? guides.space : guides.vline)
 
-        append!(
-            segments,
-            render(
-                node;
-                prevguides = prev,
-                lasttree = lasttree,
-                waslast = vcat(waslast, lasttree),
-                guides = guides,
-            ),
-        )
-        hasleaves && length(node.leaves) > 0 && _add(prevguides * guides.vline)
-    end
-
-    # render leaves
-    if hasleaves
-        for (last, leaf) in loop_last(tree.leaves)
+            append!(
+                segments,
+                render(
+                    elem;
+                    prevguides = prev,
+                    lasttree = last,
+                    waslast = vcat(waslast, last), # vcat(waslast, lasttree),
+                    guides = guides,
+                ),
+            )
+            # hasleaves && length(elem.leaves) > 0 && _add(prevguides * guides.vline)
+        elseif elem isa Leaf
+            # @info "rendering leaf $(elem.idx): $(elem.name) > $(elem.text)"
             seg = last ? guides.leaf : guides.branch
-            if isnothing(leaf.text)
-                k = isnothing(leaf.name) ? "" : highlight(leaf.name)
+            if isnothing(elem.text)
+                k = isnothing(elem.name) ? "" : highlight(elem.name)
                 v = ""
             else
-                k = if isnothing(leaf.name)
+                k = if isnothing(elem.name)
                     ""
                 else
-                    "{$(tree.leaf_style)}$(leaf.name){/$(tree.leaf_style)}: "
+                    "{$(tree.leaf_style)}$(elem.name){/$(tree.leaf_style)}: "
                 end
-                v = leaf.text
+                v = elem.text
             end
             _add(prevguides * seg * k * v)
         end
@@ -322,13 +328,13 @@ Apply style for the type whose hierarchy Tree we are making
 style_T(T) = "{orange1 italic underline}$T{/orange1 italic underline}"
 
 """
-    make_hierarchy_dict(x::Vector{DataType}, T::DataType, Tsubs::Dict)::Dict
+    make_hierarchy_dict(x::Vector{DataType}, T::DataType, Tsubs::AbstractDict)::AbstractDict
 
 Recursively create a dictionary with the types hierarchy for `T`.
 `Tsubs` carries information about T's subtypes.
-The Dict is made backwards. From  the deepest levels up.
+The AbstractDict is made backwards. From  the deepest levels up.
 """
-function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::Dict)::Dict
+function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::AbstractDict)::AbstractDict
     data = Dict()
     prev = ""
     for (n, y) in enumerate(x)
@@ -369,8 +375,8 @@ function Tree(T::DataType)::Tree
 
     return Tree(
         data;
-        # title=string(supertypes(T)[end]),
-        title = "Any",
+        title = string(supertypes(T)[end - 1]),
+        # title = "Any",
         title_style = "bright_green italic",
         guides_style = "green dim",
     )

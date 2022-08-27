@@ -48,12 +48,11 @@ t8 = Table(
 
 # save tables as strings to files
 tbls = [t1, t2, t3, t4, t5, t6, t7, t8]
-for (i, t) in enumerate(tbls)
-    tofile(string(t), "./txtfiles/table_$i.txt")
-end
 
 @testset "TABLE" begin
     for (i, t) in enumerate(tbls)
-        @test fromfile("./txtfiles/table_$i.txt") == cleanstring(t)
+        name = string("table_$i")
+
+        IS_WIN || @compare_to_string(cleanstring(t), name)
     end
 end

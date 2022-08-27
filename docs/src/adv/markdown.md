@@ -4,6 +4,8 @@ If you've had a loot at the `REPR` section, you might have noticed that Term is 
 Let's have a look.
 
 ```@example md
+import Term.Consoles: Console, enable, disable # hide
+con = Console(60) |> enable #hide
 import Term: tprintln
 using Term.TermMarkdown
 using Markdown
@@ -111,6 +113,8 @@ tprint(md"""
 | Row `1`    | Column `2` |              |
 | *Row* 2    | **Row** 2  | Column ``3`` |
 """)
+
+disable(con)  # hide
 ```
 
 

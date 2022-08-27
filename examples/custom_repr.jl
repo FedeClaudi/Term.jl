@@ -40,7 +40,7 @@ obj = myType("Rocket", 10, 10, 99.9)
 
 # or just use our macro!
 
-@with_repr mutable struct Rocket
+@with_repr mutable struct myRocket
     width::Int
     height::Int
     mass::Float64
@@ -49,4 +49,4 @@ obj = myType("Rocket", 10, 10, 99.9)
     manufacturer::String
 end
 
-obj = Rocket(10, 50, 5000, [1.1, 123123, 1], "NASA")
+obj = myRocket(10, 50, 5000, [1.1, 123123, 1], "NASA")
