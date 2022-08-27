@@ -151,4 +151,18 @@ function inspect(
     nothing
 end
 
+
+function inspect(
+    F::Function;
+    documentation::Bool = false,
+)
+    hLine("inspecting: $F", style = "bold white") |> print
+
+    documentation && begin
+        termshow(F)
+        print("\n"^3)
+    end
+    nothing
+end
+
 end
