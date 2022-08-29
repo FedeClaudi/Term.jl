@@ -121,7 +121,7 @@ mutable struct Live
     end
 end
 
-function update_live(live::Live, x)
+function update_live(live::Live, content::AbstractRenderable)
     !isnothing(live.prevcontent) && begin
         nlines = live.prevcontent.measure.h + 1
         for _ in 1:nlines
@@ -130,11 +130,13 @@ function update_live(live::Live, x)
         end
     end
 
-    println(live.ioc, x)
-    live.prevcontent = x
+    println(live.ioc, content)
+    live.prevcontent = content
 
     write(stdout, take!(live.iob))
 end
+
+update_live(live::Live, content::String) = update_live(live, RenderableText(content))
 
 macro live(expr)
 
