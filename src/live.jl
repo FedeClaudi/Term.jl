@@ -10,11 +10,6 @@ import Term: Measure
 
 # TODO use IOCapture to collect stdout output during live rendering
 
-
-
-
-
-
 using Markdown
 text = md"""
  # Markdown rendering in Term.jl
@@ -108,16 +103,15 @@ text = md"""
 import Term.TermMarkdown: parse_md
 import Term: Renderable, Measure
 
-
 mutable struct Live
     iob::IOBuffer
     ioc::IOContext
-    prevcontent::Union{Nothing, AbstractRenderable}
+    prevcontent::Union{Nothing,AbstractRenderable}
 
     function Live()
         iob = IOBuffer()
-        ioc = IOContext(iob, :displaysize=>displaysize(stdout))
-        return new(iob, ioc,  nothing)
+        ioc = IOContext(iob, :displaysize => displaysize(stdout))
+        return new(iob, ioc, nothing)
     end
 end
 
@@ -137,20 +131,18 @@ function update_live(live::Live, x)
 end
 
 macro live(expr)
-
     updater = Live()
 
     # inject code to print the output of each loop in `expr`
     body = expr.args[2]
     body = Expr(
-        body.head, 
-        body.args[1:end-2]..., 
-        Expr(Symbol("="), :__live_content, body.args[end-1]), 
+        body.head,
+        body.args[1:(end - 2)]...,
+        Expr(Symbol("="), :__live_content, body.args[end - 1]),
         :(update_live($updater, __live_content)),
-        body.args[end]
+        body.args[end],
     )
     expr.args[2] = body
-
 
     quote
         eval($expr)
@@ -159,26 +151,31 @@ end
 
 import MyterialColors: pink
 
-
 function pager(content::String)
     i = 0
     W = Measure(content).w
     content = split(content, "\n")
 
     @live while i < length(content) - 10
-        sleep(rand(.25:.05:.5) / 4)
+        sleep(rand(0.25:0.05:0.5) / 4)
         i += 1
-        
-        page = join(content[i:i+10], "\n")
-        Panel(page, fit=false, width=W+10, padding=(4, 4, 1, 1), 
-            subtitle="Lines: $i:$(i+10)", subtitle_style="bold dim", subtitle_justify=:right,
-            style="$pink", title="Term.jl PAGER", title_style="bold white"
-            )
+
+        page = join(content[i:(i + 10)], "\n")
+        Panel(
+            page,
+            fit = false,
+            width = W + 10,
+            padding = (4, 4, 1, 1),
+            subtitle = "Lines: $i:$(i+10)",
+            subtitle_style = "bold dim",
+            subtitle_justify = :right,
+            style = "$pink",
+            title = "Term.jl PAGER",
+            title_style = "bold white",
+        )
     end
 
     println("done")
 end
 
 pager(parse_md(text))
-
-
