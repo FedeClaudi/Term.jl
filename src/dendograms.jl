@@ -112,13 +112,15 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
         pad(apply_style("$(head)", title_style), width, :center)
     else
         _title = ": {bold default underline $title_style}$first_arg{/bold default underline $title_style}"
-        pad(apply_style("$(head)$_title", title_style * " dim"), width - 4, :center) *
-        " "^4
+        pad(apply_style("$(head)$_title", title_style * " dim"), width - 4, :center) * " "^4
     end
 
     # put together
-    segments =
-        [Segment(title), Segment(line, line_style), Segment(leaves_line, TERM_THEME[].dendo_leaves)]
+    segments = [
+        Segment(title),
+        Segment(line, line_style),
+        Segment(leaves_line, TERM_THEME[].dendo_leaves),
+    ]
 
     # add 'pretitle' lines (for expressions only)
     if !isnothing(pretitle)
@@ -251,7 +253,10 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
         prepend!(
             segments,
             [
-                Segment(" "^l(pretitle) * pretitle * " "^r(pretitle), TERM_THEME[].dendo_pretitle),
+                Segment(
+                    " "^l(pretitle) * pretitle * " "^r(pretitle),
+                    TERM_THEME[].dendo_pretitle,
+                ),
                 Segment(" "^l("⋀") * "⋀" * " "^r("⋀"), "$LINES_STYLE bold"),
                 Segment(
                     " "^l(BOXES[:SQUARE].bottom.vertical) *

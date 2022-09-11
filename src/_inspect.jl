@@ -17,8 +17,6 @@ function get_docstring(obj)
     return doc, unescape_brackets(docstring)
 end
 
-
-
 """
     style_methods(methods::Union{Vector{Base.Method}, Base.MethodList}, tohighlight::AbstractString)
 
@@ -28,7 +26,6 @@ function style_methods(
     methods::Union{Vector{Base.Method},Base.MethodList},
     tohighlight::AbstractString,
 )
-
     txt_col = TERM_THEME[].text
     fn_col = TERM_THEME[].func
     highlight_col = TERM_THEME[].inspect_highlight
@@ -48,7 +45,8 @@ function style_methods(
             tohighlight => "{$highlight_col default}$tohighlight{/$highlight_col default}{dim}",
         )
         code = RenderableText(
-            "     {$accent_col dim}($i){/$accent_col dim}  {$fn_col}$(m.name){/$fn_col}" * code,
+            "     {$accent_col dim}($i){/$accent_col dim}  {$fn_col}$(m.name){/$fn_col}" *
+            code,
         )
         info =
             string(m.module) != prevmod ?
@@ -57,7 +55,9 @@ function style_methods(
             ) : nothing
         prevmod = string(m.module)
 
-        dest = RenderableText("{dim default italic}             → $(m.file):$(m.line){/dim default italic}")
+        dest = RenderableText(
+            "{dim default italic}             → $(m.file):$(m.line){/dim default italic}",
+        )
         content = isnothing(info) ? code / dest / "" : info / code / dest / ""
         push!(mets, content)
     end

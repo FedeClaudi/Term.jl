@@ -112,11 +112,7 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
             style = theme.repr_type * " dim",
         )
-    vals =
-        RenderableText.(
-            short_string.(values(obj));
-            style = theme.repr_values * " bold",
-        )
+    vals = RenderableText.(short_string.(values(obj)); style = theme.repr_values * " bold")
     vtypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(values(obj)));

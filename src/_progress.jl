@@ -172,7 +172,8 @@ struct ETAColumn <: AbstractColumn
     style::String
     padwidth::Int
 
-    ETAColumn(job::ProgressJob; style = TERM_THEME[].progress_etacol_default) = new(job, [], Measure(7 + 11, 1), style, 7)
+    ETAColumn(job::ProgressJob; style = TERM_THEME[].progress_etacol_default) =
+        new(job, [], Measure(7 + 11, 1), style, 7)
 end
 
 function update!(col::ETAColumn, args...)::String
@@ -315,7 +316,8 @@ end
 
 function update!(col::SpinnerColumn, args...)::String
     col.job.started || return " "^(col.measure.w)
-    col.job.finished && return "{$(TERM_THEME[].progress_spinnerdone_default)}✔{/$(TERM_THEME[].progress_spinnerdone_default)}"
+    col.job.finished &&
+        return "{$(TERM_THEME[].progress_spinnerdone_default)}✔{/$(TERM_THEME[].progress_spinnerdone_default)}"
 
     t = (now() - col.job.startime).value
 

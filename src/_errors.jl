@@ -19,7 +19,8 @@ function render_frame_info(frame::StackFrame; show_source = true)
         reshape_text(highlight(func), default_stacktrace_width()) |> remove_markup |> lstrip
 
     # get other information about the function 
-    inline = frame.inlined ? RenderableText("   inlined"; style = "bold dim $(theme.text)") : ""
+    inline =
+        frame.inlined ? RenderableText("   inlined"; style = "bold dim $(theme.text)") : ""
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
 
     # get name of module
@@ -125,7 +126,8 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
                     numren,
                     info;
                     subtitle = reverse_backtrace ? "TOP LEVEL" : "ERROR LINE",
-                    subtitle_style = reverse_backtrace ? "$(theme.text_accent)" : "bold $(theme.text_accent)",
+                    subtitle_style = reverse_backtrace ? "$(theme.text_accent)" :
+                                     "bold $(theme.text_accent)",
                     subtitle_justify = :right,
                 ),
             )
@@ -137,7 +139,8 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
                     numren,
                     info;
                     subtitle = reverse_backtrace ? "ERROR LINE" : "TOP LEVEL",
-                    subtitle_style = reverse_backtrace ? "bold $(theme.text_accent)" : "$(theme.text_accent)",
+                    subtitle_style = reverse_backtrace ? "bold $(theme.text_accent)" :
+                                     "$(theme.text_accent)",
                     subtitle_justify = :right,
                 ),
             )

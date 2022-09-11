@@ -124,7 +124,9 @@ function method_error_candidate(fun, candidate)
     # highlight non-matched types
     candidate = replace(
         candidate,
-        method_error_regex => SubstitutionString("{$(theme.err_errmsg)}" * s"\g<0>" * "{/$(theme.err_errmsg)}"),
+        method_error_regex => SubstitutionString(
+            "{$(theme.err_errmsg)}" * s"\g<0>" * "{/$(theme.err_errmsg)}",
+        ),
     )
     # remove
     candidate = replace(candidate, "!Matched" => "")
@@ -248,7 +250,10 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                 println("\n")
                 ename = string(typeof(er))
                 print(
-                    hLine("{default bold $(theme.err_errmsg)}$ename{/default bold $(theme.err_errmsg)}"; style = "dim $(theme.err_errmsg)"),
+                    hLine(
+                        "{default bold $(theme.err_errmsg)}$ename{/default bold $(theme.err_errmsg)}";
+                        style = "dim $(theme.err_errmsg)",
+                    ),
                 )
 
                 # print error stacktrace

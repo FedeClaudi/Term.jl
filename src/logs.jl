@@ -207,7 +207,8 @@ function Logging.handle_message(
     # for multi-lines message, print each line separately.
     msg_lines::Vector{AbstractString} = split(msg, "\n")
     for n in 2:length(msg_lines)
-        msg_lines[n] = "  $vert   " * " "^textlen(content) * "{$logmsg_color}" * msg_lines[n]
+        msg_lines[n] =
+            "  $vert   " * " "^textlen(content) * "{$logmsg_color}" * msg_lines[n]
     end
 
     length(msg_lines) > 0 && (content *= "  " * msg_lines[1])
@@ -244,7 +245,8 @@ function Logging.handle_message(
             " {bold $(logger.theme.text)}$k{/bold $(logger.theme.text)}"
 
         epad = namepad - textlen(string(k))
-        line *= " "^epad * " {bold $(logger.theme.operator)}={/bold $(logger.theme.operator)} "
+        line *=
+            " "^epad * " {bold $(logger.theme.operator)}={/bold $(logger.theme.operator)} "
         lpad = textlen(line) - 4
 
         # get value style

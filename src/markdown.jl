@@ -5,7 +5,8 @@ import OrderedCollections: OrderedDict
 
 import UnicodeFun: to_latex
 
-import Term: reshape_text, highlight_syntax, fillin, escape_brackets, default_width, TERM_THEME
+import Term:
+    reshape_text, highlight_syntax, fillin, escape_brackets, default_width, TERM_THEME
 import ..Tables: Table
 import ..Style: apply_style
 import ..Layout: pad, hLine, vLine
@@ -18,8 +19,6 @@ import ..Panels: Panel
 import ..Segments: Segment
 
 export parse_md
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                   PARSE MD                                   #
@@ -59,12 +58,12 @@ Parse `Headers` with different style based on the level
 function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...) where {l}
     theme = TERM_THEME[]
     header_styles = Dict(
-        1 => theme.md_h1, 
-        2 => theme.md_h2, 
-        3 => theme.md_h3, 
-        4 => theme.md_h4, 
-        5 => theme.md_h5, 
-        6 => theme.md_h6, 
+        1 => theme.md_h1,
+        2 => theme.md_h2,
+        3 => theme.md_h3,
+        4 => theme.md_h4,
+        5 => theme.md_h5,
+        6 => theme.md_h6,
     )
 
     header_justify =
@@ -208,7 +207,10 @@ function parse_md(
     content = length(content) > 1 ? join(content) : content[1]
     # content = reshape_text(content, width)
     theme = TERM_THEME[]
-    content = "{$(theme.text_accent)}“{/$(theme.text_accent)}" * content * "{$(theme.text_accent)}”{/$(theme.text_accent)}\e[0m"
+    content =
+        "{$(theme.text_accent)}“{/$(theme.text_accent)}" *
+        content *
+        "{$(theme.text_accent)}”{/$(theme.text_accent)}\e[0m"
 
     content = RenderableText(content; width = max(30, width))
     line =
@@ -279,7 +281,9 @@ function parse_md(note::Markdown.Footnote; width = console_width(), inline = fal
     if isnothing(note.text)
         return id = "{$(theme.md_footnote)}[$(note.id)]{/$(theme.md_footnote)}"
     else
-        id = (inline ? "\n" : "") * "{$(theme.md_footnote)}[$(note.id)]{/$(theme.md_footnote)}"
+        id =
+            (inline ? "\n" : "") *
+            "{$(theme.md_footnote)}[$(note.id)]{/$(theme.md_footnote)}"
         content = parse_md.(note.text)
         return if length(content) == 1
             string(RenderableText("$id: " * content[1]; width = width))

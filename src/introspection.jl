@@ -38,7 +38,7 @@ typestree(io::IO, T::DataType) = print(
     Panel(
         Tree(T);
         title = "Types hierarchy",
-        style = "$(TERM_THEME[].emphasis) dim" ,
+        style = "$(TERM_THEME[].emphasis) dim",
         title_style = orange * " default",
         title_justify = :right,
         fit = true,
@@ -111,7 +111,7 @@ Flags can be used to choose the level of detail in the information presented:
  - supertypes: show methods using `T`'s supertypes in their signature
 """
 function inspect(
-    T::Union{Union, DataType};
+    T::Union{Union,DataType};
     documentation::Bool = false,
     constructors::Bool = true,
     methods::Bool = true,
@@ -131,7 +131,8 @@ function inspect(
 
     # constructors
     constructors && begin
-        "\n{$(theme.text_accent)}○ {$(theme.inspect_accent)}$T{/$(theme.inspect_accent)} constructors:" |> tprintln
+        "\n{$(theme.text_accent)}○ {$(theme.inspect_accent)}$T{/$(theme.inspect_accent)} constructors:" |>
+        tprintln
         t_name = split(string(T), '.')[end]
         print.(style_methods(Base.methods(T), t_name))
     end
