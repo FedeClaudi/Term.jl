@@ -260,7 +260,7 @@ end
 
 Show a type's arguments, constructors and docstring.
 """
-function termshow(io::IO, obj::DataType; kwargs...)
+function termshow(io::IO, obj::DataType; showdocs = true, kwargs...)
     theme = TERM_THEME[]
     ts = theme.repr_type
     field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent)
@@ -283,21 +283,24 @@ function termshow(io::IO, obj::DataType; kwargs...)
             justify = :center,
         )
 
-    # get docstring
-    doc, _ = get_docstring(obj)
-    doc = parse_md(doc; width = min(100, console_width()))
-    doc = split_lines(doc)
-    if (m = length(doc) - 100) > 0
-        doc = [
-            doc[1:min(100, length(doc))]...,
-            "{dim $(theme.repr_array_text)}$m $(plural("line", m)) omitted...{/dim $(theme.repr_array_text)}",
-        ]
-    end
-    doc = join(doc, "\n")
 
     print(io, content)
-    print(io, hLine(console_width(), "Docstring"; style = "green dim", box = :HEAVY))
-    tprint(io, doc)
+
+    showdocs && begin
+        # get docstring
+        doc, _ = get_docstring(obj)
+        doc = parse_md(doc; width = min(100, console_width()))
+        doc = split_lines(doc)
+        if (m = length(doc) - 100) > 0
+            doc = [
+                doc[1:min(100, length(doc))]...,
+                "{dim bright_blue}$m $(plural("line", m)) omitted...{/dim bright_blue}",
+            ]
+        end
+        doc = join(doc, "\n")
+        print(io, hLine(console_width(), "Docstring"; style = "green dim", box = :HEAVY))
+        tprint(io, doc)
+    end
 end
 
 """

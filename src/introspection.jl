@@ -112,18 +112,19 @@ Flags can be used to choose the level of detail in the information presented:
 """
 function inspect(
     T::Union{Union,DataType};
-    documentation::Bool = false,
+    documentation::Bool = true,
     constructors::Bool = true,
-    methods::Bool = true,
-    supertypes::Bool = true,
+    methods::Bool = false,
+    supertypes::Bool = false,
 )
     theme = TERM_THEME[]
     hLine("inspecting: $T", style = theme.text_accent) |> print
 
+    documentation || termshow(T; showdocs = false)
     documentation && begin
         termshow(T)
-        print("\n"^3)
     end
+    print("\n"^3)
 
     # types hierarchy
     "{$(theme.text_accent)}○ Types hierarchy:" |> tprintln
