@@ -73,12 +73,15 @@ style outputs to terminal.
     tree_max_width::Int = 44
 
     # repr
-    repr_accent::String = "bold #e0db79"
-    repr_name::String   = "#e3ac8d"
-    repr_type::String   = "#bb86db"
-    repr_values::String = "#b3d4ff"
-    repr_line::String   = "dim #7e9dd9"
-    repr_panel::String  = "#9bb3e0"
+    repr_accent::String      = "bold #e0db79"
+    repr_name::String        = "#e3ac8d"
+    repr_type::String        = "#bb86db"
+    repr_values::String      = "#b3d4ff"
+    repr_line::String        = "dim #7e9dd9"
+    repr_panel::String       = "#9bb3e0"
+    repr_array_panel::String = "dim yellow"
+    repr_array_title::String = "dim bright_blue"
+    repr_array_text::String  = "bright_blue"
 
     # errors
     err_accent::String        = pink
