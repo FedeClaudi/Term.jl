@@ -51,7 +51,9 @@ function style_methods(
             ) : nothing
         prevmod = string(m.module)
 
-        dest = RenderableText("{dim italic}             → $(m.file):$(m.line){/dim italic}")
+        dest = RenderableText(
+            "{dim default italic}             → $(m.file):$(m.line){/dim default italic}",
+        )
 
         content = isnothing(info) ? code / dest / "" : info / code / dest / ""
 

@@ -112,18 +112,19 @@ Flags can be used to choose the level of detail in the information presented:
  - supertypes: show methods using `T`'s supertypes in their signature
 """
 function inspect(
-    T::DataType;
-    documentation::Bool = false,
+    T::Union{Union,DataType};
+    documentation::Bool = true,
     constructors::Bool = true,
-    methods::Bool = true,
-    supertypes::Bool = true,
+    methods::Bool = false,
+    supertypes::Bool = false,
 )
     hLine("inspecting: $T", style = "bold white") |> print
 
+    documentation || termshow(T; showdocs = false)
     documentation && begin
         termshow(T)
-        print("\n"^3)
     end
+    print("\n"^3)
 
     # types hierarchy
     "{bold white}○ Types hierarchy:" |> tprintln
