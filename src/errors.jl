@@ -258,7 +258,10 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
 
                 # print error message and description
                 Panel(
-                    error_message(er)[1];
+                    RenderableText(
+                        error_message(er)[1],
+                        width = default_stacktrace_width() - 4,
+                    );
                     width = default_stacktrace_width(),
                     title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
                     padding = (2, 2, 1, 1),
