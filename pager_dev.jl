@@ -39,17 +39,19 @@ end
 mutable struct Pager <: AbstractLiveDisplay
     internals::LiveInternals
     content::Vector{String}
+    title::String
     tot_lines::Int
     curr_line::Int
     page_lines::Int
     w::Int
 end
 
-function Pager(content::String; page_lines=10)
+function Pager(content::String; page_lines=10, title="Term.jl PAGER")
     content = split(content, "\n")
     return Pager(
         LiveInternals(),
         content,
+        title,
         length(content),
         1,
         page_lines,
@@ -66,11 +68,10 @@ function frame(pager::Pager)::AbstractRenderable
         width=max(default_width(), pager.w+10), 
         padding=(4, 4, 1, 1), 
         subtitle="Lines: $i:$(i+Δi) of $(pager.tot_lines)",
-        justify=:center,
         subtitle_style="bold dim",
         subtitle_justify=:right,
         style=pink,
-        title="Term.jl PAGER",
+        title=pager.title,
         title_style="bold white"
         )
 end
@@ -92,14 +93,12 @@ end
 key_press(p::Pager, ::HomeKey) = p.curr_line = 1
 key_press(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
 
-
-text =  @capture_out inspect(Panel)
+clear()
+text =  @capture_out inspect(Panel; documentation=true, supertypes=false)
 # text = join(rand("\nasdasd\n \n asd ", 1000))
-pager = Pager(text; page_lines=40)
+pager = Pager(text; page_lines=30, title="inspect(Panel)")
 while true
     update!(pager) || break
-    # sleep(.01)
-    # yield
 end
 stop!(pager)
 println("done")

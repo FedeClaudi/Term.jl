@@ -99,7 +99,6 @@ end
 # ---------------------------------- update ---------------------------------- #
 
 function shouldupdate(live::AbstractLiveDisplay)::Bool
-    return true
     currtime = Dates.value(now())
     isnothing(live.internals.last_update) && begin
         live.internals.last_update = currtime
@@ -107,7 +106,7 @@ function shouldupdate(live::AbstractLiveDisplay)::Bool
     end
     
     Δt = currtime - live.internals.last_update
-    if Δt > 10
+    if Δt > 100
         live.internals.last_update = currtime
         return true
     end
@@ -128,16 +127,27 @@ function update!(live::AbstractLiveDisplay)::Bool
     internals = live.internals
     !isnothing(internals.prevcontent) && inp && begin
         nlines = internals.prevcontent.measure.h + 1
-        for _ in 1:nlines
-            up(internals.ioc)
+        newlines = split(string(content), "\n")
+        nnew = length(newlines)
+
+        up(internals.ioc, nlines)
+        if nlines > nnew
+            for _ in 1:(nlines - nnew)
+                erase_line(internals.ioc)
+                down(internals.ioc)
+            end
+        end
+        for i in 1:nnew
             erase_line(internals.ioc)
+            println(internals.ioc, newlines[i])
         end
     end
 
-    println(internals.ioc, content)
+    # println(internals.ioc, content)
     internals.prevcontent = content
 
-    write(stdout, take!(internals.iob))
+    output = take!(internals.iob)
+    write(stdout, output)
     return true
 end
 
