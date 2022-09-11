@@ -26,7 +26,7 @@ and clean it up
 """
 fromfile(filepath) = replace_multi(read(filepath, String), "\\n" => "\n", "\\e" => "\e")
 
-fromfilelines(filepath) = lines = readlines(filepath)
+fromfilelines(filepath) = readlines(filepath)
 
 """
 Highlight different characters between two strings.

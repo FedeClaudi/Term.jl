@@ -1,102 +1,152 @@
-using Term
 using REPL
+using REPL.TerminalMenus: readkey, terminal
+using REPL.Terminals: raw!, AbstractTerminal
+using Dates
 
+
+using Term
 using Term.Consoles
-using Logging
-import Random
-
 import Term.Renderables: AbstractRenderable
-import Term: Measure
 
-# TODO use IOCapture to collect stdout output during live rendering
 
-import Term: Renderable, Measure
+@enum(Key,
+    ARROW_LEFT = 1000,
+    ARROW_RIGHT,
+    ARROW_UP,
+    ARROW_DOWN,
+    DEL_KEY,
+    HOME_KEY,
+    END_KEY,
+    PAGE_UP,
+    PAGE_DOWN)
+
+
+
+
+abstract type KeyInput end
+struct ArrowLeft <: KeyInput end
+struct ArrowRight <: KeyInput end
+struct ArrowUp <: KeyInput end
+struct ArrowDown <: KeyInput end
+struct DelKey <: KeyInput end
+struct HomeKey <: KeyInput end
+struct EndKey <: KeyInput end
+struct PageUpKey <: KeyInput end
+struct PageDownKey <: KeyInput end
+
+
+KEYs = Dict{Int, KeyInput}(
+    1000=>ArrowLeft(),
+    1001=>ArrowRight(),
+    1002=>ArrowUp(),
+    1003=>ArrowDown(),
+    1004=>DelKey(),
+    1005=>HomeKey(),
+    1006=>EndKey(),
+    1007=>PageUpKey(),
+    1008=>PageDownKey(),
+)
+
+
+
+
+
 
 # ---------------------------------------------------------------------------- #
-#                              LIVE FUNCTIONALITY                              #
+#                                 ABSTRACT LIVE                                #
 # ---------------------------------------------------------------------------- #
-# ----------------------------------- Live ----------------------------------- #
-mutable struct Live
-    iob::IOBuffer
-    ioc::IOContext
-    prevcontent::Union{Nothing, AbstractRenderable}
 
-    function Live()
-        iob = IOBuffer()
-        ioc = IOContext(iob, :displaysize=>displaysize(stdout))
-        return new(iob, ioc,  nothing)
+abstract type AbstractLiveDisplay end
+
+"""
+Update a live renderable's content
+"""
+update!(::AbstractLiveDisplay, ::AbstractRenderable) = error("Not implemented")
+
+"""
+Get the current conttent of a live display
+"""
+frame(::AbstractLiveDisplay) = error("Not implemented")
+
+key_press(live::AbstractLiveDisplay, inpt::KeyInput) = begin
+    @warn "Key press for $inpt not implemented for $(typeof(live))"
+    return false
+end
+
+
+
+# ------------------------------ keyboard input ------------------------------ #
+function keyboard_input(live::AbstractLiveDisplay)
+    if bytesavailable(terminal.in_stream) > 0
+        c = readkey(terminal.in_stream) |> Int
+        return if Int(c) in keys(KEYs)
+            out = key_press(live, KEYs[Int(c)])
+            out isa Bool && return out
+            return true
+        else
+            c = Char(c)
+            return if c == 'q'
+                c
+            else
+                true
+            end
+        end
     end
+    return true
 end
 
 
 # ---------------------------------- update ---------------------------------- #
-function update_live(live::Live, content::AbstractRenderable)
-    !isnothing(live.prevcontent) && begin
-        nlines = live.prevcontent.measure.h + 1
+
+function shouldupdate(live::AbstractLiveDisplay)::Bool
+    return true
+    currtime = Dates.value(now())
+    isnothing(live.internals.last_update) && begin
+        live.internals.last_update = currtime
+        return true
+    end
+    
+    Δt = currtime - live.internals.last_update
+    if Δt > 10
+        live.internals.last_update = currtime
+        return true
+    end
+    return false
+end
+
+function update!(live::AbstractLiveDisplay)::Bool
+    # check for keyboard inputs
+    inp = keyboard_input(live)
+    inp == 'q' && return false
+
+    shouldupdate(live) || return true
+
+    # get new content
+    content::AbstractRenderable = frame(live)
+
+    # render
+    internals = live.internals
+    !isnothing(internals.prevcontent) && inp && begin
+        nlines = internals.prevcontent.measure.h + 1
         for _ in 1:nlines
-            up(live.ioc)
-            erase_line(live.ioc)
+            up(internals.ioc)
+            erase_line(internals.ioc)
         end
     end
 
-    println(live.ioc, content)
-    live.prevcontent = content
+    println(internals.ioc, content)
+    internals.prevcontent = content
 
-    write(stdout, take!(live.iob))
+    write(stdout, take!(internals.iob))
+    return true
 end
 
-update_live(live::Live, content::String) = update_live(live, RenderableText(content))
 
-
-# -------------------------------- @live macro ------------------------------- #
-macro live(expr)
-    updater = Live()
-
-    # inject code to print the output of each loop in `expr`
-    body = expr.args[2]
-    body = Expr(
-        body.head, 
-        body.args[1:end-2]..., 
-        Expr(Symbol("="), :__live_content, body.args[end-1]), 
-        :(update_live($updater, __live_content)),
-        body.args[end]
-    )
-    expr.args[2] = body
-
-    quote
-        eval($expr)
-    end |> esc
+# ----------------------------------- stop ----------------------------------- #
+function stop!(live::AbstractLiveDisplay)
+    print(live.internals.term.out_stream, "\x1b[?25h") # unhide cursor
+    raw!(live.internals.term, false)
+    nothing
 end
-
-import MyterialColors: pink
-
-
-# ---------------------------------------------------------------------------- #
-#                               LIVE RENDERABLES                               #
-# ---------------------------------------------------------------------------- #
-function pager(content::String)
-    i = 0
-    W = Measure(content).w
-    content = split(content, "\n")
-
-    @live while i < length(content) - 10
-        sleep(rand(.25:.05:.5) / 4)
-        i += 1
-        
-        page = join(content[i:i+10], "\n")
-        Panel(page, fit=false, width=W+10, padding=(4, 4, 1, 1), 
-            subtitle="Lines: $i:$(i+10)",
-            subtitle_style="bold dim",
-            subtitle_justify=:right,
-            style="$pink",
-            title="Term.jl PAGER",
-            title_style="bold white"
-            )
-    end
-
-    println("done")
-end
-
-pager(parse_md(text))
 
 
