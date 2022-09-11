@@ -86,8 +86,6 @@ text = md"""
 
  [^note]:
      Named footnote text containing several toplevel elements.
-
-
  """
 
 tprintln(text)

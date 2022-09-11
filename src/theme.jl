@@ -1,5 +1,5 @@
 using Highlights.Tokens, Highlights.Themes
-
+import Markdown: @md_str
 import MyterialColors:
     green,
     green_light,
@@ -57,6 +57,8 @@ style outputs to terminal.
     text_accent::String    = "white"
     emphasis::String       = "$blue  bold"
     emphasis_light::String = yellow_light
+    line::String           = "default" # used by Panel,  hLine, vLine
+    box::Symbol            = :ROUNDED  # used by Panel,  hLine, vLine
 
     # logging 
     info::String   = "#7cb0cf"
@@ -167,6 +169,103 @@ function Base.show(io::IO, ::MIME"text/plain", theme::Theme)
 end
 
 set_theme(theme::Theme) = (TERM_THEME[] = theme)
+
+function demo(theme::Theme = TERM_THEME[])
+    # change theme
+    currtheme = TERM_THEME[]
+    set_theme(theme)
+
+    # ------------------------------- prepare data ------------------------------- #
+    markdow_text = md"""
+    # Header lvl 1
+    ##  Header lvl two
+    ###  Header lvl three
+    ####  Header lvl four
+    #####  Header lvl five
+    ######  Header lvl six
+
+    ---
+    ### Math
+    ```math
+    f(a) = \frac{1}{2\pi}\int_{0}^{2\pi} (\alpha+R\cos(\theta))d\theta
+    ```
+    .
+
+    ### Code
+
+    ```julia
+    function say_hi(x)
+        print("Hellow World")
+    end
+    ```
+
+     ### Quotes
+     > Multi line quote
+
+      
+    ### Admonitions
+    !!! note
+        note admonition
+
+    !!! warning
+        warning admonition
+
+    !!! danger
+        danger admonition
+
+    !!! tip
+        tip admonition
+
+    ### Tables
+    | Term | handles | tables|
+    |:---------- | ---------- |:------------:|
+    | Row `1`    | Column `2` |              |
+    | *Row* 2    | **Row** 2  | Column ``3`` |
+
+    """
+
+    tree_dict = Dict(
+        "nested" => Dict("n1" => 1, "n2" => 2),
+        "leaf2" => 2,
+        "leaf" => 2,
+        "leafme" => "v",
+        "canopy" => "test",
+    )
+
+    t = 1:5
+    table_data = hcat(t, ones(length(t)), rand(Int8, length(t)))
+
+    # ---------------------------------- display --------------------------------- #
+    hLine("Renderables") |> println
+    Panel() |> println
+
+    hLine("logging") |> println
+    @info "info logging" √9
+    @debug "debug logging"
+    @warn "warn logging"
+    @error "error logging"
+
+    hLine("Tree") |> println
+    Tree(tree_dict) |> println
+
+    hLine("Dendogram") |> println
+    Dendogram("awesome", "this", :is, "a", "dendogram!") |> println
+
+    hLine("Table") |> println
+    Table(table_data; header = ["Num", "Const.", "Values"]) |> println
+
+    hLine("Term show") |> println
+    termshow(collect(t))
+    termshow(rand(5, 5))
+    termshow(tree_dict)
+
+    hLine("Markdown") |> println
+    tprintln(markdow_text)
+
+    # reset theme
+    set_theme(currtheme)
+    nothing
+end
 
 # ------------------------------ Highlighters.jl ----------------------------- #
 

@@ -283,7 +283,6 @@ function termshow(io::IO, obj::DataType; showdocs = true, kwargs...)
             justify = :center,
         )
 
-
     print(io, content)
 
     showdocs && begin

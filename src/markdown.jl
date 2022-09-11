@@ -55,7 +55,7 @@ end
 
 Parse `Headers` with different style based on the level
 """
-function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...) where {l}
+function parse_md(header::Markdown.Header{l}; width = default_width(), kwargs...) where {l}
     theme = TERM_THEME[]
     header_styles = Dict(
         1 => theme.md_h1,
@@ -72,8 +72,8 @@ function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...
     style = header_styles[l]
     header_text = chomp(join(map(ln -> "{$style}$ln{/$style}\n", header.text))) |> rstrip
     if l > 1
-        header_text = reshape_text(header_text, width - 2)
-        return pad(header_text, width, header_justify[l])
+        header_text = reshape_text(header_text, width)
+        return pad(header_text, width - 1, header_justify[l])
     else
         return string(
             Panel(
@@ -192,27 +192,23 @@ end
 """
     function parse_md(
         qt::Markdown.BlockQuote;
-        width = min(default_width(), console_width() - 30),
+        width = default_width(),
         kwargs...,
     )::String
 
 Style a BlockQuote with a line and a quotation marker.
 """
-function parse_md(
-    qt::Markdown.BlockQuote;
-    width = min(default_width(), console_width() - 30),
-    kwargs...,
-)::String
+function parse_md(qt::Markdown.BlockQuote; width = default_width() - 1, kwargs...)::String
     content = parse_md.(qt.content; inline = true)
     content = length(content) > 1 ? join(content) : content[1]
-    # content = reshape_text(content, width)
+    # content = reshape_text(content, width-1)
     theme = TERM_THEME[]
     content =
         "{$(theme.text_accent)}“{/$(theme.text_accent)}" *
         content *
         "{$(theme.text_accent)}”{/$(theme.text_accent)}\e[0m"
 
-    content = RenderableText(content; width = max(30, width))
+    content = RenderableText(content; width = width - 5)
     line =
         content.measure.h > 1 ?
         (
@@ -222,8 +218,8 @@ function parse_md(
     string("  " * line * " " * content)
 end
 
-parse_md(hl::Markdown.HorizontalRule; width = console_width(), kwargs...)::String =
-    string(hLine(width; style = "dim", box = :HEAVY))
+parse_md(hl::Markdown.HorizontalRule; width = default_width(), kwargs...)::String =
+    string(hLine(width - 1; style = "dim", box = :HEAVY))
 
 """
     function parse_md(

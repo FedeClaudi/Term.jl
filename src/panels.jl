@@ -9,7 +9,8 @@ import Term:
     default_width,
     remove_ansi,
     get_bg_color,
-    textlen
+    textlen,
+    TERM_THEME
 
 import ..Renderables:
     AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
@@ -394,8 +395,8 @@ Construct a `Panel`'s content.
 """
 function render(
     content;
-    box::Symbol = :ROUNDED,
-    style::String = "default",
+    box::Symbol = TERM_THEME[].box,
+    style::String = TERM_THEME[].line,
     title::Union{String,Nothing} = nothing,
     title_style::Union{Nothing,String} = nothing,
     title_justify::Symbol = :left,
