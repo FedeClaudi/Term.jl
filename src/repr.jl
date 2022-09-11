@@ -307,6 +307,7 @@ end
 Show a function's methods and docstring.
 """
 function termshow(io::IO, fun::Function; width = min(console_width(io), default_width(io)))
+    theme = TERM_THEME[]
     # get methods
     methods_contents, N = style_function_methods(fun; width = width)
 
