@@ -17,7 +17,7 @@ function get_docstring(obj)
     return doc, unescape_brackets(docstring)
 end
 
-fn_col = TERM_THEME[].func
+
 
 """
     style_methods(methods::Union{Vector{Base.Method}, Base.MethodList}, tohighlight::AbstractString)
@@ -28,6 +28,12 @@ function style_methods(
     methods::Union{Vector{Base.Method},Base.MethodList},
     tohighlight::AbstractString,
 )
+
+    txt_col = TERM_THEME[].text
+    fn_col = TERM_THEME[].func
+    highlight_col = TERM_THEME[].inspect_highlight
+    accent_col = TERM_THEME[].inspect_accent
+
     mets = []
     prevmod = ""
     for (i, m) in enumerate(methods)
@@ -39,22 +45,20 @@ function style_methods(
         code = "{dim}" * code * "{/dim}"
         code = replace(
             code,
-            tohighlight => "{$pink_light default}$tohighlight{/$pink_light default}{dim}",
+            tohighlight => "{$highlight_col default}$tohighlight{/$highlight_col default}{dim}",
         )
         code = RenderableText(
-            "     {$pink dim}($i){/$pink dim}  {$fn_col}$(m.name){/$fn_col}" * code,
+            "     {$accent_col dim}($i){/$accent_col dim}  {$fn_col}$(m.name){/$fn_col}" * code,
         )
         info =
             string(m.module) != prevmod ?
             RenderableText(
-                "{bright_blue}   ────── Methods in {$pink underline bold}$(m.module){/$pink underline bold} for {$pink}$tohighlight{/$pink} ──────{/bright_blue}",
+                "{bright_blue}   ────── Methods in {$accent_col underline bold}$(m.module){/$accent_col underline bold} for {$accent_col}$tohighlight{/$accent_col} ──────{/bright_blue}",
             ) : nothing
         prevmod = string(m.module)
 
-        dest = RenderableText("{dim italic}             → $(m.file):$(m.line){/dim italic}")
-
+        dest = RenderableText("{dim default italic}             → $(m.file):$(m.line){/dim default italic}")
         content = isnothing(info) ? code / dest / "" : info / code / dest / ""
-
         push!(mets, content)
     end
     return mets

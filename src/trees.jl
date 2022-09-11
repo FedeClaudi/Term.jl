@@ -1,6 +1,4 @@
 module Trees
-
-import MyterialColors: yellow, orange, red, blue
 import OrderedCollections: OrderedDict
 import Base: @kwdef
 
@@ -25,6 +23,7 @@ import ..Measures: Measure
 import ..Panels: Panel
 
 export Tree
+
 
 # ---------------------------------------------------------------------------- #
 #                                    GUIDES                                    #
@@ -102,10 +101,10 @@ It renders as a hierarchical structure with lines (guides) connecting the variou
     leaves::Vector{Leaf}
     idx::Int = 0  # rendering index for tree that are nodes in a lager tree
 
-    title_style::String = TERM_THEME[].tree_title_style
-    node_style::String = TERM_THEME[].tree_node_style
-    leaf_style::String = TERM_THEME[].tree_leaf_style
-    guides_style::String = TERM_THEME[].tree_guide_style
+    title_style::String = TERM_THEME[].tree_title
+    node_style::String = TERM_THEME[].tree_node
+    leaf_style::String = TERM_THEME[].tree_leaf
+    guides_style::String = TERM_THEME[].tree_guide
     guides_type::Symbol = :standardtree
 end
 
@@ -369,6 +368,7 @@ end
 Construct a `Tree` visualization of `T`'s types hierarchy
 """
 function Tree(T::DataType)::Tree
+    theme = TERM_THEME[]
     # create a dictionary of types hierarchy
     subs = Dict(string(s) => nothing for s in subtypes(T))
     data = make_hierarchy_dict(supertypes(T), T, subs)
@@ -377,14 +377,14 @@ function Tree(T::DataType)::Tree
         data;
         title = string(supertypes(T)[end - 1]),
         # title = "Any",
-        title_style = "bright_green italic",
-        guides_style = "green dim",
+        title_style = "$(theme.emphasis_light) italic",
+        guides_style = theme.emphasis,
     )
 end
 
 function _key(e::Expr)
     if length(e.args) > 1
-        "$(expr2string(e))  {dim blue}($(e.head): {/dim blue}{red bold default}$(e.args[1]){/red bold default}{dim blue}){/dim blue}"
+        "$(expr2string(e))  {dim $(TERM_THEME[].emphasis)}($(e.head): {/dim $(TERM_THEME[].emphasis)}{red bold default}$(e.args[1]){/red bold default}{dim blue}){/dim blue}"
     else
         string(e.head)
     end

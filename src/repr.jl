@@ -57,8 +57,8 @@ termshow(io::IO, obj) = print(
         subtitle_justify = :right,
         width = 40,
         justify = :center,
-        style = TERM_THEME[].repr_panel_style,
-        subtitle_style = TERM_THEME[].repr_name_style,
+        style = TERM_THEME[].repr_panel,
+        subtitle_style = TERM_THEME[].repr_name,
     ),
 )
 
@@ -86,8 +86,8 @@ function termshow(io::IO, e::Expr; kwargs...)
             subtitle_justify = :right,
             width = 40,
             justify = :center,
-            style = TERM_THEME[].repr_panel_style,
-            subtitle_style = TERM_THEME[].repr_name_style,
+            style = TERM_THEME[].repr_panel,
+            subtitle_style = TERM_THEME[].repr_name,
         ),
     )
 end
@@ -106,31 +106,31 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
     theme = TERM_THEME[]
 
     # prepare text renderables
-    k = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent_style * " bold")
+    k = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent * " bold")
     ktypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
-            style = theme.repr_type_style * " dim",
+            style = theme.repr_type * " dim",
         )
     vals =
         RenderableText.(
             short_string.(values(obj));
-            style = theme.repr_values_style * " bold",
+            style = theme.repr_values * " bold",
         )
     vtypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(values(obj)));
-            style = theme.repr_type_style * " dim",
+            style = theme.repr_type * " dim",
         )
 
     # trim if too many
     arrows = if length(k) > 10
         k, ktypes, vals, vtypes = k[1:10], ktypes[1:10], vals[1:10], vtypes[1:10]
 
-        push!(k, RenderableText("⋮"; style = theme.repr_accent_style))
-        push!(ktypes, RenderableText("⋮"; style = theme.repr_type_style * " dim"))
-        push!(vals, RenderableText("⋮"; style = theme.repr_values_style))
-        push!(vtypes, RenderableText("⋮"; style = theme.repr_type_style * " dim"))
+        push!(k, RenderableText("⋮"; style = theme.repr_accent))
+        push!(ktypes, RenderableText("⋮"; style = theme.repr_type * " dim"))
+        push!(vals, RenderableText("⋮"; style = theme.repr_values))
+        push!(vtypes, RenderableText("⋮"; style = theme.repr_type * " dim"))
 
         vstack(RenderableText.(fill("=>", length(k) - 1); style = "red bold")...)
     else
@@ -154,8 +154,8 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
             title_justify = :left,
             width = 40,
             justify = :center,
-            style = theme.repr_panel_style,
-            title_style = theme.repr_name_style,
+            style = theme.repr_panel,
+            title_style = theme.repr_name,
             padding = (2, 2, 1, 1),
             subtitle = "{bold white}$m{/bold white}{default} $(plural("item", m)){/default}",
             subtitle_justify = :right,
@@ -258,15 +258,15 @@ Show a type's arguments, constructors and docstring.
 """
 function termshow(io::IO, obj::DataType; kwargs...)
     theme = TERM_THEME[]
-    ts = theme.repr_type_style
-    field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent_style)
+    ts = theme.repr_type
+    field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent)
     field_types = apply_style.(map(f -> "::" * string(f), obj.types), ts)
 
-    line = vLine(length(field_names); style = theme.repr_name_style)
+    line = vLine(length(field_names); style = theme.repr_name)
     space = Spacer(length(field_names), 1)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
 
-    type_name = apply_style(string(obj), theme.repr_name_style * " bold")
+    type_name = apply_style(string(obj), theme.repr_name * " bold")
     sup = supertypes(obj)[2]
     type_name *= " {bright_blue dim}<: $sup{/bright_blue dim}"
     content =

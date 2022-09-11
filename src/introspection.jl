@@ -38,7 +38,7 @@ typestree(io::IO, T::DataType) = print(
     Panel(
         Tree(T);
         title = "Types hierarchy",
-        style = "blue dim",
+        style = "$(TERM_THEME[].emphasis) dim" ,
         title_style = orange * " default",
         title_justify = :right,
         fit = true,
@@ -57,7 +57,7 @@ function expressiontree(io::IO, e::Expr)
         Panel(
             tree;
             title = _expr,
-            title_style = "$light_green default bold",
+            title_style = "$(TERM_THEME[].emphasis_light) default bold",
             title_justify = :center,
             style = grey_dark,
             fit = tree.measure.w > default_width(),
@@ -84,11 +84,10 @@ function inspect(io::IO, expr::Expr)
         Panel(
             dendo;
             title = _expr,
-            title_style = "$light_green default bold",
+            title_style = "$(TERM_THEME[].emphasis_light) default bold",
             title_justify = :center,
-            style = grey_dark,
+            style = TERM_THEME[].emphasis,
             fit = true,
-            # width=dendo.measure.w,
             subtitle = "inspect",
             subtitle_justify = :right,
             justify = :center,
@@ -112,13 +111,14 @@ Flags can be used to choose the level of detail in the information presented:
  - supertypes: show methods using `T`'s supertypes in their signature
 """
 function inspect(
-    T::DataType;
+    T::Union{Union, DataType};
     documentation::Bool = false,
     constructors::Bool = true,
     methods::Bool = true,
     supertypes::Bool = true,
 )
-    hLine("inspecting: $T", style = "bold white") |> print
+    theme = TERM_THEME[]
+    hLine("inspecting: $T", style = theme.text_accent) |> print
 
     documentation && begin
         termshow(T)
@@ -126,12 +126,12 @@ function inspect(
     end
 
     # types hierarchy
-    "{bold white}○ Types hierarchy:" |> tprintln
+    "{$(theme.text_accent)}○ Types hierarchy:" |> tprintln
     "   " * Tree(T) |> print
 
     # constructors
     constructors && begin
-        "\n{bold white}○ {$pink}$T{/$pink} constructors:" |> tprintln
+        "\n{$(theme.text_accent)}○ {$(theme.inspect_accent)}$T{/$(theme.inspect_accent)} constructors:" |> tprintln
         t_name = split(string(T), '.')[end]
         print.(style_methods(Base.methods(T), t_name))
     end
@@ -143,7 +143,7 @@ function inspect(
             length(_methods) == 0 && continue
             dt_name = split(string(dt), '.')[end]
 
-            "\n{bold white}○ Methods for $dt:" |> tprintln
+            "\n{$(theme.text_accent)}○ Methods for $dt:" |> tprintln
             print.(style_methods(_methods, dt_name))
             supertypes || break
         end
@@ -152,7 +152,7 @@ function inspect(
 end
 
 function inspect(F::Function; documentation::Bool = false)
-    hLine("inspecting: $F", style = "bold white") |> print
+    hLine("inspecting: $F", style = "$(TERM_THEME[].text_accent)") |> print
 
     documentation && begin
         termshow(F)

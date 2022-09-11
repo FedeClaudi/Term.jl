@@ -1,6 +1,6 @@
 module Dendograms
 
-import Term: fint, rint, cint, str_trunc, loop_firstlast, highlight, textlen
+import Term: fint, rint, cint, str_trunc, loop_firstlast, highlight, textlen, TERM_THEME
 
 import ..Renderables: AbstractRenderable
 import ..Boxes: get_rrow, get_lrow, get_row, BOXES
@@ -9,13 +9,8 @@ import ..Segments: Segment
 import ..Measures: Measure
 import ..Layout: pad
 
-import MyterialColors: yellow, blue_light, green_light, salmon_light, blue_grey_light
-
 export Dendogram, link
 
-PRETITLE_STYLE = blue_grey_light
-LEAVES_STYLE = blue_grey_light
-LINES_STYLE = blue_light * " dim bold"
 CELLWIDTH = 10
 SPACING = 1
 
@@ -51,7 +46,7 @@ function Leaf(leaf)
 
     # create renderable Leaf
     midpoint = fint(textlen(leaf) / 2)
-    seg = Segment(" " * leaf * " ", LEAVES_STYLE)
+    seg = Segment(" " * leaf * " ", TERM_THEME[].dendo_leaves)
     return Leaf([seg], Measure(seg), leaf, midpoint)
 end
 
@@ -109,17 +104,21 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
     end
 
     # get title
+    title_style = TERM_THEME[].dendo_title
+    pretitle_style = TERM_THEME[].dendo_pretitle
+    line_style = TERM_THEME[].dendo_lines
+
     title = if isnothing(first_arg)
-        pad(apply_style("$(head)", salmon_light), width, :center)
+        pad(apply_style("$(head)", title_style), width, :center)
     else
-        _title = ": {bold default underline $salmon_light}$first_arg{/bold default underline $salmon_light}"
-        pad(apply_style("$(head)$_title", salmon_light * " dim"), width - 4, :center) *
+        _title = ": {bold default underline $title_style}$first_arg{/bold default underline $title_style}"
+        pad(apply_style("$(head)$_title", title_style * " dim"), width - 4, :center) *
         " "^4
     end
 
     # put together
     segments =
-        [Segment(title), Segment(line, LINES_STYLE), Segment(leaves_line, LEAVES_STYLE)]
+        [Segment(title), Segment(line, line_style), Segment(leaves_line, TERM_THEME[].dendo_leaves)]
 
     # add 'pretitle' lines (for expressions only)
     if !isnothing(pretitle)
@@ -128,12 +127,12 @@ function Dendogram(head, args::Vector; first_arg = nothing, pretitle = nothing)
             [
                 Segment(
                     " " * pad(str_trunc(pretitle, CELLWIDTH), width - 1, :center),
-                    PRETITLE_STYLE,
+                    pretitle_style,
                 ),
-                Segment(" " * pad("⋀", width - 1, :center), "green bold"),
+                Segment(" " * pad("⋀", width - 1, :center), "$line_style bold"),
                 Segment(
                     " " * pad(string(BOXES[:SQUARE].bottom.vertical), width - 1, :center),
-                    "green dim",
+                    "$line_style dim",
                 ),
             ],
         )
@@ -178,8 +177,8 @@ function Dendogram(e::Expr; pretitle = nothing)
 
     # make dendogram by linking individual elements
     title = apply_style(
-        "$(e.head): {bold underline default $salmon_light}$(e.args[1]){/bold underline default $salmon_light}",
-        salmon_light,
+        "$(e.head): {bold underline default $(TERM_THEME[].dendo_title)}$(e.args[1]){/bold underline default $(TERM_THEME[].dendo_title)}",
+        TERM_THEME[].dendo_title,
     )
     return link(leaves...; title = title, shifttitle = true, pretitle = pretitle)
 end
@@ -222,11 +221,13 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
     # get elements of linking line
     line = get_row(BOXES[:SQUARE], widths, :top)
     line, midpoint = replace_line_midpoint(line; widths = widths .+ 1)
+    LINES_STYLE = TERM_THEME[].dendo_lines
+    TITLE_STYLE = TERM_THEME[].dendo_title
 
     title = if shifttitle
-        pad(apply_style(title, salmon_light * " dim"), textwidth(line) - 5, :center) * " "^5
+        pad(apply_style(title, TITLE_STYLE * " dim"), textwidth(line) - 5, :center) * " "^5
     else
-        pad(apply_style(title, salmon_light), textwidth(line), :center)
+        pad(apply_style(title, TITLE_STYLE), textwidth(line), :center)
     end
     space = " "^(dendos[1].midpoint)
 
@@ -250,13 +251,13 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
         prepend!(
             segments,
             [
-                Segment(" "^l(pretitle) * pretitle * " "^r(pretitle), PRETITLE_STYLE),
-                Segment(" "^l("⋀") * "⋀" * " "^r("⋀"), "green bold"),
+                Segment(" "^l(pretitle) * pretitle * " "^r(pretitle), TERM_THEME[].dendo_pretitle),
+                Segment(" "^l("⋀") * "⋀" * " "^r("⋀"), "$LINES_STYLE bold"),
                 Segment(
                     " "^l(BOXES[:SQUARE].bottom.vertical) *
                     BOXES[:SQUARE].bottom.vertical *
                     " "^r(BOXES[:SQUARE].bottom.vertical),
-                    "green dim",
+                    "$LINES_STYLE dim",
                 ),
             ],
         )

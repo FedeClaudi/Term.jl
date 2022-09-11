@@ -4,15 +4,15 @@ function repr_get_obj_fields_display(obj)
     field_names = fieldnames(typeof(obj))
     theme = TERM_THEME[]
     length(field_names) == 0 && return RenderableText(
-        "$obj{$(theme.repr_type_style)}::$(typeof(obj)){/$(theme.repr_type_style)}",
+        "$obj{$(theme.repr_type)}::$(typeof(obj)){/$(theme.repr_type)}",
     )
     field_types = map(f -> "::" * string(f), typeof(obj).types)
     _values = map(f -> getfield(obj, f), field_names)
 
     fields = map(
         ft -> RenderableText(
-            apply_style(string(ft[1]), theme.repr_accent_style) *
-            apply_style(string(ft[2]), theme.repr_type_style),
+            apply_style(string(ft[1]), theme.repr_accent) *
+            apply_style(string(ft[2]), theme.repr_type),
         ),
         zip(field_names, field_types),
     )
@@ -20,10 +20,10 @@ function repr_get_obj_fields_display(obj)
     values = []
     for val in _values
         val = str_trunc(string(val), 45)
-        push!(values, RenderableText.(val; style = theme.repr_values_style))
+        push!(values, RenderableText.(val; style = theme.repr_values))
     end
 
-    line = vLine(length(fields); style = theme.repr_line_style)
+    line = vLine(length(fields); style = theme.repr_line)
     space = Spacer(length(fields), 1)
 
     return rvstack(fields...) * line * space * lvstack(values...)
@@ -59,8 +59,8 @@ repr_panel(
     title_justify = :left,
     width = width,
     justify = justify,
-    style = TERM_THEME[].repr_panel_style,
-    title_style = TERM_THEME[].repr_name_style,
+    style = TERM_THEME[].repr_panel,
+    title_style = TERM_THEME[].repr_name,
     padding = (2, 1, 1, 1),
     subtitle = subtitle,
     subtitle_justify = :right,

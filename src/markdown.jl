@@ -2,11 +2,10 @@ module TermMarkdown
 
 using Markdown
 import OrderedCollections: OrderedDict
-import MyterialColors:
-    yellow_light, indigo_light, blue, light_blue, cyan_light, cyan_lighter
+
 import UnicodeFun: to_latex
 
-import Term: reshape_text, highlight_syntax, fillin, escape_brackets, default_width
+import Term: reshape_text, highlight_syntax, fillin, escape_brackets, default_width, TERM_THEME
 import ..Tables: Table
 import ..Style: apply_style
 import ..Layout: pad, hLine, vLine
@@ -19,6 +18,8 @@ import ..Panels: Panel
 import ..Segments: Segment
 
 export parse_md
+
+
 
 # ---------------------------------------------------------------------------- #
 #                                   PARSE MD                                   #
@@ -56,13 +57,14 @@ end
 Parse `Headers` with different style based on the level
 """
 function parse_md(header::Markdown.Header{l}; width = console_width(), kwargs...) where {l}
+    theme = TERM_THEME[]
     header_styles = Dict(
-        1 => "bold $indigo_light",
-        2 => "bold $blue underline",
-        3 => "bold $blue",
-        4 => "bold $light_blue",
-        5 => "bold $cyan_light",
-        6 => "bold $cyan_lighter",
+        1 => theme.md_h1, 
+        2 => theme.md_h2, 
+        3 => theme.md_h3, 
+        4 => theme.md_h4, 
+        5 => theme.md_h5, 
+        6 => theme.md_h6, 
     )
 
     header_justify =
@@ -132,10 +134,11 @@ function parse_md(
         formula = string(ltx.formula)
     end
 
+    theme = TERM_THEME[]
     if inline
-        return "{$yellow_light italic}" * formula * "{/$yellow_light italic}"
+        return "{$(theme.md_latex)}" * formula * "{/$(theme.md_latex)}"
     else
-        txt = "\n     {$yellow_light italic}" * formula * "{/$yellow_light italic}\n"
+        txt = "\n     {$(theme.md_latex)}" * formula * "{/$(theme.md_latex)}\n"
         return reshape_text(txt, width) * "\e[0m"
     end
 end
@@ -162,18 +165,19 @@ function parse_md(
     kwargs...,
 )::String
     syntax = highlight_syntax(code.code)
+    theme = TERM_THEME[]
     if inline
-        return "{$yellow_light italic}`$(code.language){/$yellow_light italic}" *
+        return "{$(theme.md_code)}`$(code.language){/$(theme.md_code)}" *
                syntax *
-               "{$yellow_light italic}`{/$yellow_light italic}"
+               "{$(theme.md_code)}`{/$(theme.md_code)}"
     else
         panel = Panel(
             syntax;
-            style = "white dim on_#262626",
+            style = "white dim on_$(theme.md_codeblock_bg)",
             box = :SQUARE,
             subtitle = length(code.language) > 0 ? code.language : nothing,
             width = width - 12,
-            background = "on_#262626",
+            background = "on_$(theme.md_codeblock_bg)",
             subtitle_justify = :right,
             fit = false,
         )
@@ -203,16 +207,16 @@ function parse_md(
     content = parse_md.(qt.content; inline = true)
     content = length(content) > 1 ? join(content) : content[1]
     # content = reshape_text(content, width)
-
-    content = "{bold white}“{/bold white}" * content * "{bold white}”{/bold white}\e[0m"
+    theme = TERM_THEME[]
+    content = "{$(theme.text_accent)}“{/$(theme.text_accent)}" * content * "{$(theme.text_accent)}”{/$(theme.text_accent)}\e[0m"
 
     content = RenderableText(content; width = max(30, width))
     line =
         content.measure.h > 1 ?
         (
-            "{#5a74f2}>{/#5a74f2}" /
-            vLine(content.measure.h - 1; style = "#6b77b0 dim", box = :HEAVY)
-        ) : "{#5a74f2}>{/#5a74f2}"
+            "{$(theme.md_quote)}>{/$(theme.md_quote)}" /
+            vLine(content.measure.h - 1; style = "$(theme.md_quote) dim", box = :HEAVY)
+        ) : "{$(theme.md_quote)}>{/$(theme.md_quote)}"
     string("  " * line * " " * content)
 end
 
@@ -235,6 +239,7 @@ function parse_md(
     inline = false,
     space = "",
 )::String
+    theme = TERM_THEME[]
     list_elements = []
     for item in list.items
         push!(list_elements, join(parse_md.(item)))
@@ -245,7 +250,7 @@ function parse_md(
         bullet = if Markdown.isordered(list)
             "$space{bold}" * "  $(i + list.ordered - 1). " * "{/bold}"
         else
-            "$space{white bold}" * "  • " * "{/white bold}"
+            "$space{$(theme.text_accent)}" * "  • " * "{/$(theme.text_accent)}"
         end
 
         item_content = map(
@@ -270,10 +275,11 @@ end
 Style a footnote differently based on if they are a renference to it or its content.
 """
 function parse_md(note::Markdown.Footnote; width = console_width(), inline = false)
+    theme = TERM_THEME[]
     if isnothing(note.text)
-        return id = "{#9aacdb}[$(note.id)]{/#9aacdb}"
+        return id = "{$(theme.md_footnote)}[$(note.id)]{/$(theme.md_footnote)}"
     else
-        id = (inline ? "\n" : "") * "{#9aacdb}[$(note.id)]{/#9aacdb}"
+        id = (inline ? "\n" : "") * "{$(theme.md_footnote)}[$(note.id)]{/$(theme.md_footnote)}"
         content = parse_md.(note.text)
         return if length(content) == 1
             string(RenderableText("$id: " * content[1]; width = width))
@@ -311,7 +317,7 @@ function parse_md(tb::Markdown.Table; width = console_width())::String
                 table_content;
                 columns_justify = [just[j] for j in tb.align],
                 box = :ROUNDED,
-                header_style = "bold yellow",
+                header_style = TERM_THEME[].md_table_header,
                 style = "dim",
             );
             width = width - 8,
@@ -328,17 +334,18 @@ parse_md(link::Markdown.Link; kwargs...)::String =
 Parse adomitions and style them with colored `Panel` renderables.
 """
 function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::String
+    theme = TERM_THEME[]
     title_styles = Dict(
-        "note" => "blue",
-        "info" => "blue",
-        "warning" => yellow_light,
-        "danger" => "red",
-        "tip" => "green",
+        "note" => theme.md_admonition_note,
+        "info" => theme.md_admonition_info,
+        "warning" => theme.md_admonition_warning,
+        "danger" => theme.md_admonition_danger,
+        "tip" => theme.md_admonition_tip,
     )
     has_title = length(ad.title) > 0
     content = parse_md(ad.content; inline = true)
     content = reshape_text(content, width - 10)
-    style = get(title_styles, ad.category, "white")
+    style = get(title_styles, ad.category, theme.text)
     return string(
         "    " * Panel(
             content;
