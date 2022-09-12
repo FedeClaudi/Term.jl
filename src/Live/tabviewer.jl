@@ -87,7 +87,23 @@ mutable struct TabViewer <: AbstractLiveDisplay
     options::Vector{AbstractTab}
     selected::Int
     context::TVContext
-    TabViewer(options) = new(LiveInternals(), options, 1, OptionsContext())
+    needs_update::Bool
+    TabViewer(options) = new(LiveInternals(), options, 1, OptionsContext(), true)
+end
+
+function shouldupdate(tv::TabViewer) 
+    currtime = Dates.value(now())
+    isnothing(tv.internals.last_update) && begin
+        tv.internals.last_update = currtime
+        return true
+    end
+    
+    Δt = currtime - tv.internals.last_update
+    if Δt > 250
+        tv.internals.last_update = currtime
+        return true
+    end
+    tv.needs_update
 end
 
 function toggle_option_select(tv::TabViewer)
@@ -125,13 +141,18 @@ function frame(tv::TabViewer)::AbstractRenderable
         height=40,
         padding=(4, 4, 1, 1)
     )
+    tv.needs_update = false
+
     return options * content
 end
 
 
 
 
-key_press(tv::TabViewer, k) = key_press(tv, (k), tv.context)
+key_press(tv::TabViewer, k) = begin
+    tv.needs_update = true
+    key_press(tv, (k), tv.context)
+end
 key_press(tv::TabViewer, ::ArrowLeft) = tv.context = OptionsContext()
 key_press(tv::TabViewer, ::ArrowRight) = tv.context = ContentContext()
 key_press(tv::TabViewer, ::ArrowDown, ::OptionsContext) = tv.selected = min(length(tv.options), tv.selected+1)
@@ -146,4 +167,4 @@ key_press(tv::TabViewer, k::KeyInput, ::ContentContext) = key_press(get_active_t
 
 
 """ capture undefined calls """
-key_press(::TabViewer, ::KeyInput, ::Any) = nothing
+key_press(tv::TabViewer, ::KeyInput, ::Any) = nothing

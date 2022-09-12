@@ -5,3 +5,6 @@ using Term.Consoles
 
 clear()
 inspect(Panel)
+
+
+# TODO add a help menu for live displays

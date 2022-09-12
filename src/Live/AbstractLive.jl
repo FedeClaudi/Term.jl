@@ -42,7 +42,7 @@ Get the current conttent of a live display
 """
 frame(::AbstractLiveDisplay) = error("Not implemented")
 
-key_press(live::AbstractLiveDisplay, inpt) = nothing
+key_press(::AbstractLiveDisplay, ::Any) = nothing
 
 
 function shouldupdate(live::AbstractLiveDisplay)::Bool
@@ -53,11 +53,24 @@ function shouldupdate(live::AbstractLiveDisplay)::Bool
     end
     
     Δt = currtime - live.internals.last_update
-    if Δt > 100
+    if Δt > 5
         live.internals.last_update = currtime
         return true
     end
     return false
+end
+
+
+function replace_line(internals::LiveInternals)
+    erase_line(internals.ioc)
+    down(internals.ioc)
+    # write(stdout, take!(internals.iob))
+end
+
+function replace_line(internals::LiveInternals, newline)
+    erase_line(internals.ioc)
+    println(internals.ioc, newline)
+    # write(stdout, take!(internals.iob))
 end
 
 function update!(live::AbstractLiveDisplay)::Bool
@@ -75,26 +88,32 @@ function update!(live::AbstractLiveDisplay)::Bool
     internals = live.internals
     !isnothing(internals.prevcontent) && begin
         nlines = internals.prevcontent.measure.h + 1
-        newlines = split(string(content), "\n")
+        scontent = string(content)
+        newlines = split(scontent, "\n")
         nnew = length(newlines)
 
         up(internals.ioc, nlines)
-        if nlines > nnew
-            for _ in 1:(nlines - nnew)
-                erase_line(internals.ioc)
-                down(internals.ioc)
-            end
+        for _ in 1:nlines - nnew
+            replace_line(internals)
         end
+
+        # cleartoend(internals.ioc)
+        # up(internals.ioc, nnew)
+        # clear(internals.ioc)
+        # print(internals.ioc, scontent)
+        # if nlines > nnew
+        #     for _ in 1:(nlines - nnew)
+        #         replace_line(internals)
+        #     end
+        # end
         for i in 1:nnew
-            erase_line(internals.ioc)
-            println(internals.ioc, newlines[i])
+            replace_line(internals, newlines[i])
         end
     end
 
     # output
     internals.prevcontent = content
-    output = take!(internals.iob)
-    write(stdout, output)
+    write(stdout, take!(internals.iob))
     return true
 end
 
