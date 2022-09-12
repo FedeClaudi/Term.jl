@@ -9,7 +9,7 @@ abstract type AbstractTab end
 
 function menu_tab(opt::AbstractTab)::Panel
     bg = opt.selected ? "white" : ""
-    cl = opt.selected ? "black" : "white"
+    cl = opt.selected ? "black bold" : "white bold"
     txt = "{$cl on_$bg}$(opt.title){/$cl on_$bg}"
     Panel(
         txt; 
@@ -48,7 +48,7 @@ mutable struct PagerTab <: AbstractTab
     tot_lines::Int
     curr_line::Int
     page_lines::Int
-    function PagerTab(title, content; page_lines=30)
+    function PagerTab(title, content; page_lines=35)
         content = split(content, "\n")
         new(title, content, false, length(content), 1, page_lines)
     end
@@ -60,6 +60,13 @@ key_press(p::PagerTab, ::PageDownKey) = p.curr_line = min(p.tot_lines-p.page_lin
 key_press(p::PagerTab, ::PageUpKey)= p.curr_line = max(1, p.curr_line-p.page_lines)
 key_press(p::PagerTab, ::HomeKey) = p.curr_line = 1
 key_press(p::PagerTab, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
+function key_press(p::PagerTab, k::CharKey) 
+    if k.char == ']'
+        key_press(p, PageDownKey())
+    elseif k.char == '['
+        key_press(p, PageUpKey())
+    end
+end
 
 function display_content(tab::PagerTab)::String
     i, Δi = tab.curr_line, tab.page_lines
