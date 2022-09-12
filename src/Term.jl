@@ -80,10 +80,11 @@ include("markdown.jl")
 include("repr.jl")
 include("compositors.jl")
 include("grid.jl")
-include("introspection.jl")
 
 # interactive
 include("Live/live.jl")
+include("introspection.jl")
+
 
 export RenderableText, Panel, TextBox
 export TERM_THEME, highlight

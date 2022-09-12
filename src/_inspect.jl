@@ -32,30 +32,28 @@ function style_methods(
     prevmod = ""
     for (i, m) in enumerate(methods)
         _name = split(string(m), " in ")[1]
-        code =
-            (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name) |>
-            highlight_syntax
+        code = (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name) 
 
-        code = "{dim}" * code * "{/dim}"
-        code = replace(
-            code,
-            tohighlight => "{$pink_light default}$tohighlight{/$pink_light default}{dim}",
-        )
-        code = RenderableText(
-            "     {$pink dim}($i){/$pink dim}  {$fn_col}$(m.name){/$fn_col}" * code,
-        )
-        info =
-            string(m.module) != prevmod ?
-            RenderableText(
-                "{bright_blue}   ────── Methods in {$pink underline bold}$(m.module){/$pink underline bold} for {$pink}$tohighlight{/$pink} ──────{/bright_blue}",
-            ) : nothing
-        prevmod = string(m.module)
+        # code = "{dim}" * code * "{/dim}"
+        # code = replace(
+        #     code,
+        #     tohighlight => "{$pink_light default}$tohighlight{/$pink_light default}{dim}",
+        # )
+        # code = RenderableText(
+        #     "     {$pink dim}($i){/$pink dim}  {$fn_col}$(m.name){/$fn_col}" * code,
+        # )
+        # info =
+        #     string(m.module) != prevmod ?
+        #     RenderableText(
+        #         "{bright_blue}   ────── Methods in {$pink underline bold}$(m.module){/$pink underline bold} for {$pink}$tohighlight{/$pink} ──────{/bright_blue}",
+        #     ) : nothing
+        # prevmod = string(m.module)
 
-        dest = RenderableText("{dim italic}             → $(m.file):$(m.line){/dim italic}")
+        # dest = RenderableText("{dim italic}             → $(m.file):$(m.line){/dim italic}")
 
-        content = isnothing(info) ? code / dest / "" : info / code / dest / ""
+        # content = isnothing(info) ? code / dest / "" : info / code / dest / ""
 
-        push!(mets, content)
+        push!(mets, string(code))
     end
     return mets
 end

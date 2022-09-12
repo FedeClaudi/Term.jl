@@ -26,6 +26,7 @@ import ..Tprint: tprintln
 import ..Repr: termshow
 using ..LiveDisplays
 import ..TermMarkdown: parse_md
+import ..Consoles: console_width
 
 include("_inspect.jl")
 
@@ -103,6 +104,41 @@ end
 #                             INTROSPECT DATATYPES                             #
 # ---------------------------------------------------------------------------- #
 
+function style_methods(
+    methods::Union{Vector{Base.Method},Base.MethodList},
+    tohighlight::AbstractString,
+)
+    mets = []
+    prevmod = ""
+    for (i, m) in enumerate(methods)
+        _name = split(string(m), " in ")[1]
+        code = (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name) 
+
+        # code = "{dim}" * code * "{/dim}"
+        # code = replace(
+        #     code,
+        #     tohighlight => "{$pink_light default}$tohighlight{/$pink_light default}{dim}",
+        # )
+        # code = RenderableText(
+        #     "     {$pink dim}($i){/$pink dim}  {$fn_col}$(m.name){/$fn_col}" * code,
+        # )
+        # info =
+        #     string(m.module) != prevmod ?
+        #     RenderableText(
+        #         "{bright_blue}   ────── Methods in {$pink underline bold}$(m.module){/$pink underline bold} for {$pink}$tohighlight{/$pink} ──────{/bright_blue}",
+        #     ) : nothing
+        # prevmod = string(m.module)
+
+        # dest = RenderableText("{dim italic}             → $(m.file):$(m.line){/dim italic}")
+
+        # content = isnothing(info) ? code / dest / "" : info / code / dest / ""
+
+        push!(mets, string(code))
+    end
+    return mets
+end
+
+
 """
     inspect(T::DataType; documentation::Bool=false, constructors::Bool=true, methods::Bool=true, supertypes::Bool=true)
 
@@ -129,7 +165,12 @@ function inspect(
 
 
     t_name = split(string(T), '.')[end]
-    constructors_content = join(string.(style_methods(Base.methods(T), t_name)), '\n')
+    constructors_content = join(string.(Panel.(
+        style_methods(Base.methods(T), t_name);
+        fit=false, width=40, padding=(0, 0, 0, 0)
+        )
+        ), '\n'
+    )
 
 
     # # methods with T and supertypes
