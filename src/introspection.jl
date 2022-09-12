@@ -24,6 +24,8 @@ import ..Trees: Tree
 import ..Layout: hLine
 import ..Tprint: tprintln
 import ..Repr: termshow
+using ..LiveDisplays
+import ..TermMarkdown: parse_md
 
 include("_inspect.jl")
 
@@ -118,37 +120,45 @@ function inspect(
     methods::Bool = true,
     supertypes::Bool = true,
 )
-    hLine("inspecting: $T", style = "bold white") |> print
+    # hLine("inspecting: $T", style = "bold white") |> print
 
-    documentation && begin
-        termshow(T)
-        print("\n"^3)
+    # documentation && begin
+    #     termshow(T)
+    #     print("\n"^3)
+    # end
+
+
+    t_name = split(string(T), '.')[end]
+    constructors_content = join(string.(style_methods(Base.methods(T), t_name)), '\n')
+
+
+    # # methods with T and supertypes
+    # methods && begin
+    #     for dt in getsupertypes(T)[1:(end - 1)]
+    #         _methods = methodswith(dt)
+    #         length(_methods) == 0 && continue
+    #         dt_name = split(string(dt), '.')[end]
+
+    #         "\n{bold white}○ Methods for $dt:" |> tprintln
+    #         print.(style_methods(_methods, dt_name))
+    #         supertypes || break
+    #     end
+    # end
+    # nothing
+
+    tv = TabViewer(
+        [
+            PagerTab("Types hierarchy", string(Tree(T))),
+            PagerTab("documentation", parse_md(get_docstring(T)[1])),
+            PagerTab("Constructors", constructors_content),
+        ]
+    )
+
+    while true
+        LiveDisplays.update!(tv) || break
     end
-
-    # types hierarchy
-    "{bold white}○ Types hierarchy:" |> tprintln
-    "   " * Tree(T) |> print
-
-    # constructors
-    constructors && begin
-        "\n{bold white}○ {$pink}$T{/$pink} constructors:" |> tprintln
-        t_name = split(string(T), '.')[end]
-        print.(style_methods(Base.methods(T), t_name))
-    end
-
-    # methods with T and supertypes
-    methods && begin
-        for dt in getsupertypes(T)[1:(end - 1)]
-            _methods = methodswith(dt)
-            length(_methods) == 0 && continue
-            dt_name = split(string(dt), '.')[end]
-
-            "\n{bold white}○ Methods for $dt:" |> tprintln
-            print.(style_methods(_methods, dt_name))
-            supertypes || break
-        end
-    end
-    nothing
+    stop!(tv)
+    println("done")
 end
 
 function inspect(F::Function; documentation::Bool = false)

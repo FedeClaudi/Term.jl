@@ -82,6 +82,9 @@ include("compositors.jl")
 include("grid.jl")
 include("introspection.jl")
 
+# interactive
+include("Live/live.jl")
+
 export RenderableText, Panel, TextBox
 export TERM_THEME, highlight
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
@@ -94,6 +97,7 @@ export @with_repr, termshow, @showme
 export Compositor, update!
 export grid
 export inspect
+export Pager
 
 # ----------------------------------- base ----------------------------------- #
 using .Measures
@@ -169,6 +173,13 @@ using .Repr: @with_repr, termshow, install_term_repr, @showme
 
 using .Grid
 
+# -------------------------------- interactive ------------------------------- #
+import .LiveDisplays: Pager
+
+
+# ---------------------------------------------------------------------------- #
+#                                precompilation                                #
+# ---------------------------------------------------------------------------- #
 using SnoopPrecompile
 
 @precompile_setup begin
