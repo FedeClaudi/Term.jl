@@ -10,7 +10,6 @@ job = addjob!(pbar; N = 100)
 start!(pbar)
 for i in 1:100
     Progress.update!(job)
-    sleep(0.01)
     i % 25 == 0 && println("We can print from here too")
     LiveDisplays.refresh!(pbar) || break
 end

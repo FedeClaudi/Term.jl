@@ -12,7 +12,7 @@ module LiveDisplays
     import ..Measures: Measure
     using ..Consoles
 
-    export AbstractLiveDisplay, update!, key_press, shouldupdate, frame, stop!
+    export AbstractLiveDisplay, refresh!, play, key_press, shouldupdate, frame, stop!
     export Pager, TabViewer, TextTab, PagerTab
 
     include("AbstractLive.jl")

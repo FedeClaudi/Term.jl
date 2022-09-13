@@ -189,11 +189,7 @@ function inspect(T::DataType;)
         ]
     )
 
-    while true
-        LiveDisplays.update!(tv) || break
-    end
-    stop!(tv)
-    println("done")
+    LiveDisplays.play(tv)
 end
 
 function inspect(F::Function; documentation::Bool = false)
