@@ -9,7 +9,7 @@ text =  @capture_out inspect(Panel; documentation=true, supertypes=false)
 # text = join(rand("\nasdasd\n \n asd ", 1000))
 pager = Pager(text; page_lines=30, title="inspect(Panel)")
 while true
-    LiveDisplays.update!(pager) || break
+    LiveDisplays.refresh!(pager) || break
 end
 stop!(pager)
 println("done")

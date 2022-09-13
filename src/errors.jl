@@ -128,7 +128,7 @@ function method_error_candidate(fun, candidate)
 
     # highlight fun
     candidate = replace(candidate, string(fun) => "{bold yellow}$(fun){/bold yellow}")
-    return candidate
+    return RenderableText(candidate; width=min(50, default_stacktrace_width()))
 end
 
 function error_message(er::MethodError; kwargs...)

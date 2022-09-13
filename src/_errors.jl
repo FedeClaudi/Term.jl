@@ -97,7 +97,7 @@ function render_backtrace_frame(
             kwargs...,
         )
     else
-        "   " * RenderableText(string(content), width = default_stacktrace_width() - 18)
+        "   " * RenderableText(string(content), width = () - 18)
     end
 end
 

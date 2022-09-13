@@ -23,7 +23,7 @@ mutable struct LiveInternals
             raw!(terminal, true)
             true
         catch err
-            @warn "Unable to enter raw mode: " exception=(err, catch_backtrace())
+            @debug "Unable to enter raw mode: " exception=(err, catch_backtrace())
             false
         end
         # hide the cursor
@@ -73,7 +73,7 @@ function replace_line(internals::LiveInternals, newline)
     # write(stdout, take!(internals.iob))
 end
 
-function update!(live::AbstractLiveDisplay)::Bool
+function refresh!(live::AbstractLiveDisplay)::Bool
     # check for keyboard inputs
     shouldstop = keyboard_input(live)
     shouldstop && return false
@@ -97,24 +97,34 @@ function update!(live::AbstractLiveDisplay)::Bool
             replace_line(internals)
         end
 
-        # cleartoend(internals.ioc)
-        # up(internals.ioc, nnew)
-        # clear(internals.ioc)
-        # print(internals.ioc, scontent)
-        # if nlines > nnew
-        #     for _ in 1:(nlines - nnew)
-        #         replace_line(internals)
-        #     end
-        # end
         for i in 1:nnew
             replace_line(internals, newlines[i])
         end
+    end
+    
+    if isnothing(internals.prevcontent)
+        nlines = length(split(string(content), "\n"))
+        print(
+            internals.ioc,
+            '\n'^nlines
+        )
     end
 
     # output
     internals.prevcontent = content
     write(stdout, take!(internals.iob))
     return true
+end
+
+function erase!(live::AbstractLiveDisplay)
+    nlines = live.internals.prevcontent.measure.h + 1
+    up(live.internals.ioc, nlines)
+    for _ in 1:nlines
+        replace_line(live.internals)
+    end
+    write(stdout, take!(live.internals.iob))
+
+    nothing
 end
 
 

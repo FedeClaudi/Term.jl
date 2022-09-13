@@ -21,11 +21,13 @@ import ..Consoles:
     savecursor,
     restorecursor
 
-import ..Renderables: AbstractRenderable
+import ..Renderables: AbstractRenderable, Renderable
 import ..Measures: Measure
 import ..Segments: Segment
 import ..Colors: RGBColor
-import ..Layout: hLine
+import ..Layout: hLine, lvstack
+using ..LiveDisplays: LiveInternals, AbstractLiveDisplay
+import ..LiveDisplays
 
 export ProgressBar,
     ProgressJob,
@@ -36,7 +38,6 @@ export ProgressBar,
     removejob!,
     with,
     @track,
-    render,
     foreachprogress
 
 # ---------------------------------------------------------------------------- #
@@ -209,20 +210,7 @@ include("_progress.jl")
 # ---------------------------------------------------------------------------- #
 #                                  PROGRESS BAR                                #
 # ---------------------------------------------------------------------------- #
-"""
-    RenderStatus
 
-Keep track of rendering information for a `ProgressBar`
-"""
-Base.@kwdef mutable struct RenderStatus
-    rendered::Bool = false
-    nlines::Int = 0
-    maxnlines::Int = 0
-    hline::String = ""
-    scrollline::Int = 0
-end
-
-# ------------------------------- constructors ------------------------------- #
 """
     ProgressBar
 
@@ -243,29 +231,22 @@ Arguments:
     - `column_kwargs`: keyword arguments to pass to each column
     - `transient`: if true jobs disappear when done (and the whole pbar when all jobs are done)
     - `colors`: set of 3 `RGBColor` to change the color of the progress bar with progress
-    - `Δt`: delay between refreshes of the visualization.
     - `buff`: `IOBuffer` used to render the progress bars
     - `running`: true if the progress bar is active
     - `paused`: false when the bar is running but briefly paused (e.g. to update `jobs`)
     - `task`: references a `Task` for updating the progress bar in parallel
-    - `renderstatus`: a `RenderStatus` instance.
 """
-mutable struct ProgressBar
+mutable struct ProgressBar <: AbstractLiveDisplay
+    internals::LiveInternals
     jobs::Vector{ProgressJob}
     width::Int
-
     columns::Vector{DataType}
     columns_kwargs::Dict
-
     transient::Bool
     colors::Vector{RGBColor}
-    Δt::Float64
-
-    buff::IOBuffer  # will be used to store temporarily re-directed stdout
     running::Bool
     paused::Bool
     task::Union{Task,Nothing}
-    renderstatus::Any
 end
 
 """
@@ -296,7 +277,6 @@ function ProgressBar(;
         RGBColor("(.05, .05, 1)"),
         RGBColor("(.05, 1, .05)"),
     ],
-    refresh_rate::Int = 60,  # FPS of rendering
 )
     columns = columns isa Symbol ? get_columns(columns) : columns
 
@@ -304,18 +284,16 @@ function ProgressBar(;
     width = expand ? console_width() - 5 : min(max(width, 20), console_width() - 5)
 
     return ProgressBar(
+        LiveInternals(),
         Vector{ProgressJob}(),
         width,
         columns,
         columns_kwargs,
         transient,
         colors,
-        1 / refresh_rate,
-        IOBuffer(),
         false,
         false,
         nothing,
-        RenderStatus(),
     )
 end
 
@@ -426,22 +404,14 @@ function stop!(pbar::ProgressBar)
     pbar.paused = true
     pbar.running = false
 
-    # if transient, delete
-    if pbar.transient
-        # move cursor to stale scrollregion and clear
-        move_to_line(stdout, console_height())
-        for i in 1:(pbar.renderstatus.nlines + 2)
-            erase_line(stdout)
-            up(stdout)
-        end
-    else
-        print("\n")
-    end
+    LiveDisplays.stop!(pbar)
 
-    # restore scrollbar region
-    change_scroll_region(stdout, console_height())
-    show_cursor()
-    pbar.transient || print("\n")
+    nlines = length(
+        pbar.internals.prevcontent.measure.h + 4
+    )
+    pbar.transient || print("\n"^nlines)
+    pbar.transient && LiveDisplays.erase!(pbar)
+
     return nothing
 end
 
@@ -482,10 +452,7 @@ number of running jobs.
 All fo this requires a bit of careful work in moving the
 cursor around and doing ANSI magic.
 """
-function render(pbar::ProgressBar)
-    # check if running
-    pbar.running || return nothing
-
+function LiveDisplays.frame(pbar::ProgressBar)::AbstractRenderable
     # remove completed, transient jobs
     for job in pbar.jobs
         if job.finished && job.transient
@@ -493,47 +460,13 @@ function render(pbar::ProgressBar)
         end
     end
 
-    # get variables
-    njobs, height = length(pbar.jobs) + 1, console_height()
-    iob = pbar.buff
-
-    # on the first render, create sticky region
-    if !pbar.renderstatus.rendered
-        print(iob, "\n"^(njobs))
-        pbar.renderstatus.scrollline = height - njobs
-        change_scroll_region(iob, pbar.renderstatus.scrollline)
-
-        pbar.renderstatus.rendered = true
-        pbar.renderstatus.hline =
-            string(hLine(pbar.width, "progress"; style = "blue dim")) * "\n"
-        pbar.renderstatus.nlines = njobs
-        pbar.renderstatus.maxnlines = njobs
-
-    elseif njobs > pbar.renderstatus.maxnlines
-        # if we need more lines, scroll
-        write(iob, "\n"^(njobs - pbar.renderstatus.maxnlines))
-
-        # set scroll region
-        pbar.renderstatus.maxnlines = njobs
-        pbar.renderstatus.scrollline = height - pbar.renderstatus.maxnlines
-        change_scroll_region(iob, pbar.renderstatus.scrollline)
-    end
-
-    # move cursor to scrollregion and clear
-    move_to_line(iob, pbar.renderstatus.scrollline + 1)
-    cleartoend(iob)
-
     # render the progressbars
-    write(iob, pbar.renderstatus.hline)
-    for (last, job) in loop_last(pbar.jobs)
-        contents = render(job, pbar)
-        coda = last ? "" : "\n"
-        write(iob, contents * coda)
-    end
-
-    # restore position and write
-    move_to_line(iob, pbar.renderstatus.scrollline)
-    return print(String(take!(iob)))
+    output = reduce(
+        lvstack, 
+        map(j->render(j, pbar), pbar.jobs);
+        init=hLine("progress"; style="bright_blue dim")
+    )
+    return Renderable(output)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -570,7 +503,7 @@ function with(expr, pbar::ProgressBar)
 
         task = Threads.@spawn expr()
         while !istaskdone(task) && pbar.running
-            pbar.paused || render(pbar)
+            pbar.paused || LiveDisplays.refresh!(pbar)
             sleep(pbar.Δt)
         end
         stop!(pbar)
@@ -726,7 +659,7 @@ _getn(_, _) = nothing
 
 function _startrenderloop(pbar)
     while pbar.running
-        pbar.paused || render(pbar)
+        pbar.paused || LiveDisplays.refresh!(pbar)
         sleep(pbar.Δt)
     end
 end
