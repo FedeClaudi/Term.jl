@@ -47,7 +47,7 @@ else
 end
 
 function Base.string(renderable::AbstractRenderable, width::Int)::String
-    isnothing(renderable.measure) && (return string(renderable))
+    isnothing(renderable.measure) && return string(renderable)
     return if renderable.measure.w <= width
         string(renderable)
     else
@@ -62,7 +62,7 @@ end
 Print a renderable to an IO
 """
 function Base.print(io::IO, renderable::AbstractRenderable; highlight = true)
-    ren = unescape_brackets_with_space(string(renderable, console_width(io)))
+    ren = unescape_brackets_with_space(string(renderable))
     return println(io, ren)
 end
 
@@ -79,7 +79,7 @@ Base.show(io::IO, renderable::AbstractRenderable) = print(io, info(renderable))
 Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
-    println(io, string(renderable, console_width(io)))
+    println(io, string(renderable))
     DEBUG_ON[] && println(io, info(renderable))
 end
 

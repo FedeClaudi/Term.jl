@@ -451,7 +451,7 @@ end
 vstack(renderables::Union{Vector,Tuple}; kwargs...) = vstack(renderables...; kwargs...)
 
 """
-    hstack(r1::RenderablesUnion, r2::RenderablesUnion   )
+    hstack(r1::RenderablesUnion, r2::RenderablesUnion)
 
 Horizontally stack two renderables to give a new renderable.
 """
@@ -477,6 +477,10 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
 
     # combine segments
     segments = [Segment(ss1.text * ' '^pad * ss2.text) for (ss1, ss2) in zip(s1, s2)]
+
+    println(stderr, 100, h1, h2)
+    println(stderr, segments)
+    println(stderr, Renderable(segments, Measure(segments)))
 
     return Renderable(segments, Measure(segments))
 end
