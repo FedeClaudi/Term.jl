@@ -167,22 +167,18 @@ function Panel(
     # estimate content and panel size 
     content_width = content isa AbstractString ? Measure(content).w : content.measure.w
 
-    @show default_width() console_width()
     panel_width = if (auto_fit = isnothing(fit))
         isnothing(width) ? default_width() : width
     else
         content_width + padding.left + padding.right + 2
     end
-    @show panel_width
     width = auto_fit ? min(panel_width, console_width()) : panel_width
-    @show width
 
     fit = if auto_fit
         content isa AbstractString ? true : panel_width <= console_width()
     else
         fit
     end
-    @show fit
 
     # @info "Ready to make panel" content content_width panel_width width console_width() fit
     return Panel(content, Val(fit), padding; width = width, kwargs...)
@@ -405,8 +401,8 @@ function render(
     kwargs...,
 )::Panel
     background = get_bg_color(background)
-    @info "calling render" content content_measure background
-    println("Content\n", content)
+    # @info "calling render" content content_measure background
+    # println("Content\n", content)
 
     # create top/bottom rows with titles
     box = BOXES[box]  # get box object from symbol
