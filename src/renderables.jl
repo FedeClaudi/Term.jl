@@ -46,6 +46,7 @@ else
     join(map(seg -> seg.text, r.segments), "\n")
 end
 
+#=
 function Base.string(renderable::AbstractRenderable, width::Int)::String
     isnothing(renderable.measure) && return string(renderable)
     return if renderable.measure.w <= width
@@ -55,6 +56,7 @@ function Base.string(renderable::AbstractRenderable, width::Int)::String
         string(RenderableText(string(renderable), width = width))
     end
 end
+=#
 
 """
     print(io::IO, renderable::AbstractRenderable)
