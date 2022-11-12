@@ -451,7 +451,7 @@ end
 vstack(renderables::Union{Vector,Tuple}; kwargs...) = vstack(renderables...; kwargs...)
 
 """
-    hstack(r1::RenderablesUnion, r2::RenderablesUnion)
+    hstack(r1::RenderablesUnion, r2::RenderablesUnion   )
 
 Horizontally stack two renderables to give a new renderable.
 """

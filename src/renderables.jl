@@ -43,7 +43,7 @@ Creates a string representation of a renderable
 Base.string(r::AbstractRenderable)::String = return if isnothing(r.segments)
     ""
 else
-    join([seg.text for seg in r.segments], "\n")
+    join(map(seg -> seg.text, r.segments), "\n")
 end
 
 function Base.string(renderable::AbstractRenderable, width::Int)::String

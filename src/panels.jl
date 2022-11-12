@@ -139,7 +139,7 @@ end
 ---
     Panel(
         content::Union{AbstractString,AbstractRenderable};
-        fit::Union{Nothing,Bool} = nothing,
+        fit::Bool = true,
         padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
         kwargs...,
     )
@@ -151,34 +151,29 @@ on the value of `fit` to either fith the `Panel` to its content or vice versa.
 
 `kwargs` can be used to set various aspects of the `Panel`'s appearance like
 the presence and style of titles, box type etc... see [render](@ref) below.
-
-!!! warning
-    If the content is larger than the console terminal's width, it will get trimmed to avoid overflow, unless `fit=true/false` is given.
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable};
-    fit::Union{Nothing,Bool} = nothing,
+    fit::Bool = false,
     padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
-    width::Union{Nothing,Int} = nothing,
+    width::Int = default_width(),
     kwargs...,
 )
     padding = padding isa Padding ? padding : Padding(padding...)
 
     # estimate content and panel size 
     content_width = content isa AbstractString ? Measure(content).w : content.measure.w
-
-    panel_width = if (auto_fit = isnothing(fit))
-        isnothing(width) ? default_width() : width
-    else
+    panel_width = if fit
         content_width + padding.left + padding.right + 2
-    end
-    width = auto_fit ? min(panel_width, console_width()) : panel_width
-
-    fit = if auto_fit
-        content isa AbstractString ? true : panel_width <= console_width()
     else
-        fit
+        width
     end
+
+    # if too large, set fit=false
+    fit =
+        fit ? (!isa(content, AbstractString) ? panel_width <= console_width() : true) :
+        false
+    width = fit ? min(panel_width, console_width()) : width
 
     # @info "Ready to make panel" content content_width panel_width width console_width() fit
     return Panel(content, Val(fit), padding; width = width, kwargs...)
@@ -189,26 +184,42 @@ end
 
 Convert any input content to a renderable
 """
-content_as_renderable(content, width, Δw, justify, background) = RenderableText(
-    string(content),
-    width = width - Δw,
-    background = background,
-    justify = justify,
-)
+function content_as_renderable(content, width, Δw, justify, background)
+    rt = RenderableText(
+        string(content),
+        width = width - Δw,
+        background = background,
+        justify = justify,
+    )
+    return rt
+end
+
+# function content_as_renderable(content::AbstractString, width, Δw, justify, background)
+#     RenderableText(
+#         string(content),
+#         width = width - Δw,
+#         background = background,
+#         justify = justify,
+#     )
+# end
 
 """
 ---
 
     Panel(
         content::Union{AbstractString,AbstractRenderable},
-        fit::Val{true},
+        ::Val{true},
         padding::Padding;
         height::Union{Nothing,Int} = nothing,
         width::Union{Nothing,Int} = nothing,
+        trim::Bool = true,
         kwargs...,
     )
 
 Construct a `Panel` fitting the content's width.
+
+!!! warning
+    If the content is larger than the console terminal's width, it will get trimmed to avoid overflow, unless `trim=false` is given.
 """
 function Panel(
     content::Union{AbstractString,AbstractRenderable},
@@ -250,7 +261,7 @@ end
 ---
     Panel(
         content::Union{AbstractString,AbstractRenderable},
-        fit::Val{false},
+        ::Val{false},
         padding::Padding;
         height::Union{Nothing,Int} = nothing,
         width::Int = $(default_width()),
@@ -451,7 +462,8 @@ function render(
     ]
 
     # content
-    content_sgs::Vector{Segment} = if content.measure.w > 0
+    content_sgs::Vector{Segment} =
+        content.measure.w > 0 ?
         map(
             s -> makecontent_line(
                 s.text,
@@ -464,10 +476,7 @@ function render(
                 Δw,
             ),
             content.segments,
-        )
-    else
-        []
-    end
+        ) : []
 
     final_segments = Segment[
         repeat(empty, n_extra)...,                  # lines to reach target height
