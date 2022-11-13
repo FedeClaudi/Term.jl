@@ -35,6 +35,8 @@ Stores information about ammount of padding.
     bottom::Int
 end
 
+Padding(padding::Tuple) = Padding(padding...)
+
 """
     pad(text::AbstractString, target_width::Int, method::Symbol)::String
 
