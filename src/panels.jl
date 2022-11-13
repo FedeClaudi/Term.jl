@@ -117,9 +117,6 @@ function Panel(;
     content = ""
     content_measure = Measure(0, 0)
 
-    # get padding
-    padding = padding isa Padding ? padding : Padding(padding...)
-
     # make panel
     return Panel(
         content;
@@ -130,7 +127,7 @@ function Panel(;
         Δh = padding.top + padding.bottom,
         height = height,
         width = width,
-        padding = padding,
+        padding = Padding(padding),
         kwargs...,
     )
 end
@@ -139,8 +136,8 @@ end
 ---
     Panel(
         content::Union{AbstractString,AbstractRenderable};
-        fit::Bool = true,
-        padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+        fit::Bool = false,
+        padding::Union{Nothing,Padding,NTuple} = nothing,
         kwargs...,
     )
 
@@ -155,11 +152,19 @@ the presence and style of titles, box type etc... see [render](@ref) below.
 function Panel(
     content::Union{AbstractString,AbstractRenderable};
     fit::Bool = false,
-    padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+    padding::Union{Nothing,Padding,NTuple} = nothing,
     width::Int = default_width(),
     kwargs...,
 )
-    padding = padding isa Padding ? padding : Padding(padding...)
+    padding = if isnothing(padding)
+        if get(kwargs, :style, "default") == "hidden"
+            Padding(0, 0, 0, 0)
+        else
+            Padding(2, 2, 0, 0)
+        end
+    else
+        Padding(padding)
+    end
 
     # estimate content and panel size 
     content_width = content isa AbstractString ? Measure(content).w : content.measure.w
@@ -170,9 +175,11 @@ function Panel(
     end
 
     # if too large, set fit=false
-    fit =
-        fit ? (!isa(content, AbstractString) ? panel_width <= console_width() : true) :
+    fit = if fit
+        (!isa(content, AbstractString) ? panel_width <= console_width() : true)
+    else
         false
+    end
     width = fit ? min(panel_width, console_width()) : width
 
     # @info "Ready to make panel" content content_width panel_width width console_width() fit
@@ -184,24 +191,12 @@ end
 
 Convert any input content to a renderable
 """
-function content_as_renderable(content, width, Δw, justify, background)
-    rt = RenderableText(
-        string(content),
-        width = width - Δw,
-        background = background,
-        justify = justify,
-    )
-    return rt
-end
-
-# function content_as_renderable(content::AbstractString, width, Δw, justify, background)
-#     RenderableText(
-#         string(content),
-#         width = width - Δw,
-#         background = background,
-#         justify = justify,
-#     )
-# end
+content_as_renderable(content, width, Δw, justify, background) = RenderableText(
+    string(content),
+    width = width - Δw,
+    background = background,
+    justify = justify,
+)
 
 """
 ---
@@ -358,7 +353,7 @@ function makecontent_line(
     Δw,
 )::Segment
     line = apply_style(cline) |> rstrip
-    line = if panel_measure.w - textlen(line) > 2
+    line = if panel_measure.w - textlen(line) ≥ 2
         pad(cline, panel_measure.w - Δw, justify; bg = background)
     else
         line * " "
@@ -462,8 +457,7 @@ function render(
     ]
 
     # content
-    content_sgs::Vector{Segment} =
-        content.measure.w > 0 ?
+    content_sgs::Vector{Segment} = if content.measure.w > 0
         map(
             s -> makecontent_line(
                 s.text,
@@ -476,7 +470,10 @@ function render(
                 Δw,
             ),
             content.segments,
-        ) : []
+        )
+    else
+        []
+    end
 
     final_segments = Segment[
         repeat(empty, n_extra)...,                  # lines to reach target height
