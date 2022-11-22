@@ -136,7 +136,7 @@ Flags can be used to choose the level of detail in the information presented:
  - methods: show methods using `T` in their signature
  - supertypes: show methods using `T`'s supertypes in their signature
 """
-function inspect(T::DataType;)
+function inspect(T::Union{UnionAll, DataType};)
 
     constructors_content = join(
         string.(
