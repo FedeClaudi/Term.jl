@@ -450,7 +450,8 @@ function vstack(renderables::RenderablesUnion...; pad::Int = 0)
     return Renderable(segments, Measure(segments))
 end
 
-vstack(renderables::Union{AbstractVector,Tuple}; kwargs...) = vstack(renderables...; kwargs...)
+vstack(renderables::Union{AbstractVector,Tuple}; kwargs...) =
+    vstack(renderables...; kwargs...)
 
 """
     hstack(r1::RenderablesUnion, r2::RenderablesUnion   )
@@ -496,7 +497,8 @@ function hstack(renderables...; pad::Int = 0)
     return renderable
 end
 
-hstack(renderables::Union{AbstractVector,Tuple}; kwargs...) = hstack(renderables...; kwargs...)
+hstack(renderables::Union{AbstractVector,Tuple}; kwargs...) =
+    hstack(renderables...; kwargs...)
 
 # --------------------------------- operators -------------------------------- #
 
@@ -538,9 +540,12 @@ Right align renderables and then vertically stack.
 rvstack(renderables::RenderablesUnion...; kwargs...)::Renderable =
     vstack(rightalign(renderables...)...; kwargs...)
 
-rvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) = rvstack(renderables...; kwargs...)
-cvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) = cvstack(renderables...; kwargs...)
-lvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) = lvstack(renderables...; kwargs...)
+rvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) =
+    rvstack(renderables...; kwargs...)
+cvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) =
+    cvstack(renderables...; kwargs...)
+lvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) =
+    lvstack(renderables...; kwargs...)
 
 # ---------------------------------------------------------------------------- #
 #                                LINES & SPACER                                #
