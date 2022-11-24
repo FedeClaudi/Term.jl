@@ -20,18 +20,13 @@ import ..Measures: Measure
 import ..Measures: height as get_height
 import ..Measures: width as get_width
 import ..Consoles: console_width, console_height
-import ..TermMarkdown: parse_md
 using ..Boxes
-
-using Markdown
 
 export Panel, TextBox
 
+
 abstract type AbstractPanel <: AbstractRenderable end
 
-""" convert markdown to strings """
-panel_parse_md(text::Markdown.MD) = parse_md(text)
-panel_parse_md(text) = text
 
 # ---------------------------------------------------------------------------- #
 #                                     PANEL                                    #
@@ -71,7 +66,7 @@ mutable struct Panel <: AbstractPanel
         return if x1 isa Vector && x2 isa Measure
             new(x1, x2)
         else
-            Panel(vstack(panel_parse_md(x1), panel_parse_md(x2)); kwargs...)
+            Panel(vstack(x1, x2); kwargs...)
         end
     end
 end
@@ -339,9 +334,9 @@ Panel(renderables::Vector{RenderablesUnion}; kwargs...) =
     Panel(vstack(renderables...); kwargs...)
 
 Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
-Panel(ren; kwargs...) = Panel(panel_parse_md(ren); kwargs...)
+Panel(ren; kwargs...) = Panel(ren; kwargs...)
 Panel(ren, renderables...; kwargs...) =
-    Panel(vstack(panel_parse_md(ren), panel_parse_md.(renderables)...); kwargs...)
+    Panel(vstack(ren, renderables...); kwargs...)
 
 # ---------------------------------- render ---------------------------------- #
 
