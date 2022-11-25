@@ -172,7 +172,7 @@ function parse_md(
     else
         panel = Panel(
             syntax;
-            style = "white dim on_$(theme.md_codeblock_bg)",
+            style = "white on_$(theme.md_codeblock_bg)",
             box = :SQUARE,
             subtitle = length(code.language) > 0 ? code.language : nothing,
             width = width - 12,
