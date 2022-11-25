@@ -263,16 +263,25 @@ Show a type's arguments, constructors and docstring.
 function termshow(io::IO, obj::DataType; showdocs = true, kwargs...)
     theme = TERM_THEME[]
     ts = theme.repr_type
-    field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent)
-    field_types = apply_style.(map(f -> "::" * string(f), obj.types), ts)
+
+    field_names, field_types = [], []
+    try
+        field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent)
+        field_types = apply_style.(map(f -> "::" * string(f), obj.types), ts)
+    catch
+        field_names = []
+        field_types = []
+    end
 
     line = vLine(length(field_names); style = theme.repr_name)
     space = Spacer(length(field_names), 1)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
 
     type_name = apply_style(string(obj), theme.repr_name * " bold")
-    sup = supertypes(obj)[2]
-    type_name *= " {$(theme.repr_array_text) dim}<: $sup{/$(theme.repr_array_text) dim}"
+    if length(supertypes(obj))>1
+        sup = supertypes(obj)[2]
+        type_name *= " {$(theme.repr_array_text) dim}<: $sup{/$(theme.repr_array_text) dim}"
+    end
     content =
         "    " * repr_panel(
             nothing,
