@@ -25,9 +25,7 @@ using ..Boxes
 
 export Panel, TextBox
 
-
 abstract type AbstractPanel <: AbstractRenderable end
-
 
 # ---------------------------------------------------------------------------- #
 #                                     PANEL                                    #
@@ -336,8 +334,7 @@ Panel(renderables::Vector{RenderablesUnion}; kwargs...) =
 
 Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
 Panel(ren; kwargs...) = Panel(ren; kwargs...)
-Panel(ren, renderables...; kwargs...) =
-    Panel(vstack(ren, renderables...); kwargs...)
+Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwargs...)
 
 # ---------------------------------- render ---------------------------------- #
 
