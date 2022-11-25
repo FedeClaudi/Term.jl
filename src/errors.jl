@@ -95,7 +95,8 @@ end
 # !  KeyError
 function error_message(er::KeyError)
     # @info "err KeyError" er fieldnames(KeyError)
-    key = truncate(string(er.key), 40)
+    # key = truncate(string(er.key), 40)
+    key = string(er.key)
     msg = "Key `$(key)` not found!"
     return msg, ""
 end
@@ -154,12 +155,11 @@ function error_message(er::MethodError; kwargs...)
     _args = join(
         map(
             a ->
-                "   {dim bold}($(a[1])){/dim bold} $(str_trunc(highlight("::"*string(typeof(a[2]))), 30))",
+                "   {dim bold}($(a[1])){/dim bold} $(highlight("::"*string(typeof(a[2]))))\n",
             enumerate(er.args),
         ),
-        "\n",
     )
-    main_line = "No method matching `$name` with arguments types:" / _args
+    main_line = "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" / _args
 
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
@@ -270,7 +270,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                 Panel(
                     RenderableText(
                         error_message(er)[1],
-                        width = default_stacktrace_width() - 4,
+                        # width = default_stacktrace_width() - 4,
                     );
                     width = default_stacktrace_width(),
                     title = "{bold $(theme.err_errmsg) default underline}$(typeof(er)){/bold $(theme.err_errmsg) default underline}",

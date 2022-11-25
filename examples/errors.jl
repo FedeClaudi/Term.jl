@@ -29,7 +29,7 @@ corresponding error message
 """
 
 # ------------  MethodError
-# 1 - "a"
+1 - "a"
 
 # ------------  DomainError
 # sqrt(-1)
@@ -69,13 +69,13 @@ corresponding error message
 
 # ------------  Errors with type creation
 
-struct MyType
-    x::Int
-    y
-    z::String
-end
+# struct MyType
+#     x::Int
+#     y
+#     z::String
+# end
 
-MyType(x::Int, y::Int) = MyType(x, y, "" + string(1 + "o"))
-MyType(x::Int) = MyType(x, 0)
+# MyType(x::Int, y::Int) = MyType(x, y, "" + string(1 + "o"))
+# MyType(x::Int) = MyType(x, 0)
 
-MyType(1)
+# MyType(1)
