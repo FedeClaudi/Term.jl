@@ -1,2 +1,3 @@
 [deps]
 Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
+JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
