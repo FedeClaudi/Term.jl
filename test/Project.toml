@@ -2,3 +2,4 @@
 StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
 Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 TimerOutputs = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
+JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
