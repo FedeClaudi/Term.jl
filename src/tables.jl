@@ -2,8 +2,7 @@ module Tables
 
 import Tables as TablesPkg
 
-import Term: do_by_line, fillin, str_trunc
-import MyterialColors: orange
+import Term: do_by_line, fillin, str_trunc, TERM_THEME
 
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Layout: cvstack, hstack, vstack, pad, vLine, vertical_pad
@@ -15,6 +14,7 @@ using ..Boxes
 
 export Table
 
+theme = TERM_THEME[]
 include("_tables.jl")
 
 """
@@ -75,20 +75,20 @@ Generic constructor for a Table renderable.
 """
 function Table(
     tb::TablesPkg.AbstractColumns;
-    box::Symbol = :MINIMAL_HEAVY_HEAD,
-    style::String = "#9bb3e0",
+    box::Symbol = TERM_THEME[].tb_box,
+    style::String = TERM_THEME[].tb_style,
     hpad::Union{Vector,Int} = 2,
     vpad::Union{Vector,Int} = 0,
     vertical_justify::Symbol = :center,
     show_header::Bool = true,
     header::Union{Nothing,Vector,Tuple} = nothing,
-    header_style::Union{String,Vector,Tuple} = "bold white",
+    header_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_header,
     header_justify::Union{Nothing,Symbol,Vector,Tuple} = nothing,
-    columns_style::Union{String,Vector,Tuple} = "default",
+    columns_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_columns,
     columns_justify::Union{Symbol,Vector,Tuple} = :center,
     columns_widths::Union{Nothing,Int,Vector} = nothing,
     footer::Union{Function,Nothing,Vector,Tuple} = nothing,
-    footer_style::Union{String,Vector,Tuple} = "default",
+    footer_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_footer,
     footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
     compact::Bool = false,
 )

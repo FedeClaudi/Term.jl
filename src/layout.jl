@@ -3,7 +3,16 @@ module Layout
 import Parameters: @with_kw
 
 import Term:
-    rint, get_lr_widths, textlen, cint, fint, rtrim_str, ltrim_str, do_by_line, get_bg_color
+    rint,
+    get_lr_widths,
+    textlen,
+    cint,
+    fint,
+    rtrim_str,
+    ltrim_str,
+    do_by_line,
+    get_bg_color,
+    TERM_THEME
 import Term: justify as justify_text
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..Consoles: console_width, console_height
@@ -589,8 +598,8 @@ Create a `vLine` given a height and, optionally, style information.
 """
 function vLine(
     height::Int;
-    style::String = "default",
-    box::Symbol = :ROUNDED,
+    style::String = TERM_THEME[].line,
+    box::Symbol = TERM_THEME[].box,
     char::Union{Char,Nothing} = nothing,
 )
     char = isnothing(char) ? BOXES[box].head.left : char
@@ -610,7 +619,7 @@ vLine(ren::AbstractRenderable; kwargs...) = vLine(ren.measure.h; kwargs...)
 
 Create a `vLine` as tall as the `stdout` console.
 """
-vLine(; style::String = "default", box::Symbol = :ROUNDED) =
+vLine(; style::String = TERM_THEME[].line, box::Symbol = TERM_THEME[].box) =
     vLine(console_height(stdout); style = style, box = box)
 
 # ----------------------------------- hLine ---------------------------------- #
@@ -626,23 +635,23 @@ mutable struct hLine <: AbstractLayoutElement
 end
 
 """
-    hLine(width::Number, style::Union{String, Nothing}; box::Symbol=:ROUNDED)
+    hLine(width::Number, style::Union{String, Nothing}; box::Symbol=TERM_THEME[].box)
 
 Create a styled `hLine` of given width.
 """
-hLine(width::Int; style::String = "default", box::Symbol = :ROUNDED) =
+hLine(width::Int; style::String = TERM_THEME[].line, box::Symbol = TERM_THEME[].box) =
     hLine([Segment(BOXES[box].row.mid^width * "\e[0m", style)], Measure(1, width))
 
 """
-    hLine(width::Number, text::String; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
+    hLine(width::Number, text::String; style::Union{String, Nothing}=nothing, box::Symbol=TERM_THEME[].box)
 
 Creates an hLine object with texte centered horizontally.
 """
 function hLine(
     width::Number,
     text::String;
-    style::String = "default",
-    box::Symbol = :ROUNDED,
+    style::String = TERM_THEME[].line,
+    box::Symbol = TERM_THEME[].box,
 )
     box = BOXES[box]
     text = apply_style(text) * "\e[0m"
@@ -662,20 +671,23 @@ function hLine(
 end
 
 """
-    hLine(; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
+    hLine(; style::Union{String, Nothing}=nothing, box::Symbol=TERM_THEME[].box)
 
 Construct an `hLine` as wide as the `stdout`.
 """
-hLine(; style::String = "default", box::Symbol = :ROUNDED) =
+hLine(; style::String = TERM_THEME[].line, box::Symbol = TERM_THEME[].box) =
     hLine(console_width(stdout); style = style, box = box)
 
 """
-    hLine(text::AbstractString; style::Union{String, Nothing}=nothing, box::Symbol=:ROUNDED)
+    hLine(text::AbstractString; style::Union{String, Nothing}=nothing, box::Symbol=TERM_THEME[].box)
 
 Construct an `hLine` as wide as the `stdout` with centered text.
 """
-hLine(text::AbstractString; style::String = "default", box::Symbol = :ROUNDED) =
-    hLine(console_width(stdout), text; style = style, box = box)
+hLine(
+    text::AbstractString;
+    style::String = TERM_THEME[].line,
+    box::Symbol = TERM_THEME[].box,
+) = hLine(console_width(stdout), text; style = style, box = box)
 
 """
     hLine(ren::AbstractRenderable; kwargs)

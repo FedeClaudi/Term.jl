@@ -1,4 +1,4 @@
-import MyterialColors: orange_light, teal, purple_light, pink
+import MyterialColors: orange_light, teal, purple_light
 
 """
 Definition of several type of columns for progress bars.
@@ -38,7 +38,7 @@ struct SeparatorColumn <: AbstractColumn
     text::String
 
     function SeparatorColumn(job::ProgressJob)
-        seg = Segment("●", pink)
+        seg = Segment("●", TERM_THEME[].progress_accent)
         return new(job, [seg], Measure(1, 1), seg.text)
     end
 end
@@ -52,7 +52,7 @@ struct SpaceColumn <: AbstractColumn
     text::String
 
     function SpaceColumn(job::ProgressJob; width = 1)
-        seg = Segment(" "^width, pink)
+        seg = Segment(" "^width, TERM_THEME[].progress_accent)
         return new(job, [seg], seg.measure, seg.text)
     end
 end
@@ -68,7 +68,7 @@ struct CompletedColumn <: AbstractColumn
     padwidth::Int
     style::String
 
-    function CompletedColumn(job::ProgressJob; style::String = "white bold")
+    function CompletedColumn(job::ProgressJob; style::String = TERM_THEME[].text_accent)
         if isnothing(job.N)
             seg = Segment(" "^10)
             return new(job, [seg], seg.measure, "", 0, style)
@@ -76,7 +76,7 @@ struct CompletedColumn <: AbstractColumn
             width = length(string(job.N)) * 2 + 1
             seg = Segment(" "^width)
             text = apply_style(
-                "{white bold}/{/white bold}{(.1, .8, .4) underline}$(job.N){/(.1, .8, .4) underline}",
+                "{$style}/{/$style}{($(TERM_THEME[].text_accent)) underline}$(job.N){/($(TERM_THEME[].text_accent)) underline}",
             )
             return new(job, [seg], seg.measure, text, length(digits(job.N)), style)
         end
@@ -140,7 +140,7 @@ struct ElapsedColumn <: AbstractColumn
     style::String
     padwidth::Int
 
-    ElapsedColumn(job::ProgressJob; style = purple_light) =
+    ElapsedColumn(job::ProgressJob; style = TERM_THEME[].progress_elapsedcol_default) =
         new(job, [], Measure(6 + 9, 1), style, 6)
 end
 
@@ -172,7 +172,8 @@ struct ETAColumn <: AbstractColumn
     style::String
     padwidth::Int
 
-    ETAColumn(job::ProgressJob; style = teal) = new(job, [], Measure(7 + 11, 1), style, 7)
+    ETAColumn(job::ProgressJob; style = TERM_THEME[].progress_etacol_default) =
+        new(job, [], Measure(7 + 11, 1), style, 7)
 end
 
 function update!(col::ETAColumn, args...)::String
@@ -290,7 +291,7 @@ mutable struct SpinnerColumn <: AbstractColumn
     function SpinnerColumn(
         job::ProgressJob;
         spinnertype::Symbol = :dot,
-        style = "bold blue",
+        style = TERM_THEME[].progress_spiner_default,
     )
         spinnerdata = copy(SPINNERS[spinnertype])
 
@@ -315,7 +316,8 @@ end
 
 function update!(col::SpinnerColumn, args...)::String
     col.job.started || return " "^(col.measure.w)
-    col.job.finished && return "{green bold}✔{/green bold}"
+    col.job.finished &&
+        return "{$(TERM_THEME[].progress_spinnerdone_default)}✔{/$(TERM_THEME[].progress_spinnerdone_default)}"
 
     t = (now() - col.job.startime).value
 

@@ -10,7 +10,8 @@ import Term:
     default_stacktrace_width,
     escape_brackets,
     unescape_brackets,
-    remove_markup
+    remove_markup,
+    TERM_THEME
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
@@ -62,7 +63,7 @@ function error_message(er::BoundsError)
     if isdefined(er, :a)
         if er.a isa AbstractString
             nunits = ncodeunits(er.a)
-            additional_msg = "S\ntring has $nunits codeunits, $(length(er.a)) characters."
+            additional_msg = "\nString has $nunits codeunits, $(length(er.a)) characters."
         end
     else
         additional_msg = "\n{red}Variable is not defined!.{/red}"
@@ -109,25 +110,29 @@ end
 
 # ! LoadError
 function error_message(er::LoadError)
+    theme = TERM_THEME[]
     # @info "load error message"  fieldnames(LoadError)
-    msg = "At {grey62 underline}$(er.file){/grey62 underline} line {bold}$(er.line){/bold}"
-    subm = "The cause is an error of type: {bright_red}$(string(typeof(er.error)))"
+    msg = "At {$(theme.err_filepath) underline}$(er.file){/$(theme.err_filepath) underline} line {bold}$(er.line){/bold}"
+    subm = "The cause is an error of type: {$(theme.err_errmsg)}$(string(typeof(er.error)))"
     return msg, subm
 end
 
 # ! METHOD ERROR
 method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
 function method_error_candidate(fun, candidate)
+    theme = TERM_THEME[]
     # highlight non-matched types
     candidate = replace(
         candidate,
-        method_error_regex => SubstitutionString("{red}" * s"\g<0>" * "{/red}"),
+        method_error_regex => SubstitutionString(
+            "{$(theme.err_errmsg)}" * s"\g<0>" * "{/$(theme.err_errmsg)}",
+        ),
     )
     # remove
     candidate = replace(candidate, "!Matched" => "")
 
     # highlight fun
-    candidate = replace(candidate, string(fun) => "{bold yellow}$(fun){/bold yellow}")
+    candidate = replace(candidate, string(fun) => "{$(theme.func)}$(fun){/$(theme.func)}")
     return candidate
 end
 
@@ -176,9 +181,9 @@ error_message(er::StackOverflowError) = "Stack overflow error: too many function
 # ! TYPE ERROR
 function error_message(er::TypeError)
     # @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
-    # var = string(er.var)
+    theme = TERM_THEME[]
     msg = "In `$(er.func)` > `$(er.context)` got"
-    msg *= " {orange1 bold}$(er.got){/orange1 bold}(::$(typeof(er.got))) but expected argument of type ::$(er.expected)"
+    msg *= " {$(theme.emphasis_light)) bold}$(er.got){/$(theme.emphasis_light)) bold}(::$(typeof(er.got))) but expected argument of type ::$(er.expected)"
     return msg, ""
 end
 
@@ -206,10 +211,11 @@ function error_message(er)
     # @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(
     #     typeof(er)
     # )
+    theme = TERM_THEME[]
     if hasfield(typeof(er), :error)
         # @info "nested error" typeof(er.error)
         m1, m2 = error_message(er.error)
-        msg = "\n{bold red}LoadError:{/bold red}\n" * m1
+        msg = "\n{bold $(theme.err_errmsg)}LoadError:{/bold $(theme.err_errmsg)}\n" * m1
     else
         msg = if hasfield(typeof(er), :msg)
             er.msg
@@ -227,6 +233,7 @@ end
 function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30)
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
+            theme = TERM_THEME[]
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
 
@@ -243,7 +250,10 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                 println("\n")
                 ename = string(typeof(er))
                 print(
-                    hLine("{default bold red}$ename{/default bold red}"; style = "dim red"),
+                    hLine(
+                        "{default bold $(theme.err_errmsg)}$ename{/default bold $(theme.err_errmsg)}";
+                        style = "dim $(theme.err_errmsg)",
+                    ),
                 )
 
                 # print error stacktrace
@@ -263,9 +273,9 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                         width = default_stacktrace_width() - 4,
                     );
                     width = default_stacktrace_width(),
-                    title = "{bold red default underline}$(typeof(er)){/bold red default underline}",
+                    title = "{bold $(theme.err_errmsg) default underline}$(typeof(er)){/bold $(theme.err_errmsg) default underline}",
                     padding = (2, 2, 1, 1),
-                    style = "dim red",
+                    style = "dim $(theme.err_errmsg)",
                     title_justify = :center,
                     fit = false,
                 ) |> print
