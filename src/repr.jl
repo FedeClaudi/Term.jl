@@ -278,7 +278,7 @@ function termshow(io::IO, obj::DataType; showdocs = true, kwargs...)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
 
     type_name = apply_style(string(obj), theme.repr_name * " bold")
-    if length(supertypes(obj))>1
+    if length(supertypes(obj)) > 1
         sup = supertypes(obj)[2]
         type_name *= " {$(theme.repr_array_text) dim}<: $sup{/$(theme.repr_array_text) dim}"
     end

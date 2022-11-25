@@ -159,7 +159,9 @@ function error_message(er::MethodError; kwargs...)
             enumerate(er.args),
         ),
     )
-    main_line = "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" / _args
+    main_line =
+        "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" /
+        _args
 
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]

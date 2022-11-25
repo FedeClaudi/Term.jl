@@ -197,9 +197,9 @@ function Logging.handle_message(
     msg = if msg isa AbstractString
         reshape_text(has_markup(msg) ? msg : "{$logmsg_color}$msg{/$logmsg_color}", 64)
     else
-        "{$logmsg_color}"*reshape_text(string(msg), 64)*"{/$logmsg_color}"
+        "{$logmsg_color}" * reshape_text(string(msg), 64) * "{/$logmsg_color}"
     end
-    msg = length(msg) > 100 ? ltrim_str(msg, 97)*"..." : msg
+    msg = length(msg) > 100 ? ltrim_str(msg, 97) * "..." : msg
 
     # get the first line of information
     fn_color = logger.theme.func
