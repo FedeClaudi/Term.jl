@@ -1,4 +1,4 @@
-import Term: Theme, set_theme, demo
+import Term: Theme, set_theme, demo_theme
 
 @testset "\e[34mtheme" begin
     io = PipeBuffer()
@@ -87,5 +87,5 @@ end
         box                          = :HEAVY,
     )
 
-    @compare_to_string(demo(newtheme), "theme_demo")
+    @compare_to_string(demo_theme(newtheme), "theme_demo")
 end
