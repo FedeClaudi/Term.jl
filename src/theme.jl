@@ -1,33 +1,6 @@
 using Highlights.Tokens, Highlights.Themes
 import Markdown: @md_str
-import MyterialColors:
-    green,
-    green_light,
-    purple_light,
-    blue,
-    red,
-    green_light,
-    green,
-    blue_light,
-    orange_light,
-    pink_light,
-    orange,
-    yellow,
-    yellow_light,
-    white,
-    green,
-    amber,
-    green_dark,
-    orange,
-    pink,
-    blue_grey_light,
-    blue_grey_light,
-    teal,
-    salmon_light,
-    indigo_light,
-    light_blue,
-    cyan_light,
-    cyan_lighter
+using MyterialColors
 
 import Parameters: @with_kw
 
@@ -136,6 +109,111 @@ style outputs to terminal.
     tb_box::Symbol     = :MINIMAL_HEAVY_HEAD
 end
 
+
+DarkTheme = Theme(name="dark")
+
+LightTheme = Theme(
+name= "light",
+
+# syntax
+docstring     = green_dark,
+string        = "#64b565",
+type          = purple_dark,
+code          = yellow_darker,
+multiline_code= yellow_darker,
+symbol        = orange,
+expression    = amber,
+number        = blue_dark,
+operator      = red,
+func          = yellow_darker,
+
+# misc
+text          = "default",
+text_accent   = grey_dark,
+emphasis      = "$blue  bold",
+emphasis_light= yellow_dark,
+line          = "default",
+
+# logging 
+info  = "#7cb0cf",
+debug = "#197fbd",
+warn  = orange,
+error = "bold #d13f3f",
+logmsg= "#8abeff",
+
+# tree 
+tree_title = "$orange italic",
+tree_node  = "$yellow_darker italic",
+tree_leaf  = yellow_dark,
+tree_guide = blue_darker,
+
+# repr
+repr_accent     = "bold $yellow_darker",
+repr_name       = yellow_darker,
+repr_type       = purple_darker,
+repr_values     = indigo_darker,
+repr_line       = "dim $indigo_dark",
+repr_panel      = "black",
+repr_array_panel= "dim $yellow_darker",
+repr_array_title= "dim $blue_dark",
+repr_array_text = "$blue_dark",
+
+# errors
+err_accent       = pink_darker,
+er_bt            = "#ff8a4f",
+err_btframe_panel= "#9bb3e0",
+err_filepath     = "grey62",
+err_errmsg                = "red",
+
+# introspection
+inspect_highlight= pink_dark,
+inspect_accent   = pink,
+
+# progress
+progress_accent             = pink_darker,
+progress_elapsedcol_default = purple_dark,
+progress_etacol_default     = teal_darker,
+progress_spiner_default     = "bold $blue_dark",
+progress_spinnerdone_default= "$green_dark bold",
+
+# dendogram
+dendo_title            = salmon_dark,
+dendo_pretitle= blue_grey_dark,
+dendo_leaves  = blue_grey_dark,
+dendo_lines   = "$blue_dark dim bold",
+
+# markdown
+md_h1                = "bold $indigo_dark",
+md_h2                = "bold $blue underline",
+md_h3                = "bold $blue",
+md_h4                = "bold $indigo_dark",
+md_h5                = "bold $cyan_dark",
+md_h6                = "bold $cyan_darker",
+md_latex             = "$yellow_dark italic",
+md_code              = "$yellow_dark italic",
+md_codeblock_bg      = "#262626",
+md_quote             = "#5a74f2",
+md_footnote          = "#9aacdb",
+md_table_header      = "bold yellow",
+md_admonition_note   = "blue",
+md_admonition_info   = "blue",
+md_admonition_warning= yellow_dark,
+md_admonition_danger = "red",
+md_admonition_tip    = "green",
+
+# table
+tb_style  = grey_darker,
+tb_header = "bold black",
+tb_columns= "black",
+tb_footer = "black",
+)
+
+
+
+
+# ---------------------------------- display --------------------------------- #
+
+
 function Base.show(io::IO, ::MIME"text/plain", theme::Theme)
     fields = fieldnames(Theme)
     N = length(fields)
@@ -170,7 +248,7 @@ end
 
 set_theme(theme::Theme) = (TERM_THEME[] = theme)
 
-function demo(theme::Theme = TERM_THEME[])
+function demo_theme(theme::Theme = TERM_THEME[])
     # change theme
     currtheme = TERM_THEME[]
     set_theme(theme)
@@ -259,8 +337,8 @@ function demo(theme::Theme = TERM_THEME[])
     termshow(rand(5, 5))
     termshow(tree_dict)
 
-    hLine("Markdown") |> println
-    tprintln(markdow_text)
+    # hLine("Markdown") |> println
+    # tprintln(markdow_text)
 
     # reset theme
     set_theme(currtheme)
