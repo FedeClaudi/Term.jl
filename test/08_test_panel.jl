@@ -421,5 +421,5 @@ end
         style = "red",
     )
 
-    @compare_to_string(pns, "panels_layout_macro")
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro")
 end
