@@ -23,7 +23,7 @@ import ..Measures: width as get_width
 import ..Consoles: console_width, console_height
 using ..Boxes
 
-export Panel, TextBox
+export Panel, TextBox, @nested_panels
 
 abstract type AbstractPanel <: AbstractRenderable end
 
@@ -484,6 +484,94 @@ function render(
 
     segments = vcat(initial_segments, content_sgs, final_segments)
     return Panel(segments, Measure(segments))
+end
+
+# ---------------------------------------------------------------------------- #
+#                              PANEL LAYOUT MACRO                              #
+# ---------------------------------------------------------------------------- #
+
+"""
+    function parse_layout_args end
+
+Parse the arguments of a `Expr(:call, :Panel, ...)` to 
+add a keyword argument to fix the panel's width. 
+A few diferent menthods are defined to handle different combinations
+of args/kwargs for the Panel call.
+"""
+function parse_layout_args end
+
+""" `Panel` had no args/kwargs """
+function parse_layout_args(depth)
+    w = console_width()
+    Δw = 6
+    kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth))
+    content_args = []
+    return kwargs_arg, content_args
+end
+
+""" `Panel`'s args did not start with an `Expr` (e.g. a string) """
+function parse_layout_args(depth, firstarg, args...)
+    w = console_width()
+    Δw = 6
+    kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth))
+    return kwargs_arg, [firstarg, args...]
+end
+
+""" `Panels`'s first argument was an `Expr`, nested content! """
+function parse_layout_args(depth, firstarg::Expr, args...)
+    w = console_width()
+    Δw = 6
+
+    if firstarg.head == :parameters
+        kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth), firstarg.args...)
+        content_args = collect(args)
+    else
+        kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth))
+        content_args = length(args) > 1 ? collect(args[2:end]) : []
+    end
+
+    return kwargs_arg, content_args
+end
+
+"""
+    fix_layout_width(panel_call::Expr, depth::Int)::Expr
+
+Go through an `Expr` with a `:call` to a `Panel` and add a keyword
+argument expression with the correct `width` (using `parse_layout_args`).
+Also go through any other argument to the call to fix inner panels' width.
+"""
+function fix_layout_width(panel_call::Expr, depth::Int)::Expr
+    kwargs_arg, content_args = parse_layout_args(depth, panel_call.args[2:end]...)
+
+    # @info "got ready" content_args
+    for (i, arg) in enumerate(content_args)
+        !isa(arg, Expr) && continue
+        # @info "doing" arg arg.head
+        if arg.head == :call && arg.args[1] == :Panel
+            content_args[i] = fix_layout_width(arg, depth + 1)
+        end
+    end
+    return Expr(:call, :Panel, kwargs_arg, content_args...)
+end
+
+"""
+    macro nested_panels(layout_call)
+
+Macro to automate layout of multiple nested `Panel`. The width of the
+panels is automatically adjusted based on the depth of eeach nested level.
+
+Uses `fix_layout_width` recursively to add a keyword argument `width` to each
+`Panel`.
+"""
+macro nested_panels(layout_call)
+    if layout_call.head != :call || layout_call.args[1] != :Panel
+        error("Layout only works for nested `Panel`")
+    end
+
+    layout_call = fix_layout_width(layout_call, 0)
+    quote
+        $layout_call
+    end |> esc
 end
 
 # ---------------------------------------------------------------------------- #

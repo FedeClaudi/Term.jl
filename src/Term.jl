@@ -82,7 +82,7 @@ include("compositors.jl")
 include("grid.jl")
 include("introspection.jl")
 
-export RenderableText, Panel, TextBox
+export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
@@ -115,7 +115,7 @@ using .Renderables: AbstractRenderable, Renderable, RenderableText
 
 using .Layout
 
-using .Panels: Panel, TextBox
+using .Panels: Panel, TextBox, @nested_panels
 
 # define additional methods for measure functions
 
