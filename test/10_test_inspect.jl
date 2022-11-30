@@ -48,7 +48,7 @@ end
 
 @testset "Introspect types and funcs" begin
     intro = @capture_out begin
-        inspect(Panel; methods = true, supertypes = true)
+        inspect(Int; methods = true, supertypes = true)
     end
     intro = remove_ansi(intro)
     @compare_to_string(intro, "introspection_panel")
