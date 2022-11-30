@@ -433,4 +433,11 @@ end
     )
 
     IS_WIN || @compare_to_string(pns, "panels_layout_macro2")
+
+
+    pns = @nested_panels Panel()
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro3")
+
+    pns = @nested_panels Panel(Panel())
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro3")
 end

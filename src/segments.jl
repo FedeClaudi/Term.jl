@@ -41,7 +41,6 @@ Construct a Segment out of a plain string and a markup string with style info
 """
 Segment(text, markup::String) = Segment("{$markup}" * text * "{/$markup}")
 
-Segment(seg::Segment) = seg
 
 # --------------------------------- printing --------------------------------- #
 

@@ -1,5 +1,5 @@
 import Term.Style: apply_style
-import Term: tprint, tprintln
+import Term: tprint, tprintln, get_file_format
 
 @testset "\e[34mStyle\e[0m" begin
     @test apply_style("test") == "test"
@@ -49,4 +49,9 @@ end
           "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[32m sdfsdp\e[39m\e[1msdsdfs\npdfsdp\e[22m\e[39m"
 
     @test stprint("This and that {{something}} for") == "This and that {{something}} for"
+end
+
+@testset "\e[34mTmisc\e[0m" begin
+      @test get_file_format(1024) == "1.0 KB"
+      @test get_file_format(10243312) == "9.77 MB"
 end
