@@ -68,7 +68,7 @@ repr_panel(
     kwargs...,
 )
 
-function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsis=false)
+function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsis = false)
     shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     out = highlight.(shortsting.(v[1:N]))
 
@@ -81,16 +81,16 @@ function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 50, max_D =
     N = min(max_items, size(mtx, 1))
     D = min(max_D, size(mtx, 2))
 
-    _D = size(mtx, 2) > max_D ? D-1 : D
-    columns = [vec_elems2renderables(mtx[:, i], N, max_w; ellipsis=true) for i in 1:_D]
+    _D = size(mtx, 2) > max_D ? D - 1 : D
+    columns = [vec_elems2renderables(mtx[:, i], N, max_w; ellipsis = true) for i in 1:_D]
 
     # add a column of ellipses
-    if size(mtx, 2) > max_D 
-        c = repeat(["⋯"], length(columns[1])-1)
+    if size(mtx, 2) > max_D
+        c = repeat(["⋯"], length(columns[1]) - 1)
         push!(c, size(mtx, 1) <= max_items ? "⋯" : "⋱")
         push!(columns, c)
 
-        headers = "(" .* string.(1:length(columns)-1) .* ")" |> collect
+        headers = "(" .* string.(1:(length(columns) - 1)) .* ")" |> collect
         push!(headers, "($(size(mtx, 2)))")
     else
         headers = "(" .* string.(1:length(columns)) .* ")" |> collect
@@ -100,22 +100,21 @@ function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 50, max_D =
     if size(mtx, 1) <= max_items
         pushfirst!(columns, "{dim}(" .* string.(1:length(columns[1])) .* "){/dim}")
     else
-        nums = "{dim}(" .* string.(1:length(columns[1])-1) .* "){/dim}"
+        nums = "{dim}(" .* string.(1:(length(columns[1]) - 1)) .* "){/dim}"
         push!(nums, "")
         pushfirst!(columns, nums)
     end
     pushfirst!(headers, "")
-    
 
     content = Table(
-        OrderedDict(map(i -> headers[i]=>columns[i], 1:length(columns))); 
+        OrderedDict(map(i -> headers[i] => columns[i], 1:length(columns)));
         vpad = 0,
         hpad = 1,
         compact = true,
         box = :NONE,
-        header_style="dim",
-        header_justify=:center,
-        columns_justify=:left,
+        header_style = "dim",
+        header_justify = :center,
+        columns_justify = :left,
     )
     return content
 end
@@ -134,7 +133,6 @@ function vec2content(vec::Union{Tuple,AbstractVector})
         push!(vec_items, " ⋮";)
         push!(counts, "";)
     end
-
 
     content = Table(
         [counts vec_items];

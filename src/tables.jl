@@ -225,10 +225,10 @@ function Table(
             mid = :mid
             _compact = (show_header && (box != BOXES[:NONE])) ? false : compact
 
-
-        # add additional rows
+            # add additional rows
         elseif l == nrows
-            top, mid, bottom, _compact = nothing, :mid, isnothing(footer) ? :bottom : :foot_row, false
+            top, mid, bottom, _compact =
+                nothing, :mid, isnothing(footer) ? :bottom : :foot_row, false
         else
             top, mid, bottom, _compact = nothing, :mid, :row, compact
         end
@@ -337,7 +337,7 @@ function table_row(
     cells::Vector,
     widths::Vector,
     box,
-    top_level::Union{Nothing, Symbol},
+    top_level::Union{Nothing,Symbol},
     mid_level::Symbol,
     bottom_level::Symbol,
     box_style,
