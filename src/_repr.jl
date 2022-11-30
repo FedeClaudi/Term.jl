@@ -1,4 +1,5 @@
 import Term: default_width
+import OrderedCollections: OrderedDict
 
 function repr_get_obj_fields_display(obj)
     field_names = fieldnames(typeof(obj))
@@ -54,47 +55,68 @@ repr_panel(
     kwargs...,
 ) = Panel(
     content;
-    fit = false,
+    fit = true,
     title = isnothing(obj) ? obj : escape_brackets(string(typeof(obj))),
     title_justify = :left,
     width = width,
     justify = justify,
     style = TERM_THEME[].repr_panel,
     title_style = TERM_THEME[].repr_name,
-    padding = (2, 1, 1, 1),
+    padding = (1, 1, 1, 1),
     subtitle = subtitle,
     subtitle_justify = :right,
     kwargs...,
 )
 
-function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w)
+function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsis=false)
     shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     out = highlight.(shortsting.(v[1:N]))
 
-    length(v) > N && push!(out, "⋮";)
+    ellipsis && length(v) > N && push!(out, " ⋮";)
     return out
 end
 
-function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 100, max_D = 10)
+function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 50, max_D = 10)
     max_D = console_width() < 150 ? 5 : max_D
     N = min(max_items, size(mtx, 1))
     D = min(max_D, size(mtx, 2))
 
-    columns = [vec_elems2renderables(mtx[:, i], N, max_w) for i in 1:D]
-    counts = RenderableText.("(" .* string.(1:N) .* ")"; style = "dim")
-    top_counts = RenderableText.("(" .* string.(1:D) .* ")"; style = "dim white bold")
+    _D = size(mtx, 2) > max_D ? D-1 : D
+    columns = [vec_elems2renderables(mtx[:, i], N, max_w; ellipsis=true) for i in 1:_D]
 
-    space1, space2 = Spacer(length(counts), 3), Spacer(length(counts), 2)
+    # add a column of ellipses
+    if size(mtx, 2) > max_D 
+        c = repeat(["⋯"], length(columns[1])-1)
+        push!(c, size(mtx, 1) <= max_items ? "⋯" : "⋱")
+        push!(columns, c)
 
-    content = ("" / "" / rvstack(counts...)) * space1
-    for i in 1:(D - 1)
-        content *= cvstack(top_counts[i], "", lvstack(columns[i])) * space2
+        headers = "(" .* string.(1:length(columns)-1) .* ")" |> collect
+        push!(headers, "($(size(mtx, 2)))")
+    else
+        headers = "(" .* string.(1:length(columns)) .* ")" |> collect
     end
-    content *= cvstack(top_counts[end], "", lvstack(columns[end]))
 
-    if D < size(mtx, 2)
-        content *= "" / "" / vstack((" {bold}⋯{/bold}" for i in 1:N)...)
+    # add a column of numbers
+    if size(mtx, 1) <= max_items
+        pushfirst!(columns, "{dim}(" .* string.(1:length(columns[1])) .* "){/dim}")
+    else
+        nums = "{dim}(" .* string.(1:length(columns[1])-1) .* "){/dim}"
+        push!(nums, "")
+        pushfirst!(columns, nums)
     end
+    pushfirst!(headers, "")
+    
+
+    content = Table(
+        OrderedDict(map(i -> headers[i]=>columns[i], 1:length(columns))); 
+        vpad = 0,
+        hpad = 1,
+        compact = true,
+        box = :NONE,
+        header_style="dim",
+        header_justify=:center,
+        columns_justify=:left,
+    )
     return content
 end
 
@@ -107,6 +129,12 @@ function vec2content(vec::Union{Tuple,AbstractVector})
 
     vec_items = vec_elems2renderables(vec, N, max_w)
     counts = "(" .* string.(1:length(vec_items)) .* ")"
+
+    length(vec) > N && begin
+        push!(vec_items, " ⋮";)
+        push!(counts, "";)
+    end
+
 
     content = Table(
         [counts vec_items];

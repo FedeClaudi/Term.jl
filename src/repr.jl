@@ -223,8 +223,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
                 width = 60,
                 style = panel_style,
                 subtitle_style = "default",
-                title = "($n)",
-                title_style = panel_title_style,
+                fit=true,
             ),
         )
         push!(panels, Spacer(2, 1))
