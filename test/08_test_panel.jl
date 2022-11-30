@@ -409,3 +409,35 @@ end
     │ ⠀1⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀2⠀│
     ╰───────────────────────────────────────────╯"""
 end
+
+@testset "\e[34mPANEL - nested panels macro" begin
+    pns = @nested_panels Panel(
+        Panel("inner", Panel("out", Panel("deep")); style = "green"),
+        Panel("inner2 "^25; height = 5),
+        "test",
+        RenderableText("adasdasda"),
+        Panel(; style = "red on_black");
+        height = 20,
+        style = "red",
+    )
+
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro")
+
+    pns = @nested_panels Panel(
+        Panel(Panel()),
+        Panel(Panel("red"); style = "red on_black"),
+        Panel(),
+        Panel(; style = "red"),
+        "done";
+        height = 20,
+        style = "red",
+    )
+
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro2")
+
+    pns = @nested_panels Panel()
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro3")
+
+    pns = @nested_panels Panel(Panel())
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro3")
+end

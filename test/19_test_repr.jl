@@ -65,6 +65,8 @@ objs = if VERSION >= v"1.7.1"
         (6, zeros(3, 3, 3)),
         (7, clear),
         (8, :(x / y + √9)),
+        (9, zeros(10)),
+        (10, zeros(5, 5)),
     )
 else
     (

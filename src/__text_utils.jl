@@ -130,7 +130,7 @@ textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
 
 """
-    remove_ansi(str)::String
+    escape_brackets(text)::Stringremove_ansi(str)::String
 
 Replace each curly bracket with a double copy of itself
 """
@@ -282,16 +282,6 @@ Split a string into its composing lines.
 """
 split_lines(text::String)::Vector{String} = split(text, "\n")
 split_lines(text::SubString)::Vector{String} = String.(split(text, "\n"))
-
-"""
-    split_lines(renderable)
-
-Split a renderable's text.
-"""
-function split_lines(renderable)
-    string(typeof(renderable)) == "Segment" && return split_lines(renderable.text)
-    return [s.text for s in renderable.segments]
-end
 
 """
     do_by_line(fn::Function, text::String)

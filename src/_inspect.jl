@@ -24,7 +24,8 @@ Create a `Renderable` with styled `Method` information for `inspect(::DataType)`
 """
 function style_methods(
     methods::Union{Vector{Base.Method},Base.MethodList},
-    tohighlight::AbstractString,
+    tohighlight::AbstractString;
+    constructor::Bool = false,
 )
     txt_col = TERM_THEME[].text
     fn_col = TERM_THEME[].func
@@ -40,10 +41,19 @@ function style_methods(
             highlight_syntax
 
         code = "{dim}" * code * "{/dim}"
+
+        # avoid repeating construct name
+        if constructor
+            code = replace(code, tohighlight => ""; count = 1)
+        end
+
+        # avoid name of interest
         code = replace(
             code,
             tohighlight => "{$highlight_col default}$tohighlight{/$highlight_col default}{dim}",
         )
+
+        # add preamble
         code = RenderableText(
             "     {$accent_col dim}($i){/$accent_col dim}  {$fn_col}$(m.name){/$fn_col}" *
             code,

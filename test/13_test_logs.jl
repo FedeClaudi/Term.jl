@@ -28,8 +28,6 @@ install_term_logger()
 
         sdfs
         s""" 1 + 2
-
-        # uninstall_term_logger()
     end
 end
 
