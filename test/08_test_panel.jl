@@ -423,17 +423,17 @@ end
 
     IS_WIN || @compare_to_string(pns, "panels_layout_macro")
 
-
     pns = @nested_panels Panel(
         Panel(Panel()),
         Panel(Panel("red"); style = "red on_black"),
-        Panel(), Panel(; style="red"), "done";
+        Panel(),
+        Panel(; style = "red"),
+        "done";
         height = 20,
         style = "red",
     )
 
     IS_WIN || @compare_to_string(pns, "panels_layout_macro2")
-
 
     pns = @nested_panels Panel()
     IS_WIN || @compare_to_string(pns, "panels_layout_macro3")

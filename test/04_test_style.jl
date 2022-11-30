@@ -52,6 +52,6 @@ end
 end
 
 @testset "\e[34mTmisc\e[0m" begin
-      @test get_file_format(1024) == "1.0 KB"
-      @test get_file_format(10243312) == "9.77 MB"
+    @test get_file_format(1024) == "1.0 KB"
+    @test get_file_format(10243312) == "9.77 MB"
 end

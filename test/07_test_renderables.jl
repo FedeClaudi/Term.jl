@@ -23,7 +23,6 @@ import Term: fillin
     @test ("t2" * seg).text == "t2test"
     @test (seg * seg).text == "testtest"
 
-
     s = @capture_out show(seg)
     @test s == string(s)
 end

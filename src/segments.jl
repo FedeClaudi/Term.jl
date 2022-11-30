@@ -41,7 +41,6 @@ Construct a Segment out of a plain string and a markup string with style info
 """
 Segment(text, markup::String) = Segment("{$markup}" * text * "{/$markup}")
 
-
 # --------------------------------- printing --------------------------------- #
 
 Base.show(io::IO, seg::Segment) = print(io, unescape_brackets(seg.text))
