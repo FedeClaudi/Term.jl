@@ -62,9 +62,11 @@ end
 end
 
 @testset "\e[34mRenderables - trim renderables" begin
-    r = trim_renderable(RenderableText("aa bb"^100), 25)
-    @compare_to_string(r, "trim_renderables_1")
+    IS_WIN || begin
+        r = trim_renderable(RenderableText("aa bb"^100), 25)
+        @compare_to_string(r, "trim_renderables_1")
 
-    r = trim_renderable(Panel("aa bb"^100), 25)
-    @compare_to_string(r, "trim_renderables_2")
+        r = trim_renderable(Panel("aa bb"^100), 25)
+        @compare_to_string(r, "trim_renderables_2")
+    end
 end
