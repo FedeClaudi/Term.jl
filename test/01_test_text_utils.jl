@@ -19,7 +19,8 @@ import Term:
     has_ansi,
     textlen,
     fillin,
-    chars
+    chars,
+    justify
 import Term.Style: apply_style
 import Term.Measures: width as get_width
 
@@ -242,4 +243,11 @@ id est laborum."""
     #         @test len[end] == (offset > 0 ? offset : width + offset)
     #     end
     # end
+end
+
+@testset "Text justify" begin
+    str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    _str = reshape_text(str, 50)
+
+    @compare_to_string(justify(str, 150), "justify")
 end

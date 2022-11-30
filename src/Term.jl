@@ -46,7 +46,6 @@ include("__text_utils.jl")
 include("_ansi.jl")
 include("_utils.jl")
 include("_text_reshape.jl")
-include("link.jl")
 
 # don't import other modules
 include("measures.jl")

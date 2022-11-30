@@ -173,7 +173,7 @@ function Table(
     # ----------------------------- create table rows ---------------------------- #
     nrows = length(rows_values)
     lines::Vector{String} = []
-    # @info "creating table" height widths
+    # @info "creating table" heights widths
 
     # create a row for the header
     show_header && push!(
@@ -194,7 +194,8 @@ function Table(
             :head,
             :head_row,
             style,
-            heights[1],
+            heights[1];
+            # compact = true
         ),
     )
 

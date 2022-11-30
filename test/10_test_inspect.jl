@@ -45,7 +45,14 @@ end
     end
 end
 
-@testset "Introspect types and modules" begin
-    # @compare_to_string :(inspect(Panel)) "inspect_panel"
-    inspect(Panel)  # find way to fix this
+@testset "Introspect types and funcs" begin
+    intro = @capture_out begin
+        inspect(Panel; methods = true, supertypes = true)
+    end
+    @compare_to_string(intro, "introspection_panel")
+
+    intro = @capture_out begin
+        inspect(print)
+    end
+    @compare_to_string(intro, "introspection_print")
 end

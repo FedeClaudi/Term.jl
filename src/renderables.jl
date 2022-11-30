@@ -204,9 +204,4 @@ function trim_renderable(ren::RenderableText, width::Int)::RenderableText
     return RenderableText(text, width = width)
 end
 
-trim_renderable(text::AbstractString, width::Int) = begin
-    # @info "Trimming text" text
-    text_to_width(text, width)
-end
-
 end

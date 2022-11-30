@@ -284,16 +284,6 @@ split_lines(text::String)::Vector{String} = split(text, "\n")
 split_lines(text::SubString)::Vector{String} = String.(split(text, "\n"))
 
 """
-    split_lines(renderable)
-
-Split a renderable's text.
-"""
-function split_lines(renderable)
-    string(typeof(renderable)) == "Segment" && return split_lines(renderable.text)
-    return [s.text for s in renderable.segments]
-end
-
-"""
     do_by_line(fn::Function, text::String)
 
 Apply `fn` to each line in the `text`.

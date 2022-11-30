@@ -12,8 +12,7 @@ import Term:
     textlen,
     TERM_THEME
 
-import ..Renderables:
-    AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
+import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
 import ..Style: apply_style
 import ..Segments: Segment

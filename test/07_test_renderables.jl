@@ -1,4 +1,5 @@
-import Term.Renderables: Renderable, RenderableText, AbstractRenderable
+import Term.Renderables: Renderable, RenderableText, AbstractRenderable, trim_renderable
+import Term: Panel
 import Term.Segments: Segment
 import Term: fillin
 
@@ -58,4 +59,12 @@ end
         r = RenderableText(lorem, width = width, justify = :center, background = "on_red")
         @compare_to_string(r, "renderable_text_2")
     end
+end
+
+@testset "\e[34mRenderables - trim renderables" begin
+    r = trim_renderable(RenderableText("aa bb"^100), 25)
+    @compare_to_string(r, "trim_renderables_1")
+
+    r = trim_renderable(Panel("aa bb"^100), 25)
+    @compare_to_string(r, "trim_renderables_2")
 end
