@@ -182,7 +182,7 @@ function Panel(
     end
     width = fit ? min(panel_width, console_width()) : width
 
-    # @info "Ready to make panel" content content_width panel_width width console_width() fit
+    # @debug "Ready to make panel" content content_width panel_width width console_width() fit
     return Panel(content, Val(fit), padding; width = width, kwargs...)
 end
 
@@ -238,7 +238,7 @@ function Panel(
         max(width, content.measure.w + padding.left + padding.right + 2),
     )
 
-    # @info "Creating fitted panel" content.measure panel_measure content
+    # @debug "Creating fitted panel" content.measure panel_measure content
     return render(
         content;
         panel_measure = panel_measure,
@@ -309,7 +309,7 @@ function Panel(
         content = Renderable(segments, Measure(segments))
     end
 
-    # @info "creating not fitted panel" content.measure panel_measure width Δw 
+    # @debug "creating not fitted panel" content.measure panel_measure width Δw 
     return render(
         content;
         panel_measure = panel_measure,
@@ -407,7 +407,7 @@ function render(
     kwargs...,
 )::Panel
     background = get_bg_color(background)
-    # @info "calling render" content content_measure background
+    # @debug "calling render" content content_measure background
     # println("Content\n", content)
 
     # create top/bottom rows with titles
@@ -442,7 +442,7 @@ function render(
     else
         [Segment(left * "{$background}" * " "^(panel_measure.w - 2) * "{/$background}" * right)]
     end
-    # @info "rendering" panel_measure Δw
+    # @debug "rendering" panel_measure Δw
 
     # check if we need extra lines at the bottom to reach target height
     n_extra = if content_measure.h < panel_measure.h - Δh - 2
@@ -526,8 +526,11 @@ function parse_layout_args(depth, firstarg::Expr, args...)
         content_args = collect(args)
     else
         kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth))
-        content_args = length(args) > 1 ? collect(args[2:end]) : []
+        # content_args = length(args) > 1 ? collect(args[2:end]) : []
+        content_args = [firstarg, args...]
     end
+
+    @debug "in here" firstarg args kwargs_arg content_args
 
     return kwargs_arg, content_args
 end
@@ -540,12 +543,13 @@ argument expression with the correct `width` (using `parse_layout_args`).
 Also go through any other argument to the call to fix inner panels' width.
 """
 function fix_layout_width(panel_call::Expr, depth::Int)::Expr
+    @debug "Starting" panel_call.args
     kwargs_arg, content_args = parse_layout_args(depth, panel_call.args[2:end]...)
 
-    # @info "got ready" content_args
+    @debug "got ready" content_args kwargs_arg
     for (i, arg) in enumerate(content_args)
         !isa(arg, Expr) && continue
-        # @info "doing" arg arg.head
+
         if arg.head == :call && arg.args[1] == :Panel
             content_args[i] = fix_layout_width(arg, depth + 1)
         end

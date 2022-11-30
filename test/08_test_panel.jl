@@ -440,4 +440,10 @@ end
 
     pns = @nested_panels Panel(Panel())
     IS_WIN || @compare_to_string(pns, "panels_layout_macro3")
+
+    pns = @nested_panels Panel(Panel("a"), Panel("b"))
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro4")
+
+    pns = @nested_panels Panel(Panel("a"), Panel("b"; style = "green"); style = "red")
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro5")
 end
