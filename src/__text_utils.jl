@@ -130,7 +130,7 @@ textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
 
 """
-    remove_ansi(str)::String
+    escape_brackets(text)::Stringremove_ansi(str)::String
 
 Replace each curly bracket with a double copy of itself
 """

@@ -1,5 +1,6 @@
 import Term: inspect, expressiontree, typestree, Dendogram, Tree
 import Term.Consoles: console_width
+import Term: remove_ansi
 
 # define expressions
 e1 = :(2x + 3y + 2)
@@ -49,10 +50,12 @@ end
     intro = @capture_out begin
         inspect(Panel; methods = true, supertypes = true)
     end
+    intro = remove_ansi(intro)
     @compare_to_string(intro, "introspection_panel")
 
     intro = @capture_out begin
         inspect(print)
     end
+    intro = remove_ansi(intro)
     @compare_to_string(intro, "introspection_print")
 end
