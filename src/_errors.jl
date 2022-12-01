@@ -26,7 +26,7 @@ function render_frame_info(frame::StackFrame,; show_source = true)
             SubstitutionString("{$(theme.func)}" * s"\g<0>" * "{/$(theme.func)}"),
     )
     func =
-        reshape_text(highlight(func), default_stacktrace_width()) |> remove_markup |> lstrip
+        reshape_text(func, default_stacktrace_width())  |> lstrip
 
     # get other information about the function 
     inline =
@@ -204,18 +204,17 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
                     push!(content, skipped_line)
                     added_skipped_message = true
                 end
-            else
-                # show "inner" frames without additional info, hide base optionally
+            else  # show "inner" frames without additional info, hide base optionally
 
                 # skip frames in modules like Base
                 to_skip = (curr_module == "Base" && hide_base)
 
                 # show number of frames skipped
-                if (to_skip == false && n_skipped > 0) || (num == length(bt)-1)
+                if (to_skip == false || num == length(bt)-1) && n_skipped > 0
                     color = TERM_THEME[].err_btframe_panel
                     push!(content, 
-                        RenderableText("⋮" /"{$color}Skipped {bold}$n_skipped{/bold} frames from module Base{/$color}" / "⋮"; 
-                        width=default_stacktrace_width() - 6, justify=:center))
+                        RenderableText("⋮" /"Skipped {bold}$n_skipped{/bold} frames from module Base" / "⋮"; 
+                        width=default_stacktrace_width() - 6, justify=:center, style=color))
                 end
 
                 # skip

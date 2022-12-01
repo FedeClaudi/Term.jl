@@ -23,7 +23,7 @@ style outputs to terminal.
     expression::String     = amber
     number::String         = blue_light
     operator::String       = red
-    func::String           = yellow
+    func::String           = "#f2d777"
 
     # misc
     text::String           = "default"
