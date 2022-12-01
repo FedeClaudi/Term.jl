@@ -1,6 +1,11 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 
+function parse_kw_func_name(frame::StackFrame)
+    def = frame.linfo.def
+    return replace(string(def.name), "##kw" => "") *
+           "{default dim} -- keyword arguments call{/default dim}"
+end
 """
     function render_frame_info end
 
@@ -19,6 +24,9 @@ function render_frame_info(frame::StackFrame, ; show_source = true)
 
     # get the name of the error function
     func = sprint(StackTraces.show_spec_linfo, frame)
+    contains(func, "##kw") && (func = parse_kw_func_name(frame))
+
+    # format function name
     func = replace(
         func,
         r"(?<group>^[^(]+)" =>
@@ -129,6 +137,11 @@ Get module from file path.
 frame_module(path::String) = startswith(path, "./") ? "Base" : nothing
 
 """
+Get module for a pointer obj
+"""
+frame_module(pointer::Ptr{Nothing}) = frame_module(StackTraces.lookup(pointer)[1])
+
+"""
     should_skip
 
 A frame should skip if it's in Base or an installed package.
@@ -235,11 +248,13 @@ function render_backtrace(
         info = render_frame_info(frame; show_source = num in (1, length(bt)))
 
         # if the current frame's module differs from the previous one, show module name
-        curr_module = frames_modules[num]
+        curr_module =
+            isnothing(frames_modules[num]) ? prev_frame_module : frames_modules[num]
         (
             curr_module != prev_frame_module &&
             !should_skip(frame, hide_frames) &&
-            curr_module != "nothing"
+            curr_module != "nothing" &&
+            !isnothing(curr_module)
         ) && add_new_module_name!(content, curr_module, hide_frames, num, bt)
 
         if num == 1  # first frame is highlighted

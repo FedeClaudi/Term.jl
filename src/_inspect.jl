@@ -8,7 +8,7 @@ Extract and style an object's docstring.
 function get_docstring(obj)
     # get doc and docstring
     doc = getdocs(obj)
-
+    asda
     docstring = if isnothing(doc)
         "no docstring"
     else
@@ -68,7 +68,6 @@ function style_methods(
         dest = RenderableText(
             "{dim default italic}             → $(m.file):$(m.line){/dim default italic}",
         )
-
         content = isnothing(info) ? code / dest / "" : info / code / dest / ""
         push!(mets, content)
     end
