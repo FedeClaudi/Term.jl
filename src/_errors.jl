@@ -139,14 +139,16 @@ should_skip(frame::StackFrame) =
         contains(string(frame.file), r"[/\\]julia[/\\]stdlib[/\\]")
     )
 
+should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false
+
 """
-    add_new_module_name!(content, curr_module, hide_base, num, bt)
+    add_new_module_name!(content, curr_module, hide_frames, num, bt)
 
 When a frame belonging to a module different from the previous one is shown, 
 print the new module's name.
 """
-function add_new_module_name!(content, curr_module, hide_base, num, bt)
-    (curr_module == "Base" && hide_base && num ∉ [1, length(bt)]) || begin
+function add_new_module_name!(content, curr_module, hide_frames, num, bt)
+    (curr_module == "Base" && hide_frames && num ∉ [1, length(bt)]) || begin
         theme = TERM_THEME[]
         accent = theme.err_accent
         push!(
@@ -208,7 +210,7 @@ function render_backtrace(
     bt::Vector;
     reverse_backtrace = true,
     max_n_frames = 30,
-    hide_base = true,
+    hide_frames = true,
 )
     theme = TERM_THEME[]
     length(bt) == 0 && return RenderableText("")
@@ -234,8 +236,8 @@ function render_backtrace(
 
         # if the current frame's module differs from the previous one, show module name
         curr_module = frames_modules[num]
-        (curr_module != prev_frame_module && !should_skip(frame)) &&
-            add_new_module_name!(content, curr_module, hide_base, num, bt)
+        (curr_module != prev_frame_module && !should_skip(frame, hide_frames) && curr_module != "nothing") &&
+            add_new_module_name!(content, curr_module, hide_frames, num, bt)
 
         if num == 1  # first frame is highlighted
             push!(
@@ -279,7 +281,7 @@ function render_backtrace(
                 end
             else  # show "inner" frames without additional info, hide base optionally
                 # skip frames in modules like Base
-                to_skip = should_skip(frame)
+                to_skip = should_skip(frame, hide_frames)
 
                 # show number of frames skipped
                 if (to_skip == false || num == length(bt) - 1) && n_skipped > 0

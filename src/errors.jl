@@ -248,7 +248,7 @@ and hide Base and standard libraries error information (i.e. when a frame is in 
 function install_term_stacktrace(;
     reverse_backtrace::Bool = true,
     max_n_frames::Int = 30,
-    hide_base = true,
+    hide_frames = true,
 )
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
@@ -281,7 +281,7 @@ function install_term_stacktrace(;
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
-                        hide_base = $(hide_base),
+                        hide_frames = $(hide_frames),
                     )
                     print(rendered_bt)
                 end
