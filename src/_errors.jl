@@ -32,6 +32,7 @@ function render_frame_info(frame::StackFrame, ; show_source = true)
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
     func_line = hstack(func, inline, c; pad = 1)
 
+    # load source code around error and render it
     file = Base.fixup_stdlib_path(string(frame.file))
     if length(string(frame.file)) > 0
         file_line = RenderableText(

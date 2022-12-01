@@ -190,6 +190,22 @@ function error_message(er::StringIndexError)
     return m1
 end
 
+# ! SYSTEM ERROR
+function error_message(er::SystemError)
+    if @static(Sys.iswindows() ? er.extrainfo isa WindowsErrorInfo : false)
+        errstring = Libc.FormatMessage(er.extrainfo.errnum)
+        extrainfo = er.extrainfo.extrainfo
+    else
+        errstring = Libc.strerror(er.errnum)
+        extrainfo = er.extrainfo
+    end
+    if extrainfo === nothing
+        return "$(er.prefix)\n" * errstring
+    else
+        return "SystemError (with $extrainfo): $(er.prefix)\n" * errstring
+    end
+end
+
 # ! catch all other errors
 function error_message(er)
     # @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(

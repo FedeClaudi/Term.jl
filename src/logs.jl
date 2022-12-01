@@ -199,7 +199,7 @@ function Logging.handle_message(
     else
         "{$logmsg_color}" * reshape_text(string(msg), 64) * "{/$logmsg_color}"
     end
-    msg = length(msg) > 100 ? ltrim_str(msg, 97) * "..." : msg
+    msg = length(msg) > 1000 ? ltrim_str(msg, 997) * "..." : msg
 
     # get the first line of information
     fn_color = logger.theme.func
@@ -209,7 +209,7 @@ function Logging.handle_message(
     msg_lines::Vector{AbstractString} = split(msg, "\n")
     for n in 2:length(msg_lines)
         msg_lines[n] =
-            "  $vert   " * " "^textlen(content) * "{$logmsg_color}" * msg_lines[n]
+            "  $vert   " * " "^(textlen(content) - 4) * "{$logmsg_color}" * msg_lines[n]
     end
 
     length(msg_lines) > 0 && (content *= "  " * msg_lines[1])
