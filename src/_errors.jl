@@ -1,14 +1,24 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 
-function render_frame_info(pointer::Ptr{Nothing}; show_source = true)
+"""
+    function render_frame_info end
+
+Create a Term visualization of info and metadata about a 
+stacktrace frame.
+"""
+function render_frame_info end
+
+
+function render_frame_info(pointer::Ptr{Nothing}, args...; show_source = true)
     frame = StackTraces.lookup(pointer)[1]
-    return render_frame_info(frame; show_source = show_source)
-    # return RenderableText("   " * string(frame); width = default_stacktrace_width() - 12)
+    return render_frame_info(frame, args...; show_source = show_source)
 end
 
-function render_frame_info(frame::StackFrame; show_source = true)
+function render_frame_info(frame::StackFrame,; show_source = true)
     theme = TERM_THEME[]
+
+    # get the name of the error function
     func = sprint(StackTraces.show_spec_linfo, frame)
     func = replace(
         func,
@@ -22,29 +32,9 @@ function render_frame_info(frame::StackFrame; show_source = true)
     inline =
         frame.inlined ? RenderableText("   inlined"; style = "bold dim $(theme.text)") : ""
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
-
-    # get name of module
-    m = Base.parentmodule(frame)
-    if m !== nothing
-        while parentmodule(m) !== m
-            pm = parentmodule(m)
-            pm == Main && break
-            m = pm
-        end
-    end
-    m = !isnothing(m) ? string(m) : nothing
-
-    # get other info
-    file = Base.fixup_stdlib_path(string(frame.file))
-
-    # create text
     func_line = hstack(func, inline, c; pad = 1)
 
-    if !isnothing(m)
-        accent = theme.err_accent
-        func_line /= " {$accent dim}────{/$accent dim} {#9bb3e0}In module {$accent bold}$(m){/$accent bold}  {$accent dim}────{/$accent dim}{/#9bb3e0}"
-    end
-
+    file = Base.fixup_stdlib_path(string(frame.file))
     if length(string(frame.file)) > 0
         file_line = RenderableText(
             "{dim}$(file):{bold $(theme.text_accent)}$(frame.line){/bold $(theme.text_accent)}{/dim}";
@@ -83,9 +73,20 @@ function render_frame_info(frame::StackFrame; show_source = true)
     end
 end
 
+
+"""
+    render_backtrace_frame(
+        num::RenderableText,
+        info::AbstractRenderable;
+        as_panel = true,
+        kwargs...,
+    )
+
+Render a backtrace frame as either a `Panel` or a `RenderableText`
+"""
 function render_backtrace_frame(
     num::RenderableText,
-    info::AbstractRenderable;
+    info::AbstractRenderable,;
     as_panel = true,
     kwargs...,
 )
@@ -104,7 +105,32 @@ function render_backtrace_frame(
     end
 end
 
-function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 30)
+
+frame_module(path::String) = startswith(path, "./") ? "Base" : nothing
+
+function frame_module(frame::StackFrame)
+    m = Base.parentmodule(frame)
+    if m !== nothing
+        while parentmodule(m) !== m
+            pm = parentmodule(m)
+            pm == Main && break
+            m = pm
+        end
+    end
+    m = !isnothing(m) ? string(m) : frame_module(string(frame.file))
+
+    return m
+end
+
+
+"""
+    render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 30)
+
+Main error backtrace rendering function. 
+It renders each frame in a stacktrace after some filtering (e.g. to hide frames in BASE).
+It takes care of hiding frames when there's a large number of them. 
+"""
+function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 30, hide_base=true)
     theme = TERM_THEME[]
     length(bt) == 0 && return RenderableText("")
 
@@ -112,14 +138,34 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
         bt = reverse(bt)
     end
 
+    # get the module each frame's code line is defined in
+    frames_modules = frame_module.(bt)
+
+    # render each frame
     content = AbstractRenderable[]
     added_skipped_message = false
     N = length(bt)
+    prev_frame_module = nothing # keep track of the previous' frame module
+    n_skipped = 0  # keep track of number of frames skipped (e.g in Base)
     for (num, frame) in enumerate(bt)
         numren = RenderableText("($(num))"; style = "$(theme.emphasis) bold dim")
         info = render_frame_info(frame; show_source = num in (1, length(bt)))
 
-        if num == 1
+        # if the current frame's module differs from the previous one, show module name
+        curr_module = frames_modules[num]
+        if curr_module != prev_frame_module
+            (curr_module == "Base" && hide_base && num ∉ [1, length(bt)]) || begin
+                accent = theme.err_accent
+                push!(content, hLine(
+                    default_stacktrace_width() - 6,
+                    "{default $(theme.text_accent)}In module {$accent bold}$(curr_module){/$accent bold}{/default $(theme.text_accent)}"; 
+                    style = "$accent dim"
+                )
+                )
+            end
+        end
+        
+        if num == 1  # first frame is highlighted
             push!(
                 content,
                 render_backtrace_frame(
@@ -132,7 +178,7 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
                 ),
             )
 
-        elseif num == length(bt)
+        elseif num == length(bt)  # last frame is highlighted
             push!(
                 content,
                 render_backtrace_frame(
@@ -145,7 +191,9 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
                 ),
             )
 
-        else
+        else  # inside frames are printed without an additional panel around
+
+            # skip extra panels for long stack traces
             if num > max_n_frames && num < length(bt) - 5
                 if added_skipped_message == false
                     skipped_line = hLine(
@@ -157,11 +205,35 @@ function render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 3
                     added_skipped_message = true
                 end
             else
+                # show "inner" frames without additional info, hide base optionally
+
+                # skip frames in modules like Base
+                to_skip = (curr_module == "Base" && hide_base)
+
+                # show number of frames skipped
+                if (to_skip == false && n_skipped > 0) || (num == length(bt)-1)
+                    color = TERM_THEME[].err_btframe_panel
+                    push!(content, 
+                        RenderableText("⋮" /"{$color}Skipped {bold}$n_skipped{/bold} frames from module Base{/$color}" / "⋮"; 
+                        width=default_stacktrace_width() - 6, justify=:center))
+                end
+
+                # skip
+                to_skip && begin
+                    n_skipped += 1
+                    continue
+                end
+
+                # show
+                n_skipped = 0
                 push!(content, render_backtrace_frame(numren, info; as_panel = false))
             end
         end
+
+        prev_frame_module = curr_module
     end
 
+    # create an overall panel
     return Panel(
         lvstack(content..., pad = 1);
         padding = (2, 2, 2, 1),
