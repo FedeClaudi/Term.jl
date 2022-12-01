@@ -22,8 +22,6 @@ export install_term_stacktrace
 
 include("_errors.jl")
 
-
-
 # ----------------------- error type specific messages ----------------------- #
 
 # ! ARGUMENT ERROR
@@ -231,10 +229,13 @@ Several options are provided to reverse the order in which the frames are shown 
 Julia's default ordering), hide extra frames when a large number is in the trace (e.g. Stack Overflow error)
 and hide Base and standard libraries error information (i.e. when a frame is in a module belonging to those.)
 """
-function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30, hide_base=true)
+function install_term_stacktrace(;
+    reverse_backtrace::Bool = true,
+    max_n_frames::Int = 30,
+    hide_base = true,
+)
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            
             theme = TERM_THEME[]
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
@@ -264,7 +265,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
-                        hide_base = $(hide_base)
+                        hide_base = $(hide_base),
                     )
                     print(rendered_bt)
                 end

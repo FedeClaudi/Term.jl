@@ -6,7 +6,7 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
 
     @test highlight("this is ::Int64";) == "this is {#CE93D8}::Int64{/#CE93D8}"
 
-    @test highlight("print", :func;) == "\e[38;2;255;238;88mprint\e[39m"
+    @test highlight("print", :func;) == "\e[38;2;242;215;119mprint\e[39m"
 
     @test highlight("1 + 2", :code;) == "\e[38;2;255;238;88m1 + 2\e[39m"
 
@@ -19,7 +19,7 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
 
     @test highlight(Int32;) == "\e[38;2;206;147;216mInt32\e[39m"
 
-    @test highlight(print;) == "\e[38;2;255;238;88mprint\e[39m"
+    @test highlight(print;) == "\e[38;2;242;215;119mprint\e[39m"
 
     @test highlight("this :this :(x+y) 'a'";) ==
           "this {#FFA726}:this{/#FFA726} {#FFCA28}:{#FFF59D}({/#FFF59D}x{#EF5350}+{/#EF5350}y{#FFF59D}){/#FFF59D}{/#FFCA28} {#64b565}'a'{/#64b565}"
