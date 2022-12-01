@@ -139,6 +139,64 @@ should_skip(frame::StackFrame) =
     )
 
 """
+    add_new_module_name!(content, curr_module, hide_base, num, bt)
+
+When a frame belonging to a module different from the previous one is shown, 
+print the new module's name.
+"""
+function add_new_module_name!(content, curr_module, hide_base, num, bt)
+    (curr_module == "Base" && hide_base && num ∉ [1, length(bt)]) || begin
+        theme = TERM_THEME[]
+        accent = theme.err_accent
+        push!(
+            content,
+            hLine(
+                default_stacktrace_width() - 6,
+                "{default $(theme.text_accent)}In module {$accent bold}$(curr_module){/$accent bold}{/default $(theme.text_accent)}";
+                style = "$accent dim",
+            ),
+        )
+    end
+end
+
+"""
+    add_number_frames_skipped!(content, to_skip, num, bt, n_skipped, skipped_frames_modules)
+
+Add some text explaining how many frames were skipped from the stacktrace visualization
+and to which modules they belonged. 
+"""
+function add_number_frames_skipped!(
+    content,
+    to_skip,
+    num,
+    bt,
+    n_skipped,
+    skipped_frames_modules,
+)
+    if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
+        color = TERM_THEME[].err_btframe_panel
+        accent = TERM_THEME[].err_accent
+        modules = join(unique(string.(skipped_frames_modules)), ", ")
+        push!(
+            content,
+            cvstack(
+                hLine(default_stacktrace_width() - 12; style = "$color dim"),
+                RenderableText(
+                    "⋮" /
+                    "Skipped {bold}$n_skipped{/bold} frames in {$accent}$modules{/$accent}" /
+                    "⋮";
+                    width = default_stacktrace_width() - 6,
+                    justify = :center,
+                    style = color,
+                ),
+                hLine(default_stacktrace_width() - 12; style = "$color dim");
+                pad = 0,
+            ),
+        )
+    end
+end
+
+"""
     render_backtrace(bt::Vector; reverse_backtrace = true, max_n_frames = 30)
 
 Main error backtrace rendering function. 
@@ -168,25 +226,15 @@ function render_backtrace(
     prev_frame_module = nothing # keep track of the previous' frame module
     n_skipped = 0  # keep track of number of frames skipped (e.g in Base)
     skipped_frames_modules = []
+    tot_frames_added = 0
     for (num, frame) in enumerate(bt)
         numren = RenderableText("($(num))"; style = "$(theme.emphasis) bold dim")
         info = render_frame_info(frame; show_source = num in (1, length(bt)))
 
         # if the current frame's module differs from the previous one, show module name
         curr_module = frames_modules[num]
-        if curr_module != prev_frame_module
-            (curr_module == "Base" && hide_base && num ∉ [1, length(bt)]) || begin
-                accent = theme.err_accent
-                push!(
-                    content,
-                    hLine(
-                        default_stacktrace_width() - 6,
-                        "{default $(theme.text_accent)}In module {$accent bold}$(curr_module){/$accent bold}{/default $(theme.text_accent)}";
-                        style = "$accent dim",
-                    ),
-                )
-            end
-        end
+        (curr_module != prev_frame_module && !should_skip(frame)) &&
+            add_new_module_name!(content, curr_module, hide_base, num, bt)
 
         if num == 1  # first frame is highlighted
             push!(
@@ -200,6 +248,7 @@ function render_backtrace(
                     subtitle_justify = :right,
                 ),
             )
+            tot_frames_added += 1
 
         elseif num == length(bt)  # last frame is highlighted
             push!(
@@ -213,11 +262,11 @@ function render_backtrace(
                     subtitle_justify = :right,
                 ),
             )
+            tot_frames_added += 1
 
         else  # inside frames are printed without an additional panel around
-
             # skip extra panels for long stack traces
-            if num > max_n_frames && num < length(bt) - 5
+            if tot_frames_added > max_n_frames && num < length(bt) - 5
                 if added_skipped_message == false
                     skipped_line = hLine(
                         content[1].measure.w,
@@ -228,43 +277,32 @@ function render_backtrace(
                     added_skipped_message = true
                 end
             else  # show "inner" frames without additional info, hide base optionally
-
                 # skip frames in modules like Base
                 to_skip = should_skip(frame)
 
                 # show number of frames skipped
                 if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
-                    color = TERM_THEME[].err_btframe_panel
-                    accent = TERM_THEME[].err_accent
-                    modules = join(unique(string.(skipped_frames_modules)), ", ")
-                    push!(
+                    add_number_frames_skipped!(
                         content,
-                        cvstack(
-                            hLine(default_stacktrace_width() - 12; style = "$color dim"),
-                            RenderableText(
-                                "⋮" /
-                                "Skipped {bold}$n_skipped{/bold} frames from {$accent}$modules{/$accent}" /
-                                "⋮";
-                                width = default_stacktrace_width() - 6,
-                                justify = :center,
-                                style = color,
-                            ),
-                            hLine(default_stacktrace_width() - 12; style = "$color dim");
-                            pad = 0,
-                        ),
+                        to_skip,
+                        num,
+                        bt,
+                        n_skipped,
+                        skipped_frames_modules,
                     )
                 end
 
                 # skip
                 to_skip && begin
                     n_skipped += 1
-                    push!(skipped_frames_modules, curr_module)
+                    isnothing(curr_module) || push!(skipped_frames_modules, curr_module)
                     continue
                 end
 
                 # show
                 n_skipped, skipped_frames_modules = 0, []
                 push!(content, render_backtrace_frame(numren, info; as_panel = false))
+                tot_frames_added += 1
             end
         end
 
