@@ -236,8 +236,11 @@ function render_backtrace(
 
         # if the current frame's module differs from the previous one, show module name
         curr_module = frames_modules[num]
-        (curr_module != prev_frame_module && !should_skip(frame, hide_frames) && curr_module != "nothing") &&
-            add_new_module_name!(content, curr_module, hide_frames, num, bt)
+        (
+            curr_module != prev_frame_module &&
+            !should_skip(frame, hide_frames) &&
+            curr_module != "nothing"
+        ) && add_new_module_name!(content, curr_module, hide_frames, num, bt)
 
         if num == 1  # first frame is highlighted
             push!(
