@@ -1,6 +1,52 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 
+"""
+    show_error_code_line(frame::StackFrame; δ=2)
+
+Create a `Panel` showing formatted Julia code for a frame's error line. 
+The parameter `δ` speciies how many lines above/below the error line to show. 
+When δ = 0 only the error line is shown and the panel's style is altered
+"""
+function show_error_code_line(frame::StackFrame; δ = 2)
+    theme = TERM_THEME[]
+    error_source = nothing
+    try
+        error_source = load_code_and_highlight(string(frame.file), frame.line; δ = δ)
+    catch
+        error_source = nothing
+    end
+
+    (isnothing(error_source) || length(error_source) == 0) && return nothing
+
+    code_error_panel = Panel(
+        error_source;
+        fit = δ == 0,
+        style = δ > 0 ? "$(theme.text_accent) dim" : "dim",
+        width = min(60, default_stacktrace_width() - 6),
+        subtitle_justify = :center,
+        subtitle = δ > 0 ? "error line" : nothing,
+        subtitle_style = "default $(theme.error)",
+        height = δ > 0 ? nothing : 1,
+        padding = δ == 0 ? (0, 1, 0, 0) : (2, 2, 0, 0),
+        # background = δ > 0 ? nothing : theme.md_codeblock_bg
+    )
+
+    δ == 0 && (
+        code_error_panel =
+            "  " * RenderableText("│\n╰─"; style = "dim") * code_error_panel
+    )
+    δ > 0 && (code_error_panel = "  " * code_error_panel)
+
+    return code_error_panel
+end
+
+"""
+    parse_kw_func_name(frame::StackFrame)
+
+Kw function calls have a weird name, this finds a decent
+way to represent the function's name.
+"""
 function parse_kw_func_name(frame::StackFrame)
     def = frame.linfo.def
     return replace(string(def.name), "##kw" => "") *
@@ -19,7 +65,7 @@ function render_frame_info(pointer::Ptr{Nothing}, args...; show_source = true)
     return render_frame_info(frame, args...; show_source = show_source)
 end
 
-function render_frame_info(frame::StackFrame, ; show_source = true)
+function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
     theme = TERM_THEME[]
 
     # get the name of the error function
@@ -32,7 +78,7 @@ function render_frame_info(frame::StackFrame, ; show_source = true)
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{$(theme.func)}" * s"\g<0>" * "{/$(theme.func)}"),
     )
-    func = reshape_text(func, default_stacktrace_width()) |> lstrip
+    func = reshape_text(func, default_stacktrace_width() - 30) |> lstrip
 
     # get other information about the function 
     inline =
@@ -50,29 +96,8 @@ function render_frame_info(frame::StackFrame, ; show_source = true)
 
         out = func_line / file_line
         if show_source
-            error_source = nothing
-            try
-                error_source = load_code_and_highlight(string(frame.file), frame.line)
-            catch
-                error_source = nothing
-            end
-
-            out = if isnothing(error_source) || length(error_source) == 0
-                out
-            else
-                code_error_panel =
-                    "   " * Panel(
-                        error_source;
-                        fit = false,
-                        style = "$(theme.text_accent) dim",
-                        width = min(60, default_stacktrace_width() - 30),
-                        subtitle_justify = :center,
-                        subtitle = "error line",
-                        subtitle_style = "default $(theme.text_accent) #fa6673",
-                    )
-
-                lvstack(out, code_error_panel; pad = 0)
-            end
+            error_source = show_error_code_line(frame; kwargs...)
+            isnothing(error_source) || (out /= error_source)
         end
         return out
     else
@@ -108,7 +133,7 @@ function render_backtrace_frame(
             kwargs...,
         )
     else
-        "   " * RenderableText(string(content), width = default_stacktrace_width() - 18)
+        "   " * RenderableText(string(content), width = default_stacktrace_width() - 20)
     end
 end
 
@@ -245,7 +270,12 @@ function render_backtrace(
     tot_frames_added = 0
     for (num, frame) in enumerate(bt)
         numren = RenderableText("($(num))"; style = "$(theme.emphasis) bold dim")
-        info = render_frame_info(frame; show_source = num in (1, length(bt)))
+        δ = num in (1, length(bt)) ? 2 : 0
+        info = render_frame_info(
+            frame;
+            show_source = !should_skip(frame) || num in (1, length(bt)),
+            δ = δ,
+        )
 
         # if the current frame's module differs from the previous one, show module name
         curr_module =
@@ -332,7 +362,7 @@ function render_backtrace(
 
     # create an overall panel
     return Panel(
-        cvstack(content..., pad = 1);
+        lvstack(content..., pad = 1);
         padding = (2, 2, 2, 1),
         subtitle = "Error Stack",
         style = "$(theme.er_bt) dim",

@@ -8,7 +8,6 @@ Extract and style an object's docstring.
 function get_docstring(obj)
     # get doc and docstring
     doc = getdocs(obj)
-    asda
     docstring = if isnothing(doc)
         "no docstring"
     else

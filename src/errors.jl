@@ -174,13 +174,13 @@ end
 # ! UndefKeywordError
 function error_message(er::UndefKeywordError)
     # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
-    return "Undefined function keyword argument: `$(er.var)`."
+    return "Undefined function keyword argument: {bold}`$(er.var)`{/bold}."
 end
 
 # ! UNDEFVAR ERROR
 function error_message(er::UndefVarError)
     # @info "undef var error" er er.var typeof(er.var)
-    return "Undefined variable `$(er.var)`."
+    return "Undefined variable {bold}`$(er.var)`{/bold}."
 end
 
 # ! STRING INDEX ERROR

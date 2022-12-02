@@ -304,7 +304,8 @@ function Panel(
                 omit_msg.segments[1]
             ]
         else
-            [omit_msg.segments[1]]
+            # [omit_msg.segments[1]]
+            [content.segments[1]]
         end
         content = Renderable(segments, Measure(segments))
     end
