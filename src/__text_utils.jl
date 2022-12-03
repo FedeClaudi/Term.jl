@@ -11,6 +11,8 @@ function replace_multi(text, pairs...)::String
     return text
 end
 
+plural(word::AbstractString, n) = n <= 1 ? word : word * 's'
+
 # ---------------------------------------------------------------------------- #
 #                                     REGEX                                    #
 # ---------------------------------------------------------------------------- #

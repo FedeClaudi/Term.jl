@@ -11,7 +11,8 @@ import Term:
     unescape_brackets,
     split_lines,
     TERM_THEME,
-    default_width
+    default_width,
+    plural
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
@@ -26,8 +27,6 @@ export @with_repr, termshow, install_term_repr, @showme
 
 include("_repr.jl")
 include("_inspect.jl")
-
-plural(word::AbstractString, n) = n <= 1 ? word : word * 's'
 
 """
     termshow

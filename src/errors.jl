@@ -11,13 +11,13 @@ import Term:
     escape_brackets,
     unescape_brackets,
     remove_markup,
-    TERM_THEME
+    TERM_THEME,
+    plural
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
 import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
-import ..Repr: plural
 
 export install_term_stacktrace
 
