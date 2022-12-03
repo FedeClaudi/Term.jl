@@ -27,7 +27,7 @@ export @with_repr, termshow, install_term_repr, @showme
 include("_repr.jl")
 include("_inspect.jl")
 
-plural(word::AbstractString, n) = n == 1 ? word : word * 's'
+plural(word::AbstractString, n) = n <= 1 ? word : word * 's'
 
 """
     termshow

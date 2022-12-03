@@ -1,5 +1,6 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
+import Term.Repr: termshow
 
 """
     show_error_code_line(frame::StackFrame; δ=2)
@@ -26,7 +27,7 @@ function show_error_code_line(frame::StackFrame; δ = 2)
         width = min(60, default_stacktrace_width() - 6),
         subtitle_justify = :center,
         subtitle = δ > 0 ? "error line" : nothing,
-        subtitle_style = "default $(theme.error)",
+        subtitle_style = "default $(theme.text_accent)",
         height = δ > 0 ? nothing : 1,
         padding = δ == 0 ? (0, 1, 0, 0) : (2, 2, 0, 0),
         # background = δ > 0 ? nothing : theme.md_codeblock_bg
@@ -48,10 +49,9 @@ Kw function calls have a weird name, this finds a decent
 way to represent the function's name.
 """
 function parse_kw_func_name(frame::StackFrame)
-    def = frame.linfo.def
-    return replace(string(def.name), "##kw" => "") *
-           "{default dim} -- keyword arguments call{/default dim}"
+    return replace(string(frame.linfo.def.name), "##kw"=>"")
 end
+
 """
     function render_frame_info end
 
@@ -60,9 +60,9 @@ stacktrace frame.
 """
 function render_frame_info end
 
-function render_frame_info(pointer::Ptr{Nothing}, args...; show_source = true)
+function render_frame_info(pointer::Ptr{Nothing}, args...; show_source = true, kwargs...)
     frame = StackTraces.lookup(pointer)[1]
-    return render_frame_info(frame, args...; show_source = show_source)
+    return render_frame_info(frame, args...; show_source = show_source, kwargs...)
 end
 
 function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
@@ -71,6 +71,8 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
     # get the name of the error function
     func = sprint(StackTraces.show_spec_linfo, frame)
     contains(func, "##kw") && (func = parse_kw_func_name(frame))
+    # contains(func, ".var\"#") && (func = RenderableText("{$(theme.func)}anonymous function{/$(theme.func)"))
+
 
     # format function name
     func = replace(
@@ -78,7 +80,7 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{$(theme.func)}" * s"\g<0>" * "{/$(theme.func)}"),
     )
-    func = reshape_text(func, default_stacktrace_width() - 30) |> lstrip
+    func = reshape_text(func, default_stacktrace_width() - 6) |> lstrip
 
     # get other information about the function 
     inline =
@@ -142,14 +144,16 @@ end
 
 Get the Module a function is defined in, as a string
 """
-function frame_module(frame::StackFrame)
+function frame_module(frame::StackFrame)::Union{Nothing, String}
     m = Base.parentmodule(frame)
+
     if m !== nothing
         while parentmodule(m) !== m
             pm = parentmodule(m)
             pm == Main && break
             m = pm
         end
+
     end
     m = !isnothing(m) ? string(m) : frame_module(string(frame.file))
 
@@ -164,7 +168,7 @@ frame_module(path::String) = startswith(path, "./") ? "Base" : nothing
 """
 Get module for a pointer obj
 """
-frame_module(pointer::Ptr{Nothing}) = frame_module(StackTraces.lookup(pointer)[1])
+frame_module(pointer::Ptr) = frame_module(StackTraces.lookup(pointer)[1])
 
 """
     should_skip
@@ -174,30 +178,32 @@ A frame should skip if it's in Base or an installed package.
 should_skip(frame::StackFrame) =
     frame_module(frame) == "Base" || (
         contains(string(frame.file), r"[/\\].julia[/\\]") ||
-        contains(string(frame.file), r"[/\\]julia[/\\]stdlib[/\\]")
+        contains(string(frame.file), r"[/\\]julia[/\\]stdlib[/\\]") ||
+        contains(string(frame.file), r"[/\\]julia[/\\]lib[/\\]")
     )
 
 should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false
+should_skip(pointer::Ptr) = should_skip(StackTraces.lookup(pointer)[1])
+should_skip(pointer::Ptr, hide::Bool) = hide ? should_skip(pointer) : false
+
 
 """
-    add_new_module_name!(content, curr_module, hide_frames, num, bt)
+    add_new_module_name!(content, curr_modul)
 
 When a frame belonging to a module different from the previous one is shown, 
 print the new module's name.
 """
-function add_new_module_name!(content, curr_module, hide_frames, num, bt)
-    (curr_module == "Base" && hide_frames && num ∉ [1, length(bt)]) || begin
-        theme = TERM_THEME[]
-        accent = theme.err_accent
-        push!(
-            content,
-            hLine(
-                default_stacktrace_width() - 6,
-                "{default $(theme.text_accent)}In module {$accent bold}$(curr_module){/$accent bold}{/default $(theme.text_accent)}";
-                style = "$accent dim",
-            ),
-        )
-    end
+function add_new_module_name!(content, curr_module)
+    theme = TERM_THEME[]
+    accent = theme.err_accent
+    push!(
+        content,
+        hLine(
+            default_stacktrace_width() - 6,
+            "{default $(theme.text_accent)}In module {$accent bold}$(curr_module){/$accent bold}{/default $(theme.text_accent)}";
+            style = "$accent dim",
+        ),
+    )
 end
 
 """
@@ -217,15 +223,19 @@ function add_number_frames_skipped!(
     if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
         color = TERM_THEME[].err_btframe_panel
         accent = TERM_THEME[].err_accent
-        modules = join(unique(string.(skipped_frames_modules)), ", ")
+        modules = join(unique(string.(
+            filter(!isnothing, skipped_frames_modules)
+            )), ", ")
+
+        modules = filter(x -> x != "nothing",  modules)
+        in_mod = length(modules) == 0 ? "" : "in {$accent}$modules{/$accent}"
+        word = plural("frame", length(modules))
         push!(
             content,
             cvstack(
                 hLine(default_stacktrace_width() - 12; style = "$color dim"),
                 RenderableText(
-                    "⋮" /
-                    "Skipped {bold}$n_skipped{/bold} frames in {$accent}$modules{/$accent}" /
-                    "⋮";
+                    "Skipped {bold}$n_skipped{/bold} $word $in_mod";
                     width = default_stacktrace_width() - 6,
                     justify = :center,
                     style = color,
@@ -249,7 +259,7 @@ function render_backtrace(
     reverse_backtrace = true,
     max_n_frames = 30,
     hide_frames = true,
-)
+)   
     theme = TERM_THEME[]
     length(bt) == 0 && return RenderableText("")
 
@@ -278,14 +288,12 @@ function render_backtrace(
         )
 
         # if the current frame's module differs from the previous one, show module name
-        curr_module =
-            isnothing(frames_modules[num]) ? prev_frame_module : frames_modules[num]
+        curr_module = frames_modules[num]
         (
             curr_module != prev_frame_module &&
             !should_skip(frame, hide_frames) &&
-            curr_module != "nothing" &&
             !isnothing(curr_module)
-        ) && add_new_module_name!(content, curr_module, hide_frames, num, bt)
+        ) && add_new_module_name!(content, curr_module)
 
         if num == 1  # first frame is highlighted
             push!(
@@ -346,7 +354,7 @@ function render_backtrace(
                 # skip
                 to_skip && begin
                     n_skipped += 1
-                    isnothing(curr_module) || push!(skipped_frames_modules, curr_module)
+                    push!(skipped_frames_modules, curr_module)
                     continue
                 end
 
@@ -357,7 +365,7 @@ function render_backtrace(
             end
         end
 
-        prev_frame_module = curr_module
+        isnothing(curr_module) || (prev_frame_module = curr_module)
     end
 
     # create an overall panel

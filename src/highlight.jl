@@ -128,8 +128,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     @assert lineno > 0 "lineno must be ≥1"
     @assert lineno ≤ η "lineno $lineno too high for file with $(η) lines"
 
-    lines = read_file_lines(path, lineno - 9, lineno + 10)
-
+    lines = read_file_lines(path, lineno - δ, lineno + δ)
     linenos = first.(lines)
     lines = [ln[2] for ln in lines]
     code = split(highlight_syntax(join(lines); style = true), "\n")
@@ -138,19 +137,6 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     clean(line) = replace(line, "    {/    }" => "")
     codelines = clean.(code)  # [10-δ:10+δ]
     linenos = linenos  # [10-δ:10+δ]
-
-    # make n lines match
-    if lineno ≤ δ
-        codelines = clean.(code)[1:(lineno + δ)]
-        linenos = linenos[1:(lineno + δ)]
-    elseif η - lineno ≤ δ
-        d = η - lineno
-        codelines = clean.(code)[(end - δ - d):end]
-        linenos = linenos[(end - δ - d):end] .+ (lineno < η ? 1 : 0)
-    else
-        codelines = clean.(code)[(10 - δ):(10 + δ)]
-        linenos = linenos[(10 - δ):(10 + δ)]
-    end
 
     # format
     _len = textlen ∘ lstrip

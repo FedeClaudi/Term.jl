@@ -17,8 +17,8 @@ style outputs to terminal.
     docstring::String      = green_dark
     string::String         = "#64b565"
     type::String           = purple_light
-    code::String           = "$yellow"
-    multiline_code::String = "$yellow"
+    code::String           = yellow
+    multiline_code::String = yellow
     symbol::String         = orange
     expression::String     = amber
     number::String         = blue_light

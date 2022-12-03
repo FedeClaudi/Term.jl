@@ -17,6 +17,7 @@ import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
 import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
+import ..Repr: plural
 
 export install_term_stacktrace
 
