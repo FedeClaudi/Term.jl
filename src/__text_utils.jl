@@ -175,6 +175,12 @@ function read_file_lines(path::AbstractString, start::Int, stop::Int)
     return collect(enumerate(lines))[start:stop]
 end
 
+function read_file_lines(path::AbstractString, line::Int)
+    !isfile(path) && return nothing
+    lines = readlines(path; keep = true)
+    return collect(enumerate(lines))[line]
+end
+
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #

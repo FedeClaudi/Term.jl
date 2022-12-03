@@ -1,6 +1,6 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
-import Term.Repr: termshow
+import Term: read_file_lines
 
 """
     show_error_code_line(frame::StackFrame; δ=2)
@@ -13,7 +13,7 @@ function show_error_code_line(frame::StackFrame; δ = 2)
     theme = TERM_THEME[]
     error_source = nothing
     try
-        error_source = load_code_and_highlight(string(frame.file), frame.line; δ = δ)
+        error_source = load_code_and_highlight(string(frame.file), Int(frame.line); δ = δ)
     catch
         error_source = nothing
     end
@@ -45,11 +45,17 @@ end
 """
     parse_kw_func_name(frame::StackFrame)
 
-Kw function calls have a weird name, this finds a decent
-way to represent the function's name.
+Kw function calls have a weird name, just show the func definition line.
 """
 function parse_kw_func_name(frame::StackFrame)
-    return replace(string(frame.linfo.def.name), "##kw"=>"")
+    def = frame.linfo.def
+
+    out = read_file_lines(string(def.file), Int(def.line))
+    return if !isnothing(out)
+        replace(out[2], "function" => "") |> rstrip |> lstrip
+    else
+        string(sprint(StackTraces.show_spec_linfo, frame))
+    end
 end
 
 """
@@ -72,7 +78,6 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
     func = sprint(StackTraces.show_spec_linfo, frame)
     contains(func, "##kw") && (func = parse_kw_func_name(frame))
     # contains(func, ".var\"#") && (func = RenderableText("{$(theme.func)}anonymous function{/$(theme.func)"))
-
 
     # format function name
     func = replace(
@@ -103,7 +108,7 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
         end
         return out
     else
-        return RenderableText("   " * func; width = default_stacktrace_width() - 4)
+        return RenderableText(func; width = default_stacktrace_width() - 30)
     end
 end
 
@@ -144,7 +149,7 @@ end
 
 Get the Module a function is defined in, as a string
 """
-function frame_module(frame::StackFrame)::Union{Nothing, String}
+function frame_module(frame::StackFrame)::Union{Nothing,String}
     m = Base.parentmodule(frame)
 
     if m !== nothing
@@ -153,7 +158,6 @@ function frame_module(frame::StackFrame)::Union{Nothing, String}
             pm == Main && break
             m = pm
         end
-
     end
     m = !isnothing(m) ? string(m) : frame_module(string(frame.file))
 
@@ -185,7 +189,6 @@ should_skip(frame::StackFrame) =
 should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false
 should_skip(pointer::Ptr) = should_skip(StackTraces.lookup(pointer)[1])
 should_skip(pointer::Ptr, hide::Bool) = hide ? should_skip(pointer) : false
-
 
 """
     add_new_module_name!(content, curr_modul)
@@ -223,11 +226,9 @@ function add_number_frames_skipped!(
     if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
         color = TERM_THEME[].err_btframe_panel
         accent = TERM_THEME[].err_accent
-        modules = join(unique(string.(
-            filter(!isnothing, skipped_frames_modules)
-            )), ", ")
+        modules = join(unique(string.(filter(!isnothing, skipped_frames_modules))), ", ")
 
-        modules = filter(x -> x != "nothing",  modules)
+        modules = filter(x -> x != "nothing", modules)
         in_mod = length(modules) == 0 ? "" : "in {$accent}$modules{/$accent}"
         word = plural("frame", length(modules))
         push!(
@@ -259,7 +260,7 @@ function render_backtrace(
     reverse_backtrace = true,
     max_n_frames = 30,
     hide_frames = true,
-)   
+)
     theme = TERM_THEME[]
     length(bt) == 0 && return RenderableText("")
 
