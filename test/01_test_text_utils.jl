@@ -146,7 +146,7 @@ id est laborum."""
         ),
         (
             "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
-            "Lorem {red}ipsum dolor sit {underline}amet,\nconsectetur{/underline} adipiscing elit,\n{/red}{blue}sed do eiusmod tempor incididunt{/blue}\nut labore et dolore magna aliqua." ,
+            "Lorem {red}ipsum dolor sit {underline}amet,\nconsectetur{/underline} adipiscing elit,\n{/red}{blue}sed do eiusmod tempor incididunt{/blue}\nut labore et dolore magna aliqua.",
         ),
         (
             "Lorem{red}ipsumdolorsit{underline}amet, consectetur{/underline} adipiscing elit, {/red}seddoeiusmo{blue}dtemporincididunt{/blue}ut labore et dolore magna aliqua.",

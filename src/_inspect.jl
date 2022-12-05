@@ -34,29 +34,9 @@ function style_methods(
     mets = []
     prevmod = ""
     for (i, m) in enumerate(methods)
-        _name = split(string(m), " in ")[1]
-        code =
-            (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name) |>
-            highlight_syntax
+        code = "    - " * split(string(m), " in ")[1] |> highlight_syntax
+        code = replace(code, string(m.name) => "{$fn_col}$(m.name){/$fn_col}")
 
-        code = "{dim}" * code * "{/dim}"
-
-        # avoid repeating construct name
-        if constructor
-            code = replace(code, tohighlight => ""; count = 1)
-        end
-
-        # avoid name of interest
-        code = replace(
-            code,
-            tohighlight => "{$highlight_col default}$tohighlight{/$highlight_col default}{dim}",
-        )
-
-        # add preamble
-        code = RenderableText(
-            "     {$accent_col dim}($i){/$accent_col dim}  {$fn_col}$(m.name){/$fn_col}" *
-            code,
-        )
         info =
             string(m.module) != prevmod ?
             RenderableText(
@@ -65,7 +45,7 @@ function style_methods(
         prevmod = string(m.module)
 
         dest = RenderableText(
-            "{dim default italic}             → $(m.file):$(m.line){/dim default italic}",
+            "\e[0m{dim default italic}             → $(m.file):$(m.line){/dim default italic}",
         )
         content = isnothing(info) ? code / dest / "" : info / code / dest / ""
         push!(mets, content)

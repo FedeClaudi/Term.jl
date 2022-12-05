@@ -80,7 +80,7 @@ end
 
             # NOTE: using a panel with arbitrary long text can fail testing on wide terminals, since
             # the final `height` can vary (github.com/FedeClaudi/Term.jl/issues/112)
-            @testpanel(Panel(Panel("°"^250); _nofit...), 18, TEST_CONSOLE_WIDTH)
+            @testpanel(Panel(Panel("°"^250); _nofit...), 14, TEST_CONSOLE_WIDTH)
 
             @testpanel(
                 Panel(Panel("test"; _kw...); fit = false),
@@ -149,7 +149,7 @@ end
         @testpanel(
             Panel(Panel("°"^250, fit = true); _kw...),
             # WIDE_TERM ? nothing : 8,
-            18,
+            14,
             TEST_CONSOLE_WIDTH
         )
 
@@ -309,7 +309,7 @@ end
 # @testset "\e[34mPanel + renderables" begin
 #     @testpanel(Panel(RenderableText("x"^5)), 3, 11)
 
-@testpanel(Panel(RenderableText("x"^500); fit = false), 16, TEST_CONSOLE_WIDTH)
+@testpanel(Panel(RenderableText("x"^500); fit = false), 15, TEST_CONSOLE_WIDTH)
 
 @testpanel(Panel(RenderableText("x"^5); fit = true), 3, 11)
 

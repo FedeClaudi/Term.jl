@@ -145,7 +145,8 @@ function inspect(
             length(_methods) == 0 && continue
             dt_name = split(string(dt), '.')[end]
 
-            "\n{$(theme.text_accent)}○ Methods for $dt:" |> tprintln
+            "\n{$(theme.text_accent)}○ Methods for {$(theme.inspect_accent)}$dt{/$(theme.inspect_accent)}:" |>
+            tprintln
             print.(style_methods(_methods, dt_name))
             supertypes || break
         end

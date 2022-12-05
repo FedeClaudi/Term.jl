@@ -122,12 +122,12 @@ function reshape_text(text::AbstractString, width::Int)
 
         # see if we need to go to a new line
         if !bracketed && !in_escape_code
-            line_length += textwidth(c)   
+            line_length += textwidth(c)
 
             if line_length + 1 > width
                 push!(lines, rstrip(line))
                 line, line_length = "", 0
-            elseif (line_length + 1 > width-5) && (c == ' ')
+            elseif (line_length + 1 > width - 5) && (c == ' ')
                 push!(lines, rstrip(line))
                 line, line_length = "", 0
             end
@@ -146,7 +146,6 @@ function reshape_text(text::AbstractString, width::Int)
 
     chomp(out)
 end
-
 
 """
     justify(text::AbstractString, width::Int)::String
