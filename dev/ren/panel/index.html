@@ -111,16 +111,16 @@ print(Panel(&quot;.&quot;^60))</code></pre><pre class="documenter-example-output
 print(Panel(p1; height=2, width=30))  # fit=true -&gt; expand out panel, width/height ignored
 print(Panel(p1; height=10, width=30, fit=false))  # fit=false -&gt; truncate the content
 print(Panel(&quot;very long text&quot;^20; height=10, width=30, fit=false))  # text is reshaped to fit the panel</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭────────────────────────────╮
-│  <span class="sgr2">... content omitted ... </span>  │
+│  ╭──────────────────────   │
 ╰────────────────────────────╯
 ╭────────────────────────────╮
-│  ╭──────────────────       │
+│  ╭──────────────────────   │
 │  ───────────────────────   │
-│  ─────────────────╮        │
-│  │                         │
-│  ..........                │
+│  ─────────────╮            │
+│  │  ..........             │
 │                            │
-│            │               │
+│                            │
+│       │                    │
 │  <span class="sgr2">... content omitted ... </span>  │
 ╰────────────────────────────╯
 ╭────────────────────────────╮
@@ -164,8 +164,7 @@ print(
 │                                                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯</code></pre><p>The syntax is <code>(left, right, top, bottom)</code> and the default is <code>(2, 2, 0, 0)</code>.</p><h1 id="TBoxDoc"><a class="docs-heading-anchor" href="#TBoxDoc">TextBox</a><a id="TBoxDoc-1"></a><a class="docs-heading-anchor-permalink" href="#TBoxDoc" title="Permalink"></a></h1><p>Sometimes you want to have the benefits of <code>Panel</code> (you can control the height, width, padding, justification, titles...) without actually showing the panel itself. Introduce: <code>TextBox</code>.</p><pre><code class="language-julia hljs">using Term: TextBox
 TextBox(&quot;A very long piece of text&quot;^10; title=&quot;TEXT&quot;, width=30, fit=false)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">      TEXT                    
-   A very long piece of       
-   textA very long piece      
+   A very long piece          
    of textA very long         
    piece of textA very        
    long piece of textA        
@@ -176,6 +175,7 @@ TextBox(&quot;A very long piece of text&quot;^10; title=&quot;TEXT&quot;, width=
    long piece of textA        
    very long piece of         
    textA very long piece      
-   of text                    
+   of textA very long         
+   piece of text              
                               
-</code></pre><p>Easy peasy!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../text/">« RenderableText</a><a class="docs-footer-nextpage" href="../table/">Table »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Thursday 1 December 2022 01:23">Thursday 1 December 2022</span>. Using Julia version 1.8.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre><p>Easy peasy!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../text/">« RenderableText</a><a class="docs-footer-nextpage" href="../table/">Table »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Monday 5 December 2022 04:37">Monday 5 December 2022</span>. Using Julia version 1.8.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
