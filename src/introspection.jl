@@ -108,22 +108,18 @@ function style_methods(methods::Union{Vector{Base.Method},Base.MethodList})
     mets = []
     for (i, m) in enumerate(methods)
         _name = split(string(m), " in ")[1]
-        code = (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name) 
+        code = (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name)
 
-        code = replace(
-            code,
-            string(m.name) => "",
-        )
+        code = replace(code, string(m.name) => "")
         code = RenderableText(
             "     {$pink dim}($i){/$pink dim}  {$fn_col}$(m.name){/$fn_col}" * code,
         )
-        
+
         dest = RenderableText("{dim italic} $(m.file):$(m.line){/dim italic}")
-        push!(mets, string(code/dest))
+        push!(mets, string(code / dest))
     end
     return mets
 end
-
 
 """
     inspect(T::DataType; documentation::Bool=false, constructors::Bool=true, methods::Bool=true, supertypes::Bool=true)

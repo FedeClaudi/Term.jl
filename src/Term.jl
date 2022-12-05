@@ -86,7 +86,6 @@ include("introspection.jl")
 include("progress.jl")
 include("logs.jl")
 
-
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
@@ -174,12 +173,10 @@ using .Grid
 # -------------------------------- interactive ------------------------------- #
 import .LiveDisplays: Pager
 
-
 # ----------------------------- using interactive ---------------------------- #
 using .Progress: ProgressBar, ProgressJob, with, @track
 
 using .Introspection: inspect, typestree, expressiontree, inspect
-
 
 # ---------------------------------------------------------------------------- #
 #                                precompilation                                #

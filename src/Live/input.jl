@@ -14,18 +14,17 @@ struct CharKey <: KeyInput
     char::Char
 end
 
-KEYs = Dict{Int, KeyInput}(
-    1000=>ArrowLeft(),
-    1001=>ArrowRight(),
-    1002=>ArrowUp(),
-    1003=>ArrowDown(),
-    1004=>DelKey(),
-    1005=>HomeKey(),
-    1006=>EndKey(),
-    1007=>PageUpKey(),
-    1008=>PageDownKey(),
+KEYs = Dict{Int,KeyInput}(
+    1000 => ArrowLeft(),
+    1001 => ArrowRight(),
+    1002 => ArrowUp(),
+    1003 => ArrowDown(),
+    1004 => DelKey(),
+    1005 => HomeKey(),
+    1006 => EndKey(),
+    1007 => PageUpKey(),
+    1008 => PageDownKey(),
 )
-
 
 """
     keyboard_input(live::AbstractLiveDisplay)
@@ -42,7 +41,7 @@ If the input was `q` it signals that the display should be stopped
 function keyboard_input(live::AbstractLiveDisplay)::Bool
     if bytesavailable(terminal.in_stream) > 0
         c = readkey(terminal.in_stream) |> Int
-        
+
         c in keys(KEYs) && key_press(live, KEYs[Int(c)])
 
         c = Char(c)

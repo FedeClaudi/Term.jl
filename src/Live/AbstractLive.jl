@@ -1,34 +1,33 @@
 
 abstract type AbstractLiveDisplay end
 
-
 # ---------------------------------------------------------------------------- #
 #                                LIVE INTERNALS                                #
 # ---------------------------------------------------------------------------- #
-mutable struct LiveInternals
+@with_repr mutable struct LiveInternals
     iob::IOBuffer
     ioc::IOContext
     term::AbstractTerminal
-    prevcontent::Union{Nothing, AbstractRenderable}
+    prevcontent::Union{Nothing,AbstractRenderable}
     raw_mode_enabled::Bool
-    last_update::Union{Nothing, Int}
-    pipe::Union{Nothing, Pipe}
-    original_stdout::Union{Nothing, Base.TTY}
-    original_stderr::Union{Nothing, Base.TTY}
+    last_update::Union{Nothing,Int}
+    pipe::Union{Nothing,Pipe}
+    original_stdout::Union{Nothing,Base.TTY}
+    original_stderr::Union{Nothing,Base.TTY}
     redirected_stdout
     redirected_stderr
 
     function LiveInternals()
         # get output buffers
         iob = IOBuffer()
-        ioc = IOContext(iob, :displaysize=>displaysize(stdout))
+        ioc = IOContext(iob, :displaysize => displaysize(stdout))
 
         # prepare terminal 
         raw_mode_enabled = try
             raw!(terminal, true)
             true
         catch err
-            @debug "Unable to enter raw mode: " exception=(err, catch_backtrace())
+            @debug "Unable to enter raw mode: " exception = (err, catch_backtrace())
             false
         end
 
@@ -39,7 +38,7 @@ mutable struct LiveInternals
         # # TODO add this to Consoles
         # default_stdout = stdout
         # default_stderr = stderr
-        
+
         # # Redirect both the `stdout` and `stderr` streams to a single `Pipe` object.
         # pipe = Pipe()
         # Base.link_pipe!(pipe; reader_supports_async = true, writer_supports_async = true)
@@ -54,21 +53,20 @@ mutable struct LiveInternals
         # redirect_stderr(pe_stderr)
 
         return new(
-                iob,
-                ioc,
-                terminal,
-                nothing,
-                raw_mode_enabled,
-                nothing,
-                nothing,
-                nothing,
-                nothing,
-                nothing,
-                nothing,
+            iob,
+            ioc,
+            terminal,
+            nothing,
+            raw_mode_enabled,
+            nothing,
+            nothing,
+            nothing,
+            nothing,
+            nothing,
+            nothing,
         )
     end
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                                METHODS ON LIVE                               #
@@ -80,14 +78,13 @@ frame(::AbstractLiveDisplay) = error("Not implemented")
 
 key_press(::AbstractLiveDisplay, ::Any) = nothing
 
-
 function shouldupdate(live::AbstractLiveDisplay)::Bool
     currtime = Dates.value(now())
     isnothing(live.internals.last_update) && begin
         live.internals.last_update = currtime
         return true
     end
-    
+
     Δt = currtime - live.internals.last_update
     if Δt > 5
         live.internals.last_update = currtime
@@ -95,7 +92,6 @@ function shouldupdate(live::AbstractLiveDisplay)::Bool
     end
     return false
 end
-
 
 function replace_line(internals::LiveInternals)
     erase_line(internals.ioc)
@@ -109,7 +105,7 @@ end
 
 function read_stdout_output(internals::LiveInternals)
     write(internals.ioc, internals.pipe)
-    out =  String(take!(internals.ioc))
+    out = String(take!(internals.ioc))
     length(out) > 0 ? out : nothing
 end
 
@@ -127,18 +123,18 @@ function refresh!(live::AbstractLiveDisplay)::Bool
 
     # get calls to print from user
     printed = read_stdout_output(live.internals)
-    isnothing(printed) || (scontent = printed/scontent)
+    isnothing(printed) || (scontent = printed / scontent)
 
     # render
     internals = live.internals
     !isnothing(internals.prevcontent) && begin
         nlines = internals.prevcontent.measure.h + 1
-        
+
         newlines = split(scontent, "\n")
         nnew = length(newlines)
 
         up(internals.ioc, nlines)
-        for _ in 1:nlines - nnew
+        for _ in 1:(nlines - nnew)
             replace_line(internals)
         end
 
@@ -146,13 +142,10 @@ function refresh!(live::AbstractLiveDisplay)::Bool
             replace_line(internals, newlines[i])
         end
     end
-    
+
     if isnothing(internals.prevcontent)
         nlines = length(split(string(content), "\n"))
-        print(
-            internals.ioc,
-            '\n'^nlines
-        )
+        print(internals.ioc, '\n'^nlines)
     end
 
     # output
@@ -172,14 +165,13 @@ function erase!(live::AbstractLiveDisplay)
     nothing
 end
 
-
 function stop!(live::AbstractLiveDisplay)
     internals = live.internals
     print(internals.term.out_stream, "\x1b[?25h") # unhide cursor
     raw!(internals.term, false)
 
     # reset original stdout
-    
+
     redirect_stdout(internals.original_stdout)
     redirect_stderr(internals.original_stderr)
     close(internals.redirected_stdout)

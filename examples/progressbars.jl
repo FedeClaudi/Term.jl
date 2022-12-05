@@ -30,7 +30,7 @@ stop!(pbar)
 Or with multiple jobs
 """
 
-pbar = ProgressBar(transient=true)
+pbar = ProgressBar(transient = true)
 job = addjob!(pbar; N = 100)
 job2 = addjob!(pbar; N = 50)
 job3 = addjob!(pbar; N = 25)

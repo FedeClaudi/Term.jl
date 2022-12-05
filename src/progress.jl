@@ -31,15 +31,7 @@ using ..LiveDisplays: LiveInternals, AbstractLiveDisplay
 import ..LiveDisplays
 
 export ProgressBar,
-    ProgressJob,
-    addjob!,
-    start!,
-    stop!,
-    update!,
-    removejob!,
-    with,
-    @track,
-    foreachprogress
+    ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track, foreachprogress
 
 # ---------------------------------------------------------------------------- #
 #                               PROGRESS BAR JOB                               #
@@ -407,9 +399,7 @@ function stop!(pbar::ProgressBar)
 
     LiveDisplays.stop!(pbar)
 
-    nlines = length(
-        pbar.internals.prevcontent.measure.h + 4
-    )
+    nlines = length(pbar.internals.prevcontent.measure.h + 4)
     pbar.transient || print("\n"^nlines)
     pbar.transient && LiveDisplays.erase!(pbar)
 
@@ -463,9 +453,9 @@ function LiveDisplays.frame(pbar::ProgressBar)::AbstractRenderable
 
     # render the progressbars
     output = reduce(
-        lvstack, 
-        map(j->render(j, pbar), pbar.jobs);
-        init=hLine("progress"; style="bright_blue dim")
+        lvstack,
+        map(j -> render(j, pbar), pbar.jobs);
+        init = hLine("progress"; style = "bright_blue dim"),
     )
     return Renderable(output)
 end
