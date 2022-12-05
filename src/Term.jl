@@ -81,18 +81,18 @@ include("compositors.jl")
 include("grid.jl")
 
 # interactive
-include("Live/live.jl")
-include("introspection.jl")
-include("progress.jl")
-include("logs.jl")
+# include("Live/live.jl")
+# include("introspection.jl")
+# include("progress.jl")
+# include("logs.jl")
 
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
 export tprint, tprintln
-export install_term_stacktrace,
-    install_term_logger, uninstall_term_logger, install_term_repr
+# export install_term_stacktrace,
+#     install_term_logger, uninstall_term_logger, install_term_repr
 export vLine, hLine
 export @with_repr, termshow, @showme
 export Compositor, update!
@@ -171,34 +171,34 @@ using .Repr: @with_repr, termshow, install_term_repr, @showme
 using .Grid
 
 # -------------------------------- interactive ------------------------------- #
-import .LiveDisplays: Pager
+# import .LiveDisplays: Pager
 
-# ----------------------------- using interactive ---------------------------- #
-using .Progress: ProgressBar, ProgressJob, with, @track
+# # ----------------------------- using interactive ---------------------------- #
+# using .Progress: ProgressBar, ProgressJob, with, @track
 
-using .Introspection: inspect, typestree, expressiontree, inspect
+# using .Introspection: inspect, typestree, expressiontree, inspect
 
 # ---------------------------------------------------------------------------- #
 #                                precompilation                                #
 # ---------------------------------------------------------------------------- #
-using SnoopPrecompile
+# using SnoopPrecompile
 
-@precompile_setup begin
-    originalSTDOUT = stdout
+# @precompile_setup begin
+#     originalSTDOUT = stdout
 
-    (outRead, outWrite) = redirect_stdout()
+#     (outRead, outWrite) = redirect_stdout()
 
-    @precompile_all_calls begin
-        Panel()
-        Panel("test") * Panel(Panel()) / hLine(20) |> tprint
-        termshow(Panel)
-        termshow(Dict(:x => 1))
-        termshow(zeros(4))
-        termshow(zeros(4, 4))
-    end
+#     @precompile_all_calls begin
+#         Panel()
+#         Panel("test") * Panel(Panel()) / hLine(20) |> tprint
+#         termshow(Panel)
+#         termshow(Dict(:x => 1))
+#         termshow(zeros(4))
+#         termshow(zeros(4, 4))
+#     end
 
-    close(outRead)
+#     close(outRead)
 
-    redirect_stdout(originalSTDOUT)
-end
+#     redirect_stdout(originalSTDOUT)
+# end
 end

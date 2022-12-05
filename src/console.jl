@@ -19,8 +19,8 @@ export console_height,
     savecursor,
     restorecursor,
     Console,
-    enable,
-    disable
+    enable!,
+    disable!
 
 const STDOUT = stdout
 const STDERR = stderr
@@ -129,16 +129,51 @@ console_width(io::IO = stdout) = something(ACTIVE_CONSOLE_WIDTH[], displaysize(i
 struct Console
     height
     width
+    default_stdout
+    default_stderr
+    redirected_stdout
+    redirected_stderr
+    pipe
 end
 
+
+Console(h, w) = Console(h, w, nothing, nothing, nothing, nothing, nothing)
 Console(width) = Console(console_height(), width)
+Console() = Console(console_height(), console_width())
+Base.displaysize(c::Console) = (c.height, c_width)
 
-function enable(console::Console)
+function enable!(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = console.width
-    nothing
+
+    
+    # replace stdout stderr
+    console.default_stdout = stdout
+    console.default_stderr = stderr
+
+    # Redirect both the `stdout` and `stderr` streams to a single `Pipe` object.
+    pipe = Pipe()
+    Base.link_pipe!(pipe; reader_supports_async = true, writer_supports_async = true)
+    @static if VERSION >= v"1.6.0-DEV.481" # https://github.com/JuliaLang/julia/pull/36688
+        pe_stdout = IOContext(pipe.in, :displaysize=>displaysize(console))
+        pe_stderr = IOContext(pipe.in, :displaysize=>displaysize(console))
+    else
+        pe_stdout = pipe.in
+        pe_stderr = pipe.in
+    end
+    redirect_stdout(pe_stdout)
+    redirect_stderr(pe_stderr)
+
+    console.pe_stdout = pe_stdout
+    console.pe_stderr = pe_stderr
+    console.pipe = pipe
+
+    console
 end
 
-function disable(console::Console)
+function disable!(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = nothing
+
+    redirect_stdout(pe_stdout)
+    redirect_stderr(pe_stderr)
 end
 end

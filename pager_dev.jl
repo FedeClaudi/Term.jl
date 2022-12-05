@@ -101,4 +101,5 @@ This is where you print the content of your foot notes:
 p = Pager(text; page_lines = 30, title = "inspect(Panel)")
 p |> LiveDisplays.play
 
+stop!(p)
 println("done")
