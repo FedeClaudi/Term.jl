@@ -20,11 +20,12 @@ function show_error_code_line(frame::StackFrame; δ = 2)
 
     (isnothing(error_source) || length(error_source) == 0) && return nothing
 
+    _width = min(60, default_stacktrace_width() - 6)
     code_error_panel = Panel(
-        error_source;
+        str_trunc(error_source, _width - 5; ignore_markup = true);
         fit = δ == 0,
         style = δ > 0 ? "$(theme.text_accent) dim" : "dim",
-        width = min(60, default_stacktrace_width() - 6),
+        width = _width,
         subtitle_justify = :center,
         subtitle = δ > 0 ? "error line" : nothing,
         subtitle_style = "default $(theme.text_accent)",
@@ -33,11 +34,7 @@ function show_error_code_line(frame::StackFrame; δ = 2)
         # background = δ > 0 ? nothing : theme.md_codeblock_bg
     )
 
-    δ == 0 && (
-        code_error_panel =
-            "  " * RenderableText("│\n╰─"; style = "dim") * code_error_panel
-    )
-    δ > 0 && (code_error_panel = "  " * code_error_panel)
+    code_error_panel = "  " * RenderableText("│\n╰─"; style = "dim") * code_error_panel
 
     return code_error_panel
 end
@@ -136,7 +133,7 @@ function render_backtrace_frame(
             padding = (2, 2, 1, 1),
             style = TERM_THEME[].err_btframe_panel,
             fit = false,
-            width = default_stacktrace_width() - 12,
+            width = default_stacktrace_width() - 6,
             kwargs...,
         )
     else

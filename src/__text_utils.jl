@@ -333,11 +333,28 @@ end
 
 Shorten a string of text to a target width
 """
-function str_trunc(text::AbstractString, width::Int; trailing_dots = "...")::String
+function str_trunc(
+    text::AbstractString,
+    width::Int;
+    trailing_dots = "...",
+    ignore_markup = false,
+)::String
     width < 0 && return text
     textlen(text) ≤ width && return text
+    if contains(text, '\n')
+        return do_by_line(
+            l -> str_trunc(
+                l,
+                width;
+                trailing_dots = trailing_dots,
+                ignore_markup = ignore_markup,
+            ),
+            text,
+        )
+    end
 
-    trunc = reshape_text(text, width - textwidth(trailing_dots))
+    trunc =
+        reshape_text(text, width - textwidth(trailing_dots); ignore_markup = ignore_markup)
     out = first(split_lines(trunc))
     textlen(out) == 0 && return out
     out[end] != ' ' && (out *= trailing_dots)
