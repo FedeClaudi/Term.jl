@@ -15,7 +15,7 @@ const TIMEROUTPUT = TimerOutputs.TimerOutput()
 
 import Term.Consoles: Console, enable, disable
 
-Term.DEBUG_ON[] = true
+Term.DEBUG_ON[] = false
 const TEST_DEBUG_MODE = false  # renderables are saved as strings
 const TEST_CONSOLE_WIDTH = 80
 const IS_WIN = Sys.iswindows()
@@ -55,7 +55,6 @@ end
 @runner "20_test_compositor.jl"
 @runner "21_test_markdown.jl"
 @runner "22_test_grid.jl"
-@runner "23_test_issues.jl"
 @runner "98_test_examples.jl"
 @runner "99_test_errors.jl"
 

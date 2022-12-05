@@ -193,19 +193,23 @@ function Logging.handle_message(
     vert = "{$outline_markup}" * BOXES[:ROUNDED].mid.left * "{/$outline_markup}"
 
     # style message
+    logmsg_color = logger.theme.logmsg
     msg = if msg isa AbstractString
-        reshape_text(has_markup(msg) ? msg : "{#8abeff}$msg{/#8abeff}", 64)
+        reshape_text(has_markup(msg) ? msg : "{$logmsg_color}$msg{/$logmsg_color}", 64)
     else
-        string(msg)
+        "{$logmsg_color}" * reshape_text(string(msg), 64) * "{/$logmsg_color}"
     end
+    msg = length(msg) > 1000 ? ltrim_str(msg, 997) * "..." : msg
 
     # get the first line of information
-    content = "{$color underline bold}@$(string(lvl)){/$color underline bold} {#edb46f }($(_mod)$fname):{/#edb46f }"
+    fn_color = logger.theme.func
+    content = "{$color underline bold}@$(string(lvl)){/$color underline bold} {$fn_color }($(_mod)$fname):{/$fn_color }"
 
     # for multi-lines message, print each line separately.
     msg_lines::Vector{AbstractString} = split(msg, "\n")
     for n in 2:length(msg_lines)
-        msg_lines[n] = "  $vert   " * " "^textlen(content) * "{#8abeff}" * msg_lines[n]
+        msg_lines[n] =
+            "  $vert   " * " "^(textlen(content) - 4) * "{$logmsg_color}" * msg_lines[n]
     end
 
     length(msg_lines) > 0 && (content *= "  " * msg_lines[1])
@@ -239,10 +243,11 @@ function Logging.handle_message(
             "  $vert" *
             " "^pad *
             " {$(logger.theme.type) dim}($(_type)){/$(logger.theme.type) dim}" *
-            " {bold #e0e0e0}$k{/bold #e0e0e0}"
+            " {bold $(logger.theme.text)}$k{/bold $(logger.theme.text)}"
 
         epad = namepad - textlen(string(k))
-        line *= " "^epad * " {bold red}={/bold red} "
+        line *=
+            " "^epad * " {bold $(logger.theme.operator)}={/bold $(logger.theme.operator)} "
         lpad = textlen(line) - 4
 
         # get value style
@@ -257,15 +262,15 @@ function Logging.handle_message(
             _size = length(v)
             v = escape_brackets(string(v))
             v = textlen(v) > 33 ? v[1:30] * "..." : v
-            v *= "\n {white}$(_size) {/white}{dim}items{/dim}"
+            v *= "\n {$(logger.theme.text)}$(_size) {/$(logger.theme.text)}{dim}items{/dim}"
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
             _size = size(v)
             v = ltrim_str("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 30)
             v *=
-                "\n {dim}shape: {default white}" *
+                "\n {dim}shape: {default $(logger.theme.text)}" *
                 join(string.(_size), " × ") *
-                "{/default white}{/dim}"
+                "{/default $(logger.theme.text)}{/dim}"
 
         elseif v isa Function
             _style = logger.theme.func

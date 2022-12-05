@@ -42,7 +42,7 @@ typestree(io::IO, T::DataType) = print(
     Panel(
         Tree(T);
         title = "Types hierarchy",
-        style = "blue dim",
+        style = "$(TERM_THEME[].emphasis) dim",
         title_style = orange * " default",
         title_justify = :right,
         fit = true,
@@ -61,7 +61,7 @@ function expressiontree(io::IO, e::Expr)
         Panel(
             tree;
             title = _expr,
-            title_style = "$light_green default bold",
+            title_style = "$(TERM_THEME[].emphasis_light) default bold",
             title_justify = :center,
             style = grey_dark,
             fit = tree.measure.w > default_width(),
@@ -88,11 +88,10 @@ function inspect(io::IO, expr::Expr)
         Panel(
             dendo;
             title = _expr,
-            title_style = "$light_green default bold",
+            title_style = "$(TERM_THEME[].emphasis_light) default bold",
             title_justify = :center,
-            style = grey_dark,
+            style = TERM_THEME[].emphasis,
             fit = true,
-            # width=dendo.measure.w,
             subtitle = "inspect",
             subtitle_justify = :right,
             justify = :center,
@@ -136,64 +135,52 @@ Flags can be used to choose the level of detail in the information presented:
  - methods: show methods using `T` in their signature
  - supertypes: show methods using `T`'s supertypes in their signature
 """
-function inspect(T::Union{UnionAll, DataType};)
-
-    constructors_content = join(
-        string.(
-            Panel.(
-                style_methods(Base.methods(T));
-                fit=false, width=console_width()-33, padding=(0, 0, 0, 0),
-                style="hidden"
-            )
-        ), '\n'
-    )
-
-    _methods = vcat(methodswith.(getsupertypes(T)[1:3])...)
-    supertypes_methods = join(
-        string.(
-                Panel.(
-                style_methods(_methods);
-                fit=false, width=console_width()-33, padding=(0, 0, 0, 0),
-                style="hidden"
-            )
-        ),
-    "\n")
-
+function inspect(
+    T::Union{Union,DataType};
+    documentation::Bool = true,
+    constructors::Bool = true,
+    methods::Bool = false,
+    supertypes::Bool = false,
+)
     theme = TERM_THEME[]
-    field_names = apply_style.(string.(fieldnames(T)), theme.repr_accent_style)
-    field_types = apply_style.(map(f -> "::" * string(f), T.types), theme.repr_type_style)
+    hLine("inspecting: $T", style = theme.text_accent) |> print
 
-    line = vLine(length(field_names); style = theme.repr_name_style)
-    space = Spacer(length(field_names), 1)
-    fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
-    type_name = apply_style(string(T), theme.repr_name_style * " bold")
+    documentation || termshow(T; showdocs = false)
+    documentation && begin
+        termshow(T)
+    end
+    print("\n"^3)
 
+    # types hierarchy
+    "{$(theme.text_accent)}○ Types hierarchy:" |> tprintln
+    "   " * Tree(T) |> print
 
-    tv = TabViewer(
-        [
-            PagerTab("Info", 
-                string(
-                Panel(type_name / ("  " * line * fields); fit=false, 
-                        width=console_width()-33, justify=:center,
-                        title="Fields", title_style="bright_blue bold",
-                        style="bright_blue dim"
-                ) /
-                hLine(console_width()-33; style="dim") / 
-                "" /
-                Tree(T))
-            
-            ),
-            PagerTab("documentation", parse_md(get_docstring(T)[1]; width=console_width()-33)),
-            PagerTab("Constructors", constructors_content),
-            PagerTab("Methods", supertypes_methods),
-        ]
-    )
+    # constructors
+    constructors && begin
+        "\n{$(theme.text_accent)}○ {$(theme.inspect_accent)}$T{/$(theme.inspect_accent)} constructors:" |>
+        tprintln
+        t_name = split(string(T), '.')[end]
+        print.(style_methods(Base.methods(T), t_name; constructor = true))
+    end
 
-    LiveDisplays.play(tv)
+    # methods with T and supertypes
+    methods && begin
+        for dt in getsupertypes(T)[1:(end - 1)]
+            _methods = methodswith(dt)
+            length(_methods) == 0 && continue
+            dt_name = split(string(dt), '.')[end]
+
+            "\n{$(theme.text_accent)}○ Methods for {$(theme.inspect_accent)}$dt{/$(theme.inspect_accent)}:" |>
+            tprintln
+            print.(style_methods(_methods, dt_name))
+            supertypes || break
+        end
+    end
+    nothing
 end
 
-function inspect(F::Function; documentation::Bool = false)
-    hLine("inspecting: $F", style = "bold white") |> print
+function inspect(F::Function; documentation::Bool = true)
+    hLine("inspecting: $F", style = "$(TERM_THEME[].text_accent)") |> print
 
     documentation && begin
         termshow(F)

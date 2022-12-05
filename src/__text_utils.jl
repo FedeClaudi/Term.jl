@@ -11,6 +11,8 @@ function replace_multi(text, pairs...)::String
     return text
 end
 
+plural(word::AbstractString, n) = n <= 1 ? word : word * 's'
+
 # ---------------------------------------------------------------------------- #
 #                                     REGEX                                    #
 # ---------------------------------------------------------------------------- #
@@ -130,7 +132,7 @@ textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
 const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
 
 """
-    remove_ansi(str)::String
+    escape_brackets(text)::Stringremove_ansi(str)::String
 
 Replace each curly bracket with a double copy of itself
 """
@@ -173,6 +175,12 @@ function read_file_lines(path::AbstractString, start::Int, stop::Int)
     stop = stop ≥ countlines(path) ? countlines(path) : stop
     lines = readlines(path; keep = true)
     return collect(enumerate(lines))[start:stop]
+end
+
+function read_file_lines(path::AbstractString, line::Int)
+    !isfile(path) && return nothing
+    lines = readlines(path; keep = true)
+    return collect(enumerate(lines))[line]
 end
 
 # ---------------------------------------------------------------------------- #
@@ -284,16 +292,6 @@ split_lines(text::String)::Vector{String} = split(text, "\n")
 split_lines(text::SubString)::Vector{String} = String.(split(text, "\n"))
 
 """
-    split_lines(renderable)
-
-Split a renderable's text.
-"""
-function split_lines(renderable)
-    string(typeof(renderable)) == "Segment" && return split_lines(renderable.text)
-    return [s.text for s in renderable.segments]
-end
-
-"""
     do_by_line(fn::Function, text::String)
 
 Apply `fn` to each line in the `text`.
@@ -335,14 +333,13 @@ end
 
 Shorten a string of text to a target width
 """
-function str_trunc(text::AbstractString, width::Int; trailing_dots = "...")
-    # occursin('\n', text) && do_by_line(ln -> str_trunc(ln, width; trailing_dots=trailing_dots), text)
+function str_trunc(text::AbstractString, width::Int; trailing_dots = "...")::String
     width < 0 && return text
     textlen(text) ≤ width && return text
 
-    trunc = reshape_text(text, width - 3)
+    trunc = reshape_text(text, width - textwidth(trailing_dots))
     out = first(split_lines(trunc))
+    textlen(out) == 0 && return out
     out[end] != ' ' && (out *= trailing_dots)
-    # @assert textlen(out) ≤ width - 3
     return out
 end

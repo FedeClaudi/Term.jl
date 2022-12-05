@@ -26,8 +26,8 @@ end
 @testset "\e[34mPanel - fit overflow" begin
     inside = Panel("MYTEXT"^50; height = 10)
     @testpanel(inside, 10, 80)
-    @testpanel(Panel(inside / inside, fit = true), 52, TEST_CONSOLE_WIDTH,)
-    @testpanel(Panel(inside / inside, fit = false), 52, TEST_CONSOLE_WIDTH,)
+    @testpanel(Panel(inside / inside, fit = true), 42, TEST_CONSOLE_WIDTH,)
+    @testpanel(Panel(inside / inside, fit = false), 42, TEST_CONSOLE_WIDTH,)
 end
 
 @testset "\e[34mPANEL - fit - measure" begin
@@ -80,7 +80,7 @@ end
 
             # NOTE: using a panel with arbitrary long text can fail testing on wide terminals, since
             # the final `height` can vary (github.com/FedeClaudi/Term.jl/issues/112)
-            @testpanel(Panel(Panel("°"^250); _nofit...), 18, TEST_CONSOLE_WIDTH)
+            @testpanel(Panel(Panel("°"^250); _nofit...), 14, TEST_CONSOLE_WIDTH)
 
             @testpanel(
                 Panel(Panel("test"; _kw...); fit = false),
@@ -149,7 +149,7 @@ end
         @testpanel(
             Panel(Panel("°"^250, fit = true); _kw...),
             # WIDE_TERM ? nothing : 8,
-            18,
+            14,
             TEST_CONSOLE_WIDTH
         )
 
@@ -309,7 +309,7 @@ end
 # @testset "\e[34mPanel + renderables" begin
 #     @testpanel(Panel(RenderableText("x"^5)), 3, 11)
 
-@testpanel(Panel(RenderableText("x"^500); fit = false), 16, TEST_CONSOLE_WIDTH)
+@testpanel(Panel(RenderableText("x"^500); fit = false), 15, TEST_CONSOLE_WIDTH)
 
 @testpanel(Panel(RenderableText("x"^5); fit = true), 3, 11)
 
@@ -363,4 +363,87 @@ ads
 
     @test string(p) ==
           "\e[22m╭──────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    asasd\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdasadas\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdsasdasdsadasdsa\e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44mads\e[49m\e[41m               \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    \e[49m\e[41m              \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────╯\e[22m\e[0m"
+end
+
+@testset "\e[34mPANEL - UnicodePlots" begin
+    # using UnicodePlots; pl = lineplot(1:2; padding=0, margin=0); str = UnicodePlots.no_ansi_escape(string(pl))
+    str = """
+     ┌────────────────────────────────────────┐
+    2│⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     │⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+    1│⣀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│
+     └────────────────────────────────────────┘
+     ⠀1⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀2⠀"""
+    p = Panel(str; fit = true, style = "hidden")
+    @test Term.remove_ansi(string(p)) == """
+    ╭───────────────────────────────────────────╮
+    │ ┌────────────────────────────────────────┐│
+    │2│⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ │⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │1│⣀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+    │ └────────────────────────────────────────┘│
+    │ ⠀1⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀2⠀│
+    ╰───────────────────────────────────────────╯"""
+end
+
+@testset "\e[34mPANEL - nested panels macro" begin
+    pns = @nested_panels Panel(
+        Panel("inner", Panel("out", Panel("deep")); style = "green"),
+        Panel("inner2 "^25; height = 5),
+        "test",
+        RenderableText("adasdasda"),
+        Panel(; style = "red on_black");
+        height = 20,
+        style = "red",
+    )
+
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro")
+
+    pns = @nested_panels Panel(
+        Panel(Panel()),
+        Panel(Panel("red"); style = "red on_black"),
+        Panel(),
+        Panel(; style = "red"),
+        "done";
+        height = 20,
+        style = "red",
+    )
+
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro2")
+
+    pns = @nested_panels Panel()
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro3")
+
+    pns = @nested_panels Panel(Panel())
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro4")
+
+    pns = @nested_panels Panel(Panel("a"), Panel("b"))
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro5")
+
+    pns = @nested_panels Panel(Panel("a"), Panel("b"; style = "green"); style = "red")
+    IS_WIN || @compare_to_string(pns, "panels_layout_macro6")
 end

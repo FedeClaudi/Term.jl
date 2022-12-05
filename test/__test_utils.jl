@@ -31,7 +31,7 @@ fromfilelines(filepath) = readlines(filepath)
 """
 Highlight different characters between two strings.
 """
-function highlight_diff(s1::String, s2::String)
+function highlight_diff(s1::String, s2::String; stop = 500)
     s1 == s2 && return
 
     r(x) = replace(x, ' ' => "⋅")  # replace spaces for visualization
@@ -57,16 +57,17 @@ function highlight_diff(s1::String, s2::String)
     while i < (min(length(c1), length(c2)) - 50)
         "{dim}Characters $i-$(i+50){/dim}" |> tprintln
         tprintln(
-            "{bold red}(  obj  ){/bold red}  - " * join(c1[i:(i + 50)]),
+            "{bold blue}(current){/bold blue}  - " * join(c1[i:(i + 50)]),
             highlight = false,
         )
         tprintln(
-            "{bold red}(correct){/bold red}  - " * join(c2[i:(i + 50)]),
+            "{bold blue}(correct){/bold blue}  - " * join(c2[i:(i + 50)]),
             highlight = false,
         )
         hLine(style = "dim") |> tprint
         print("\n")
         i += 50
+        i > stop && break
     end
     hLine(style = "red") |> tprint
 end

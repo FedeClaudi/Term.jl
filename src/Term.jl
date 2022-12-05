@@ -30,6 +30,8 @@ end
 """
 module Term
 
+using Unicode
+
 const DEBUG_ON = Ref(false)
 
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
@@ -46,7 +48,6 @@ include("__text_utils.jl")
 include("_ansi.jl")
 include("_utils.jl")
 include("_text_reshape.jl")
-include("link.jl")
 
 # don't import other modules
 include("measures.jl")
@@ -86,7 +87,7 @@ include("progress.jl")
 include("logs.jl")
 
 
-export RenderableText, Panel, TextBox
+export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
 export @red, @black, @green, @yellow, @blue, @magenta, @cyan, @white, @default
 export @bold, @dim, @italic, @underline, @style
@@ -120,7 +121,7 @@ using .Renderables: AbstractRenderable, Renderable, RenderableText
 
 using .Layout
 
-using .Panels: Panel, TextBox
+using .Panels: Panel, TextBox, @nested_panels
 
 # define additional methods for measure functions
 

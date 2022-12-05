@@ -49,7 +49,7 @@ end
 
 Print an `AbstractRenderable`.
 
-Equivalent to `println(x)`
+Equivalent to `print(x)`
 """
 function tprint(io::IO, x::AbstractRenderable; highlight = true)
     w = console_width()

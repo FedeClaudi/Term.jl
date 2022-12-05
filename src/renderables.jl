@@ -43,11 +43,12 @@ Creates a string representation of a renderable
 Base.string(r::AbstractRenderable)::String = return if isnothing(r.segments)
     ""
 else
-    join([seg.text for seg in r.segments], "\n")
+    join(map(seg -> seg.text, r.segments), "\n")
 end
 
+#=
 function Base.string(renderable::AbstractRenderable, width::Int)::String
-    isnothing(renderable.measure) && (return string(renderable))
+    isnothing(renderable.measure) && return string(renderable)
     return if renderable.measure.w <= width
         string(renderable)
     else
@@ -55,6 +56,7 @@ function Base.string(renderable::AbstractRenderable, width::Int)::String
         string(RenderableText(string(renderable), width = width))
     end
 end
+=#
 
 """
     print(io::IO, renderable::AbstractRenderable)
@@ -62,7 +64,7 @@ end
 Print a renderable to an IO
 """
 function Base.print(io::IO, renderable::AbstractRenderable; highlight = true)
-    ren = unescape_brackets_with_space(string(renderable, console_width(io)))
+    ren = unescape_brackets_with_space(string(renderable))
     return println(io, ren)
 end
 
@@ -79,7 +81,7 @@ Base.show(io::IO, renderable::AbstractRenderable) = print(io, info(renderable))
 Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
-    println(io, string(renderable, console_width(io)))
+    println(io, string(renderable))
     DEBUG_ON[] && println(io, info(renderable))
 end
 
@@ -200,11 +202,6 @@ function trim_renderable(ren::RenderableText, width::Int)::RenderableText
     # @info "Trimming text renderable" ren
     text = join(getfield.(ren.segments, :text))
     return RenderableText(text, width = width)
-end
-
-trim_renderable(text::AbstractString, width::Int) = begin
-    # @info "Trimming text" text
-    text_to_width(text, width)
 end
 
 end

@@ -1,4 +1,4 @@
-import Term: reshape_text
+import Term: reshape_text, tprintln
 import Term.Consoles: clear
 
 strings = [
@@ -13,7 +13,7 @@ strings = [
 
     # # korean
     "국가유공자·상이군경 및 전몰군경의 유가족은 법률이 정하는 바에 의하여",
-    "국[red]가유공자·상이군{bold}경 및 전{/bold}몰군경의 유{/red}가족은 법률이 정하는 바에 의하여",
+    "국{red}가유공자·상이군{bold}경 및 전{/bold}몰군경의 유{/red}가족은 법률이 정하는 바에 의하여",
 
     # # large chars
     "┌────────────────┬────────────────┬────────────────┬────────────────┬──────────────",
@@ -44,11 +44,11 @@ width = 33
 for text in strings
     # println('_'^width)
     # println(reshape_text(text, width))
+
     print("\n\n")
-    println('_'^width)
+    println("\e[0m" * '_'^width)
     tprintln(reshape_text(text, width))
-    println('_'^width)
-    # tprint(text)
+    println("\e[0m" * '_'^width)
 end
 
 # text = strings[end]

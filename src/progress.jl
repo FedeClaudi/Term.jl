@@ -4,7 +4,8 @@ using Dates
 import Parameters: @with_kw
 import UUIDs: UUID
 
-import Term: rint, textlen, str_trunc, loop_last, get_file_format, update!, default_width
+import Term:
+    rint, textlen, str_trunc, loop_last, get_file_format, update!, default_width, TERM_THEME
 import ..Tprint: tprint, tprintln
 import ..Style: apply_style
 import ..Consoles:

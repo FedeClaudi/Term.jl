@@ -12,9 +12,9 @@ mutable struct LiveInternals
     prevcontent::Union{Nothing, AbstractRenderable}
     raw_mode_enabled::Bool
     last_update::Union{Nothing, Int}
-    pipe::Pipe
-    original_stdout::Base.TTY
-    original_stderr::Base.TTY
+    pipe::Union{Nothing, Pipe}
+    original_stdout::Union{Nothing, Base.TTY}
+    original_stderr::Union{Nothing, Base.TTY}
     redirected_stdout
     redirected_stderr
 
