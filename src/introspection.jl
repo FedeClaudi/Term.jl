@@ -106,13 +106,14 @@ end
 
 function style_methods(methods::Union{Vector{Base.Method},Base.MethodList})
     mets = []
+    fn_col = TERM_THEME[].func
     for (i, m) in enumerate(methods)
         _name = split(string(m), " in ")[1]
         code = (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name)
 
         code = replace(code, string(m.name) => "")
         code = RenderableText(
-            "     {$pink dim}($i){/$pink dim}  {$fn_col}$(m.name){/$fn_col}" * code,
+            "     {$pink dim}($i){/$pink dim}  {$(fn_col)}$(m.name){/$(fn_col)}" * code,
         )
 
         dest = RenderableText("{dim italic} $(m.file):$(m.line){/dim italic}")
@@ -133,46 +134,63 @@ Flags can be used to choose the level of detail in the information presented:
 """
 function inspect(
     T::Union{Union,DataType};
-    documentation::Bool = true,
-    constructors::Bool = true,
-    methods::Bool = false,
-    supertypes::Bool = false,
 )
+    constructors_content = join(
+        string.(
+            Panel.(
+                style_methods(Base.methods(T));
+                fit=false, width=console_width()-33, padding=(0, 0, 0, 0),
+                style="hidden"
+            )
+        ), '\n'
+    )
+
+    _methods = vcat(methodswith.(getsupertypes(T)[1:3])...)
+    supertypes_methods = join(
+        string.(
+                Panel.(
+                style_methods(_methods);
+                fit=false, width=console_width()-33, padding=(0, 0, 0, 0),
+                style="hidden"
+            )
+        ),
+    "\n")
+
     theme = TERM_THEME[]
-    hLine("inspecting: $T", style = theme.text_accent) |> print
+    field_names = apply_style.(string.(fieldnames(T)), theme.repr_accent)
+    field_types = apply_style.(map(f -> "::" * string(f), T.types), theme.repr_type)
 
-    documentation || termshow(T; showdocs = false)
-    documentation && begin
-        termshow(T)
-    end
-    print("\n"^3)
+    line = vLine(length(field_names); style = theme.repr_name)
+    space = Spacer(length(field_names), 1)
+    fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
+    type_name = apply_style(string(T), theme.repr_name * " bold")
 
-    # types hierarchy
-    "{$(theme.text_accent)}○ Types hierarchy:" |> tprintln
-    "   " * Tree(T) |> print
 
-    # constructors
-    constructors && begin
-        "\n{$(theme.text_accent)}○ {$(theme.inspect_accent)}$T{/$(theme.inspect_accent)} constructors:" |>
-        tprintln
-        t_name = split(string(T), '.')[end]
-        print.(style_methods(Base.methods(T), t_name; constructor = true))
-    end
+    tv = TabViewer(
+        [
+            PagerTab("Info", 
+                string(
+                Panel(type_name / ("  " * line * fields); fit=false, 
+                        width=console_width()-33, justify=:center,
+                        title="Fields", title_style="bright_blue bold",
+                        style="bright_blue dim"
+                ) /
+                hLine(console_width()-33; style="dim") / 
+                "" /
+                Tree(T))
+            
+            ),
+            PagerTab("documentation", parse_md(get_docstring(T)[1]; width=console_width()-33)),
+            PagerTab("Constructors", constructors_content),
+            PagerTab("Methods", supertypes_methods),
+        ]
+    )
 
-    # methods with T and supertypes
-    methods && begin
-        for dt in getsupertypes(T)[1:(end - 1)]
-            _methods = methodswith(dt)
-            length(_methods) == 0 && continue
-            dt_name = split(string(dt), '.')[end]
 
-            "\n{$(theme.text_accent)}○ Methods for {$(theme.inspect_accent)}$dt{/$(theme.inspect_accent)}:" |>
-            tprintln
-            print.(style_methods(_methods, dt_name))
-            supertypes || break
-        end
-    end
-    nothing
+    LiveDisplays.play(tv) 
+
+    stop!(tv)
+    println("done")
 end
 
 function inspect(F::Function; documentation::Bool = true)

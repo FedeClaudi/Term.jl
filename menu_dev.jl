@@ -4,7 +4,7 @@ using Term.LiveDisplays
 using Term.Consoles
 using Term.Progress
 
-clear()
+# clear()
 inspect(Panel)
 
 # pbar = ProgressBar(; transient = false)

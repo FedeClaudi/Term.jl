@@ -21,7 +21,7 @@ function show_error_code_line(frame::StackFrame; δ = 2)
     (isnothing(error_source) || length(error_source) == 0) && return nothing
     _width = min(60, default_stacktrace_width() - 6)
     code_error_panel = Panel(
-        str_trunc(error_source, _width - 5);
+        str_trunc(error_source, _width - 5; ignore_markup=true);
         fit = δ == 0,
         style = δ > 0 ? "$(theme.text_accent) dim" : "dim",
         width = _width,
