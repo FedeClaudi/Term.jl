@@ -30,6 +30,8 @@ end
 """
 module Term
 
+using Unicode
+
 const DEBUG_ON = Ref(false)
 
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)

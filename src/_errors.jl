@@ -77,7 +77,6 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
     # get the name of the error function
     func = sprint(StackTraces.show_spec_linfo, frame)
     contains(func, "##kw") && (func = parse_kw_func_name(frame))
-    # contains(func, ".var\"#") && (func = RenderableText("{$(theme.func)}anonymous function{/$(theme.func)"))
 
     # format function name
     func = replace(
@@ -86,6 +85,7 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
             SubstitutionString("{$(theme.func)}" * s"\g<0>" * "{/$(theme.func)}"),
     )
     func = reshape_text(func, default_stacktrace_width() - 6) |> lstrip
+    func = highlight(func)
 
     # get other information about the function 
     inline =

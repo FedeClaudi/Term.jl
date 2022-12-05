@@ -69,6 +69,7 @@ repr_panel(
 )
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsis = false)
+    # shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     out = highlight.(shortsting.(v[1:N]))
 
@@ -146,7 +147,6 @@ function vec2content(vec::Union{Tuple,AbstractVector})
         box = :NONE,
     )
 
-    # content = rvstack(counts...) * Spacer(length(counts), 3) * cvstack(vec_items)
     return content
 end
 

@@ -26,8 +26,8 @@ end
 @testset "\e[34mPanel - fit overflow" begin
     inside = Panel("MYTEXT"^50; height = 10)
     @testpanel(inside, 10, 80)
-    @testpanel(Panel(inside / inside, fit = true), 52, TEST_CONSOLE_WIDTH,)
-    @testpanel(Panel(inside / inside, fit = false), 52, TEST_CONSOLE_WIDTH,)
+    @testpanel(Panel(inside / inside, fit = true), 42, TEST_CONSOLE_WIDTH,)
+    @testpanel(Panel(inside / inside, fit = false), 42, TEST_CONSOLE_WIDTH,)
 end
 
 @testset "\e[34mPANEL - fit - measure" begin

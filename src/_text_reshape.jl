@@ -1,4 +1,5 @@
 import Base: rpad as brpad
+using WordTokenizers
 
 rx = r"\s*\S+\s*"
 
@@ -102,46 +103,50 @@ Insert newline characters in a string so that each line is within the given widt
 """
 function reshape_text(text::AbstractString, width::Int)
     occursin('\n', text) && (return do_by_line(ln -> reshape_text(ln, width), text))
-
     textlen(text) ≤ width && return text
-    text = split_tags_into_words(text)
-    position = 0
-    cuts = []
-    for (start, _, word, word_length) in words(text)
-        if position + word_length > width
-            len_t = length(text[1:start])
-            # we need to cut the text
-            if word_length > width
-                # the word is longer than the line
-                word_chars = characters(word)
-                position > 0 && push!(cuts, len_t + length(cuts))
-                _, position = first(word_chars)  # width of first char
 
-                for (i, (char, w)) in enumerate(word_chars[2:end])
-                    if position + w > width
-                        push!(cuts, len_t + length(cuts) + i)
-                        position = w
-                    else
-                        position += w
-                    end
-                end
+    lines = []
+    line, line_length = "", 0
+    bracketed = false
+    in_escape_code = false
+    for c in text
+        # check if we are entering a special context
+        if c == '\e'
+            in_escape_code = true
+        end
+        if c == '{'
+            bracketed = true
+        end
 
-            elseif position > 0 && start > 1
-                push!(cuts, len_t + length(cuts))
-                position = word_length
+        line *= c
+
+        # see if we need to go to a new line
+        if !bracketed && !in_escape_code
+            line_length += textwidth(c)   
+
+            if line_length + 1 > width
+                push!(lines, rstrip(line))
+                line, line_length = "", 0
+            elseif (line_length + 1 > width-5) && (c == ' ')
+                push!(lines, rstrip(line))
+                line, line_length = "", 0
             end
-        else
-            position += word_length
+        end
+
+        # check if we are exiting from a special context
+        if c == 'm' && in_escape_code
+            in_escape_code = false
+        end
+        if c == '}'
+            bracketed = false
         end
     end
+    push!(lines, rstrip(line))
+    out = join(lines, "\n")
 
-    chars = collect(text)
-    for cut in cuts
-        insert!(chars, cut, '\n')
-    end
-
-    apply_style(style_at_each_line(String(chars)))
+    chomp(out)
 end
+
 
 """
     justify(text::AbstractString, width::Int)::String
