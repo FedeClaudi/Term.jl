@@ -1,10 +1,8 @@
 module Panels
 
 import Term:
-    reshape_text,
     join_lines,
     fillin,
-    str_trunc,
     ltrim_str,
     default_width,
     remove_ansi,
@@ -289,7 +287,7 @@ function Panel(
     panel_measure = Measure(height, width)
 
     # if the content is too tall, exclude some lines
-    if content.measure.h > height - Δh
+    if content.measure.h > height - Δh - 2
         lines_to_drop = content.measure.h - height + Δh + 3
         omit_msg = RenderableText(
             "... content omitted ...",
@@ -304,7 +302,8 @@ function Panel(
                 omit_msg.segments[1]
             ]
         else
-            [omit_msg.segments[1]]
+            # [omit_msg.segments[1]]
+            [content.segments[1]]
         end
         content = Renderable(segments, Measure(segments))
     end

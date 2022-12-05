@@ -6,7 +6,7 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
 
     @test highlight("this is ::Int64";) == "this is {#CE93D8}::Int64{/#CE93D8}"
 
-    @test highlight("print", :func;) == "\e[38;2;255;238;88mprint\e[39m"
+    @test highlight("print", :func;) == "\e[38;2;242;215;119mprint\e[39m"
 
     @test highlight("1 + 2", :code;) == "\e[38;2;255;238;88m1 + 2\e[39m"
 
@@ -19,7 +19,7 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
 
     @test highlight(Int32;) == "\e[38;2;206;147;216mInt32\e[39m"
 
-    @test highlight(print;) == "\e[38;2;255;238;88mprint\e[39m"
+    @test highlight(print;) == "\e[38;2;242;215;119mprint\e[39m"
 
     @test highlight("this :this :(x+y) 'a'";) ==
           "this {#FFA726}:this{/#FFA726} {#FFCA28}:{#FFF59D}({/#FFF59D}x{#EF5350}+{/#EF5350}y{#FFF59D}){/#FFF59D}{/#FFCA28} {#64b565}'a'{/#64b565}"
@@ -35,5 +35,14 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
           "\e[38;2;222;222;222mThis\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mis\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;109;89m::\e[39m\e[38;2;222;222;222mInt64\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mmy\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;222;222mstyle\e[39m\e[38;2;222;222;222m\n\e[39m\e[38;2;232;212;114mprint\e[39m\e[38;2;227;136;100m(\e[39m\e[38;2;222;222;222mx\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;222;109;89m+\e[39m\e[38;2;222;222;222m \e[39m\e[38;2;144;202;249m2\e[39m\e[38;2;227;136;100m)\e[39m\e[38;2;222;222;222m\n\e[39m"
 
     @test load_code_and_highlight("02_test_ansi.jl", 7)[1:100] ==
-          "{red bold}❯{/red bold} {white}7{/white}     \e[39m\e[38;2;222;222;222mget_color\e[39m\e[38;2;227;136;1"
+          "  {grey39}4{/grey39} \e[38;2;222;222;222m    \e[39m\e[38;2;222;222;222mis_hex_color\e[39m\e[38;2;227;136;"
+
+    @test load_code_and_highlight("02_test_ansi.jl", 1)[1:100] ==
+          "{red bold}❯{/red bold} {white}1{/white} \e[38;2;122;147;245mimport\e[39m\e[38;2;222;222;222m \e[39m\e[3"
+
+    @test load_code_and_highlight("02_test_ansi.jl", 94)[1:100] ==
+          "  {grey39}91{/grey39} \e[38;2;222;222;222m        \e[39m\e[38;2;222;222;222m@test\e[39m\e[38;2;222;222;22"
+
+    @test load_code_and_highlight("02_test_ansi.jl", 92)[1:100] ==
+          "  {grey39}89{/grey39} \e[38;2;222;222;222m    \e[39m\e[38;2;222;222;222mhexes\e[39m\e[38;2;222;222;222m \e"
 end

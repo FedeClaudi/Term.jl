@@ -69,6 +69,7 @@ repr_panel(
 )
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsis = false)
+    # shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     out = highlight.(shortsting.(v[1:N]))
 
@@ -121,7 +122,7 @@ end
 
 function vec2content(vec::Union{Tuple,AbstractVector})
     max_w = default_width()
-    max_items = 100
+    max_items = 50
     N = min(max_items, length(vec))
 
     N == 0 && return "{bright_blue}empty vector{/bright_blue}"
@@ -146,7 +147,6 @@ function vec2content(vec::Union{Tuple,AbstractVector})
         box = :NONE,
     )
 
-    # content = rvstack(counts...) * Spacer(length(counts), 3) * cvstack(vec_items)
     return content
 end
 

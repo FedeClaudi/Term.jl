@@ -11,7 +11,8 @@ import Term:
     escape_brackets,
     unescape_brackets,
     remove_markup,
-    TERM_THEME
+    TERM_THEME,
+    plural
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
@@ -21,8 +22,6 @@ import ..Panels: Panel
 export install_term_stacktrace
 
 include("_errors.jl")
-
-
 
 # ----------------------- error type specific messages ----------------------- #
 
@@ -176,13 +175,13 @@ end
 # ! UndefKeywordError
 function error_message(er::UndefKeywordError)
     # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
-    return "Undefined function keyword argument: `$(er.var)`."
+    return "Undefined function keyword argument: {bold}`$(er.var)`{/bold}."
 end
 
 # ! UNDEFVAR ERROR
 function error_message(er::UndefVarError)
     # @info "undef var error" er er.var typeof(er.var)
-    return "Undefined variable `$(er.var)`."
+    return "Undefined variable {bold}`$(er.var)`{/bold}."
 end
 
 # ! STRING INDEX ERROR
@@ -190,6 +189,22 @@ function error_message(er::StringIndexError)
     # @info er typeof(er) fieldnames(typeof(er)) 
     m1 = "attempted to access a String at index $(er.index)\n"
     return m1
+end
+
+# ! SYSTEM ERROR
+function error_message(er::SystemError)
+    if @static(Sys.iswindows() ? er.extrainfo isa WindowsErrorInfo : false)
+        errstring = Libc.FormatMessage(er.extrainfo.errnum)
+        extrainfo = er.extrainfo.extrainfo
+    else
+        errstring = Libc.strerror(er.errnum)
+        extrainfo = er.extrainfo
+    end
+    if extrainfo === nothing
+        return "$(er.prefix)\n" * errstring
+    else
+        return "SystemError (with $extrainfo): $(er.prefix)\n" * errstring
+    end
 end
 
 # ! catch all other errors
@@ -231,10 +246,13 @@ Several options are provided to reverse the order in which the frames are shown 
 Julia's default ordering), hide extra frames when a large number is in the trace (e.g. Stack Overflow error)
 and hide Base and standard libraries error information (i.e. when a frame is in a module belonging to those.)
 """
-function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30, hide_base=true)
+function install_term_stacktrace(;
+    reverse_backtrace::Bool = true,
+    max_n_frames::Int = 30,
+    hide_frames = true,
+)
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            
             theme = TERM_THEME[]
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
@@ -264,7 +282,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
-                        hide_base = $(hide_base)
+                        hide_frames = $(hide_frames),
                     )
                     print(rendered_bt)
                 end
