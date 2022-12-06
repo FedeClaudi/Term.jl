@@ -37,20 +37,16 @@ abstract type AbstractLiveDisplay end
         # TODO add this to Console instead
         # replace stdout stderr
         default_stdout = stdout
-        default_stderr = stderr
 
         # Redirect both the `stdout` and `stderr` streams to a single `Pipe` object.
         pipe = Pipe()
         Base.link_pipe!(pipe; reader_supports_async = true, writer_supports_async = true)
         @static if VERSION >= v"1.6.0-DEV.481" # https://github.com/JuliaLang/julia/pull/36688
             pe_stdout = IOContext(pipe.in, :displaysize=>displaysize(stdout))
-            pe_stderr = IOContext(pipe.in, :displaysize=>displaysize(stdout))
         else
             pe_stdout = pipe.in
-            pe_stderr = pipe.in
         end
         redirect_stdout(pe_stdout)
-        redirect_stderr(pe_stderr)
 
         return new(
             iob,
@@ -61,9 +57,7 @@ abstract type AbstractLiveDisplay end
             nothing,
             pipe,
             default_stdout,
-            default_stderr,
             pe_stdout,
-            pw_stderr,
         )
     end
 end
