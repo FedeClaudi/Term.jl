@@ -20,9 +20,9 @@ function show_error_code_line(frame::StackFrame; δ = 2)
 
     (isnothing(error_source) || length(error_source) == 0) && return nothing
 
-    _width = min(60, default_stacktrace_width() - 6)
+    _width = min(60, default_stacktrace_width() - 12)
     code_error_panel = Panel(
-        str_trunc(error_source, _width - 5; ignore_markup = true);
+        str_trunc(error_source, _width; ignore_markup = true);
         fit = δ == 0,
         style = δ > 0 ? "$(theme.text_accent) dim" : "dim",
         width = _width,
@@ -81,14 +81,16 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{$(theme.func)}" * s"\g<0>" * "{/$(theme.func)}"),
     )
-    func = reshape_text(func, default_stacktrace_width() - 6) |> lstrip
-    func = highlight(func)
+    func = highlight(func) |> apply_style
 
     # get other information about the function 
     inline =
         frame.inlined ? RenderableText("   inlined"; style = "bold dim $(theme.text)") : ""
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
-    func_line = hstack(func, inline, c; pad = 1)
+
+    func = str_trunc(func, default_stacktrace_width()-20; ignore_markup=true)
+    func_line = hstack(func, inline, c; pad = 1) |> string |> apply_style |> remove_markup
+    
 
     # load source code around error and render it
     file = Base.fixup_stdlib_path(string(frame.file))
@@ -133,7 +135,7 @@ function render_backtrace_frame(
             padding = (2, 2, 1, 1),
             style = TERM_THEME[].err_btframe_panel,
             fit = false,
-            width = default_stacktrace_width() - 6,
+            width = default_stacktrace_width() - 12,
             kwargs...,
         )
     else

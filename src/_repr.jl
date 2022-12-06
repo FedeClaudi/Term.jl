@@ -69,13 +69,15 @@ repr_panel(
 )
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsis = false)
-    # shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
+    v=Vector(v)  # necessary to handle sparse vectors
+
     shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
     out = highlight.(shortsting.(v[1:N]))
 
     ellipsis && length(v) > N && push!(out, " ⋮";)
     return out
 end
+
 
 function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 50, max_D = 10)
     max_D = console_width() < 150 ? 5 : max_D

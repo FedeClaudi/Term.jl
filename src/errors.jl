@@ -12,7 +12,9 @@ import Term:
     unescape_brackets,
     remove_markup,
     TERM_THEME,
-    plural
+    plural,
+    apply_style,
+    str_trunc
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
@@ -141,7 +143,7 @@ function error_message(er::MethodError; kwargs...)
                 "   {dim bold}($(a[1])){/dim bold} $(highlight("::"*string(typeof(a[2]))))\n",
             enumerate(er.args),
         ),
-    )
+    ) |> apply_style
     main_line =
         "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" /
         _args
@@ -152,7 +154,7 @@ function error_message(er::MethodError; kwargs...)
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
         candidates = map(c -> method_error_candidate(name, c), _candidates)
-        main_line /= lvstack("", "Alternative candidates:", candidates...)
+        main_line /= lvstack("", "Alternative candidates:", candidates...) |> string |> apply_style
     else
         main_line = main_line / " " / "{dim}No alternative candidates found"
     end
