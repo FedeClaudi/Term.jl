@@ -171,7 +171,7 @@ using .Repr: @with_repr, termshow, install_term_repr, @showme
 using .Grid
 
 using SnoopPrecompile
-
+# TODO improve pre-compilation
 @precompile_setup begin
     originalSTDOUT = stdout
 
