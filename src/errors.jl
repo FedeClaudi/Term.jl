@@ -13,9 +13,8 @@ import Term:
     remove_markup,
     TERM_THEME,
     plural,
-    apply_style,
     str_trunc
-
+import ..Style: apply_style
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
 import ..Renderables: RenderableText, AbstractRenderable
@@ -107,6 +106,15 @@ end
 method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
 function method_error_candidate(fun, candidate)
     theme = TERM_THEME[]
+
+    # if contains(candidate, "##kw")
+    #     name = split(candidate, "\")(")[1]
+    #     name = replace(name, "(::Core.var\"#"=>"", "##kw"=>"")
+
+    #     @info "candidate" fun candidate name
+
+    # end
+
     # highlight non-matched types
     candidate = replace(
         candidate,
@@ -119,7 +127,7 @@ function method_error_candidate(fun, candidate)
 
     # highlight fun
     candidate = replace(candidate, string(fun) => "{$(theme.func)}$(fun){/$(theme.func)}")
-    return candidate
+    return candidate |> rstrip
 end
 
 function error_message(er::MethodError; kwargs...)

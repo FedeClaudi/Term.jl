@@ -73,7 +73,7 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
 
     # get the name of the error function
     func = sprint(StackTraces.show_spec_linfo, frame)
-    contains(func, "##kw") && (func = parse_kw_func_name(frame))
+    # contains(func, "##kw") && (func = parse_kw_func_name(frame))
 
     # format function name
     func = replace(
@@ -180,8 +180,9 @@ A frame should skip if it's in Base or an installed package.
 should_skip(frame::StackFrame) =
     frame_module(frame) == "Base" || (
         contains(string(frame.file), r"[/\\].julia[/\\]") ||
-        contains(string(frame.file), r"[/\\]julia[/\\]stdlib[/\\]") ||
-        contains(string(frame.file), r"[/\\]julia[/\\]lib[/\\]")
+        contains(string(frame.file), r"julia[/\\]stdlib") ||
+        contains(string(frame.file), r"julia[/\\]lib") ||
+        contains(string(frame.file), r"julialang.language") 
     )
 
 should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false

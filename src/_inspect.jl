@@ -30,7 +30,6 @@ function style_methods(
     fn_col = TERM_THEME[].func
     highlight_col = TERM_THEME[].inspect_highlight
     accent_col = TERM_THEME[].inspect_accent
-
     mets = []
     prevmod = ""
     for (i, m) in enumerate(methods)
