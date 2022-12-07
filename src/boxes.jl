@@ -173,7 +173,7 @@ function get_title_row(
         return Segment(get_row(box, width, row), style)
     else
         title = apply_style(title)
-        title = textlen(title) < width - 8 ? title : str_trunc(title, width - 8)
+        title = textlen(title) < width - 12 ? title : str_trunc(title, width - 12)
     end
 
     # compose title line 
@@ -189,20 +189,39 @@ function get_title_row(
             "{" * title_style * "}", "{/" * title_style * "}" * open
         end
     end
+
+    # get the title
     title = space * topen * title * tclose * space
-    if justify ≡ :left
-        line = open * boxline.left * boxline.mid^4 * title
-        line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
-    elseif justify ≡ :right
-        pre_len = width - textlen(title) - 4
-        line = open * get_lrow(box, pre_len, row)
-        line *= title * boxline.mid^3 * boxline.right * close
-    else  # justify :center
-        tl, tr = get_lr_widths(textlen(title))
-        lw, rw = get_lr_widths(width)
-        line =
-            open * get_lrow(box, lw - tl, row) * title * get_rrow(box, rw - tr, row) * close
-        return Segment(line * "\e[0m")
+
+    # only add the title if the box is wide enough
+    if width < 6
+        line = open * boxline.left * boxline.mid^(width - 2) * boxline.right * close
+    else
+        # close the box
+        if justify ≡ :left
+            line = open * boxline.left * boxline.mid^4 * title
+
+            # check if the title is too long
+            if width - textlen(line) - 1 < 1
+                line = open * boxline.left * boxline.mid^2 * title
+            end
+
+            line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
+        elseif justify ≡ :right
+            pre_len = width - textlen(title) - 4
+            line = open * get_lrow(box, pre_len, row)
+            line *= title * boxline.mid^3 * boxline.right * close
+        else  # justify :center
+            tl, tr = get_lr_widths(textlen(title))
+            lw, rw = get_lr_widths(width)
+            line =
+                open *
+                get_lrow(box, lw - tl, row) *
+                title *
+                get_rrow(box, rw - tr, row) *
+                close
+            return Segment(line * "\e[0m")
+        end
     end
     return Segment(line * "\e[0m")
 end

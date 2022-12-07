@@ -88,9 +88,8 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
         frame.inlined ? RenderableText("   inlined"; style = "bold dim $(theme.text)") : ""
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
 
-    func = str_trunc(func, default_stacktrace_width()-20; ignore_markup=true)
+    func = str_trunc(func, default_stacktrace_width() - 20; ignore_markup = true)
     func_line = hstack(func, inline, c; pad = 1) |> string |> apply_style |> remove_markup
-    
 
     # load source code around error and render it
     file = Base.fixup_stdlib_path(string(frame.file))

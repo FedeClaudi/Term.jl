@@ -222,6 +222,24 @@ end
           "\e[22m╭──── test\e[22m ──────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────── aaaaa\e[22m ───╯\e[22m\e[0m\e[22m\e[0m"
 end
 
+@testset "PANEL - small panel with title" begin
+    p = Panel(; width = 12, title = "testadasd")
+    @test string(p) ==
+          "\e[22m╭── t...\e[22m ──╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
+
+    p = Panel(; width = 12, title = "testadasd", title_justify = :right)
+    @test string(p) ==
+          "\e[22m╭─ t...\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
+
+    p = Panel(; width = 12, title = "testadasd", title_justify = :center)
+    @test string(p) ==
+          "\e[22m╭── t...\e[22m ──╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
+
+    p = Panel(; width = 5, title = "asdasdasd")
+    @test string(p) ==
+          "\e[22m╭───╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰───╯\e[22m\e[0m"
+end
+
 @testset "PANEL - compare to string" begin
     pts = """
 Lorem{red} ipsum dolor s{/red}it amet, consectetur adipiscing elit,
