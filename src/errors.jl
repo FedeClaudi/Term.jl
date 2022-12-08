@@ -24,8 +24,6 @@ export install_term_stacktrace
 
 include("_errors.jl")
 
-
-
 # ----------------------- error type specific messages ----------------------- #
 
 # ! ARGUMENT ERROR
@@ -132,7 +130,7 @@ function method_error_candidate(fun, candidate)
     return candidate |> rstrip
 end
 
-function error_message(er::MethodError; kwargs...)    
+function error_message(er::MethodError; kwargs...)
     f = er.f
     ft = typeof(f)
     # name = ft.name.mt.name
@@ -141,27 +139,27 @@ function error_message(er::MethodError; kwargs...)
 
     # handle calls kwcall
     args = er.args
-    if length(args) > 1 && args[1] isa NamedTuple && args[2] isa DataType && contains(string(f), "##kw")
+    if length(args) > 1 && args[1] isa NamedTuple && contains(string(f), "##kw")
         f = (er.args::Tuple)[2]
         ft = typeof(f)
 
         # arg_types_param = arg_types_param[3:end]
         kwargs = pairs(er.args[1])
-        er = MethodError(f, er.args[3:end::Int])
+        er = MethodError(f, er.args[3:(end::Int)])
     end
 
     # show signature of method call with args types
     emph = TERM_THEME[].emphasis
     sym = TERM_THEME[].symbol
 
-    name = sprint(io -> Base.show_signature_function(io, isa(f, Type) ? Type{f} : typeof(f)))
-    msg = "No method matching {bold $(emph)}`$name`{/bold $(emph)} with arguments types:" 
+    name =
+        sprint(io -> Base.show_signature_function(io, isa(f, Type) ? Type{f} : typeof(f)))
+    msg = "No method matching {bold $(emph)}`$name`{/bold $(emph)} with arguments types:"
     args = join(map(a -> "::$(typeof(a))", er.args), ", ")
     !isempty(kwargs) && begin
-        args *= "; " * join(["{$sym}$k{/$sym}::$(typeof(v))" for (k,v) in kwargs], ", ")
+        args *= "; " * join(["{$sym}$k{/$sym}::$(typeof(v))" for (k, v) in kwargs], ", ")
     end
     msg /= highlight(args)
-
 
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
@@ -248,10 +246,13 @@ Several options are provided to reverse the order in which the frames are shown 
 Julia's default ordering), hide extra frames when a large number is in the trace (e.g. Stack Overflow error)
 and hide Base and standard libraries error information (i.e. when a frame is in a module belonging to those.)
 """
-function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30, hide_frames=true)
+function install_term_stacktrace(;
+    reverse_backtrace::Bool = true,
+    max_n_frames::Int = 30,
+    hide_frames = true,
+)
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            
             theme = TERM_THEME[]
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
@@ -281,7 +282,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
-                        hide_frames = $(hide_frames)
+                        hide_frames = $(hide_frames),
                     )
                     print(rendered_bt)
                 end
