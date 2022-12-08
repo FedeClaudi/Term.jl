@@ -194,6 +194,7 @@ frame_module(path::String) = startswith(path, "./") ? "Base" : nothing
 Get module for a pointer obj
 """
 frame_module(pointer::Ptr) = frame_module(StackTraces.lookup(pointer)[1])
+frame_module(iip::Base.InterpreterIP) = string(iip.mod)
 
 """
     should_skip
@@ -211,6 +212,8 @@ should_skip(frame::StackFrame) =
 should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false
 should_skip(pointer::Ptr) = should_skip(StackTraces.lookup(pointer)[1])
 should_skip(pointer::Ptr, hide::Bool) = hide ? should_skip(pointer) : false
+should_skip(iip::Base.InterpreterIP) = true
+should_skip(iip::Base.InterpreterIP, hide::Bool) = true
 
 """
     add_new_module_name!(content, curr_modul)

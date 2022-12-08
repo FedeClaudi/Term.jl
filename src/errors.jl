@@ -36,7 +36,6 @@ error_message(er::AssertionError) = return er.msg
 function error_message(er::BoundsError)
     # @info "bounds error" er fieldnames(typeof(er))
     obj = escape_brackets(string(typeof(er.a)))
-    println(obj)
     if er.a isa AbstractArray
         obj = "a `$obj` width shape $(string(size(er.a)))"
     end
@@ -60,7 +59,7 @@ end
 function error_message(er::DomainError)
     # @info "err exceprion" er fieldnames(DomainError) er.val
     # msg = split(er.msg, " around ")[1]
-    return er.msg / "The invalid value is: $(er.val)."
+    return er.msg / "The invalid value is: $(er.val)." |> string
 end
 
 # ! DimensionMismatch
@@ -289,10 +288,13 @@ function install_term_stacktrace(;
 )
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
+            # @info "SHOWERROR" io er bt backtrace
             theme = TERM_THEME[]
-            (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
+
+            # isnothing(bt) || (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
 
+            # if the terminal is too narrow, avoid using Term's functionality
             if default_stacktrace_width() < 70
                 println(io)
                 @warn "Term.jl: can't render error message, console too narrow. Using default stacktrace"
@@ -303,16 +305,15 @@ function install_term_stacktrace(;
             end
 
             try
-                println("\n")
                 ename = string(typeof(er))
-                print(
-                    hLine(
+                length(bt) > 0 && print(
+                    "\n" / hLine(
                         "{default bold $(theme.err_errmsg)}$ename{/default bold $(theme.err_errmsg)}";
                         style = "dim $(theme.err_errmsg)",
                     ),
                 )
 
-                # print error stacktrace
+                # print error backtrace or panel
                 if length(bt) > 0
                     rendered_bt = render_backtrace(
                         bt;
@@ -321,21 +322,18 @@ function install_term_stacktrace(;
                         hide_frames = $(hide_frames),
                     )
                     print(rendered_bt)
+                else
+                    # print error message and description
+                    "\n" / Panel(
+                        RenderableText(error_message(er));
+                        width = default_stacktrace_width(),
+                        title = "{bold $(theme.err_errmsg) default underline}$(typeof(er)){/bold $(theme.err_errmsg) default underline}",
+                        padding = (2, 2, 1, 1),
+                        style = "dim $(theme.err_errmsg)",
+                        title_justify = :center,
+                        fit = false,
+                    ) |> print
                 end
-
-                # print error message and description
-                Panel(
-                    RenderableText(
-                        error_message(er),
-                        # width = default_stacktrace_width() - 4,
-                    );
-                    width = default_stacktrace_width(),
-                    title = "{bold $(theme.err_errmsg) default underline}$(typeof(er)){/bold $(theme.err_errmsg) default underline}",
-                    padding = (2, 2, 1, 1),
-                    style = "dim $(theme.err_errmsg)",
-                    title_justify = :center,
-                    fit = false,
-                ) |> print
 
             catch cought_err  # catch when something goes wrong during error handling in Term
                 @error "Term.jl: error while rendering error message: " exception =
