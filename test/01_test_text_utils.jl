@@ -45,6 +45,11 @@ import Term.Measures: width as get_width
 
     @test remove_markup("text with {{double}} squares") == "text with {{double}} squares"
     @test !has_markup("text with {{double}} squares")
+
+    text = "{red}asdasda{/green}a{blue}sda{/blue}sda{/red}"
+
+    @test remove_markup(text) == "asdasdaasdasda"
+    @test remove_markup(text; remove_orphan_tags = false) == "asdasda{/green}asdasda"
 end
 
 @testset "TU_ansi" begin
@@ -229,20 +234,8 @@ id est laborum."""
 
     for width in (40, 60, 99)
         rh = reshape_text(str, width)
-        @test all(textlen.(split(rh, '\n')) .≤ width)
+        @test all(textlen.(split(rh, '\n'); remove_orphan_tags = true) .≤ width)
     end
-
-    # for i in 5:10
-    #     width = 2^i
-    #     for offset in (-(width ÷ 2)):(width ÷ 2)
-    #         txt = '.'^(2width + offset)
-    #         rt = reshape_text(txt, width)
-    #         len = length.(split(rt, '\n'))
-    #         # @show length(txt) width rt len
-    #         @test all(len[1:(end - 1)] .<= width)
-    #         @test len[end] == (offset > 0 ? offset : width + offset)
-    #     end
-    # end
 end
 
 @testset "Text justify" begin

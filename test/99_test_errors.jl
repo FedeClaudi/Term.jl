@@ -55,8 +55,7 @@ end
         # Test3(x, y, z) = new(x, y)
         Test3(x, y) = new(x, y)
     end
-    Test(x; y = 1) = Test(x, y)
-    @test_throws MethodError Test3(x) = Test3(x, x)
+    @test_throws MethodError Test3(1; a = :test)
 
     # convert
     f(x)::Vector = 2x

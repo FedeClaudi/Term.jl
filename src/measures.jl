@@ -29,7 +29,7 @@ default_size() = (rint(default_width() / 2DEFAULT_ASPECT_RATIO[]), default_width
 Constructs a measure object from a string
 """
 function Measure(str::AbstractString)
-    str = (remove_ansi ∘ remove_markup)(str)
+    str = remove_markup(remove_ansi(str); remove_orphan_tags = false)
     lines = split(str, '\n')
     return Measure(length(lines), maximum(textwidth.(lines)))
 end

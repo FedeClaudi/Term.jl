@@ -149,7 +149,6 @@ function RenderableText(
     justify::Symbol = :left,
 )
     # @info "Construcing RenderableText" text width 
-    # reshape text
     text = apply_style(text)
     text = text_to_width(text, width, justify; background = background) |> chomp
 

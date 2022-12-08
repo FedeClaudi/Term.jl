@@ -12,9 +12,9 @@ import Term:
     unescape_brackets,
     remove_markup,
     TERM_THEME,
-    apply_style,
     plural
 
+import ..Style: apply_style
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
 import ..Renderables: RenderableText, AbstractRenderable

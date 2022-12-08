@@ -32,13 +32,24 @@ GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 Remove all markup tags from a string of text.
 """
-remove_markup(input_text)::String = replace_multi(
-    input_text,
-    OPEN_TAG_REGEX => "",
-    GENERIC_CLOSER_REGEX => "",
-    CLOSE_TAG_REGEX => "",
-)
-
+function remove_markup(input_text; remove_orphan_tags = true)::String
+    if remove_orphan_tags
+        return replace_multi(
+            input_text,
+            OPEN_TAG_REGEX => "",
+            GENERIC_CLOSER_REGEX => "",
+            CLOSE_TAG_REGEX => "",
+        )
+    else
+        # turn non-orphaned closing tags in opening tags before removing them
+        for match in eachmatch(OPEN_TAG_REGEX, input_text)
+            markup = match.match[2:(end - 1)]
+            close = r"\{\/" * Regex(markup) * r"\}"
+            input_text = replace(input_text, close => "{$markup}", count = 1)
+        end
+        return replace_multi(input_text, OPEN_TAG_REGEX => "", GENERIC_CLOSER_REGEX => "")
+    end
+end
 
 """ 
     has_markup(text::String)
@@ -126,8 +137,8 @@ cleantext(str)::String = (remove_ansi ∘ remove_markup)(str)
 
 Get length of text after all style information is removed.
 """
-textlen(x::String)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
-textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
+textlen(x; remove_orphan_tags = false)::Int =
+    remove_markup(remove_ansi(x); remove_orphan_tags = remove_orphan_tags) |> textwidth
 
 # --------------------------------- brackets --------------------------------- #
 const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
