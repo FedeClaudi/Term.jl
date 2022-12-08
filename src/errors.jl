@@ -134,24 +134,28 @@ function error_message(er::MethodError; kwargs...)
     f = er.f
     ft = typeof(f)
     name = ft.name.mt.name
-    kwargs = ()
-    if endswith(string(ft.name.name), "##kw")
-        f = er.args[2]
-        ft = typeof(f)
-        name = ft.name.mt.name
-        # arg_types_param = arg_types_param[3:end]
-        kwargs = pairs(er.args[1])
-        # er = MethodError(f, er.args[3:end::Int])
-    end
+    # kwargs = ()
+    # if endswith(string(ft.name.name), "##kw")
+    #     f = er.args[2]
+    #     ft = typeof(f)
+    #     name = ft.name.mt.name
+    #     # arg_types_param = arg_types_param[3:end]
+    #     kwargs = pairs(er.args[1])
+    #     # er = MethodError(f, er.args[3:end::Int])
+    # end
 
     # get main error message
+    @info "args" er.args er.args[1]
+    args_types = map(
+        a -> a isa NamedTupleds ? "Tuple" : (a |> typeof |> string), er.args
+    )
     _args =
         join(
             map(
                 a ->
-                    "   {dim bold}($(a[1])){/dim bold} $(highlight("::"*string(typeof(a[2]))))\n",
-                enumerate(er.args),
-            ),
+                    "{dim bold}($(a[1])){/dim bold}   $(highlight("::"*a[2]))",
+                enumerate(args_types),
+            ), "\n"
         ) |> apply_style
     main_line =
         "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" /
