@@ -11,8 +11,7 @@ import Term:
     escape_brackets,
     unescape_brackets,
     remove_markup,
-    TERM_THEME,
-    plural
+    TERM_THEME
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
@@ -22,6 +21,8 @@ import ..Panels: Panel
 export install_term_stacktrace
 
 include("_errors.jl")
+
+
 
 # ----------------------- error type specific messages ----------------------- #
 
@@ -105,6 +106,15 @@ end
 method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
 function method_error_candidate(fun, candidate)
     theme = TERM_THEME[]
+
+    # if contains(candidate, "##kw")
+    #     name = split(candidate, "\")(")[1]
+    #     name = replace(name, "(::Core.var\"#"=>"", "##kw"=>"")
+
+    #     @info "candidate" fun candidate name
+
+    # end
+
     # highlight non-matched types
     candidate = replace(
         candidate,
@@ -117,31 +127,36 @@ function method_error_candidate(fun, candidate)
 
     # highlight fun
     candidate = replace(candidate, string(fun) => "{$(theme.func)}$(fun){/$(theme.func)}")
-    return candidate
+    return candidate |> rstrip
 end
 
 function error_message(er::MethodError; kwargs...)
     f = er.f
     ft = typeof(f)
     name = ft.name.mt.name
-    kwargs = ()
-    if endswith(string(ft.name.name), "##kw")
-        f = er.args[2]
-        ft = typeof(f)
-        name = ft.name.mt.name
-        # arg_types_param = arg_types_param[3:end]
-        kwargs = pairs(er.args[1])
-        # er = MethodError(f, er.args[3:end::Int])
-    end
+    # kwargs = ()
+    # if endswith(string(ft.name.name), "##kw")
+    #     f = er.args[2]
+    #     ft = typeof(f)
+    #     name = ft.name.mt.name
+    #     # arg_types_param = arg_types_param[3:end]
+    #     kwargs = pairs(er.args[1])
+    #     # er = MethodError(f, er.args[3:end::Int])
+    # end
 
     # get main error message
-    _args = join(
-        map(
-            a ->
-                "   {dim bold}($(a[1])){/dim bold} $(highlight("::"*string(typeof(a[2]))))\n",
-            enumerate(er.args),
-        ),
+    @info "args" er.args er.args[1]
+    args_types = map(
+        a -> a isa NamedTupleds ? "Tuple" : (a |> typeof |> string), er.args
     )
+    _args =
+        join(
+            map(
+                a ->
+                    "{dim bold}($(a[1])){/dim bold}   $(highlight("::"*a[2]))",
+                enumerate(args_types),
+            ), "\n"
+        ) |> apply_style
     main_line =
         "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" /
         _args
@@ -152,7 +167,8 @@ function error_message(er::MethodError; kwargs...)
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
         candidates = map(c -> method_error_candidate(name, c), _candidates)
-        main_line /= lvstack("", "Alternative candidates:", candidates...)
+        main_line /=
+            lvstack("", "Alternative candidates:", candidates...) |> string |> apply_style
     else
         main_line = main_line / " " / "{dim}No alternative candidates found"
     end
@@ -175,13 +191,13 @@ end
 # ! UndefKeywordError
 function error_message(er::UndefKeywordError)
     # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
-    return "Undefined function keyword argument: {bold}`$(er.var)`{/bold}."
+    return "Undefined function keyword argument: `$(er.var)`."
 end
 
 # ! UNDEFVAR ERROR
 function error_message(er::UndefVarError)
     # @info "undef var error" er er.var typeof(er.var)
-    return "Undefined variable {bold}`$(er.var)`{/bold}."
+    return "Undefined variable `$(er.var)`."
 end
 
 # ! STRING INDEX ERROR
@@ -189,22 +205,6 @@ function error_message(er::StringIndexError)
     # @info er typeof(er) fieldnames(typeof(er)) 
     m1 = "attempted to access a String at index $(er.index)\n"
     return m1
-end
-
-# ! SYSTEM ERROR
-function error_message(er::SystemError)
-    if @static(Sys.iswindows() ? er.extrainfo isa WindowsErrorInfo : false)
-        errstring = Libc.FormatMessage(er.extrainfo.errnum)
-        extrainfo = er.extrainfo.extrainfo
-    else
-        errstring = Libc.strerror(er.errnum)
-        extrainfo = er.extrainfo
-    end
-    if extrainfo === nothing
-        return "$(er.prefix)\n" * errstring
-    else
-        return "SystemError (with $extrainfo): $(er.prefix)\n" * errstring
-    end
 end
 
 # ! catch all other errors
@@ -246,13 +246,10 @@ Several options are provided to reverse the order in which the frames are shown 
 Julia's default ordering), hide extra frames when a large number is in the trace (e.g. Stack Overflow error)
 and hide Base and standard libraries error information (i.e. when a frame is in a module belonging to those.)
 """
-function install_term_stacktrace(;
-    reverse_backtrace::Bool = true,
-    max_n_frames::Int = 30,
-    hide_frames = true,
-)
+function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30, hide_base=true)
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
+            
             theme = TERM_THEME[]
             (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
@@ -282,7 +279,7 @@ function install_term_stacktrace(;
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
-                        hide_frames = $(hide_frames),
+                        hide_base = $(hide_base)
                     )
                     print(rendered_bt)
                 end

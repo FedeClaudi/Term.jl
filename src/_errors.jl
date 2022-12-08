@@ -20,11 +20,12 @@ function show_error_code_line(frame::StackFrame; δ = 2)
 
     (isnothing(error_source) || length(error_source) == 0) && return nothing
 
+    _width = min(60, default_stacktrace_width() - 12)
     code_error_panel = Panel(
-        error_source;
+        str_trunc(error_source, _width; ignore_markup = true);
         fit = δ == 0,
         style = δ > 0 ? "$(theme.text_accent) dim" : "dim",
-        width = min(60, default_stacktrace_width() - 6),
+        width = _width,
         subtitle_justify = :center,
         subtitle = δ > 0 ? "error line" : nothing,
         subtitle_style = "default $(theme.text_accent)",
@@ -33,11 +34,7 @@ function show_error_code_line(frame::StackFrame; δ = 2)
         # background = δ > 0 ? nothing : theme.md_codeblock_bg
     )
 
-    δ == 0 && (
-        code_error_panel =
-            "  " * RenderableText("│\n╰─"; style = "dim") * code_error_panel
-    )
-    δ > 0 && (code_error_panel = "  " * code_error_panel)
+    code_error_panel = "  " * RenderableText("│\n╰─"; style = "dim") * code_error_panel
 
     return code_error_panel
 end
@@ -76,7 +73,7 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
 
     # get the name of the error function
     func = sprint(StackTraces.show_spec_linfo, frame)
-    contains(func, "##kw") && (func = parse_kw_func_name(frame))
+    # contains(func, "##kw") && (func = parse_kw_func_name(frame))
 
     # format function name
     func = replace(
@@ -84,14 +81,15 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{$(theme.func)}" * s"\g<0>" * "{/$(theme.func)}"),
     )
-    func = reshape_text(func, default_stacktrace_width() - 6) |> lstrip
-    func = highlight(func)
+    func = highlight(func) |> apply_style
 
     # get other information about the function 
     inline =
         frame.inlined ? RenderableText("   inlined"; style = "bold dim $(theme.text)") : ""
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
-    func_line = hstack(func, inline, c; pad = 1)
+
+    func = str_trunc(func, default_stacktrace_width() - 20; ignore_markup = true)
+    func_line = hstack(func, inline, c; pad = 1) |> string |> apply_style |> remove_markup
 
     # load source code around error and render it
     file = Base.fixup_stdlib_path(string(frame.file))
@@ -182,8 +180,9 @@ A frame should skip if it's in Base or an installed package.
 should_skip(frame::StackFrame) =
     frame_module(frame) == "Base" || (
         contains(string(frame.file), r"[/\\].julia[/\\]") ||
-        contains(string(frame.file), r"[/\\]julia[/\\]stdlib[/\\]") ||
-        contains(string(frame.file), r"[/\\]julia[/\\]lib[/\\]")
+        contains(string(frame.file), r"julia[/\\]stdlib") ||
+        contains(string(frame.file), r"julia[/\\]lib") ||
+        contains(string(frame.file), r"julialang.language") 
     )
 
 should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false

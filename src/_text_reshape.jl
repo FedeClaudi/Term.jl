@@ -10,7 +10,7 @@ Reshape a text to have a given width.
 
 Insert newline characters in a string so that each line is within the given width.
 """
-function reshape_text(text::AbstractString, width::Int)
+function reshape_text(text::AbstractString, width::Int; ignore_markup = false)
     occursin('\n', text) && (return do_by_line(ln -> reshape_text(ln, width), text))
     textlen(text) ≤ width && return text
 
@@ -23,7 +23,7 @@ function reshape_text(text::AbstractString, width::Int)
         if c == '\e'
             in_escape_code = true
         end
-        if c == '{'
+        if c == '{' && !ignore_markup
             bracketed = true
         end
 
