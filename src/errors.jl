@@ -11,7 +11,9 @@ import Term:
     escape_brackets,
     unescape_brackets,
     remove_markup,
-    TERM_THEME
+    TERM_THEME,
+    apply_style,
+    plural
 
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
@@ -130,36 +132,36 @@ function method_error_candidate(fun, candidate)
     return candidate |> rstrip
 end
 
-function error_message(er::MethodError; kwargs...)
+function error_message(er::MethodError; kwargs...)    
     f = er.f
     ft = typeof(f)
-    name = ft.name.mt.name
-    # kwargs = ()
-    # if endswith(string(ft.name.name), "##kw")
-    #     f = er.args[2]
-    #     ft = typeof(f)
-    #     name = ft.name.mt.name
-    #     # arg_types_param = arg_types_param[3:end]
-    #     kwargs = pairs(er.args[1])
-    #     # er = MethodError(f, er.args[3:end::Int])
-    # end
+    # name = ft.name.mt.name
+    kwargs = ()
+    # @info "cacca" er er.args f ft 
 
-    # get main error message
-    @info "args" er.args er.args[1]
-    args_types = map(
-        a -> a isa NamedTupleds ? "Tuple" : (a |> typeof |> string), er.args
-    )
-    _args =
-        join(
-            map(
-                a ->
-                    "{dim bold}($(a[1])){/dim bold}   $(highlight("::"*a[2]))",
-                enumerate(args_types),
-            ), "\n"
-        ) |> apply_style
-    main_line =
-        "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" /
-        _args
+    # handle calls kwcall
+    args = er.args
+    if length(args) > 1 && args[1] isa NamedTuple && args[2] isa DataType && contains(string(f), "##kw")
+        f = (er.args::Tuple)[2]
+        ft = typeof(f)
+
+        # arg_types_param = arg_types_param[3:end]
+        kwargs = pairs(er.args[1])
+        er = MethodError(f, er.args[3:end::Int])
+    end
+
+    # show signature of method call with args types
+    emph = TERM_THEME[].emphasis
+    sym = TERM_THEME[].symbol
+
+    name = sprint(io -> Base.show_signature_function(io, isa(f, Type) ? Type{f} : typeof(f)))
+    msg = "No method matching {bold $(emph)}`$name`{/bold $(emph)} with arguments types:" 
+    args = join(map(a -> "::$(typeof(a))", er.args), ", ")
+    !isempty(kwargs) && begin
+        args *= "; " * join(["{$sym}$k{/$sym}::$(typeof(v))" for (k,v) in kwargs], ", ")
+    end
+    msg /= highlight(args)
+
 
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
@@ -167,13 +169,13 @@ function error_message(er::MethodError; kwargs...)
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
         candidates = map(c -> method_error_candidate(name, c), _candidates)
-        main_line /=
+        msg /=
             lvstack("", "Alternative candidates:", candidates...) |> string |> apply_style
     else
-        main_line = main_line / " " / "{dim}No alternative candidates found"
+        msg /= " " / "{dim}No alternative candidates found"
     end
 
-    return string(main_line)
+    return string(msg)
 end
 
 # ! StackOverflowError
@@ -246,7 +248,7 @@ Several options are provided to reverse the order in which the frames are shown 
 Julia's default ordering), hide extra frames when a large number is in the trace (e.g. Stack Overflow error)
 and hide Base and standard libraries error information (i.e. when a frame is in a module belonging to those.)
 """
-function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30, hide_base=true)
+function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30, hide_frames=true)
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
             
@@ -279,7 +281,7 @@ function install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames:
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
-                        hide_base = $(hide_base)
+                        hide_frames = $(hide_frames)
                     )
                     print(rendered_bt)
                 end
