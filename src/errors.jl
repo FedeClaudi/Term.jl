@@ -14,6 +14,7 @@ import Term:
     TERM_THEME,
     plural
 
+import ..Style: apply_style
 import ..Layout:
     hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
 import ..Renderables: RenderableText, AbstractRenderable
@@ -117,34 +118,84 @@ function method_error_candidate(fun, candidate)
 
     # highlight fun
     candidate = replace(candidate, string(fun) => "{$(theme.func)}$(fun){/$(theme.func)}")
-    return candidate
+    return candidate |> rstrip
+end
+
+function convert_error_message(er::MethodError, arg_types_param)
+    T = Base.striptype(er.args[1])
+    if T === nothing
+        return "First argument to `convert` must be a Type, got $(er.args[1])"
+    else
+        p2 = arg_types_param[2]
+        ok, not_ok = TERM_THEME[].emphasis, TERM_THEME[].warn
+        a = T == p2 ? string(p2) : "{$ok bold}$p2{/$ok bold}"
+        b = T == p2 ? string(T) : "{$not_ok bold}$T{/$not_ok bold}"
+        return "Cannot `convert` an object of type: $(a) to an object of type $(b)"
+    end
+end
+
+function handle_methoderror_special_cases(er, f, ft, arg_types_param, is_arg_types)
+    # handle failed conversions
+    if f === Base.convert && length(arg_types_param) == 2 && !is_arg_types
+        return convert_error_message(er, arg_types_param)
+    elseif f === Base.mapreduce_empty || f === Base.reduce_empty
+        return "reducing over an empty collection is not allowed; consider supplying `init` to the reducer"
+    elseif isempty(methods(f)) && isa(f, DataType) && isabstracttype(f)
+        return "no constructors have been defined for $f"
+    elseif isempty(methods(f)) && !isa(f, Function) && !isa(f, Type)
+        return "objects of type ", ft, " are not callable"
+    end
+    # no edge case detect, return nothign
+    return nothing
 end
 
 function error_message(er::MethodError; kwargs...)
     f = er.f
     ft = typeof(f)
-    name = ft.name.mt.name
     kwargs = ()
-    if endswith(string(ft.name.name), "##kw")
-        f = er.args[2]
+    is_arg_types = isa(er.args, DataType)
+    arg_types = (is_arg_types ? er.args : Base.typesof(er.args...))::DataType
+    arg_types_param::Base.SimpleVector = arg_types.parameters
+
+    # handle calls kwcall
+    args = er.args
+    if length(args) > 1 && args[1] isa NamedTuple && contains(string(f), "##kw")
+        f = (er.args::Tuple)[2]
         ft = typeof(f)
-        name = ft.name.mt.name
-        # arg_types_param = arg_types_param[3:end]
+
+        arg_types_param = arg_types_param[3:end]
         kwargs = pairs(er.args[1])
-        # er = MethodError(f, er.args[3:end::Int])
+        er = MethodError(f, er.args[3:(end::Int)])
     end
 
-    # get main error message
-    _args = join(
-        map(
-            a ->
-                "   {dim bold}($(a[1])){/dim bold} $(highlight("::"*string(typeof(a[2]))))\n",
-            enumerate(er.args),
-        ),
+    # handle edge cases like failed calls to conver
+    # @info "er" f ft arg_types_param kwargs
+    msg = handle_methoderror_special_cases(er, f, ft, arg_types_param, is_arg_types)
+
+    # if not an edge case, show signature of method call with args types
+    emph = TERM_THEME[].emphasis
+    sym = TERM_THEME[].symbol
+
+    name =
+        sprint(io -> Base.show_signature_function(io, isa(f, Type) ? Type{f} : typeof(f)))
+    if isnothing(msg)
+        msg = "No method matching {bold $(emph)}`$name`{/bold $(emph)} with arguments types:"
+        args = join(map(a -> "::$(typeof(a))", er.args), ", ")
+        !isempty(kwargs) && begin
+            length(args) > 0 && (args *= "; ")
+            args *= join(["{$sym}$k{/$sym}::$(typeof(v))" for (k, v) in kwargs], ", ")
+        end
+        msg /= highlight(args)
+    end
+
+    if (
+        er.world != typemax(UInt) &&
+        hasmethod(er.f, arg_types) &&
+        !hasmethod(er.f, arg_types, world = er.world)
     )
-    main_line =
-        "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" /
-        _args
+        curworld = get_world_counter()
+        msg /= "The applicable method may be too new: running in world age $(er.world), while current world is $(curworld)."
+    end
 
     # get recomended candidates
     _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
@@ -152,12 +203,13 @@ function error_message(er::MethodError; kwargs...)
     if length(_candidates) > 0
         _candidates = map(c -> split(c, " at ")[1], _candidates)
         candidates = map(c -> method_error_candidate(name, c), _candidates)
-        main_line /= lvstack("", "Alternative candidates:", candidates...)
+        msg /=
+            lvstack("", "Alternative candidates:", candidates...) |> string |> apply_style
     else
-        main_line = main_line / " " / "{dim}No alternative candidates found"
+        msg /= " " / "{dim}No alternative candidates found"
     end
 
-    return string(main_line)
+    return string(msg)
 end
 
 # ! StackOverflowError
@@ -175,13 +227,13 @@ end
 # ! UndefKeywordError
 function error_message(er::UndefKeywordError)
     # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
-    return "Undefined function keyword argument: {bold}`$(er.var)`{/bold}."
+    return "Undefined function keyword argument: `$(er.var)`."
 end
 
 # ! UNDEFVAR ERROR
 function error_message(er::UndefVarError)
     # @info "undef var error" er er.var typeof(er.var)
-    return "Undefined variable {bold}`$(er.var)`{/bold}."
+    return "Undefined variable `$(er.var)`."
 end
 
 # ! STRING INDEX ERROR
@@ -189,22 +241,6 @@ function error_message(er::StringIndexError)
     # @info er typeof(er) fieldnames(typeof(er)) 
     m1 = "attempted to access a String at index $(er.index)\n"
     return m1
-end
-
-# ! SYSTEM ERROR
-function error_message(er::SystemError)
-    if @static(Sys.iswindows() ? er.extrainfo isa WindowsErrorInfo : false)
-        errstring = Libc.FormatMessage(er.extrainfo.errnum)
-        extrainfo = er.extrainfo.extrainfo
-    else
-        errstring = Libc.strerror(er.errnum)
-        extrainfo = er.extrainfo
-    end
-    if extrainfo === nothing
-        return "$(er.prefix)\n" * errstring
-    else
-        return "SystemError (with $extrainfo): $(er.prefix)\n" * errstring
-    end
 end
 
 # ! catch all other errors

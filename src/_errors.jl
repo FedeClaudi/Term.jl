@@ -20,9 +20,9 @@ function show_error_code_line(frame::StackFrame; δ = 2)
 
     (isnothing(error_source) || length(error_source) == 0) && return nothing
 
-    _width = min(60, default_stacktrace_width() - 6)
+    _width = min(60, default_stacktrace_width() - 12)
     code_error_panel = Panel(
-        str_trunc(error_source, _width - 5; ignore_markup = true);
+        str_trunc(error_source, _width; ignore_markup = true);
         fit = δ == 0,
         style = δ > 0 ? "$(theme.text_accent) dim" : "dim",
         width = _width,
@@ -45,14 +45,31 @@ end
 Kw function calls have a weird name, just show the func definition line.
 """
 function parse_kw_func_name(frame::StackFrame)
-    def = frame.linfo.def
+    linfo = frame.linfo
+    def = linfo.def
+    if isa(def, Method)
+        sig = linfo.specTypes
+        argnames = Base.method_argnames(def)
+        ftypes = map(i -> fieldtype(sig, i), 1:length(argnames)) |> collect
 
-    out = read_file_lines(string(def.file), Int(def.line))
-    return if !isnothing(out)
-        replace(out[2], "function" => "") |> rstrip |> lstrip
+        kwargs = map(
+            i -> fieldname(ftypes[2], i) => fieldtype(ftypes[2], 1),
+            1:length(fieldnames(ftypes[2])),
+        )
+
+        func = replace(string(def.name), "##kw" => "") * "("
+        func *= join(
+            map(i -> string(argnames[i]) * "::" * string(ftypes[i]), 4:length(ftypes)),
+            ", ",
+        )
+        !isempty(kwargs) && begin
+            func *= "; " * join(["$k::$v" for (k, v) in kwargs], ", ")
+        end
+        func *= ")"
     else
-        string(sprint(StackTraces.show_spec_linfo, frame))
+        func = string(sprint(StackTraces.show_spec_linfo, frame))
     end
+    return func
 end
 
 """
@@ -73,7 +90,8 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
 
     # get the name of the error function
     func = sprint(StackTraces.show_spec_linfo, frame)
-    contains(func, "##kw") && (func = parse_kw_func_name(frame))
+    (contains(func, "##kw") || contains(func, "kwerr")) &&
+        (func = parse_kw_func_name(frame))
 
     # format function name
     func = replace(
@@ -81,17 +99,23 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
         r"(?<group>^[^(]+)" =>
             SubstitutionString("{$(theme.func)}" * s"\g<0>" * "{/$(theme.func)}"),
     )
-    func = reshape_text(func, default_stacktrace_width() - 6) |> lstrip
-    func = highlight(func)
+    func = highlight(func) |> apply_style
 
     # get other information about the function 
     inline =
         frame.inlined ? RenderableText("   inlined"; style = "bold dim $(theme.text)") : ""
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
-    func_line = hstack(func, inline, c; pad = 1)
+
+    # func = str_trunc(func, default_stacktrace_width() - 23; ignore_markup = true)
+    func = RenderableText(func; width = default_stacktrace_width() - 30)
+    func_line = hstack(func, inline, c; pad = 1) |> string |> apply_style |> remove_markup
 
     # load source code around error and render it
     file = Base.fixup_stdlib_path(string(frame.file))
+    Base.stacktrace_expand_basepaths() &&
+        (file = something(Base.find_source_file(file), file))
+    Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
+
     if length(string(frame.file)) > 0
         file_line = RenderableText(
             "{dim}$(file):{bold $(theme.text_accent)}$(frame.line){/bold $(theme.text_accent)}{/dim}";
@@ -133,7 +157,7 @@ function render_backtrace_frame(
             padding = (2, 2, 1, 1),
             style = TERM_THEME[].err_btframe_panel,
             fit = false,
-            width = default_stacktrace_width() - 6,
+            width = default_stacktrace_width() - 12,
             kwargs...,
         )
     else
@@ -179,8 +203,9 @@ A frame should skip if it's in Base or an installed package.
 should_skip(frame::StackFrame) =
     frame_module(frame) == "Base" || (
         contains(string(frame.file), r"[/\\].julia[/\\]") ||
-        contains(string(frame.file), r"[/\\]julia[/\\]stdlib[/\\]") ||
-        contains(string(frame.file), r"[/\\]julia[/\\]lib[/\\]")
+        contains(string(frame.file), r"julia[/\\]stdlib") ||
+        contains(string(frame.file), r"julia[/\\]lib") ||
+        contains(string(frame.file), r"julialang.language")
     )
 
 should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false
