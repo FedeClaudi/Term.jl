@@ -135,7 +135,7 @@ function inspect(
         "\n{$(theme.text_accent)}○ {$(theme.inspect_accent)}$T{/$(theme.inspect_accent)} constructors:" |>
         tprintln
         t_name = split(string(T), '.')[end]
-        print.(style_methods(Base.methods(T), t_name; constructor = true, a = 1))
+        print.(style_methods(Base.methods(T), t_name; constructor = true))
     end
 
     # methods with T and supertypes
