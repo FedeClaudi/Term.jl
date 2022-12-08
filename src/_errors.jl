@@ -20,7 +20,7 @@ function show_error_code_line(frame::StackFrame; δ = 2)
 
     (isnothing(error_source) || length(error_source) == 0) && return nothing
 
-    _width = min(60, default_stacktrace_width() - 12)
+    _width = min(60, default_stacktrace_width() - 35)
     code_error_panel = Panel(
         str_trunc(error_source, _width; ignore_markup = true);
         fit = δ == 0,
@@ -106,17 +106,22 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
         frame.inlined ? RenderableText("   inlined"; style = "bold dim $(theme.text)") : ""
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
 
-    # func = str_trunc(func, default_stacktrace_width() - 23; ignore_markup = true)
-    func = RenderableText(func; width = default_stacktrace_width() - 30)
-    func_line = hstack(func, inline, c; pad = 1) |> string |> apply_style |> remove_markup
+    func =
+        str_trunc(func, default_stacktrace_width() - 30; ignore_markup = true) |>
+        RenderableText
+    # func = RenderableText(
+    #     apply_style(string(func)); 
+    #     width= default_stacktrace_width() - 30
+    # )
+    func_line = (frame.inlined || frame.from_c) ? func / hstack(inline, c; pad = 1) : func
+    func_line = func_line |> string |> apply_style |> remove_markup
 
     # load source code around error and render it
-    file = Base.fixup_stdlib_path(string(frame.file))
-    Base.stacktrace_expand_basepaths() &&
-        (file = something(Base.find_source_file(file), file))
-    Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
-
     if length(string(frame.file)) > 0
+        file = Base.fixup_stdlib_path(string(frame.file))
+        Base.stacktrace_expand_basepaths() &&
+            (file = something(Base.find_source_file(file), file))
+        Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
         file_line = RenderableText(
             "{dim}$(file):{bold $(theme.text_accent)}$(frame.line){/bold $(theme.text_accent)}{/dim}";
             width = default_stacktrace_width() - 30,
@@ -154,14 +159,14 @@ function render_backtrace_frame(
     return if as_panel
         Panel(
             content;
-            padding = (2, 2, 1, 1),
+            padding = (2, 2, 0, 0),
             style = TERM_THEME[].err_btframe_panel,
             fit = false,
             width = default_stacktrace_width() - 12,
             kwargs...,
         )
     else
-        "   " * RenderableText(string(content), width = default_stacktrace_width() - 20)
+        "   " * RenderableText(string(content), width = default_stacktrace_width() - 12)
     end
 end
 
@@ -227,7 +232,7 @@ function add_new_module_name!(content, curr_module)
     push!(
         content,
         hLine(
-            default_stacktrace_width() - 6,
+            default_stacktrace_width() - 8,
             "{default $(theme.text_accent)}In module {$accent bold}$(curr_module){/$accent bold}{/default $(theme.text_accent)}";
             style = "$accent dim",
         ),
@@ -259,14 +264,14 @@ function add_number_frames_skipped!(
         push!(
             content,
             cvstack(
-                hLine(default_stacktrace_width() - 12; style = "$color dim"),
+                hLine(default_stacktrace_width() - 10; style = "$color dim"),
                 RenderableText(
                     "Skipped {bold}$n_skipped{/bold} $word $in_mod";
-                    width = default_stacktrace_width() - 6,
+                    width = default_stacktrace_width() - 20,
                     justify = :center,
                     style = color,
                 ),
-                hLine(default_stacktrace_width() - 12; style = "$color dim");
+                hLine(default_stacktrace_width() - 10; style = "$color dim");
                 pad = 0,
             ),
         )
@@ -396,8 +401,8 @@ function render_backtrace(
 
     # create an overall panel
     return Panel(
-        lvstack(content..., pad = 1);
-        padding = (2, 2, 2, 1),
+        cvstack(content..., pad = 0);
+        padding = (2, 2, 1, 1),
         subtitle = "Error Stack",
         style = "$(theme.er_bt) dim",
         subtitle_style = "bold $(theme.er_bt) default",

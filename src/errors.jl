@@ -256,7 +256,8 @@ function error_message(er)
         msg = if hasfield(typeof(er), :msg)
             er.msg
         else
-            "no message for error of type $(typeof(er)), sorry."
+            # "no message for error of type $(typeof(er)), sorry."
+            string(typeof(er))
         end
     end
     return msg
@@ -287,11 +288,10 @@ function install_term_stacktrace(;
     hide_frames = true,
 )
     @eval begin
-        function Base.showerror(io::IO, er, bt; backtrace = true)
-            # @info "SHOWERROR" io er bt backtrace
+        function Base.showerror(io::IO, er, bt::Vector; backtrace = true)
+            print("\n")
+            # @info "SHOWERROR" er bt backtrace string(io) io.io (isa(io.io, Base.TTY))
             theme = TERM_THEME[]
-
-            # isnothing(bt) || (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
 
             # if the terminal is too narrow, avoid using Term's functionality
@@ -307,7 +307,7 @@ function install_term_stacktrace(;
             try
                 ename = string(typeof(er))
                 length(bt) > 0 && print(
-                    "\n" / hLine(
+                    hLine(
                         "{default bold $(theme.err_errmsg)}$ename{/default bold $(theme.err_errmsg)}";
                         style = "dim $(theme.err_errmsg)",
                     ),
@@ -322,9 +322,11 @@ function install_term_stacktrace(;
                         hide_frames = $(hide_frames),
                     )
                     print(rendered_bt)
-                else
-                    # print error message and description
-                    "\n" / Panel(
+                end
+
+                # check if we should print the message panel or if that's handled by a second call to this function with vscode
+                isa(io.io, Base.TTY) &&
+                    Panel(
                         RenderableText(error_message(er));
                         width = default_stacktrace_width(),
                         title = "{bold $(theme.err_errmsg) default underline}$(typeof(er)){/bold $(theme.err_errmsg) default underline}",
@@ -333,7 +335,6 @@ function install_term_stacktrace(;
                         title_justify = :center,
                         fit = false,
                     ) |> print
-                end
 
             catch cought_err  # catch when something goes wrong during error handling in Term
                 @error "Term.jl: error while rendering error message: " exception =

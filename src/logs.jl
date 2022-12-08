@@ -194,11 +194,7 @@ function Logging.handle_message(
 
     # style message
     logmsg_color = logger.theme.logmsg
-    msg = if msg isa AbstractString
-        reshape_text(has_markup(msg) ? msg : "{$logmsg_color}$msg{/$logmsg_color}", 64)
-    else
-        "{$logmsg_color}" * reshape_text(string(msg), 64) * "{/$logmsg_color}"
-    end
+    msg = string(msg)
     msg = length(msg) > 1500 ? ltrim_str(msg, 1500 - 3) * "..." : msg
 
     # get the first line of information
@@ -225,12 +221,12 @@ function Logging.handle_message(
 
     # get padding width
     _types = string.(typeof.(collect(values(kwargs))))
-    _types = map(t -> str_trunc(t, 60), _types)
+    _types = map(t -> str_trunc(t, 24), _types)
     for (i, _type) in enumerate(values(kwargs))
         typeof(_type) <: Function && (_types[i] = string(Function))
     end
 
-    wpad = maximum(textlen.(_types)) + 2
+    wpad = 24 - maximum(textlen.(_types)) + 2
     ks = str_trunc.(string.(keys(kwargs)), 28)
     namepad = maximum(textlen.(ks))
 
@@ -238,7 +234,7 @@ function Logging.handle_message(
     tprintln("  $vert"; highlight = false)
     for (k, v, _type) in zip(ks, values(kwargs), _types)
         # get line stub
-        pad = wpad - textlen(_type) - 1
+        pad = max(wpad - textlen(_type) - 1, 1)
         line =
             "  $vert" *
             " "^pad *
@@ -282,11 +278,7 @@ function Logging.handle_message(
         end
 
         # print value lines
-        try
-            v = reshape_text(str_trunc(string(v), 177), 60)
-        catch
-            v = str_trunc(string(v), 60)
-        end
+        v = reshape_text(str_trunc(string(v), 177), 44)
         vlines = split(v, "\n")
 
         vlines = if !isnothing(_style)
