@@ -199,7 +199,7 @@ function Logging.handle_message(
     else
         "{$logmsg_color}" * reshape_text(string(msg), 64) * "{/$logmsg_color}"
     end
-    msg = length(msg) > 1000 ? ltrim_str(msg, 997) * "..." : msg
+    msg = length(msg) > 1500 ? ltrim_str(msg, 1500 - 3) * "..." : msg
 
     # get the first line of information
     fn_color = logger.theme.func
@@ -225,7 +225,7 @@ function Logging.handle_message(
 
     # get padding width
     _types = string.(typeof.(collect(values(kwargs))))
-    _types = map(t -> ltrim_str(t, 22), _types)
+    _types = map(t -> str_trunc(t, 60), _types)
     for (i, _type) in enumerate(values(kwargs))
         typeof(_type) <: Function && (_types[i] = string(Function))
     end
@@ -266,7 +266,7 @@ function Logging.handle_message(
         elseif v isa AbstractArray || v isa AbstractMatrix
             _style = logger.theme.number
             _size = size(v)
-            v = ltrim_str("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 30)
+            v = str_trunc("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 60)
             v *=
                 "\n {dim}shape: {default $(logger.theme.text)}" *
                 join(string.(_size), " × ") *
@@ -283,9 +283,9 @@ function Logging.handle_message(
 
         # print value lines
         try
-            v = reshape_text(ltrim_str(string(v), 177), 60)
+            v = reshape_text(str_trunc(string(v), 177), 60)
         catch
-            v = ltrim_str(string(v), 60)
+            v = str_trunc(string(v), 60)
         end
         vlines = split(v, "\n")
 
