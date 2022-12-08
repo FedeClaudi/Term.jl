@@ -39,6 +39,7 @@ remove_markup(input_text)::String = replace_multi(
     CLOSE_TAG_REGEX => "",
 )
 
+
 """ 
     has_markup(text::String)
 
