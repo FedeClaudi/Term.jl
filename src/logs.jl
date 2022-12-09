@@ -229,24 +229,24 @@ function Logging.handle_message(
     # prepare the first line of information
     fn_color = logger.theme.func
     firstline = "{$color underline bold}@$(string(lvl)){/$color underline bold} {$fn_color }($(_mod)$fname):{/$fn_color }"
+    
+    # print first line
+    msg_lines = split(msg, "\n")
+    length(msg_lines) > 0 &&
+        (firstline *= "  " * RenderableText(reshape_text(msg_lines[1], console_width() - textlen(firstline)); style=logmsg_color))
+    tprintln(firstline; highlight = false)
 
     # for multi-lines message, print each line separately.
-    msg_lines::Vector{AbstractString} = split(msg, "\n")
+    _vert = "  $vert   "
+    vert_width = textlen(_vert)
     for n in 2:length(msg_lines)
-        msg_lines[n] =
-            "  $vert   " *
-            " "^(textlen(firstline) - 4) *
-            "{$logmsg_color}" *
-            msg_lines[n] *
-            "{/$logmsg_color}"
+        # make sure the text fits in the given space
+        txt = RenderableText(reshape_text(msg_lines[n], console_width()-vert_width-1); style=logmsg_color)
+        v = join(repeat([_vert], height(txt)), "\n")
+        tprint(v * txt; highlight=false)
     end
 
-    length(msg_lines) > 0 &&
-        (firstline *= "  " * "{$logmsg_color}" * msg_lines[1] * "{/$logmsg_color}")
-    tprintln(firstline; highlight = false)
-    tprintln.(msg_lines[2:end]; highlight = false)
-
-    # --------------------------------- contente --------------------------------- #
+    # --------------------------------- contents --------------------------------- #
     # if no kwargs we can just quit
     if length(kwargs) == 0 || length(msg_lines) == 0
         print_closing_line(color)
