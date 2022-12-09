@@ -12,31 +12,59 @@ import Term:
     unescape_brackets,
     remove_markup,
     TERM_THEME,
-    plural
+    plural,
+    Theme
 
 import ..Style: apply_style
 import ..Layout:
-    hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
+    hLine,
+    rvstack,
+    cvstack,
+    rvstack,
+    vstack,
+    vLine,
+    Spacer,
+    hstack,
+    lvstack,
+    pad,
+    vertical_pad
 import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
+import ..Measures: height
 
 export install_term_stacktrace
-
-include("_error_messages.jl")
-include("_errors.jl")
-
 
 """
 Stores information useful for creating the layout
 of a stack trace visualization.
 """
 struct StacktraceContext
-    out_w::Int        # max width of the stacktrace
-    inner_w::Int      # width of inner elements like frame panels
-    fname_w::Int      # width of frame's function name and file
-    code_w::Int       # width of code panels
+    out_w::Int              # max width of the stacktrace
+    frame_panel_w::Int      # width of inner elements like frame panels
+    module_line_w::Int      # width of hline to print module name
+    func_name_w::Int        # width of frame's function name and file
+    code_w::Int             # width of code panels
+    theme::Theme
 end
 
+function StacktraceContext()
+    w = default_stacktrace_width()
+    frame_panel_w = w - 4 - 12 - 3 # panel walls and padding
+    module_line_w = w - 4 - 4
+    func_name_w = frame_panel_w - 4 - 4 # including (n) before fname
+    code_w = func_name_w - 8
+    return StacktraceContext(
+        w,
+        frame_panel_w,
+        module_line_w,
+        func_name_w,
+        code_w,
+        TERM_THEME[],
+    )
+end
+
+include("_error_messages.jl")
+include("_errors.jl")
 
 # ---------------------------------------------------------------------------- #
 #                              INSTALL STACKTRACE                              #
@@ -65,8 +93,8 @@ function install_term_stacktrace(;
     @eval begin
         function Base.showerror(io::IO, er, bt::Vector; backtrace = true)
             print("\n")
-            # @info "SHOWERROR" er bt backtrace string(io) io.io (isa(io.io, Base.TTY))
-            theme = TERM_THEME[]
+
+            # shorten very long backtraces
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
 
             # if the terminal is too narrow, avoid using Term's functionality
@@ -80,17 +108,22 @@ function install_term_stacktrace(;
             end
 
             try
+                # create a StacktraceContext
+                ctx = StacktraceContext()
+
+                # print an hLine with the error name
                 ename = string(typeof(er))
                 length(bt) > 0 && print(
                     hLine(
-                        "{default bold $(theme.err_errmsg)}$ename{/default bold $(theme.err_errmsg)}";
-                        style = "dim $(theme.err_errmsg)",
+                        "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
+                        style = "dim $(ctx.theme.err_errmsg)",
                     ),
                 )
 
                 # print error backtrace or panel
                 if length(bt) > 0
                     rendered_bt = render_backtrace(
+                        ctx,
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
@@ -99,21 +132,23 @@ function install_term_stacktrace(;
                     print(rendered_bt)
                 end
 
-                # check if we should print the message panel or if that's handled by a second call to this function with vscode
+                # print message panel if VSCode is not handling that through a second call to this fn
                 isa(io.io, Base.TTY) &&
                     Panel(
-                        RenderableText(error_message(er));
-                        width = default_stacktrace_width(),
-                        title = "{bold $(theme.err_errmsg) default underline}$(typeof(er)){/bold $(theme.err_errmsg) default underline}",
+                        RenderableText(
+                            highlight(error_message(er));
+                            width = ctx.module_line_w,
+                        );
+                        width = ctx.out_w,
+                        title = "{bold $(ctx.theme.err_errmsg) default underline}$(typeof(er)){/bold $(ctx.theme.err_errmsg) default underline}",
                         padding = (2, 2, 1, 1),
-                        style = "dim $(theme.err_errmsg)",
+                        style = "dim $(ctx.theme.err_errmsg)",
                         title_justify = :center,
                         fit = false,
                     ) |> print
 
             catch cought_err  # catch when something goes wrong during error handling in Term
-                # @error "Term.jl: error while rendering error message: " exception =
-                #     cought_err
+                @error "Term.jl: error while rendering error message: " cought_err
                 Base.show_backtrace(io, bt)
                 print(io, '\n'^3)
                 Base.showerror(io, er)

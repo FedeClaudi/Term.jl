@@ -16,7 +16,7 @@ error information.
 import Term: install_term_stacktrace, hLine
 
 install_term_stacktrace()
-
+install_term_logger()
 print(hLine("Fancy Errors"; style = "bold blue"))
 
 """
@@ -32,7 +32,7 @@ corresponding error message
 # 1 - "a"
 
 # ------------  DomainError
-# sqrt(-1)
+sqrt(-1)
 
 # ------------  UndefVarError
 # println(x)

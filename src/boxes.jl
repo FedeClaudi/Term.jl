@@ -181,10 +181,10 @@ function get_title_row(
 
     open, close, space = "{" * style * "}", "{/" * style * "}", " "
 
-    topen, tclose = "", open
+    topen, tclose = "\e[0m", open
     if !isnothing(title_style)
         topen, tclose = if style == "hidden"
-            "\e[28m" * topen, tclose * "\e[8m"
+            "\e[28m" * "{" * title_style * "}", "{/" * title_style * "}" * open * "\e[8m"
         else
             "{" * title_style * "}", "{/" * title_style * "}" * open
         end

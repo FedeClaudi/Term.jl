@@ -205,11 +205,11 @@ end
           "\e[22m╭───────────────────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
 
     @test string(Panel(title = "test", width = 50, title_justify = :left)) ==
-          "\e[22m╭──── test\e[22m ──────────────────────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
+          "\e[22m╭──── \e[0mtest\e[22m ──────────────────────────────────────╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(Panel(title = "test", width = 50, title_justify = :center)) ==
-          "\e[22m╭───────────────────── test\e[22m ─────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
+          "\e[22m╭───────────────────── \e[0mtest\e[22m ─────────────────────╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
     @test string(Panel(title = "test", width = 50, title_justify = :right)) ==
-          "\e[22m╭─────────────────────────────────────── test\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
+          "\e[22m╭─────────────────────────────────────── \e[0mtest\e[22m ───╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
 
     p = Panel(
         title = "test",
@@ -219,21 +219,21 @@ end
         width = 22,
     )
     @test string(p) ==
-          "\e[22m╭──── test\e[22m ──────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────── aaaaa\e[22m ───╯\e[22m\e[0m\e[22m\e[0m"
+          "\e[22m╭──── \e[0mtest\e[22m ──────────╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────── \e[0maaaaa\e[22m ───╯\e[22m\e[0m\e[22m\e[0m\e[0m"
 end
 
 @testset "PANEL - small panel with title" begin
     p = Panel(; width = 12, title = "testadasd")
     @test string(p) ==
-          "\e[22m╭── t...\e[22m ──╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
+          "\e[22m╭── \e[0mt...\e[22m ──╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
 
     p = Panel(; width = 12, title = "testadasd", title_justify = :right)
     @test string(p) ==
-          "\e[22m╭─ t...\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
+          "\e[22m╭─ \e[0mt...\e[22m ───╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
 
     p = Panel(; width = 12, title = "testadasd", title_justify = :center)
     @test string(p) ==
-          "\e[22m╭── t...\e[22m ──╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
+          "\e[22m╭── \e[0mt...\e[22m ──╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
 
     p = Panel(; width = 5, title = "asdasdasd")
     @test string(p) ==

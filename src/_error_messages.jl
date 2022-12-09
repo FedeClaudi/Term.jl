@@ -27,14 +27,12 @@ function error_message(er::BoundsError)
         additional_msg = "{red}Variable is not defined!.{/red}"
     end
 
-    return highlight(main_msg) / additional_msg
+    return string(highlight(main_msg) / additional_msg)
 end
 
 # ! Domain ERROR
 function error_message(er::DomainError)
-    # @info "err exceprion" er fieldnames(DomainError) er.val
-    # msg = split(er.msg, " around ")[1]
-    return er.msg / "The invalid value is: $(er.val)." |> string
+    return er.msg * "\nThe invalid value is: $(er.val)."
 end
 
 # ! DimensionMismatch

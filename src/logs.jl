@@ -15,8 +15,7 @@ import Term:
     rint,
     highlight,
     TERM_THEME,
-    str_trunc,
-    ltrim_str
+    str_trunc
 
 import ..Consoles: console_width, console_height, change_scroll_region, move_to_line
 import ..Renderables: AbstractRenderable, RenderableText
@@ -229,21 +228,29 @@ function Logging.handle_message(
     # prepare the first line of information
     fn_color = logger.theme.func
     firstline = "{$color underline bold}@$(string(lvl)){/$color underline bold} {$fn_color }($(_mod)$fname):{/$fn_color }"
-    
+
     # print first line
     msg_lines = split(msg, "\n")
-    length(msg_lines) > 0 &&
-        (firstline *= "  " * RenderableText(reshape_text(msg_lines[1], console_width() - textlen(firstline)); style=logmsg_color))
-    tprintln(firstline; highlight = false)
+    length(msg_lines) > 0 && (
+        firstline *=
+            "  " * RenderableText(
+                reshape_text(msg_lines[1], console_width() - textlen(firstline) - 1);
+                style = logmsg_color,
+            )
+    )
+    tprint(firstline; highlight = false)
 
     # for multi-lines message, print each line separately.
     _vert = "  $vert   "
     vert_width = textlen(_vert)
     for n in 2:length(msg_lines)
         # make sure the text fits in the given space
-        txt = RenderableText(reshape_text(msg_lines[n], console_width()-vert_width-1); style=logmsg_color)
+        txt = RenderableText(
+            reshape_text(msg_lines[n], console_width() - vert_width - 1);
+            style = logmsg_color,
+        )
         v = join(repeat([_vert], height(txt)), "\n")
-        tprint(v * txt; highlight=false)
+        tprint(v * txt; highlight = false)
     end
 
     # --------------------------------- contents --------------------------------- #
@@ -259,10 +266,9 @@ function Logging.handle_message(
     """
 
     # function to reshape all content appropriately
-    w = min(120, (Int ∘ round)((console_width() - 6) / 4))   # six to allow space for vert and =
-    fmt_str(x, style; f = 1) = RenderableText(reshape_text(string(x), f * w); style = style)
-    fmt_str(::Function, style; f = 1) =
-        RenderableText(reshape_text("Function", f * w); style = style)
+    w = min(120, (Int ∘ round)((console_width() - 6) / 5))   # six to allow space for vert and =
+    fmt_str(x, style; f = 1) = RenderableText(string(x); width = f * w - 1, style = style)
+    fmt_str(::Function, style; f = 1) = RenderableText("Function"; style = style)
 
     # get types, keys and values as RenderableText with style
     ks = map(k -> fmt_str(k, logger.theme.text_accent), keys(kwargs))
@@ -273,12 +279,12 @@ function Logging.handle_message(
     vals = map(v -> style_log_msg_kw_value(logger, v), collect(values(kwargs)))
     vals_style = [x[2] for x in vals]
     vv = first.(vals)
-    vals = map(i -> fmt_str(vv[i], vals_style[i]; f = 2), 1:length(vv))
+    vals = map(i -> fmt_str(vv[i], vals_style[i]; f = 3), 1:length(vv))
 
     # get the ma width of each piece of content
-    type_w = maximum(width.(_types))
-    keys_w = maximum(width.(ks))
-    vals_w = maximum(width.(vals))
+    type_w = min(maximum(width.(_types)), w)
+    keys_w = min(maximum(width.(ks)), w)
+    vals_w = min(maximum(width.(vals)), 2w)
 
     # print all kwargs
     eq = "{$(logger.theme.operator)}={/$(logger.theme.operator)}"
