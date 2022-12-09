@@ -288,6 +288,14 @@ function install_term_stacktrace(;
     hide_frames = true,
 )
     @eval begin
+        function Base.showerror(args...; kwargs...)
+            println("Catchy", args, kwargs)
+        end
+
+        function Base.showerror(io::IO, er, bt::Nothing; backtrace = true)
+            Base.showerror(io, er, Any[]; backtrace = backtrace)
+        end
+
         function Base.showerror(io::IO, er, bt::Vector; backtrace = true)
             print("\n")
             # @info "SHOWERROR" er bt backtrace string(io) io.io (isa(io.io, Base.TTY))
@@ -337,8 +345,8 @@ function install_term_stacktrace(;
                     ) |> print
 
             catch cought_err  # catch when something goes wrong during error handling in Term
-                @error "Term.jl: error while rendering error message: " exception =
-                    cought_err
+                # @error "Term.jl: error while rendering error message: " exception =
+                #     cought_err
                 Base.show_backtrace(io, bt)
                 print(io, '\n'^3)
                 Base.showerror(io, er)

@@ -20,7 +20,7 @@ function show_error_code_line(frame::StackFrame; δ = 2)
 
     (isnothing(error_source) || length(error_source) == 0) && return nothing
 
-    _width = min(60, default_stacktrace_width() - 35)
+    _width = min(60, default_stacktrace_width() - (δ > 0 ? 30 : 12))
     code_error_panel = Panel(
         str_trunc(error_source, _width; ignore_markup = true);
         fit = δ == 0,
@@ -107,7 +107,7 @@ function render_frame_info(frame::StackFrame; show_source = true, kwargs...)
     c = frame.from_c ? RenderableText("   from C"; style = "bold dim $(theme.text)") : ""
 
     func =
-        str_trunc(func, default_stacktrace_width() - 30; ignore_markup = true) |>
+        str_trunc(func, default_stacktrace_width() - 25; ignore_markup = true) |>
         RenderableText
     # func = RenderableText(
     #     apply_style(string(func)); 
@@ -401,7 +401,7 @@ function render_backtrace(
 
     # create an overall panel
     return Panel(
-        cvstack(content..., pad = 0);
+        cvstack(content..., pad = 1);
         padding = (2, 2, 1, 1),
         subtitle = "Error Stack",
         style = "$(theme.er_bt) dim",

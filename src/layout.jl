@@ -146,8 +146,14 @@ julia> pad(RenderableText("ciao"); width=10)
     ciao   
 ```
 """
-function pad(ren::AbstractRenderable; width::Int)
-    nl, nr = get_lr_widths(width - ren.measure.w)
+function pad(ren::AbstractRenderable; width::Int, method = :center)
+    if method == :center
+        nl, nr = get_lr_widths(width - ren.measure.w)
+    elseif method == :right
+        nl, nr = 0, width - ren.measure.w
+    else
+        nl, nr = width - ren.measure.w, 0
+    end
     return pad(ren, nl, nr)
 end
 
@@ -232,9 +238,15 @@ vertical_pad(ren::AbstractRenderable; height::Int)
 
 Vertical pad a renderable to achieve a target height.
 """
-function vertical_pad(ren::AbstractRenderable; height::Int)
-    nl, nr = get_lr_widths(height - ren.measure.h)
-    return vertical_pad(ren, nl, nr)
+function vertical_pad(ren::AbstractRenderable; height::Int, method = :center)
+    if method == :center
+        n_above, n_below = get_lr_widths(height - ren.measure.h)
+    elseif method == :bottom
+        n_above, n_below = height - ren.measure.h, 0
+    elseif method == :top
+        n_above, n_below = 0, height - ren.measure.h
+    end
+    return vertical_pad(ren, n_above, n_below)
 end
 
 """

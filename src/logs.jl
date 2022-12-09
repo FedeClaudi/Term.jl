@@ -19,9 +19,9 @@ import Term:
     ltrim_str
 
 import ..Consoles: console_width, console_height, change_scroll_region, move_to_line
-import ..Renderables: AbstractRenderable
+import ..Renderables: AbstractRenderable, RenderableText
 import ..Style: apply_style
-import ..Tprint: tprintln
+import ..Tprint: tprintln, tprint
 import ..Boxes: BOXES
 import ..Progress:
     ProgressBar,
@@ -37,6 +37,8 @@ import ..Progress:
     getjob,
     SeparatorColumn,
     PercentageColumn
+import ..Measures: width, height
+import ..Layout: hstack, rvstack, lvstack, vertical_pad, pad
 
 export TermLogger, install_term_logger
 
@@ -146,6 +148,33 @@ function handle_progress(logger::TermLogger, prog)
     end
 end
 
+style_log_msg_kw_value(logger, v::Number) = (v, logger.theme.number)
+style_log_msg_kw_value(logger, v::Symbol) = (v, logger.theme.symbol)
+style_log_msg_kw_value(logger, v::AbstractString) = (v, logger.theme.string)
+style_log_msg_kw_value(logger, v::Function) = (v, logger.theme.func)
+style_log_msg_kw_value(logger, v::AbstractRenderable) =
+    ("$(typeof(v))  \e[2m$(v.measure)\e[0m", "default")
+style_log_msg_kw_value(logger, v) = (v, nothing)
+
+function style_log_msg_kw_value(logger, v::AbstractVector)
+    _style = logger.theme.number
+    _size = length(v)
+    v = escape_brackets(string(v))
+    v = textlen(v) > 33 ? v[1:30] * "..." : v
+    v *= "\n {$(logger.theme.text)}$(_size) {/$(logger.theme.text)}{dim}items{/dim}"
+    return (v, _style)
+end
+function style_log_msg_kw_value(logger, v::Union{AbstractArray,AbstractMatrix})
+    _style = logger.theme.number
+    _size = size(v)
+    v = str_trunc("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 60)
+    v *=
+        "\n {dim}shape: {default $(logger.theme.text)}" *
+        join(string.(_size), " × ") *
+        "{/default $(logger.theme.text)}{/dim}"
+    return (v, _style)
+end
+
 """
     handle_message(logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...)
 
@@ -165,6 +194,7 @@ function Logging.handle_message(
     line;
     kwargs...,
 )
+    # handle log progress
     _progress = asprogress(lvl, msg, _mod, group, id, file, line; kwargs...)
     isnothing(_progress) || return handle_progress(logger, _progress)
 
@@ -188,111 +218,85 @@ function Logging.handle_message(
     else
         "#90CAF9"
     end
-
     outline_markup = "$color dim"
     vert = "{$outline_markup}" * BOXES[:ROUNDED].mid.left * "{/$outline_markup}"
 
-    # style message
+    # ---------------------------------- message --------------------------------- #
     logmsg_color = logger.theme.logmsg
     msg = string(msg)
     msg = length(msg) > 1500 ? ltrim_str(msg, 1500 - 3) * "..." : msg
 
-    # get the first line of information
+    # prepare the first line of information
     fn_color = logger.theme.func
-    content = "{$color underline bold}@$(string(lvl)){/$color underline bold} {$fn_color }($(_mod)$fname):{/$fn_color }"
+    firstline = "{$color underline bold}@$(string(lvl)){/$color underline bold} {$fn_color }($(_mod)$fname):{/$fn_color }"
 
     # for multi-lines message, print each line separately.
     msg_lines::Vector{AbstractString} = split(msg, "\n")
     for n in 2:length(msg_lines)
         msg_lines[n] =
-            "  $vert   " * " "^(textlen(content) - 4) * "{$logmsg_color}" * msg_lines[n]
+            "  $vert   " *
+            " "^(textlen(firstline) - 4) *
+            "{$logmsg_color}" *
+            msg_lines[n] *
+            "{/$logmsg_color}"
     end
 
-    length(msg_lines) > 0 && (content *= "  " * msg_lines[1])
-
-    tprintln(content; highlight = false)
+    length(msg_lines) > 0 &&
+        (firstline *= "  " * "{$logmsg_color}" * msg_lines[1] * "{/$logmsg_color}")
+    tprintln(firstline; highlight = false)
     tprintln.(msg_lines[2:end]; highlight = false)
 
+    # --------------------------------- contente --------------------------------- #
     # if no kwargs we can just quit
     if length(kwargs) == 0 || length(msg_lines) == 0
         print_closing_line(color)
         return nothing
     end
 
-    # get padding width
-    _types = string.(typeof.(collect(values(kwargs))))
-    _types = map(t -> str_trunc(t, 24), _types)
-    for (i, _type) in enumerate(values(kwargs))
-        typeof(_type) <: Function && (_types[i] = string(Function))
-    end
+    """
+        For each kwarg, get the type and the content, as string.
+        Optionally trim these strings to ensure formatting is fine.
+    """
 
-    wpad = 24 - maximum(textlen.(_types)) + 2
-    ks = str_trunc.(string.(keys(kwargs)), 28)
-    namepad = maximum(textlen.(ks))
+    # function to reshape all content appropriately
+    w = min(120, (Int ∘ round)((console_width() - 6) / 4))   # six to allow space for vert and =
+    fmt_str(x, style; f = 1) = RenderableText(reshape_text(string(x), f * w); style = style)
+    fmt_str(::Function, style; f = 1) =
+        RenderableText(reshape_text("Function", f * w); style = style)
+
+    # get types, keys and values as RenderableText with style
+    ks = map(k -> fmt_str(k, logger.theme.text_accent), keys(kwargs))
+
+    _types = map(t -> t isa Function ? Function : typeof(t), (collect(values(kwargs))))
+    _types = map(t -> fmt_str("$t::", "dim " * logger.theme.type), _types)
+
+    vals = map(v -> style_log_msg_kw_value(logger, v), collect(values(kwargs)))
+    vals_style = [x[2] for x in vals]
+    vv = first.(vals)
+    vals = map(i -> fmt_str(vv[i], vals_style[i]; f = 2), 1:length(vv))
+
+    # get the ma width of each piece of content
+    type_w = maximum(width.(_types))
+    keys_w = maximum(width.(ks))
+    vals_w = maximum(width.(vals))
 
     # print all kwargs
+    eq = "{$(logger.theme.operator)}={/$(logger.theme.operator)}"
     tprintln("  $vert"; highlight = false)
-    for (k, v, _type) in zip(ks, values(kwargs), _types)
-        # get line stub
-        pad = max(wpad - textlen(_type) - 1, 1)
-        line =
-            "  $vert" *
-            " "^pad *
-            " {$(logger.theme.type) dim}($(_type)){/$(logger.theme.type) dim}" *
-            " {bold $(logger.theme.text)}$k{/bold $(logger.theme.text)}"
+    for (t, k, v) in zip(_types, ks, vals, _types)
+        # get the height of the tallest piece of content on this line
+        h = maximum(height.([k, v, t]))
 
-        epad = namepad - textlen(string(k))
-        line *=
-            " "^epad * " {bold $(logger.theme.operator)}={/bold $(logger.theme.operator)} "
-        lpad = textlen(line) - 4
+        # make sure all renderables have the same height and each columns' renderable has the right width
+        t = vertical_pad(pad(t; width = type_w, method = :left); height = h, method = :top)
+        k = vertical_pad(pad(k; width = keys_w, method = :left); height = h, method = :top)
+        v = vertical_pad(pad(v; width = vals_w, method = :right); height = h, method = :top)
 
-        # get value style
-        if v isa Number
-            _style = logger.theme.number
-        elseif v isa Symbol
-            _style = logger.theme.symbol
-        elseif v isa AbstractString
-            _style = logger.theme.string
-        elseif v isa AbstractVector
-            _style = logger.theme.number
-            _size = length(v)
-            v = escape_brackets(string(v))
-            v = textlen(v) > 33 ? v[1:30] * "..." : v
-            v *= "\n {$(logger.theme.text)}$(_size) {/$(logger.theme.text)}{dim}items{/dim}"
-        elseif v isa AbstractArray || v isa AbstractMatrix
-            _style = logger.theme.number
-            _size = size(v)
-            v = str_trunc("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 60)
-            v *=
-                "\n {dim}shape: {default $(logger.theme.text)}" *
-                join(string.(_size), " × ") *
-                "{/default $(logger.theme.text)}{/dim}"
+        # make vertical line and =
+        line = join(repeat(["  $vert"], h), "\n")
+        equal = vertical_pad(eq, h, :top)
 
-        elseif v isa Function
-            _style = logger.theme.func
-        elseif v isa AbstractRenderable
-            _style = "default"
-            v = "$(typeof(v)) \e[2m(size: $(v.measure))\e[0m"
-        else
-            _style = nothing
-        end
-
-        # print value lines
-        v = reshape_text(str_trunc(string(v), 177), 44)
-        vlines = split(v, "\n")
-
-        vlines = if !isnothing(_style)
-            map(ln -> "{" * _style * "}" * ln * "{/" * _style * "}", vlines)
-        else
-            highlight.(vlines)
-        end
-
-        tprintln(line * vlines[1]; highlight = false)
-        if length(vlines) ≥ 1
-            for ln in vlines[2:end]
-                tprintln("  $vert " * " "^lpad * ln; highlight = false)
-            end
-        end
+        hstack(line, t, k, equal, v; pad = 1) |> tprint
     end
     return print_closing_line(color)
 end
@@ -312,7 +316,6 @@ function install_term_logger(theme::Theme = TERM_THEME[])
 end
 
 function uninstall_term_logger()
-    _lg = global_logger(DEFAULT_LOGGER)
     logger = global_logger(DEFAULT_LOGGER)
     return logger
 end
