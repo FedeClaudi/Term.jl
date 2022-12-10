@@ -9,6 +9,8 @@ using Term.Links
     l3 = Link(file, lineno; style="red")
 
     ren = RenderableText("abcd")
+    lr = RenderableText(link*ren)
+    # TODO test
 
     # TODO check measure of each
 

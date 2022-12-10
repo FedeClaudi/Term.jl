@@ -40,23 +40,13 @@ info(r::AbstractRenderable)::String =
 
 Creates a string representation of a renderable
 """
-Base.string(r::AbstractRenderable)::String = return if isnothing(r.segments)
-    ""
-else
-    join(map(seg -> seg.text, r.segments), "\n")
+function Base.string(r::AbstractRenderable)::String 
+    isnothing(r.segments) && return ""
+    seg_texts = getfield.(r.segments, :text)
+    println.(typeof.(seg_texts))
+    return join(seg_texts, "\n")
 end
 
-#=
-function Base.string(renderable::AbstractRenderable, width::Int)::String
-    isnothing(renderable.measure) && return string(renderable)
-    return if renderable.measure.w <= width
-        string(renderable)
-    else
-        # string(trim_renderable(renderable, width)) * "\e[0m"
-        string(RenderableText(string(renderable), width = width))
-    end
-end
-=#
 
 """
     print(io::IO, renderable::AbstractRenderable)
@@ -180,7 +170,7 @@ function RenderableText(
     end
 end
 
-function RenderableText(ren::AbstractRenderable, args...; width::Int = console_width(), kwargs...) 
+function RenderableText(ren::AbstractRenderable, args...; kwargs...) 
     # if ren.measure.w <= width
     #     return RenderableText(ren.segments, ren.measure, nothing)
     # else

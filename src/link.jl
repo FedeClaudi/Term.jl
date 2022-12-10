@@ -1,58 +1,92 @@
 module Links
     import ..Measures: Measure
+    import ..Measures
+    import ..Segments
     import ..Segments: Segment
     import ..Style: apply_style
     import ..Renderables: RenderableText, AbstractRenderable
     import ..Renderables
     import ..Layout: pad
     import Term: get_relative_path, textlen, TERM_THEME, cleantext
+    import Term
 
     export Link
+
+
+
+    struct LinkString <: AbstractString
+        link::String
+        width::Int
+    end
+
+    Measures.Measure(l::LinkString) = Measure(1, l.width)
+    Measures.width(l::LinkString) = l.width
+    Base.textwidth(l::LinkString) = l.width
+    Base.string(l::LinkString) = l
+    Base.convert(::String, l) = l
+    Base.print(io::IO, s::LinkString) = print(io, s.link)
+    Base.show(io::IO, ::MIME"text/plain", l::LinkString) = print(io, l.link)
+    Base.:*(s::AbstractString, l::LinkString) = LinkString(s*l.link, textlen(s)+l.width)
+    Base.:*(l::LinkString, s::AbstractString) = LinkString(s*l.link, textlen(s)+l.width)
+    Base.:*(c::Char, l::LinkString) = l * string(c)
+    Base.:*(l::LinkString, c::Char) = l * string(c)
+    Base.:/(s::AbstractString, l::LinkString) = LinkString(s/l.link, max(textlen(s), l.width))
+    Base.:/(l::LinkString, s::AbstractString) = LinkString(l.link/s, max(textlen(s), l.width))
+
+    Segments.Segment(l::LinkString) = Segment(l, Measure(1, l.width))
+    Term.textlen(l::LinkString) = l.width
+    
+
 
 
     struct Link <: AbstractRenderable
         segments::Vector{Segment}
         measure::Measure
-        display_text::String
-        link::String
+        link::LinkString
         style::String
+        display_text::String
+        link_dest::String
     end
 
     function Link(file_path::AbstractString, line_number::Union{Nothing, Integer}=nothing; style=TERM_THEME[].link)
-        link = isnothing(line_number) ? file_path : "$file_path#$line_number"
+        link_dest = isnothing(line_number) ? file_path : "$file_path#$line_number"
         short_path = get_relative_path(file_path)
         display_text = isnothing(line_number) ? short_path : "$short_path $(line_number)"
-        clickable_link = "\x1b]8;;$link\x1b\\$display_text\x1b]8;;\x1b\\"
+        link_text = "{$(style)}" * "\x1b]8;;$link_dest\x1b\\$display_text\x1b]8;;\x1b\\" * "{/$(style)}" |> apply_style
+        link_measure = Measure(1, textlen(display_text))
 
-        m = Measure(1, textlen(display_text))
+        link_string = LinkString(link_text,  link_measure.w)
         return Link(
-            [Segment(apply_style("{$(style)}" * clickable_link * "{/$(style)}"), m)],
-            m, display_text, link, style
+            [Segment(link_string)],
+            link_measure, 
+            link_string, 
+            style,
+            display_text,
+            link_dest
         )
     end
 
-    function Renderables.RenderableText(link::Link, args...;     
-        style::Union{Nothing,String} = link.style,
-        width::Int = link.measure.w,
-        background::Union{Nothing,String} = nothing,
-        justify::Symbol = :left,)
+    Base.string(l::Link) = l.link
+    Base.convert(::String, l::Link) = l.link
+
+    function Renderables.RenderableText(
+            link::Link, args...;     
+            style::Union{Nothing,String} = link.style,
+            width::Int = link.measure.w,
+            background::Union{Nothing,String} = nothing,
+            justify::Symbol = :left,
+        )
         
+            display_text = pad(cleantext(link.display_text), width-link.measure.w, justify; bg=background)
+            link_text = "{$(style)}" * "\x1b]8;;$(link.link_dest)\x1b\\$display_text\x1b]8;;\x1b\\" * "{/$(style)}" |> apply_style
+            link_string = LinkString(link_text,  link.measure.w)
 
-
-        display_text = pad(cleantext(link.display_text), width-link.measure.w, justify; bg=background)
-        clickable_link = "\x1b]8;;$(link.link)\x1b\\$display_text\x1b]8;;\x1b\\"
 
         return RenderableText(
-            [Segment(apply_style("{$(style)}" * clickable_link * "{/$(style)}"), link.measure)],
-            link.measure, style
+            Segment[Segment(link_string)], link.measure,  style
         )
     end
+
+
 end
 
-
-
-# path = "/Users/federicoclaudi/Documents/Github/Term.jl/src/_utils.jl"
-# link = Links.get_clickable_link(path)
-# Renderable(link).measure
-
-# # rvstack(link, "aa")

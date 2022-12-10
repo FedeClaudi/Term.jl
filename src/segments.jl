@@ -19,7 +19,7 @@ export Segment
 stores one piece of text with all the styles applied to it.
 """
 struct Segment
-    text::String   # text with ANSI codes injected
+    text::AbstractString   # text with ANSI codes injected
     measure::Measure       # measure of plain text
 end
 
