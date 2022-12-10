@@ -168,7 +168,7 @@ function Table(
 
     # get the height of each row
     heights = rows_heights(N_rows, show_header, header, rows_values, footer, vpad)
-    # @info "sizes" widths heights    
+    @info "sizes" widths heights  tb sch
 
     # ----------------------------- create table rows ---------------------------- #
     nrows = length(rows_values)

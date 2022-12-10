@@ -190,7 +190,7 @@ end
 Convert any input content to a renderable
 """
 content_as_renderable(content, width, Δw, justify, background) = RenderableText(
-    string(content),
+    content,
     width = width - Δw,
     background = background,
     justify = justify,
@@ -237,7 +237,7 @@ function Panel(
         max(width, content.measure.w + padding.left + padding.right + 2),
     )
 
-    # @debug "Creating fitted panel" content.measure panel_measure content
+    @info "Creating fitted panel" content.measure panel_measure content
     return render(
         content;
         panel_measure = panel_measure,
@@ -310,7 +310,7 @@ function Panel(
         content = Renderable(segments, Measure(segments))
     end
 
-    # @debug "creating not fitted panel" content.measure panel_measure width Δw 
+    @info "creating not fitted panel" content.measure panel_measure width Δw 
     return render(
         content;
         panel_measure = panel_measure,
@@ -344,22 +344,26 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
 Create a Panel's content line.
 """
 function makecontent_line(
-    cline,
-    panel_measure,
-    justify,
-    background,
-    padding,
-    left,
-    right,
-    Δw,
+    cline::Segment,
+    panel_measure::Measure,
+    segment_measure::Measure,
+    justify::Symbol,
+    background::Union{Nothing, String},
+    padding::Padding,
+    left::String,
+    right::String,
+    Δw::Int,
 )::Segment
-    line = apply_style(cline) |> rstrip
-    line = if panel_measure.w - textlen(line) ≥ 2
-        pad(cline, panel_measure.w - Δw, justify; bg = background)
+    @info "line" cline panel_measure segment_measure Δw
+
+    # make sure line has the correct width to fit in the panel
+    line = if panel_measure.w - segment_measure.w ≥ 2
+        pad(cline, panel_measure.w - Δw, justify; bg = background) |> string
     else
         line * " "
     end
 
+    # add Panel's padding
     line = pad(line, padding.left, padding.right; bg = background)
 
     # make line
@@ -389,7 +393,7 @@ end
 Construct a `Panel`'s content.
 """
 function render(
-    content;
+    content::RenderableText;
     box::Symbol = TERM_THEME[].box,
     style::String = TERM_THEME[].line,
     title::Union{String,Nothing} = nothing,
@@ -408,7 +412,7 @@ function render(
     kwargs...,
 )::Panel
     background = get_bg_color(background)
-    # @debug "calling render" content content_measure background
+    @info "calling render" content content_measure background
 
     # create top/bottom rows with titles
     box = BOXES[box]  # get box object from symbol
@@ -460,8 +464,9 @@ function render(
     content_sgs::Vector{Segment} = if content.measure.w > 0
         map(
             s -> makecontent_line(
-                s.text,
+                s,
                 panel_measure,
+                s.measure,
                 justify,
                 background,
                 padding,

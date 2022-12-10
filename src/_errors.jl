@@ -109,16 +109,14 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
             r"(?<group>^[^(]+)" => SubstitutionString(
                 "{$(ctx.theme.func)}" * s"\g<0>" * "{/$(ctx.theme.func)}",
             ),
-        ) |>
-        highlight |>
-        apply_style
+        ) 
+        
+    func = highlight(func) |> apply_style
+
 
     # reshape but taking care of potential curly bracktes
-    func =
-        reshape_text(escape_brackets(func), ctx.func_name_w; ignore_markup = true) |>
-        unescape_brackets
-    func = do_by_line(remove_markup, func)
-    return RenderableText(func)
+    func = reshape_text(func, ctx.func_name_w; ignore_markup = true)
+    return RenderableText(func) 
 end
 
 # ---------------------------------------------------------------------------- #
@@ -197,12 +195,12 @@ function add_stack_frame!(
         Base.stacktrace_expand_basepaths() &&
             (file = something(Base.find_source_file(file), file))
         Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
-        file_line = RenderableText(
-            "{dim}$(file):{bold $(ctx.theme.text_accent)}$(frame.line){/bold $(ctx.theme.text_accent)}{/dim}";
-            width = ctx.func_name_w,
-        )
+
+        # get a link renderable pointing to error file
+        file_line = Link(file, frame.line; style="dim")
 
         _out = func_line / file_line
+        
         error_source = render_error_code_line(ctx, frame; δ = δ)
         isnothing(error_source) || (_out /= error_source)
         _out
@@ -211,6 +209,8 @@ function add_stack_frame!(
     end
 
     # make panel and add it to content
+    @info "making panel" panel_content
+    println(panel_content)
     panel = if as_panel
         Panel(
             panel_content;

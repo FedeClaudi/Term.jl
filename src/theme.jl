@@ -24,6 +24,7 @@ style outputs to terminal.
     number::String         = blue_light
     operator::String       = red
     func::String           = "#f2d777"
+    link::String           = "underline $(light_blue_light)"
 
     # misc
     text::String           = "default"

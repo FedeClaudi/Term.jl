@@ -134,7 +134,7 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
     else
         vstack(RenderableText.(fill("=>", length(k)); style = TERM_THEME[].operator)...)
     end
-
+    
     # prepare other renderables
     space = Spacer(length(k), 1)
     line = vLine(length(k); style = "dim $(TERM_THEME[].emphasis)")

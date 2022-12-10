@@ -4,6 +4,7 @@ import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
 import Term:
     highlight,
+    highlight_syntax,
     str_trunc,
     reshape_text,
     load_code_and_highlight,
@@ -16,6 +17,7 @@ import Term:
     Theme,
     do_by_line
 
+import ..Links: Link
 import ..Style: apply_style
 import ..Layout:
     hLine,

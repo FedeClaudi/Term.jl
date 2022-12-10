@@ -64,11 +64,14 @@ include("style.jl")
 include("segments.jl")
 include("macros.jl")
 
+
+
 # renderables, rely heavily on other modules
 include("boxes.jl")
 include("console.jl")
 include("renderables.jl")
 include("layout.jl")
+include("link.jl")
 include("panels.jl")
 include("errors.jl")
 include("tprint.jl")
@@ -115,6 +118,8 @@ using .Consoles: console_height, console_width
 using .Renderables: AbstractRenderable, Renderable, RenderableText
 
 using .Layout
+
+using .Links
 
 using .Panels: Panel, TextBox, @nested_panels
 

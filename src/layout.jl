@@ -73,7 +73,17 @@ function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothi
     # get total padding size
     lw = width(text)
     lw ≥ target_width && return text
+    return pad(text, target_width, method, lw; bg=bg)
+end
 
+"""
+    function pad(text::AbstractString, target_width::Int, method::Symbol, lw::Int; bg = nothing)::String
+
+complete string padding but knowing line width of the string.
+Useful in cases the line width needs to be enforced instead of obtained through `width(text)`, e.g.
+when paddnig a `Link`'s text.
+"""
+function pad(text::AbstractString, target_width::Int, method::Symbol, lw::Int; bg = nothing)::String
     npads = target_width - lw
     if method ≡ :left
         p = isnothing(bg) ? ' '^npads : "{$bg}" * ' '^npads * "{/$bg}"
@@ -109,14 +119,37 @@ pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing) =
         l * text * r
     end
 
+
+"""
+---
+
+    pad(s::Segment, left::Int = 0, right::Int = 0; kwargs...)
+
+Pad a segment.
+"""
+pad(s::Segment, left::Int = 0, right::Int = 0; kwargs...) = Segment(
+        pad(s.text, left, right; kwargs...), Measure(s.measure.h, s.measure.w+left+right)
+    )
+
+function pad(s::Segment, width::Int = 0, method::Symbol = :center; kwargs...) 
+    return if width <= s.measure.w
+        s
+    else
+        Segment(
+            pad(s.text, width, method, s.measure.w; kwargs...), Measure(s.measure.h, width)
+        )
+    end
+end
+
+
 """
 ---
     pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0)
 
 Pad a renderable's segments to the left and the right.
 """
-pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0) =
-    map((s) -> Segment(pad(s.text, left, right)), segments)
+pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0; kwargs...) =
+    map((s) -> pad(s, left, right; kwargs...), segments)
 
 """
 ---
@@ -124,8 +157,8 @@ pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0) =
 
 Pad an `AbstractRenderable` by padding each of its segments.
 """
-function pad(ren::AbstractRenderable, left::Int, right::Int)
-    segments = pad(ren.segments, left, right)
+function pad(ren::AbstractRenderable, left::Int, right::Int; kwargs...)
+    segments = pad(ren.segments, left, right; kwargs...)
     return Renderable(segments, Measure(segments))
 end
 
@@ -148,6 +181,7 @@ julia> pad(RenderableText("ciao"); width=10)
 """
 function pad(ren::AbstractRenderable; width::Int, method = :center)
     ren.measure.w >= width && return ren
+
     if method == :center
         nl, nr = get_lr_widths(width - ren.measure.w)
     elseif method == :right
@@ -165,7 +199,7 @@ In place version for padding a renderable.
 """
 function pad!(ren::AbstractRenderable, left::Int, right::Int)
     ren.segments = pad(ren.segments, left, right)
-    return ren.measure = Measure(ren.segments)
+    ren.measure = Measure(ren.segments)
 end
 
 """
@@ -503,7 +537,11 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     end
 
     # combine segments
-    segments = [Segment(ss1.text * ' '^pad * ss2.text) for (ss1, ss2) in zip(s1, s2)]
+    segments = [
+        Segment(ss1.text * ' '^pad * ss2.text, 
+                    Measure(1, ss1.measure.w+pad+ss2.measure.w)) 
+        for (ss1, ss2) in zip(s1, s2)
+    ]
 
     return Renderable(segments, Measure(segments))
 end
