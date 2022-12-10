@@ -228,6 +228,7 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # create content
+    # @info "panel fit" width height Δw Δh
     content = content_as_renderable(content, width, Δw, justify, background)
 
     # estimate panel size
@@ -285,6 +286,7 @@ function Panel(
     content = content_as_renderable(content, width, Δw, justify, background)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
+    # @info "panel nofit" width  Δw Δh height panel_measure
 
     # if the content is too tall, exclude some lines
     if content.measure.h > height - Δh - 2
@@ -407,7 +409,6 @@ function render(
 )::Panel
     background = get_bg_color(background)
     # @debug "calling render" content content_measure background
-    # println("Content\n", content)
 
     # create top/bottom rows with titles
     box = BOXES[box]  # get box object from symbol

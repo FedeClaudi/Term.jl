@@ -310,13 +310,7 @@ Apply `fn` to each line in the `text`.
 
 The function `fn` should accept a single `::String` argument.
 """
-function do_by_line(fn::Function, text)::String
-    out = ""
-    for (last, line) in loop_last(split_lines(text))
-        out *= fn(line) * (last ? "" : "\n")
-    end
-    return out
-end
+do_by_line(fn::Function, text::AbstractString)::String = join(fn.(split_lines(text)), "\n")
 
 do_by_line(fn::Function, text::Vector)::String = join_lines(fn.(text))
 

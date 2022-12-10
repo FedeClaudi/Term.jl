@@ -112,10 +112,8 @@ function highlight_syntax(code::AbstractString; style::Bool = true)
         CodeTheme;
         context = stdout,
     )
-    txt = unescape_brackets(txt)
     style && (txt = apply_style(txt))
-
-    return do_by_line(rstrip, remove_markup(txt))
+    return remove_markup(txt)
 end
 
 """
@@ -130,8 +128,8 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
 
     lines = read_file_lines(path, lineno - δ, lineno + δ)
     linenos = first.(lines)
-    lines = [ln[2] for ln in lines]
-    code = split(highlight_syntax(join(lines); style = true), "\n")
+    code = [highlight_syntax(ln[2]; style = true) for ln in lines]
+    code = split(join(code), "\n")
 
     # clean
     clean(line) = replace(line, "    {/    }" => "")

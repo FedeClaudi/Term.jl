@@ -13,7 +13,8 @@ import Term:
     remove_markup,
     TERM_THEME,
     plural,
-    Theme
+    Theme,
+    do_by_line
 
 import ..Style: apply_style
 import ..Layout:
@@ -51,7 +52,7 @@ function StacktraceContext()
     w = default_stacktrace_width()
     frame_panel_w = w - 4 - 12 - 3 # panel walls and padding
     module_line_w = w - 4 - 4
-    func_name_w = frame_panel_w - 4 - 4 # including (n) before fname
+    func_name_w = frame_panel_w - 4 - 8 # including (n) before fname
     code_w = func_name_w - 8
     return StacktraceContext(
         w,

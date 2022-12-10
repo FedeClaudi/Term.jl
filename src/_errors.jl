@@ -43,13 +43,12 @@ frame_module(iip::Base.InterpreterIP) = string(iip.mod)
 A frame should skip if it's in Base or an installed package.
 """
 should_skip(frame::StackFrame) =
-    frame_module(frame) == "Base" || (
+    frame_module(frame) ∈ ["Base", "Main", nothing] || (
         contains(string(frame.file), r"[/\\].julia[/\\]") ||
         contains(string(frame.file), r"julia[/\\]stdlib") ||
         contains(string(frame.file), r"julia[/\\]lib") ||
         contains(string(frame.file), r"julialang.language")
     )
-
 should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false
 should_skip(pointer::Ptr) = should_skip(StackTraces.lookup(pointer)[1])
 should_skip(pointer::Ptr, hide::Bool) = hide ? should_skip(pointer) : false
@@ -118,6 +117,7 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
     func =
         reshape_text(escape_brackets(func), ctx.func_name_w; ignore_markup = true) |>
         unescape_brackets
+    func = do_by_line(remove_markup, func)
     return RenderableText(func)
 end
 
@@ -315,6 +315,7 @@ function render_backtrace(
 
     # get the module each frame's code line is defined in
     frames_modules = frame_module.(bt)
+    # println.(zip(frames_modules, should_skip.(bt)))
 
     """
     Define a few variables to keep track of during stack 
@@ -366,7 +367,7 @@ function render_backtrace(
             Dict(:style => "hidden")
         end
         δ = num in (1, length(bt)) ? 2 : 0
-        add_stack_frame!(
+        (should_skip(frame, hide_frames) && num ∉ [1, length(bt)]) || add_stack_frame!(
             content,
             frame,
             ctx,

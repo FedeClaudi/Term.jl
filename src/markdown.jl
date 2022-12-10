@@ -163,7 +163,7 @@ function parse_md(
     lpad = true,
     kwargs...,
 )::String
-    syntax = highlight_syntax(code.code)
+    syntax = reshape_text(highlight_syntax(code.code), width - 20)
     theme = TERM_THEME[]
     if inline
         return "{$(theme.md_code)}`$(code.language){/$(theme.md_code)}" *
