@@ -28,7 +28,6 @@ function calc_columns_widths(
     footers_widths = isnothing(footer) ? zeros(N_cols) : collect(width.(footer))
     widths = hcat(headers_widths, data_widths, footers_widths)
     
-    @info "cacca" data_widths length(sch.names)
 
     hpad = isa(hpad, Int) ? fill(hpad, N_rows) : hpad
     widths = Int.([mapslices(x -> max(x...), widths; dims = 2)...] .+ hpad * 2)

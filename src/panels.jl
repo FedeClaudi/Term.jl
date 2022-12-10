@@ -344,7 +344,7 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
 Create a Panel's content line.
 """
 function makecontent_line(
-    cline::Segment,
+    cline::String,
     panel_measure::Measure,
     segment_measure::Measure,
     justify::Symbol,
@@ -354,14 +354,15 @@ function makecontent_line(
     right::String,
     Δw::Int,
 )::Segment
-    @info "line" cline panel_measure segment_measure Δw
+    line = apply_style(cline) |> rstrip
 
     # make sure line has the correct width to fit in the panel
-    line = if panel_measure.w - segment_measure.w ≥ 2
-        pad(cline, panel_measure.w - Δw, justify; bg = background) |> string
-    else
-        line * " "
-    end
+    # line = if panel_measure.w - segment_measure.w ≥ 2
+        # pad(cline, panel_measure.w - Δw, justify; bg = background)
+    # else
+    #     line * " "
+    # end
+    line = pad(cline, panel_measure.w - Δw, justify; bg = background)
 
     # add Panel's padding
     line = pad(line, padding.left, padding.right; bg = background)
@@ -393,7 +394,7 @@ end
 Construct a `Panel`'s content.
 """
 function render(
-    content::RenderableText;
+    content::Union{Renderable, RenderableText};
     box::Symbol = TERM_THEME[].box,
     style::String = TERM_THEME[].line,
     title::Union{String,Nothing} = nothing,
@@ -464,7 +465,7 @@ function render(
     content_sgs::Vector{Segment} = if content.measure.w > 0
         map(
             s -> makecontent_line(
-                s,
+                s.text,
                 panel_measure,
                 s.measure,
                 justify,

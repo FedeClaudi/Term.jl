@@ -196,7 +196,7 @@ function add_stack_frame!(
             (file = something(Base.find_source_file(file), file))
         Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
 
-        # get a link renderable pointing to error file
+        # get a link renderable pointing to error
         file_line = Link(file, frame.line; style="dim")
 
         _out = func_line / file_line

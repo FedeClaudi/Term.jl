@@ -131,7 +131,7 @@ pad(s::Segment, left::Int = 0, right::Int = 0; kwargs...) = Segment(
         pad(s.text, left, right; kwargs...), Measure(s.measure.h, s.measure.w+left+right)
     )
 
-function pad(s::Segment, width::Int = 0, method::Symbol = :center; kwargs...) 
+function pad(s::Segment, width::Int, method::Symbol; kwargs...) 
     return if width <= s.measure.w
         s
     else

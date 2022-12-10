@@ -181,11 +181,11 @@ function RenderableText(
 end
 
 function RenderableText(ren::AbstractRenderable, args...; width::Int = console_width(), kwargs...) 
-    if ren.measure.w <= width
-        return RenderableText(ren.segments, ren.measure, nothing)
-    else
-        return RenderableText(string(ren), args...;kwargs...)
-    end
+    # if ren.measure.w <= width
+    #     return RenderableText(ren.segments, ren.measure, nothing)
+    # else
+    return RenderableText(string(ren), args...;kwargs...)
+    # end
 end
 
 # ---------------------------------------------------------------------------- #
