@@ -164,10 +164,10 @@ end
             title_style = "italic red",
         )
         @testpanel(p, nothing, 40)
-        @compare_to_string(p, "centered_title_panel_$(i)")
+        IS_WIN || @compare_to_string(p, "centered_title_panel_$(i)")
 
         p = Panel(title = "test", width = 50, title_justify = just)
-        @compare_to_string(p, "centered_title_panel_$(i+3)")
+        IS_WIN || @compare_to_string(p, "centered_title_panel_$(i+3)")
         @testpanel(p, nothing, 50)
     end
 
