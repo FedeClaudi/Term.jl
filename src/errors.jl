@@ -4,6 +4,7 @@ import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
 import Term:
     highlight,
+    highlight_syntax,
     str_trunc,
     reshape_text,
     load_code_and_highlight,
@@ -14,8 +15,12 @@ import Term:
     TERM_THEME,
     plural,
     Theme,
-    do_by_line
+    do_by_line,
+    RECURSIVE_OPEN_TAG_REGEX,
+    STACKTRACE_HIDDEN_MODULES,
+    STACKTRACE_HIDE_FRAME
 
+import ..Links: Link
 import ..Style: apply_style
 import ..Layout:
     hLine,
@@ -149,7 +154,11 @@ function install_term_stacktrace(;
                     ) |> print
 
             catch cought_err  # catch when something goes wrong during error handling in Term
-                @error "Term.jl: error while rendering error message: " cought_err
+                @error "Term.jl: error while rendering error message: " # string(cought_err)
+                println("Error during term's stacktrace generation:")
+                Base.showerror(io, cought_err)
+
+                println("\n\n\nOriginal error")
                 Base.show_backtrace(io, bt)
                 print(io, '\n'^3)
                 Base.showerror(io, er)

@@ -12,14 +12,16 @@ import Term:
     ltrim_str,
     do_by_line,
     get_bg_color,
-    TERM_THEME
+    TERM_THEME,
+    string_type
+
 import Term: justify as justify_text
 import ..Renderables: RenderablesUnion, Renderable, AbstractRenderable, RenderableText
 import ..Consoles: console_width, console_height
 import ..Measures: Measure, height, width
 import ..Boxes: get_lrow, get_rrow
 import ..Style: apply_style
-import ..Segments: Segment
+import ..Segments: Segment, get_string_types
 using ..Boxes
 
 export Padding, vstack, hstack, pad, pad!, vertical_pad, vertical_pad!
@@ -65,7 +67,7 @@ julia> pad("ciao", 10, :right)
 "      ciao"
 ```
 """
-function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothing)::String
+function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothing)
     bg = get_bg_color(bg)
     occursin('\n', text) &&
         return do_by_line(ln -> pad(ln, target_width, method; bg = bg), text)
@@ -73,23 +75,35 @@ function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothi
     # get total padding size
     lw = width(text)
     lw ≥ target_width && return text
+    return pad(text, target_width, method, lw; bg = bg)
+end
 
+"""
+    function pad(text::AbstractString, target_width::Int, method::Symbol, lw::Int; bg = nothing)::String
+
+complete string padding but knowing line width of the string.
+Useful in cases the line width needs to be enforced instead of obtained through `width(text)`, e.g.
+when paddnig a `Link`'s text.
+"""
+function pad(text::AbstractString, target_width::Int, method::Symbol, lw::Int; bg = nothing)
+    stype = string_type(text)
     npads = target_width - lw
+    # println("TEXT ", text, " NPADS ", npads, " METHOD ", method, " lw ", lw)
     if method ≡ :left
         p = isnothing(bg) ? ' '^npads : "{$bg}" * ' '^npads * "{/$bg}"
-        return text * p
+        return text * p |> stype
     elseif method ≡ :right
         p = isnothing(bg) ? ' '^npads : "{$bg}" * ' '^npads * "{/$bg}"
-        return p * text
+        return p * text |> stype
     else
         nl, nr = get_lr_widths(npads)
         l = isnothing(bg) ? ' '^nl : "{$bg}" * ' '^nl * "{/$bg}"
         r = isnothing(bg) ? ' '^nr : "{$bg}" * ' '^nr * "{/$bg}"
         t = l * text * r
         return if method == :center
-            t
+            t |> stype
         else
-            justify_text(t, target_width)
+            justify_text(t, target_width) |> stype
         end
     end
 end
@@ -100,14 +114,39 @@ end
 
 Pad a string by a fixed ammount to the left and to the right.
 """
-pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing) =
+function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing)
+    stype = string_type(text)
     if isnothing(bg)
-        ' '^max(0, left) * text * ' '^max(0, right)
+        (' '^max(0, left) * text * ' '^max(0, right)) |> stype
     else
         l = "{$bg}" * ' '^max(0, left) * "{/$bg}"
         r = "{$bg}" * ' '^max(0, right) * "{/$bg}"
-        l * text * r
+        (l * text * r) |> stype
     end
+end
+
+"""
+---
+
+    pad(s::Segment, left::Int = 0, right::Int = 0; kwargs...)
+
+Pad a segment.
+"""
+pad(s::Segment, left::Int = 0, right::Int = 0; kwargs...) = Segment(
+    pad(s.text, left, right; kwargs...),
+    Measure(s.measure.h, s.measure.w + left + right),
+)
+
+function pad(s::Segment, width::Int, method::Symbol; kwargs...)
+    return if width <= s.measure.w
+        s
+    else
+        Segment(
+            pad(s.text, width, method, s.measure.w; kwargs...),
+            Measure(s.measure.h, width),
+        )
+    end
+end
 
 """
 ---
@@ -115,8 +154,8 @@ pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing) =
 
 Pad a renderable's segments to the left and the right.
 """
-pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0) =
-    map((s) -> Segment(pad(s.text, left, right)), segments)
+pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0; kwargs...) =
+    map((s) -> pad(s, left, right; kwargs...), segments)
 
 """
 ---
@@ -124,8 +163,8 @@ pad(segments::AbstractVector{Segment}, left::Int = 0, right::Int = 0) =
 
 Pad an `AbstractRenderable` by padding each of its segments.
 """
-function pad(ren::AbstractRenderable, left::Int, right::Int)
-    segments = pad(ren.segments, left, right)
+function pad(ren::AbstractRenderable, left::Int, right::Int; kwargs...)
+    segments = pad(ren.segments, left, right; kwargs...)
     return Renderable(segments, Measure(segments))
 end
 
@@ -148,6 +187,7 @@ julia> pad(RenderableText("ciao"); width=10)
 """
 function pad(ren::AbstractRenderable; width::Int, method = :center)
     ren.measure.w >= width && return ren
+
     if method == :center
         nl, nr = get_lr_widths(width - ren.measure.w)
     elseif method == :right
@@ -165,7 +205,8 @@ In place version for padding a renderable.
 """
 function pad!(ren::AbstractRenderable, left::Int, right::Int)
     ren.segments = pad(ren.segments, left, right)
-    return ren.measure = Measure(ren.segments)
+    ren.measure = Measure(ren.segments)
+    nothing
 end
 
 """
@@ -187,7 +228,7 @@ vertical_pad(text, target_height::Int, method::Symbol)::String
 Vertically pad a string to height: `target_height` by adding empty strings above/below " ".
 Where the spaces are added depends on the justification `method` ∈ (:top, :center, :bottom).
 """
-function vertical_pad(text::AbstractString, target_height::Int, method::Symbol)::String
+function vertical_pad(text::AbstractString, target_height::Int, method::Symbol)
     # get total padding size
     h = height(text)
     h ≥ target_height && return text
@@ -209,8 +250,9 @@ end
 Vertical pad a string by a fixed ammount to above and below.
 """
 function vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
+    stype = string_type(text)
     space = ' '^(width(text))
-    return string(vstack(fill(space, above)..., text, fill(space, below)...))
+    return stype(vstack(fill(space, above)..., text, fill(space, below)...))
 end
 
 """
@@ -503,8 +545,13 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     end
 
     # combine segments
-    segments = [Segment(ss1.text * ' '^pad * ss2.text) for (ss1, ss2) in zip(s1, s2)]
-
+    stype = get_string_types(s1, s2)
+    segments = [
+        Segment(
+            stype(ss1.text * ' '^pad * ss2.text),
+            Measure(1, ss1.measure.w + pad + ss2.measure.w),
+        ) for (ss1, ss2) in zip(s1, s2)
+    ]
     return Renderable(segments, Measure(segments))
 end
 

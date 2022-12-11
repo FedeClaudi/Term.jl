@@ -88,19 +88,6 @@ end
                 TEST_CONSOLE_WIDTH
             )
 
-            # @testpanel(
-            #     Panel(Panel(Panel("°"; fit=true, _kw...); _kw...); fit = false),
-            #     14,
-            #     TEST_CONSOLE_WIDTH
-            # )
-
-            # @testpanel(
-            #     Panel(Panel("°"^250; _kw...); fit = false),
-            #     # WIDE_TERM ? nothing : 5,
-            #     17,
-            #     TEST_CONSOLE_WIDTH
-            # )
-
             @testpanel(
                 Panel(
                     Panel("t1"; fit = true, _kw...),
@@ -157,12 +144,6 @@ end
 
         @testpanel(Panel(Panel(Panel("°"; _kw...); _kw...); fit = true), 7, 19,)
 
-        # @testpanel(
-        #     Panel(Panel("°"^250; justify = justify); fit = true),
-        #     nothing,
-        #     console_width() - 1,
-        # )
-
         @testpanel(Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = true), 8, 14,)
 
         _kw = (fit = true, width = 30, height = 8)
@@ -175,41 +156,20 @@ end
 end
 
 @testset "PANEL - centered title style" begin
-    @test string(
-        Panel(
+    for (i, just) in enumerate([:left, :center, :right])
+        p = Panel(
             title = "test",
             width = 40,
-            title_justify = :left,
+            title_justify = just,
             title_style = "italic red",
-        ),
-    ) ==
-          "\e[22m╭──── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
+        )
+        @testpanel(p, nothing, 40)
+        IS_WIN || @compare_to_string(p, "centered_title_panel_$(i)")
 
-    @test string(
-        Panel(
-            title = "test",
-            width = 40,
-            title_justify = :center,
-            title_style = "italic red",
-        ),
-    ) ==
-          "\e[22m╭──────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ────────────────╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
-    @test string(
-        Panel(
-            title = "test",
-            width = 40,
-            title_justify = :right,
-            title_style = "italic red",
-        ),
-    ) ==
-          "\e[22m╭───────────────────────────── \e[3m\e[31mtest\e[23m\e[39m\e[22m\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m                                      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────────────────────╯\e[22m\e[0m"
-
-    @test string(Panel(title = "test", width = 50, title_justify = :left)) ==
-          "\e[22m╭──── \e[0mtest\e[22m ──────────────────────────────────────╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(title = "test", width = 50, title_justify = :center)) ==
-          "\e[22m╭───────────────────── \e[0mtest\e[22m ─────────────────────╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
-    @test string(Panel(title = "test", width = 50, title_justify = :right)) ==
-          "\e[22m╭─────────────────────────────────────── \e[0mtest\e[22m ───╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                                                \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────────────────────────────────────╯\e[22m\e[0m"
+        p = Panel(title = "test", width = 50, title_justify = just)
+        IS_WIN || @compare_to_string(p, "centered_title_panel_$(i+3)")
+        @testpanel(p, nothing, 50)
+    end
 
     p = Panel(
         title = "test",
@@ -218,26 +178,18 @@ end
         subtitle_justify = :right,
         width = 22,
     )
-    @test string(p) ==
-          "\e[22m╭──── \e[0mtest\e[22m ──────────╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                    \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────── \e[0maaaaa\e[22m ───╯\e[22m\e[0m\e[22m\e[0m\e[0m"
+    IS_WIN || @compare_to_string(p, "centered_titile_panel_7")
 end
 
 @testset "PANEL - small panel with title" begin
-    p = Panel(; width = 12, title = "testadasd")
-    @test string(p) ==
-          "\e[22m╭── \e[0mt...\e[22m ──╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
-
-    p = Panel(; width = 12, title = "testadasd", title_justify = :right)
-    @test string(p) ==
-          "\e[22m╭─ \e[0mt...\e[22m ───╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
-
-    p = Panel(; width = 12, title = "testadasd", title_justify = :center)
-    @test string(p) ==
-          "\e[22m╭── \e[0mt...\e[22m ──╮\e[22m\e[0m\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
-
-    p = Panel(; width = 5, title = "asdasdasd")
-    @test string(p) ==
-          "\e[22m╭───╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰───╯\e[22m\e[0m"
+    for (i, w) in enumerate((5, 9, 10, 11, 12, 13, 14, 15))
+        for (j, title) in enumerate(("aa", "aaaa", "aaaaaa"))
+            for (k, just) in enumerate([:left, :center, :right])
+                p = Panel(; width = w, title = title, title_justify = just)
+                IS_WIN || @compare_to_string(p, "small_panel_title_$(i)_$(j)_$(k)")
+            end
+        end
+    end
 end
 
 @testset "PANEL - compare to string" begin

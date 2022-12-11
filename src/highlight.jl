@@ -128,7 +128,8 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
 
     lines = read_file_lines(path, lineno - δ, lineno + δ)
     linenos = first.(lines)
-    code = [highlight_syntax(ln[2]; style = true) for ln in lines]
+    code =
+        [highlight_syntax((δ == 0 ? lstrip(ln[2]) : ln[2]); style = true) for ln in lines]
     code = split(join(code), "\n")
 
     # clean
@@ -155,7 +156,6 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
             " ", "grey39"
         end
 
-        # end
         line = textlen(line) > 1 ? lpad(line[dedent:end], 8) : line
         push!(cleaned_lines, symb * " {$color}$n{/$color} " * line)
     end

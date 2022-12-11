@@ -66,6 +66,15 @@ end
     end
 end
 
+@testset "\e[34mRenderables - RenderableText shape" begin
+    lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    for (i, w) in enumerate([10, 12, 15, 18, 23, 25, 60])
+        t = RenderableText(lorem; width = w)
+        @testpanel(t, nothing, w)
+        IS_WIN || @compare_to_string(t, "rend_text_shape_$(i)")
+    end
+end
+
 @testset "\e[34mRenderables - trim renderables" begin
     IS_WIN || begin
         r = trim_renderable(RenderableText("aa bb"^100), 25)
