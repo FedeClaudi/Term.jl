@@ -1,4 +1,12 @@
 using Term
+import Term.Style: apply_style
+import Term: highlight
+
+"""
+Prompts in VSCODE require a bit of a hack:
+https://discourse.julialang.org/t/vscode-errors-with-user-input-readline/75097/4?u=fedeclaudi
+"""
+
 
 # ------------------------------ abstract prompt ----------------------------- #
 
@@ -6,11 +14,13 @@ using Term
 abstract type AbstractPrompt end
 
 """ display an `AbstractPrompt`, get user's reply and validate. """
-function ask(prompt::AbstractPrompt)
-    println(prompt)
+function ask(io::IO, prompt::AbstractPrompt)
+    println(io, prompt)
     ans = readline()
     return validate_answer(ans, prompt)
 end
+
+ask(prompt::AbstractPrompt) = ask(stdout, prompt)
 
 """
     validate_answer
@@ -37,16 +47,24 @@ struct TypePrompt{T} <: AbstractPrompt
     prompt::String
 end
 
-function Base.println(io, prompt::TypePrompt)
+function Base.println(io::IO, prompt::TypePrompt)
     println(io, prompt.prompt)
 end
+
+struct AnswerValidationError <: Exception
+    answer_type
+    expected_type
+end
+
+Term.Errors.error_message(e::AnswerValidationError) = highlight("TypePrompt expected an answer of type: `$(e.expected_type)`, got `$(e.answer_type)` instead") |> apply_style
+
 
 function validate_answer(answer, prompt::TypePrompt)
     answer isa prompt.answer_type && return answer
     try
-        return convert(prompt.answer_type, answer)
-    catch
-        error("Prompt expected answer of type: $(prompt.answer_type), got $(typeof(answer))")
+        return parse(prompt.answer_type, answer)
+    catch err
+        throw(AnswerValidationError(typeof(answer), prompt.answer_type))
     end
 end
 
