@@ -1,7 +1,8 @@
 using Term.Links
 import Term.Layout: pad
+import Term: RenderableText, Panel
 
-clean_link(l) = sprint(print, l) |> remove_ansi |> remove_markup
+clean_link(l) = sprint(print, l)
 
 file = "/Users/federicoclaudi/Documents/Github/Term.jl/src/_tables.jl"
 lineno = 234
@@ -35,7 +36,7 @@ end
         for (j, met) in enumerate([:left, :center, :right])
             ll = pad(link; width = 80, method = :left)
             @test ll.measure.w == 80
-            IS_WIN || @compare_to_string(ll, "link_pad_$(ln)_$j")
+            IS_WIN || @compare_to_string(clean_link(ll), "link_pad_$(ln)_$j")
         end
     end
 end
@@ -50,7 +51,7 @@ IS_WIN || @testset "LINK and panel" begin
             p4 = Panel(link, p3; fit = fit)
 
             for (j, p) in enumerate([p0, p1, p2, p3, p4])
-                @compare_to_string(p, "link_panel_$(ln)_$(i)_$(j)")
+                @compare_to_string(clean_link(p), "link_panel_$(ln)_$(i)_$(j)")
             end
         end
     end
