@@ -111,6 +111,7 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
     )
 
     func = highlight(func) |> apply_style
+    func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
 
     # reshape but taking care of potential curly bracktes
     func = reshape_text(func, ctx.func_name_w; ignore_markup = true)
@@ -189,15 +190,9 @@ function add_stack_frame!(
 
     # make file line & load source code around error and render it
     panel_content = if length(string(frame.file)) > 0
-        file = Base.fixup_stdlib_path(string(frame.file))
-        Base.stacktrace_expand_basepaths() &&
-            (file = something(Base.find_source_file(file), file))
-        Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
-
         # get a link renderable pointing to error
-        file_line = Link(file, frame.line; style = "dim")
-
-        _out = func_line / file_line
+        source_file = Link(string(frame.file), frame.line; style = "underline dim")
+        _out = func_line / source_file
 
         error_source = render_error_code_line(ctx, frame; δ = δ)
         isnothing(error_source) || (_out /= error_source)
@@ -207,8 +202,6 @@ function add_stack_frame!(
     end
 
     # make panel and add it to content
-    @info "making panel" panel_content
-    println(panel_content)
     panel = if as_panel
         Panel(
             panel_content;
@@ -219,7 +212,7 @@ function add_stack_frame!(
             kwargs...,
         )
     else
-        pad("   " * func_line; width = ctx.frame_panel_w, method = :right)
+        pad("   " * panel_content; width = ctx.frame_panel_w, method = :right)
     end
 
     numren = vertical_pad("{dim}($num){/dim} ", height(panel), :center)
@@ -272,7 +265,7 @@ function add_number_frames_skipped!(
         modules = join(unique(string.(filter(!isnothing, skipped_frames_modules))), ", ")
         modules = filter(x -> x != "nothing", modules)
         in_mod = length(modules) == 0 ? "" : "in {$accent}$modules{/$accent}"
-        word = plural("frame", length(modules))
+        word = n_skipped > 1 ? "frames" : "frame"
 
         # render
         push!(

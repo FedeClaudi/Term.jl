@@ -15,7 +15,8 @@ import Term:
     TERM_THEME,
     plural,
     Theme,
-    do_by_line
+    do_by_line,
+    RECURSIVE_OPEN_TAG_REGEX
 
 import ..Links: Link
 import ..Style: apply_style
