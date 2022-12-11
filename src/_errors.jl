@@ -76,8 +76,8 @@ should_skip(frame::StackFrame, hide::Bool, args...) =
 should_skip(pointer::Ptr, args...) = should_skip(StackTraces.lookup(pointer)[1], args...)
 should_skip(pointer::Ptr, hide::Bool, args...) =
     hide ? should_skip(pointer, args...) : false
-should_skip(iip::Base.InterpreterIP) = true
-should_skip(iip::Base.InterpreterIP, hide::Bool) = true
+should_skip(iip::Base.InterpreterIP, args...) = true
+should_skip(iip::Base.InterpreterIP, hide::Bool, args...) = true
 
 """
     parse_kw_func_name(frame::StackFrame)

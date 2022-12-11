@@ -168,12 +168,14 @@ function get_title_row(
     justify::Symbol = :left,
 )::Segment
 
-    # if no title just return a r ow
-    if isnothing(title)
+    # if no title or no space, just return a row
+    if isnothing(title) || width < 12
         return Segment(get_row(box, width, row), style)
     else
         title = apply_style(title)
-        title = textlen(title) < width - 12 ? title : str_trunc(title, width - 15)
+        title =
+            (textlen(title) < width - 12 || textlen(title) <= 4) ? title :
+            str_trunc(title, max(1, width - 15))
     end
 
     # compose title line 

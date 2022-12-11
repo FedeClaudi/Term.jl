@@ -154,7 +154,11 @@ function install_term_stacktrace(;
                     ) |> print
 
             catch cought_err  # catch when something goes wrong during error handling in Term
-                @error "Term.jl: error while rendering error message: " cought_err
+                @error "Term.jl: error while rendering error message: " # string(cought_err)
+                println("Error during term's stacktrace generation:")
+                Base.showerror(io, cought_err)
+
+                println("\n\n\nOriginal error")
                 Base.show_backtrace(io, bt)
                 print(io, '\n'^3)
                 Base.showerror(io, er)

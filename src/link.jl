@@ -13,11 +13,29 @@ import Term
 
 export Link
 
+"""
+    struct LinkString <: AbstractString
+        link::String
+        width::Int
+    end
+
+`LinkString` behaves like a sting, but it's sneaky.
+It keeps track of a link which has different length as a string
+and when printed. So we override a lot of the normal string's behavior
+to get it to work with renderables.
+"""
 struct LinkString <: AbstractString
     link::String
     width::Int
 end
 
+"""
+    LinkString(s::String)
+
+Construct a LinkString from a normal string, taking
+into account that there might be a link in there, 
+so get the right width.
+"""
 function LinkString(s::String)
     link_width, additional_text_w = 0, 0
     for line in split(s, "\n")
@@ -32,14 +50,6 @@ end
 
 LinkString(l::LinkString) = l
 
-Measures.Measure(l::LinkString) = Measure(1, l.width)
-Measures.width(l::LinkString) = l.width
-
-Base.textwidth(l::LinkString) = l.width
-Base.string(l::LinkString) = l
-Base.convert(::String, l) = l
-Base.print(io::IO, s::LinkString) = print(io, s.link)
-Base.show(io::IO, ::MIME"text/plain", l::LinkString) = print(io, l.link)
 Base.:*(s::AbstractString, l::LinkString) = LinkString(s * l.link, textlen(s) + l.width)
 Base.:*(l::LinkString, s::AbstractString) = LinkString(l.link * s, textlen(s) + l.width)
 Base.:*(c::Char, l::LinkString) = l * string(c)
@@ -48,10 +58,23 @@ Base.:/(s::AbstractString, l::LinkString) = LinkString(s / l.link, max(textlen(s
 Base.:/(l::LinkString, s::AbstractString) = LinkString(l.link / s, max(textlen(s), l.width))
 
 Segments.Segment(l::LinkString) = Segment(l, Measure(1, l.width))
-
 Term.textlen(l::LinkString) = l.width
 Term.split_lines(l::LinkString) = Term.split_lines(l.link)
 
+"""
+    struct Link <: AbstractRenderable
+        segments::Vector{Segment}
+        measure::Measure
+        link::LinkString
+        style::String
+        display_text::String
+        link_dest::String
+    end
+
+A link renderable. With a link to an url or file path
+and a text that gets displayed (and is clickable on most terminals).
+Key to it working as a properly renderable is its `LinkString`
+"""
 struct Link <: AbstractRenderable
     segments::Vector{Segment}
     measure::Measure
@@ -61,6 +84,21 @@ struct Link <: AbstractRenderable
     link_dest::String
 end
 
+Base.textwidth(l::LinkString) = l.width
+Base.string(l::LinkString) = l
+Base.convert(::String, l) = l
+Base.print(io::IO, s::LinkString) = print(io, s.link)
+Base.show(io::IO, ::MIME"text/plain", l::LinkString) = print(io, l.link)
+
+"""
+    Link(
+        file_path::AbstractString,
+        line_number::Union{Nothing,Integer} = nothing;
+        style = TERM_THEME[].link,
+    )
+
+Build a link given a file path and line number.
+"""
 function Link(
     file_path::AbstractString,
     line_number::Union{Nothing,Integer} = nothing;
@@ -86,9 +124,21 @@ function Link(
     )
 end
 
-Base.string(l::Link) = l.link
-Base.convert(::String, l::Link) = l.link
+"""
+---
+    Renderables.RenderableText(
+        link::Link,
+        args...;
+        style::Union{Nothing,String} = link.style,
+        width::Int = link.measure.w,
+        background::Union{Nothing,String} = nothing,
+        justify::Symbol = :left,
+    )
 
+Custom constructor to make a `RenderableText` out of a `Link`,
+specialized to take into account `Link`'s different sizes 
+between displayed and actual text.
+"""
 function Renderables.RenderableText(
     link::Link,
     args...;
