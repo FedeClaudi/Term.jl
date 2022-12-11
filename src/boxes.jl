@@ -168,12 +168,14 @@ function get_title_row(
     justify::Symbol = :left,
 )::Segment
 
-    # if no title just return a r ow
-    if isnothing(title)
+    # if no title or no space, just return a row
+    if isnothing(title) || width < 12
         return Segment(get_row(box, width, row), style)
     else
         title = apply_style(title)
-        title = textlen(title) < width - 12 ? title : str_trunc(title, width - 12)
+        title =
+            (textlen(title) < width - 12 || textlen(title) <= 4) ? title :
+            str_trunc(title, max(1, width - 15))
     end
 
     # compose title line 
@@ -181,10 +183,10 @@ function get_title_row(
 
     open, close, space = "{" * style * "}", "{/" * style * "}", " "
 
-    topen, tclose = "", open
+    topen, tclose = "\e[0m", open
     if !isnothing(title_style)
         topen, tclose = if style == "hidden"
-            "\e[28m" * topen, tclose * "\e[8m"
+            "\e[28m" * "{" * title_style * "}", "{/" * title_style * "}" * open * "\e[8m"
         else
             "{" * title_style * "}", "{/" * title_style * "}" * open
         end
@@ -206,7 +208,7 @@ function get_title_row(
                 line = open * boxline.left * boxline.mid^2 * title
             end
 
-            line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
+            line *= boxline.mid^(max(1, width - textlen(line) - 1)) * boxline.right * close
         elseif justify ≡ :right
             pre_len = width - textlen(title) - 4
             line = open * get_lrow(box, pre_len, row)

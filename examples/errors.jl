@@ -16,7 +16,7 @@ error information.
 import Term: install_term_stacktrace, hLine
 
 install_term_stacktrace()
-
+install_term_logger()
 print(hLine("Fancy Errors"; style = "bold blue"))
 
 """
@@ -29,10 +29,10 @@ corresponding error message
 """
 
 # ------------  MethodError
-1 - "a"
+# 1 - "a"
 
 # ------------  DomainError
-# sqrt(-1)
+sqrt(-1)
 
 # ------------  UndefVarError
 # println(x)
@@ -69,13 +69,13 @@ corresponding error message
 
 # ------------  Errors with type creation
 
-# struct MyType
-#     x::Int
-#     y
-#     z::String
-# end
+struct MyType
+    x::Int
+    y
+    z::String
+end
 
-# MyType(x::Int, y::Int) = MyType(x, y, "" + string(1 + "o"))
-# MyType(x::Int) = MyType(x, 0)
+MyType(x::Int, y::Int) = MyType(x, y, 1)
+MyType(x::Int) = MyType(x, 0)
 
-# MyType(1)
+MyType(1)

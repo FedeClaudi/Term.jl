@@ -4,6 +4,7 @@ import Base: show_method_candidates, ExceptionStack, InterpreterIP
 
 import Term:
     highlight,
+    highlight_syntax,
     str_trunc,
     reshape_text,
     load_code_and_highlight,
@@ -13,235 +14,63 @@ import Term:
     remove_markup,
     TERM_THEME,
     plural,
-    str_trunc
+    Theme,
+    do_by_line,
+    RECURSIVE_OPEN_TAG_REGEX,
+    STACKTRACE_HIDDEN_MODULES,
+    STACKTRACE_HIDE_FRAME
+
+import ..Links: Link
 import ..Style: apply_style
 import ..Layout:
-    hLine, rvstack, cvstack, rvstack, vstack, vLine, Spacer, hstack, lvstack, pad
+    hLine,
+    rvstack,
+    cvstack,
+    rvstack,
+    vstack,
+    vLine,
+    Spacer,
+    hstack,
+    lvstack,
+    pad,
+    vertical_pad
 import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
+import ..Measures: height
 
 export install_term_stacktrace
 
+"""
+Stores information useful for creating the layout
+of a stack trace visualization.
+"""
+struct StacktraceContext
+    out_w::Int              # max width of the stacktrace
+    frame_panel_w::Int      # width of inner elements like frame panels
+    module_line_w::Int      # width of hline to print module name
+    func_name_w::Int        # width of frame's function name and file
+    code_w::Int             # width of code panels
+    theme::Theme
+end
+
+function StacktraceContext()
+    w = default_stacktrace_width()
+    frame_panel_w = w - 4 - 12 - 3 # panel walls and padding
+    module_line_w = w - 4 - 4
+    func_name_w = frame_panel_w - 4 - 8 # including (n) before fname
+    code_w = func_name_w - 8
+    return StacktraceContext(
+        w,
+        frame_panel_w,
+        module_line_w,
+        func_name_w,
+        code_w,
+        TERM_THEME[],
+    )
+end
+
+include("_error_messages.jl")
 include("_errors.jl")
-
-# ----------------------- error type specific messages ----------------------- #
-
-# ! ARGUMENT ERROR
-error_message(er::ArgumentError) = er.msg
-
-# ! ASSERTION ERROR
-error_message(er::AssertionError) = return er.msg
-
-# ! BOUNDS ERROR
-function error_message(er::BoundsError)
-    # @info "bounds error" er fieldnames(typeof(er))
-    obj = escape_brackets(string(typeof(er.a)))
-    println(obj)
-    if er.a isa AbstractArray
-        obj = "a `$obj` width shape $(string(size(er.a)))"
-    end
-    main_msg = "Attempted to access $(obj) at index $(er.i)"
-
-    additional_msg = ""
-
-    if isdefined(er, :a)
-        if er.a isa AbstractString
-            nunits = ncodeunits(er.a)
-            additional_msg = "String has $nunits codeunits, $(length(er.a)) characters."
-        end
-    else
-        additional_msg = "{red}Variable is not defined!.{/red}"
-    end
-
-    return highlight(main_msg) / additional_msg
-end
-
-# ! Domain ERROR
-function error_message(er::DomainError)
-    # @info "err exceprion" er fieldnames(DomainError) er.val
-    # msg = split(er.msg, " around ")[1]
-    return er.msg / "The invalid value is: $(er.val)."
-end
-
-# ! DimensionMismatch
-error_message(er::DimensionMismatch) = er.msg
-
-# ! DivideError
-error_message(er::DivideError) = "Attempted integer division by {bold}0{/bold}"
-
-# ! EXCEPTION ERROR
-function error_message(er::ErrorException)
-    # @info "err exceprion" er fieldnames(ErrorException) er.msg
-    msg = split(er.msg, " around ")[1]
-    return msg
-end
-
-# !  KeyError
-function error_message(er::KeyError)
-    # @info "err KeyError" er fieldnames(KeyError)
-    # key = truncate(string(er.key), 40)
-    key = string(er.key)
-    msg = "Key `$(key)` not found!"
-    return msg
-end
-
-# ! InexactError
-function error_message(er::InexactError)
-    # @info "load error message"  fieldnames(InexactError)
-    msg = "Cannot convert $(er.val) to type ::$(er.T)"
-    subm = "Conversion error in function: $(er.func)"
-    return msg / subm
-end
-
-# ! LoadError
-function error_message(er::LoadError)
-    theme = TERM_THEME[]
-    # @info "load error message"  fieldnames(LoadError)
-    msg = "At {$(theme.err_filepath) underline}$(er.file){/$(theme.err_filepath) underline} line {bold}$(er.line){/bold}"
-    subm = "The cause is an error of type: {$(theme.err_errmsg)}$(string(typeof(er.error)))"
-    return msg / subm
-end
-
-# ! METHOD ERROR
-method_error_regex = r"(?<group>\!Matched\:\:(\w|\.)+)"
-function method_error_candidate(fun, candidate)
-    theme = TERM_THEME[]
-
-    # if contains(candidate, "##kw")
-    #     name = split(candidate, "\")(")[1]
-    #     name = replace(name, "(::Core.var\"#"=>"", "##kw"=>"")
-
-    #     @info "candidate" fun candidate name
-
-    # end
-
-    # highlight non-matched types
-    candidate = replace(
-        candidate,
-        method_error_regex => SubstitutionString(
-            "{$(theme.err_errmsg)}" * s"\g<0>" * "{/$(theme.err_errmsg)}",
-        ),
-    )
-    # remove
-    candidate = replace(candidate, "!Matched" => "")
-
-    # highlight fun
-    candidate = replace(candidate, string(fun) => "{$(theme.func)}$(fun){/$(theme.func)}")
-    return candidate |> rstrip
-end
-
-function error_message(er::MethodError; kwargs...)
-    f = er.f
-    ft = typeof(f)
-    name = ft.name.mt.name
-    # kwargs = ()
-    # if endswith(string(ft.name.name), "##kw")
-    #     f = er.args[2]
-    #     ft = typeof(f)
-    #     name = ft.name.mt.name
-    #     # arg_types_param = arg_types_param[3:end]
-    #     kwargs = pairs(er.args[1])
-    #     # er = MethodError(f, er.args[3:end::Int])
-    # end
-
-    # get main error message
-    @info "args" er.args er.args[1]
-    args_types = map(
-        a -> a isa NamedTupleds ? "Tuple" : (a |> typeof |> string), er.args
-    )
-    _args =
-        join(
-            map(
-                a ->
-                    "{dim bold}($(a[1])){/dim bold}   $(highlight("::"*a[2]))",
-                enumerate(args_types),
-            ), "\n"
-        ) |> apply_style
-    main_line =
-        "No method matching {bold $(TERM_THEME[].emphasis)}`$name`{/bold $(TERM_THEME[].emphasis)} with arguments types:" /
-        _args
-
-    # get recomended candidates
-    _candidates = split(sprint(show_method_candidates, er), "\n")[3:(end - 1)]
-
-    if length(_candidates) > 0
-        _candidates = map(c -> split(c, " at ")[1], _candidates)
-        candidates = map(c -> method_error_candidate(name, c), _candidates)
-        main_line /=
-            lvstack("", "Alternative candidates:", candidates...) |> string |> apply_style
-    else
-        main_line = main_line / " " / "{dim}No alternative candidates found"
-    end
-
-    return string(main_line)
-end
-
-# ! StackOverflowError
-error_message(er::StackOverflowError) = "Stack overflow error: too many function calls."
-
-# ! TYPE ERROR
-function error_message(er::TypeError)
-    # @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
-    theme = TERM_THEME[]
-    msg = "In `$(er.func)` > `$(er.context)` got"
-    msg *= " {$(theme.emphasis_light)) bold}$(er.got){/$(theme.emphasis_light)) bold}(::$(typeof(er.got))) but expected argument of type ::$(er.expected)"
-    return msg
-end
-
-# ! UndefKeywordError
-function error_message(er::UndefKeywordError)
-    # @info "UndefKeywordError" er er.var typeof(er.var) fieldnames(typeof(er.var))
-    return "Undefined function keyword argument: {bold}`$(er.var)`{/bold}."
-end
-
-# ! UNDEFVAR ERROR
-function error_message(er::UndefVarError)
-    # @info "undef var error" er er.var typeof(er.var)
-    return "Undefined variable {bold}`$(er.var)`{/bold}."
-end
-
-# ! STRING INDEX ERROR
-function error_message(er::StringIndexError)
-    # @info er typeof(er) fieldnames(typeof(er)) 
-    m1 = "attempted to access a String at index $(er.index)\n"
-    return m1
-end
-
-# ! SYSTEM ERROR
-function error_message(er::SystemError)
-    if @static(Sys.iswindows() ? er.extrainfo isa WindowsErrorInfo : false)
-        errstring = Libc.FormatMessage(er.extrainfo.errnum)
-        extrainfo = er.extrainfo.extrainfo
-    else
-        errstring = Libc.strerror(er.errnum)
-        extrainfo = er.extrainfo
-    end
-    if extrainfo === nothing
-        return "$(er.prefix)\n" * errstring
-    else
-        return "SystemError (with $extrainfo): $(er.prefix)\n" * errstring
-    end
-end
-
-# ! catch all other errors
-function error_message(er)
-    # @debug "Error message type doesnt have a specialized method!" er typeof(er) fieldnames(
-    #     typeof(er)
-    # )
-    theme = TERM_THEME[]
-    if hasfield(typeof(er), :error)
-        # @info "nested error" typeof(er.error)
-        m1, _ = error_message(er.error)
-        msg = "\n{bold $(theme.err_errmsg)}LoadError:{/bold $(theme.err_errmsg)}\n" * m1
-    else
-        msg = if hasfield(typeof(er), :msg)
-            er.msg
-        else
-            "no message for error of type $(typeof(er)), sorry."
-        end
-    end
-    return msg
-end
 
 # ---------------------------------------------------------------------------- #
 #                              INSTALL STACKTRACE                              #
@@ -268,11 +97,13 @@ function install_term_stacktrace(;
     hide_frames = true,
 )
     @eval begin
-        function Base.showerror(io::IO, er, bt; backtrace = true)
-            theme = TERM_THEME[]
-            (length(bt) == 0 && !isa(er, StackOverflowError)) && return nothing
+        function Base.showerror(io::IO, er, bt::Vector; backtrace = true)
+            print("\n")
+
+            # shorten very long backtraces
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
 
+            # if the terminal is too narrow, avoid using Term's functionality
             if default_stacktrace_width() < 70
                 println(io)
                 @warn "Term.jl: can't render error message, console too narrow. Using default stacktrace"
@@ -283,18 +114,22 @@ function install_term_stacktrace(;
             end
 
             try
-                println("\n")
+                # create a StacktraceContext
+                ctx = StacktraceContext()
+
+                # print an hLine with the error name
                 ename = string(typeof(er))
-                print(
+                length(bt) > 0 && print(
                     hLine(
-                        "{default bold $(theme.err_errmsg)}$ename{/default bold $(theme.err_errmsg)}";
-                        style = "dim $(theme.err_errmsg)",
+                        "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
+                        style = "dim $(ctx.theme.err_errmsg)",
                     ),
                 )
 
-                # print error stacktrace
+                # print error backtrace or panel
                 if length(bt) > 0
                     rendered_bt = render_backtrace(
+                        ctx,
                         bt;
                         reverse_backtrace = $(reverse_backtrace),
                         max_n_frames = $(max_n_frames),
@@ -303,23 +138,27 @@ function install_term_stacktrace(;
                     print(rendered_bt)
                 end
 
-                # print error message and description
-                Panel(
-                    RenderableText(
-                        error_message(er),
-                        # width = default_stacktrace_width() - 4,
-                    );
-                    width = default_stacktrace_width(),
-                    title = "{bold $(theme.err_errmsg) default underline}$(typeof(er)){/bold $(theme.err_errmsg) default underline}",
-                    padding = (2, 2, 1, 1),
-                    style = "dim $(theme.err_errmsg)",
-                    title_justify = :center,
-                    fit = false,
-                ) |> print
+                # print message panel if VSCode is not handling that through a second call to this fn
+                isa(io.io, Base.TTY) &&
+                    Panel(
+                        RenderableText(
+                            highlight(error_message(er));
+                            width = ctx.module_line_w,
+                        );
+                        width = ctx.out_w,
+                        title = "{bold $(ctx.theme.err_errmsg) default underline}$(typeof(er)){/bold $(ctx.theme.err_errmsg) default underline}",
+                        padding = (2, 2, 1, 1),
+                        style = "dim $(ctx.theme.err_errmsg)",
+                        title_justify = :center,
+                        fit = false,
+                    ) |> print
 
             catch cought_err  # catch when something goes wrong during error handling in Term
-                @error "Term.jl: error while rendering error message: " exception =
-                    cought_err
+                @error "Term.jl: error while rendering error message: " # string(cought_err)
+                println("Error during term's stacktrace generation:")
+                Base.showerror(io, cought_err)
+
+                println("\n\n\nOriginal error")
                 Base.show_backtrace(io, bt)
                 print(io, '\n'^3)
                 Base.showerror(io, er)

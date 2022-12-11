@@ -1,6 +1,6 @@
 module Measures
 
-import Term: rint, remove_ansi, remove_markup, default_width, DEFAULT_ASPECT_RATIO
+import Term: rint, remove_ansi, remove_markup, default_width, DEFAULT_ASPECT_RATIO, textlen
 
 export Measure
 
@@ -29,9 +29,9 @@ default_size() = (rint(default_width() / 2DEFAULT_ASPECT_RATIO[]), default_width
 Constructs a measure object from a string
 """
 function Measure(str::AbstractString)
-    str = (remove_ansi ∘ remove_markup)(str)
+    str = remove_markup(remove_ansi(str); remove_orphan_tags = false)
     lines = split(str, '\n')
-    return Measure(length(lines), maximum(textwidth.(lines)))
+    return Measure(length(lines), maximum(textlen.(lines)))
 end
 
 Measure(::Nothing) = Measure(0, 0)

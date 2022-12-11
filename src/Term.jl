@@ -32,6 +32,9 @@ module Term
 
 using Unicode
 
+const STACKTRACE_HIDDEN_MODULES = Ref(String[])
+const STACKTRACE_HIDE_FRAME = Ref(true)
+
 const DEBUG_ON = Ref(false)
 
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
@@ -69,6 +72,7 @@ include("boxes.jl")
 include("console.jl")
 include("renderables.jl")
 include("layout.jl")
+include("link.jl")
 include("panels.jl")
 include("errors.jl")
 include("tprint.jl")
@@ -115,6 +119,8 @@ using .Consoles: console_height, console_width
 using .Renderables: AbstractRenderable, Renderable, RenderableText
 
 using .Layout
+
+using .Links
 
 using .Panels: Panel, TextBox, @nested_panels
 

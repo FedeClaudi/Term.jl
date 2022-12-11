@@ -45,3 +45,19 @@ will be different from the one you'd expect
     #     i + "a"
     # end
 end
+
+@testset "MethodError" begin
+    # kwargs call
+    struct Test3
+        x::Float64
+        y::Int
+
+        # Test3(x, y, z) = new(x, y)
+        Test3(x, y) = new(x, y)
+    end
+    @test_throws MethodError Test3(1; a = :test)
+
+    # convert
+    f(x)::Vector = 2x
+    @test_throws MethodError f(1)
+end
