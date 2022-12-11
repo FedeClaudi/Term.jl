@@ -1,32 +1,47 @@
 using Term
 
+# ------------------------------ abstract prompt ----------------------------- #
+
+""" Prompt types """
 abstract type AbstractPrompt end
 
-function validate_default(default::String, options::Vector{String})
-    default ∉ options && error("Default is not a valid option: $default, $(options).")
-end
+""" display an `AbstractPrompt`, get user's reply and validate. """
+function ask end
 
-function ask(p::AbstractPrompt)
-    _options = join(
-        map(o -> o == p.default ? "{bold underline}$o{/bold underline}" : o, p.options),
-        ", ",
-    )
-
-    tprint("$(p.text)? $(_options)\n\n")
-    reply = readline()
-end
-
-struct YNPrompt <: AbstractPrompt
-    text::String
-    options::Vector{String}
-    default::String
-
-    function YNPrompt(text::String, options::Vector{String}, default::String)
-        validate_default(default, options)
-        @assert length(options) >= 2 "Need at least two options for a prompt"
-        return new(text, options, default)
+# -------------------------------- type prompt ------------------------------- #
+"""
+    struct TypePrompt{T}
+        answer_type::Union{Union, DataType} = T
+        prompt::String
     end
+
+Asks for input given `prompt` and checks/converts the answer to type `T`
+"""
+struct TypePrompt{T}
+    answer_type::Union{Union, DataType} = T
+    prompt::String
 end
 
-confirm = YNPrompt("Confirm", ["Yes", "No"], "Yes")
-ask(confirm)
+# TODO ask and validate answer methods and print
+
+# ---------------------------------------------------------------------------- #
+#                                OPTIONS PROMPTS                               #
+# ---------------------------------------------------------------------------- #
+""" Prompt types where user can only choose among options """
+abstract type OptionsPrompt <: AbstractPrompt end
+
+""" Options types with a default answer """
+abstract type AbstractDefaultPrompt <: OptionsPrompt end
+
+
+struct DefaultPropt
+    answers::Vector{String}
+    default::Int # index of default answer
+    prompt::String
+end
+
+# TODO ask, validate and print methods
+
+confirm() = ask(DefaultPropt(["Yes", "No"], 1, "Confirm?"))
+
+
