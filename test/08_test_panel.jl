@@ -178,7 +178,7 @@ end
         subtitle_justify = :right,
         width = 22,
     )
-    @compare_to_string(p, "centered_titile_panel_7")
+    IS_WIN || @compare_to_string(p, "centered_titile_panel_7")
 end
 
 @testset "PANEL - small panel with title" begin
@@ -186,7 +186,7 @@ end
         for (j, title) in enumerate(("aa", "aaaa", "aaaaaa"))
             for (k, just) in enumerate([:left, :center, :right])
                 p = Panel(; width = w, title = title, title_justify = just)
-                @compare_to_string(p, "small_panel_title_$(i)_$(j)_$(k)")
+                IS_WIN || @compare_to_string(p, "small_panel_title_$(i)_$(j)_$(k)")
             end
         end
     end
