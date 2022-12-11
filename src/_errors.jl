@@ -61,7 +61,7 @@ function should_skip(frame::StackFrame, modul)
     f = get_frame_file(frame)
 
     bad = mod ∈ ["Base", "Main", nothing, "VSCodeServer", "REPL"]
-    bad = bad || mod ∈ STACKTRACE_HIDE_MODULES[]
+    bad = bad || mod ∈ STACKTRACE_HIDDEN_MODULES[]
 
     return bad || (
         contains(f, r"[/\\].julia[/\\]") ||

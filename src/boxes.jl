@@ -173,7 +173,7 @@ function get_title_row(
         return Segment(get_row(box, width, row), style)
     else
         title = apply_style(title)
-        title = textlen(title) < width - 12 ? title : str_trunc(title, width - 12)
+        title = textlen(title) < width - 12 ? title : str_trunc(title, width - 15)
     end
 
     # compose title line 
@@ -206,7 +206,7 @@ function get_title_row(
                 line = open * boxline.left * boxline.mid^2 * title
             end
 
-            line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
+            line *= boxline.mid^(max(1, width - textlen(line) - 1)) * boxline.right * close
         elseif justify ≡ :right
             pre_len = width - textlen(title) - 4
             line = open * get_lrow(box, pre_len, row)

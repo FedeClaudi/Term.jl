@@ -17,7 +17,7 @@ import Term:
     Theme,
     do_by_line,
     RECURSIVE_OPEN_TAG_REGEX,
-    STACKTRACE_HIDE_MODULES,
+    STACKTRACE_HIDDEN_MODULES,
     STACKTRACE_HIDE_FRAME
 
 import ..Links: Link

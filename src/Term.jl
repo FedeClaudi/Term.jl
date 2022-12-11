@@ -32,6 +32,9 @@ module Term
 
 using Unicode
 
+const STACKTRACE_HIDDEN_MODULES = Ref(String[])
+const STACKTRACE_HIDE_FRAME = Ref(true)
+
 const DEBUG_ON = Ref(false)
 
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
@@ -56,9 +59,6 @@ include("theme.jl")
 include("highlight.jl")
 
 const TERM_THEME = Ref(Theme())
-
-const STACKTRACE_HIDDEN_MODULES = Ref(String[])
-const STACKTRACE_HIDE_FRAME = Ref(true)
 
 function update! end
 
