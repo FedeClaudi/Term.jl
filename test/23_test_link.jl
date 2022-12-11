@@ -40,7 +40,7 @@ end
     end
 end
 
-@testset "LINK and panel" begin
+IS_WIN || @testset "LINK and panel" begin
     for (ln, link) in enumerate((l1, l2, l3))
         for (i, fit) in enumerate([true, false])
             p0 = Panel(link; fit = fit)
