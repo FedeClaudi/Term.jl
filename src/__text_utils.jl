@@ -23,7 +23,7 @@ This regex uses lookahead and lookbehind to exclude {{
 at the beginning of a tag, with this:
     (?<!\\{)\\[(?!\\{)
 """
-RECURSIVE_OPEN_TAG_REGEX = r"\{(?:[^{}]*){2,}\}" 
+RECURSIVE_OPEN_TAG_REGEX = r"\{(?:[^{}]*){2,}\}"
 OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#\n]*\}"
 CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#\n]+[^/\{]\}"
 GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
@@ -367,3 +367,29 @@ function str_trunc(
     out[end] != ' ' && (out *= trailing_dots)
     return out
 end
+
+# ---------------------------------------------------------------------------- #
+#                                     LINK                                     #
+# ---------------------------------------------------------------------------- #
+
+"""
+    excise_link_display_text(link::String)
+
+Given a link string of the form:
+    "\x1b]8;;LINK_DESTINATION\x1b\\LINK_DISPLAY_TEXT\x1b]8;;\x1b\\"
+this function returns "LINK_DISPLAY_TEXT" alone.
+"""
+function excise_link_display_text(link::AbstractString)
+    parts = split(link, "\x1b\\")
+    return if length(parts) > 1
+        replace(parts[2], "\e]8;;" => "")
+    else
+        ""
+    end
+end
+
+"""
+    string_type(x)
+Return the type of `x` if it's an AbstractString, else String
+"""
+string_type(x) = x isa AbstractString ? typeof(x) : String

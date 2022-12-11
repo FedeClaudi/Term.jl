@@ -103,20 +103,18 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         (func = parse_kw_func_name(frame))
 
     # format function name
-    func =
-        replace(
-            func,
-            r"(?<group>^[^(]+)" => SubstitutionString(
-                "{$(ctx.theme.func)}" * s"\g<0>" * "{/$(ctx.theme.func)}",
-            ),
-        ) 
-        
-    func = highlight(func) |> apply_style
+    func = replace(
+        func,
+        r"(?<group>^[^(]+)" => SubstitutionString(
+            "{$(ctx.theme.func)}" * s"\g<0>" * "{/$(ctx.theme.func)}",
+        ),
+    )
 
+    func = highlight(func) |> apply_style
 
     # reshape but taking care of potential curly bracktes
     func = reshape_text(func, ctx.func_name_w; ignore_markup = true)
-    return RenderableText(func) 
+    return RenderableText(func)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -197,10 +195,10 @@ function add_stack_frame!(
         Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
 
         # get a link renderable pointing to error
-        file_line = Link(file, frame.line; style="dim")
+        file_line = Link(file, frame.line; style = "dim")
 
         _out = func_line / file_line
-        
+
         error_source = render_error_code_line(ctx, frame; δ = δ)
         isnothing(error_source) || (_out /= error_source)
         _out

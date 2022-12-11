@@ -189,12 +189,8 @@ end
 
 Convert any input content to a renderable
 """
-content_as_renderable(content, width, Δw, justify, background) = RenderableText(
-    string(content),
-    width = width - Δw,
-    background = background,
-    justify = justify,
-)
+content_as_renderable(content, width, Δw, justify, background) =
+    RenderableText(content, width = width - Δw, background = background, justify = justify)
 
 """
 ---
@@ -344,26 +340,18 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
 Create a Panel's content line.
 """
 function makecontent_line(
-    cline,
-    panel_measure,
-    justify,
-    background,
-    padding,
-    left,
-    right,
-    Δw,
+    cline::Segment,
+    panel_measure::Measure,
+    justify::Symbol,
+    background::Union{Nothing,String},
+    padding::Padding,
+    left::String,
+    right::String,
+    Δw::Int,
 )::Segment
-    line = apply_style(cline) |> rstrip
-    line = if panel_measure.w - textlen(line) ≥ 2
-        pad(cline, panel_measure.w - Δw, justify; bg = background)
-    else
-        line * " "
-    end
-
+    line = pad(cline, panel_measure.w - Δw, justify, ; bg = background).text
     line = pad(line, padding.left, padding.right; bg = background)
-
-    # make line
-    return Segment(left * line * right)
+    return Segment(typeof(cline.text)(left * line * right))
 end
 
 """
@@ -408,7 +396,7 @@ function render(
     kwargs...,
 )::Panel
     background = get_bg_color(background)
-    @info "calling render" content content_measure background
+    # @info "calling render" content content_measure background
 
     # create top/bottom rows with titles
     box = BOXES[box]  # get box object from symbol
@@ -460,7 +448,7 @@ function render(
     content_sgs::Vector{Segment} = if content.measure.w > 0
         map(
             s -> makecontent_line(
-                s.text,
+                s,
                 panel_measure,
                 justify,
                 background,

@@ -64,8 +64,6 @@ include("style.jl")
 include("segments.jl")
 include("macros.jl")
 
-
-
 # renderables, rely heavily on other modules
 include("boxes.jl")
 include("console.jl")
