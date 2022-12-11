@@ -1,11 +1,24 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 import Term: read_file_lines
+using Pkg
 
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
 
+function get_frame_file(frame::StackFrame)
+    file = string(frame.file)
+    file = Base.fixup_stdlib_path(file)
+    Base.stacktrace_expand_basepaths() && (file = something(find_source_file(file), file))
+    Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
+
+    return if isnothing(file)
+        ""
+    else
+        basename(file)
+    end
+end
 """
     function frame_module end 
 
@@ -23,6 +36,7 @@ function frame_module(frame::StackFrame)::Union{Nothing,String}
     end
     m = !isnothing(m) ? string(m) : frame_module(string(frame.file))
 
+    isnothing(m) && return frame_module(get_frame_file(frame))
     return m
 end
 
@@ -42,16 +56,26 @@ frame_module(iip::Base.InterpreterIP) = string(iip.mod)
 
 A frame should skip if it's in Base or an installed package.
 """
-should_skip(frame::StackFrame) =
-    frame_module(frame) ∈ ["Base", "Main", nothing] || (
-        contains(string(frame.file), r"[/\\].julia[/\\]") ||
-        contains(string(frame.file), r"julia[/\\]stdlib") ||
-        contains(string(frame.file), r"julia[/\\]lib") ||
-        contains(string(frame.file), r"julialang.language")
+function should_skip(frame::StackFrame, modul)
+    mod = something(modul, frame)
+    f = get_frame_file(frame)
+
+    bad = mod ∈ ["Base", "Main", nothing, "VSCodeServer", "REPL"]
+    bad = bad || mod ∈ STACKTRACE_HIDE_MODULES[]
+
+    return bad || (
+        contains(f, r"[/\\].julia[/\\]") ||
+        contains(f, r"julia[/\\]stdlib") ||
+        contains(f, r"julia[/\\]lib") ||
+        contains(f, "julialang.language") ||
+        contains(f, "libjulia")
     )
-should_skip(frame::StackFrame, hide::Bool) = hide ? should_skip(frame) : false
-should_skip(pointer::Ptr) = should_skip(StackTraces.lookup(pointer)[1])
-should_skip(pointer::Ptr, hide::Bool) = hide ? should_skip(pointer) : false
+end
+should_skip(frame::StackFrame, hide::Bool, args...) =
+    hide ? should_skip(frame, args...) : false
+should_skip(pointer::Ptr, args...) = should_skip(StackTraces.lookup(pointer)[1], args...)
+should_skip(pointer::Ptr, hide::Bool, args...) =
+    hide ? should_skip(pointer, args...) : false
 should_skip(iip::Base.InterpreterIP) = true
 should_skip(iip::Base.InterpreterIP, hide::Bool) = true
 
@@ -306,7 +330,6 @@ function render_backtrace(
 
     # get the module each frame's code line is defined in
     frames_modules = frame_module.(bt)
-    # println.(zip(frames_modules, should_skip.(bt)))
 
     """
     Define a few variables to keep track of during stack 
@@ -325,16 +348,14 @@ function render_backtrace(
 
     # render each frame
     content = AbstractRenderable[]
+    curr_module = nothing
     for (num, frame) in enumerate(bt)
         # if the current frame's module differs from the previous one, show module name
-        curr_module = frames_modules[num]
-        (
-            curr_module != prev_frame_module &&
-            !should_skip(frame, hide_frames) &&
-            !isnothing(curr_module)
-        ) && add_new_module_name!(content, ctx, curr_module)
+        curr_module =
+            (num > 1 && !isnothing(curr_module)) ?
+            something(frames_modules[num], curr_module) : frames_modules[num]
 
-        # render frame
+        # get params for rendering
         frame_panel_kwargs = if num == 1  # first frame is highlighted
             Dict(
                 :subtitle => reverse_backtrace ? "TOP LEVEL" : "ERROR LINE",
@@ -358,18 +379,13 @@ function render_backtrace(
             Dict(:style => "hidden")
         end
         δ = num in (1, length(bt)) ? 2 : 0
-        (should_skip(frame, hide_frames) && num ∉ [1, length(bt)]) || add_stack_frame!(
-            content,
-            frame,
-            ctx,
-            num ∈ [1, length(bt)],
-            num;
-            δ = δ,
-            frame_panel_kwargs...,
-        )
+        to_skip =
+            should_skip(frame, hide_frames, curr_module) &&
+            num ∉ [1, length(bt)] &&
+            STACKTRACE_HIDE_FRAME[]
 
         # keep track of frames being skipped
-        if num != 1 || num != length(bt)
+        if num ∉ [1, length(bt)]
             # skip extra panels for long stack traces
             if tot_frames_added > max_n_frames &&
                num < length(bt) - 5 &&
@@ -381,10 +397,8 @@ function render_backtrace(
                 )
                 push!(content, skipped_line)
                 added_skipped_message = true
-            else  # show "inner" frames without additional info, hide base optionally
-                # skip frames in modules like Base
-                to_skip = should_skip(frame, hide_frames)
 
+            else
                 # show number of frames skipped
                 if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
                     add_number_frames_skipped!(
@@ -399,19 +413,35 @@ function render_backtrace(
                 end
 
                 # skip
-                to_skip && begin
+                if to_skip
+                    # @info "frame" num to_skip n_skipped curr_module frames_modules[num]
                     n_skipped += 1
-                    push!(skipped_frames_modules, curr_module)
+                    push!(skipped_frames_modules, frames_modules[num])
                     continue
+                else
+                    # @info "frame" num to_skip n_skipped curr_module
+                    n_skipped, skipped_frames_modules = 0, []
+                    tot_frames_added += 1
                 end
-
-                # show
-                n_skipped, skipped_frames_modules = 0, []
-                tot_frames_added += 1
             end
         else
             tot_frames_added += 1
         end
+
+        # mark switch to a new module
+        (curr_module != prev_frame_module && !to_skip && !isnothing(curr_module)) &&
+            add_new_module_name!(content, ctx, curr_module)
+
+        # add frame if not hidden
+        to_skip || add_stack_frame!(
+            content,
+            frame,
+            ctx,
+            num ∈ [1, length(bt)],
+            num;
+            δ = δ,
+            frame_panel_kwargs...,
+        )
 
         isnothing(curr_module) || (prev_frame_module = curr_module)
     end

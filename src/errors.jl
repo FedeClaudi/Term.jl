@@ -16,7 +16,9 @@ import Term:
     plural,
     Theme,
     do_by_line,
-    RECURSIVE_OPEN_TAG_REGEX
+    RECURSIVE_OPEN_TAG_REGEX,
+    STACKTRACE_HIDE_MODULES,
+    STACKTRACE_HIDE_FRAME
 
 import ..Links: Link
 import ..Style: apply_style

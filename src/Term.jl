@@ -57,6 +57,9 @@ include("highlight.jl")
 
 const TERM_THEME = Ref(Theme())
 
+const STACKTRACE_HIDDEN_MODULES = Ref(String[])
+const STACKTRACE_HIDE_FRAME = Ref(true)
+
 function update! end
 
 # rely on other modules
