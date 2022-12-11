@@ -35,7 +35,7 @@ end
         for (j, met) in enumerate([:left, :center, :right])
             ll = pad(link; width = 80, method = :left)
             @test ll.measure.w == 80
-            IS_WIN && @compare_to_string(ll, "link_pad_$(ln)_$j")
+            IS_WIN || @compare_to_string(ll, "link_pad_$(ln)_$j")
         end
     end
 end
@@ -50,7 +50,7 @@ IS_WIN || @testset "LINK and panel" begin
             p4 = Panel(link, p3; fit = fit)
 
             for (j, p) in enumerate([p0, p1, p2, p3, p4])
-                IS_WIN && @compare_to_string(p, "link_panel_$(ln)_$(i)_$(j)")
+                @compare_to_string(p, "link_panel_$(ln)_$(i)_$(j)")
             end
         end
     end
