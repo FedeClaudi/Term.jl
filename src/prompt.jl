@@ -20,7 +20,7 @@ function ask(io::IO, prompt::AbstractPrompt)
     return validate_answer(ans, prompt)
 end
 
-ask(prompt::AbstractPrompt) = ask(stdout, prompt)
+ask(prompt) = ask(stdout, prompt)
 
 """
     validate_answer
@@ -81,12 +81,53 @@ abstract type AbstractDefaultPrompt <: OptionsPrompt end
 
 
 struct DefaultPropt
-    answers::Vector{String}
+    answers::Vector
     default::Int # index of default answer
     prompt::String
+
+    function DefaultPropt(answers::Vector, default::Int, prompt::String)
+        @assert default > 0 && default < length(answers)  "Default answer number: $default not valid"
+        new(answers, default, prompt)
+    end
 end
 
-# TODO ask, validate and print methods
+function Base.println(io::IO, prompt::DefaultPropt)
+    txt = prompt.prompt * " "
+    answer_styles = map(
+        i -> i == prompt.default ? "green bold" : "default",
+        1:length(prompt.answers)
+    )
+    # answers = join(
+    #     apply_style.(
+    #         map(
+    #             i -> "{$(answer_styles[i])}$(prompt.answers[1]){/$(answer_styles[i])}"
+    #         )
+    #     ), ", "
+    # )
+    # # println(io, txt * answers)
+end
+
+function validate_answer(answer, prompt::DefaultPropt)
+    answer == "" && return prompt.answers[prompt.default]
+    answer ∉ prompt.answers && begin
+        println("Answer `$(answer)` is not a valid option.")
+        return nothing
+    end
+    return answer
+
+end
+
+
+function ask(io::IO, prompt::DefaultPropt)
+    println(io, prompt)
+    ans = nothing
+    while isnothing(ans)
+        println(io, prompt)
+        ans = validate_answer(readline(), prompt)
+    end
+    return ans
+end
+
 
 confirm() = ask(DefaultPropt(["Yes", "No"], 1, "Confirm?"))
 
@@ -94,5 +135,9 @@ confirm() = ask(DefaultPropt(["Yes", "No"], 1, "Confirm?"))
 # ---------------------------------------------------------------------------- #
 #                                      DEV                                     #
 # ---------------------------------------------------------------------------- #
-ask(TypePrompt(Int, "give me a number"))
+# ask(TypePrompt(Int, "give me a number"))
+confirm()
 
+
+# TODO add style & theme
+# TODO add tprint methods
