@@ -98,6 +98,15 @@ end
                 TEST_CONSOLE_WIDTH
             )
 
+            @testpanel(
+                Panel(
+                    [Panel("t1"; fit = true, _kw...), Panel("t2"; fit = true, _kw...)];
+                    fit = false,
+                ),
+                8,
+                TEST_CONSOLE_WIDTH
+            )
+
             _kw = (fit = false, height = 8, width = 30)
             @testpanel(Panel(Panel("test"; width = 22); _kw...), 8, 30)
 
