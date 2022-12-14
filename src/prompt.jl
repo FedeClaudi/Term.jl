@@ -1,6 +1,12 @@
-using Term
-import Term.Style: apply_style
-import Term: highlight
+
+module Prompts
+
+import Term
+import Term: highlight, TERM_THEME
+import ..Style: apply_style
+import ..Tprint: tprint, tprintln
+
+export TypePrompt, OptionsPrompt, DefaultPropt, confirm, ask
 
 """
 Prompts in VSCODE require a bit of a hack:
@@ -13,9 +19,18 @@ https://discourse.julialang.org/t/vscode-errors-with-user-input-readline/75097/4
 """ Prompt types """
 abstract type AbstractPrompt end
 
+function Base.print(io::IO, prompt::AbstractPrompt)
+    style = TERM_THEME[].prompt_text
+    tprintln(io, "{$style}{dim}❯❯❯ {/dim}"*prompt.prompt * "{/$style}")
+end
+
+Base.println(io::IO, prompt::AbstractPrompt) = print(io, prompt, "\n")
+tprint(io::IO, prompt::AbstractPrompt) = print(io, prompt)
+tprintln(io::IO, prompt::AbstractPrompt) = println(io, prompt)
+
 """ display an `AbstractPrompt`, get user's reply and validate. """
 function ask(io::IO, prompt::AbstractPrompt)
-    println(io, prompt)
+    print(io, prompt)
     ans = readline()
     return validate_answer(ans, prompt)
 end
@@ -47,25 +62,26 @@ struct TypePrompt{T} <: AbstractPrompt
     prompt::String
 end
 
-function Base.println(io::IO, prompt::TypePrompt)
-    println(io, prompt.prompt)
-end
 
 struct AnswerValidationError <: Exception
     answer_type
     expected_type
+    err
 end
 
-Term.Errors.error_message(e::AnswerValidationError) = highlight("TypePrompt expected an answer of type: `$(e.expected_type)`, got `$(e.answer_type)` instead") |> apply_style
+Term.Errors.error_message(e::AnswerValidationError) = highlight(
+    "TypePrompt expected an answer of type: `$(e.expected_type)`, got `$(e.answer_type)` instead\nConversion to `$(e.expected_type)` failed because of: $(e.err)") |> apply_style
 
 
 function validate_answer(answer, prompt::TypePrompt)
     answer isa prompt.answer_type && return answer
+
+    err = nothing
     try
         return parse(prompt.answer_type, answer)
     catch err
-        throw(AnswerValidationError(typeof(answer), prompt.answer_type))
     end
+    throw(AnswerValidationError(typeof(answer), prompt.answer_type, apply_style(string(err))))
 end
 
 
@@ -74,43 +90,32 @@ end
 #                                OPTIONS PROMPTS                               #
 # ---------------------------------------------------------------------------- #
 """ Prompt types where user can only choose among options """
-abstract type OptionsPrompt <: AbstractPrompt end
-
-""" Options types with a default answer """
-abstract type AbstractDefaultPrompt <: OptionsPrompt end
+abstract type AbstractOptionsPrompt <: AbstractPrompt end
 
 
-struct DefaultPropt
-    answers::Vector
-    default::Int # index of default answer
-    prompt::String
-
-    function DefaultPropt(answers::Vector, default::Int, prompt::String)
-        @assert default > 0 && default < length(answers)  "Default answer number: $default not valid"
-        new(answers, default, prompt)
-    end
-end
-
-function Base.println(io::IO, prompt::DefaultPropt)
-    txt = prompt.prompt * " "
+function Base.print(io::IO, prompt::AbstractOptionsPrompt)
+    style = TERM_THEME[].prompt_text
+    txt = "{$style}{dim}❯❯❯ {/dim}"*prompt.prompt * "{/$style} "
     answer_styles = map(
-        i -> i == prompt.default ? "green bold" : "default",
-        1:length(prompt.answers)
+        i -> i == prompt.default ? TERM_THEME[].prompt_default_option : TERM_THEME[].prompt_options,
+        1:length(prompt.options)
     )
-    # answers = join(
-    #     apply_style.(
-    #         map(
-    #             i -> "{$(answer_styles[i])}$(prompt.answers[1]){/$(answer_styles[i])}"
-    #         )
-    #     ), ", "
-    # )
-    # # println(io, txt * answers)
+    options = join(
+        (
+            map(
+                i -> "{$(answer_styles[i])}$(prompt.options[i]){/$(answer_styles[i])}",
+                1:length(prompt.options)
+            )
+        ), ", "
+    )
+    tprint(io, txt * options)
 end
 
-function validate_answer(answer, prompt::DefaultPropt)
-    answer == "" && return prompt.answers[prompt.default]
-    answer ∉ prompt.answers && begin
-        println("Answer `$(answer)` is not a valid option.")
+
+function validate_answer(answer, prompt::AbstractOptionsPrompt)
+    (prompt isa AbstractDefaultPrompt && strip(answer) == "") && return prompt.options[prompt.default]
+    answer ∉ prompt.options && begin
+        tprintln("{dim}Answer `$(answer)` is not valid.{/dim}")
         return nothing
     end
     return answer
@@ -118,8 +123,7 @@ function validate_answer(answer, prompt::DefaultPropt)
 end
 
 
-function ask(io::IO, prompt::DefaultPropt)
-    println(io, prompt)
+function ask(io::IO, prompt::AbstractOptionsPrompt)
     ans = nothing
     while isnothing(ans)
         println(io, prompt)
@@ -129,15 +133,25 @@ function ask(io::IO, prompt::DefaultPropt)
 end
 
 
+
+""" Options types with a default answer """
+abstract type AbstractDefaultPrompt <: AbstractOptionsPrompt end
+
+
+""" An option prompt with a default option """
+struct DefaultPropt <: AbstractDefaultPrompt
+    options::Vector
+    default::Int # index of default answer
+    prompt::String
+
+    function DefaultPropt(options::Vector, default::Int, prompt::String)
+        @assert default > 0 && default < length(options)  "Default answer number: $default not valid"
+        new(options, default, prompt)
+    end
+end
+
+
+
 confirm() = ask(DefaultPropt(["Yes", "No"], 1, "Confirm?"))
+end
 
-
-# ---------------------------------------------------------------------------- #
-#                                      DEV                                     #
-# ---------------------------------------------------------------------------- #
-# ask(TypePrompt(Int, "give me a number"))
-confirm()
-
-
-# TODO add style & theme
-# TODO add tprint methods

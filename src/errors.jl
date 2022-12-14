@@ -18,7 +18,7 @@ import Term:
     do_by_line,
     RECURSIVE_OPEN_TAG_REGEX,
     STACKTRACE_HIDDEN_MODULES,
-    STACKTRACE_HIDE_FRAME
+    STACKTRACE_HIDE_FRAMES
 
 import ..Links: Link
 import ..Style: apply_style

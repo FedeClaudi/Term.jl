@@ -44,8 +44,8 @@ install_term_stacktrace(
 but you can also do more, if you just want to quickly change some options (e.g. to deal with a particularly though bug). You can set flags to change the behavior on the fly:
 
 ```@example
-import Term: STACKTRACE_HIDE_MODULES, STACKTRACE_HIDE_FRAME
+import Term: STACKTRACE_HIDE_MODULES, STACKTRACE_HIDE_FRAMES
 
 STACKTRACE_HIDE_MODULES[] = ["REPL", "OhMyREPL"]  # list names of modules you want ignored in the stacktrace
-STACKTRACE_HIDE_FRAME[] = false # set to true to hide frame, false to show all of them
+STACKTRACE_HIDE_FRAMES[] = false # set to true to hide frame, false to show all of them
 ```

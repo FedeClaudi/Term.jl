@@ -1,7 +1,6 @@
 import Base.StackTraces: StackFrame
 import MyterialColors: pink, indigo_light
 import Term: read_file_lines
-using Pkg
 
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
@@ -382,7 +381,7 @@ function render_backtrace(
         to_skip =
             should_skip(frame, hide_frames, curr_module) &&
             num ∉ [1, length(bt)] &&
-            STACKTRACE_HIDE_FRAME[]
+            STACKTRACE_HIDE_FRAMES[]
 
         # keep track of frames being skipped
         if num ∉ [1, length(bt)]
