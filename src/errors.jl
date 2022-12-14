@@ -97,8 +97,9 @@ function install_term_stacktrace(;
     hide_frames = true,
 )
     @eval begin
-        function Base.showerror(io::IO, er, bt::Vector; backtrace = true)
+        function Base.showerror(io::IO, er, bt; backtrace = true)
             print("\n")
+            # @info "Showing" er bt
 
             # shorten very long backtraces
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
@@ -142,7 +143,7 @@ function install_term_stacktrace(;
                 isa(io.io, Base.TTY) &&
                     Panel(
                         RenderableText(
-                            highlight(error_message(er));
+                            escape_brackets(apply_style(highlight(error_message(er))));
                             width = ctx.module_line_w,
                         );
                         width = ctx.out_w,
