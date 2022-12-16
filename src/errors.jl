@@ -97,8 +97,9 @@ function install_term_stacktrace(;
     hide_frames = true,
 )
     @eval begin
-        function Base.showerror(io::IO, er, bt::Vector; backtrace = true)
+        function Base.showerror(io::IO, er, bt; backtrace = true)
             print("\n")
+            # @info "Showing" er bt
 
             # shorten very long backtraces
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
@@ -145,7 +146,10 @@ function install_term_stacktrace(;
                     msg = reshape_text(msg, ctx.module_line_w; ignore_markup = true)
 
                     Panel(
-                        RenderableText(msg;);
+                        RenderableText(
+                            escape_brackets(apply_style(highlight(error_message(er))));
+                            width = ctx.module_line_w,
+                        );
                         width = ctx.out_w,
                         title = "{bold $(ctx.theme.err_errmsg) default underline}$(typeof(er)){/bold $(ctx.theme.err_errmsg) default underline}",
                         padding = (2, 2, 1, 1),
@@ -156,11 +160,17 @@ function install_term_stacktrace(;
                 end
 
             catch cought_err  # catch when something goes wrong during error handling in Term
-                @error "Term.jl: error while rendering error message: " # string(cought_err)
-                println("Error during term's stacktrace generation:")
-                Base.showerror(io, cought_err)
+                @error "Term.jl: error while rendering error message: " cought_err
 
-                println("\n\n\nOriginal error")
+                for (i, (exc, _bt)) in enumerate(current_exceptions())
+                    i == 1 && println("Error during term's stacktrace generation:")
+                    Base.show_backtrace(io, _bt)
+                    print(io, '\n'^3)
+                    Base.showerror(io, exc)
+                end
+
+                print(io, '\n'^5)
+                println(io, "Original error:")
                 Base.show_backtrace(io, bt)
                 print(io, '\n'^3)
                 Base.showerror(io, er)

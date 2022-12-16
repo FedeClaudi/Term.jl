@@ -98,6 +98,15 @@ end
                 TEST_CONSOLE_WIDTH
             )
 
+            @testpanel(
+                Panel(
+                    [Panel("t1"; fit = true, _kw...), Panel("t2"; fit = true, _kw...)];
+                    fit = false,
+                ),
+                8,
+                TEST_CONSOLE_WIDTH
+            )
+
             _kw = (fit = false, height = 8, width = 30)
             @testpanel(Panel(Panel("test"; width = 22); _kw...), 8, 30)
 
@@ -190,24 +199,6 @@ end
             end
         end
     end
-end
-
-@testset "PANEL - small panel with title" begin
-    p = Panel(; width = 12, title = "testadasd")
-    @test string(p) ==
-          "\e[22m╭── t...\e[22m ──╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
-
-    p = Panel(; width = 12, title = "testadasd", title_justify = :right)
-    @test string(p) ==
-          "\e[22m╭─ t...\e[22m ───╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
-
-    p = Panel(; width = 12, title = "testadasd", title_justify = :center)
-    @test string(p) ==
-          "\e[22m╭── t...\e[22m ──╮\e[22m\e[0m\e[22m\n\e[0m\e[22m│\e[22m\e[0m          \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────╯\e[22m\e[0m"
-
-    p = Panel(; width = 5, title = "asdasdasd")
-    @test string(p) ==
-          "\e[22m╭───╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰───╯\e[22m\e[0m"
 end
 
 @testset "PANEL - compare to string" begin

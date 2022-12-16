@@ -9,7 +9,8 @@ import Term: read_file_lines
 function get_frame_file(frame::StackFrame)
     file = string(frame.file)
     file = Base.fixup_stdlib_path(file)
-    Base.stacktrace_expand_basepaths() && (file = something(find_source_file(file), file))
+    Base.stacktrace_expand_basepaths() &&
+        (file = something(Base.find_source_file(file), file))
     Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
 
     return if isnothing(file)
@@ -424,7 +425,6 @@ function render_backtrace(
                     push!(skipped_frames_modules, frames_modules[num])
                     continue
                 else
-                    # @info "frame" num to_skip n_skipped curr_module
                     n_skipped, skipped_frames_modules = 0, []
                     tot_frames_added += 1
                 end

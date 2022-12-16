@@ -329,7 +329,7 @@ Panel(renderables::Vector{RenderablesUnion}; kwargs...) =
     Panel(vstack(renderables...); kwargs...)
 
 Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
-Panel(ren; kwargs...) = Panel(ren; kwargs...)
+Panel(ren::Vector; kwargs...) = Panel(vstack(ren); kwargs...)
 Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwargs...)
 
 # ---------------------------------- render ---------------------------------- #
