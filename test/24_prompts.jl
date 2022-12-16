@@ -10,6 +10,9 @@ import Term.Prompts: validate_answer, AnswerValidationError
 
     opts = OptionsPrompt(["one", "two"], "What option?")
     opts_style = OptionsPrompt(["one", "two"], "What option?", "red", "green")
+
+    default = DefaultPropt(["yes", "no"], 1, "asking", "red", "green", "blue")
+    default = DefaultPropt(["yes", "no"], 1, "asking")
 end
 
 basic = Prompt("basic prompt?")
@@ -23,11 +26,15 @@ opts_style = OptionsPrompt(["one", "two"], "What option?", "red", "green")
 
 default = DefaultPropt(["yes", "no"], 1, "asking", "red", "green", "blue")
 
-all_prompts = (basic, basic_with_color, type_prompt, type_prompt_style, opts, opts_style)
+all_prompts =
+    (basic, basic_with_color, type_prompt, type_prompt_style, opts, opts_style, default)
 
-@testset "Prompt, printing" begin
+IS_WIN || @testset "Prompt, printing" begin
     for (i, p) in enumerate(all_prompts)
         @compare_to_string(sprint(print, p), "prompt_print_$i")
+        @compare_to_string(sprint(println, p), "prompt_print_$(i)_ln")
+        @compare_to_string(sprint(tprintln, p), "prompt_print_$(i)_t")
+        @compare_to_string(sprint(tprintln, p), "prompt_print_$(i)_tln")
     end
 end
 
