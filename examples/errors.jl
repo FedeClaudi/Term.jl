@@ -32,7 +32,7 @@ corresponding error message
 # 1 - "a"
 
 # ------------  DomainError
-sqrt(-1)
+# sqrt(-1)
 
 # ------------  UndefVarError
 # println(x)
