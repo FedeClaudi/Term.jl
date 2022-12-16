@@ -139,12 +139,13 @@ function install_term_stacktrace(;
                 end
 
                 # print message panel if VSCode is not handling that through a second call to this fn
-                isa(io.io, Base.TTY) &&
+                isa(io.io, Base.TTY) && begin
+                    msg = highlight(error_message(er)) |> apply_style
+                    msg = replace(msg, RECURSIVE_OPEN_TAG_REGEX => "")
+                    msg = reshape_text(msg, ctx.module_line_w; ignore_markup = true)
+
                     Panel(
-                        RenderableText(
-                            highlight(error_message(er));
-                            width = ctx.module_line_w,
-                        );
+                        RenderableText(msg;);
                         width = ctx.out_w,
                         title = "{bold $(ctx.theme.err_errmsg) default underline}$(typeof(er)){/bold $(ctx.theme.err_errmsg) default underline}",
                         padding = (2, 2, 1, 1),
@@ -152,6 +153,7 @@ function install_term_stacktrace(;
                         title_justify = :center,
                         fit = false,
                     ) |> print
+                end
 
             catch cought_err  # catch when something goes wrong during error handling in Term
                 @error "Term.jl: error while rendering error message: " # string(cought_err)

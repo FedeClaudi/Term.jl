@@ -122,8 +122,11 @@ Get and stylize a function's name/signature
 function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
     # get the name of the error function
     func = sprint(StackTraces.show_spec_linfo, frame)
-    (contains(func, "##kw") || contains(func, "kwerr")) &&
-        (func = parse_kw_func_name(frame))
+    try
+        (contains(func, "##kw") || contains(func, "kwerr")) &&
+            (func = parse_kw_func_name(frame))
+    catch
+    end
 
     # format function name
     func = replace(
@@ -133,11 +136,15 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         ),
     )
 
-    func = highlight(func) |> apply_style
-    func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
+    try
+        func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
+    catch
+    end
 
     # reshape but taking care of potential curly bracktes
+    func = highlight(func) |> apply_style
     func = reshape_text(func, ctx.func_name_w; ignore_markup = true)
+
     return RenderableText(func)
 end
 
@@ -399,7 +406,7 @@ function render_backtrace(
 
             else
                 # show number of frames skipped
-                if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
+                if to_skip == false && n_skipped > 0
                     add_number_frames_skipped!(
                         content,
                         ctx,
@@ -413,7 +420,6 @@ function render_backtrace(
 
                 # skip
                 if to_skip
-                    # @info "frame" num to_skip n_skipped curr_module frames_modules[num]
                     n_skipped += 1
                     push!(skipped_frames_modules, frames_modules[num])
                     continue
@@ -424,6 +430,17 @@ function render_backtrace(
                 end
             end
         else
+            if num == length(bt) && n_skipped > 0
+                add_number_frames_skipped!(
+                    content,
+                    ctx,
+                    to_skip,
+                    num,
+                    bt,
+                    n_skipped,
+                    skipped_frames_modules,
+                )
+            end
             tot_frames_added += 1
         end
 
