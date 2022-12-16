@@ -7,7 +7,7 @@ clear()
 
 pprint(pan) = begin
     print(" " * hLine(pan.measure.w; style = "red"))
-    print(vLine(pan.measure.h + 1; style = "red") * pan)
+    print(vLine(pan.measure.h; style = "red") * pan)
     println(pan.measure, "  ", length(pan.segments))
     # print(pan)
 end

@@ -55,6 +55,8 @@ end
 @runner "20_test_compositor.jl"
 @runner "21_test_markdown.jl"
 @runner "22_test_grid.jl"
+@runner "23_test_link.jl"
+@runner "24_prompts.jl"
 @runner "98_test_examples.jl"
 @runner "99_test_errors.jl"
 

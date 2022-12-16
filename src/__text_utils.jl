@@ -23,6 +23,7 @@ This regex uses lookahead and lookbehind to exclude {{
 at the beginning of a tag, with this:
     (?<!\\{)\\[(?!\\{)
 """
+RECURSIVE_OPEN_TAG_REGEX = r"\{(?:[^{}]*){2,}\}"
 OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#\n]*\}"
 CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#\n]+[^/\{]\}"
 GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
@@ -32,12 +33,24 @@ GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 Remove all markup tags from a string of text.
 """
-remove_markup(input_text)::String = replace_multi(
-    input_text,
-    OPEN_TAG_REGEX => "",
-    GENERIC_CLOSER_REGEX => "",
-    CLOSE_TAG_REGEX => "",
-)
+function remove_markup(input_text; remove_orphan_tags = true)::String
+    if remove_orphan_tags
+        return replace_multi(
+            input_text,
+            OPEN_TAG_REGEX => "",
+            GENERIC_CLOSER_REGEX => "",
+            CLOSE_TAG_REGEX => "",
+        )
+    else
+        # turn non-orphaned closing tags in opening tags before removing them
+        for match in eachmatch(OPEN_TAG_REGEX, input_text)
+            markup = match.match[2:(end - 1)]
+            close = r"\{\/" * Regex(markup) * r"\}"
+            input_text = replace(input_text, close => "{$markup}", count = 1)
+        end
+        return replace_multi(input_text, OPEN_TAG_REGEX => "", GENERIC_CLOSER_REGEX => "")
+    end
+end
 
 """ 
     has_markup(text::String)
@@ -125,8 +138,8 @@ cleantext(str)::String = (remove_ansi ∘ remove_markup)(str)
 
 Get length of text after all style information is removed.
 """
-textlen(x::String)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
-textlen(x::SubString)::Int = (textwidth ∘ remove_markup ∘ remove_ansi)(x)
+textlen(x; remove_orphan_tags = false)::Int =
+    remove_markup(remove_ansi(x); remove_orphan_tags = remove_orphan_tags) |> textwidth
 
 # --------------------------------- brackets --------------------------------- #
 const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
@@ -298,13 +311,7 @@ Apply `fn` to each line in the `text`.
 
 The function `fn` should accept a single `::String` argument.
 """
-function do_by_line(fn::Function, text)::String
-    out = ""
-    for (last, line) in loop_last(split_lines(text))
-        out *= fn(line) * (last ? "" : "\n")
-    end
-    return out
-end
+do_by_line(fn::Function, text::AbstractString)::String = join(fn.(split_lines(text)), "\n")
 
 do_by_line(fn::Function, text::Vector)::String = join_lines(fn.(text))
 
@@ -360,3 +367,29 @@ function str_trunc(
     out[end] != ' ' && (out *= trailing_dots)
     return out
 end
+
+# ---------------------------------------------------------------------------- #
+#                                     LINK                                     #
+# ---------------------------------------------------------------------------- #
+
+"""
+    excise_link_display_text(link::String)
+
+Given a link string of the form:
+    "\x1b]8;;LINK_DESTINATION\x1b\\LINK_DISPLAY_TEXT\x1b]8;;\x1b\\"
+this function returns "LINK_DISPLAY_TEXT" alone.
+"""
+function excise_link_display_text(link::AbstractString)
+    parts = split(link, "\x1b\\")
+    return if length(parts) > 1
+        replace(parts[2], "\e]8;;" => "")
+    else
+        ""
+    end
+end
+
+"""
+    string_type(x)
+Return the type of `x` if it's an AbstractString, else String
+"""
+string_type(x) = x isa AbstractString ? typeof(x) : String

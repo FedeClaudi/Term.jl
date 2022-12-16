@@ -18,7 +18,7 @@ less(term_demo) # see demo code
 
 # Example
 
-```jldoctest
+``` julia
 begin
     println(@green "this is green")
     println(@blue "and this is blue")
@@ -31,6 +31,9 @@ end
 module Term
 
 using Unicode
+
+const STACKTRACE_HIDDEN_MODULES = Ref(String[])
+const STACKTRACE_HIDE_FRAMES = Ref(true)
 
 const DEBUG_ON = Ref(false)
 
@@ -69,6 +72,7 @@ include("boxes.jl")
 include("console.jl")
 include("renderables.jl")
 include("layout.jl")
+include("link.jl")
 include("panels.jl")
 include("errors.jl")
 include("tprint.jl")
@@ -82,6 +86,7 @@ include("repr.jl")
 include("compositors.jl")
 include("grid.jl")
 include("introspection.jl")
+include("prompt.jl")
 
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
@@ -115,6 +120,8 @@ using .Consoles: console_height, console_width
 using .Renderables: AbstractRenderable, Renderable, RenderableText
 
 using .Layout
+
+using .Links
 
 using .Panels: Panel, TextBox, @nested_panels
 
@@ -169,6 +176,12 @@ using .TermMarkdown: parse_md
 using .Repr: @with_repr, termshow, install_term_repr, @showme
 
 using .Grid
+
+using .Prompts
+
+# ---------------------------------------------------------------------------- #
+#                                PRE COMPILATION                               #
+# ---------------------------------------------------------------------------- #
 
 using SnoopPrecompile
 # TODO improve pre-compilation

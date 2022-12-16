@@ -5,7 +5,8 @@ Let's have a look.
 
 ```@example md
 import Term.Consoles: Console, enable, disable # hide
-con = Console(60) |> enable #hide
+con = Console(60) # hide
+enable(con) #hide
 import Term: tprintln
 using Term.TermMarkdown
 using Markdown
