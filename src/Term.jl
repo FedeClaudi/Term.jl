@@ -40,8 +40,8 @@ const DEBUG_ON = Ref(false)
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
 const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
 
-default_width(io = stdout) = min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
-default_stacktrace_width(io = stderr) =
+default_width(io = stdout)::Int = min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+default_stacktrace_width(io = stderr)::Int =
     min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
@@ -97,7 +97,7 @@ export install_term_stacktrace,
     install_term_logger, uninstall_term_logger, install_term_repr
 export vLine, hLine
 export @with_repr, termshow, @showme
-export Compositor, update!
+export Compositor
 export grid
 export inspect
 
@@ -169,7 +169,7 @@ using .Introspection: inspect, typestree, expressiontree, inspect
 
 using .Tables: Table
 
-using .Compositors: Compositor, update!
+using .Compositors: Compositor
 
 using .TermMarkdown: parse_md
 
@@ -179,28 +179,5 @@ using .Grid
 
 using .Prompts
 
-# ---------------------------------------------------------------------------- #
-#                                PRE COMPILATION                               #
-# ---------------------------------------------------------------------------- #
-
-using SnoopPrecompile
-# TODO improve pre-compilation
-@precompile_setup begin
-    originalSTDOUT = stdout
-
-    (outRead, outWrite) = redirect_stdout()
-
-    @precompile_all_calls begin
-        Panel()
-        Panel("test") * Panel(Panel()) / hLine(20) |> tprint
-        termshow(Panel)
-        termshow(Dict(:x => 1))
-        termshow(zeros(4))
-        termshow(zeros(4, 4))
-    end
-
-    close(outRead)
-
-    redirect_stdout(originalSTDOUT)
-end
+include("__precompilation.jl")
 end
