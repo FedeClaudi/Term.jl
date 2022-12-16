@@ -7,7 +7,16 @@ For example:
 ```@example prompt
 using Term.Prompts
 
-Prompt("Simple, right?") |> ask
+prompt = Prompt("Simple, right?");
+```
+
+creates a `Prompt` object and `ask` then prints the propmt and asks for input: 
+```julia
+prompt |> ask
+```
+the output should look something like
+```@example prompt
+print(prompt)  # hide
 ```
 
 here we construct a basic `Prompt` and "ask" it: print the message and capture the reply. `ask` returns the answer, which you can do with as you please. A small warning before we carry on:
@@ -21,8 +30,10 @@ There's a couple more ways you can use prompts like. One is to ensure you get an
 ```@example prompt
 
 # this only accepts `Int`s
-TypePrompt(Int, "give me a number") |> ask  
+prompt = TypePrompt(Int, "give me a number")  # don't forget to |> ask
+print(prompt) # hide
 ```
+
 
 If your answer can't be converted to the correct type you'll get a `AnswerValidationError`, not good.
 
@@ -30,7 +41,8 @@ If your answer can't be converted to the correct type you'll get a `AnswerValida
 So, what if you want to get user inputs, but you don't want to handle any crazy input they can provide? Fear not, use `OptionsPrompt` so that only acceptable options will be ok. This will keep "asking" your prompt until the user's answer matches one of the given options
 
 ```@example prompt
-OptionsPrompt(["a lot", "so much", "the most"], "How likely would you be to recomend Term.jl to a friend or colleague?") |> ask
+prompt = OptionsPrompt(["a lot", "so much", "the most"], "How likely would you be to recomend Term.jl to a friend or colleague?") # don't forget to |> ask
+print(prompt) # hide
 ```
 
 Okay, so much typing though. Let's be realistic, most likely you just want to ask a yes/no question and the answer is likely just yes. So just use a `DefaultPrompt`:
@@ -38,18 +50,17 @@ Okay, so much typing though. Let's be realistic, most likely you just want to as
 ```@example prompt
 
 # one says the first option is the default
-DefaultPropt(["yes", "no"], 1, "Confirm?") |> ask
+prompt = DefaultPrompt(["yes", "no"], 1, "Confirm?") # don't forget to |> ask
+print(prompt) # hide
 ```
 
-still too much typing? Ask the user to `confirm`:
+still too much typing? You can just use the `confirm` function which is equivalent to asking the prompt shown above. 
 
-```@example prompt
-confirm()
-```
 
 ## Style
 The style of prompt elements (e.g. the color of the prompt's text or of the options) is defined in `Theme`. You can also pass style information during prompt creation:
 
 ```@example prompt
-Promt("Do you like this color?", "red") |> println
-DefaultPropt(["yes", "no"], 1, "Confirm?", "green", "blue", "red") 
+Prompt("Do you like this color?", "red") |> println
+DefaultPrompt(["yes", "no"], 1, "Confirm?", "green", "blue", "red") |> println
+```

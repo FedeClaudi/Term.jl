@@ -18,7 +18,7 @@ less(term_demo) # see demo code
 
 # Example
 
-```jldoctest
+``` julia
 begin
     println(@green "this is green")
     println(@blue "and this is blue")

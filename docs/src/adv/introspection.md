@@ -12,7 +12,7 @@ You can now use `inspect(T::DataType)` to get all information you possibly need 
 
 
 ```@meta
-CurrentModule = Introspection
+CurrentModule = Term.Introspection
 ```
 
 ```@docs

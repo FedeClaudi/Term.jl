@@ -138,7 +138,7 @@ function enable(console::Console)
     nothing
 end
 
-function disable(console::Console)
+function disable(::Console)
     ACTIVE_CONSOLE_WIDTH[] = nothing
 end
 end

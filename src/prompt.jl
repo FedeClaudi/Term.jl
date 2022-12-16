@@ -16,7 +16,7 @@ import ..Style: apply_style
 import ..Tprint: tprint, tprintln
 import ..Repr: @with_repr, termshow
 
-export Prompt, TypePrompt, OptionsPrompt, DefaultPropt, confirm, ask
+export Prompt, TypePrompt, OptionsPrompt, DefaultPrompt, confirm, ask
 
 """
 Prompts in VSCODE require a bit of a hack:
@@ -245,7 +245,7 @@ abstract type AbstractDefaultPrompt <: AbstractOptionsPrompt end
 """
 
 """
-@with_repr struct DefaultPropt <: AbstractDefaultPrompt
+@with_repr struct DefaultPrompt <: AbstractDefaultPrompt
     options::Vector{String}
     default::Int
     prompt::String
@@ -254,13 +254,13 @@ abstract type AbstractDefaultPrompt <: AbstractOptionsPrompt end
     default_answer_style::String
 end
 
-function DefaultPropt(options::Vector, default::Int, prompt::String, args...)
+function DefaultPrompt(options::Vector, default::Int, prompt::String, args...)
     @assert default > 0 && default < length(options) "Default answer number: $default not valid"
-    DefaultPropt(options, default, prompt, args...)
+    DefaultPrompt(options, default, prompt, args...)
 end
 
-function DefaultPropt(options::Vector, default::Int, prompt::String)
-    DefaultPropt(
+function DefaultPrompt(options::Vector, default::Int, prompt::String)
+    DefaultPrompt(
         options,
         default,
         prompt,
@@ -292,5 +292,5 @@ function Base.print(io::IO, prompt::AbstractDefaultPrompt)
     tprint(io, " " * options)
 end
 
-confirm() = ask(DefaultPropt(["yes", "no"], 1, "Confirm?"))
+confirm() = ask(DefaultPrompt(["yes", "no"], 1, "Confirm?"))
 end

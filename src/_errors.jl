@@ -137,16 +137,10 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         ),
     )
 
-<<<<<<< HEAD
     func = highlight(func) |> apply_style
     try
         func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
-    catch 
-=======
-    try
-        func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
     catch
->>>>>>> 143c9ba4f7ddc59286b6b1a70f3e134861790223
     end
 
     # reshape but taking care of potential curly bracktes
