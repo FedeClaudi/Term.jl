@@ -9,7 +9,8 @@ import Term: read_file_lines
 function get_frame_file(frame::StackFrame)
     file = string(frame.file)
     file = Base.fixup_stdlib_path(file)
-    Base.stacktrace_expand_basepaths() && (file = something(Base.find_source_file(file), file))
+    Base.stacktrace_expand_basepaths() &&
+        (file = something(Base.find_source_file(file), file))
     Base.stacktrace_contract_userdir() && (file = Base.contractuser(file))
 
     return if isnothing(file)
@@ -127,7 +128,6 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
             (func = parse_kw_func_name(frame))
     catch
     end
-        
 
     # format function name
     func = replace(
@@ -137,11 +137,15 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         ),
     )
 
-    func = highlight(func) |> apply_style
-    func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
+    try
+        func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
+    catch
+    end
 
     # reshape but taking care of potential curly bracktes
+    func = highlight(func) |> apply_style
     func = reshape_text(func, ctx.func_name_w; ignore_markup = true)
+
     return RenderableText(func)
 end
 
@@ -385,7 +389,7 @@ function render_backtrace(
         to_skip =
             should_skip(frame, hide_frames, curr_module) &&
             num ∉ [1, length(bt)] &&
-            STACKTRACE_HIDE_FRAME[]
+            STACKTRACE_HIDE_FRAMES[]
 
         # keep track of frames being skipped
         if num ∉ [1, length(bt)]
@@ -403,7 +407,7 @@ function render_backtrace(
 
             else
                 # show number of frames skipped
-                if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
+                if to_skip == false && n_skipped > 0
                     add_number_frames_skipped!(
                         content,
                         ctx,
@@ -426,6 +430,17 @@ function render_backtrace(
                 end
             end
         else
+            if num == length(bt) && n_skipped > 0
+                add_number_frames_skipped!(
+                    content,
+                    ctx,
+                    to_skip,
+                    num,
+                    bt,
+                    n_skipped,
+                    skipped_frames_modules,
+                )
+            end
             tot_frames_added += 1
         end
 

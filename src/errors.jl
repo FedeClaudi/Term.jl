@@ -18,7 +18,7 @@ import Term:
     do_by_line,
     RECURSIVE_OPEN_TAG_REGEX,
     STACKTRACE_HIDDEN_MODULES,
-    STACKTRACE_HIDE_FRAME
+    STACKTRACE_HIDE_FRAMES
 
 import ..Links: Link
 import ..Style: apply_style
@@ -97,8 +97,9 @@ function install_term_stacktrace(;
     hide_frames = true,
 )
     @eval begin
-        function Base.showerror(io::IO, er, bt::Vector; backtrace = true)
+        function Base.showerror(io::IO, er, bt; backtrace = true)
             print("\n")
+            # @info "Showing" er bt
 
             # shorten very long backtraces
             isa(er, StackOverflowError) && (bt = [bt[1:25]..., bt[(end - 25):end]...])
@@ -139,10 +140,14 @@ function install_term_stacktrace(;
                 end
 
                 # print message panel if VSCode is not handling that through a second call to this fn
-                isa(io.io, Base.TTY) &&
+                isa(io.io, Base.TTY) && begin
+                    msg = highlight(error_message(er)) |> apply_style
+                    msg = replace(msg, RECURSIVE_OPEN_TAG_REGEX => "")
+                    msg = reshape_text(msg, ctx.module_line_w; ignore_markup = true)
+
                     Panel(
                         RenderableText(
-                            highlight(error_message(er));
+                            escape_brackets(apply_style(highlight(error_message(er))));
                             width = ctx.module_line_w,
                         );
                         width = ctx.out_w,
@@ -152,17 +157,18 @@ function install_term_stacktrace(;
                         title_justify = :center,
                         fit = false,
                     ) |> print
+                end
 
             catch cought_err  # catch when something goes wrong during error handling in Term
                 @error "Term.jl: error while rendering error message: " cought_err
-                
+
                 for (i, (exc, _bt)) in enumerate(current_exceptions())
                     i == 1 && println("Error during term's stacktrace generation:")
                     Base.show_backtrace(io, _bt)
                     print(io, '\n'^3)
                     Base.showerror(io, exc)
                 end
-                
+
                 print(io, '\n'^5)
                 println(io, "Original error:")
                 Base.show_backtrace(io, bt)

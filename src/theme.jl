@@ -108,6 +108,11 @@ style outputs to terminal.
     tb_columns::String = "defualt"
     tb_footer::String  = "default"
     tb_box::Symbol     = :MINIMAL_HEAVY_HEAD
+
+    # prompt
+    prompt_text::String           = blue
+    prompt_default_option::String = "underline bold $green"
+    prompt_options::String        = "default"
 end
 
 DarkTheme = Theme(name = "dark")
