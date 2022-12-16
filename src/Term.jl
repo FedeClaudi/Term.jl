@@ -33,7 +33,7 @@ module Term
 using Unicode
 
 const STACKTRACE_HIDDEN_MODULES = Ref(String[])
-const STACKTRACE_HIDE_FRAME = Ref(true)
+const STACKTRACE_HIDE_FRAMES = Ref(true)
 
 const DEBUG_ON = Ref(false)
 
@@ -86,6 +86,7 @@ include("repr.jl")
 include("compositors.jl")
 include("grid.jl")
 include("introspection.jl")
+include("prompt.jl")
 
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
@@ -175,6 +176,12 @@ using .TermMarkdown: parse_md
 using .Repr: @with_repr, termshow, install_term_repr, @showme
 
 using .Grid
+
+using .Prompts
+
+# ---------------------------------------------------------------------------- #
+#                                PRE COMPILATION                               #
+# ---------------------------------------------------------------------------- #
 
 using SnoopPrecompile
 

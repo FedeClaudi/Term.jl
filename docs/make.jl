@@ -23,6 +23,7 @@ makedocs(;
             "basics/renderables.md",
             "basics/tprint.md",
             "basics/console.md",
+            "basics/prompt.md",
         ],
         "Renderables" => Any[
             "ren/intro.md",
