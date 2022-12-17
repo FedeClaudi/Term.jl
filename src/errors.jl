@@ -98,7 +98,7 @@ function install_term_stacktrace(;
 )
     @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
-            print("\n")
+            print(io, "\n")
             # @info "Showing" er bt
 
             # shorten very long backtraces
@@ -121,7 +121,7 @@ function install_term_stacktrace(;
                 # print an hLine with the error name
                 ename = string(typeof(er))
                 length(bt) > 0 && print(
-                    hLine(
+                    io, hLine(
                         "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
                         style = "dim $(ctx.theme.err_errmsg)",
                     ),
@@ -136,16 +136,16 @@ function install_term_stacktrace(;
                         max_n_frames = $(max_n_frames),
                         hide_frames = $(hide_frames),
                     )
-                    print(rendered_bt)
+                    print(io, rendered_bt)
                 end
 
                 # print message panel if VSCode is not handling that through a second call to this fn
-                isa(io.io, Base.TTY) && begin
+                (hasfield(typeof(io), :io) && isa(io.io, Base.TTY)) && begin
                     msg = highlight(error_message(er)) |> apply_style
                     msg = replace(msg, RECURSIVE_OPEN_TAG_REGEX => "")
                     msg = reshape_text(msg, ctx.module_line_w; ignore_markup = true)
 
-                    Panel(
+                    err_panel = Panel(
                         RenderableText(
                             escape_brackets(apply_style(highlight(error_message(er))));
                             width = ctx.module_line_w,
@@ -156,7 +156,8 @@ function install_term_stacktrace(;
                         style = "dim $(ctx.theme.err_errmsg)",
                         title_justify = :center,
                         fit = false,
-                    ) |> print
+                    ) 
+                    print(io, err_panel)
                 end
 
             catch cought_err  # catch when something goes wrong during error handling in Term
