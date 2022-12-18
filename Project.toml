@@ -4,6 +4,7 @@ authors = ["FedeClaudi <federicoclaudi@protonmail.com> and contributors"]
 version = "1.2.0"
 
 [deps]
+AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 CodeTracking = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Highlights = "eafb193a-b7ab-5a9e-9068-77385905fa72"

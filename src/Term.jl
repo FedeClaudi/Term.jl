@@ -181,6 +181,4 @@ using .Prompts
 
 include("__precompilation.jl")
 
-# TODO add more markdown, termshow and highlight precompilation
-
 end
