@@ -192,7 +192,7 @@ function error_message(er::TypeError)
     # @info "type err" er fieldnames(typeof(er)) er.func er.context er.expected er.got
     theme = TERM_THEME[]
     msg = "In `$(er.func)` > `$(er.context)` got"
-    msg *= " {$(theme.emphasis_light)) bold}$(er.got){/$(theme.emphasis_light)) bold}(::$(typeof(er.got))) but expected argument of type ::$(er.expected)"
+    msg *= " {$(theme.emphasis_light) bold}$(er.got){/$(theme.emphasis_light) bold}(::$(typeof(er.got))) but expected argument of type ::$(er.expected)"
     return msg
 end
 
