@@ -31,7 +31,7 @@ Constructs a measure object from a string
 function Measure(str::AbstractString)
     str = remove_markup(remove_ansi(str); remove_orphan_tags = false)
     lines = split(str, '\n')
-    return Measure(length(lines), maximum(textlen.(lines)))
+    return Measure(length(lines), maximum(textlen.(lines; remove_orphan_tags=false)))
 end
 
 Measure(::Nothing) = Measure(0, 0)

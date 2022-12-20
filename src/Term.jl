@@ -87,6 +87,7 @@ include("compositors.jl")
 include("grid.jl")
 include("introspection.jl")
 include("prompt.jl")
+include("annotations.jl")
 
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
@@ -178,6 +179,8 @@ using .Repr: @with_repr, termshow, install_term_repr, @showme
 using .Grid
 
 using .Prompts
+
+using .Annotations
 
 include("__precompilation.jl")
 
