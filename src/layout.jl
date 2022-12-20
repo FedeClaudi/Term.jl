@@ -344,8 +344,7 @@ function leftalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = maximum(map(r -> r.measure.w, renderables))
-    renderables = map(r -> pad(r, 0, width - r.measure.w), renderables)
-    return renderables
+    return map(r -> pad(r, 0, width - r.measure.w), renderables)
 end
 
 """

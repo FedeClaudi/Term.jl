@@ -1,7 +1,7 @@
 """ 
 multiple strings replacement.
 """
-function replace_multi(text, pairs...)::String
+function replace_multi(text::AbstractString, pairs::Pair...)::String
     VERSION ≥ v"1.7" && return replace(text, pairs...)
     VERSION < v"1.7" && begin
         for pair in pairs

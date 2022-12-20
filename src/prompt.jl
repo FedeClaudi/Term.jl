@@ -42,9 +42,6 @@ with a bit of style.
 """
 Base.print(io::IO, prompt::AbstractPrompt) = _print_prompt_text(io, prompt)
 
-Base.println(io::IO, prompt::AbstractPrompt) = print(io, prompt, "\n")
-tprint(io::IO, prompt::AbstractPrompt) = print(io, prompt)
-tprintln(io::IO, prompt::AbstractPrompt) = println(io, prompt)
 
 """
     ask

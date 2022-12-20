@@ -119,7 +119,7 @@ See also [`Renderable`](@ref), [`TextBox`](@ref)
 """
 
 mutable struct RenderableText <: AbstractRenderable
-    segments::Vector
+    segments::Vector{Segment}
     measure::Measure
     style::Union{Nothing,String}
 end
@@ -139,7 +139,7 @@ function RenderableText(
     background::Union{Nothing,String} = nothing,
     justify::Symbol = :left,
 )
-    stype = typeof(text)
+    stype::DataType = typeof(text)
     text = apply_style(text)
     text = text_to_width(text, width, justify; background = background) |> chomp
 
@@ -151,7 +151,7 @@ function RenderableText(
 
     segments = map(ln -> Segment(stype(style_init * ln * style_finish)), split(text, "\n"))
 
-    return RenderableText(segments, Measure(segments), style)
+    return RenderableText(segments::Vector{Segment}, Measure(segments), style::String)
 end
 
 """
