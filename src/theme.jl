@@ -113,6 +113,9 @@ style outputs to terminal.
     prompt_text::String           = blue
     prompt_default_option::String = "underline bold $green"
     prompt_options::String        = "default"
+
+    # annotations
+    annotation_color::String      = blue_light
 end
 
 DarkTheme = Theme(name = "dark")
