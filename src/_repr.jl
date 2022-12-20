@@ -182,11 +182,14 @@ function style_function_methods(fun, methods::String; max_n = 11, width = defaul
         )
     end
     methods_contents = if N > 1
+        # methods_texts = map(
+        #     m -> reshape_text(
+        #         m, width-30; ignore_markup=true
+        #     ), _methods  
+        # )  .|> highlight # .|> apply_style # .|> RenderableText
         methods_texts = map(
-            m -> reshape_text(
-                m, width-30; ignore_markup=true
-            ), _methods  
-        )  .|> highlight # .|> apply_style # .|> RenderableText
+            m -> reshape_code_string(m, width-30), _methods
+        )
 
         vstack(map(i -> counts[i] * methods_texts[i], 1:length(counts)) ...)
     else

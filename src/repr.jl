@@ -26,6 +26,7 @@ import ..TermMarkdown: parse_md
 
 export @with_repr, termshow, install_term_repr, @showme
 
+include("_code.jl")
 include("_repr.jl")
 include("_inspect.jl")
 

@@ -137,14 +137,24 @@ function apply_style(text)::String
 
         # get style codes
         ansi_open, ansi_close = get_style_codes(MarkupStyle(markup))
-
-        # replace markup with ANSI codes
-        text = replace_text(
-            text,
-            max(open_match.offset - 1, 0),
-            open_match.offset + length(markup) + 1,
-            ansi_open,
-        )
+        if ansi_open == "" && ansi_close == "" 
+            # found an invalid tag (e.g. {string}). Leave it but edit it to avoid getting stuck in this lookup
+            # replace markup with ANSI codes
+            text = replace_text(
+                text,
+                max(open_match.offset - 1, 0),
+                open_match.offset + length(markup) + 1,
+                "{{"*markup*"}}",
+            )
+        else
+            # replace markup with ANSI codes
+            text = replace_text(
+                text,
+                max(open_match.offset - 1, 0),
+                open_match.offset + length(markup) + 1,
+                ansi_open,
+            )
+        end
 
         # get closing tag (including [/] or missing close)
         close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"

@@ -16,7 +16,6 @@ import Term:
     plural,
     Theme,
     do_by_line,
-    RECURSIVE_OPEN_TAG_REGEX,
     STACKTRACE_HIDDEN_MODULES,
     STACKTRACE_HIDE_FRAMES
 
@@ -37,6 +36,8 @@ import ..Layout:
 import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
 import ..Measures: height
+
+include("_code.jl")
 
 export install_term_stacktrace
 
@@ -142,12 +143,12 @@ function install_term_stacktrace(;
                 # print message panel if VSCode is not handling that through a second call to this fn
                 (hasfield(typeof(io), :io) && isa(io.io, Base.TTY)) && begin
                     msg = highlight(error_message(er)) |> apply_style
-                    msg = replace(msg, RECURSIVE_OPEN_TAG_REGEX => "")
+                    # msg = replace(msg, RECURSIVE_OPEN_TAG_REGEX => "")
                     msg = reshape_text(msg, ctx.module_line_w; ignore_markup = true)
 
                     err_panel = Panel(
                         RenderableText(
-                            escape_brackets(apply_style(highlight(error_message(er))));
+                            reshape_code_string(error_message(er), ctx.module_line_w);
                             width = ctx.module_line_w,
                         );
                         width = ctx.out_w,

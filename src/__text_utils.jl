@@ -161,14 +161,14 @@ Replece every double squared parenthesis with a single copy of itself
 """
 unescape_brackets(text)::String = replace_multi(
     text,
-    remove_brackets_regexes[1] => "{",
-    remove_brackets_regexes[2] => "}",
+    "{{" => "{",
+    "}}" => "}",
 )
 
 unescape_brackets_with_space(text)::String = replace_multi(
     text,
-    remove_brackets_regexes[1] => " {",
-    remove_brackets_regexes[2] => "} ",
+    "{{" => " {",
+    "}}" => "} ",
 )
 
 # ---------------------------------------------------------------------------- #

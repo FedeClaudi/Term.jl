@@ -137,17 +137,8 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         ),
     )
 
-    func = highlight(func) |> apply_style
-    try
-        func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
-    catch
-    end
-
-    # reshape but taking care of potential curly bracktes
-    func = highlight(func) |> apply_style
-    func = reshape_text(func, ctx.func_name_w; ignore_markup = true)
-
-    return RenderableText(func)
+    func = reshape_code_string(func, ctx.func_name_w)
+    return RenderableText(func; width = ctx.func_name_w)
 end
 
 # ---------------------------------------------------------------------------- #
