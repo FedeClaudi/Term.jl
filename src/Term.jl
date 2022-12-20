@@ -67,6 +67,7 @@ function update! end
 include("style.jl")
 include("segments.jl")
 include("macros.jl")
+include("_code.jl")
 
 # renderables, rely heavily on other modules
 include("boxes.jl")

@@ -1,4 +1,6 @@
-import Term: load_code_and_highlight, highlight_syntax, highlight
+import Term:
+    load_code_and_highlight, highlight_syntax, highlight, reshape_code_string, str_trunc
+import Term.Style: apply_style
 
 @testset "\e[34mHIGHLIGHT" begin
     @test highlight("test 1 123 33.4 44,5 +1 -2 12 0.5, ,, ...") ==
@@ -27,7 +29,9 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
     @test highlight(:x;) == "\e[38;2;255;167;38mx\e[39m"
 
     @test highlight(:(x + y);) == "\e[38;2;255;202;40mx + y\e[39m"
+end
 
+@testset "HIGHLIGHT syntax basic" begin
     @test highlight_syntax("""
     This is ::Int64 my style
     print(x + 2)
@@ -45,4 +49,21 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
 
     @test load_code_and_highlight("02_test_ansi.jl", 92)[1:100] ==
           "  {grey39}89{/grey39} \e[38;2;222;222;222m    \e[39m\e[38;2;222;222;222mhexes\e[39m\e[38;2;222;222;222m \e"
+end
+
+@testset "HIGHLIGHT syntax adv" begin
+    for (i, ln) in enumerate((1, 2, 5, 90, 93, 94))
+        for (j, δ) in enumerate((0, 1, 3, 5))
+            _code = load_code_and_highlight("02_test_ansi.jl", ln; δ = δ)
+            IS_WIN || @compare_to_string(_code, "code_highlight_$(i)_$(j)")
+
+            for (k, w) in enumerate((15, 33, 67))
+                _code_w = reshape_code_string(_code, w)
+                IS_WIN || @compare_to_string(_code_w, "code_highlight_$(i)_$(j)_$(k)")
+
+                _code_s = str_trunc(apply_style(_code), w; ignore_markup = true)
+                IS_WIN || @compare_to_string(_code_s, "code_highlight_$(i)_$(j)_$(k)_trunc")
+            end
+        end
+    end
 end
