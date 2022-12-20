@@ -127,7 +127,7 @@ Apply style to a piece of text.
 Extract markup style information and insert the 
 appropriate ANSI codes to style a string.
 """
-function apply_style(text; leave_orphan_tags=false)::String
+function apply_style(text; leave_orphan_tags = false)::String
     has_markup(text) || return text
 
     while has_markup(text)
@@ -144,7 +144,7 @@ function apply_style(text; leave_orphan_tags=false)::String
                 text,
                 max(open_match.offset - 1, 0),
                 open_match.offset + length(markup) + 1,
-                "{{"*markup*"}}",
+                "{{" * markup * "}}",
             )
         else
             # replace markup with ANSI codes

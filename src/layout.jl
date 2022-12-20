@@ -713,7 +713,7 @@ function hLine(
     text::String;
     style::String = TERM_THEME[].line,
     box::Symbol = TERM_THEME[].box,
-    pad_txt::Bool=true,
+    pad_txt::Bool = true,
 )
     box = BOXES[box]
     text = apply_style(text) * "\e[0m"

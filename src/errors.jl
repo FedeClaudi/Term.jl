@@ -122,7 +122,8 @@ function install_term_stacktrace(;
                 # print an hLine with the error name
                 ename = string(typeof(er))
                 length(bt) > 0 && print(
-                    io, hLine(
+                    io,
+                    hLine(
                         "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
                         style = "dim $(ctx.theme.err_errmsg)",
                     ),
@@ -157,7 +158,7 @@ function install_term_stacktrace(;
                         style = "dim $(ctx.theme.err_errmsg)",
                         title_justify = :center,
                         fit = false,
-                    ) 
+                    )
                     print(io, err_panel)
                 end
 

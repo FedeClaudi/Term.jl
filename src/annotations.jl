@@ -11,7 +11,6 @@ import ..Consoles: console_width
 
 export Annotation
 
-
 # ---------------------------------------------------------------------------- #
 #                                  DECORATION                                  #
 # ---------------------------------------------------------------------------- #
@@ -58,29 +57,40 @@ gets resized if its too large (based on `position` and `console_width`).
 - `underscore_width`: the width of the underscore line. 
 - `style`: color/style information
 """
-function Decoration(num::Int, position::Int, message::String, underscore_width::Int, style::String)
+function Decoration(
+    num::Int,
+    position::Int,
+    message::String,
+    underscore_width::Int,
+    style::String,
+)
     # create hLine underscore
-    underscore = hLine(underscore_width, "┬"; pad_txt=false, style="$style dim")
+    underscore = hLine(underscore_width, "┬"; pad_txt = false, style = "$style dim")
 
     # get the width of the text, see if it needs to be adjusted
     message = apply_style(message)
     max_w = min(width(message), console_width() - position - 20)
 
     # create `Panel` and add the end of an "arrow" to the side.
-    msg_panel = Panel(RenderableText(message; style=style, width=max_w); fit=true, style="$style dim")
-    msg_panel = "{$style dim}│{/$style dim}"/"{$style dim}╰─{/$style dim}" * (Spacer(0, 1)/msg_panel)
+    msg_panel = Panel(
+        RenderableText(message; style = style, width = max_w);
+        fit = true,
+        style = "$style dim",
+    )
+    msg_panel =
+        "{$style dim}│{/$style dim}" / "{$style dim}╰─{/$style dim}" *
+        (Spacer(0, 1) / msg_panel)
     return Decoration(num, position, underscore, msg_panel, style)
 end
 
 """ halve and round a number """
-half(x) = fint(x/2)
+half(x) = fint(x / 2)
 
 """ Make a vector of `Spacer` objects of given widths"""
 make_spaces(widths::Vector{Int})::Vector{Spacer} = collect(map(w -> Spacer(1, w), widths))
 
 """ hstack interleaved elements x ∈ X, y ∈ Y """
-join_interleaved(X, Y) = hstack([x*y for (x, y) in zip(X, Y)]...) |> string |> apply_style
-
+join_interleaved(X, Y) = hstack([x * y for (x, y) in zip(X, Y)]...) |> string |> apply_style
 
 """
     overlay_decorations(decorations::Vector{Decoration})
@@ -128,35 +138,35 @@ function overlay_decorations(decorations::Vector{Decoration})
     # create the first line with all the underlines
     lines = []
     lpads = map(
-        i -> i == 1 ? 
-            positions[1] : 
-            positions[i] - positions[i-1] - underscores_widths[i-1] + 2,
-        1:n
+        i ->
+            i == 1 ? positions[1] :
+            positions[i] - positions[i - 1] - underscores_widths[i - 1] + 2,
+        1:n,
     )
     spaces = make_spaces(lpads)
     push!(lines, join_interleaved(spaces, getfield.(decorations, :underscore)))
 
     # make a second line with just verticals
     lpads = map(
-        i -> i == 1 ? 
-            positions[1] + underscores_centers[1] -1 : 
-            positions[i] - positions[i-1] - underscores_centers[i-1] + underscores_centers[i] - 1,
-        1:n
+        i ->
+            i == 1 ? positions[1] + underscores_centers[1] - 1 :
+            positions[i] - positions[i - 1] - underscores_centers[i - 1] +
+            underscores_centers[i] - 1,
+        1:n,
     )
     spaces = make_spaces(lpads)
     verts = map(d -> "{$(d.style) dim}│{/$(d.style) dim}", decorations)
     push!(lines, join_interleaved(spaces, verts))
-
 
     # render additional lines with their messages
     decs = Dict([i => decorations[i] for i in 1:n])
     rendering = 1
     while rendering <= n
         # get the pad to the left of the message panel
-        lpad = rendering == 1 ? lpads[1] : sum(lpads[1:rendering])+rendering
+        lpad = rendering == 1 ? lpads[1] : sum(lpads[1:rendering]) + rendering
 
         # get each line of the message
-        for i in 1:decs[rendering].panel.measure.h
+        for i in 1:(decs[rendering].panel.measure.h)
             # get the panel segment & add space to put it in the right place
             ln = decs[rendering].panel.segments[i]
             pad_size = rendering == 1 ? lpad : lpad - 1
@@ -165,11 +175,11 @@ function overlay_decorations(decorations::Vector{Decoration})
             # add vertical segments for every other decoration to the side of the message panel
             if rendering < n
                 l = width(line)
-                for j in rendering+1:n
+                for j in (rendering + 1):n
                     pad_size = decorations[j].position - l + underscores_centers[j] - 1
                     pad_size < 0 && continue
                     space = " "^(pad_size)
-                    _style  = decorations[j].style
+                    _style = decorations[j].style
                     line *= space * "{$_style dim}│{/$_style dim}"
                 end
             end
@@ -180,8 +190,12 @@ function overlay_decorations(decorations::Vector{Decoration})
 
         # add a line with the vertical elements of each decoration left to render
         if rendering < n
-            line = " "^(positions[rendering] + underscores_centers[rendering]) 
-            push!(lines, line * join_interleaved(spaces[rendering+1:end], verts[rendering+1:end]))
+            line = " "^(positions[rendering] + underscores_centers[rendering])
+            push!(
+                lines,
+                line *
+                join_interleaved(spaces[(rendering + 1):end], verts[(rendering + 1):end]),
+            )
         end
 
         rendering += 1
@@ -189,8 +203,6 @@ function overlay_decorations(decorations::Vector{Decoration})
 
     return join(lines, "\n")
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                  ANNOTATION                                  #
@@ -238,12 +250,11 @@ struct Annotation <: AbstractRenderable
     segments::Vector
     measure::Measure
 
-    function Annotation(text::String) 
+    function Annotation(text::String)
         rt = RenderableText(text)
         return new(rt.segments, rt.measure)
     end
 end
-
 
 """
     Annotation(text::String, annotations::Pair...; kwargs...)
@@ -276,21 +287,13 @@ function Annotation(text::String, annotations::Pair...; kwargs...)
         end
 
         # get the size of the annotation decoration
-        underscore_width = match.stop - match.start+3
-        push!(decorations, Decoration(i, match.start-1, msg, underscore_width, style))
-
+        underscore_width = match.stop - match.start + 3
+        push!(decorations, Decoration(i, match.start - 1, msg, underscore_width, style))
     end
     # reverse!(decorations)
 
     decos = overlay_decorations(decorations)
-    return Annotation(text/decos)
+    return Annotation(text / decos)
 end
 
-
-
-
 end
-
-
-
-

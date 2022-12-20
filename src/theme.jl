@@ -115,7 +115,7 @@ style outputs to terminal.
     prompt_options::String        = "default"
 
     # annotations
-    annotation_color::String      = blue_light
+    annotation_color::String = blue_light
 end
 
 DarkTheme = Theme(name = "dark")

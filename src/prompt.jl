@@ -42,7 +42,6 @@ with a bit of style.
 """
 Base.print(io::IO, prompt::AbstractPrompt) = _print_prompt_text(io, prompt)
 
-
 """
     ask
 

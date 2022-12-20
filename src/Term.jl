@@ -40,7 +40,8 @@ const DEBUG_ON = Ref(false)
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
 const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
 
-default_width(io = stdout)::Int = min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+default_width(io = stdout)::Int =
+    min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 default_stacktrace_width(io = stderr)::Int =
     min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 

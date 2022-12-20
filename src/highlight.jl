@@ -14,10 +14,7 @@ highlight_regexes = OrderedDict(
     :expression => (r"(?<group>\:\(+.+[\)])",),
     :symbol => (r"(?<group>(?<!\:)(?<!\:)\:\w+)",),
     # :emphasis_light => (r"(?<group>[\[\]\(\)])", r"(?<group>@\w+)"),
-    :type => (
-        r"(?<group>\:\:[\w\.]*)", 
-        r"(?<group>\<\:\w+)"
-        ),
+    :type => (r"(?<group>\:\:[\w\.]*)", r"(?<group>\<\:\w+)"),
 )
 
 """
@@ -26,7 +23,11 @@ highlight_regexes = OrderedDict(
 Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object.
 """
-function highlight(text::AbstractString; theme::Theme = TERM_THEME[], ignore_ansi::Bool=false)
+function highlight(
+    text::AbstractString;
+    theme::Theme = TERM_THEME[],
+    ignore_ansi::Bool = false,
+)
     (has_ansi(text) && !ignore_ansi) && return text
 
     # highlight with regexes 

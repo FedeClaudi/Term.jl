@@ -1,19 +1,15 @@
 
- # ---------------------------------------------------------------------------- #
- #                                PRECOMPILATION                                #
- # ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+#                                PRECOMPILATION                                #
+# ---------------------------------------------------------------------------- #
 #  originalSTDOUT = stdout
 #  (outRead, outWrite) = redirect_stdout()
 
- using SnoopPrecompile
- SnoopPrecompile.verbose[] = false
+using SnoopPrecompile
+SnoopPrecompile.verbose[] = false
 
-
-
-
- @precompile_setup begin
+@precompile_setup begin
     txt = "aa asdasdaasads da qw d"^30
-
 
     @precompile_all_calls begin
         reshape_text(txt, 10)
@@ -35,7 +31,7 @@
         # remove_ansi(with_ansi)
         # remove_markup(txt)
         # remove_markup(txt; remove_orphan_tags = false)
-        
+
         # reshape_text(txt, 43);
         # text_to_width(txt, 43, :left)
 
@@ -45,7 +41,6 @@
         # r / p;
     end
 end
-
 
 # close(outRead)
 # redirect_stdout(originalSTDOUT)
