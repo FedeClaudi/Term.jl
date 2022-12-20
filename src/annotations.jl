@@ -87,7 +87,7 @@ end
 half(x) = fint(x / 2)
 
 """ Make a vector of `Spacer` objects of given widths"""
-make_spaces(widths::Vector{Int})::Vector{Spacer} = collct(map(w -> Spacer(1, w), widths))
+make_spaces(widths::Vector{Int})::Vector{Spacer} = collect(map(w -> Spacer(1, w), widths))
 
 """ hstack interleaved elements x ∈ X, y ∈ Y """
 join_interleaved(X, Y) = hstack([x * y for (x, y) in zip(X, Y)]...) |> string |> apply_style
