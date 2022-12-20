@@ -8,6 +8,19 @@ Annotation(
     "content" => ("here you put what goes inside the panel", "white"),
     "fit=true" => (
         "Setting this as `true` adjusts the panel's width to fit `content`. Otherwise `Panel` will have a fixed width",
-        "blue_light",
+        "bright_blue",
     ),
 ) |> print
+
+txt = """Annotation("main text", "this"=>"annotation: extra info", "main text"=>("with style", "green"))"""
+ex = "\"to annotate\"=>(\"annotation message\", \"red\")"
+ann = Annotation(
+    highlight_syntax(txt),
+    "Annotation" => ("contructor", TERM_THEME[].func),
+    "main text" => "text to be annotated.\nSubstrings of this will be annotated with extra info.",
+    "\"this\"=>\"annotation: extra info\"" => "simple annotation, no style. Just passed as a `Pair`",
+    """"main text"=>("with style", "green"))""" => (
+        "annotation with extra style info: use a `Tuple` to specify both the annotation's message and additional style info. For example:\n\n $(highlight_syntax(ex))",
+        "bright_green",
+    ),
+)

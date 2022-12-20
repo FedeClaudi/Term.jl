@@ -64,4 +64,37 @@ import Term: highlight_syntax, TERM_THEME, Panel
         style = "green dim",
     )
     IS_WIN || @compare_to_string(ann, "annotations_6")
+
+    TERM_THEME[].annotation_color = "white"
+    txt = """Annotation("main text", "this"=>"annotation: extra info", "main text"=>("with style", "green"))"""
+    ann = Annotation(
+        highlight_syntax(txt),
+        "Annotation" => "contructor",
+        "main text" => "text to be annotated",
+        "\"this\"=>\"annotation: extra info\"" => "simple annotation, no style",
+        """"main text"=>("with style", "green"))""" => "annotation with extra style info",
+    )
+    IS_WIN || @compare_to_string(ann, "annotations_7")
+
+    ann = Annotation(
+        highlight_syntax(txt),
+        "Annotation" => "contructor",
+        "main text" => "text to be annotated.\nSubstrings of this will be annotated with extra info.",
+        "\"this\"=>\"annotation: extra info\"" => "simple annotation, no style",
+        """"main text"=>("with style", "green"))""" => "annotation with extra style info",
+    )
+    IS_WIN || @compare_to_string(ann, "annotations_8")
+
+    ex = "\"to annotate\"=>(\"annotation message\", \"red\")"
+    ann = Annotation(
+        highlight_syntax(txt),
+        "Annotation" => ("contructor", TERM_THEME[].func),
+        "main text" => "text to be annotated.\nSubstrings of this will be annotated with extra info.",
+        "\"this\"=>\"annotation: extra info\"" => "simple annotation, no style. Just passed as a `Pair`",
+        """"main text"=>("with style", "green"))""" => (
+            "annotation with extra style info: use a `Tuple` to specify both the annotation's message and additional style info. For example:\n\n $(highlight_syntax(ex))",
+            "bright_green",
+        ),
+    )
+    IS_WIN || @compare_to_string(ann, "annotations_9")
 end

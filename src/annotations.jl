@@ -69,7 +69,7 @@ function Decoration(
 
     # get the width of the text, see if it needs to be adjusted
     message = apply_style(message)
-    max_w = min(width(message), console_width() - position - 20)
+    max_w = min(width(message), console_width() - position - 30)
 
     # create `Panel` and add the end of an "arrow" to the side.
     msg_panel = Panel(
@@ -174,8 +174,8 @@ function overlay_decorations(decorations::Vector{Decoration})
 
             # add vertical segments for every other decoration to the side of the message panel
             if rendering < n
-                l = width(line)
                 for j in (rendering + 1):n
+                    l = width(line)
                     pad_size = decorations[j].position - l + underscores_centers[j] - 1
                     pad_size < 0 && continue
                     space = " "^(pad_size)
@@ -269,6 +269,7 @@ parentheses is the annotation message and the second the style info. The first `
 in the `Pair` should be a substring of `text` to denote where the annotation occurs.
 """
 function Annotation(text::String, annotations::Pair...; kwargs...)
+    @assert width(text) < console_width() && height(text) == 1 "Annotation can only annotate a single line, small enough to fit in the screen."
     rawtext = cleantext(text)
 
     # create decoration objects
