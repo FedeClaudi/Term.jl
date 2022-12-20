@@ -13,7 +13,8 @@ import Term:
     TERM_THEME,
     default_width,
     plural,
-    reshape_text
+    reshape_text,
+    remove_markup
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable

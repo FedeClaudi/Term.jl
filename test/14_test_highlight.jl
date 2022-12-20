@@ -22,7 +22,7 @@ import Term: load_code_and_highlight, highlight_syntax, highlight
     @test highlight(print;) == "\e[38;2;242;215;119mprint\e[39m"
 
     @test highlight("this :this :(x+y) 'a'";) ==
-          "this {#FFA726}:this{/#FFA726} {#FFCA28}:{#FFF59D}({/#FFF59D}x{#EF5350}+{/#EF5350}y{#FFF59D}){/#FFF59D}{/#FFCA28} {#64b565}'a'{/#64b565}"
+    "this {#FFA726}:this{/#FFA726} {#FFCA28}:(x{#EF5350}+{/#EF5350}y){/#FFCA28} {#64b565}'a'{/#64b565}"
 
     @test highlight(:x;) == "\e[38;2;255;167;38mx\e[39m"
 

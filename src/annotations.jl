@@ -11,20 +11,24 @@ import ..Consoles: console_width
 
 export Annotation
 
-struct Annotation <: AbstractRenderable
-    segments::Vector
-    measure::Measure
 
-    function Annotation(text::String) 
-        rt = RenderableText(text)
-        return new(rt.segments, rt.measure)
-    end
-end
+# ---------------------------------------------------------------------------- #
+#                                  DECORATION                                  #
+# ---------------------------------------------------------------------------- #
 
 """
+struct Decoration
+    nun::Int
+    position::Int
+    underscore::hLine
+    panel::Renderable
+    style::String
+end
 
+A decoration storing a message to anotate a piece of text.
+`Decoration`s are used by `Annotation` to annotate text.
 
-A decoration is to make things like:
+A `Decoration` looks something like this when rendered.
 ```
 ────┬───                              
     │                                 
@@ -41,32 +45,83 @@ struct Decoration
     style::String
 end
 
+"""
+    Decoration(num::Int, position::Int, message::String, underscore_width::Int, style::String)
 
+Construct a `Decoration`. When preparing the `Panel` with the message, the `message` text
+gets resized if its too large (based on `position` and `console_width`).
+
+## Arguments
+- `num` number of decoration (for `Annotation` with multiple decorations)
+- `position` position of the decoration start in the text (position of the start of the underscore)
+- `message` text going inside the message box
+- `underscore_width`: the width of the underscore line. 
+- `style`: color/style information
+"""
 function Decoration(num::Int, position::Int, message::String, underscore_width::Int, style::String)
+    # create hLine underscore
     underscore = hLine(underscore_width, "┬"; pad_txt=false, style="$style dim")
 
+    # get the width of the text, see if it needs to be adjusted
     message = apply_style(message)
     max_w = min(width(message), console_width() - position - 20)
 
+    # create `Panel` and add the end of an "arrow" to the side.
     msg_panel = Panel(RenderableText(message; style=style, width=max_w); fit=true, style="$style dim")
     msg_panel = "{$style dim}│{/$style dim}"/"{$style dim}╰─{/$style dim}" * (Spacer(0, 1)/msg_panel)
     return Decoration(num, position, underscore, msg_panel, style)
 end
 
-
+""" halve and round a number """
 half(x) = fint(x/2)
-make_spaces(widths::Vector{Int}) = map(w -> Spacer(1, w), widths)
+
+""" Make a vector of `Spacer` objects of given widths"""
+make_spaces(widths::Vector{Int})::Vector{Spacer} = collect(map(w -> Spacer(1, w), widths))
+
+""" hstack interleaved elements x ∈ X, y ∈ Y """
 join_interleaved(X, Y) = hstack([x*y for (x, y) in zip(X, Y)]...) |> string |> apply_style
 
+
+"""
+    overlay_decorations(decorations::Vector{Decoration})
+
+Overlayed rendering of multiple `Decoration` object.
+Given multiple decorations, create a visualization like:
+
+```
+Panel(content; fit=true)                                                                 
+──┬── ───┬───  ────┬───                                                                  
+  │      │         │                                                                     
+  │ ╭─────────────────────────────────╮                                                  
+  ╰─│  this is the panel constructor  │                                                  
+    ╰─────────────────────────────────╯                                                  
+         │         │                                                                     
+         │ ╭───────────────────────────────────────────╮                                 
+         ╰─│  here you put what goes inside the panel  │                                 
+           ╰───────────────────────────────────────────╯                                 
+                   │                                                                     
+                   │ ╭──────────────────────────────────────────────────────────────────╮
+                   ╰─│  Setting this as `true` adjusts the panel's width to fit         │
+                     │  `content`. Otherwise `Panel` will have a fixed width            │
+                     ╰──────────────────────────────────────────────────────────────────╯
+```
+
+Note: we need all the underscores, the vertical lines to be in the right place
+and for the `Panel` with heach message to be over the lines of the following
+decorations. Spacing should be accounted to make sure all messages are visible. 
+
+Note: this function is quite long and nasty, but it seems to work well.
+"""
 function overlay_decorations(decorations::Vector{Decoration})
     n = length(decorations)
     positions = getfield.(decorations, :position)
 
-    # make sure decorations are in order
+    # make sure decorations are in order based on position
     sorter = sortperm(positions)
     decorations = decorations[sorter]
     positions = positions[sorter]
 
+    # get some info
     underscores_widths = width.(getfield.(decorations, :underscore))
     underscores_centers = half.(underscores_widths)
 
@@ -93,7 +148,7 @@ function overlay_decorations(decorations::Vector{Decoration})
     push!(lines, join_interleaved(spaces, verts))
 
 
-    # render additinoal lines with the messages
+    # render additional lines with their messages
     decs = Dict([i => decorations[i] for i in 1:n])
     rendering = 1
     while rendering <= n
@@ -102,7 +157,7 @@ function overlay_decorations(decorations::Vector{Decoration})
 
         # get each line of the message
         for i in 1:decs[rendering].panel.measure.h
-            # get the panel segment
+            # get the panel segment & add space to put it in the right place
             ln = decs[rendering].panel.segments[i]
             pad_size = rendering == 1 ? lpad : lpad - 1
             line = " "^(pad_size) * string(ln)
@@ -123,7 +178,7 @@ function overlay_decorations(decorations::Vector{Decoration})
             push!(lines, line)
         end
 
-        # add vertical lines for every remaining decoration
+        # add a line with the vertical elements of each decoration left to render
         if rendering < n
             line = " "^(positions[rendering] + underscores_centers[rendering]) 
             push!(lines, line * join_interleaved(spaces[rendering+1:end], verts[rendering+1:end]))
@@ -136,6 +191,72 @@ function overlay_decorations(decorations::Vector{Decoration})
 end
 
 
+
+# ---------------------------------------------------------------------------- #
+#                                  ANNOTATION                                  #
+# ---------------------------------------------------------------------------- #
+
+"""
+    struct  Annotation <: AbstractRenderable
+        segments::Vector
+        measure::Measure
+    end
+
+Represents a bit of text with some additional annotations. 
+Annotations are additional messages that get printed below 
+the main piece of text.
+
+## Example
+```julia
+Annotation("This is the text", "text"=>"this is an annotation")
+````
+gives
+```
+This is the text                           
+            ──┬─                           
+              │                            
+              │ ╭─────────────────────────╮
+              ╰─│  this is an annotation  │
+                ╰─────────────────────────╯
+```
+
+---
+This bit:
+```
+──┬─                           
+  │                            
+  │ ╭─────────────────────────╮
+  ╰─│  this is an annotation  │
+    ╰─────────────────────────╯
+```
+is called a `Decoration`. 
+
+A piece of text can have multiple decorations if multiple pares are 
+passed in the function call above. 
+"""
+struct Annotation <: AbstractRenderable
+    segments::Vector
+    measure::Measure
+
+    function Annotation(text::String) 
+        rt = RenderableText(text)
+        return new(rt.segments, rt.measure)
+    end
+end
+
+
+"""
+    Annotation(text::String, annotations::Pair...; kwargs...)
+
+Construct an `Annotation`.
+
+The argument `annotations` is a set of `Pair`s denoting which parts
+of `text` gets annotated, with what, and what style information each annotation
+should have. These pairas can be of the form `String=>String` if no style information
+is passed, otherwise `String=>(String, String)` where the first `String` in the 
+parentheses is the annotation message and the second the style info. The first `String`
+in the `Pair` should be a substring of `text` to denote where the annotation occurs.
+"""
 function Annotation(text::String, annotations::Pair...; kwargs...)
     rawtext = cleantext(text)
 

@@ -105,7 +105,7 @@ style outputs to terminal.
     # table
     tb_style::String   = "#9bb3e0"
     tb_header::String  = "bold white"
-    tb_columns::String = "defualt"
+    tb_columns::String = "default"
     tb_footer::String  = "default"
     tb_box::Symbol     = :MINIMAL_HEAVY_HEAD
 
