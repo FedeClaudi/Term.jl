@@ -563,7 +563,6 @@ function hstack(renderables...; pad::Int = 0)
     return renderable
 end
 
-
 # --------------------------------- operators -------------------------------- #
 
 """

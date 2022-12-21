@@ -11,7 +11,7 @@ There's MANY options to tables, so we can't cover all of them here, head to the 
 for more info.
 """
 
-t = 20:5
+t = 1:5
 data = hcat(t, ones(length(t)), rand(Int8, length(t)))
 
 """

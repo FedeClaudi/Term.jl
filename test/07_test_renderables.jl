@@ -52,7 +52,7 @@ end
 
     @test_nothrow @capture_out show(r)
 
-    @test sprint(io -> show(io, MIME("text/plain"), r)) == string(r)*"\n"
+    @test sprint(io -> show(io, MIME("text/plain"), r)) == string(r) * "\n"
 end
 
 @testset "\e[34mRenderables - RenderableText basic" begin

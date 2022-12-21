@@ -194,7 +194,12 @@ end
     for (i, w) in enumerate((5, 9, 10, 11, 12, 13, 14, 15))
         for (j, title) in enumerate(("aa", "aaaa", "aaaaaa", "adadasdoajdoaidjaldad"))
             for (k, just) in enumerate([:left, :center, :right])
-                p = Panel(; width = w, title = title, title_justify = just, style="hidden")
+                p = Panel(;
+                    width = w,
+                    title = title,
+                    title_justify = just,
+                    style = "hidden",
+                )
                 IS_WIN || @compare_to_string(p, "small_panel_title_$(i)_$(j)_$(k)")
             end
         end
@@ -427,12 +432,11 @@ end
     IS_WIN || @compare_to_string(pns, "panels_layout_macro6")
 end
 
-
 @testset "PANEL - constructors" begin
-    p1, p2 = Panel(; width=5), Panel(; width = 8)
+    p1, p2 = Panel(; width = 5), Panel(; width = 8)
     p = Panel([p1, p2])
     IS_WIN || @compare_to_string(string(p), "panels_constructors_1")
 
-    p = Panel(string.[p1, p2])
+    p = Panel(string.([p1, p2]))
     IS_WIN || @compare_to_string(string(p), "panels_constructors_2")
 end

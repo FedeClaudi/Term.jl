@@ -5,8 +5,6 @@ using Term.Progress
 import ProgressLogging
 import UUIDs: uuid4
 
-
-
 @testset "\e[34mLOGS test" begin
     install_term_logger()
     println("\nTesting logging, stdout temporarily disabled")

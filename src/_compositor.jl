@@ -80,7 +80,6 @@ function collect_elements(ex::Expr)
     end
 end
 
-
 function clean_layout_expr(ex::Expr)
     if ex.args[1] ∉ layout_symbols
         return ex.args[1]

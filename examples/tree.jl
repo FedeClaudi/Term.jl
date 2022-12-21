@@ -8,7 +8,7 @@ to show in the tree
 
 import Term: Tree
 
-data = Dict("a" => 1, "b" => Int64, "c" => [1, 2, 3], "d"=>"a b c"^100)
+data = Dict("a" => 1, "b" => Int64, "c" => [1, 2, 3], "d" => "a b c"^100)
 
 print(Tree(data))
 

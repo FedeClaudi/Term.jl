@@ -25,7 +25,6 @@ tprint(x; highlight = true) = tprint(stdout, x; highlight = highlight)
 
 tprint(io::IO, x; highlight = true) = tprint(io, string(x); highlight = highlight)
 
-
 """
 ---
     tprint(x::AbstractString)

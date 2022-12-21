@@ -247,23 +247,18 @@ end
 
     @compare_to_string(justify(str, 150), "justify")
 
-
     txt = "adsda\nadasda\nergeer\nxcvxvxvx\naasdada"
     @compare_to_string(fillin(txt), "fill_in_1")
-    @compare_to_string(fillin(txt; bg="red"), "fill_in_2")
+    @compare_to_string(fillin(txt; bg = "red"), "fill_in_2")
 end
-
-
 
 @testset "str_trunc" begin
     str = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod \ntempor incididunt ut labore et dolore\n magna aliqua."
-    
+
     for (i, w) in enumerate((12, 51, 31))
         @compare_to_string(str_trunc(str, w), "str_trunc_$(i)")
-
     end
 end
-
 
 @testset "code reshaping" begin
     codes = [
@@ -274,9 +269,9 @@ end
         """(::Term.Tables.var"#1#3"{Tables.MatrixTable{Matrix{Float64}}})(c::Symbol)""",
     ]
 
-    width = (32, 65, 88)
+    widths = (32, 65, 88)
 
-    for (i,c) in enumerate(codes) for (j,w) in enumerate(widths)
+    for (i, c) in enumerate(codes), (j, w) in enumerate(widths)
         reshaped = reshape_code_string(c, w)
         @test get_width(reshaped) <= w
         IS_WIN || @compare_to_string reshaped "reshaped_code_$(i)_$(j)"

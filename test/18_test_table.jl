@@ -57,7 +57,5 @@ tbls = [t1, t2, t3, t4, t5, t6, t7, t8]
     end
 
     # test table with problems
-    t7 = Table(data; columns_widths = [25, 7, 7,12, 41, 52], footer = sum, box = :SIMPLE)
-
+    t7 = Table(data; columns_widths = [25, 7, 7, 12, 41, 52], footer = sum, box = :SIMPLE)
 end
-

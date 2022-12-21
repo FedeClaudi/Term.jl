@@ -182,7 +182,6 @@ function read_file_lines(path::AbstractString, start::Int, stop::Int)
     return collect(enumerate(lines))[start:stop]
 end
 
-
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
@@ -192,7 +191,6 @@ end
 Get a view object with appropriate indices
 """
 tview(text, start::Int, stop::Int) = view(text, thisind(text, start):thisind(text, stop))
-
 
 """
     replace_text(text::AbstractString, start::Int, stop::Int, replace::AbstractString)
@@ -297,7 +295,6 @@ Apply `fn` to each line in the `text`.
 The function `fn` should accept a single `::String` argument.
 """
 do_by_line(fn::Function, text::AbstractString)::String = join(fn.(split_lines(text)), "\n")
-
 
 # ------------------------------- reshape text ------------------------------- #
 """

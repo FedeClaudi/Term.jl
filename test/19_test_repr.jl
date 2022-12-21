@@ -22,16 +22,14 @@ end
     end
 
     obj = Rocket(10, 50, 5000, "NASA")
-    IS_WIN || @compare_to_string sprint(termshow, obj) == "repr_rocket"
-    IS_WIN || @compare_to_string sprint(termshow, Rocket) == "repr_rocket_struct"
-
+    IS_WIN || @compare_to_string sprint(termshow, obj) "repr_rocket"
+    IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
 
     @with_repr struct T end
-    IS_WIN || @compare_to_string sprint(termshow, T()) == "repr_T_struct"
+    IS_WIN || @compare_to_string sprint(termshow, T()) "repr_T_struct"
 end
 
 @testset "REPR @with_repr with doc" begin
-
     """docs"""
     @with_repr struct Rocket2
         width::Int
@@ -44,7 +42,8 @@ end
     r = Rocket2(1, 1, 1.0, "me")
     _repr = sprint(io -> show(io, MIME("text/plain"), r))
     IS_WIN || @compare_to_string _repr "repr_rocket_2"
-    IS_WIN || @compare_to_string sprint(io -> show(io, MIME("text/plain"), Rocket2)) "repr_rocket_2_show"
+    IS_WIN ||
+        @compare_to_string sprint(io -> show(io, MIME("text/plain"), Rocket2)) "repr_rocket_2_show"
 end
 
 objs = if VERSION >= v"1.7.1"
@@ -60,7 +59,7 @@ objs = if VERSION >= v"1.7.1"
         (9, zeros(10)),
         (10, zeros(5, 5)),
         (11, zeros(100, 100, 100)),
-        (12, Panel)
+        (12, Panel),
     )
 else
     (

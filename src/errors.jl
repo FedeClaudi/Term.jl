@@ -17,7 +17,7 @@ import Term:
     Theme,
     do_by_line,
     STACKTRACE_HIDDEN_MODULES,
-    STACKTRACE_HIDE_FRAMES, 
+    STACKTRACE_HIDE_FRAMES,
     reshape_code_string
 
 import ..Links: Link
@@ -37,7 +37,6 @@ import ..Layout:
 import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
 import ..Measures: height
-
 
 export install_term_stacktrace
 
