@@ -213,8 +213,12 @@ function add_stack_frame!(
     # make file line & load source code around error and render it
     panel_content = if length(string(frame.file)) > 0
         # get a link renderable pointing to error
-        source_file = Link(string(frame.file), frame.line; style = "underline dim")
-        _out = func_line / source_file
+        if TERM_SHOW_LINK_IN_STACKTRACE[] == true
+            source_file = Link(string(frame.file), frame.line; style = "underline dim")
+            _out = func_line / source_file
+        else
+            _out = func_line
+        end
         error_source = render_error_code_line(ctx, frame; δ = δ)
         isnothing(error_source) || (_out /= error_source)
         _out

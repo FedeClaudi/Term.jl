@@ -18,7 +18,8 @@ import Term:
     do_by_line,
     STACKTRACE_HIDDEN_MODULES,
     STACKTRACE_HIDE_FRAMES,
-    reshape_code_string
+    reshape_code_string,
+    TERM_SHOW_LINK_IN_STACKTRACE
 
 import ..Links: Link
 import ..Style: apply_style

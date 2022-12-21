@@ -1,7 +1,8 @@
-import Term: install_term_stacktrace
-import Term.Errors: error_message
+import Term: install_term_stacktrace, TERM_SHOW_LINK_IN_STACKTRACE
+import Term.Errors: error_message, StacktraceContext, render_backtrace
 
-install_term_stacktrace()
+install_term_stacktrace(; hide_frames = false)
+TERM_SHOW_LINK_IN_STACKTRACE[] = false
 
 """
 The logic behind these tests is that if something goes
@@ -95,4 +96,21 @@ end
           "(\"objects of type \", Symbol, \" are not callable\")\n \n{dim}No alternative candidates found"
     @test error_message(MethodError(print, (Panel, Int))) ==
           "No method matching {bold #42A5F5  bold}`print`{/bold #42A5F5  bold} with arguments types:\n{#CE93D8}::DataType{/#CE93D8}, {#CE93D8}::DataType{/#CE93D8}\n                       \nAlternative candidates:\n  \e[38;2;242;215;119mprint\e[39m(::Any...)      \n  \e[38;2;242;215;119mprint\e[39m(\e[31m::IO\e[39m, ::Any)   "
+end
+
+@testset "ERRORS - backtrace" begin
+    f2(x) = 2x
+    f1(x) = 3x
+    f0(x; kwargs...) = begin
+        st = stacktrace()
+        ctx = StacktraceContext()
+        bt = render_backtrace(ctx, st; kwargs...)
+        return string(bt)
+    end
+
+    bt1 = f0(f2(f1(2)); hide_frames = true)
+    bt2 = f0(f2(f1(2)); hide_frames = false)
+
+    IS_WIN || @compare_to_string(string(bt1), "backtrace_1")
+    IS_WIN || @compare_to_string(string(bt2), "backtrace_2")
 end
