@@ -1,7 +1,7 @@
 """ 
 multiple strings replacement.
 """
-function replace_multi(text, pairs...)::String
+function replace_multi(text::AbstractString, pairs::Pair...)::String
     VERSION ≥ v"1.7" && return replace(text, pairs...)
     VERSION < v"1.7" && begin
         for pair in pairs
@@ -159,17 +159,9 @@ const remove_brackets_regexes = [r"\{\{", r"\}\}"]
 
 Replece every double squared parenthesis with a single copy of itself
 """
-unescape_brackets(text)::String = replace_multi(
-    text,
-    remove_brackets_regexes[1] => "{",
-    remove_brackets_regexes[2] => "}",
-)
+unescape_brackets(text)::String = replace_multi(text, "{{" => "{", "}}" => "}")
 
-unescape_brackets_with_space(text)::String = replace_multi(
-    text,
-    remove_brackets_regexes[1] => " {",
-    remove_brackets_regexes[2] => "} ",
-)
+unescape_brackets_with_space(text)::String = replace_multi(text, "{{" => " {", "}}" => "} ")
 
 # ---------------------------------------------------------------------------- #
 #                                      I/O                                     #

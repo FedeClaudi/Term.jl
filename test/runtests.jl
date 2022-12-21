@@ -16,7 +16,7 @@ const TIMEROUTPUT = TimerOutputs.TimerOutput()
 import Term.Consoles: Console, enable, disable
 
 Term.DEBUG_ON[] = false
-const TEST_DEBUG_MODE = false  # renderables are saved as strings
+const TEST_DEBUG_MODE = true  # renderables are saved as strings
 const TEST_CONSOLE_WIDTH = 80
 const IS_WIN = Sys.iswindows()
 con = Console(TEST_CONSOLE_WIDTH)
@@ -32,6 +32,10 @@ macro runner(fn)
         @time @timeit_include($fn)
     end |> esc
 end
+
+# @testset "Ambiguous methods" begin
+#     @test Test.detect_ambiguities(Term; recursive=true)
+# end
 
 @runner "01_test_text_utils.jl"
 @runner "02_test_ansi.jl"
@@ -57,6 +61,7 @@ end
 @runner "22_test_grid.jl"
 @runner "23_test_link.jl"
 @runner "24_prompts.jl"
+@runner "25_annotations.jl"
 @runner "98_test_examples.jl"
 @runner "99_test_errors.jl"
 

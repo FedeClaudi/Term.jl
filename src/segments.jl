@@ -85,8 +85,10 @@ type they're using. If they are all using normal `String` or `Substring`
 go with that, but if one of them is using a different string type, use it. 
 """
 function get_string_types(segments_vectors...)::DataType
-    stypes = map(segments -> getfield.(segments, :text), segments_vectors)
-    stypes = vcat(stypes...) .|> typeof |> unique
+    stypes::Vector{DataType} =
+        vcat(map(segments -> getfield.(segments, :text), segments_vectors)...) .|>
+        typeof |>
+        unique
 
     stypes = setdiff(stypes, [String, SubString])
     return length(stypes) == 0 ? String : stypes[1]

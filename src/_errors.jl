@@ -137,17 +137,8 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         ),
     )
 
-    func = highlight(func) |> apply_style
-    try
-        func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
-    catch
-    end
-
-    # reshape but taking care of potential curly bracktes
-    func = highlight(func) |> apply_style
-    func = reshape_text(func, ctx.func_name_w; ignore_markup = true)
-
-    return RenderableText(func)
+    func = reshape_code_string(func, ctx.func_name_w)
+    return RenderableText(func; width = ctx.func_name_w)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -171,7 +162,7 @@ function render_error_code_line(ctx::StacktraceContext, frame::StackFrame; δ = 
     (isnothing(error_source) || length(error_source) == 0) && return nothing
 
     code_error_panel = Panel(
-        str_trunc(error_source, ctx.code_w - 4; ignore_markup = false);
+        str_trunc(apply_style(error_source), ctx.code_w - 4; ignore_markup = true);
         fit = δ == 0,
         style = δ > 0 ? "$(ctx.theme.text_accent) dim" : "dim",
         width = ctx.code_w,

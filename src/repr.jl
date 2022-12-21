@@ -12,7 +12,9 @@ import Term:
     split_lines,
     TERM_THEME,
     default_width,
-    plural
+    plural,
+    reshape_text,
+    remove_markup
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
@@ -25,6 +27,7 @@ import ..TermMarkdown: parse_md
 
 export @with_repr, termshow, install_term_repr, @showme
 
+include("_code.jl")
 include("_repr.jl")
 include("_inspect.jl")
 

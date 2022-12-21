@@ -189,7 +189,13 @@ end
 
 Convert any input content to a renderable
 """
-content_as_renderable(content, width, Δw, justify, background) =
+content_as_renderable(
+    content,
+    width::Int,
+    Δw::Int,
+    justify::Symbol,
+    background::Union{String,Nothing},
+)::RenderableText =
     RenderableText(content, width = width - Δw, background = background, justify = justify)
 
 """
@@ -377,7 +383,7 @@ end
 Construct a `Panel`'s content.
 """
 function render(
-    content;
+    content::Union{Renderable,RenderableText};
     box::Symbol = TERM_THEME[].box,
     style::String = TERM_THEME[].line,
     title::Union{String,Nothing} = nothing,
@@ -392,7 +398,7 @@ function render(
     Δw::Int,
     Δh::Int,
     padding::Padding,
-    background = nothing,
+    background::Union{Nothing,String} = nothing,
     kwargs...,
 )::Panel
     background = get_bg_color(background)

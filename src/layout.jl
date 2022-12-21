@@ -344,8 +344,7 @@ function leftalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
     renderables = Renderable.(renderables)
     width = maximum(map(r -> r.measure.w, renderables))
-    renderables = map(r -> pad(r, 0, width - r.measure.w), renderables)
-    return renderables
+    return map(r -> pad(r, 0, width - r.measure.w), renderables)
 end
 
 """
@@ -714,17 +713,19 @@ function hLine(
     text::String;
     style::String = TERM_THEME[].line,
     box::Symbol = TERM_THEME[].box,
+    pad_txt::Bool = true,
 )
     box = BOXES[box]
     text = apply_style(text) * "\e[0m"
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
+    _pad = pad_txt ? " " : get_lrow(box, 1, :top; with_left = false)
 
     line =
         get_lrow(box, lw - tl, :top; with_left = false) *
-        " " *
+        _pad *
         text *
-        " " *
+        _pad *
         "{$style}" *
         get_rrow(box, rw - tr, :top; with_right = false) *
         "\e[0m"
