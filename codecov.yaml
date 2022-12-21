@@ -1,6 +1,5 @@
 # sample regex patterns
 ignore:
   - "./src/errors.jl"
-  - "./src/_errors.jl"
   - "./test"       
   - "./scripts"         

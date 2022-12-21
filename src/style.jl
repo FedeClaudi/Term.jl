@@ -26,8 +26,6 @@ apply_style(text::String, style::String) =
         apply_style("{" * style * "}" * text * "{/" * style * "}")
     end
 
-apply_style(c::Char, style::String) = apply_style(string(c), style)
-
 """
 Check if a string is a mode name
 """

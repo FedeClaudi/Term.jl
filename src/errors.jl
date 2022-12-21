@@ -17,7 +17,9 @@ import Term:
     Theme,
     do_by_line,
     STACKTRACE_HIDDEN_MODULES,
-    STACKTRACE_HIDE_FRAMES
+    STACKTRACE_HIDE_FRAMES,
+    reshape_code_string,
+    TERM_SHOW_LINK_IN_STACKTRACE
 
 import ..Links: Link
 import ..Style: apply_style
@@ -37,8 +39,6 @@ import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
 import ..Measures: height
 
-include("_code.jl")
-
 export install_term_stacktrace
 
 """
@@ -54,8 +54,7 @@ struct StacktraceContext
     theme::Theme
 end
 
-function StacktraceContext()
-    w = default_stacktrace_width()
+function StacktraceContext(w = default_stacktrace_width())
     frame_panel_w = w - 4 - 12 - 3 # panel walls and padding
     module_line_w = w - 4 - 4
     func_name_w = frame_panel_w - 4 - 8 # including (n) before fname

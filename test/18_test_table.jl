@@ -22,9 +22,11 @@ t3 = Table(
 )
 t4 = Table(data; footer = ["get", "a", "footer"], footer_justify = :center)
 
-t5 = Table(data; footer = sum, footer_justify = :center, footer_style = "dim bold")
+if VERSION >= v"1.7.1"
+    t5 = Table(data; footer = sum, footer_justify = :center, footer_style = "dim bold")
 
-t7 = Table(data; columns_widths = [25, 7, 7], footer = sum, box = :SIMPLE)
+    t7 = Table(data; columns_widths = [25, 7, 7], footer = sum, box = :SIMPLE)
+end
 
 ph1 = PlaceHolder(25, 5)
 ph2 = PlaceHolder(23, 9)
@@ -47,12 +49,21 @@ t8 = Table(
 )
 
 # save tables as strings to files
-tbls = [t1, t2, t3, t4, t5, t6, t7, t8]
+if VERSION >= v"1.7.1"
+    tbls = [t1, t2, t3, t4, t5, t6, t7, t8]
+else
+    tbls = [t1, t2, t3, t4, nothing, t6, nothing, t8]
+end
 
 @testset "TABLE" begin
     for (i, t) in enumerate(tbls)
+        isnothing(t) && continue
         name = string("table_$i")
 
         IS_WIN || @compare_to_string(cleanstring(t), name)
     end
+
+    # test table with problems
+    VERSION >= v"1.7.1" &&
+        Table(data; columns_widths = [25, 7, 7, 12, 41, 52], footer = sum, box = :SIMPLE)
 end

@@ -1,6 +1,6 @@
 install_term_repr()
 import Term.Consoles: clear
-import Term: default_width
+import Term: Panel
 
 sprint_termshow(io::IO, x) = termshow(io, x; width = 60)
 
@@ -22,30 +22,16 @@ end
     end
 
     obj = Rocket(10, 50, 5000, "NASA")
-
-    io = IOBuffer()
-    show(IOContext(io), "text/plain", obj)
-    s = String(take!(io))
-
-    IS_WIN || begin
-        @compare_to_string(s, "termshow_panel")
-
-        correct_s = load_from_txt("termshow_panel")
-        @test s == correct_s
-        @test sprint(termshow, obj) == correct_s
-    end
-
-    termshow(devnull, Rocket)  # coverage
-
     @with_repr struct T end
-    @test_nothrow termshow(T())
-    # @test sprint(termshow, T()) ==
-    #       "\e[38;2;155;179;224m╭──────────╮\e[39m\n\e[0m\e[38;2;155;179;224m│\e[39m\e[0m  T()\e[38;2;187;134;219m::T\e[39m  \e[0m\e[38;2;155;179;224m│\e[39m\e[0m\n\e[38;2;155;179;224m╰──── \e[38;2;227;172;141mT\e[39m\e[38;2;155;179;224m\e[38;2;155;179;224m ───╯\e[39m\e[0m\e[39m\e[38;2;155;179;224m\e[0m\n"
+
+    VERSION ≥ v"1.7" && begin
+        IS_WIN || @compare_to_string sprint(termshow, obj) "repr_rocket"
+        IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
+        IS_WIN || @compare_to_string sprint(termshow, T()) "repr_T_struct"
+    end
 end
 
 @testset "REPR @with_repr with doc" begin
-    # just check that creating a @with_repr is ok
-
     """docs"""
     @with_repr struct Rocket2
         width::Int
@@ -54,6 +40,12 @@ end
 
         manufacturer::String
     end
+
+    r = Rocket2(1, 1, 1.0, "me")
+    _repr = sprint(io -> show(io, MIME("text/plain"), r))
+    IS_WIN || @compare_to_string _repr "repr_rocket_2"
+    IS_WIN ||
+        @compare_to_string sprint(io -> show(io, MIME("text/plain"), Rocket2)) "repr_rocket_2_show"
 end
 
 objs = if VERSION >= v"1.7.1"
@@ -68,6 +60,7 @@ objs = if VERSION >= v"1.7.1"
         (8, :(x / y + √9)),
         (9, zeros(10)),
         (10, zeros(5, 5)),
+        (11, zeros(100, 100, 100)),
     )
 else
     (

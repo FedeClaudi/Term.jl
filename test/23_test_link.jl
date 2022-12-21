@@ -1,4 +1,5 @@
 using Term.Links
+import Term.Links: LinkString
 import Term.Layout: pad
 import Term: RenderableText, Panel
 
@@ -55,4 +56,17 @@ IS_WIN || @testset "LINK and panel" begin
             end
         end
     end
+end
+
+@testset "LINK coverage" begin
+    s = "abcd"
+    l = l1.link
+
+    @test s * l isa LinkString
+    @test s / l isa LinkString
+    @test l / s isa LinkString
+
+    @test textwidth(l) == l.width
+    @test string(l) == l
+    @test sprint(io -> show(io, MIME("text/plain"), l)) == sprint(io -> print(io, l))
 end

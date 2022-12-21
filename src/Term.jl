@@ -61,6 +61,9 @@ include("highlight.jl")
 
 const TERM_THEME = Ref(Theme())
 
+# used to disable links in stacktraces for testing
+const TERM_SHOW_LINK_IN_STACKTRACE = Ref(true)
+
 function update! end
 
 # rely on other modules

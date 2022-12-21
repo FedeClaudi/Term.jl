@@ -134,7 +134,7 @@ function assert_table_arguments(
     # if there were problems, alert user and fail gracefully
     if length(problems) > 0
         @warn "Failed to create Term.Table"
-        warn_color = orange
+        warn_color = "yellow_light"
         tprintln.("  {$warn_color}" .* problems .* "{/$warn_color}"; highlight = true)
     end
     return length(problems) == 0

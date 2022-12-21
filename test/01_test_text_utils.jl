@@ -20,7 +20,10 @@ import Term:
     textlen,
     fillin,
     chars,
-    justify
+    justify,
+    str_trunc,
+    reshape_code_string
+
 import Term.Style: apply_style
 import Term.Measures: width as get_width
 
@@ -242,5 +245,35 @@ end
     str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     _str = reshape_text(str, 50)
 
-    @compare_to_string(justify(str, 150), "justify")
+    IS_WIN || @compare_to_string(justify(str, 150), "justify")
+
+    txt = "adsda\nadasda\nergeer\nxcvxvxvx\naasdada"
+    IS_WIN || @compare_to_string(fillin(txt), "fill_in_1")
+    IS_WIN || @compare_to_string(fillin(txt; bg = "red"), "fill_in_2")
+end
+
+@testset "str_trunc" begin
+    str = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod \ntempor incididunt ut labore et dolore\n magna aliqua."
+
+    for (i, w) in enumerate((12, 51, 31))
+        IS_WIN || @compare_to_string(str_trunc(str, w), "str_trunc_$(i)")
+    end
+end
+
+@testset "code reshaping" begin
+    codes = [
+        "{#f2d777}Table{/#f2d777}(data::Matrix{Float64}; kwargs::Base.Pairs{Symbol, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})",
+        "{}}, Tuple{{}}, NamedTuple{(), Tuple{{}}}}){#f2d777}Table{/#f2d777}",
+        "{#f2d777}Table{/#f2d777}(tb::Tables.MatrixTable{Matrix{Float64}}; box::Symbol, style::String, hpad::Int64, vpad::Int64, vertical_justify::Symbol, show_header::Bool, header::Nothing, header_style::String, header_justify::Nothing, columns_style::String, columns_justify::Symbol, columns_widths::Nothing, footer::Nothing, footer_style::String, footer_justify::Symbol, compact::Bool)",
+        "{#f2d777}calc_columns_widths{/#f2d777}(N_cols::Int64, N_rows::Int64, columns_widths::Nothing, show_header::Bool, header::Tuple{String, String, String}, tb::Tables.MatrixTable{Matrix{Float64}}, sch::Tables.Schema{(:Column1, :Column2, :Column3), Tuple{Float64, Float64, Float64}}, footer::Nothing, hpad::Vector{Int64})",
+        """(::Term.Tables.var"#1#3"{Tables.MatrixTable{Matrix{Float64}}})(c::Symbol)""",
+    ]
+
+    widths = (32, 65, 88)
+
+    for (i, c) in enumerate(codes), (j, w) in enumerate(widths)
+        reshaped = reshape_code_string(c, w)
+        @test get_width(reshaped) <= w
+        IS_WIN || @compare_to_string reshaped "reshaped_code_$(i)_$(j)"
+    end
 end

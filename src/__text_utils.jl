@@ -24,8 +24,8 @@ at the beginning of a tag, with this:
     (?<!\\{)\\[(?!\\{)
 """
 RECURSIVE_OPEN_TAG_REGEX = r"\{(?:[^{}]*){2,}\}"
-OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#\n]*\}"
-CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#\n]+[^/\{]\}"
+OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#]*\}"
+CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#]+[^/\{]\}"
 GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 """
@@ -182,12 +182,6 @@ function read_file_lines(path::AbstractString, start::Int, stop::Int)
     return collect(enumerate(lines))[start:stop]
 end
 
-function read_file_lines(path::AbstractString, line::Int)
-    !isfile(path) && return nothing
-    lines = readlines(path; keep = true)
-    return collect(enumerate(lines))[line]
-end
-
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
@@ -197,7 +191,6 @@ end
 Get a view object with appropriate indices
 """
 tview(text, start::Int, stop::Int) = view(text, thisind(text, start):thisind(text, stop))
-tview(text, start::Int, stop::Int, simple::Symbol) = view(text, start:stop)
 
 """
     replace_text(text::AbstractString, start::Int, stop::Int, replace::AbstractString)
@@ -285,8 +278,6 @@ chars(text::AbstractString)::Vector{Char} = collect(text)
 Merge a vector of strings in a single string.
 """
 join_lines(lines::Vector{String})::String = join(lines, "\n")
-join_lines(lines::Vector)::String = join(lines, "\n")
-join_lines(lines...) = join(lines, "\n")
 
 """
     split_lines(text::AbstractString)
@@ -304,8 +295,6 @@ Apply `fn` to each line in the `text`.
 The function `fn` should accept a single `::String` argument.
 """
 do_by_line(fn::Function, text::AbstractString)::String = join(fn.(split_lines(text)), "\n")
-
-do_by_line(fn::Function, text::Vector)::String = join_lines(fn.(text))
 
 # ------------------------------- reshape text ------------------------------- #
 """
