@@ -22,11 +22,13 @@ end
     end
 
     obj = Rocket(10, 50, 5000, "NASA")
-    IS_WIN || @compare_to_string sprint(termshow, obj) "repr_rocket"
-    IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
-
     @with_repr struct T end
-    IS_WIN || @compare_to_string sprint(termshow, T()) "repr_T_struct"
+    
+    VERSION ≥ v"1.7" && begin
+        IS_WIN || @compare_to_string sprint(termshow, obj) "repr_rocket"
+        IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
+        IS_WIN || @compare_to_string sprint(termshow, T()) "repr_T_struct"
+    end
 end
 
 @testset "REPR @with_repr with doc" begin

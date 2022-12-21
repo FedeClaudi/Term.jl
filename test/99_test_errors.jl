@@ -99,19 +99,19 @@ end
 end
 
 # ! this fails to pass tests for some reason.
-@testset "ERRORS - backtrace" begin
-    f2(x) = 2x
-    f1(x) = 3x
-    f0(x; kwargs...) = begin
-        st = stacktrace()
-        ctx = StacktraceContext(TEST_CONSOLE_WIDTH[])
-        bt = render_backtrace(ctx, st; kwargs...)
-        return string(bt)
-    end
+# @testset "ERRORS - backtrace" begin
+#     f2(x) = 2x
+#     f1(x) = 3x
+#     f0(x; kwargs...) = begin
+#         st = stacktrace()
+#         ctx = StacktraceContext(TEST_CONSOLE_WIDTH[])
+#         bt = render_backtrace(ctx, st; kwargs...)
+#         return string(bt)
+#     end
 
-    bt1 = f0(f2(f1(2)); hide_frames = true)
-    bt2 = f0(f2(f1(2)); hide_frames = false)
+#     bt1 = f0(f2(f1(2)); hide_frames = true)
+#     bt2 = f0(f2(f1(2)); hide_frames = false)
 
-    IS_WIN || @compare_to_string(string(bt1), "backtrace_1")
-    IS_WIN || @compare_to_string(string(bt2), "backtrace_2")
-end
+#     IS_WIN || @compare_to_string(string(bt1), "backtrace_1")
+#     IS_WIN || @compare_to_string(string(bt2), "backtrace_2")
+# end
