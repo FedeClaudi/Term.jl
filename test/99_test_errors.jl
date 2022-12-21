@@ -98,12 +98,13 @@ end
           "No method matching {bold #42A5F5  bold}`print`{/bold #42A5F5  bold} with arguments types:\n{#CE93D8}::DataType{/#CE93D8}, {#CE93D8}::DataType{/#CE93D8}\n                       \nAlternative candidates:\n  \e[38;2;242;215;119mprint\e[39m(::Any...)      \n  \e[38;2;242;215;119mprint\e[39m(\e[31m::IO\e[39m, ::Any)   "
 end
 
+# ! this fails to pass tests for some reason.
 @testset "ERRORS - backtrace" begin
     f2(x) = 2x
     f1(x) = 3x
     f0(x; kwargs...) = begin
         st = stacktrace()
-        ctx = StacktraceContext()
+        ctx = StacktraceContext(TEST_CONSOLE_WIDTH[])
         bt = render_backtrace(ctx, st; kwargs...)
         return string(bt)
     end
