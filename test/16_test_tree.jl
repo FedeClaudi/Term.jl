@@ -88,7 +88,7 @@ tree_dict_order_2 = OrderedDict(2 => 1, 3 => OrderedDict(4 => 2, "a" => 2, "b" =
     @test_nothrow Tree(AbstractFloat)
 
     # compare to string
-    IS_WIN || begin
+    (VERSION >= v"1.7.1" && IS_WIN) || begin
         @compare_to_string string(Tree(tree_dict)) "tree_1"
         @compare_to_string string(Tree(tree_dict_1)) "tree_2"
         @compare_to_string string(Tree(tree_dict_2)) "tree_3"
@@ -98,9 +98,8 @@ tree_dict_order_2 = OrderedDict(2 => 1, 3 => OrderedDict(4 => 2, "a" => 2, "b" =
     end
 
     # test printing
-    if VERSION >= v"1.7.1"
-        @test sprint(io -> show(io, Tree(tree_dict_1))) == "Tree: 2 nodes, 0 leaves | Idx: 0"
-        @test sprint(io -> show(io, MIME("text/plain"), Tree(tree_dict_1).segments[1])) ==
-            "Segment{String} \e[2m(size: Measure (h: 1, w: 15))\e[0m"
-    end
+    @test sprint(io -> show(io, Tree(tree_dict_1))) == "Tree: 2 nodes, 0 leaves | Idx: 0"
+    @test sprint(io -> show(io, MIME("text/plain"), Tree(tree_dict_1).segments[1])) ==
+        "Segment{String} \e[2m(size: Measure (h: 1, w: 15))\e[0m"
+
 end
