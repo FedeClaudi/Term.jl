@@ -59,7 +59,6 @@ objs = if VERSION >= v"1.7.1"
         (9, zeros(10)),
         (10, zeros(5, 5)),
         (11, zeros(100, 100, 100)),
-        (12, Panel),
     )
 else
     (
