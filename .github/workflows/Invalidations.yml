@@ -23,8 +23,7 @@ jobs:
     - uses: julia-actions/julia-buildpkg@v1
     - uses: julia-actions/julia-invalidations@v1
       id: invs_pr
-      with:
-        test_script: 'using Term;'
+
 
     - uses: actions/checkout@v3
       with:
@@ -32,8 +31,8 @@ jobs:
     - uses: julia-actions/julia-buildpkg@v1
     - uses: julia-actions/julia-invalidations@v1
       id: invs_default
-      with:
-        test_script: 'using Term;'
+
+
     - name: Report invalidation counts
       run: |
         echo "Invalidations on default branch: ${{ steps.invs_default.outputs.total }} (${{ steps.invs_default.outputs.deps }} via deps)" >> $GITHUB_STEP_SUMMARY
