@@ -24,8 +24,8 @@ at the beginning of a tag, with this:
     (?<!\\{)\\[(?!\\{)
 """
 RECURSIVE_OPEN_TAG_REGEX = r"\{(?:[^{}]*){2,}\}"
-OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#\n]*\}"
-CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#\n]+[^/\{]\}"
+OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#]*\}"
+CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#]+[^/\{]\}"
 GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 """

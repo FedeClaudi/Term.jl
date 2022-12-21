@@ -17,7 +17,8 @@ import Term:
     Theme,
     do_by_line,
     STACKTRACE_HIDDEN_MODULES,
-    STACKTRACE_HIDE_FRAMES
+    STACKTRACE_HIDE_FRAMES, 
+    reshape_code_string
 
 import ..Links: Link
 import ..Style: apply_style
@@ -37,7 +38,6 @@ import ..Renderables: RenderableText, AbstractRenderable
 import ..Panels: Panel
 import ..Measures: height
 
-include("_code.jl")
 
 export install_term_stacktrace
 

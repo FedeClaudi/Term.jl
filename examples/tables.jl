@@ -2,6 +2,8 @@ using Term
 import Term.Tables: Table
 import Term.Layout: PlaceHolder
 
+install_term_stacktrace()
+
 """
     This is an example showing how to create tables in Term.jl
 
@@ -9,7 +11,7 @@ There's MANY options to tables, so we can't cover all of them here, head to the 
 for more info.
 """
 
-t = 1:5
+t = 20:5
 data = hcat(t, ones(length(t)), rand(Int8, length(t)))
 
 """

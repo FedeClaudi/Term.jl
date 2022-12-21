@@ -14,7 +14,8 @@ import Term:
     default_width,
     plural,
     reshape_text,
-    remove_markup
+    remove_markup,
+    reshape_code_string
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
@@ -27,7 +28,6 @@ import ..TermMarkdown: parse_md
 
 export @with_repr, termshow, install_term_repr, @showme
 
-include("_code.jl")
 include("_repr.jl")
 include("_inspect.jl")
 

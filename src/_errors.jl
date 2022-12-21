@@ -137,8 +137,7 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         ),
     )
 
-    func = reshape_code_string(func, ctx.func_name_w)
-    return RenderableText(func; width = ctx.func_name_w)
+    return  RenderableText(reshape_code_string(func, ctx.func_name_w); width=nothing)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -172,7 +171,7 @@ function render_error_code_line(ctx::StacktraceContext, frame::StackFrame; δ = 
         height = δ > 0 ? nothing : 1,
         padding = (0, 1, 0, 0),
     )
-    return "  " * RenderableText("│\n╰─"; style = "dim") * code_error_panel
+    return "  " * RenderableText("│\n╰─"; style = "dim") * (code_error_panel)
 end
 
 """
@@ -214,9 +213,8 @@ function add_stack_frame!(
     # make file line & load source code around error and render it
     panel_content = if length(string(frame.file)) > 0
         # get a link renderable pointing to error
-        source_file = Link(string(frame.file), frame.line; style = "underline dim")
+        source_file = Link(string(frame.file), frame.line; style = "underline dim") 
         _out = func_line / source_file
-
         error_source = render_error_code_line(ctx, frame; δ = δ)
         isnothing(error_source) || (_out /= error_source)
         _out

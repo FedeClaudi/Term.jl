@@ -20,7 +20,7 @@ tree_dict_2 = Dict(
 
 tree_dict_3 = Dict(
     "nested" => Dict(
-        "deeper" => Dict("aleaf" => "unbeliefable", "leaflet" => "level 3"),
+        "deeper" => Dict("aleaf" => "unbeliefable", "leaflet" => "level 3"^20),
         "n2" => Int,
         "n3" => 1 + 2,
     ),
