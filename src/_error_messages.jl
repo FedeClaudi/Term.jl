@@ -178,7 +178,7 @@ function error_message(er::MethodError; kwargs...)
         msg /=
             lvstack("", "Alternative candidates:", candidates...) |> string |> apply_style
     else
-        msg /= " " / "{dim}No alternative candidates found"
+        msg = string(msg) /  " " / "{dim}No alternative candidates found"
     end
 
     return string(msg)

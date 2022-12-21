@@ -92,7 +92,6 @@ mutable struct Renderable <: AbstractRenderable
     measure::Measure
 end
 
-Base.convert(::Renderable, x) = Renderable(x)
 
 """
     Renderable(

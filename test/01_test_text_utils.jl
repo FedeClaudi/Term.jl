@@ -20,7 +20,9 @@ import Term:
     textlen,
     fillin,
     chars,
-    justify
+    justify,
+    str_trunc
+
 import Term.Style: apply_style
 import Term.Measures: width as get_width
 
@@ -243,4 +245,20 @@ end
     _str = reshape_text(str, 50)
 
     @compare_to_string(justify(str, 150), "justify")
+
+
+    txt = "adsda\nadasda\nergeer\nxcvxvxvx\naasdada"
+    @compare_to_string(fillin(txt), "fill_in_1")
+    @compare_to_string(fillin(txt; bg="red"), "fill_in_2")
+end
+
+
+
+@testset "str_trunc" begin
+    str = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod \ntempor incididunt ut labore et dolore\n magna aliqua."
+    
+    for (i, w) in enumerate((12, 51, 31))
+        @compare_to_string(str_trunc(str, w), "str_trunc_$(i)")
+
+    end
 end

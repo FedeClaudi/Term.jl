@@ -54,8 +54,6 @@ Base.:*(s::Union{SubString,String}, l::LinkString) =
     LinkString(s * l.link, textlen(s) + l.width)
 Base.:*(l::LinkString, s::Union{SubString,String}) =
     LinkString(l.link * s, textlen(s) + l.width)
-# Base.:*(c::Char, l::LinkString) = l * string(c)
-# Base.:*(l::LinkString, c::Char) = l * string(c)
 Base.:/(s::Union{SubString,String}, l::LinkString) =
     LinkString(s / l.link, max(textlen(s), l.width))
 Base.:/(l::LinkString, s::Union{SubString,String}) =

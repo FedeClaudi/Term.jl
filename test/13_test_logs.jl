@@ -5,9 +5,10 @@ using Term.Progress
 import ProgressLogging
 import UUIDs: uuid4
 
-install_term_logger()
+
 
 @testset "\e[34mLOGS test" begin
+    install_term_logger()
     println("\nTesting logging, stdout temporarily disabled")
 
     @suppress_out begin
@@ -29,6 +30,7 @@ install_term_logger()
         sdfs
         s""" 1 + 2
     end
+    uninstall_term_logger()
 end
 
 @testset "\e[34mLOGS handle_progress" begin

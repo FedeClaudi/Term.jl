@@ -51,6 +51,8 @@ end
     @test string(RenderableText("a\nstring")) == "a     \nstring"
 
     @test_nothrow @capture_out show(r)
+
+    @test sprint(io -> show(io, MIME("text/plain"), r)) == string(r)*"\n"
 end
 
 @testset "\e[34mRenderables - RenderableText basic" begin
