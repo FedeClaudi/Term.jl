@@ -23,7 +23,7 @@ end
 
     obj = Rocket(10, 50, 5000, "NASA")
     @with_repr struct T end
-    
+
     VERSION ≥ v"1.7" && begin
         IS_WIN || @compare_to_string sprint(termshow, obj) "repr_rocket"
         IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
