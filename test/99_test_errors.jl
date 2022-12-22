@@ -1,5 +1,5 @@
 import Term: install_term_stacktrace, TERM_SHOW_LINK_IN_STACKTRACE
-import Term.Errors: error_message, StacktraceContext, render_backtrace
+import Term.Errors: StacktraceContext, render_backtrace
 
 install_term_stacktrace(; hide_frames = false)
 TERM_SHOW_LINK_IN_STACKTRACE[] = false
