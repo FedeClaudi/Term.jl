@@ -280,7 +280,7 @@ function Table(
         )
     end
 
-    lines = split(fillin(join(lines, "\n")), "\n")
+    lines = split(asda(join(lines, "\n")), "\n")
 
     segments = Segment.(lines)
     return Table(segments, Measure(segments))
