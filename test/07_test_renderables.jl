@@ -1,7 +1,6 @@
 import Term.Renderables: Renderable, RenderableText, AbstractRenderable, trim_renderable
 import Term: Panel
 import Term.Segments: Segment
-import Term: fillin
 
 @testset "\e[34mSegment" begin
     seg = Segment("test", "default")

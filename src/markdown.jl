@@ -8,7 +8,6 @@ import UnicodeFun: to_latex
 import Term:
     reshape_text,
     highlight_syntax,
-    fillin,
     escape_brackets,
     default_width,
     TERM_THEME,

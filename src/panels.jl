@@ -2,7 +2,6 @@ module Panels
 
 import Term:
     join_lines,
-    fillin,
     ltrim_str,
     default_width,
     remove_ansi,

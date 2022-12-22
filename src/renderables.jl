@@ -4,7 +4,6 @@ import Term:
     split_lines,
     reshape_text,
     ltrim_str,
-    fillin,
     join_lines,
     unescape_brackets_with_space,
     DEBUG_ON,
