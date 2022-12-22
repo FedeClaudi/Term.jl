@@ -24,21 +24,16 @@ end
 # set the colors!
 print("\n\n")
 theme = Theme(
-    tree_mid  = "green",
-    tree_terminator  = "green",
-    tree_skip  = "green",
-    tree_dash  = "green",
-    tree_trunc  = "green",
-    tree_pair  = "red",
-    tree_keys   = "blue",
-    tree_max_leaf_width = 44
+    tree_mid = "green",
+    tree_terminator = "green",
+    tree_skip = "green",
+    tree_dash = "green",
+    tree_trunc = "green",
+    tree_pair = "red",
+    tree_keys = "blue",
+    tree_max_leaf_width = 44,
 )
-print(
-    Tree(
-        data;
-        theme=theme
-    ),
-)
+print(Tree(data; theme = theme))
 
 """
 Tree can handle nested data too!

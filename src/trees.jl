@@ -3,8 +3,7 @@ module Trees
 import AbstractTrees: print_tree, TreeCharSet, children
 using InteractiveUtils
 
-import Term:
-    replace_multi, highlight, reshape_text, TERM_THEME, Theme
+import Term: replace_multi, highlight, reshape_text, TERM_THEME, Theme
 
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Style: apply_style
@@ -19,12 +18,11 @@ export Tree
 # ---------------------------------------------------------------------------- #
 
 treeguides = Dict(
-    :standardtree => TreeCharSet( "├",   "└", "│", "─", "⋮", " ⇒ "),
-    :roundedtree => TreeCharSet("├──", "╰─",  "│", "─", "⋮", " ⇒ "),
-    :boldtree => TreeCharSet(   "┣━━", "┗━━", "┃", "━", "⋮", " ⇒ "),
-    :asciitree => TreeCharSet(  "+--", "`--", "|", "--", "...", " => ")
+    :standardtree => TreeCharSet("├", "└", "│", "─", "⋮", " ⇒ "),
+    :roundedtree => TreeCharSet("├──", "╰─", "│", "─", "⋮", " ⇒ "),
+    :boldtree => TreeCharSet("┣━━", "┗━━", "┃", "━", "⋮", " ⇒ "),
+    :asciitree => TreeCharSet("+--", "`--", "|", "--", "...", " => "),
 )
-
 
 # ---------------------------------------------------------------------------- #
 #                                     TREE                                     #
@@ -36,20 +34,20 @@ treeguides = Dict(
 Core function to enable fancy tree printing. Styles the leaf/key of each node.
 """
 function print_node(io, node)
-    theme::Theme=TERM_THEME[]
+    theme::Theme = TERM_THEME[]
 
     styled = if node isa AbstractString
-        highlight(node, :string; theme=theme)
+        highlight(node, :string; theme = theme)
     else
-        styled = highlight(string(node); theme=theme) 
+        styled = highlight(string(node); theme = theme)
     end
     reshaped = reshape_text(styled, theme.tree_max_leaf_width)
     print(io, reshaped)
 end
 
-
 function style_guides(tree::String, guides::TreeCharSet, theme::Theme)
-    return replace_multi(tree, 
+    return replace_multi(
+        tree,
         guides.mid => apply_style(guides.mid, theme.tree_mid),
         guides.terminator => apply_style(guides.terminator, theme.tree_terminator),
         guides.skip => apply_style(guides.skip, theme.tree_skip),
@@ -82,28 +80,44 @@ Arguments:
 - `print_node_function`: Function used to print nodes.
 For other kwargs look at `AbstractTrees.print_tree`
 """
-function Tree(tree; guides::Union{TreeCharSet, Symbol}=:standardtree, 
-            theme::Theme=TERM_THEME[], printkeys::Union{Nothing, Bool}=true, 
-            print_node_function::Function = print_node,
-            kwargs...)
+function Tree(
+    tree;
+    guides::Union{TreeCharSet,Symbol} = :standardtree,
+    theme::Theme = TERM_THEME[],
+    printkeys::Union{Nothing,Bool} = true,
+    print_node_function::Function = print_node,
+    kwargs...,
+)
 
     # print tree
     guides = guides isa Symbol ? treeguides[guides] : guides
-    tree = sprint(io -> print_tree(print_node_function, io, tree; charset=guides, printkeys=printkeys, kwargs...))
+    tree = sprint(
+        io -> print_tree(
+            print_node_function,
+            io,
+            tree;
+            charset = guides,
+            printkeys = printkeys,
+            kwargs...,
+        ),
+    )
 
     # style keys
     rx = Regex("(?<=$(guides.dash)) [\\w.,\":\\[\\]\\d]+ (?=$(strip(guides.pair)))")
-    tree = replace(tree, rx => SubstitutionString("{$(theme.tree_keys)}" * s"\g<0>" * "{/$(theme.tree_keys)}"))
+    tree = replace(
+        tree,
+        rx => SubstitutionString(
+            "{$(theme.tree_keys)}" * s"\g<0>" * "{/$(theme.tree_keys)}",
+        ),
+    )
 
     # style guides
     tree = style_guides(tree, guides, theme)
-    
+
     # turn into a renderable
     rt = RenderableText(tree)
     return Tree(rt.segments, rt.measure)
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                HIERARCHY TREE                                #
@@ -162,18 +176,15 @@ function Tree(T::DataType)::Tree
 
     # define a fn to avoid printing nodes 
     s = TERM_THEME[].tree_mid
-    fn(io::IO, x) = length(children(x)) > 0 ? print(io, apply_style("{$s}┬{/$s}")) : print(io, "")
+    fn(io::IO, x) =
+        length(children(x)) > 0 ? print(io, apply_style("{$s}┬{/$s}")) : print(io, "")
 
     # change style of pair
     _style = TERM_THEME[].tree_pair
     TERM_THEME[].tree_pair = "hidden"
 
     # print tree
-    _tree = Tree(
-        data;
-        printkeys=true,
-        print_node_function = fn
-    )
+    _tree = Tree(data; printkeys = true, print_node_function = fn)
     TERM_THEME[].tree_pair = _style
 
     return _tree
