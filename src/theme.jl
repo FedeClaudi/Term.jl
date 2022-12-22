@@ -42,11 +42,14 @@ style outputs to terminal.
     logmsg::String = "#8abeff"
 
     # tree 
-    tree_title::String  = "$orange italic"
-    tree_node::String   = "$yellow italic"
-    tree_leaf::String   = yellow_light
-    tree_guide::String  = blue
-    tree_max_width::Int = 44
+    tree_mid::String  = blue
+    tree_terminator::String  = blue
+    tree_skip::String  = blue
+    tree_dash::String  = blue
+    tree_trunc::String  = blue
+    tree_pair::String  = red_light
+    tree_keys::String   = yellow
+    tree_max_leaf_width::Int = 44
 
     # repr
     repr_accent::String      = "bold #e0db79"
@@ -150,10 +153,14 @@ LightTheme = Theme(
     logmsg = "#8abeff",
 
     # tree 
-    tree_title = "$orange italic",
-    tree_node  = "$yellow_darker italic",
-    tree_leaf  = yellow_dark,
-    tree_guide = blue_darker,
+    tree_mid        = blue_darker,
+    tree_terminator = blue_darker,
+    tree_skip       = blue_darker,
+    tree_dash       = blue_darker,
+    tree_trunc      = blue_darker,
+    tree_pair       = red_light,
+    tree_keys       = red_dark,
+    tree_max_leaf_width = 44,
 
     # repr
     repr_accent      = "bold $yellow_darker",

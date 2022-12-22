@@ -6,9 +6,9 @@ The easiest starting point is a `Dict` object with the info we want
 to show in the tree
 """
 
-import Term: Tree
+import Term: Tree, Theme
 
-data = Dict("a" => 1, "b" => Int64, "c" => [1, 2, 3], "d" => "a b c"^100)
+data = Dict("a" => 1, "b" => Int64, "c" => [1, 2, 3], "d" => "a b c"^5)
 
 print(Tree(data))
 
@@ -17,20 +17,26 @@ print(Tree(data))
 """
 
 print("\n\n")
-for guides_type in (:standardtree, :boldtree, :asciitree)
-    print(Tree(data; title = string(guides_type), guides_type = guides_type))
+for guides in (:standardtree, :boldtree, :asciitree)
+    Tree(data; guides = guides) |> print
 end
 
 # set the colors!
 print("\n\n")
+theme = Theme(
+    tree_mid  = "green",
+    tree_terminator  = "green",
+    tree_skip  = "green",
+    tree_dash  = "green",
+    tree_trunc  = "green",
+    tree_pair  = "red",
+    tree_keys   = "blue",
+    tree_max_leaf_width = 44
+)
 print(
     Tree(
         data;
-        title = "my colors",
-        title_style = "bold red",
-        node_style = "blue underline",
-        leaf_style = "green",
-        guides_style = "red dim",
+        theme=theme
     ),
 )
 
