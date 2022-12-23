@@ -163,7 +163,6 @@ unescape_brackets(text)::String = replace_multi(text, "{{" => "{", "}}" => "}")
 
 unescape_brackets_with_space(text)::String = replace_multi(text, "{{" => " {", "}}" => "} ")
 
-
 # ------------------------------ multiline-style ----------------------------- #
 """
     fix_markup_across_lines(lines::Vector{AbstractString})::Vector{AbstractString}
@@ -185,24 +184,20 @@ function fix_markup_across_lines(lines::Vector)::Vector
             close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
 
             # if there's no close tag, add the open tag to the next line and close it on this
-            if !occursin(close_rx, ln) && !occursin("{/}", ln) 
-                lines[i] = ln*"{/$markup}"
-                i < length(lines) && (lines[i+1]="{$markup}"*lines[i+1])
-                
+            if !occursin(close_rx, ln) && !occursin("{/}", ln)
+                lines[i] = ln * "{/$markup}"
+                i < length(lines) && (lines[i + 1] = "{$markup}" * lines[i + 1])
             end
         end
-
     end
 
     return lines
 end
 
-
 function fix_markup_across_lines(text::AbstractString)
     lines = fix_style_across_lines(split(text, "\n"))
     return join(lines, "\n")
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                                      I/O                                     #

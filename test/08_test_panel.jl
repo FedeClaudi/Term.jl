@@ -245,7 +245,7 @@ id est laborum.""",
           oooo    """
     p = Panel(circle; fit = true, padding = (2, 2, 0, 0))
     @test string(p) ==
-    "\e[0m\e[22m╭────────────────╮\e[22m\e[0m\e[0m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m╰────────────────╯\e[22m\e[0m\e[0m\e[0m"
+          "\e[0m\e[22m╭────────────────╮\e[22m\e[0m\e[0m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m╰────────────────╯\e[22m\e[0m\e[0m\e[0m"
 
     p = Panel(
         "test"^25;
@@ -346,7 +346,7 @@ ads
     ); background = "on_red", fit = true)
 
     @test string(p) ==
-    "\e[0m\e[22m╭──────────────────────╮\e[22m\e[0m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    asasd\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdasadas\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdsasdasdsadasdsa\e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44mads\e[49m\e[41m               \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    \e[49m\e[41m              \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m╰──────────────────────╯\e[22m\e[0m\e[0m\e[0m"
+          "\e[0m\e[22m╭──────────────────────╮\e[22m\e[0m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    asasd\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdasadas\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdsasdasdsadasdsa\e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44mads\e[49m\e[41m               \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    \e[49m\e[41m              \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m╰──────────────────────╯\e[22m\e[0m\e[0m\e[0m"
 end
 
 @testset "\e[34mPANEL - UnicodePlots" begin

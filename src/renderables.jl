@@ -138,9 +138,8 @@ function RenderableText(
     justify::Symbol = :left,
 )
     stype::DataType = typeof(text)
-    text = apply_style(text)
-
     text = text_to_width(text, width, justify; background = background) |> chomp
+    text = apply_style(text)
 
     style = isnothing(style) ? "" : style
     background = isnothing(background) ? "" : get_bg_color(background)

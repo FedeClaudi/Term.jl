@@ -42,7 +42,7 @@ function style_methods(
                 "{bright_blue}   ────── Methods in {$accent_col underline bold}$(m.module){/$accent_col underline bold} for {$accent_col}$tohighlight{/$accent_col} ──────{/bright_blue}",
             ) : nothing
         prevmod = string(m.module)
-        
+
         dest = RenderableText(
             "\e[0m{dim default italic}             → $(m.file):$(m.line){/dim default italic}",
         )

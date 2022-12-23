@@ -86,3 +86,13 @@ end
         @compare_to_string(r, "trim_renderables_2")
     end
 end
+
+@testset "Renderables reshaped text markup" begin
+
+    #? if this fail its likely because reshape_text is called
+    #? with text over which style has already been applied.
+
+    txt = "{red}dasda asda dadasda{green}aadasdad{/green}dad asd ad ad ad asdad{bold}adada ad as sad ad ada{/red}ad adas sd ads {/bold}"
+    @compare_to_string(Panel(txt; width = 30), "reshaped_rend_with_markup_1")
+    @compare_to_string(RenderableText(txt; width = 30), "reshaped_rend_with_markup_2")
+end

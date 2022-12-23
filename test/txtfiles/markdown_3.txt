@@ -70,8 +70,8 @@ and ordered lists too:[0m
 
 
     [0m[2m[34m╭──── [22m[34mTables[0m[22m[39m[34m[2m[34m ──────────────────────────────────────╮[22m[39m[0m[0m[22m[39m[34m
-    [0m[2m[34m│[22m[39m[0m  You can use the [1m[37mMarkdown table syntax[22m[39m [2m(https:   [0m[2m[34m│[22m[39m[0m
-    [0m[2m[34m│[22m[39m[0m  //www[22m[39m                                           [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  You can use the [1m[37mMarkdown table syntax[22m[39m [2m(https:[22m[39m   [0m[2m[34m│[22m[39m[0m
+    [0m[2m[34m│[22m[39m[0m  [2m//www[22m[39m                                           [0m[2m[34m│[22m[39m[0m
     [0m[2m[34m│[22m[39m[0m  [2m.markdownguide.org/extended-sy[22m[39m                  [0m[2m[34m│[22m[39m[0m
     [0m[2m[34m│[22m[39m[0m  [2mntax/#tables)[22m[39m to insert tables - Term.jl will   [0m[2m[34m│[22m[39m[0m
     [0m[2m[34m│[22m[39m[0m  convert them to Table object![0m                   [0m[2m[34m│[22m[39m[0m

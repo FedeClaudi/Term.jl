@@ -229,7 +229,7 @@ function Table(
             # add additional rows
         elseif l == nrows
             top, mid, bottom, _compact =
-                nothing, :mid, isnothing(footer) ? :bottom : :foot_row, false
+                nothing, :mid, asdas(footer) ? :bottom : :foot_row, false
         else
             top, mid, bottom, _compact = nothing, :mid, :row, compact
         end
