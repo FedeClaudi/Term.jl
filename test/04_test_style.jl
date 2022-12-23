@@ -23,6 +23,29 @@ import Term: tprint, tprintln, get_file_format
           "This and that {{something}} for"
 end
 
+
+
+@testset "Style with nested tags" begin
+      txt = "{red}adasd ad sa dsa{green} ad {blue} sd d ads ad {/blue}da dad {/green} asdsa dad a {/red}"
+      @test apply_style(txt) == "\e[31madasd ad sa dsa\e[32m ad \e[34m sd d ads ad \e[39m\e[32mda dad \e[39m\e[31m asdsa dad a \e[39m"
+
+      txt = "{red}adasd ad sa dsa{bold} ad {blue} sd d ads ad {/blue}da dad {/bold} asdsa dad a {/red}"
+      @test apply_style(txt) == "\e[31madasd ad sa dsa\e[1m ad \e[34m sd d ads ad \e[39m\e[31mda dad \e[22m\e[31m asdsa dad a \e[39m"
+
+      txt = "{red}adasd ad sa dsa{green} ad {blue} sd d ads ad da dad {/green} asdsa ddfsf {/blue}ad a {/red}"
+      @test apply_style(txt) == "\e[31madasd ad sa dsa\e[32m ad \e[34m sd d ads ad da dad \e[39m\e[31m asdsa ddfsf \e[39mad a \e[39m"
+
+      txt = "{on_red}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} dad {/green} asdsa ddfsf ad a {/on_red}"
+      @test apply_style(txt) == "\e[41madasd ad sa dsa\e[32m ad \e[40m sd d ads ad da\e[49m\e[32m\e[41m dad \e[39m\e[41m asdsa ddfsf ad a \e[49m"
+
+      txt = "{on_(25, 25, 25)}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} {white}dad{/white} asad {/green} asdsa ddfsf ad a {/on_(25, 25, 25)}"
+      @test apply_style(txt) == "\e[48;2;25;25;25madasd ad sa dsa\e[32m ad \e[40m sd d ads ad da\e[49m\e[32m\e[48;2;25;25;25m \e[37mdad\e[39m\e[32m asad \e[39m\e[48;2;25;25;25m asdsa ddfsf ad a \e[49m"
+
+      txt = "{(220, 180, 150)} pink {bold}pink bold {dodger_blue2} pink bold blue {/dodger_blue2} pink bold {/bold} pink {on_(25, 55, 100)} pink on blue {/(220, 180, 150)} just on blue {/on_(25, 55, 100)} NOW SIMPLE WHITE {red} red red red {/red} white white {underline} underline underline {/underline}"
+      @test apply_style(txt) == "\e[38;2;220;180;150m pink \e[1mpink bold \e[38;5;27m pink bold blue \e[39m\e[38;2;220;180;150m pink bold \e[22m\e[38;2;220;180;150m pink \e[48;2;25;55;100m pink on blue \e[39m just on blue \e[49m NOW SIMPLE WHITE \e[31m red red red \e[39m white white \e[4m underline underline \e[24m"
+end
+
+
 @testset "\e[34mTprint\e[0m" begin
     stprint(x) = chomp(sprint(tprint, x; context = stdout))
     stprintln(x) = chomp(sprint(tprintln, x; context = stdout))

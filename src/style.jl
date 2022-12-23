@@ -129,13 +129,19 @@ appropriate ANSI codes to style a string.
 function apply_style(text; leave_orphan_tags = false)::String
     has_markup(text) || return text
 
+
+    previous_color = (0, length(text), MarkupStyle("default"))
+    previous_background = (0, length(text), MarkupStyle("default"))
     while has_markup(text)
         # get opening markup tag
         open_match = match(OPEN_TAG_REGEX, text)
         markup = open_match.match[2:(end - 1)]
 
         # get style codes
-        ansi_open, ansi_close = get_style_codes(MarkupStyle(markup))
+        ms = MarkupStyle(markup)
+        ansi_open, ansi_close = get_style_codes(ms)
+
+        # insert open tag
         if ansi_open == "" && ansi_close == "" && leave_orphan_tags
             # found an invalid tag (e.g. {string}). Leave it but edit it to avoid getting stuck in this lookup
             # replace markup with ANSI codes
@@ -157,27 +163,49 @@ function apply_style(text; leave_orphan_tags = false)::String
 
         # get closing tag (including [/] or missing close)
         close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
-
         if !occursin(close_rx, text)
             text = text * "{/" * markup * "}"
         end
         close_match = match(close_rx, text)
 
-        # check if there was previous ansi style info
-        # prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset - 1))
-        # prev_style = occursin(prev_style, ansi_close) ? "" : prev_style
-        prev_style = map(
-            m -> m.match,
-            eachmatch(ANSI_REGEX, tview(text, 1, open_match.offset - 1))
-        ) |> join
-        println(replace(prev_style, "\e"=>"|"))
 
-        # # replace close tag
+        # if previous style had color and we're nested, use color info
+        if open_match.offset > previous_color[1] &&
+            close_match.offset < previous_color[2] &&
+            !isnothing(previous_color[3].color)
+            col_prev_ansi_open, _ = get_style_codes(previous_color[3])
+            ansi_close = ansi_close * col_prev_ansi_open            
+        end
+
+        # and for background
+        if open_match.offset > previous_background[1] &&
+            close_match.offset < previous_background[2] &&
+            !isnothing(previous_background[3].background)
+            bg_prev_ansi_open, _ = get_style_codes(previous_background[3])
+            ansi_close = ansi_close * bg_prev_ansi_open            
+        end
+
+        # replace close tag
         text = replace_text(
             text,
             close_match.offset - 1,
             close_match.offset + length(markup) + 2,
-            ansi_close  * prev_style,
+            ansi_close
+        )
+
+        # store style info
+        isnothing(ms.color) || (
+        previous_color = (                
+            max(open_match.offset - 1, 0),
+            close_match.offset + length(markup) + 2,
+            ms)
+        )
+
+        isnothing(ms.background) || (
+            previous_background = (                
+                max(open_match.offset - 1, 0),
+                close_match.offset + length(markup) + 2,
+                ms);
         )
     end
     return text

@@ -68,7 +68,7 @@ remove_ansi(input_text)::String = replace(input_text, ANSI_REGEX => "")
 
 Returns `true` if `text` includes a `MarkupTag`
 """
-has_ansi(text)::Bool = occursin(ANSI_REGEXE, text)
+has_ansi(text)::Bool = occursin(ANSI_REGEX, text)
 
 """
     get_last_ANSI_code(text)::String
@@ -79,7 +79,7 @@ function get_last_ANSI_code(text)::String
     has_ansi(text) || return ""
 
     # get the last matching regex
-    rmatch = collect((eachmatch(ANSI_REGEXE, text)))[end]
+    rmatch = collect((eachmatch(ANSI_REGEX, text)))[end]
     return rmatch.match
 end
 
@@ -90,7 +90,7 @@ Returns a string with all ANSI codes in the input.
 """
 function get_ANSI_codes(text)::String
     has_ansi(text) || return ""
-    matches = collect((eachmatch(ANSI_REGEXE, text)))
+    matches = collect((eachmatch(ANSI_REGEX, text)))
     return *(map(m -> m.match, matches)...)
 end
 
