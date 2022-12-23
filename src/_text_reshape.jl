@@ -1,6 +1,5 @@
 import Base: rpad as brpad
 
-rx = r"\s*\S+\s*"
 
 """
     reshape_text(text::AbstractString, width::Int)
@@ -56,7 +55,7 @@ function reshape_text(text::AbstractString, width::Int; ignore_markup::Bool = fa
     end
     push!(lines, rstrip(line))
 
-    out = join(fix_markup_across_lines(lines), "\n")
+    out = join((fix_ansi_across_lines ∘ fix_markup_across_lines)(lines), "\n")
     chomp(out)
 end
 

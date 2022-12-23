@@ -12,7 +12,8 @@ import Term:
     CODES,
     ANSICode,
     tview,
-    do_by_line
+    do_by_line,
+    ANSI_REGEX
 
 import ..Colors:
     AbstractColor, NamedColor, is_color, is_background, get_color, is_hex_color, hex2rgb
@@ -163,15 +164,20 @@ function apply_style(text; leave_orphan_tags = false)::String
         close_match = match(close_rx, text)
 
         # check if there was previous ansi style info
-        prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset - 1))
-        prev_style = occursin(prev_style, ansi_close) ? "" : prev_style
+        # prev_style = get_last_ANSI_code(tview(text, 1, open_match.offset - 1))
+        # prev_style = occursin(prev_style, ansi_close) ? "" : prev_style
+        prev_style = map(
+            m -> m.match,
+            eachmatch(ANSI_REGEX, tview(text, 1, open_match.offset - 1))
+        ) |> join
+        println(replace(prev_style, "\e"=>"|"))
 
-        # replace close tag
+        # # replace close tag
         text = replace_text(
             text,
             close_match.offset - 1,
             close_match.offset + length(markup) + 2,
-            ansi_close * prev_style,
+            ansi_close  * prev_style,
         )
     end
     return text

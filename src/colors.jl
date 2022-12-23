@@ -2,15 +2,20 @@ module Colors
 
 import Term:
     NAMED_COLORS,
-    nospaces,
     COLORS_16b,
-    remove_brackets,
     ANSICode,
     rint,
     CODES,
     CODES_16BIT_COLORS
 
 export NamedColor, BitColor, RGBColor, get_color
+
+"""
+    nospaces(text::AbstractString)
+
+Remove all spaces from a string.
+"""
+nospaces(text::AbstractString) = replace(text, " " => "")
 
 # ----------------------------- types definition ----------------------------- #
 """

@@ -1,13 +1,10 @@
 import Term:
     get_last_ANSI_code,
     unescape_brackets,
-    remove_brackets,
     escape_brackets,
-    get_ANSI_codes,
     unspace_commas,
     remove_markup,
     replace_text,
-    replace_ansi,
     reshape_text,
     remove_ansi,
     split_lines,
@@ -15,7 +12,6 @@ import Term:
     has_markup,
     cleantext,
     textwidth,
-    nospaces,
     has_ansi,
     textlen,
     fillin,
@@ -24,6 +20,7 @@ import Term:
     str_trunc,
     reshape_code_string
 
+import Term.Colors: nospaces
 import Term.Style: apply_style
 import Term.Measures: width as get_width
 
@@ -79,7 +76,6 @@ end
         @test has_ansi(s1)
         @test remove_ansi(s1) == s2
         @test get_last_ANSI_code(s1) == ltag
-        @test length(get_ANSI_codes(s1)) > 0
     end
 end
 
@@ -96,19 +92,10 @@ end
     @test replace_text(text, 10, 15, ',') == "abcdefghil,,,,,rstuvz"
 
     @test nospaces("a (1, 2, 3) 4") == "a(1,2,3)4"
-    @test remove_brackets("aaa (asdsd) BB") == "aaa asdsd BB"
 
     @test unspace_commas("a, 2, 3") == "a,2,3"
 end
 
-@testset "TU_replace_ansi" begin
-    text = apply_style(
-        "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
-    )
-
-    @test replace_ansi(text) ==
-          "Lorem ¦¦¦¦¦ipsum dolor sit ¦¦¦¦amet, consectetur¦¦¦¦¦¦¦¦¦¦ adipiscing elit, ¦¦¦¦¦¦¦¦¦¦sed do eiusmod tempor incididunt¦¦¦¦¦ ut labore et dolore magna aliqua."
-end
 
 @testset "TU_misc" begin
     @test chars("abcd") == ['a', 'b', 'c', 'd']

@@ -1,7 +1,7 @@
 import Term.Renderables: Renderable, RenderableText, AbstractRenderable, trim_renderable
 import Term: Panel
 import Term.Segments: Segment
-import Term: fillin
+import Term: fillin, apply_style
 
 @testset "\e[34mSegment" begin
     seg = Segment("test", "default")
@@ -95,4 +95,12 @@ end
     txt = "{red}dasda asda dadasda{green}aadasdad{/green}dad asd ad ad ad asdad{bold}adada ad as sad ad ada{/red}ad adas sd ads {/bold}"
     @compare_to_string(Panel(txt; width = 30), "reshaped_rend_with_markup_1")
     @compare_to_string(RenderableText(txt; width = 30), "reshaped_rend_with_markup_2")
+
+
+    txt = "{(220, 180, 150)}dasda {bold}asda dadasda{dodger_blue2}aadasdad{/dodger_blue2}dad asd ad{/bold} ad ad asdad{on_(25, 55, 100)}adada ad as sad ad ada{/(220, 180, 150)}ad adas sd ads {/on_(25, 55, 100)} NOW SIMPLE {red} adasd aads a asd ads a{/red} dasiudh asjdnasdiuasda {underline} asdnaisudnadaiuda sjduiabdiabd aduas {/underline}"
+    @compare_to_string(Panel(txt; width = 30), "reshaped_rend_with_markup_3")
+    @compare_to_string(RenderableText(txt; width = 30), "reshaped_rend_with_markup_4")
+
+    @compare_to_string(Panel(apply_style(txt); width = 30), "reshaped_rend_with_markup_5")
+    @compare_to_string(RenderableText(apply_style(txt); width = 30), "reshaped_rend_with_markup_6")
 end
