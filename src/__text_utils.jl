@@ -176,7 +176,7 @@ Essentially, if a tag is opened but not closed in a line, close it at the end of
 the line and add the same open tag at the start of the next, taking care of 
 doing things in the correct order when multiple tags are in the same line.
 """
-function fix_markup_across_lines(lines::Vector{AbstractString})::Vector{AbstractString}
+function fix_markup_across_lines(lines::Vector)::Vector
     for (i, ln) in enumerate(lines)
         # loop over each open tag regex
         for open_match in reverse(collect(eachmatch(OPEN_TAG_REGEX, ln)))

@@ -136,7 +136,7 @@ pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident
 sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
 id est laborum."""
 
-    str_reshaped = "Lorem ipsum {bold}dolor sit{/bold} amet,\nconsectetur adipiscing elit,\ned do e{red}iusmod tempor incididunt{/red}\nut {bold}labore et {underline}dolore{/underline} magna aliqua.\n{/bold} Ut enim ad minim\nveniam, quis{green} nostrud exercitation\n {on_black}ullamco laboris nisi ut aliquip\nex {/on_black}\nea commodo consequat.{blue} Duis aute\nirure dolor in{/blue} reprehenderit\nin voluptate velit{/green} esse {italic}cillum\ndolore{/italic}{red} eu{/red}{italic green} fugiat {/italic green}nulla\npariatur. Excepteur{red} sint{/red}{blue} occaecat\n cupidatat {/blue}non proident,\nsunt in culpa qui {italic}officia{/italic} deserun\nt mollit anim\nid est laborum."
+    str_reshaped = "Lorem ipsum {bold}dolor sit{/bold} amet,\nconsectetur adipiscing elit,\ned do e{red}iusmod tempor incididunt{/red}\nut {bold}labore et {underline}dolore{/underline} magna aliqua.{/bold}\n{bold}{/bold} Ut enim ad minim\nveniam, quis{green} nostrud exercitation{/green}\n{green} {on_black}ullamco laboris nisi ut aliquip{/green}\n{green}{on_black}ex {/on_black}{/green}\nea commodo consequat.{blue} Duis aute{/blue}\n{blue}irure dolor in{/blue} reprehenderit\nin voluptate velit{/green} esse {italic}cillum{/italic}\n{italic}dolore{/italic}{red} eu{/red}{italic green} fugiat {/italic green}nulla\npariatur. Excepteur{red} sint{/red}{blue} occaecat{/blue}\n{blue} cupidatat {/blue}non proident,\nsunt in culpa qui {italic}officia{/italic} deserun\nt mollit anim\nid est laborum."
 
     logo_str = """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
 
@@ -145,7 +145,7 @@ id est laborum."""
     as {red}"Panel"{/red} and {red}"TextBox"{/red}.
     These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code"""
 
-    logo_str_reshaped = "Term.jl is a {#9558B2}Julia{/#9558B2} package for\ncreating styled terminal outputs.\n\nTerm provides a simple {italic green4 bold}markup\nlanguage{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline}\nto your text.\nMore complicated text layout\ncan be created using {red}\"Renderable\"\n{/red} objects such\nas {red}\"Panel\"{/red} and {red}\"TextBox\"{/red}.\nThese can also be nested and\nstacked to create {italic pink3}fancy{/italic pink3} and\n{underline}informative{/underline} terminal ouputs\nfor your Julia code"
+    logo_str_reshaped = "Term.jl is a {#9558B2}Julia{/#9558B2} package for\ncreating styled terminal outputs.\n\nTerm provides a simple {italic green4 bold}markup{/italic green4 bold}\n{italic green4 bold}language{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline}\nto your text.\nMore complicated text layout\ncan be created using {red}\"Renderable\"{/red}\n{red}{/red} objects such\nas {red}\"Panel\"{/red} and {red}\"TextBox\"{/red}.\nThese can also be nested and\nstacked to create {italic pink3}fancy{/italic pink3} and\n{underline}informative{/underline} terminal ouputs\nfor your Julia code"
 
     strings = [
         (
@@ -154,11 +154,11 @@ id est laborum."""
         ),
         (
             "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
-            "Lorem {red}ipsum dolor sit {underline}amet,\nconsectetur{/underline} adipiscing elit,\n{/red}{blue}sed do eiusmod tempor incididunt{/blue}\nut labore et dolore magna aliqua.",
+            "Lorem {red}ipsum dolor sit {underline}amet,{/red}\n{red}{underline}consectetur{/underline} adipiscing elit,{/red}\n{red}{/red}{blue}sed do eiusmod tempor incididunt{/blue}\nut labore et dolore magna aliqua.",
         ),
         (
             "Lorem{red}ipsumdolorsit{underline}amet, consectetur{/underline} adipiscing elit, {/red}seddoeiusmo{blue}dtemporincididunt{/blue}ut labore et dolore magna aliqua.",
-            "Lorem{red}ipsumdolorsit{underline}amet, consectet\nur{/underline} adipiscing elit, {/red}seddoeiusmo{blue}dt\nemporincididunt{/blue}ut labore et\ndolore magna aliqua.",
+            "Lorem{red}ipsumdolorsit{underline}amet, consectet{/red}\n{red}{underline}ur{/underline} adipiscing elit, {/red}seddoeiusmo{blue}dt{/blue}\n{blue}emporincididunt{/blue}ut labore et\ndolore magna aliqua.",
         ),
         (
             "ต้าอ่วยวาทกรรมอาว์เซี้ยว กระดี๊กระด๊า ช็อปซาดิสต์โมจิดีพาร์ตเมนต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
@@ -166,7 +166,7 @@ id est laborum."""
         ),
         (
             "ต้าอ่วยวาท{red}กรรมอาว์เซี้ยว กระดี๊กระด๊า {/red}ช็อปซาดิสต์โมจิดีพาร์ตเม{blue underline}นต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต{/blue underline}อร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
-            "ต้าอ่วยวาท{red}กรรมอาว์เซี้ยว กระดี๊กระด๊า\n{/red}ช็อปซาดิสต์โมจิดีพาร์ตเม{blue underline}นต์ อินดอร์วิว\nสี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต{/blue underline}อร์ฮันนีมูน\nยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข\n่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์\nบอยคอตต์เฟอร์รี่บึมมาราธอน",
+            "ต้าอ่วยวาท{red}กรรมอาว์เซี้ยว กระดี๊กระด๊า{/red}\n{red}{/red}ช็อปซาดิสต์โมจิดีพาร์ตเม{blue underline}นต์ อินดอร์วิว{/blue underline}\n{blue underline}สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต{/blue underline}อร์ฮันนีมูน\nยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข\n่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์\nบอยคอตต์เฟอร์รี่บึมมาราธอน",
         ),
         (
             "국가유공자·상이군경 및 전몰군경의 유가족은 법률이 정하는 바에 의하여",
@@ -174,7 +174,7 @@ id est laborum."""
         ),
         (
             "국{red}가유공자·상이군{bold}경 및 전{/bold}몰군경의 유{/red}가족은 법률이 정하는 바에 의하여",
-            "국{red}가유공자·상이군{bold}경 및 전{/bold}몰군경의\n 유{/red}가족은 법률이 정하는 바에\n의하여",
+            "국{red}가유공자·상이군{bold}경 및 전{/bold}몰군경의{/red}\n{red} 유{/red}가족은 법률이 정하는 바에\n의하여",
         ),
         (
             "朗眠裕安無際集正聞進士健音社野件草売規作独特認権価官家複入豚末告設悟自職遠氷育教載最週場仕踪持白炎組特曲強真雅立覧自価宰身訴側善論住理案者券真犯著避銀楽験館稿告",
@@ -190,11 +190,11 @@ id est laborum."""
         ),
         (
             "┌─────────{red}───ab{/red}cde────┬──────{green}────── ────┬────────abcde fghi{/green}────────┬────────────────┬──────────────",
-            "┌─────────{red}───ab{/red}cde────┬──────{green}────\n── ────┬────────abcde fghi{/green}───────\n─┬────────────────┬──────────────",
+            "┌─────────{red}───ab{/red}cde────┬──────{green}────{/green}\n{green}── ────┬────────abcde fghi{/green}───────\n─┬────────────────┬──────────────",
         ),
         (
             "┌──────────{red}────{/red}──┬{blue bold}────────────────┬──{/blue bold}──────────────┬────────────────┬──────────────end",
-            "┌──────────{red}────{/red}──┬{blue bold}───────────────\n─┬──{/blue bold}──────────────┬──────────────\n──┬──────────────end",
+            "┌──────────{red}────{/red}──┬{blue bold}───────────────{/blue bold}\n{blue bold}─┬──{/blue bold}──────────────┬──────────────\n──┬──────────────end",
         ),
         (
             "."^100,
