@@ -277,3 +277,14 @@ end
         IS_WIN || @compare_to_string reshaped "reshaped_code_$(i)_$(j)"
     end
 end
+
+
+@testset "markup reshaping" begin
+    txt = "{red}dasda asda dadasda{green}aadasdad{/green}dad asd ad ad ad asdad{bold}adada ad as sad ad ada{/red}ad adas sd ads {/bold}"
+    widths = (32, 65, 20)
+
+    for (j, w) in enumerate(widths)
+        reshaped = reshape_text(txt, w)
+        IS_WIN || @compare_to_string reshaped "reshaped_text_markuo_$(j)"
+    end
+end

@@ -55,8 +55,8 @@ function reshape_text(text::AbstractString, width::Int; ignore_markup::Bool = fa
         end
     end
     push!(lines, rstrip(line))
-    out = join(lines, "\n")
 
+    out = join(fix_markup_across_lines(lines), "\n")
     chomp(out)
 end
 

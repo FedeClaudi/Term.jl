@@ -163,6 +163,47 @@ unescape_brackets(text)::String = replace_multi(text, "{{" => "{", "}}" => "}")
 
 unescape_brackets_with_space(text)::String = replace_multi(text, "{{" => " {", "}}" => "} ")
 
+
+# ------------------------------ multiline-style ----------------------------- #
+"""
+    fix_markup_across_lines(lines::Vector{AbstractString})::Vector{AbstractString}
+
+When splitting text with markup tags across multiple lines, tags can get separated
+across lines. This is a problem when the text gets printed side by side with other 
+text with style information. This fixes that by copying/closing markup tags
+across lines as requested.
+Essentially, if a tag is opened but not closed in a line, close it at the end of 
+the line and add the same open tag at the start of the next, taking care of 
+doing things in the correct order when multiple tags are in the same line.
+"""
+function fix_markup_across_lines(lines::Vector{AbstractString})::Vector{AbstractString}
+    for (i, ln) in enumerate(lines)
+        # loop over each open tag regex
+        for open_match in reverse(collect(eachmatch(OPEN_TAG_REGEX, ln)))
+            # get closing tag text
+            markup = open_match.match[2:(end - 1)]
+            close_rx = r"(?<!\{)\{(?!\{)\/" * markup * r"\}"
+
+            # if there's no close tag, add the open tag to the next line and close it on this
+            if !occursin(close_rx, ln) && !occursin("{/}", ln) 
+                lines[i] = ln*"{/$markup}"
+                i < length(lines) && (lines[i+1]="{$markup}"*lines[i+1])
+                
+            end
+        end
+
+    end
+
+    return lines
+end
+
+
+function fix_markup_across_lines(text::AbstractString)
+    lines = fix_style_across_lines(split(text, "\n"))
+    return join(lines, "\n")
+end
+
+
 # ---------------------------------------------------------------------------- #
 #                                      I/O                                     #
 # ---------------------------------------------------------------------------- #

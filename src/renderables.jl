@@ -133,15 +133,14 @@ Optionally `justify`  can be used to set the text justification style ∈ (:left
 function RenderableText(
     text::AbstractString;
     style::Union{Nothing,String} = nothing,
-    width::Union{Nothing,Int} = min(Measure(text).w, console_width(stdout)),
+    width::Int = min(Measure(text).w, console_width(stdout)),
     background::Union{Nothing,String} = nothing,
     justify::Symbol = :left,
 )
     stype::DataType = typeof(text)
     text = apply_style(text)
 
-    isnothing(width) ||
-        (text = text_to_width(text, width, justify; background = background) |> chomp)
+    text = text_to_width(text, width, justify; background = background) |> chomp
 
     style = isnothing(style) ? "" : style
     background = isnothing(background) ? "" : get_bg_color(background)
