@@ -39,12 +39,12 @@ end
     width = 22
     r = RenderableText(lorem; width = width)
     @test string(r) ==
-    "Lorem ipsum dolor\e[0m     \nsit amet, consectetur\e[0m \n adipiscing elit,\e[0m     \nsed do eiusmod tempor\e[0m \n incididunt ut labore\e[0m \n\e[0m                      " 
+          "Lorem ipsum dolor\e[0m     \nsit amet, consectetur\e[0m \n adipiscing elit,\e[0m     \nsed do eiusmod tempor\e[0m \n incididunt ut labore\e[0m \n\e[0m                      "
     @test r.measure.w == width
 
     r = RenderableText(lorem; width = width, style = "red")
     @test string(r) ==
-    "\e[31mLorem ipsum dolor\e[0m     \e[39m\n\e[31msit amet, consectetur\e[0m \e[39m\n\e[31m adipiscing elit,\e[0m     \e[39m\n\e[31msed do eiusmod tempor\e[0m \e[39m\n\e[31m incididunt ut labore\e[0m \e[39m\n\e[31m\e[0m                      \e[39m" 
+          "\e[31mLorem ipsum dolor\e[0m     \e[39m\n\e[31msit amet, consectetur\e[0m \e[39m\n\e[31m adipiscing elit,\e[0m     \e[39m\n\e[31msed do eiusmod tempor\e[0m \e[39m\n\e[31m incididunt ut labore\e[0m \e[39m\n\e[31m\e[0m                      \e[39m"
     @test r.measure.w == width
 
     @test string(RenderableText("a string")) == "a string"
@@ -92,12 +92,14 @@ end
     @compare_to_string(Panel(txt; width = 30), "reshaped_rend_with_markup_1")
     @compare_to_string(RenderableText(txt; width = 30), "reshaped_rend_with_markup_2")
 
-
     txt = "{(220, 180, 150)}dasda {bold}asda dadasda{dodger_blue2}aadasdad{/dodger_blue2}dad asd ad{/bold} ad ad asdad{on_(25, 55, 100)}adada ad as sad ad ada{/(220, 180, 150)}ad adas sd ads {/on_(25, 55, 100)} NOW SIMPLE {red} adasd aads a asd ads a{/red} dasiudh asjdnasdiuasda {underline} asdnaisudnadaiuda sjduiabdiabd aduas {/underline}"
     @compare_to_string(Panel(txt; width = 30), "reshaped_rend_with_markup_3")
     @compare_to_string(RenderableText(txt; width = 30), "reshaped_rend_with_markup_4")
 
     txt = "{(220, 180, 150)}dasda {bold}asda dadasda{dodger_blue2}aadasdad{/dodger_blue2}dad asd ad{/bold} ad ad asdad{on_(25, 55, 100)}adada ad as sad ad ada{/(220, 180, 150)}ad adas sd ads {/on_(25, 55, 100)} NOW SIMPLE {red} adasd aads a asd ads a{/red} dasiudh asjdnasdiuasda {underline} asdnaisudnadaiuda sjduiabdiabd aduas {/underline}"
     @compare_to_string(Panel(apply_style(txt); width = 30), "reshaped_rend_with_markup_5")
-    @compare_to_string(RenderableText(apply_style(txt); width = 30), "reshaped_rend_with_markup_6")
+    @compare_to_string(
+        RenderableText(apply_style(txt); width = 30),
+        "reshaped_rend_with_markup_6"
+    )
 end

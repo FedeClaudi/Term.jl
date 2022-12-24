@@ -96,7 +96,6 @@ end
     @test unspace_commas("a, 2, 3") == "a,2,3"
 end
 
-
 @testset "TU_misc" begin
     @test chars("abcd") == ['a', 'b', 'c', 'd']
 
@@ -113,7 +112,6 @@ asddsa""",
 end
 
 @testset "TU_reshape" begin
-
     strings = [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
@@ -144,7 +142,7 @@ end
 
         if length(txt) == ncodeunits(txt) && !occursin('\n', txt)
             (debug && any(lens .> width)) && println(lens)
-            @test all(lens .≤ width) 
+            @test all(lens .≤ width)
         end
         @compare_to_string reshaped "reshaped_text_$(i)"
     end
@@ -173,8 +171,6 @@ end
         IS_WIN || @compare_to_string(str_trunc(str, w), "str_trunc_$(i)")
     end
 end
-
-
 
 @testset "code reshaping" begin
     codes = [

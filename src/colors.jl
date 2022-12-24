@@ -1,12 +1,6 @@
 module Colors
 
-import Term:
-    NAMED_COLORS,
-    COLORS_16b,
-    ANSICode,
-    rint,
-    CODES,
-    CODES_16BIT_COLORS
+import Term: NAMED_COLORS, COLORS_16b, ANSICode, rint, CODES, CODES_16BIT_COLORS
 
 export NamedColor, BitColor, RGBColor, get_color
 

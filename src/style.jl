@@ -167,21 +167,20 @@ function apply_style(text; leave_orphan_tags = false)::String
         end
         close_match = match(close_rx, text)
 
-
         # if previous style had color and we're nested, use color info
         if open_match.offset > previous_color[1] &&
-            close_match.offset < previous_color[2] &&
-            !isnothing(previous_color[3].color)
+           close_match.offset < previous_color[2] &&
+           !isnothing(previous_color[3].color)
             col_prev_ansi_open, _ = get_style_codes(previous_color[3])
-            ansi_close = ansi_close * col_prev_ansi_open            
+            ansi_close = ansi_close * col_prev_ansi_open
         end
 
         # and for background
         if open_match.offset > previous_background[1] &&
-            close_match.offset < previous_background[2] &&
-            !isnothing(previous_background[3].background)
+           close_match.offset < previous_background[2] &&
+           !isnothing(previous_background[3].background)
             bg_prev_ansi_open, _ = get_style_codes(previous_background[3])
-            ansi_close = ansi_close * bg_prev_ansi_open            
+            ansi_close = ansi_close * bg_prev_ansi_open
         end
 
         # replace close tag
@@ -189,22 +188,24 @@ function apply_style(text; leave_orphan_tags = false)::String
             text,
             close_match.offset - 1,
             close_match.offset + length(markup) + 2,
-            ansi_close
+            ansi_close,
         )
 
         # store style info
         isnothing(ms.color) || (
-        previous_color = (                
-            max(open_match.offset - 1, 0),
-            close_match.offset + length(markup) + 2,
-            ms)
+            previous_color = (
+                max(open_match.offset - 1, 0),
+                close_match.offset + length(markup) + 2,
+                ms,
+            )
         )
 
         isnothing(ms.background) || (
-            previous_background = (                
+            previous_background = (
                 max(open_match.offset - 1, 0),
                 close_match.offset + length(markup) + 2,
-                ms);
+                ms,
+            )
         )
     end
     return text

@@ -94,7 +94,6 @@ function get_ANSI_codes(text)::String
     return *(map(m -> m.match, matches)...)
 end
 
-
 # --------------------------- clean text / text len -------------------------- #
 """
     cleantext(str::AbstractString)
@@ -121,7 +120,6 @@ Replace each curly bracket with a double copy of itself
 """
 escape_brackets(text)::String =
     replace_multi(text, brackets_regexes[1] => "{{", brackets_regexes[2] => "}}")
-
 
 """
     unescape_brackets(text)::String
@@ -153,7 +151,7 @@ function fix_markup_across_lines(lines::Vector)::Vector
             close_tag = "{/$markup}"
 
             # if there's no close tag, add the open tag to the next line and close it on this
-            if !occursin(close_tag, ln[open_match.offset:end]) && !occursin("{/}", ln)
+            if !occursin(close_tag, ln[(open_match.offset):end]) && !occursin("{/}", ln)
                 # @info "carrying over" i markup
                 ln = ln * "{/$markup}"
                 i < length(lines) && (lines[i + 1] = "{$markup}" * lines[i + 1])
@@ -170,27 +168,35 @@ function fix_markup_across_lines(text::AbstractString)
     return join(lines, "\n")
 end
 
-
-
-
 """ Check if an ANSI tag is a closer """
 function is_closing_ansi_tag(tag::SubString)
-    tag ∈ ("\e[0m", "\e[39m", "\e[49m", "\e[22m", "\e[23m", "\e[24m", "\e[25m", "\e[27m", "\e[28m", "\e[29m")
+    tag ∈ (
+        "\e[0m",
+        "\e[39m",
+        "\e[49m",
+        "\e[22m",
+        "\e[23m",
+        "\e[24m",
+        "\e[25m",
+        "\e[27m",
+        "\e[28m",
+        "\e[29m",
+    )
 end
 
 ansi_pairs = Dict(
-    "\e[22m"=> "\e[22m",
-    "\e[1m"=> "\e[22m",
-    "\e[1m"=> "\e[22m",
-    "\e[2m"=> "\e[22m",
-    "\e[3m"=> "\e[23m",
-    "\e[3m"=> "\e[23m",
-    "\e[4m"=> "\e[24m",
-    "\e[4m"=> "\e[24m",
-    "\e[5m"=> "\e[25m",
-    "\e[7m"=> "\e[27m",
-    "\e[8m"=> "\e[28m",
-    "\e[9m"=> "\e[29m",
+    "\e[22m" => "\e[22m",
+    "\e[1m" => "\e[22m",
+    "\e[1m" => "\e[22m",
+    "\e[2m" => "\e[22m",
+    "\e[3m" => "\e[23m",
+    "\e[3m" => "\e[23m",
+    "\e[4m" => "\e[24m",
+    "\e[4m" => "\e[24m",
+    "\e[5m" => "\e[25m",
+    "\e[7m" => "\e[27m",
+    "\e[8m" => "\e[28m",
+    "\e[9m" => "\e[29m",
 )
 
 """ Given an ANSI tag, get the correct closer tag """
@@ -221,7 +227,7 @@ function fix_ansi_across_lines(lines::Vector)::Vector
             closer = get_closing_ansi_tag(ansi)
 
             # check if the closing tag occurs in the line
-            if !occursin(closer, ln[match.offset:end]) 
+            if !occursin(closer, ln[(match.offset):end])
                 # if no closing, add closing to end of line and tag to start of next line
                 ln = ln * closer
                 i < length(lines) && (lines[i + 1] = ansi * lines[i + 1])
@@ -237,8 +243,6 @@ function fix_ansi_across_lines(text::AbstractString)::AbstractString
     lines = split(text, "\n") |> fix_ansi_across_lines
     return join(lines, "\n")
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                      I/O                                     #
@@ -322,7 +326,6 @@ function rtrim_str(str, width)
     edge = nextind(str, 0, width)
     return str[edge:end]
 end
-
 
 """
     unspace_commas(text::AbstractString)
