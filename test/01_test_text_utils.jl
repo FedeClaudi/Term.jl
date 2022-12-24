@@ -1,5 +1,4 @@
 import Term:
-    get_last_ANSI_code,
     unescape_brackets,
     escape_brackets,
     unspace_commas,
@@ -75,7 +74,6 @@ end
     for (s1, s2, ltag) in strings
         @test has_ansi(s1)
         @test remove_ansi(s1) == s2
-        @test get_last_ANSI_code(s1) == ltag
     end
 end
 

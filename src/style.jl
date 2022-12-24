@@ -8,7 +8,6 @@ import Term:
     has_markup,
     OPEN_TAG_REGEX,
     replace_text,
-    get_last_ANSI_code,
     CODES,
     ANSICode,
     tview,

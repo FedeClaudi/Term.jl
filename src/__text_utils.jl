@@ -70,30 +70,6 @@ Returns `true` if `text` includes a `MarkupTag`
 """
 has_ansi(text)::Bool = occursin(ANSI_REGEX, text)
 
-"""
-    get_last_ANSI_code(text)::String
-
-Get the last ANSI code in a sting, returns "" if no ANSI code found.
-"""
-function get_last_ANSI_code(text)::String
-    has_ansi(text) || return ""
-
-    # get the last matching regex
-    rmatch = collect((eachmatch(ANSI_REGEX, text)))[end]
-    return rmatch.match
-end
-
-"""
-    get_ANSI_codes(text)::String
-
-Returns a string with all ANSI codes in the input.
-"""
-function get_ANSI_codes(text)::String
-    has_ansi(text) || return ""
-    matches = collect((eachmatch(ANSI_REGEX, text)))
-    return *(map(m -> m.match, matches)...)
-end
-
 # --------------------------- clean text / text len -------------------------- #
 """
     cleantext(str::AbstractString)
@@ -161,11 +137,6 @@ function fix_markup_across_lines(lines::Vector)::Vector
     end
 
     return lines
-end
-
-function fix_markup_across_lines(text::AbstractString)
-    lines = fix_style_across_lines(split(text, "\n"))
-    return join(lines, "\n")
 end
 
 """ Check if an ANSI tag is a closer """
@@ -237,11 +208,6 @@ function fix_ansi_across_lines(lines::Vector)::Vector
     end
 
     return lines
-end
-
-function fix_ansi_across_lines(text::AbstractString)::AbstractString
-    lines = split(text, "\n") |> fix_ansi_across_lines
-    return join(lines, "\n")
 end
 
 # ---------------------------------------------------------------------------- #
