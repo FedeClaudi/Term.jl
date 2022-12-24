@@ -124,6 +124,20 @@ Apply style to a piece of text.
 
 Extract markup style information and insert the 
 appropriate ANSI codes to style a string.
+
+When multiple, nested color tags are present, like in"
+    "{red} abcd {green} asd {/green} eadsa {/red}"
+extra care should be put to ensure that when `green` is closed
+the text is rendered as red. To this end, this function
+keeps track of the last color style information and where it occurred in the input
+text. If the current markup tag is nested in the previous, it changes, for example
+    "{/green}"
+to
+    "{/green}{red}".
+The same in parallel has to be done for background colors. 
+
+By default, "orphaned" tags (i.e. open/close markup tags without the corresponding
+tag) are removed from the string. Use `leave_orphan_tags` to change this behavior.
 """
 function apply_style(text; leave_orphan_tags = false)::String
     has_markup(text) || return text
