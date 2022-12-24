@@ -1,7 +1,7 @@
 import Term.Renderables: Renderable, RenderableText, AbstractRenderable, trim_renderable
 import Term: Panel
 import Term.Segments: Segment
-import Term: fillin
+import Term: fillin, apply_style
 
 @testset "\e[34mSegment" begin
     seg = Segment("test", "default")
@@ -39,12 +39,12 @@ end
     width = 22
     r = RenderableText(lorem; width = width)
     @test string(r) ==
-          "Lorem ipsum dolor     \nsit amet, consectetur \n adipiscing elit,     \nsed do eiusmod tempor \n incididunt ut labore "
+          "Lorem ipsum dolor\e[0m     \nsit amet, consectetur\e[0m \n adipiscing elit,\e[0m     \nsed do eiusmod tempor\e[0m \n incididunt ut labore\e[0m \n\e[0m                      "
     @test r.measure.w == width
 
     r = RenderableText(lorem; width = width, style = "red")
     @test string(r) ==
-          "\e[31mLorem ipsum dolor     \e[39m\n\e[31msit amet, consectetur \e[39m\n\e[31m adipiscing elit,     \e[39m\n\e[31msed do eiusmod tempor \e[39m\n\e[31m incididunt ut labore \e[39m"
+          "\e[31mLorem ipsum dolor\e[0m     \e[39m\n\e[31msit amet, consectetur\e[0m \e[39m\n\e[31m adipiscing elit,\e[0m     \e[39m\n\e[31msed do eiusmod tempor\e[0m \e[39m\n\e[31m incididunt ut labore\e[0m \e[39m\n\e[31m\e[0m                      \e[39m"
     @test r.measure.w == width
 
     @test string(RenderableText("a string")) == "a string"
@@ -85,4 +85,26 @@ end
         r = trim_renderable(Panel("aa bb"^100), 25)
         @compare_to_string(r, "trim_renderables_2")
     end
+end
+
+@testset "Renderables reshaped text markup" begin
+    txt = "{red}dasda asda dadasda{green}aadasdad{/green}dad asd ad ad ad asdad{bold}adada ad as sad ad ada{/red}ad adas sd ads {/bold}"
+    IS_WIN || @compare_to_string(Panel(txt; width = 30), "reshaped_rend_with_markup_1")
+    IS_WIN ||
+        @compare_to_string(RenderableText(txt; width = 30), "reshaped_rend_with_markup_2")
+
+    txt = "{(220, 180, 150)}dasda {bold}asda dadasda{dodger_blue2}aadasdad{/dodger_blue2}dad asd ad{/bold} ad ad asdad{on_(25, 55, 100)}adada ad as sad ad ada{/(220, 180, 150)}ad adas sd ads {/on_(25, 55, 100)} NOW SIMPLE {red} adasd aads a asd ads a{/red} dasiudh asjdnasdiuasda {underline} asdnaisudnadaiuda sjduiabdiabd aduas {/underline}"
+    IS_WIN || @compare_to_string(Panel(txt; width = 30), "reshaped_rend_with_markup_3")
+    IS_WIN ||
+        @compare_to_string(RenderableText(txt; width = 30), "reshaped_rend_with_markup_4")
+
+    txt = "{(220, 180, 150)}dasda {bold}asda dadasda{dodger_blue2}aadasdad{/dodger_blue2}dad asd ad{/bold} ad ad asdad{on_(25, 55, 100)}adada ad as sad ad ada{/(220, 180, 150)}ad adas sd ads {/on_(25, 55, 100)} NOW SIMPLE {red} adasd aads a asd ads a{/red} dasiudh asjdnasdiuasda {underline} asdnaisudnadaiuda sjduiabdiabd aduas {/underline}"
+    IS_WIN || @compare_to_string(
+        Panel(apply_style(txt); width = 30),
+        "reshaped_rend_with_markup_5"
+    )
+    IS_WIN || @compare_to_string(
+        RenderableText(apply_style(txt); width = 30),
+        "reshaped_rend_with_markup_6"
+    )
 end

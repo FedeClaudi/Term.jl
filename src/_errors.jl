@@ -137,7 +137,7 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         ),
     )
 
-    return RenderableText(reshape_code_string(func, ctx.func_name_w); width = nothing)
+    return RenderableText(reshape_code_string(func, ctx.func_name_w))
 end
 
 # ---------------------------------------------------------------------------- #

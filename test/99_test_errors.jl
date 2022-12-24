@@ -64,7 +64,6 @@ end
     @test_throws MethodError f(1)
 end
 
-
 # ! this fails to pass tests for some reason.
 # @testset "ERRORS - backtrace" begin
 #     f2(x) = 2x

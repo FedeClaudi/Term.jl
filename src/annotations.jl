@@ -68,7 +68,6 @@ function Decoration(
     underscore = hLine(underscore_width, "┬"; pad_txt = false, style = "$style dim")
 
     # get the width of the text, see if it needs to be adjusted
-    message = apply_style(message)
     max_w = min(width(message), console_width() - position - 30)
 
     # create `Panel` and add the end of an "arrow" to the side.

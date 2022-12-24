@@ -20,7 +20,7 @@ ann = Annotation(
     "main text" => "text to be annotated.\nSubstrings of this will be annotated with extra info.",
     "\"this\"=>\"annotation: extra info\"" => "simple annotation, no style. Just passed as a `Pair`",
     """"main text"=>("with style", "green"))""" => (
-        "annotation with extra style info: use a `Tuple` to specify both the annotation's message and additional style info. For example:\n\n $(highlight_syntax(ex))",
+        "{white}annotation with extra style info: use a {red}`Tuple` to specify both the annotation's{/red} message and additional style info.{/white} For example:\n\n $(highlight_syntax(ex))",
         "bright_green",
     ),
 )

@@ -1,0 +1,7 @@
+{red}dasda asda dadasda{green}aa{/green}{/red}[0m
+{red}{green}dasdad{/green}dad{/red}[0m[0m
+{red}asd ad ad ad asdad{bold}ad{/bold}{/red}[0m
+{red}{bold}ada ad{/bold}{/red}[0m[0m
+{red}{bold}as sad ad ada{/red}ad{/bold}[0m
+{bold}adas sd ads{/bold}[0m[0m
+{bold}{/bold}[0m
