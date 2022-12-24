@@ -129,7 +129,6 @@ appropriate ANSI codes to style a string.
 function apply_style(text; leave_orphan_tags = false)::String
     has_markup(text) || return text
 
-
     previous_color = (0, length(text), MarkupStyle("default"))
     previous_background = (0, length(text), MarkupStyle("default"))
     while has_markup(text)

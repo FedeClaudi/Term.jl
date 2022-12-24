@@ -1,5 +1,5 @@
 import Term.Style: apply_style
-import Term: tprint, tprintln, get_file_format
+import Term: tprint, tprintln, get_file_format, reshape_text
 
 @testset "\e[34mStyle\e[0m" begin
     @test apply_style("test") == "test"
@@ -16,7 +16,7 @@ import Term: tprint, tprintln, get_file_format
     test {red} sdfsdf
     fdsf{/red} {bold} sfsdfp{green} sdfsdp{/green}sdsdfs
     pdfsdp{/bold}""") ==
-          "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[32m sdfsdp\e[39m\e[1msdsdfs\npdfsdp\e[22m\e[39m"
+    "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[32m sdfsdp\e[39msdsdfs\npdfsdp\e[22m"
 
     # check that parentheses are escaped correctly
     @test apply_style("This and that {{something}} for") ==
@@ -46,6 +46,26 @@ end
 end
 
 
+@testset "Style with nested tags and reshaping" begin
+      txts = [
+            "{red}adasd ad sa dsa{green} ad {blue} sd d ads ad {/blue}da dad {/green} asdsa dad a {/red}",
+            "{red}adasd ad sa dsa{bold} ad {blue} sd d ads ad {/blue}da dad {/bold} asdsa dad a {/red}",
+            "{red}adasd ad sa dsa{green} ad {blue} sd d ads ad da dad {/green} asdsa ddfsf {/blue}ad a {/red}",
+            "{on_red}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} dad {/green} asdsa ddfsf ad a {/on_red}",
+            "{on_(25, 25, 25)}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} {white}dad{/white} asad {/green} asdsa ddfsf ad a {/on_(25, 25, 25)}",
+            "{(220, 180, 150)} pink {bold}pink bold {dodger_blue2} pink bold blue {/dodger_blue2} pink bold {/bold} pink {on_(25, 55, 100)} pink on blue {/(220, 180, 150)} just on blue {/on_(25, 55, 100)} NOW SIMPLE WHITE {red} red red red {/red} white white {underline} underline underline {/underline}",
+      ]
+
+      sizes = (25, 33, 61)
+
+      for (i, txt) in enumerate(txts)
+            for (j, w) in enumerate(sizes)
+                  IS_WIN || @compare_to_string apply_style(reshape_text(txt, w)) "nested_tags_reshape_$(i)_$(j)"
+                  IS_WIN || @compare_to_string reshape_text(apply_style(txt), w) "nested_tags_reshape_$(i)_$(j)_reverse"
+            end
+      end
+end
+
 @testset "\e[34mTprint\e[0m" begin
     stprint(x) = chomp(sprint(tprint, x; context = stdout))
     stprintln(x) = chomp(sprint(tprintln, x; context = stdout))
@@ -69,7 +89,7 @@ end
     test {red} sdfsdf
     fdsf{/red} {bold} sfsdfp{green} sdfsdp{/green}sdsdfs
     pdfsdp{/bold}""") ==
-          "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[32m sdfsdp\e[39m\e[1msdsdfs\npdfsdp\e[22m\e[39m"
+    "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[32m sdfsdp\e[39msdsdfs\npdfsdp\e[22m" 
 
     @test stprint("This and that {{something}} for") == "This and that {{something}} for"
 end

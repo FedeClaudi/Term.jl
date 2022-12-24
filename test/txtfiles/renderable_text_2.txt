@@ -1,4 +1,4 @@
-[41m[41m [49mLorem ipsum dolor sit amet,[41m  [49m[49m
-[41m[41m [49mconsectetur adipiscing elit,[41m [49m[49m
-[41m[41m[49msed do eiusmod tempor incidid[41m [49m[49m
-[41m[41m        [49munt ut labore[41m         [49m[49m
+[41m[41m [49mLorem ipsum dolor sit amet,[0m[41m  [49m[49m
+[41m[41m [49mconsectetur adipiscing elit,[0m[41m [49m[49m
+[41m[41m[49msed do eiusmod tempor incidid[0m[41m [49m[49m
+[41m[41m        [49munt ut labore[0m[41m         [49m[49m

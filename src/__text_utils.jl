@@ -153,13 +153,13 @@ function fix_markup_across_lines(lines::Vector)::Vector
             close_tag = "{/$markup}"
 
             # if there's no close tag, add the open tag to the next line and close it on this
-            if !occursin(close_tag, ln) && !occursin("{/}", ln)
-                lines[i] = ln * "{/$markup}"
+            if !occursin(close_tag, ln[open_match.offset:end]) && !occursin("{/}", ln)
+                # @info "carrying over" i markup
+                ln = ln * "{/$markup}"
                 i < length(lines) && (lines[i + 1] = "{$markup}" * lines[i + 1])
-            # else
-            #     lines[i] = ln * "e\[0m"
             end
         end
+        lines[i] = ln * "\e[0m"
     end
 
     return lines
@@ -172,11 +172,11 @@ end
 
 
 
+
 """ Check if an ANSI tag is a closer """
 function is_closing_ansi_tag(tag::SubString)
     tag ∈ ("\e[0m", "\e[39m", "\e[49m", "\e[22m", "\e[23m", "\e[24m", "\e[25m", "\e[27m", "\e[28m", "\e[29m")
 end
-
 
 ansi_pairs = Dict(
     "\e[22m"=> "\e[22m",
@@ -204,8 +204,6 @@ function get_closing_ansi_tag(tag::SubString)
     # deal with background colors
     occursin(r"\e\[4\dm", tag) && return "\e[49m"
     occursin(r"\e\[48[0-9;]*m", tag) && return "\e[49m"
-
-
     return nothing
 end
 
@@ -221,21 +219,15 @@ function fix_ansi_across_lines(lines::Vector)::Vector
 
             # get closing tag
             closer = get_closing_ansi_tag(ansi)
-            # @info match closer
-            isnothing(closer) && begin
-                    lines[i] = ln * "\e[0m"
-                    continue
-            end
 
             # check if the closing tag occurs in the line
-            if !occursin(closer, ln) && !occursin("\e[0m", ln)
+            if !occursin(closer, ln[match.offset:end]) 
                 # if no closing, add closing to end of line and tag to start of next line
-                lines[i] = ln * "\e[0m"
+                ln = ln * closer
                 i < length(lines) && (lines[i + 1] = ansi * lines[i + 1])
-            elseif i < length(lines)
-                lines[i] = ln * "\e[0m"
             end
         end
+        lines[i] = ln # * "\e[0m"
     end
 
     return lines
