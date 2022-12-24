@@ -144,7 +144,7 @@ end
             (debug && any(lens .> width)) && println(lens)
             @test all(lens .≤ width)
         end
-        @compare_to_string reshaped "reshaped_text_$(i)"
+        IS_WIN || @compare_to_string reshaped "reshaped_text_$(i)"
     end
 
     for width in (40, 60, 99)
