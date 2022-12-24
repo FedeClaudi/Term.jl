@@ -86,7 +86,7 @@ end
 half(x) = fint(x / 2)
 
 """ Make a vector of `Spacer` objects of given widths"""
-make_spaces(widths::Vector{Int})::Vector{Spacer} = collect(map(w -> Spacer(1, w), widths))
+make_spaces(widths::Vector{Int})::Vector{Spacer} = collect(map(w -> Spacer(1, max(0, w)), widths))
 
 """ hstack interleaved elements x ∈ X, y ∈ Y """
 join_interleaved(X, Y) = hstack([x * y for (x, y) in zip(X, Y)]...) |> string |> apply_style
@@ -142,6 +142,7 @@ function overlay_decorations(decorations::Vector{Decoration})
             positions[i] - positions[i - 1] - underscores_widths[i - 1] + 2,
         1:n,
     )
+
     spaces = make_spaces(lpads)
     push!(lines, join_interleaved(spaces, getfield.(decorations, :underscore)))
 
