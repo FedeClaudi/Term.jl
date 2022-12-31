@@ -48,10 +48,11 @@ end
 Hilights an entire text as if it was a type of semantically
 relevant text of type :like.
 """
-highlight(text::AbstractString, like::Symbol; theme::Theme = TERM_THEME[]) = apply_style(text, getfield(theme, like))
+highlight(text::AbstractString, like::Symbol; theme::Theme = TERM_THEME[]) =
+    apply_style(text, getfield(theme, like))
 
 # shorthand to highlight objects based on type
-highlight(x; theme = TERM_THEME[]) =  apply_style(string(x), theme(x)) # capture all other cases
+highlight(x; theme = TERM_THEME[]) = apply_style(string(x), theme(x)) # capture all other cases
 
 # ------------------------------ Highlighters.jl ----------------------------- #
 

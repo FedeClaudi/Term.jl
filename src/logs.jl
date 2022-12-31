@@ -266,7 +266,7 @@ function Logging.handle_message(
     """
 
     # function to reshape all content appropriately
-    w = min(120, (Int ∘ round)((console_width() - 6) / 5)-1)   # six to allow space for vert and =
+    w = min(120, (Int ∘ round)((console_width() - 6) / 5) - 1)   # six to allow space for vert and =
     fmt_str(x, style; f = 1) = RenderableText(string(x); width = f * w - 1, style = style)
     fmt_str(::Function, style; f = 1) = RenderableText("Function"; style = style)
 

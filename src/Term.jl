@@ -185,8 +185,5 @@ using .Grid
 
 using .Prompts
 
-using .Annotations: Annotation
-
-# include("__precompilation.jl")
-
+include("__precompilation.jl")
 end
