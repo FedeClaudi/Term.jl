@@ -33,10 +33,6 @@ macro runner(fn)
     end |> esc
 end
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 # @testset "Ambiguous methods" begin
 #     @test Test.detect_ambiguities(Term; recursive=true)
 # end
@@ -64,16 +60,10 @@ end
 @runner "21_test_markdown.jl"
 @runner "22_test_grid.jl"
 @runner "23_test_link.jl"
-<<<<<<< HEAD
-# @runner "24_prompts.jl"
-# @runner "98_test_examples.jl"
-# @runner "99_test_errors.jl"
-=======
 @runner "24_prompts.jl"
 @runner "25_annotations.jl"
 @runner "98_test_examples.jl"
 @runner "99_test_errors.jl"
->>>>>>> master
 
 show(TIMEROUTPUT; compact = true, sortby = :firstexec)
 println('\n')

@@ -118,10 +118,9 @@ style outputs to terminal.
     annotation_color::String = blue_light
 end
 
-
 (t::Theme)(::Function) = t.func
 (t::Theme)(::Number) = t.number
-(t::Theme)(::Union{UnionAll, DataType}) = t.type
+(t::Theme)(::Union{UnionAll,DataType}) = t.type
 (t::Theme)(::Symbol) = t.symbol
 (t::Theme)(::Expr) = t.expression
 (t::Theme)(::AbstractVector) = t.number
