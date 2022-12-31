@@ -16,7 +16,7 @@ jobs:
         version:
           - '1.6'
           - '1' # latest 1.X
-          # - 'nightly'
+          - 'nightly'
         os:
           - ubuntu-latest
           - windows-latest
