@@ -105,7 +105,7 @@ style outputs to terminal.
     # table
     tb_style::String   = "#9bb3e0"
     tb_header::String  = "bold white"
-    tb_columns::String = "defualt"
+    tb_columns::String = "default"
     tb_footer::String  = "default"
     tb_box::Symbol     = :MINIMAL_HEAVY_HEAD
 
@@ -113,8 +113,21 @@ style outputs to terminal.
     prompt_text::String           = blue
     prompt_default_option::String = "underline bold $green"
     prompt_options::String        = "default"
+
+    # annotations
+    annotation_color::String = blue_light
 end
 
+
+(t::Theme)(::Function) = t.func
+(t::Theme)(::Number) = t.number
+(t::Theme)(::Union{UnionAll, DataType}) = t.type
+(t::Theme)(::Symbol) = t.symbol
+(t::Theme)(::Expr) = t.expression
+(t::Theme)(::AbstractVector) = t.number
+(t::Theme)(::Any) = t.text
+
+# ---------------------------------- themes ---------------------------------- #
 DarkTheme = Theme(name = "dark")
 
 LightTheme = Theme(

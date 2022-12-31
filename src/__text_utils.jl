@@ -18,14 +18,8 @@ plural(word::AbstractString, n) = n <= 1 ? word : word * 's'
 # ---------------------------------------------------------------------------- #
 # ---------------------------------- markup ---------------------------------- #
 
-"""
-This regex uses lookahead and lookbehind to exclude {{
-at the beginning of a tag, with this:
-    (?<!\\{)\\[(?!\\{)
-"""
-RECURSIVE_OPEN_TAG_REGEX = r"\{(?:[^{}]*){2,}\}"
-OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#\n]*\}"
-CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#\n]+[^/\{]\}"
+OPEN_TAG_REGEX = r"(?<!\{)\{(?!\{)[a-zA-Z _0-9. ,()#]*\}"
+CLOSE_TAG_REGEX = r"\{\/[a-zA-Z _0-9. ,()#]+[^/\{]\}"
 GENERIC_CLOSER_REGEX = r"(?<!\{)\{(?!\{)\/\}"
 
 """
@@ -60,70 +54,21 @@ Returns `true` if `text` includes a `MarkupTag`
 has_markup(text)::Bool = occursin(OPEN_TAG_REGEX, text)
 
 # ----------------------------------- ansi ----------------------------------- #
-const ANSI_REGEXE = r"\e\[[0-9;]*m"
+const ANSI_REGEX = r"\e\[[0-9;]*m"
 
 """
     remove_ansi(input_text::AbstractString)::AbstractString
 
 Remove all ANSI tags from a string of text
 """
-remove_ansi(input_text)::String = replace(input_text, ANSI_REGEXE => "")
+remove_ansi(input_text)::String = replace(input_text, ANSI_REGEX => "")
 
 """ 
     has_ansi(text::String)
 
 Returns `true` if `text` includes a `MarkupTag`
 """
-has_ansi(text)::Bool = occursin(ANSI_REGEXE, text)
-
-"""
-    get_last_ANSI_code(text)::String
-
-Get the last ANSI code in a sting, returns "" if no ANSI code found.
-"""
-function get_last_ANSI_code(text)::String
-    has_ansi(text) || return ""
-
-    # get the last matching regex
-    rmatch = collect((eachmatch(ANSI_REGEXE, text)))[end]
-    return rmatch.match
-end
-
-"""
-    get_ANSI_codes(text)::String
-
-Returns a string with all ANSI codes in the input.
-"""
-function get_ANSI_codes(text)::String
-    has_ansi(text) || return ""
-    matches = collect((eachmatch(ANSI_REGEXE, text)))
-    return *(map(m -> m.match, matches)...)
-end
-
-"""
-    replace_ansi(input_text)
-
-Replace ANSI tags with ¦.
-
-The number of '¦' matches the length of the ANSI tags.
-Used when we want to hide ANSI tags but keep the string length intact.
-"""
-function replace_ansi(input_text)
-    while occursin(rx, input_text) && (m = match(ANSI_REGEXE, input_text)) !== nothing
-        input_text =
-            replace_text(input_text, m.offset - 1, m.offset + length(m.match) - 1, '¦')
-    end
-    return input_text
-end
-
-ANSI_CLEANUP_REGEXES = [
-    r"\e\[[0-9][0-9]m\e\[39m" => "",
-    r"\e\[[0-9][0-9]m\e\[49m" => "",
-    r"\e\[[0-9]m\e\[2[0-9]m" => "",
-    r"\e\[22m\e\[22m" => "",
-]
-
-cleanup_ansi(text) = replace_multi(text, ANSI_CLEANUP_REGEXES...)
+has_ansi(text)::Bool = occursin(ANSI_REGEX, text)
 
 # --------------------------- clean text / text len -------------------------- #
 """
@@ -152,24 +97,118 @@ Replace each curly bracket with a double copy of itself
 escape_brackets(text)::String =
     replace_multi(text, brackets_regexes[1] => "{{", brackets_regexes[2] => "}}")
 
-const remove_brackets_regexes = [r"\{\{", r"\}\}"]
-
 """
     unescape_brackets(text)::String
 
 Replece every double squared parenthesis with a single copy of itself
 """
-unescape_brackets(text)::String = replace_multi(
-    text,
-    remove_brackets_regexes[1] => "{",
-    remove_brackets_regexes[2] => "}",
+unescape_brackets(text)::String = replace_multi(text, "{{" => "{", "}}" => "}")
+
+unescape_brackets_with_space(text)::String = replace_multi(text, "{{" => " {", "}}" => "} ")
+
+# ------------------------------ multiline-style ----------------------------- #
+"""
+    fix_markup_across_lines(lines::Vector{AbstractString})::Vector{AbstractString}
+
+When splitting text with markup tags across multiple lines, tags can get separated
+across lines. This is a problem when the text gets printed side by side with other 
+text with style information. This fixes that by copying/closing markup tags
+across lines as requested.
+Essentially, if a tag is opened but not closed in a line, close it at the end of 
+the line and add the same open tag at the start of the next, taking care of 
+doing things in the correct order when multiple tags are in the same line.
+"""
+function fix_markup_across_lines(lines::Vector)::Vector
+    for (i, ln) in enumerate(lines)
+        # loop over each open tag regex
+        for open_match in reverse(collect(eachmatch(OPEN_TAG_REGEX, ln)))
+            # get closing tag text
+            markup = open_match.match[2:(end - 1)]
+            close_tag = "{/$markup}"
+
+            # if there's no close tag, add the open tag to the next line and close it on this
+            if !occursin(close_tag, ln[(open_match.offset):end]) && !occursin("{/}", ln)
+                # @info "carrying over" i markup
+                ln = ln * "{/$markup}"
+                i < length(lines) && (lines[i + 1] = "{$markup}" * lines[i + 1])
+            end
+        end
+        lines[i] = ln * "\e[0m"
+    end
+
+    return lines
+end
+
+""" Check if an ANSI tag is a closer """
+function is_closing_ansi_tag(tag::SubString)
+    tag ∈ (
+        "\e[0m",
+        "\e[39m",
+        "\e[49m",
+        "\e[22m",
+        "\e[23m",
+        "\e[24m",
+        "\e[25m",
+        "\e[27m",
+        "\e[28m",
+        "\e[29m",
+    )
+end
+
+ansi_pairs = Dict(
+    "\e[22m" => "\e[22m",
+    "\e[1m" => "\e[22m",
+    "\e[1m" => "\e[22m",
+    "\e[2m" => "\e[22m",
+    "\e[3m" => "\e[23m",
+    "\e[3m" => "\e[23m",
+    "\e[4m" => "\e[24m",
+    "\e[4m" => "\e[24m",
+    "\e[5m" => "\e[25m",
+    "\e[7m" => "\e[27m",
+    "\e[8m" => "\e[28m",
+    "\e[9m" => "\e[29m",
 )
 
-unescape_brackets_with_space(text)::String = replace_multi(
-    text,
-    remove_brackets_regexes[1] => " {",
-    remove_brackets_regexes[2] => "} ",
-)
+""" Given an ANSI tag, get the correct closer tag """
+function get_closing_ansi_tag(tag::SubString)
+    tag ∈ keys(ansi_pairs) && return ansi_pairs[tag]
+
+    # deal with foreground colors
+    occursin(r"\e\[3\dm", tag) && return "\e[39m"
+    occursin(r"\e\[38[0-9;]*m", tag) && return "\e[39m"
+
+    # deal with background colors
+    occursin(r"\e\[4\dm", tag) && return "\e[49m"
+    occursin(r"\e\[48[0-9;]*m", tag) && return "\e[49m"
+    return nothing
+end
+
+"""
+
+Same as `fix_markup_across_lines` but for ANSI style tags.
+"""
+function fix_ansi_across_lines(lines::Vector)::Vector
+    for (i, ln) in enumerate(lines)
+        for match in reverse(collect(eachmatch(ANSI_REGEX, ln)))
+            ansi = match.match
+            is_closing_ansi_tag(ansi) && continue
+
+            # get closing tag
+            closer = get_closing_ansi_tag(ansi)
+
+            # check if the closing tag occurs in the line
+            if !occursin(closer, ln[(match.offset):end])
+                # if no closing, add closing to end of line and tag to start of next line
+                ln = ln * closer
+                i < length(lines) && (lines[i + 1] = ansi * lines[i + 1])
+            end
+        end
+        lines[i] = ln # * "\e[0m"
+    end
+
+    return lines
+end
 
 # ---------------------------------------------------------------------------- #
 #                                      I/O                                     #
@@ -190,12 +229,6 @@ function read_file_lines(path::AbstractString, start::Int, stop::Int)
     return collect(enumerate(lines))[start:stop]
 end
 
-function read_file_lines(path::AbstractString, line::Int)
-    !isfile(path) && return nothing
-    lines = readlines(path; keep = true)
-    return collect(enumerate(lines))[line]
-end
-
 # ---------------------------------------------------------------------------- #
 #                                     MISC                                     #
 # ---------------------------------------------------------------------------- #
@@ -205,7 +238,6 @@ end
 Get a view object with appropriate indices
 """
 tview(text, start::Int, stop::Int) = view(text, thisind(text, start):thisind(text, stop))
-tview(text, start::Int, stop::Int, simple::Symbol) = view(text, start:stop)
 
 """
     replace_text(text::AbstractString, start::Int, stop::Int, replace::AbstractString)
@@ -262,20 +294,6 @@ function rtrim_str(str, width)
 end
 
 """
-    nospaces(text::AbstractString)
-
-Remove all spaces from a string.
-"""
-nospaces(text::AbstractString) = replace(text, " " => "")
-
-"""
-    remove_brackets(text::AbstractString)
-
-Remove all () brackets from a string.
-"""
-remove_brackets(text)::String = replace_multi(text, "(" => "", ")" => "")
-
-"""
     unspace_commas(text::AbstractString)
 
 Remove spaces after commas.
@@ -293,8 +311,6 @@ chars(text::AbstractString)::Vector{Char} = collect(text)
 Merge a vector of strings in a single string.
 """
 join_lines(lines::Vector{String})::String = join(lines, "\n")
-join_lines(lines::Vector)::String = join(lines, "\n")
-join_lines(lines...) = join(lines, "\n")
 
 """
     split_lines(text::AbstractString)
@@ -312,8 +328,6 @@ Apply `fn` to each line in the `text`.
 The function `fn` should accept a single `::String` argument.
 """
 do_by_line(fn::Function, text::AbstractString)::String = join(fn.(split_lines(text)), "\n")
-
-do_by_line(fn::Function, text::Vector)::String = join_lines(fn.(text))
 
 # ------------------------------- reshape text ------------------------------- #
 """

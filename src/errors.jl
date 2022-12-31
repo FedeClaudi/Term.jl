@@ -16,9 +16,10 @@ import Term:
     plural,
     Theme,
     do_by_line,
-    RECURSIVE_OPEN_TAG_REGEX,
     STACKTRACE_HIDDEN_MODULES,
-    STACKTRACE_HIDE_FRAMES
+    STACKTRACE_HIDE_FRAMES,
+    reshape_code_string,
+    TERM_SHOW_LINK_IN_STACKTRACE
 
 import ..Links: Link
 import ..Style: apply_style
@@ -53,8 +54,7 @@ struct StacktraceContext
     theme::Theme
 end
 
-function StacktraceContext()
-    w = default_stacktrace_width()
+function StacktraceContext(w = default_stacktrace_width())
     frame_panel_w = w - 4 - 12 - 3 # panel walls and padding
     module_line_w = w - 4 - 4
     func_name_w = frame_panel_w - 4 - 8 # including (n) before fname
@@ -69,7 +69,6 @@ function StacktraceContext()
     )
 end
 
-include("_error_messages.jl")
 include("_errors.jl")
 
 # ---------------------------------------------------------------------------- #
@@ -121,7 +120,8 @@ function install_term_stacktrace(;
                 # print an hLine with the error name
                 ename = string(typeof(er))
                 length(bt) > 0 && print(
-                    io, hLine(
+                    io,
+                    hLine(
                         "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
                         style = "dim $(ctx.theme.err_errmsg)",
                     ),
@@ -141,13 +141,10 @@ function install_term_stacktrace(;
 
                 # print message panel if VSCode is not handling that through a second call to this fn
                 (hasfield(typeof(io), :io) && isa(io.io, Base.TTY)) && begin
-                    msg = highlight(error_message(er)) |> apply_style
-                    msg = replace(msg, RECURSIVE_OPEN_TAG_REGEX => "")
-                    msg = reshape_text(msg, ctx.module_line_w; ignore_markup = true)
-
+                    msg = highlight(sprint(Base.showerror, er)) |> apply_style
                     err_panel = Panel(
                         RenderableText(
-                            escape_brackets(apply_style(highlight(error_message(er))));
+                            reshape_code_string(msg, ctx.module_line_w);
                             width = ctx.module_line_w,
                         );
                         width = ctx.out_w,
@@ -156,7 +153,7 @@ function install_term_stacktrace(;
                         style = "dim $(ctx.theme.err_errmsg)",
                         title_justify = :center,
                         fit = false,
-                    ) 
+                    )
                     print(io, err_panel)
                 end
 

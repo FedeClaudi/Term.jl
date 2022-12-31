@@ -63,9 +63,9 @@ corresponding error message
 # my_func()
 
 # ------------  DimensionMismatch
-# m = zeros(20, 20)
-# n = zeros(5, 4)
-# m .+ n
+m = zeros(20, 20)
+n = zeros(5, 4)
+m .+ n
 
 # ------------  Errors with type creation
 

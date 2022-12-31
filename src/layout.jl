@@ -100,11 +100,7 @@ function pad(text::AbstractString, target_width::Int, method::Symbol, lw::Int; b
         l = isnothing(bg) ? ' '^nl : "{$bg}" * ' '^nl * "{/$bg}"
         r = isnothing(bg) ? ' '^nr : "{$bg}" * ' '^nr * "{/$bg}"
         t = l * text * r
-        return if method == :center
-            t |> stype
-        else
-            justify_text(t, target_width) |> stype
-        end
+        return t |> stype
     end
 end
 
@@ -567,9 +563,6 @@ function hstack(renderables...; pad::Int = 0)
     return renderable
 end
 
-hstack(renderables::Union{AbstractVector,Tuple}; kwargs...) =
-    hstack(renderables...; kwargs...)
-
 # --------------------------------- operators -------------------------------- #
 
 """
@@ -577,8 +570,6 @@ hstack(renderables::Union{AbstractVector,Tuple}; kwargs...) =
 """
 
 Base.:/(r1::RenderablesUnion, r2::RenderablesUnion) = vstack(r1, r2)
-Base.:/(rr::Tuple{RenderablesUnion,RenderablesUnion}) = vstack(rr...)
-Base.:/(rr...) = vstack
 
 Base.:*(r1::AbstractRenderable, r2::AbstractRenderable) = hstack(r1, r2)
 Base.:*(r1::AbstractString, r2::AbstractRenderable) = hstack(r1, r2)
@@ -713,17 +704,19 @@ function hLine(
     text::String;
     style::String = TERM_THEME[].line,
     box::Symbol = TERM_THEME[].box,
+    pad_txt::Bool = true,
 )
     box = BOXES[box]
     text = apply_style(text) * "\e[0m"
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
+    _pad = pad_txt ? " " : get_lrow(box, 1, :top; with_left = false)
 
     line =
         get_lrow(box, lw - tl, :top; with_left = false) *
-        " " *
+        _pad *
         text *
-        " " *
+        _pad *
         "{$style}" *
         get_rrow(box, rw - tr, :top; with_right = false) *
         "\e[0m"

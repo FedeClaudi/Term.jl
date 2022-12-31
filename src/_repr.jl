@@ -70,7 +70,8 @@ repr_panel(
 
 function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsis = false)
     v = Vector(v)  # necessary to handle sparse vectors
-    shortsting(x) = x isa AbstractRenderable ? info(x) : str_trunc(string(x), max_w)
+    shortsting(x) =
+        x isa AbstractRenderable ? info(x) : remove_markup(str_trunc(string(x), max_w))
     out = highlight.(shortsting.(v[1:N]))
 
     ellipsis && length(v) > N && push!(out, " ⋮";)
@@ -182,14 +183,12 @@ function style_function_methods(fun, methods::String; max_n = 11, width = defaul
         )
     end
     methods_contents = if N > 1
-        methods_texts =
-            RenderableText.(
-                escape_brackets.(apply_style.(highlight.(_methods)));
-                width = width - 20,
-            )
-        join(string.(map(i -> counts[i] * methods_texts[i], 1:length(counts))), '\n')
+        methods_texts = map(m -> reshape_code_string(m, width - 30), _methods)
+
+        vstack(map(i -> counts[i] * methods_texts[i], 1:length(counts))...)
     else
         fun |> methods |> string |> split_lines |> first
     end
+
     return methods_contents, N
 end

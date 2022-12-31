@@ -50,7 +50,7 @@ end
 
     p = Panel(height = 10, width = 20)
     @test string(vertical_pad(p, 4, 4)) ==
-          "                    \n                    \n                    \n                    \n\e[22m╭──────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m                  \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────╯\e[22m\e[0m\n                    \n                    \n                    \n                    "
+          "                    \n                    \n                    \n                    \n\e[0m\e[22m╭──────────────────╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m                  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m                  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m                  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m                  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m                  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m                  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m                  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m                  \e[0m\e[22m│\e[22m\n\e[0m\e[22m╰──────────────────╯\e[22m\e[0m\e[0m\n                    \n                    \n                    \n                    "
 
     vertical_pad!(p, 4, 4)
     @test p isa Panel
@@ -60,12 +60,23 @@ end
     vertical_pad!(p; height = 30)
     @test p isa Panel
     @test size(p.measure) == (30, 20)
+
+    p = Panel(height = 2, width = 4)
+    @test string(vertical_pad(p; height = 5, method = :top)) ==
+          "\e[0m\e[22m╭──╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m  \e[0m\e[22m│\e[22m\n\e[0m\e[22m╰──╯\e[22m\e[0m\e[0m\n    \n    "
+    @test string(vertical_pad(p; height = 5, method = :bottom)) ==
+          "    \n    \n\e[0m\e[22m╭──╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m  \e[0m\e[22m│\e[22m\n\e[0m\e[22m╰──╯\e[22m\e[0m\e[0m"
+    @test string(vertical_pad(p; height = 5, method = :center)) ==
+          "    \n\e[0m\e[22m╭──╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m  \e[0m\e[22m│\e[22m\n\e[0m\e[22m╰──╯\e[22m\e[0m\e[0m\n    "
 end
 
 @testset "\e[34mlayout - spacer" begin
     sizes = [(22, 1), (44, 123), (21, 1), (4334, 232)]
     for (w, h) in sizes
         spacer = Spacer(h, w)
+        @test size(spacer.measure) == (h, w)
+
+        spacer = Spacer(h + 0.1, w + 0.1)
         @test size(spacer.measure) == (h, w)
     end
 end
@@ -99,7 +110,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-          "\e[22m╭───╮\e[22m          \n\e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m          \n\e[22m╰───╯\e[22m\e[0m          \n\e[22m╭────────╮\e[22m     \n\e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m     \n\e[22m╰────────╯\e[22m\e[0m     \n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "\e[0m\e[22m╭───╮\e[22m\e[0m          \n\e[0m\e[22m│\e[22m   \e[0m\e[22m│\e[22m          \n\e[0m\e[22m╰───╯\e[22m\e[0m\e[0m          \n\e[0m\e[22m╭────────╮\e[22m\e[0m     \n\e[0m\e[22m│\e[22m        \e[0m\e[22m│\e[22m     \n\e[0m\e[22m╰────────╯\e[22m\e[0m\e[0m     \n\e[0m\e[22m╭─────────────╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m             \e[0m\e[22m│\e[22m\n\e[0m\e[22m╰─────────────╯\e[22m\e[0m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 
@@ -108,7 +119,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-          "     \e[22m╭───╮\e[22m     \n     \e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m     \n     \e[22m╰───╯\e[22m\e[0m     \n  \e[22m╭────────╮\e[22m   \n  \e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m   \n  \e[22m╰────────╯\e[22m\e[0m   \n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "     \e[0m\e[22m╭───╮\e[22m\e[0m     \n     \e[0m\e[22m│\e[22m   \e[0m\e[22m│\e[22m     \n     \e[0m\e[22m╰───╯\e[22m\e[0m\e[0m     \n  \e[0m\e[22m╭────────╮\e[22m\e[0m   \n  \e[0m\e[22m│\e[22m        \e[0m\e[22m│\e[22m   \n  \e[0m\e[22m╰────────╯\e[22m\e[0m\e[0m   \n\e[0m\e[22m╭─────────────╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m             \e[0m\e[22m│\e[22m\n\e[0m\e[22m╰─────────────╯\e[22m\e[0m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 
@@ -117,7 +128,7 @@ end
     @test pp isa Renderable
     @test pp.measure.w == 15
     @test string(pp) ==
-          "          \e[22m╭───╮\e[22m\n          \e[0m\e[22m│\e[22m\e[0m   \e[0m\e[22m│\e[22m\e[0m\n          \e[22m╰───╯\e[22m\e[0m\n     \e[22m╭────────╮\e[22m\n     \e[0m\e[22m│\e[22m\e[0m        \e[0m\e[22m│\e[22m\e[0m\n     \e[22m╰────────╯\e[22m\e[0m\n\e[22m╭─────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m             \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰─────────────╯\e[22m\e[0m"
+          "          \e[0m\e[22m╭───╮\e[22m\e[0m\n          \e[0m\e[22m│\e[22m   \e[0m\e[22m│\e[22m\n          \e[0m\e[22m╰───╯\e[22m\e[0m\e[0m\n     \e[0m\e[22m╭────────╮\e[22m\e[0m\n     \e[0m\e[22m│\e[22m        \e[0m\e[22m│\e[22m\n     \e[0m\e[22m╰────────╯\e[22m\e[0m\e[0m\n\e[0m\e[22m╭─────────────╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m             \e[0m\e[22m│\e[22m\n\e[0m\e[22m╰─────────────╯\e[22m\e[0m\e[0m"
     @test p1 isa Panel
     @test p1.measure.w == 5
 end

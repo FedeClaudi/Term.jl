@@ -192,9 +192,14 @@ end
 
 @testset "PANEL - small panel with title" begin
     for (i, w) in enumerate((5, 9, 10, 11, 12, 13, 14, 15))
-        for (j, title) in enumerate(("aa", "aaaa", "aaaaaa"))
+        for (j, title) in enumerate(("aa", "aaaa", "aaaaaa", "adadasdoajdoaidjaldad"))
             for (k, just) in enumerate([:left, :center, :right])
-                p = Panel(; width = w, title = title, title_justify = just)
+                p = Panel(;
+                    width = w,
+                    title = title,
+                    title_justify = just,
+                    style = "hidden",
+                )
                 IS_WIN || @compare_to_string(p, "small_panel_title_$(i)_$(j)_$(k)")
             end
         end
@@ -240,7 +245,7 @@ id est laborum.""",
           oooo    """
     p = Panel(circle; fit = true, padding = (2, 2, 0, 0))
     @test string(p) ==
-          "\e[22m╭────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m  oooooooooooo  \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m   oooooooooo   \e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m      oooo      \e[0m\e[22m│\e[22m\e[0m\n\e[22m╰────────────────╯\e[22m\e[0m"
+          "\e[0m\e[22m╭────────────────╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m      oooo      \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m   oooooooooo   \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m  oooooooooooo  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m  oooooooooooo  \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m   oooooooooo   \e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m      oooo      \e[0m\e[22m│\e[22m\n\e[0m\e[22m╰────────────────╯\e[22m\e[0m\e[0m"
 
     p = Panel(
         "test"^25;
@@ -285,20 +290,6 @@ id est laborum.""",
     @test size(p.measure) == (22, 49)
 end
 
-# @testset "\e[34mPanel + renderables" begin
-#     @testpanel(Panel(RenderableText("x"^5)), 3, 11)
-
-@testpanel(Panel(RenderableText("x"^500); fit = false), 15, TEST_CONSOLE_WIDTH)
-
-@testpanel(Panel(RenderableText("x"^5); fit = true), 3, 11)
-
-#     @testpanel(
-#         Panel(RenderableText("x"^500); fit = true),
-#         nothing,
-#         displaysize(stdout)[2] - 1,
-#     )
-# end
-
 @testset "\e[34mPANEL - titles" begin
     style = "red"
     for fit in (true, false)
@@ -341,7 +332,7 @@ ads
     ); background = "on_red", fit = true)
 
     @test string(p) ==
-          "\e[22m╭──────────────────────╮\e[22m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    asasd\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdasadas\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44masdsasdasdsadasdsa\e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44mads\e[49m\e[41m               \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[0m\e[41m  \e[49m\e[0m\e[41m\e[44m    \e[49m\e[41m              \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\e[0m\n\e[22m╰──────────────────────╯\e[22m\e[0m"
+          "\e[0m\e[22m╭──────────────────────╮\e[22m\e[0m\n\e[0m\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44m    asasd\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44masdasadas\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44masdsasdasdsadasdsa\e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44mads\e[49m\e[41m               \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\n\e[0m\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44m    \e[49m\e[41m              \e[49m\e[49m\e[41m  \e[49m\e[0m\e[22m│\e[22m\n\e[0m\e[22m╰──────────────────────╯\e[22m\e[0m\e[0m"
 end
 
 @testset "\e[34mPANEL - UnicodePlots" begin
@@ -425,4 +416,13 @@ end
 
     pns = @nested_panels Panel(Panel("a"), Panel("b"; style = "green"); style = "red")
     IS_WIN || @compare_to_string(pns, "panels_layout_macro6")
+end
+
+@testset "PANEL - constructors" begin
+    p1, p2 = Panel(; width = 5), Panel(; width = 8)
+    p = Panel([p1, p2])
+    IS_WIN || @compare_to_string(string(p), "panels_constructors_1")
+
+    p = Panel(string.([p1, p2]))
+    IS_WIN || @compare_to_string(string(p), "panels_constructors_2")
 end

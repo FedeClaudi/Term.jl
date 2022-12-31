@@ -1,15 +1,10 @@
 name: CI
 on:
-  push:
-    branches:
-      - 'master'
-    tags: '*'
   pull_request:
     types:
     - opened
     - reopened
     - synchronize
-    - ready_for_review
 
 jobs:
   test:

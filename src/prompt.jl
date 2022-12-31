@@ -42,7 +42,6 @@ with a bit of style.
 """
 Base.print(io::IO, prompt::AbstractPrompt) = _print_prompt_text(io, prompt)
 
-
 """
     ask
 
@@ -90,10 +89,12 @@ struct AnswerValidationError <: Exception
     err
 end
 
-Term.Errors.error_message(e::AnswerValidationError) =
+Base.showerror(io::IO, e::AnswerValidationError) = print(
+    io,
     highlight(
         "TypePrompt expected an answer of type: `$(e.expected_type)`, got `$(e.answer_type)` instead\nConversion to `$(e.expected_type)` failed because of: $(e.err)",
-    ) |> apply_style
+    ) |> apply_style,
+)
 
 # ---------------------------------------------------------------------------- #
 #                                    PROMPT                                    #
@@ -249,11 +250,11 @@ abstract type AbstractDefaultPrompt <: AbstractOptionsPrompt end
     style::String
     answers_style::String
     default_answer_style::String
-end
 
-function DefaultPrompt(options::Vector, default::Int, prompt::String, args...)
-    @assert default > 0 && default < length(options) "Default answer number: $default not valid"
-    DefaultPrompt(options, default, prompt, args...)
+    function DefaultPrompt(options::Vector, default::Int, prompt::String, args...)
+        @assert default > 0 && default < length(options) "Default answer number: $default not valid"
+        new(options, default, prompt, args...)
+    end
 end
 
 function DefaultPrompt(options::Vector, default::Int, prompt::String)

@@ -3,9 +3,6 @@ print("\n\n\n\n")
 println("PRECOMILATION")
 @time include("../src/Term.jl")
 
-
-
-
 runnable = quote
     originalSTDOUT = stdout
     (outRead, outWrite) = redirect_stdout()

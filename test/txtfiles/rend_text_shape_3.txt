@@ -1,37 +1,37 @@
-Lorem ipsum    
-dolor sit      
-amet, consecte 
-tur adipiscing 
- elit, sed     
-do eiusmod     
-tempor incidid 
-unt ut labore  
-et dolore      
-magna aliqua.  
-Ut enim ad     
-minim veniam,  
-quis nostrud   
-exercitation   
-ullamco labori 
-s nisi ut      
-aliquip ex     
-ea commodo     
-consequat.     
-Duis aute      
-irure dolor    
-in reprehender 
-it in voluptat 
-e velit esse   
-cillum dolore  
-eu fugiat      
-nulla pariatur 
-. Excepteur    
-sint occaecat  
-cupidatat      
-non proident,  
-sunt in culpa  
-qui officia    
-deserunt       
-mollit anim    
-id est laborum 
-.              
+Lorem ipsum[0m    
+dolor sit[0m      
+amet, consecte[0m 
+tur adipiscing[0m 
+ elit, sed[0m     
+do eiusmod[0m     
+tempor incidid[0m 
+unt ut labore[0m  
+et dolore[0m      
+magna aliqua.[0m  
+Ut enim ad[0m     
+minim veniam,[0m  
+quis nostrud[0m   
+exercitation[0m   
+ullamco labori[0m 
+s nisi ut[0m      
+aliquip ex[0m     
+ea commodo[0m     
+consequat.[0m     
+Duis aute[0m      
+irure dolor[0m    
+in reprehender[0m 
+it in voluptat[0m 
+e velit esse[0m   
+cillum dolore[0m  
+eu fugiat[0m      
+nulla pariatur[0m 
+. Excepteur[0m    
+sint occaecat[0m  
+cupidatat[0m      
+non proident,[0m  
+sunt in culpa[0m  
+qui officia[0m    
+deserunt[0m       
+mollit anim[0m    
+id est laborum[0m 
+.[0m              

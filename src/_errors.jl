@@ -137,17 +137,7 @@ function get_frame_function_name(frame::StackFrame, ctx::StacktraceContext)
         ),
     )
 
-    func = highlight(func) |> apply_style
-    try
-        func = replace(func, RECURSIVE_OPEN_TAG_REGEX => "")
-    catch
-    end
-
-    # reshape but taking care of potential curly bracktes
-    func = highlight(func) |> apply_style
-    func = reshape_text(func, ctx.func_name_w; ignore_markup = true)
-
-    return RenderableText(func)
+    return RenderableText(reshape_code_string(func, ctx.func_name_w))
 end
 
 # ---------------------------------------------------------------------------- #
@@ -171,7 +161,7 @@ function render_error_code_line(ctx::StacktraceContext, frame::StackFrame; δ = 
     (isnothing(error_source) || length(error_source) == 0) && return nothing
 
     code_error_panel = Panel(
-        str_trunc(error_source, ctx.code_w - 4; ignore_markup = false);
+        str_trunc(apply_style(error_source), ctx.code_w - 4; ignore_markup = true);
         fit = δ == 0,
         style = δ > 0 ? "$(ctx.theme.text_accent) dim" : "dim",
         width = ctx.code_w,
@@ -181,7 +171,7 @@ function render_error_code_line(ctx::StacktraceContext, frame::StackFrame; δ = 
         height = δ > 0 ? nothing : 1,
         padding = (0, 1, 0, 0),
     )
-    return "  " * RenderableText("│\n╰─"; style = "dim") * code_error_panel
+    return "  " * RenderableText("│\n╰─"; style = "dim") * (code_error_panel)
 end
 
 """
@@ -223,9 +213,12 @@ function add_stack_frame!(
     # make file line & load source code around error and render it
     panel_content = if length(string(frame.file)) > 0
         # get a link renderable pointing to error
-        source_file = Link(string(frame.file), frame.line; style = "underline dim")
-        _out = func_line / source_file
-
+        if TERM_SHOW_LINK_IN_STACKTRACE[] == true
+            source_file = Link(string(frame.file), frame.line; style = "underline dim")
+            _out = func_line / source_file
+        else
+            _out = func_line
+        end
         error_source = render_error_code_line(ctx, frame; δ = δ)
         isnothing(error_source) || (_out /= error_source)
         _out

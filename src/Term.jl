@@ -40,15 +40,16 @@ const DEBUG_ON = Ref(false)
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
 const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
 
-default_width(io = stdout)::Int = min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+default_width(io = stdout)::Int =
+    min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 default_stacktrace_width(io = stderr)::Int =
     min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
 # general utils
-include("__text_utils.jl")
 include("_ansi.jl")
+include("__text_utils.jl")
 include("_utils.jl")
 include("_text_reshape.jl")
 
@@ -60,12 +61,16 @@ include("highlight.jl")
 
 const TERM_THEME = Ref(Theme())
 
+# used to disable links in stacktraces for testing
+const TERM_SHOW_LINK_IN_STACKTRACE = Ref(true)
+
 function update! end
 
 # rely on other modules
 include("style.jl")
 include("segments.jl")
 include("macros.jl")
+include("_code.jl")
 
 # renderables, rely heavily on other modules
 include("boxes.jl")
@@ -87,6 +92,7 @@ include("compositors.jl")
 include("grid.jl")
 include("introspection.jl")
 include("prompt.jl")
+include("annotations.jl")
 
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
@@ -179,6 +185,12 @@ using .Grid
 
 using .Prompts
 
+<<<<<<< HEAD
 include("__precompilation.jl")
+=======
+using .Annotations: Annotation
+
+# include("__precompilation.jl")
+>>>>>>> master
 
 end
