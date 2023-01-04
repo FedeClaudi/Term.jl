@@ -100,9 +100,10 @@ This is where you print the content of your foot notes:
 """,
 )
 
-# clear()
+clear()
 
 p = Pager(text; page_lines = 30, title = "Example pager")
+p.internals
 p |> LiveDisplays.play
 
 stop!(p)

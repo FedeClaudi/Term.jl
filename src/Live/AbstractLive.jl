@@ -4,15 +4,17 @@ abstract type AbstractLiveDisplay end
 # ---------------------------------------------------------------------------- #
 #                                LIVE INTERNALS                                #
 # ---------------------------------------------------------------------------- #
-mutable struct LiveInternals
+@with_repr mutable struct LiveInternals
     iob::IOBuffer
     ioc::IOContext
     term::AbstractTerminal
     prevcontent::Union{Nothing, AbstractRenderable}
+    prevcontentlines::Vector{String}
     raw_mode_enabled::Bool
     last_update::Union{Nothing, Int}
+    refresh_Δt::Int
 
-    function LiveInternals()
+    function LiveInternals(; refresh_rate::Int=100)
         # get output buffers
         iob = IOBuffer()
         ioc = IOContext(iob, :displaysize=>displaysize(stdout))
@@ -25,10 +27,11 @@ mutable struct LiveInternals
             @debug "Unable to enter raw mode: " exception=(err, catch_backtrace())
             false
         end
+
         # hide the cursor
         raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
 
-        return new(iob, ioc,  terminal, nothing, raw_mode_enabled, nothing)
+        return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate))
     end
 end
 
@@ -51,7 +54,7 @@ function shouldupdate(live::AbstractLiveDisplay)::Bool
     end
 
     Δt = currtime - live.internals.last_update
-    if Δt > 5
+    if Δt > live.internals.refresh_Δt
         live.internals.last_update = currtime
         return true
     end
@@ -83,38 +86,35 @@ function refresh!(live::AbstractLiveDisplay)::Bool
     shouldupdate(live) || return true
 
     # get new content
+    internals = live.internals
     content::AbstractRenderable = frame(live)
-    scontent = string(content)
+    content_lines::Vector{String} = split(string(content), "\n")
+    nlines::Int = length(content_lines)
+    nlines_prev::Int = isnothing(internals.prevcontentlines) ? 1 : length(internals.prevcontentlines)+1
 
     # get calls to print from user
     # printed = read_stdout_output(live.internals)
     # isnothing(printed) || (scontent = printed / scontent)
 
-    # render
-    internals = live.internals
-    !isnothing(internals.prevcontent) && begin
-        nlines = internals.prevcontent.measure.h + 1
-
-        newlines = split(scontent, "\n")
-        nnew = length(newlines)
-
-        up(internals.ioc, nlines)
-        for _ in 1:(nlines - nnew)
-            replace_line(internals)
-        end
-
-        for i in 1:nnew
-            replace_line(internals, newlines[i])
-        end
+    # remove extra lines from previous content
+    up(internals.ioc, nlines_prev)
+    for _ in 1:(nlines_prev - nlines)
+        replace_line(internals)
     end
 
-    if isnothing(internals.prevcontent)
-        nlines = length(split(string(content), "\n"))
-        print(internals.ioc, '\n'^nlines)
+    # render new content
+    for i in 1:nlines
+        # (nlines_prev > 1 && content_lines[i] != internals.prevcontentlines[i]) && 
+        !isnothing(internals.prevcontent) && content_lines[i] != internals.prevcontentlines[i] && begin
+            down(internals.ioc)
+            continue
+        end
+        replace_line(internals, content_lines[i])
     end
 
     # output
     internals.prevcontent = content
+    internals.prevcontentlines = content_lines
     write(stdout, take!(internals.iob))
     return true
 end

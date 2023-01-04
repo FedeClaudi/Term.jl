@@ -46,6 +46,7 @@ display_content(opt::TextTab)::String = opt.content
     tot_lines::Int
     curr_line::Int
     page_lines::Int
+
     function PagerTab(title, content; page_lines = 35)
         content = split(content, "\n")
         new(title, content, false, length(content), 1, page_lines)
@@ -127,11 +128,12 @@ function frame(tv::TabViewer)::AbstractRenderable
 
     selected_tab = get_active_tab(tv)
     content_w = console_width() - 23
-    tab_content =
-        RenderableText(
-            reshape_text((display_content(selected_tab)), content_w - 10);
-            width = content_w - 10,
-        ) |> string
+    tab_content = display_content(selected_tab)
+        # RenderableText(
+        #     # reshape_text((display_content(selected_tab)), content_w - 10);
+        #     display_content(selected_tab);
+        #     width = content_w - 10,
+        # ) |> string
 
     content = Panel(
         tab_content,
