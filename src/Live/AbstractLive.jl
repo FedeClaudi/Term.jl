@@ -4,63 +4,34 @@ abstract type AbstractLiveDisplay end
 # ---------------------------------------------------------------------------- #
 #                                LIVE INTERNALS                                #
 # ---------------------------------------------------------------------------- #
-@with_repr mutable struct LiveInternals
+mutable struct LiveInternals
     iob::IOBuffer
     ioc::IOContext
     term::AbstractTerminal
-    prevcontent::Union{Nothing,AbstractRenderable}
+    prevcontent::Union{Nothing, AbstractRenderable}
     raw_mode_enabled::Bool
-    last_update::Union{Nothing,Int}
-    pipe::Union{Nothing,Pipe}
-    original_stdout::Union{Nothing,Base.TTY}
-    original_stderr::Union{Nothing,Base.TTY}
-    redirected_stdout
-    redirected_stderr
+    last_update::Union{Nothing, Int}
 
     function LiveInternals()
         # get output buffers
         iob = IOBuffer()
-        ioc = IOContext(iob, :displaysize => displaysize(stdout))
+        ioc = IOContext(iob, :displaysize=>displaysize(stdout))
 
         # prepare terminal 
         raw_mode_enabled = try
             raw!(terminal, true)
             true
         catch err
-            @debug "Unable to enter raw mode: " exception = (err, catch_backtrace())
+            @debug "Unable to enter raw mode: " exception=(err, catch_backtrace())
             false
         end
-
         # hide the cursor
         raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
 
-        # TODO add this to Console instead
-        # replace stdout stderr
-        default_stdout = stdout
-
-        # Redirect both the `stdout` and `stderr` streams to a single `Pipe` object.
-        pipe = Pipe()
-        Base.link_pipe!(pipe; reader_supports_async = true, writer_supports_async = true)
-        @static if VERSION >= v"1.6.0-DEV.481" # https://github.com/JuliaLang/julia/pull/36688
-            pe_stdout = IOContext(pipe.in, :displaysize=>displaysize(stdout))
-        else
-            pe_stdout = pipe.in
-        end
-        redirect_stdout(pe_stdout)
-
-        return new(
-            iob,
-            ioc,
-            terminal,
-            nothing,
-            raw_mode_enabled,
-            nothing,
-            pipe,
-            default_stdout,
-            pe_stdout,
-        )
+        return new(iob, ioc,  terminal, nothing, raw_mode_enabled, nothing)
     end
 end
+
 
 # ---------------------------------------------------------------------------- #
 #                                METHODS ON LIVE                               #
@@ -144,7 +115,7 @@ function refresh!(live::AbstractLiveDisplay)::Bool
 
     # output
     internals.prevcontent = content
-    write(internals.original_stdout, take!(internals.iob))
+    write(stdout, take!(internals.iob))
     return true
 end
 
@@ -154,7 +125,7 @@ function erase!(live::AbstractLiveDisplay)
     for _ in 1:nlines
         replace_line(live.internals)
     end
-    write(internals.original_stdout, take!(live.internals.iob))
+    write(stdout, take!(live.internals.iob))
 
     nothing
 end
@@ -163,14 +134,6 @@ function stop!(live::AbstractLiveDisplay)
     internals = live.internals
     print(internals.term.out_stream, "\x1b[?25h") # unhide cursor
     raw!(internals.term, false)
-
-    # reset original stdout
-
-    redirect_stdout(internals.original_stdout)
-    redirect_stderr(internals.original_stderr)
-    close(internals.redirected_stdout)
-    close(internals.redirected_stderr)
-    # wait(internals.reading_task)
     nothing
 end
 

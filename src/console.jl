@@ -19,8 +19,8 @@ export console_height,
     savecursor,
     restorecursor,
     Console,
-    enable!,
-    disable!
+    enable,
+    disable
 
 const STDOUT = stdout
 const STDERR = stderr
@@ -135,12 +135,12 @@ Console(width) = Console(console_height(), width)
 Console() = Console(console_height(), console_width())
 Base.displaysize(c::Console) = (c.height, c.width)
 
-function enable!(console::Console)
+function enable(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = console.width
     console
 end
 
-function disable!(console::Console)
+function disable(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = nothing
     console
 end

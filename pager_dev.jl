@@ -3,6 +3,10 @@ using Term.LiveDisplays
 using Term.Consoles
 using Term.TermMarkdown
 
+install_term_repr()
+install_term_logger()
+install_term_stacktrace()
+
 using Markdown
 
 text = parse_md(
@@ -98,7 +102,7 @@ This is where you print the content of your foot notes:
 
 # clear()
 
-p = Pager(text; page_lines = 30, title = "inspect(Panel)")
+p = Pager(text; page_lines = 30, title = "Example pager")
 p |> LiveDisplays.play
 
 stop!(p)

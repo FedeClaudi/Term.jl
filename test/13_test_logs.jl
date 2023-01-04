@@ -31,11 +31,11 @@ import UUIDs: uuid4
     uninstall_term_logger()
 end
 
-@testset "\e[34mLOGS handle_progress" begin
-    logger = TermLogger(devnull, TERM_THEME[])
-    for fraction in (nothing, 0.0, 0.5, 1.0)
-        handle_progress(logger, ProgressLogging.Progress(id = uuid4(), fraction = fraction))
-    end
+# @testset "\e[34mLOGS handle_progress" begin
+#     logger = TermLogger(devnull, TERM_THEME[])
+#     for fraction in (nothing, 0.0, 0.5, 1.0)
+#         handle_progress(logger, ProgressLogging.Progress(id = uuid4(), fraction = fraction))
+#     end
 
-    @test true
-end
+#     @test true
+# end

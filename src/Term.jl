@@ -92,13 +92,10 @@ include("grid.jl")
 # interactive
 include("Live/live.jl")
 include("introspection.jl")
-<<<<<<< HEAD
 include("progress.jl")
 include("logs.jl")
-=======
 include("prompt.jl")
 include("annotations.jl")
->>>>>>> master
 
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
@@ -197,4 +194,5 @@ using .Introspection: inspect, typestree, expressiontree, inspect
 using .Prompts
 
 include("__precompilation.jl")
+
 end
