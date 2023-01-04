@@ -1,7 +1,4 @@
 import Base: rpad as brpad
-using WordTokenizers
-
-rx = r"\s*\S+\s*"
 
 """
     reshape_text(text::AbstractString, width::Int)
@@ -10,8 +7,13 @@ Reshape a text to have a given width.
 
 Insert newline characters in a string so that each line is within the given width.
 """
-function reshape_text(text::AbstractString, width::Int; ignore_markup=false)
-    occursin('\n', text) && (return do_by_line(ln -> reshape_text(ln, width), text))
+function reshape_text(text::AbstractString, width::Int; ignore_markup::Bool = false)
+    occursin('\n', text) && (
+        return do_by_line(
+            ln -> reshape_text(ln, width::Int; ignore_markup = ignore_markup),
+            text,
+        )
+    )
     textlen(text) ≤ width && return text
 
     lines = []
@@ -23,8 +25,8 @@ function reshape_text(text::AbstractString, width::Int; ignore_markup=false)
         if c == '\e'
             in_escape_code = true
         end
-        if c == '{'
-            bracketed = true & ignore_markup
+        if c == '{' && !ignore_markup
+            bracketed = true
         end
 
         line *= c
@@ -51,8 +53,8 @@ function reshape_text(text::AbstractString, width::Int; ignore_markup=false)
         end
     end
     push!(lines, rstrip(line))
-    out = join(lines, "\n")
 
+    out = join((fix_ansi_across_lines ∘ fix_markup_across_lines)(lines), "\n")
     chomp(out)
 end
 
@@ -101,7 +103,7 @@ function text_to_width(
     text::AbstractString,
     width::Int,
     justify::Symbol;
-    background = nothing,
+    background::Union{String,Nothing} = nothing,
 )::String
     # reshape text
     if Measure(text).w > width

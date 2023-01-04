@@ -6,7 +6,13 @@ import OrderedCollections: OrderedDict
 import UnicodeFun: to_latex
 
 import Term:
-    reshape_text, highlight_syntax, fillin, escape_brackets, default_width, TERM_THEME
+    reshape_text,
+    highlight_syntax,
+    fillin,
+    escape_brackets,
+    default_width,
+    TERM_THEME,
+    reshape_code_string
 import ..Tables: Table
 import ..Style: apply_style
 import ..Layout: pad, hLine, vLine
@@ -163,7 +169,7 @@ function parse_md(
     lpad = true,
     kwargs...,
 )::String
-    syntax = highlight_syntax(code.code)
+    syntax = reshape_code_string(highlight_syntax(code.code), width - 20)
     theme = TERM_THEME[]
     if inline
         return "{$(theme.md_code)}`$(code.language){/$(theme.md_code)}" *

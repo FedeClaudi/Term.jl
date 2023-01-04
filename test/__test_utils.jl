@@ -109,8 +109,9 @@ macro compare_to_string(obj, filename, fn = x -> x, skip = nothing)
 
         filepath = "./txtfiles/$($filename).txt"
 
-        if TEST_DEBUG_MODE
-            tprint(txt, highlight = false)
+        if TEST_DEBUG_MODE || !isfile(filepath)  # if it doesn't exist, create it.
+            print("\n"^3)
+            tprintln(txt, highlight = false)
             tofile(txt, filepath)
         else
             correct = load_from_txt($filename)

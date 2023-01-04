@@ -1,0 +1,2 @@
+{{}}}, Tuple{{}}, NamedTuple{(),[0m
+ Tuple{{}}}})[38;2;242;215;119mTable[39m[0m

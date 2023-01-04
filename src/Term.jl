@@ -18,7 +18,7 @@ less(term_demo) # see demo code
 
 # Example
 
-```jldoctest
+``` julia
 begin
     println(@green "this is green")
     println(@blue "and this is blue")
@@ -32,20 +32,24 @@ module Term
 
 using Unicode
 
+const STACKTRACE_HIDDEN_MODULES = Ref(String[])
+const STACKTRACE_HIDE_FRAMES = Ref(true)
+
 const DEBUG_ON = Ref(false)
 
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
 const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
 
-default_width(io = stdout) = min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
-default_stacktrace_width(io = stderr) =
+default_width(io = stdout)::Int =
+    min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+default_stacktrace_width(io = stderr)::Int =
     min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
 # general utils
-include("__text_utils.jl")
 include("_ansi.jl")
+include("__text_utils.jl")
 include("_utils.jl")
 include("_text_reshape.jl")
 
@@ -57,18 +61,23 @@ include("highlight.jl")
 
 const TERM_THEME = Ref(Theme())
 
+# used to disable links in stacktraces for testing
+const TERM_SHOW_LINK_IN_STACKTRACE = Ref(true)
+
 function update! end
 
 # rely on other modules
 include("style.jl")
 include("segments.jl")
 include("macros.jl")
+include("_code.jl")
 
 # renderables, rely heavily on other modules
 include("boxes.jl")
 include("console.jl")
 include("renderables.jl")
 include("layout.jl")
+include("link.jl")
 include("panels.jl")
 include("errors.jl")
 include("tprint.jl")
@@ -83,8 +92,13 @@ include("grid.jl")
 # interactive
 include("Live/live.jl")
 include("introspection.jl")
+<<<<<<< HEAD
 include("progress.jl")
 include("logs.jl")
+=======
+include("prompt.jl")
+include("annotations.jl")
+>>>>>>> master
 
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight
@@ -95,7 +109,7 @@ export install_term_stacktrace,
     install_term_logger, uninstall_term_logger, install_term_repr
 export vLine, hLine
 export @with_repr, termshow, @showme
-export Compositor, update!
+export Compositor
 export grid
 export inspect
 export Pager
@@ -119,6 +133,8 @@ using .Consoles: console_height, console_width
 using .Renderables: AbstractRenderable, Renderable, RenderableText
 
 using .Layout
+
+using .Links
 
 using .Panels: Panel, TextBox, @nested_panels
 
@@ -162,7 +178,7 @@ using .Dendograms: Dendogram
 
 using .Tables: Table
 
-using .Compositors: Compositor, update!
+using .Compositors: Compositor
 
 using .TermMarkdown: parse_md
 
@@ -178,27 +194,7 @@ using .Progress: ProgressBar, ProgressJob, with, @track
 
 using .Introspection: inspect, typestree, expressiontree, inspect
 
-# ---------------------------------------------------------------------------- #
-#                                precompilation                                #
-# ---------------------------------------------------------------------------- #
-# using SnoopPrecompile
+using .Prompts
 
-# @precompile_setup begin
-#     originalSTDOUT = stdout
-
-#     (outRead, outWrite) = redirect_stdout()
-
-#     @precompile_all_calls begin
-#         Panel()
-#         Panel("test") * Panel(Panel()) / hLine(20) |> tprint
-#         termshow(Panel)
-#         termshow(Dict(:x => 1))
-#         termshow(zeros(4))
-#         termshow(zeros(4, 4))
-#     end
-
-#     close(outRead)
-
-#     redirect_stdout(originalSTDOUT)
-# end
+include("__precompilation.jl")
 end

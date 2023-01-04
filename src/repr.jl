@@ -12,7 +12,10 @@ import Term:
     split_lines,
     TERM_THEME,
     default_width,
-    plural
+    plural,
+    reshape_text,
+    remove_markup,
+    reshape_code_string
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable

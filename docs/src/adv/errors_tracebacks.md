@@ -26,12 +26,26 @@ test()
 ![](stacktrace.png)
 
 
-!!! warning "Term is opinionated"
-    In altering Julia's default stacktraces handling, a few choices where made such as: inveriting the order in which the backtrace's stack frames are shown and hiding frames from `Base` or other packages installed through `Pkg` (similarly to [AbbreviatedStackTraces.jl](https://github.com/BioTurboNick/AbbreviatedStackTraces.jl)).
-    When installing `Term`'s stacktrace system with `install_term_stacktrace`, you can use the keyword arguments to alter this behavior
+### Term is opinionated
+
+In altering Julia's default stacktraces handling, a few choices where made such as: inveriting the order in which the backtrace's stack frames are shown and hiding frames from `Base` or other packages installed through `Pkg` (similarly to [AbbreviatedStackTraces.jl](https://github.com/BioTurboNick/AbbreviatedStackTraces.jl)).
+When installing `Term`'s stacktrace system with `install_term_stacktrace`, you can use the keyword arguments to alter this behavior
     
 ```@example
 using Term # hide
 install_term_repr() # hide
-install_term_stacktrace
+install_term_stacktrace(;
+    reverse_backtrace = true,  # change me!
+    max_n_frames = 30,
+    hide_frames = false,
+)
+```
+
+but you can also do more, if you just want to quickly change some options (e.g. to deal with a particularly though bug). You can set flags to change the behavior on the fly:
+
+```@example
+import Term: STACKTRACE_HIDDEN_MODULES, STACKTRACE_HIDE_FRAMES
+
+STACKTRACE_HIDDEN_MODULES[] = ["REPL", "OhMyREPL"]  # list names of modules you want ignored in the stacktrace
+STACKTRACE_HIDE_FRAMES[] = false # set to true to hide frame, false to show all of them
 ```

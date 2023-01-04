@@ -1,27 +1,28 @@
-aa bbaa bbaa bbaa bbaa   
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa   bbaa    
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa      bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa      bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa      bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa      bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa      bbaa      
-bbaa bbaa bbaa bbaa      
-bbaa bbaa bbaa bbaa      
-bb                       
+aa bbaa bbaa bbaa bbaa[0m   
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa[0m   bbaa[0m    
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa[0m      bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa[0m      bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa[0m      bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa[0m      bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa[0m      bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bbaa bbaa bbaa bbaa[0m      
+bb[0m[0m                       
+[0m                         
