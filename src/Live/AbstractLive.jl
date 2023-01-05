@@ -15,7 +15,7 @@ abstract type AbstractLiveDisplay end
     refresh_Δt::Int
     help_shown::Bool
 
-    function LiveInternals(; refresh_rate::Int=100)
+    function LiveInternals(; refresh_rate::Int=60)
         # get output buffers
         iob = IOBuffer()
         ioc = IOContext(iob, :displaysize=>displaysize(stdout))

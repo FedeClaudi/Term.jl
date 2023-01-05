@@ -16,6 +16,7 @@ import ..Measures: width as get_width
 using ..Consoles
 import ..Repr: @with_repr, termshow
 import ..Style: apply_style
+import ..Layout: Spacer, vLine
 
 export AbstractLiveDisplay, refresh!, play, key_press, shouldupdate, frame, stop!
 export Pager, TabViewer, TextTab, PagerTab

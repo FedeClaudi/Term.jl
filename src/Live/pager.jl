@@ -14,10 +14,14 @@ using keys such as arrow up and arrow down.
 end
 
 
-function Pager(content::String; page_lines = 10, title = "Term.jl PAGER", width=console_width())
+function Pager(content::String; page_lines::Int = 10, title::String = "Term.jl PAGER", width::Int=console_width(), line_numbers::Bool=false)
+    page_lines = min(page_lines, console_height()-8)
+
+    line_numbers && (content = join(map(iln -> "{dim}$(iln[1])  {/dim}" * iln[2], enumerate(split(content, "\n"))), "\n"))
+
     content = split(
         string(
-            RenderableText(content; width=width-19)
+            RenderableText(content; width=width-8)
         ), "\n")
 
     return Pager(
@@ -41,11 +45,25 @@ Create a Panel with, as content, the currently visualized lines in the Pager.
 function frame(pager::Pager)::AbstractRenderable
     i, Δi = pager.curr_line, pager.page_lines
     page = join(pager.content[i:min(pager.tot_lines, i + Δi)], "\n")
+
+    # make a scroll bar
+    page_lines = pager.page_lines
+    scrollbar_lines = 5
+    scrollbar = vLine(scrollbar_lines; style="white on_white")
+
+    p = (i+Δi/2)/pager.tot_lines
+    scrollbar_center =   p * (page_lines) 
+    nspaces_above = max(0, scrollbar_center-scrollbar_lines/2)|> round |> Int
+
+    above = RenderableText(join(repeat([" \n"], nspaces_above)); style="on_gray23")
+    below = RenderableText(join(repeat([" \n"], page_lines - scrollbar_lines - nspaces_above)); style="on_gray23")
+    scrollbar = above / scrollbar / below
+
     Panel(
-        page,
+        page * scrollbar,
         fit = false,
         width = pager.measure.w,
-        padding = (4, 4, 1, 1),
+        padding = (2, 0, 1, 1),
         subtitle = "Lines: $i:$(i+Δi) of $(pager.tot_lines)",
         subtitle_style = "bold dim",
         subtitle_justify = :right,

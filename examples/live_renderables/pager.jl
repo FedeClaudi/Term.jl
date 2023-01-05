@@ -12,4 +12,5 @@ filepath = "././src/live/abstractlive.jl"
 code = load_code_and_highlight(filepath)
 
 
-LiveDisplays.play(Pager(code; page_lines = 20, title = filepath); transient=true)
+LiveDisplays.play(Pager(code; page_lines = 40, title = filepath, line_numbers=true); transient=true)
+# TODO finish scrollbar
