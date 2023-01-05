@@ -10,12 +10,14 @@ struct EndKey <: KeyInput end
 struct PageUpKey <: KeyInput end
 struct PageDownKey <: KeyInput end
 struct Enter <: KeyInput end
+struct SpaceBar <: KeyInput end
 struct CharKey <: KeyInput
     char::Char
 end
 
 KEYs = Dict{Int,KeyInput}(
     13 => Enter(),
+    32 => SpaceBar(),
     1000 => ArrowLeft(),
     1001 => ArrowRight(),
     1002 => ArrowUp(),
@@ -28,7 +30,7 @@ KEYs = Dict{Int,KeyInput}(
 )
 
 
-function help(live::AbstractLiveDisplay)
+function help(live)
     internals = live.internals
 
     # make help message
@@ -102,7 +104,7 @@ for the `AbstractLiveDisplay` with the corresponding
 use that.
 If the input was `q` it signals that the display should be stopped
 """
-function keyboard_input(live::AbstractLiveDisplay)::Tuple{Bool, Any}
+function keyboard_input(live)::Tuple{Bool, Any}
     if bytesavailable(terminal.in_stream) > 0
         c = readkey(terminal.in_stream) |> Int
 
@@ -112,15 +114,15 @@ function keyboard_input(live::AbstractLiveDisplay)::Tuple{Bool, Any}
             return (key isa Enter, retval)
         end
 
+        # c = Char(c)
+        # c == 'q' && return (true, nothing)
+        # c == 'h' && begin
+        #     help(live)
+        #     return (false, nothing)
+        # end
 
-        c = Char(c)
-        c == 'q' && return (true, nothing)
-
-        c == 'h' && begin
-            help(live)
-            return (false, nothing)
-        end
-        key_press(live, CharKey(c))
+        # fallback to char key calls
+        return key_press(live, CharKey(c))
     end
     return (false, nothing)
 end

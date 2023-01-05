@@ -47,6 +47,20 @@ frame(::AbstractLiveDisplay) = error("Not implemented")
 
 key_press(::AbstractLiveDisplay, ::Any) = nothing
 
+"""
+CharKey('q'): quit program without returning anything
+CharKey('h'): toggle help message display
+"""
+function key_press(live::AbstractLiveDisplay, k::CharKey)::Tuple{Bool, Nothing}
+    k.char == 'q' && return (true, nothing)
+    k.char == 'h' && begin
+        help(live)
+        return (false, nothing)
+    end
+    return (false, nothing)
+end
+
+
 function shouldupdate(live::AbstractLiveDisplay)::Bool
     currtime = Dates.value(now())
     isnothing(live.internals.last_update) && begin

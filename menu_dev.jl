@@ -3,10 +3,10 @@ using Term.LiveDisplays
 using Term.Consoles
 using Term.Progress
 
-clear()
+# clear() 
 
 # inspect(Panel)
 
-mn = SimpleMenu(["One "^50, "{red}Two{/red}", Panel("Three"; fit=true)])
+mn = MultiSelectMenu(["One ",  "two", "three"])
 retval = mn |> LiveDisplays.play
 return retval

@@ -175,4 +175,72 @@ end
 
 
 
+# ---------------------------------------------------------------------------- #
+#                                 MULTI SELECT                                 #
+# ---------------------------------------------------------------------------- #
+@with_repr mutable struct MultiSelectMenu <: AbstractMenu
+    internals::LiveInternals
+    measure::Measure
+    options::Vector
+    active_style::String
+    inactive_style::String
+    options_width::Int
+    selected::Vector{Int}
+    active::Int
+    n_titles::Int
+    selected_sym::String
+    notselected_sym::String
 
+    function MultiSelectMenu(
+        options::Vector;
+        active_style::String="white bold",
+        inactive_style::String="dim",
+        width::Int=console_width(),
+    )
+
+        selected_sym = apply_style("✔ ", active_style)
+        notselected_sym = apply_style("□ ", inactive_style)
+        
+        max_titles_width = min(
+            width, 
+            maximum(get_width.(options)) + 2
+        ) 
+
+        new(LiveInternals(), Measure(length(options), width), options, active_style, inactive_style, max_titles_width, Int[], 1, length(options), selected_sym, notselected_sym)
+    end
+end
+
+"""
+- Enter: select the current option.
+"""
+function key_press(mn::MultiSelectMenu, ::Enter)
+    return mn.selected
+end
+
+function key_press(mn::MultiSelectMenu, ::SpaceBar)
+    active = mn.active
+    if active ∈ mn.selected
+        deleteat!(mn.selected, mn.selected .== active)
+    else
+        push!(mn.selected, active)
+    end
+end
+
+
+function frame(mn::MultiSelectMenu)
+    make_option(i::Int, isactive::Bool, isselected::Bool) = begin
+        sym = isselected ? mn.selected_sym : mn.notselected_sym
+        style = isactive ? mn.active_style : mn.inactive_style
+
+        RenderableText(
+        sym * "{$style}" * mn.options[i] * "{/$style}";
+        width=mn.options_width,
+        
+        )
+    end
+
+    options = map(
+        i -> make_option(i, i == mn.active, i ∈ mn.selected), 1:mn.n_titles
+    )
+    return vstack(options)
+end
