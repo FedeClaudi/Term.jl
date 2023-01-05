@@ -27,6 +27,34 @@ KEYs = Dict{Int,KeyInput}(
     1008 => PageDownKey(),
 )
 
+
+function help(live::AbstractLiveDisplay)
+    internals = live.internals
+
+    # make help message
+    key_methods = methods(key_press, (typeof(live), KeyInput))
+    help_message = RenderableText(join(string.(key_methods), "\n"))
+
+    # show/hide message
+    if internals.help_shown
+        # hide it
+        internals.help_shown = false
+
+        h = console_height() - length(internals.prevcontentlines) - help_message.measure.h - 1
+        move_to_line(stdout, h)
+        cleartoend(stdout)
+    else
+        # show it
+        erase!(live)
+        println(stdout, help_message)
+        internals.help_shown = true
+    end
+
+    internals.prevcontent = nothing
+    internals.prevcontentlines = String[]
+end
+
+
 """
     keyboard_input(live::AbstractLiveDisplay)
 
@@ -52,6 +80,11 @@ function keyboard_input(live::AbstractLiveDisplay)::Tuple{Bool, Any}
 
         c = Char(c)
         c == 'q' && return (true, nothing)
+
+        c == 'h' && begin
+            help(live)
+            return (false, nothing)
+        end
         key_press(live, CharKey(c))
     end
     return (false, nothing)

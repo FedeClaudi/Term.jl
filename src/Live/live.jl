@@ -16,7 +16,7 @@ import ..Repr: @with_repr, termshow
 
 export AbstractLiveDisplay, refresh!, play, key_press, shouldupdate, frame, stop!
 export Pager, TabViewer, TextTab, PagerTab
-export SimpleMenu
+export SimpleMenu, ButtonsMenu
 
 include("abstractlive.jl")
 include("input.jl")

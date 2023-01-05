@@ -8,11 +8,12 @@ abstract type AbstractLiveDisplay end
     iob::IOBuffer
     ioc::IOContext
     term::AbstractTerminal
-    prevcontent::Union{Nothing, AbstractRenderable}
+    prevcontent::Union{Nothing, AbstractRenderable, String}
     prevcontentlines::Vector{String}
     raw_mode_enabled::Bool
     last_update::Union{Nothing, Int}
     refresh_Δt::Int
+    help_shown::Bool
 
     function LiveInternals(; refresh_rate::Int=100)
         # get output buffers
@@ -31,7 +32,7 @@ abstract type AbstractLiveDisplay end
         # hide the cursor
         raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
 
-        return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate))
+        return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate), false)
     end
 end
 
@@ -87,7 +88,7 @@ function refresh!(live::AbstractLiveDisplay)::Tuple{Bool, Any}
 
     # get new content
     internals = live.internals
-    content::AbstractRenderable = frame(live)
+    content::Union{String, AbstractRenderable} = frame(live)
     content_lines::Vector{String} = split(string(content), "\n")
     nlines::Int = length(content_lines)
     nlines_prev::Int = isnothing(internals.prevcontentlines) ? 0 : length(internals.prevcontentlines)
@@ -98,19 +99,14 @@ function refresh!(live::AbstractLiveDisplay)::Tuple{Bool, Any}
     # printed = read_stdout_output(live.internals)
     # isnothing(printed) || (scontent = printed / scontent)
 
-    # remove extra lines from previous content
-    up(internals.ioc, nlines_prev)
-    # for _ in 1:(nlines_prev - nlines)
-    #     replace_line(internals)
-    # end
-
     # render new content
+    up(internals.ioc, nlines_prev)
     for i in 1:nlines
         line = content_lines[i]
         
         # avoid re-writing unchanged lines
         !isnothing(internals.prevcontent) && nlines_prev > i && begin
-            old_line = view(old_lines, i)
+            old_line = old_lines[i]
             line == old_line && begin
                 down(internals.ioc)
                 continue
@@ -129,13 +125,10 @@ function refresh!(live::AbstractLiveDisplay)::Tuple{Bool, Any}
 end
 
 function erase!(live::AbstractLiveDisplay)
-    nlines = live.internals.prevcontent.measure.h + 1
+    nlines = live.internals.prevcontent.measure.h
     up(live.internals.ioc, nlines)
-    for _ in 1:nlines
-        replace_line(live.internals)
-    end
+    cleartoend(live.internals.ioc)
     write(stdout, take!(live.internals.iob))
-
     nothing
 end
 
