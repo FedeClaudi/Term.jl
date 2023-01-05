@@ -33,16 +33,51 @@ function help(live::AbstractLiveDisplay)
 
     # make help message
     key_methods = methods(key_press, (typeof(live), KeyInput))
-    help_message = RenderableText(join(string.(key_methods), "\n"))
+    # help_message = RenderableText(join(string.(key_methods), "\n"))
+
+    messages =  [
+        RenderableText(md"#### Live Renderable description"; width=live.measure.w-10),
+        RenderableText(getdocs(live); width=live.measure.w-10),
+        RenderableText(md"#### Controls"; width=live.measure.w-10),
+
+        # RenderableText(
+        #     @doc(key_press(live)); width=live.measure.w-10
+        # ),
+        ]
+
+
+
+    # for m in key_methods
+    #     push!(
+    #         messages,
+    #         RenderableText(getdocs(eval(m.name)); width=live.measure.w-10)
+    #     )
+    # end
+
+
+
+    help_message = Panel(
+        messages; 
+        width=live.measure.w,
+        title="$(typeof(live)) help",
+        title_style="bold",
+        title_justify=:center,
+        style="dim",
+        )
+
 
     # show/hide message
     if internals.help_shown
         # hide it
         internals.help_shown = false
 
+        # go to the top of the error message and delete everything
         h = console_height() - length(internals.prevcontentlines) - help_message.measure.h - 1
         move_to_line(stdout, h)
         cleartoend(stdout)
+
+        # move cursor back to the top of the live to re-print it in the right position
+        move_to_line(stdout, console_height() - length(internals.prevcontentlines))
     else
         # show it
         erase!(live)
