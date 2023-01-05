@@ -1,15 +1,7 @@
 """
-    mutable struct Pager <: AbstractLiveDisplay
-        internals::LiveInternals
-        measure::Measure
-        content::Vector{String}
-        title::String
-        tot_lines::Int
-        curr_line::Int
-        page_lines::Int
-    end
-
-Live renderables to display long texts in the terminal, a few lines at the time. 
+A `Pager` is a live renderable for visualizing long texts a few lines at the time. 
+It shows a few lines of a longer text and allows users to move up and down the text
+using keys such as arrow up and arrow down.
 """
 @with_repr mutable struct Pager <: AbstractLiveDisplay
     internals::LiveInternals
@@ -21,11 +13,7 @@ Live renderables to display long texts in the terminal, a few lines at the time.
     page_lines::Int
 end
 
-"""
-    function Pager(content::String; page_lines = 10, title = "Term.jl PAGER", width=console_width())
 
-Construct a Pager for a given piece of text.
-"""
 function Pager(content::String; page_lines = 10, title = "Term.jl PAGER", width=console_width())
     content = split(
         string(
@@ -69,39 +57,39 @@ end
 
 # --------------------------------- controls --------------------------------- #
 """
-- ArrowDown: move to the next line
+- {bold white}arrow down{/bold white}: move to the next line
 """
 function key_press(p::Pager, ::ArrowDown)
     p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + 1)
 end
 
 """
-- ArrowUp: move to the previous line
+- {bold white}arrow up{/bold white}: move to the previous line
 """
 function key_press(p::Pager, ::ArrowUp)
     p.curr_line = max(1, p.curr_line - 1)
 end
 
 """
-- PageDownKey,ArrowRight: move to the next page
+- {bold white}page down, arrow right{/bold white}: move to the next page
 """
 function key_press(p::Pager, ::Union{PageDownKey,ArrowRight})
     p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + p.page_lines)
 end
 
 """
-- PageUpKey,ArrowLeft: move to the previous page
+- {bold white}page up, arrow left{/bold white}: move to the previous page
 """
 function key_press(p::Pager, ::Union{PageUpKey,ArrowLeft})
     p.curr_line = max(1, p.curr_line - p.page_lines)
 end
 
 """
-- HomeKey: move to first line
+- {bold white}home key{/bold white}: move to first line
 """
 key_press(p::Pager, ::HomeKey) = p.curr_line = 1
 
 """
-- EndKey: move to the last line
+- {bold white}end key{/bold white}: move to the last line
 """
 key_press(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines

@@ -13,9 +13,3 @@ code = load_code_and_highlight(filepath)
 
 
 p = Pager(code; page_lines = 20, title = filepath) |> LiveDisplays.play
-
-
-# TODO for help: 2) get docstrings of key_press functions and print that.
-# TODO add a generic charkey input for users
-# TODO add multi select menu
-# TODO add capture user input

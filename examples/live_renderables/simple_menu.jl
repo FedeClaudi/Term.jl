@@ -1,10 +1,5 @@
 using Term.LiveDisplays
 
-"""
-Simple interactive menu. 
-
-Use arrows to navigate, "Enter" to confirm an opton and "q" to exit. "h" prints a help message.
-"""
 
 println("Please choose a menu type:")
 retval = SimpleMenu(["Simple", "Buttons", "MultiSelect"]) |> LiveDisplays.play

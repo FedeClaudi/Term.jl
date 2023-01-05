@@ -48,8 +48,9 @@ frame(::AbstractLiveDisplay) = error("Not implemented")
 key_press(::AbstractLiveDisplay, ::Any) = nothing
 
 """
-CharKey('q'): quit program without returning anything
-CharKey('h'): toggle help message display
+- {bold white}q{/bold white}: quit program without returning anything
+
+- {bold white}h{/bold white}: toggle help message display
 """
 function key_press(live::AbstractLiveDisplay, k::CharKey)::Tuple{Bool, Nothing}
     k.char == 'q' && return (true, nothing)

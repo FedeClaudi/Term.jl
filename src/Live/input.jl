@@ -33,31 +33,37 @@ KEYs = Dict{Int,KeyInput}(
 function help(live)
     internals = live.internals
 
-    # make help message
-    key_methods = methods(key_press, (typeof(live), KeyInput))
-    # help_message = RenderableText(join(string.(key_methods), "\n"))
+    # get the docstring for each key_press method for the live renderable
+    key_methods = methods(key_press, (typeof(live), LiveDisplays.KeyInput))
 
+    dcs = Docs.meta(LiveDisplays)
+    bd = Base.Docs.Binding(LiveDisplays, :key_press)
+
+    function get_method_docstring(m)
+        try
+            return dcs[bd].docs[Tuple{m.sig.types[2], m.sig.types[3]}].text[1]
+        catch
+            return ""
+        end
+    end
+
+    methods_docs = map(
+        m -> RenderableText(get_method_docstring(m); width=live.measure.w-10),
+        key_methods
+    )  
+
+    # compose help tooltip
     messages =  [
         RenderableText(md"#### Live Renderable description"; width=live.measure.w-10),
         RenderableText(getdocs(live); width=live.measure.w-10),
-        RenderableText(md"#### Controls"; width=live.measure.w-10),
-
-        # RenderableText(
-        #     @doc(key_press(live)); width=live.measure.w-10
-        # ),
+        "",
+        RenderableText(md"#### Controls "; width=live.measure.w-10),
+        RenderableText("- {bold white}enter{/bold white}: quit program, possibly returning a value.\n"; width=live.measure.w-10),
+        methods_docs...
         ]
 
 
-
-    # for m in key_methods
-    #     push!(
-    #         messages,
-    #         RenderableText(getdocs(eval(m.name)); width=live.measure.w-10)
-    #     )
-    # end
-
-
-
+    # create full message
     help_message = Panel(
         messages; 
         width=live.measure.w,
@@ -113,13 +119,6 @@ function keyboard_input(live)::Tuple{Bool, Any}
             retval = key_press(live, key)
             return (key isa Enter, retval)
         end
-
-        # c = Char(c)
-        # c == 'q' && return (true, nothing)
-        # c == 'h' && begin
-        #     help(live)
-        #     return (false, nothing)
-        # end
 
         # fallback to char key calls
         return key_press(live, CharKey(c))
