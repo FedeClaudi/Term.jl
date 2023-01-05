@@ -10,21 +10,21 @@ abstract type AbstractMenu <: AbstractLiveDisplay end
 
 # --------------------------------- controls --------------------------------- #
 """ 
-- ArrowDown: select a next option if one is available
+- {bold white}arrow down{/bold white}: select a next option if one is available
 """
 function key_press(mn::AbstractMenu, ::ArrowDown) 
     mn.active = min(mn.active+1, mn.n_titles)
 end
 
 """
-- ArrowUp: select a previos option if one is available
+- {bold white}arrow up{/bold white}: select a previos option if one is available
 """
 function key_press(mn::AbstractMenu, ::ArrowUp) 
     mn.active =  max(1, mn.active-1)
 end
 
 """
-- Enter: select the current option.
+- {bold white}enter{/bold white}: select the current option.
 """
 function key_press(mn::AbstractMenu, ::Enter)
     return mn.active
@@ -48,17 +48,8 @@ end
 # ---------------------------------------------------------------------------- #
 
 """
-    mutable struct SimpleMenu <: AbstractMenu
-        internals::LiveInternals
-        measure::Measure
-        active_titles::Vector{String}
-        inactive_titles::Vector{String}
-        n_titles::Int
-        active::Int
-    end
-
-Simple text based menu. Each option is a string with different styling based
-on wether it is highlighted or not.
+Simple text based menu. 
+The currently selected option is highlighted with a different style.
 """
 @with_repr mutable struct SimpleMenu <: AbstractMenu
     internals::LiveInternals
@@ -104,18 +95,8 @@ end
 
 
 """
-    mutable struct ButtonsMenu <: AbstractMenu
-        internals::LiveInternals
-        measure::Measure
-        active_titles::Vector{String}
-        inactive_titles::Vector{String}
-        n_titles::Int
-        active::Int
-    end
-
-Menu variant in which each option is a `Panel` to make it look 
-more like a button. Different styling is applied to the 
-currently selected option.
+Simple menu in which each option is a `Panel` object.
+Styling reflects which option is currently selected
 """
 @with_repr mutable struct ButtonsMenu <: AbstractMenu
     internals::LiveInternals
@@ -178,6 +159,11 @@ end
 # ---------------------------------------------------------------------------- #
 #                                 MULTI SELECT                                 #
 # ---------------------------------------------------------------------------- #
+
+"""
+Menu variant for selecting multiple options. 
+Color indicates current active option, ticks selected options
+"""
 @with_repr mutable struct MultiSelectMenu <: AbstractMenu
     internals::LiveInternals
     measure::Measure
@@ -211,12 +197,15 @@ end
 end
 
 """
-- Enter: select the current option.
+- {bold white}enter{bold white}: return selected options
 """
 function key_press(mn::MultiSelectMenu, ::Enter)
     return mn.selected
 end
 
+"""
+- {bold white}space bar{/bold white}: select current option
+"""
 function key_press(mn::MultiSelectMenu, ::SpaceBar)
     active = mn.active
     if active ∈ mn.selected

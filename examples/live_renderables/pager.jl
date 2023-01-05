@@ -12,4 +12,4 @@ filepath = "././src/live/abstractlive.jl"
 code = load_code_and_highlight(filepath)
 
 
-p = Pager(code; page_lines = 20, title = filepath) |> LiveDisplays.play
+LiveDisplays.play(Pager(code; page_lines = 20, title = filepath); transient=true)

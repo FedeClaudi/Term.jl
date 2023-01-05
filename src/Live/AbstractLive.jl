@@ -48,6 +48,11 @@ frame(::AbstractLiveDisplay) = error("Not implemented")
 key_press(::AbstractLiveDisplay, ::Any) = nothing
 
 """
+- {bold white}enter{/bold white}: quit program, possibly returning a value
+"""
+key_press(live::AbstractLiveDisplay, ::Enter) = nothing
+
+"""
 - {bold white}q{/bold white}: quit program without returning anything
 
 - {bold white}h{/bold white}: toggle help message display
@@ -154,12 +159,13 @@ function stop!(live::AbstractLiveDisplay)
     nothing
 end
 
-function play(live::AbstractLiveDisplay)
+function play(live::AbstractLiveDisplay; transient::Bool=true)
     retval = nothing
     while true
         should_continue, retval = refresh!(live) 
         should_continue || break
     end
     stop!(live)
+    transient && erase!(live)
     return retval
 end

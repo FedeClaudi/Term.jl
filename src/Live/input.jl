@@ -39,26 +39,31 @@ function help(live)
     dcs = Docs.meta(LiveDisplays)
     bd = Base.Docs.Binding(LiveDisplays, :key_press)
 
+    added_sigs = []
     function get_method_docstring(m)
         try
-            return dcs[bd].docs[Tuple{m.sig.types[2], m.sig.types[3]}].text[1]
+            sig = m.sig.types[3]
+            sig ∈ added_sigs && return ""
+            docstr = dcs[bd].docs[Tuple{m.sig.types[2], m.sig.types[3]}].text[1]
+            push!(added_sigs, sig)
+            return docstr
         catch
             return ""
         end
     end
 
+    width = console_width()
     methods_docs = map(
-        m -> RenderableText(get_method_docstring(m); width=live.measure.w-10),
+        m -> RenderableText(get_method_docstring(m); width=width-10),
         key_methods
     )  
 
     # compose help tooltip
     messages =  [
-        RenderableText(md"#### Live Renderable description"; width=live.measure.w-10),
-        RenderableText(getdocs(live); width=live.measure.w-10),
+        RenderableText(md"#### Live Renderable description"; width=width-10),
+        RenderableText(getdocs(live); width=width-10),
         "",
-        RenderableText(md"#### Controls "; width=live.measure.w-10),
-        RenderableText("- {bold white}enter{/bold white}: quit program, possibly returning a value.\n"; width=live.measure.w-10),
+        RenderableText(md"#### Controls "; width=width-10),
         methods_docs...
         ]
 
@@ -66,9 +71,9 @@ function help(live)
     # create full message
     help_message = Panel(
         messages; 
-        width=live.measure.w,
+        width=width,
         title="$(typeof(live)) help",
-        title_style="bold",
+        title_style="default bold blue",
         title_justify=:center,
         style="dim",
         )

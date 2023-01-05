@@ -2,7 +2,7 @@ using Term.LiveDisplays
 
 
 println("Please choose a menu type:")
-retval = SimpleMenu(["Simple", "Buttons", "MultiSelect"]) |> LiveDisplays.play
+retval = LiveDisplays.play(SimpleMenu(["Simple", "Buttons", "MultiSelect"]); transient=true)
 print("\n\n")
 
 # get the selected menu style
@@ -18,7 +18,7 @@ elseif retval == 3
 end
 
 println("\nPlease choose an option:")
-retval = mn |> LiveDisplays.play
+retval = LiveDisplays.play(mn; transient=false)
 
 print("The menu returned the value: $retval")
 
