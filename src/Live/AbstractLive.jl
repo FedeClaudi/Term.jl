@@ -77,20 +77,22 @@ function read_stdout_output(internals::LiveInternals)
     length(out) > 0 ? out : nothing
 end
 
-function refresh!(live::AbstractLiveDisplay)::Bool
+function refresh!(live::AbstractLiveDisplay)::Tuple{Bool, Any}
     # check for keyboard inputs
-    shouldstop = keyboard_input(live)
-    shouldstop && return false
+    shouldstop, retval = keyboard_input(live)
+    shouldstop && return (false, retval)
 
     # check if its time to update
-    shouldupdate(live) || return true
+    shouldupdate(live) || return (true, retval)
 
     # get new content
     internals = live.internals
     content::AbstractRenderable = frame(live)
     content_lines::Vector{String} = split(string(content), "\n")
     nlines::Int = length(content_lines)
-    nlines_prev::Int = isnothing(internals.prevcontentlines) ? 1 : length(internals.prevcontentlines)+1
+    nlines_prev::Int = isnothing(internals.prevcontentlines) ? 0 : length(internals.prevcontentlines)
+    old_lines = internals.prevcontentlines
+    nlines_prev == 0 && print(internals.ioc, "\n")
 
     # get calls to print from user
     # printed = read_stdout_output(live.internals)
@@ -98,25 +100,32 @@ function refresh!(live::AbstractLiveDisplay)::Bool
 
     # remove extra lines from previous content
     up(internals.ioc, nlines_prev)
-    for _ in 1:(nlines_prev - nlines)
-        replace_line(internals)
-    end
+    # for _ in 1:(nlines_prev - nlines)
+    #     replace_line(internals)
+    # end
 
     # render new content
     for i in 1:nlines
-        # (nlines_prev > 1 && content_lines[i] != internals.prevcontentlines[i]) && 
-        !isnothing(internals.prevcontent) && content_lines[i] != internals.prevcontentlines[i] && begin
-            down(internals.ioc)
-            continue
+        line = content_lines[i]
+        
+        # avoid re-writing unchanged lines
+        !isnothing(internals.prevcontent) && nlines_prev > i && begin
+            old_line = view(old_lines, i)
+            line == old_line && begin
+                down(internals.ioc)
+                continue
+            end
         end
-        replace_line(internals, content_lines[i])
+
+        # re-write line
+        replace_line(internals, line)
     end
 
     # output
     internals.prevcontent = content
     internals.prevcontentlines = content_lines
     write(stdout, take!(internals.iob))
-    return true
+    return (true, retval)
 end
 
 function erase!(live::AbstractLiveDisplay)
@@ -138,8 +147,11 @@ function stop!(live::AbstractLiveDisplay)
 end
 
 function play(live::AbstractLiveDisplay)
+    retval = nothing
     while true
-        refresh!(live) || break
+        should_continue, retval = refresh!(live) 
+        should_continue || break
     end
     stop!(live)
+    return retval
 end

@@ -9,12 +9,13 @@ struct HomeKey <: KeyInput end
 struct EndKey <: KeyInput end
 struct PageUpKey <: KeyInput end
 struct PageDownKey <: KeyInput end
-
+struct Enter <: KeyInput end
 struct CharKey <: KeyInput
     char::Char
 end
 
 KEYs = Dict{Int,KeyInput}(
+    13 => Enter(),
     1000 => ArrowLeft(),
     1001 => ArrowRight(),
     1002 => ArrowUp(),
@@ -38,15 +39,20 @@ for the `AbstractLiveDisplay` with the corresponding
 use that.
 If the input was `q` it signals that the display should be stopped
 """
-function keyboard_input(live::AbstractLiveDisplay)::Bool
+function keyboard_input(live::AbstractLiveDisplay)::Tuple{Bool, Any}
     if bytesavailable(terminal.in_stream) > 0
         c = readkey(terminal.in_stream) |> Int
 
-        c in keys(KEYs) && key_press(live, KEYs[Int(c)])
+        c in keys(KEYs) && begin
+            key = KEYs[Int(c)]    
+            retval = key_press(live, key)
+            return (key isa Enter, retval)
+        end
+
 
         c = Char(c)
-        c == 'q' && return true
+        c == 'q' && return (true, nothing)
         key_press(live, CharKey(c))
     end
-    return false
+    return (false, nothing)
 end

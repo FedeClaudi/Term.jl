@@ -9,7 +9,6 @@
 end
 
 function Pager(content::String; page_lines = 10, title = "Term.jl PAGER")
-    # content = string(RenderableText(content)) # ; width=displaysize(stdout)[2]-10))
     content = split(content, "\n")
     return Pager(
         LiveInternals(),
