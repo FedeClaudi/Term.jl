@@ -1,9 +1,9 @@
 """
-A `Pager` is a live renderable for visualizing long texts a few lines at the time. 
+A `Pager` is a widget for visualizing long texts a few lines at the time. 
 It shows a few lines of a longer text and allows users to move up and down the text
 using keys such as arrow up and arrow down.
 """
-@with_repr mutable struct Pager <: AbstractLiveDisplay
+@with_repr mutable struct Pager <: AbstractWidget
     internals::LiveInternals
     measure::Measure
     content::Vector{String}

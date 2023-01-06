@@ -1,9 +1,26 @@
 
-abstract type AbstractLiveDisplay end
 
 # ---------------------------------------------------------------------------- #
 #                                LIVE INTERNALS                                #
 # ---------------------------------------------------------------------------- #
+"""
+struct LiveInternals
+    iob::IOBuffer
+    ioc::IOContext
+    term::AbstractTerminal
+    prevcontent::Union{Nothing, AbstractRenderable, String}
+    prevcontentlines::Vector{String}
+    raw_mode_enabled::Bool
+    last_update::Union{Nothing, Int}
+    refresh_Δt::Int
+    help_shown::Bool
+end
+
+`LiveInternals` handles "under the hood" work for live widgets. 
+It takes care of keeping track of information such as the content
+displayed at the last refresh of the widget to inform the printing
+of the widget's content at the next refresh.
+"""
 @with_repr mutable struct LiveInternals
     iob::IOBuffer
     ioc::IOContext
@@ -36,28 +53,37 @@ abstract type AbstractLiveDisplay end
     end
 end
 
+# ---------------------------------------------------------------------------- #
+#                                ABSTRACT WIDGET                               #
+# ---------------------------------------------------------------------------- #
+abstract type AbstractWidget end
 
-# ---------------------------------------------------------------------------- #
-#                                METHODS ON LIVE                               #
-# ---------------------------------------------------------------------------- #
+
 """
 Get the current conttent of a live display
 """
-frame(::AbstractLiveDisplay) = error("Not implemented")
+frame(::AbstractWidget) = error("Not implemented")
 
-key_press(::AbstractLiveDisplay, ::KeyInput) = nothing
+"""
+    keypress
+
+Capture user input during live widgets display.
+"""
+function keypress end
+
+key_press(::AbstractWidget, ::KeyInput) = nothing
 
 """
 - {bold white}enter{/bold white}: quit program, possibly returning a value
 """
-key_press(::AbstractLiveDisplay, ::Enter) = nothing
+key_press(::AbstractWidget, ::Enter) = nothing
 
 """
 - {bold white}q{/bold white}: quit program without returning anything
 
 - {bold white}h{/bold white}: toggle help message display
 """
-function key_press(live::AbstractLiveDisplay, c::Char)::Tuple{Bool, Nothing}
+function key_press(live::AbstractWidget, c::Char)::Tuple{Bool, Nothing}
     c == 'q' && return (true, nothing)
     c == 'h' && begin
     toggle_help(live)
@@ -67,7 +93,14 @@ function key_press(live::AbstractLiveDisplay, c::Char)::Tuple{Bool, Nothing}
 end
 
 
-function shouldupdate(live::AbstractLiveDisplay)::Bool
+"""
+    shouldupdate(live::AbstractWidget)::Bool
+
+Check if a widget's display should be updated based on:
+    1. enough time elapsed since last update
+    2. the widget has not beed displayed het
+"""
+function shouldupdate(live::AbstractWidget)::Bool
     currtime = Dates.value(now())
     isnothing(live.internals.last_update) && begin
         live.internals.last_update = currtime
@@ -82,23 +115,46 @@ function shouldupdate(live::AbstractLiveDisplay)::Bool
     return false
 end
 
+"""
+    replace_line(internals::LiveInternals)
+
+Erase a line and move cursor
+"""
 function replace_line(internals::LiveInternals)
     erase_line(internals.ioc)
     down(internals.ioc)
 end
 
+"""
+    replace_line(internals::LiveInternals, newline)
+
+Erase a line, write new content and move cursor. 
+"""
 function replace_line(internals::LiveInternals, newline)
     erase_line(internals.ioc)
     println(internals.ioc, newline)
 end
 
-function read_stdout_output(internals::LiveInternals)
-    write(internals.ioc, internals.pipe)
-    out = String(take!(internals.ioc))
-    length(out) > 0 ? out : nothing
-end
 
-function refresh!(live::AbstractLiveDisplay)::Tuple{Bool, Any}
+# function read_stdout_output(internals::LiveInternals)
+#     write(internals.ioc, internals.pipe)
+#     out = String(take!(internals.ioc))
+#     length(out) > 0 ? out : nothing
+# end
+
+
+"""
+    refresh!(live::AbstractWidget)::Tuple{Bool, Any}
+
+Update the terminal display of a widget.
+
+this is done by calling `frame` on the widget to get the new content.
+Then, line by line, the new content is compared to the previous one and when
+a discrepancy occurs the lines gets re-written. 
+This is all done printing to a buffer first and then to `stdout` to avoid
+jitter.
+"""
+function refresh!(live::AbstractWidget)::Tuple{Bool, Any}
     # check for keyboard inputs
     shouldstop, retval = keyboard_input(live)
     shouldstop && return (false, retval)
@@ -144,7 +200,12 @@ function refresh!(live::AbstractLiveDisplay)::Tuple{Bool, Any}
     return (true, retval)
 end
 
-function erase!(live::AbstractLiveDisplay)
+"""
+    erase!(live::AbstractWidget)
+
+Erase a widget from the terminal.
+"""
+function erase!(live::AbstractWidget)
     nlines = live.internals.prevcontent.measure.h
     up(live.internals.ioc, nlines)
     cleartoend(live.internals.ioc)
@@ -152,14 +213,25 @@ function erase!(live::AbstractLiveDisplay)
     nothing
 end
 
-function stop!(live::AbstractLiveDisplay)
+"""
+    stop!(live::AbstractWidget)
+
+Restore normal terminal behavior.
+"""
+function stop!(live::AbstractWidget)
     internals = live.internals
     print(internals.term.out_stream, "\x1b[?25h") # unhide cursor
     raw!(internals.term, false)
     nothing
 end
 
-function play(live::AbstractLiveDisplay; transient::Bool=true)
+
+"""
+    play(live::AbstractWidget; transient::Bool=true)
+
+Keep refreshing a renderable, until the user interrupts it. 
+"""
+function play(live::AbstractWidget; transient::Bool=true)
     retval = nothing
     while true
         should_continue, retval = refresh!(live) 

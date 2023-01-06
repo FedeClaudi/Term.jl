@@ -30,9 +30,9 @@ KEYs = Dict{Int,KeyInput}(
 
 
 """
-toggle_help(live::AbstractLiveDisplay; help_widget::Union{Nothing, AbstractLiveDisplay}=nothing)
+toggle_help(live::AbstractWidget; help_widget::Union{Nothing, AbstractWidget}=nothing)
 
-Toggle help tooltip display for a live renderable widget.
+Toggle help tooltip display for a widget widget.
 
 By default the help message of `live` is shown, but for "nested" widgets one can 
 directly specify for which widget to look up the help message for with `help_widget`.
@@ -40,11 +40,11 @@ directly specify for which widget to look up the help message for with `help_wid
 The help message itself is made up of the docstring for the `live` struct and the docstrings
 of all methods for `key_press(typeof(live), ::Any)`.
 """
-function toggle_help(live::AbstractLiveDisplay; help_widget::Union{Nothing, AbstractLiveDisplay}=nothing)
+function toggle_help(live; help_widget=nothing)
     internals = live.internals
     help_widget = something(help_widget, live)
 
-    # get the docstring for each key_press method for the live renderable
+    # get the docstring for each key_press method for the widget
     key_methods = methods(key_press, (typeof(help_widget), LiveDisplays.KeyInput))
 
     dcs = Docs.meta(LiveDisplays)
@@ -71,7 +71,7 @@ function toggle_help(live::AbstractLiveDisplay; help_widget::Union{Nothing, Abst
 
     # compose help tooltip
     messages =  [
-        RenderableText(md"#### Live Renderable description"; width=width-10),
+        RenderableText(md"#### widget description"; width=width-10),
         RenderableText(getdocs(help_widget); width=width-10),
         "",
         RenderableText(md"#### Controls "; width=width-10),
@@ -115,13 +115,13 @@ end
 
 
 """
-    keyboard_input(live::AbstractLiveDisplay)
+    keyboard_input(live::AbstractWidget)
 
 Read an user keyboard input during live display.
 
 If there are bytes available at `stdin`, read them.
 If it's a special character (e.g. arrows) call `key_press`
-for the `AbstractLiveDisplay` with the corresponding
+for the `AbstractWidget` with the corresponding
 `KeyInput` type. Else, if it's not `q` (reserved for exit),
 use that.
 If the input was `q` it signals that the display should be stopped

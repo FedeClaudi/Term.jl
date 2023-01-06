@@ -18,12 +18,12 @@ import ..Repr: @with_repr, termshow
 import ..Style: apply_style
 import ..Layout: Spacer, vLine, vstack
 
-export AbstractLiveDisplay, refresh!, play, key_press, shouldupdate, frame, stop!
+export AbstractWidget, refresh!, play, key_press, shouldupdate, frame, stop!
 export Pager, TabViewer
 export SimpleMenu, ButtonsMenu, MultiSelectMenu
 
 include("input.jl")
-include("abstractlive.jl")
+include("abstract_widget.jl")
 include("pager.jl")
 include("menu.jl")
 include("tabviewer.jl")

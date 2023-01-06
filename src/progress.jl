@@ -27,7 +27,7 @@ import ..Measures: Measure
 import ..Segments: Segment
 import ..Colors: RGBColor
 import ..Layout: hLine, lvstack
-using ..LiveDisplays: LiveInternals, AbstractLiveDisplay
+using ..LiveDisplays: LiveInternals, AbstractWidget
 import ..LiveDisplays
 
 export ProgressBar,
@@ -229,7 +229,7 @@ Arguments:
     - `paused`: false when the bar is running but briefly paused (e.g. to update `jobs`)
     - `task`: references a `Task` for updating the progress bar in parallel
 """
-mutable struct ProgressBar <: AbstractLiveDisplay
+mutable struct ProgressBar <: AbstractWidget
     internals::LiveInternals
     jobs::Vector{ProgressJob}
     width::Int

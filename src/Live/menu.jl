@@ -6,7 +6,7 @@ Objects of type AbstractMenu present the user with a few options
 and let them select one by moving around with the up/down keys 
 and using Enter to select an option.
 """
-abstract type AbstractMenu <: AbstractLiveDisplay end
+abstract type AbstractMenu <: AbstractWidget end
 
 # --------------------------------- controls --------------------------------- #
 """ 
@@ -33,7 +33,7 @@ end
 
 # ----------------------------------- frame ---------------------------------- #
 """
-Render the current state of a menu live renderable.
+Render the current state of a menu widget.
 """
 function frame(mn::AbstractMenu)
     titles = map(

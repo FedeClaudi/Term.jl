@@ -3,11 +3,11 @@
 `TabViewer` displays multiple live widgets using a menu
 to let the user chose which widget to view at a given time.
 """
-mutable struct TabViewer <: AbstractLiveDisplay
+mutable struct TabViewer <: AbstractWidget
     internals::LiveInternals
     measure::Measure
     menu::ButtonsMenu
-    tabs::Vector{AbstractLiveDisplay}
+    tabs::Vector{AbstractWidget}
     context::Symbol
 end
 

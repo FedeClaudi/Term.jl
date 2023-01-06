@@ -20,6 +20,5 @@ tabs = [
 tb = TabViewer(options, tabs)
 LiveDisplays.play(tb)
 
-
-#TODO fix problems with key_press(live::TabViewer, k::CharKey)
-#TODO docstring for help
+# TODO: inspect panel make better
+# TODO: come up with other widgets
