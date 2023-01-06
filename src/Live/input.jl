@@ -1,5 +1,6 @@
 
 abstract type KeyInput end
+
 struct ArrowLeft <: KeyInput end
 struct ArrowRight <: KeyInput end
 struct ArrowUp <: KeyInput end
@@ -11,9 +12,7 @@ struct PageUpKey <: KeyInput end
 struct PageDownKey <: KeyInput end
 struct Enter <: KeyInput end
 struct SpaceBar <: KeyInput end
-struct CharKey <: KeyInput
-    char::Char
-end
+
 
 KEYs = Dict{Int,KeyInput}(
     13 => Enter(),
@@ -30,11 +29,23 @@ KEYs = Dict{Int,KeyInput}(
 )
 
 
-function help(live)
+"""
+toggle_help(live::AbstractLiveDisplay; help_widget::Union{Nothing, AbstractLiveDisplay}=nothing)
+
+Toggle help tooltip display for a live renderable widget.
+
+By default the help message of `live` is shown, but for "nested" widgets one can 
+directly specify for which widget to look up the help message for with `help_widget`.
+
+The help message itself is made up of the docstring for the `live` struct and the docstrings
+of all methods for `key_press(typeof(live), ::Any)`.
+"""
+function toggle_help(live::AbstractLiveDisplay; help_widget::Union{Nothing, AbstractLiveDisplay}=nothing)
     internals = live.internals
+    help_widget = something(help_widget, live)
 
     # get the docstring for each key_press method for the live renderable
-    key_methods = methods(key_press, (typeof(live), LiveDisplays.KeyInput))
+    key_methods = methods(key_press, (typeof(help_widget), LiveDisplays.KeyInput))
 
     dcs = Docs.meta(LiveDisplays)
     bd = Base.Docs.Binding(LiveDisplays, :key_press)
@@ -61,7 +72,7 @@ function help(live)
     # compose help tooltip
     messages =  [
         RenderableText(md"#### Live Renderable description"; width=width-10),
-        RenderableText(getdocs(live); width=width-10),
+        RenderableText(getdocs(help_widget); width=width-10),
         "",
         RenderableText(md"#### Controls "; width=width-10),
         methods_docs...
@@ -72,7 +83,7 @@ function help(live)
     help_message = Panel(
         messages; 
         width=width,
-        title="$(typeof(live)) help",
+        title="$(typeof(help_widget)) help",
         title_style="default bold blue",
         title_justify=:center,
         style="dim",
@@ -126,7 +137,7 @@ function keyboard_input(live)::Tuple{Bool, Any}
         end
 
         # fallback to char key calls
-        return key_press(live, CharKey(c))
+        return key_press(live, Char(c))
     end
     return (false, nothing)
 end

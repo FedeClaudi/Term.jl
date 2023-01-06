@@ -1,3 +1,8 @@
+
+"""
+`TabViewer` displays multiple live widgets using a menu
+to let the user chose which widget to view at a given time.
+"""
 mutable struct TabViewer <: AbstractLiveDisplay
     internals::LiveInternals
     measure::Measure
@@ -17,9 +22,6 @@ function TabViewer(titles::Vector, tabs::Vector)
         map(t -> t.measure.h, tabs) |> maximum,
         tabs_width,
     )
-
-
-
     return TabViewer(LiveInternals(), measure, ButtonsMenu(titles; width=10), tabs, :menu)
 end
 
@@ -40,16 +42,24 @@ function frame(tb::TabViewer)
     return mn * "   " *  tab
 end
 
-
+"""
+- {bold white}arrow right{/bold white}: switch focus to currently active widget
+"""
 function key_press(tb::TabViewer, ::ArrowRight)
     tb.context=:tab
 end
 
+"""
+- {bold white}arrow left{/bold white}: switch focus to widget selection menu
+"""
 function key_press(tb::TabViewer, ::ArrowLeft)
     tb.context=:menu
 end
 
-function key_press(tb::TabViewer, k::Union{CharKey, KeyInput})
+"""
+- all other keys presses are passed to the currently active widget.
+"""
+function key_press(tb::TabViewer, k::KeyInput)
     if tb.context == :menu
         key_press(tb.menu, k)
     else
@@ -58,11 +68,32 @@ function key_press(tb::TabViewer, k::Union{CharKey, KeyInput})
     end
 end
 
-# function key_press(live::TabViewer, k::CharKey)
-#     k.char == 'q' && return (true, nothing)
-#     k.char == 'h' && begin
-#         help(live)
-#         return (false, nothing)
-#     end
-#     return (false, nothing)
-# end
+
+"""
+- {bold white}q{/bold white}: quit program without returning anything
+
+- {bold white}h{/bold white}: toggle help message display
+
+- {bold white}w{/bold white}: toggle help message display for currently active widget
+"""
+function key_press(tb::TabViewer, c::Char)::Tuple{Bool, Nothing}
+    c == 'q' && return (true, nothing)
+
+    tab = tb.tabs[tb.menu.active]
+
+    c == 'h' && begin
+        toggle_help(tb)
+        return (false, nothing)
+    end
+
+    c == 'w' && begin
+        toggle_help(tb; help_widget=tab)
+        return (false, nothing)
+    end
+
+    if tb.context == :tab
+        return key_press(tab, c)
+    else
+        return (false, nothing)
+    end
+end

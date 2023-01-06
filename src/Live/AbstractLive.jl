@@ -45,26 +45,26 @@ Get the current conttent of a live display
 """
 frame(::AbstractLiveDisplay) = error("Not implemented")
 
-key_press(::AbstractLiveDisplay, ::Any) = nothing
+key_press(::AbstractLiveDisplay, ::KeyInput) = nothing
 
 """
 - {bold white}enter{/bold white}: quit program, possibly returning a value
 """
-key_press(live::AbstractLiveDisplay, ::Enter) = nothing
+key_press(::AbstractLiveDisplay, ::Enter) = nothing
 
 """
 - {bold white}q{/bold white}: quit program without returning anything
 
 - {bold white}h{/bold white}: toggle help message display
 """
-# function key_press(live::AbstractLiveDisplay, k::CharKey)::Tuple{Bool, Nothing}
-#     k.char == 'q' && return (true, nothing)
-#     k.char == 'h' && begin
-#         help(live)
-#         return (false, nothing)
-#     end
-#     return (false, nothing)
-# end
+function key_press(live::AbstractLiveDisplay, c::Char)::Tuple{Bool, Nothing}
+    c == 'q' && return (true, nothing)
+    c == 'h' && begin
+    toggle_help(live)
+        return (false, nothing)
+    end
+    return (false, nothing)
+end
 
 
 function shouldupdate(live::AbstractLiveDisplay)::Bool

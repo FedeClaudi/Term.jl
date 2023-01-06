@@ -91,14 +91,14 @@ function key_press(p::Pager, ::ArrowUp)
 end
 
 """
-- {bold white}page down, arrow right{/bold white}: move to the next page
+- {bold white}page down, arrow right, ']'{/bold white}: move to the next page
 """
 function key_press(p::Pager, ::Union{PageDownKey,ArrowRight})
     p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + p.page_lines)
 end
 
 """
-- {bold white}page up, arrow left{/bold white}: move to the previous page
+- {bold white}page up, arrow left, '['{/bold white}: move to the previous page
 """
 function key_press(p::Pager, ::Union{PageUpKey,ArrowLeft})
     p.curr_line = max(1, p.curr_line - p.page_lines)
@@ -114,9 +114,19 @@ key_press(p::Pager, ::HomeKey) = p.curr_line = 1
 """
 key_press(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
 
+"""
+- {bold white}q{/bold white}: quit program without returning anything
 
-function key_press(p::Pager, c::CharKey)
-    error()
-    c.char == ']' && return key_press(p, ArrowRight())
-    c.char == '[' && return key_press(p, ArrowLeft())
+- {bold white}h{/bold white}: toggle help message display
+"""
+function key_press(p::Pager, c::Char)::Tuple{Bool, Nothing}
+    c == ']' && key_press(p, ArrowRight())
+    c == '[' && key_press(p, ArrowLeft())
+
+    c == 'q' && return (true, nothing)
+    c == 'h' && begin
+    toggle_help(p)
+        return (false, nothing)
+    end
+    return (false, nothing)
 end
