@@ -2,5 +2,6 @@
 ignore:
   - "./src/errors.jl"
   - "./src/_errors.jl"
+  - "./src/__precompilation.jl"
   - "./test"       
   - "./scripts"         
