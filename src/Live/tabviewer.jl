@@ -1,171 +1,68 @@
-import ..Layout: vstack
-import Term: reshape_text, remove_ansi
-
-# ---------------------------------------------------------------------------- #
-#                                     TABS                                     #
-# ---------------------------------------------------------------------------- #
-
-abstract type AbstractTab end
-
-function menu_tab(opt::AbstractTab)::Panel
-    bg = opt.selected ? "white" : ""
-    cl = opt.selected ? "black bold" : "white bold"
-    txt = "{$cl on_$bg}$(opt.title){/$cl on_$bg}"
-    Panel(
-        txt;
-        fit = false,
-        style = "hidden",
-        width = 20,
-        background = bg,
-        justify = :center,
-        box = :SQUARE,
-    )
-end
-
-""" capture undefined calls """
-key_press(::AbstractTab, ::KeyInput) = nothing
-key_press(::AbstractTab, ::KeyInput, ::Any) = nothing
-
-# --------------------------------- text tab --------------------------------- #
-@with_repr mutable struct TextTab <: AbstractTab
-    title::String
-    content::String
-    selected::Bool
-    function TextTab(title, content)
-        new(title, content, false)
-    end
-end
-
-display_content(opt::TextTab)::String = opt.content
-
-# --------------------------------- pager tab -------------------------------- #
-@with_repr mutable struct PagerTab <: AbstractTab
-    title::String
-    content::Vector{String}
-    selected::Bool
-    tot_lines::Int
-    curr_line::Int
-    page_lines::Int
-
-    function PagerTab(title, content; page_lines = 35)
-        content = split(content, "\n")
-        new(title, content, false, length(content), 1, page_lines)
-    end
-end
-
-key_press(p::PagerTab, ::ArrowDown) =
-    p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + 1)
-key_press(p::PagerTab, ::ArrowUp) = p.curr_line = max(1, p.curr_line - 1)
-key_press(p::PagerTab, ::PageDownKey) =
-    p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + p.page_lines)
-key_press(p::PagerTab, ::PageUpKey) = p.curr_line = max(1, p.curr_line - p.page_lines)
-key_press(p::PagerTab, ::HomeKey) = p.curr_line = 1
-key_press(p::PagerTab, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
-function key_press(p::PagerTab, k::CharKey)
-    if k.char == ']'
-        key_press(p, PageDownKey())
-    elseif k.char == '['
-        key_press(p, PageUpKey())
-    end
-end
-
-function display_content(tab::PagerTab)::String
-    i, Δi = tab.curr_line, tab.page_lines
-    page = join(tab.content[max(1, i):min(tab.tot_lines, i + Δi)], "\n")
-    return page
-end
-
-# ---------------------------------------------------------------------------- #
-#                                  TAB VIEWER                                  #
-# ---------------------------------------------------------------------------- #
-
-abstract type TVContext end
-struct OptionsContext <: TVContext end
-struct ContentContext <: TVContext end
-
-@with_repr mutable struct TabViewer <: AbstractLiveDisplay
+mutable struct TabViewer <: AbstractLiveDisplay
     internals::LiveInternals
-    options::Vector{AbstractTab}
-    selected::Int
-    context::TVContext
-    needs_update::Bool
-    TabViewer(options) = new(LiveInternals(), options, 1, OptionsContext(), true)
+    measure::Measure
+    menu::ButtonsMenu
+    tabs::Vector{AbstractLiveDisplay}
+    context::Symbol
 end
 
-function shouldupdate(tv::TabViewer)
-    currtime = Dates.value(now())
-    isnothing(tv.internals.last_update) && begin
-        tv.internals.last_update = currtime
-        return true
-    end
 
-    Δt = currtime - tv.internals.last_update
-    if Δt > 250
-        tv.internals.last_update = currtime
-        return true
-    end
-    tv.needs_update
-end
+function TabViewer(titles::Vector, tabs::Vector)
+    @assert length(titles) == length(tabs)
 
-function toggle_option_select(tv::TabViewer)
-    for (i, tab) in enumerate(tv.options)
-        tab.selected = i == tv.selected
-    end
-end
 
-get_active_tab(tv::TabViewer)::AbstractTab = first(filter(o -> o.selected, tv.options))
-
-function frame(tv::TabViewer)::AbstractRenderable
-    toggle_option_select(tv)
-    options = Panel(
-        vstack(menu_tab.(tv.options));
-        style = tv.context isa OptionsContext ? "default" : "hidden",
-        fit = false,
-        width = 23,
-        height = 40,
-        padding = (0, 0, 0, 0),
+    tabs_width = map(t -> t.measure.w, tabs) |> maximum
+    @assert tabs_width <= console_width()-20 "Not enough space to render tab viewer"
+    measure = Measure(
+        map(t -> t.measure.h, tabs) |> maximum,
+        tabs_width,
     )
 
-    selected_tab = get_active_tab(tv)
-    content_w = console_width() - 23
-    tab_content = display_content(selected_tab)
-        # RenderableText(
-        #     # reshape_text((display_content(selected_tab)), content_w - 10);
-        #     display_content(selected_tab);
-        #     width = content_w - 10,
-        # ) |> string
 
-    content = Panel(
-        tab_content,
-        style = tv.context isa OptionsContext ? "dim" : "default",
-        fit = false,
-        title = "Tab: " * selected_tab.title,
-        width = content_w,
-        height = 40,
-        padding = (4, 4, 1, 1),
+
+    return TabViewer(LiveInternals(), measure, ButtonsMenu(titles; width=10), tabs, :menu)
+end
+
+function frame(tb::TabViewer)
+    tab = Panel(
+        frame(tb.tabs[tb.menu.active]; omit_panel = true);
+        width=tb.tabs[tb.menu.active].measure.w,
+        padding=(2, 2, 1, 1), 
+        style = tb.context == :tab ? "default" : "hidden"
+
     )
-    tv.needs_update = false
-
-    return options * content
+    mn = Panel(frame(tb.menu); 
+        width=tb.menu.measure.w+6, height=tab.measure.h,
+        padding=(2, 2, 1, 1),
+        style = tb.context != :tab ? "default" : "hidden"
+        )
+    
+    return mn * "   " *  tab
 end
 
-key_press(tv::TabViewer, k) = begin
-    tv.needs_update = true
-    key_press(tv, (k), tv.context)
+
+function key_press(tb::TabViewer, ::ArrowRight)
+    tb.context=:tab
 end
-key_press(tv::TabViewer, ::ArrowLeft) = tv.context = OptionsContext()
-key_press(tv::TabViewer, ::ArrowRight) = tv.context = ContentContext()
-key_press(tv::TabViewer, ::ArrowDown, ::OptionsContext) =
-    tv.selected = min(length(tv.options), tv.selected + 1)
-key_press(tv::TabViewer, ::ArrowUp, ::OptionsContext) =
-    tv.selected = max(1, tv.selected - 1)
 
-"""
-    key_press(tv::TabViewer, k::KeyInput, ::ContentContext)
+function key_press(tb::TabViewer, ::ArrowLeft)
+    tb.context=:menu
+end
 
-Let tab type handle key press event
-"""
-key_press(tv::TabViewer, k::KeyInput, ::ContentContext) = key_press(get_active_tab(tv), k)
+function key_press(tb::TabViewer, k::Union{CharKey, KeyInput})
+    if tb.context == :menu
+        key_press(tb.menu, k)
+    else
+        tab = tb.tabs[tb.menu.active]
+        key_press(tab, k)
+    end
+end
 
-""" capture undefined calls """
-key_press(tv::TabViewer, ::KeyInput, ::Any) = nothing
+# function key_press(live::TabViewer, k::CharKey)
+#     k.char == 'q' && return (true, nothing)
+#     k.char == 'h' && begin
+#         help(live)
+#         return (false, nothing)
+#     end
+#     return (false, nothing)
+# end

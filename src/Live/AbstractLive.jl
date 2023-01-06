@@ -57,14 +57,14 @@ key_press(live::AbstractLiveDisplay, ::Enter) = nothing
 
 - {bold white}h{/bold white}: toggle help message display
 """
-function key_press(live::AbstractLiveDisplay, k::CharKey)::Tuple{Bool, Nothing}
-    k.char == 'q' && return (true, nothing)
-    k.char == 'h' && begin
-        help(live)
-        return (false, nothing)
-    end
-    return (false, nothing)
-end
+# function key_press(live::AbstractLiveDisplay, k::CharKey)::Tuple{Bool, Nothing}
+#     k.char == 'q' && return (true, nothing)
+#     k.char == 'h' && begin
+#         help(live)
+#         return (false, nothing)
+#     end
+#     return (false, nothing)
+# end
 
 
 function shouldupdate(live::AbstractLiveDisplay)::Bool

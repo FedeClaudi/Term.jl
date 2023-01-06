@@ -42,7 +42,7 @@ end
 
 Create a Panel with, as content, the currently visualized lines in the Pager.
 """
-function frame(pager::Pager)::AbstractRenderable
+function frame(pager::Pager; omit_panel=false)::AbstractRenderable
     i, Δi = pager.curr_line, pager.page_lines
     page = join(pager.content[i:min(pager.tot_lines, i + Δi)], "\n")
 
@@ -59,7 +59,9 @@ function frame(pager::Pager)::AbstractRenderable
     below = RenderableText(join(repeat([" \n"], page_lines - scrollbar_lines - nspaces_above)); style="on_gray23")
     scrollbar = above / scrollbar / below
 
-    Panel(
+    # return content
+    omit_panel && return page * scrollbar
+    return Panel(
         page * scrollbar,
         fit = false,
         width = pager.measure.w,
@@ -111,3 +113,10 @@ key_press(p::Pager, ::HomeKey) = p.curr_line = 1
 - {bold white}end key{/bold white}: move to the last line
 """
 key_press(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
+
+
+function key_press(p::Pager, c::CharKey)
+    error()
+    c.char == ']' && return key_press(p, ArrowRight())
+    c.char == '[' && return key_press(p, ArrowLeft())
+end

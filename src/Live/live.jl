@@ -16,10 +16,10 @@ import ..Measures: width as get_width
 using ..Consoles
 import ..Repr: @with_repr, termshow
 import ..Style: apply_style
-import ..Layout: Spacer, vLine
+import ..Layout: Spacer, vLine, vstack
 
 export AbstractLiveDisplay, refresh!, play, key_press, shouldupdate, frame, stop!
-export Pager, TabViewer, TextTab, PagerTab
+export Pager, TabViewer
 export SimpleMenu, ButtonsMenu, MultiSelectMenu
 
 include("input.jl")

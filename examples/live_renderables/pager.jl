@@ -13,4 +13,3 @@ code = load_code_and_highlight(filepath)
 
 
 LiveDisplays.play(Pager(code; page_lines = 40, title = filepath, line_numbers=true); transient=true)
-# TODO finish scrollbar
