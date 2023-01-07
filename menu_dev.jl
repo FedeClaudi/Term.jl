@@ -55,5 +55,4 @@ app = App(layout, widgets, transition_rules)
 
 play(app)
 
-# TODO horizontal menu
-# TODO gallery
+# TODO inspect make useof gallery and app

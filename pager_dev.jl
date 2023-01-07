@@ -1,5 +1,5 @@
 using Term
-using Term.LiveDisplays
+using Term.LiveWidgets
 using Term.Consoles
 using Term.TermMarkdown
 
@@ -100,12 +100,15 @@ This is where you print the content of your foot notes:
 """,
 )
 
-clear()
 
-p = Pager(text; page_lines = 30, title = "Example pager")
-p.internals
-p |> LiveDisplays.play
+page1 = Pager(text; width=80)
+page2 = Pager(text; width=80)
+page3 = Pager(text; width=80)
 
+gallery = Gallery(
+    [page1, page2, page3]
+)
+play(gallery)
 println("done")
 
 
