@@ -835,7 +835,7 @@ function PlaceHolder(
             ltrim_str(original, _w - _l) *
             "{default bold white}" *
             text *
-            "{/default bold white}" *
+            "{/default bold white}{$style}" *
             rtrim_str(original, _w + _l),
         )
     end

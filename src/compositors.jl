@@ -7,7 +7,8 @@ import ..Layout: PlaceHolder
 import ..Measures: width, height, default_size
 import ..Renderables: AbstractRenderable, RenderableText, Renderable
 import ..Repr: @with_repr, termshow
-import Term: highlight, update!
+import ..Consoles: console_height, console_width
+import Term: highlight, update!, fint
 
 export Compositor
 
@@ -33,7 +34,20 @@ each `LayoutElement` if there is one, the placeholder otherwise.
     w::Int
     renderable::Union{Nothing,String,AbstractRenderable}
     placeholder::PlaceHolder
+
+    function LayoutElement(
+            id::Symbol,
+            h::Number,
+            w::Number,
+            renderable::Union{Nothing,String,AbstractRenderable},
+            placeholder::PlaceHolder)
+            h = h isa Int ? h : fint(console_height() * h)
+            w = w isa Int ? w : fint(console_width() * w)
+            return new(id, h,w, renderable, placeholder)
+    end
 end
+
+
 
 Base.size(e::LayoutElement) = (e.h, e.w)
 
