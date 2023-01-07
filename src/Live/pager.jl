@@ -44,25 +44,35 @@ Create a Panel with, as content, the currently visualized lines in the Pager.
 """
 function frame(pager::Pager; omit_panel=false)::AbstractRenderable
     i, Δi = pager.curr_line, pager.page_lines
-    page = join(pager.content[i:min(pager.tot_lines, i + Δi)], "\n")
 
-    # make a scroll bar
-    page_lines = pager.page_lines
-    scrollbar_lines = 5
-    scrollbar = vLine(scrollbar_lines; style="white on_white")
+    page = if Δi >= pager.tot_lines
+        join(pager.content, "\n")
+    else
 
-    p = (i+Δi/2)/pager.tot_lines
-    scrollbar_center =   p * (page_lines) 
-    nspaces_above = max(0, scrollbar_center-scrollbar_lines/2)|> round |> Int
+    
+        page_content = join(pager.content[i:min(pager.tot_lines, i + Δi)], "\n")
 
-    above = RenderableText(join(repeat([" \n"], nspaces_above)); style="on_gray23")
-    below = RenderableText(join(repeat([" \n"], page_lines - scrollbar_lines - nspaces_above)); style="on_gray23")
-    scrollbar = above / scrollbar / below
+        # make a scroll bar
+        page_lines = pager.page_lines
+        scrollbar_lines = 5
+        scrollbar = vLine(scrollbar_lines; style="white on_white")
+    
+        p = (i+Δi/2)/pager.tot_lines
+        scrollbar_center =   p * (page_lines) 
+        nspaces_above = max(0, scrollbar_center-scrollbar_lines/2)|> round |> Int
+    
+        above = RenderableText(join(repeat([" \n"], nspaces_above)); style="on_gray23")
+        below = RenderableText(join(repeat([" \n"], page_lines - scrollbar_lines - nspaces_above)); style="on_gray23")
+        scrollbar = above / scrollbar / below
+
+        page_content * scrollbar
+    end
+
 
     # return content
-    omit_panel && return page * scrollbar
+    omit_panel && return RenderableText(page)
     return Panel(
-        page * scrollbar,
+        scrollbar,
         fit = false,
         width = pager.measure.w,
         padding = (2, 0, 1, 1),

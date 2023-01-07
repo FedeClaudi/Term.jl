@@ -27,6 +27,7 @@ end
 - {bold white}enter{/bold white}: select the current option.
 """
 function key_press(mn::AbstractMenu, ::Enter)
+    mn.internals.should_stop = true
     return mn.active
 end
 
@@ -35,7 +36,7 @@ end
 """
 Render the current state of a menu widget.
 """
-function frame(mn::AbstractMenu)
+function frame(mn::AbstractMenu; kwargs...)
     titles = map(
         i -> i == mn.active ? mn.active_titles[i] : mn.inactive_titles[i], 1:mn.n_titles
     ) 
@@ -125,6 +126,7 @@ Styling reflects which option is currently selected
                     width=width,
                     justify=justify,
                     box=box,
+                    padding=(1, 1, 1, 1)
             )
             , titles) .|> string |> collect
 
@@ -136,6 +138,7 @@ Styling reflects which option is currently selected
             width=width,
             justify=justify,
             box=box,
+            padding=(1, 1, 1, 1)
     )
             , titles) .|> string |> collect
     
@@ -200,6 +203,7 @@ end
 - {bold white}enter{bold white}: return selected options
 """
 function key_press(mn::MultiSelectMenu, ::Enter)
+    mn.internals.should_stop = true
     return mn.selected
 end
 
@@ -216,7 +220,7 @@ function key_press(mn::MultiSelectMenu, ::SpaceBar)
 end
 
 
-function frame(mn::MultiSelectMenu)
+function frame(mn::MultiSelectMenu; kwargs...)
     make_option(i::Int, isactive::Bool, isselected::Bool) = begin
         sym = isselected ? mn.selected_sym : mn.notselected_sym
         style = isactive ? mn.active_style : mn.inactive_style

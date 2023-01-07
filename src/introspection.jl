@@ -24,7 +24,7 @@ import ..Trees: Tree
 import ..Layout: hLine, vLine, Spacer, rvstack, lvstack
 import ..Tprint: tprintln
 import ..Repr: termshow
-using ..LiveDisplays
+using ..LiveWidgets
 import ..TermMarkdown: parse_md
 import ..Consoles: console_width
 import ..Style: apply_style

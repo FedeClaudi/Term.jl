@@ -22,10 +22,10 @@ function TabViewer(titles::Vector, tabs::Vector)
         map(t -> t.measure.h, tabs) |> maximum,
         tabs_width,
     )
-    return TabViewer(LiveInternals(), measure, ButtonsMenu(titles; width=10), tabs, :menu)
+    return TabViewer(LiveInternals(), measure, ButtonsMenu(titles; width=15), tabs, :menu)
 end
 
-function frame(tb::TabViewer)
+function frame(tb::TabViewer; kwargs...)
     tab = Panel(
         frame(tb.tabs[tb.menu.active]; omit_panel = true);
         width=tb.tabs[tb.menu.active].measure.w,
@@ -34,9 +34,10 @@ function frame(tb::TabViewer)
 
     )
     mn = Panel(frame(tb.menu); 
-        width=tb.menu.measure.w+6, height=tab.measure.h,
-        padding=(2, 2, 1, 1),
-        style = tb.context != :tab ? "default" : "hidden"
+        width=tb.menu.measure.w+2, height=tb.measure.h,
+        padding=(0, 0, 1, 1),
+        style = tb.context != :tab ? "default" : "hidden",
+        justify=:center,
         )
     
     return mn * "   " *  tab
@@ -56,6 +57,16 @@ function key_press(tb::TabViewer, ::ArrowLeft)
     tb.context=:menu
 end
 
+function key_press(tb::TabViewer, ::Enter) 
+    tb.internals.should_stop = true
+    return nothing
+end
+
+function key_press(tb::TabViewer, ::Esc) 
+    tb.internals.should_stop = true
+    return nothing
+end
+
 """
 - all other keys presses are passed to the currently active widget.
 """
@@ -70,30 +81,28 @@ end
 
 
 """
-- {bold white}q{/bold white}: quit program without returning anything
+- [on menu focus] {bold white}q{/bold white}: quit program without returning anything
 
-- {bold white}h{/bold white}: toggle help message display
+- [on menu focus] {bold white}h{/bold white}: toggle help message display
 
-- {bold white}w{/bold white}: toggle help message display for currently active widget
+- [on menu focus] {bold white}w{/bold white}: toggle help message display for currently active widget
 """
 function key_press(tb::TabViewer, c::Char)::Tuple{Bool, Nothing}
-    c == 'q' && return (true, nothing)
-
     tab = tb.tabs[tb.menu.active]
-
-    c == 'h' && begin
-        toggle_help(tb)
-        return (false, nothing)
-    end
-
-    c == 'w' && begin
-        toggle_help(tb; help_widget=tab)
-        return (false, nothing)
-    end
 
     if tb.context == :tab
         return key_press(tab, c)
     else
+        c == 'q' && return (true, nothing)    
+        c == 'h' && begin
+            toggle_help(tb)
+            return (false, nothing)
+        end
+    
+        c == 'w' && begin
+            toggle_help(tb; help_widget=tab)
+            return (false, nothing)
+        end
         return (false, nothing)
     end
 end

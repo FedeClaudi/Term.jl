@@ -12,11 +12,15 @@ struct PageUpKey <: KeyInput end
 struct PageDownKey <: KeyInput end
 struct Enter <: KeyInput end
 struct SpaceBar <: KeyInput end
+struct Esc <: KeyInput end
+struct Del <: KeyInput end
 
 
 KEYs = Dict{Int,KeyInput}(
     13 => Enter(),
+    27 => Esc(),
     32 => SpaceBar(),
+    127 => Del(),
     1000 => ArrowLeft(),
     1001 => ArrowRight(),
     1002 => ArrowUp(),
@@ -45,10 +49,10 @@ function toggle_help(live; help_widget=nothing)
     help_widget = something(help_widget, live)
 
     # get the docstring for each key_press method for the widget
-    key_methods = methods(key_press, (typeof(help_widget), LiveDisplays.KeyInput))
+    key_methods = methods(key_press, (typeof(help_widget), LiveWidgets.KeyInput))
 
-    dcs = Docs.meta(LiveDisplays)
-    bd = Base.Docs.Binding(LiveDisplays, :key_press)
+    dcs = Docs.meta(LiveWidgets)
+    bd = Base.Docs.Binding(LiveWidgets, :key_press)
 
     added_sigs = []
     function get_method_docstring(m)
@@ -133,7 +137,7 @@ function keyboard_input(live)::Tuple{Bool, Any}
         c in keys(KEYs) && begin
             key = KEYs[Int(c)]    
             retval = key_press(live, key)
-            return (key isa Enter, retval)
+            return (live.internals.should_stop, retval)
         end
 
         # fallback to char key calls

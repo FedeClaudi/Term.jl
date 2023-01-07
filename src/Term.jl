@@ -184,7 +184,7 @@ using .Repr: @with_repr, termshow, install_term_repr, @showme
 using .Grid
 
 # -------------------------------- interactive ------------------------------- #
-import .LiveDisplays: Pager
+using .LiveWidgets
 
 # ----------------------------- using interactive ---------------------------- #
 using .Progress: ProgressBar, ProgressJob, with, @track

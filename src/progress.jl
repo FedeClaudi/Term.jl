@@ -27,8 +27,8 @@ import ..Measures: Measure
 import ..Segments: Segment
 import ..Colors: RGBColor
 import ..Layout: hLine, lvstack
-using ..LiveDisplays: LiveInternals, AbstractWidget
-import ..LiveDisplays
+using ..LiveWidgets: LiveInternals, AbstractWidget
+import ..LiveWidgets
 
 export ProgressBar,
     ProgressJob, addjob!, start!, stop!, update!, removejob!, with, @track, foreachprogress
@@ -397,11 +397,11 @@ function stop!(pbar::ProgressBar)
     pbar.paused = true
     pbar.running = false
 
-    LiveDisplays.stop!(pbar)
+    LiveWidgets.stop!(pbar)
 
     nlines = length(pbar.internals.prevcontent.measure.h + 4)
     pbar.transient || print("\n"^nlines)
-    pbar.transient && LiveDisplays.erase!(pbar)
+    pbar.transient && LiveWidgets.erase!(pbar)
 
     return nothing
 end
@@ -443,7 +443,7 @@ number of running jobs.
 All fo this requires a bit of careful work in moving the
 cursor around and doing ANSI magic.
 """
-function LiveDisplays.frame(pbar::ProgressBar)::AbstractRenderable
+function LiveWidgets.frame(pbar::ProgressBar)::AbstractRenderable
     # remove completed, transient jobs
     for job in pbar.jobs
         if job.finished && job.transient
@@ -494,7 +494,7 @@ function with(expr, pbar::ProgressBar)
 
         task = Threads.@spawn expr()
         while !istaskdone(task) && pbar.running
-            pbar.paused || LiveDisplays.refresh!(pbar)
+            pbar.paused || LiveWidgets.refresh!(pbar)
             sleep(pbar.Δt)
         end
         stop!(pbar)
@@ -650,7 +650,7 @@ _getn(_, _) = nothing
 
 function _startrenderloop(pbar)
     while pbar.running
-        pbar.paused || LiveDisplays.refresh!(pbar)
+        pbar.paused || LiveWidgets.refresh!(pbar)
         sleep(pbar.Δt)
     end
 end

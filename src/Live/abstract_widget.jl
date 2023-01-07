@@ -1,4 +1,4 @@
-
+abstract type AbstractWidget end
 
 # ---------------------------------------------------------------------------- #
 #                                LIVE INTERNALS                                #
@@ -20,17 +20,21 @@ end
 It takes care of keeping track of information such as the content
 displayed at the last refresh of the widget to inform the printing
 of the widget's content at the next refresh.
+
+LiveInternals also holds linked_widgets which can be used to link to 
+other widgets to access their internal variables.
 """
 @with_repr mutable struct LiveInternals
     iob::IOBuffer
     ioc::IOContext
     term::AbstractTerminal
-    prevcontent::Union{Nothing, AbstractRenderable, String}
+    prevcontent::Union{Nothing, AbstractRenderable}
     prevcontentlines::Vector{String}
     raw_mode_enabled::Bool
     last_update::Union{Nothing, Int}
     refresh_Δt::Int
     help_shown::Bool
+    should_stop::Bool
 
     function LiveInternals(; refresh_rate::Int=60)
         # get output buffers
@@ -49,14 +53,13 @@ of the widget's content at the next refresh.
         # hide the cursor
         raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
 
-        return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate), false)
+        return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate), false, false,)
     end
 end
 
 # ---------------------------------------------------------------------------- #
 #                                ABSTRACT WIDGET                               #
 # ---------------------------------------------------------------------------- #
-abstract type AbstractWidget end
 
 
 """
@@ -74,9 +77,17 @@ function keypress end
 key_press(::AbstractWidget, ::KeyInput) = nothing
 
 """
-- {bold white}enter{/bold white}: quit program, possibly returning a value
+- {bold white}enter, esc{/bold white}: quit program, possibly returning a value
 """
-key_press(::AbstractWidget, ::Enter) = nothing
+function key_press(live::AbstractWidget, ::Enter) 
+    live.internals.should_stop = true
+    return nothing
+end
+
+function key_press(live::AbstractWidget, ::Esc) 
+    live.internals.should_stop = true
+    return nothing
+end
 
 """
 - {bold white}q{/bold white}: quit program without returning anything

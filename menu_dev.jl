@@ -1,5 +1,5 @@
 using Term
-using Term.LiveDisplays
+using Term.LiveWidgets
 using Term.Consoles
 using Term.Progress
 import Term: load_code_and_highlight
@@ -8,17 +8,4 @@ import Term: load_code_and_highlight
 
 
 
-txt = "Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore"^100
-
-
-options = ["one", "two"]
-tabs = [
-    Pager(txt; page_lines = 40, title = "", line_numbers=true, width=console_width()-20),
-    Pager(txt; page_lines = 40, title = "", line_numbers=true, width=console_width()-20),
-]
-
-tb = TabViewer(options, tabs)
-LiveDisplays.play(tb)
-
-# TODO: inspect panel make better
-# TODO: come up with other widgets
+LiveWidgets.play(InputBox())
