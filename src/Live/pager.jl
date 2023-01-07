@@ -14,7 +14,7 @@ using keys such as arrow up and arrow down.
 end
 
 
-function Pager(content::String; page_lines::Int = 10, title::String = "Term.jl PAGER", width::Int=console_width(), line_numbers::Bool=false)
+function Pager(content::String; page_lines::Int = min(console_height()-5, 25), title::String = "Term.jl PAGER", width::Int=console_width(), line_numbers::Bool=false)
     page_lines = min(page_lines, console_height()-8)
 
     line_numbers && (content = join(map(iln -> "{dim}$(iln[1])  {/dim}" * iln[2], enumerate(split(content, "\n"))), "\n"))

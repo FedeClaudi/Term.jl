@@ -240,6 +240,8 @@ function vertical_pad(text::AbstractString, target_height::Int, method::Symbol)
     end
 end
 
+# vertical_pad(text::AbstractString; height::Int, method::Symbol=:center) = vertical_pad(text, height, method)
+
 """
     vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
 

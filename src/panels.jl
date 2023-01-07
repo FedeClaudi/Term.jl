@@ -427,7 +427,7 @@ function render(
     )
 
     # get left/right vertical lines
-    σ(s) = apply_style("\e[0m{" * style * "}" * s * "{/" * style * "}")
+    σ(s) = apply_style("{" * style * "}" * s * "{/" * style * "}")
     left, right = σ(box.mid.left), σ(box.mid.right)
 
     # get an empty padding line

@@ -14,6 +14,8 @@ import Term:
     get_bg_color,
     textlen
 
+import Term
+
 import Term: highlight as highlighter
 import ..Consoles: console_width
 import ..Measures: Measure
@@ -74,6 +76,33 @@ Show a renderable and some information about its shape.
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
     println(io, string(renderable))
     DEBUG_ON[] && println(io, info(renderable))
+end
+
+"""
+    apply_style(ren::AbstractRenderable, style::String)
+
+Apply style to all lines of a pre-existing renderable.
+
+Generate a new renderable where the segments are the styled version
+of the original renderable's segments
+"""
+function Term.Style.apply_style(ren::AbstractRenderable, style::String)
+    rentype = typeof(ren)
+    fields = fieldnames(rentype)
+
+    values = map(fields) do f
+        if f == :segments
+            segs = getfield(ren, f)
+            return map(
+                s -> Segment(apply_style("{$style}$(s.text){/$style}")),
+                segs
+            )
+        else
+            return getfield(ren, f)
+        end
+    end
+
+    return rentype(values...)
 end
 
 # -------------------------------- union type -------------------------------- #

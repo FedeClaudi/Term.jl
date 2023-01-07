@@ -145,7 +145,7 @@ function inspect(
         ), '\n'
     )
 
-    _methods = vcat(methodswith.(getsupertypes(T)[1:3])...)
+    _methods = vcat(methodswith.(getsupertypes(T)[1:end-1])...)
     supertypes_methods = join(
         string.(
                 Panel.(

@@ -148,9 +148,13 @@ function update!(
         return
     end
 
-    # check that the shapes match
+    # if content is too small, pad it
     elem = compositor.elements[id]
-    if elem.w != width(content) || elem.h != height(content)
+    height(content) < elem.h && (content = vertical_pad(content; height=elem.h))
+    width(content) < elem.w && (content = pad(content, elem.w))
+
+    # check that the shapes match
+    if elem.w > width(content) || elem.h > height(content)
         content_shape = "{red}$(height(content)) × $(width(content)){/red}"
         target_shape = "{bright_blue}$(elem.h) × $(elem.w){/bright_blue}"
         @warn "Shape mismatch while updating compositor element {yellow}`$id`{/yellow}.\nGot $content_shape, expected $target_shape"
@@ -178,7 +182,7 @@ Render a compositor's current layout.
 Get a renderable from each `LayoutElement` in the compositor
 and evaluate the layout expression interpolating the renderables.
 """
-function render(compositor::Compositor; show_placeholders = false)
+function render(compositor::Compositor; show_placeholders = false)::AbstractRenderable
     # evaluate compositor
     elements = getfield.(values(compositor.elements), :id)
     renderables = getfield.(values(compositor.elements), :renderable)

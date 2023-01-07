@@ -216,6 +216,8 @@ end
 Erase a widget from the terminal.
 """
 function erase!(live::AbstractWidget)
+    isnothing(live.internals.prevcontent) && return
+    
     nlines = live.internals.prevcontent.measure.h
     up(live.internals.ioc, nlines)
     cleartoend(live.internals.ioc)
