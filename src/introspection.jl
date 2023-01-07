@@ -132,29 +132,33 @@ Flags can be used to choose the level of detail in the information presented:
  - methods: show methods using `T` in their signature
  - supertypes: show methods using `T`'s supertypes in their signature
 """
-function inspect(
-    T::Union{Union,DataType};
-)
+function inspect(T::Union{Union,DataType};)
     constructors_content = join(
         string.(
             Panel.(
                 style_methods(Base.methods(T));
-                fit=false, width=console_width()-33, padding=(0, 0, 0, 0),
-                style="hidden"
-            )
-        ), '\n'
-    )
-
-    _methods = vcat(methodswith.(getsupertypes(T)[1:end-1])...)
-    supertypes_methods = join(
-        string.(
-                Panel.(
-                style_methods(_methods);
-                fit=false, width=console_width()-33, padding=(0, 0, 0, 0),
-                style="hidden"
+                fit = false,
+                width = console_width() - 33,
+                padding = (0, 0, 0, 0),
+                style = "hidden",
             )
         ),
-    "\n")
+        '\n',
+    )
+
+    _methods = vcat(methodswith.(getsupertypes(T)[1:(end - 1)])...)
+    supertypes_methods = join(
+        string.(
+            Panel.(
+                style_methods(_methods);
+                fit = false,
+                width = console_width() - 33,
+                padding = (0, 0, 0, 0),
+                style = "hidden",
+            )
+        ),
+        "\n",
+    )
 
     theme = TERM_THEME[]
     field_names = apply_style.(string.(fieldnames(T)), theme.repr_accent)
@@ -165,35 +169,35 @@ function inspect(
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
     type_name = apply_style(string(T), theme.repr_name * " bold")
 
-
     # create tabview widget
-    tabwidth = console_width() - 26
-    tab_height = 25
-    info = string(
-        Panel(type_name / ("  " * line * fields); fit=false, 
-                width=tabwidth-10, justify=:center,
-                title="Fields", title_style="bright_blue bold",
-                style="bright_blue dim"
-        ) /
-        hLine(tabwidth-10; style="dim") / 
-        "" /
-        Tree(T))
+    error("make app")
+    # tabwidth = console_width() - 26
+    # tab_height = 25
+    # info = string(
+    #     Panel(type_name / ("  " * line * fields); fit=false, 
+    #             width=tabwidth-10, justify=:center,
+    #             title="Fields", title_style="bright_blue bold",
+    #             style="bright_blue dim"
+    #     ) /
+    #     hLine(tabwidth-10; style="dim") / 
+    #     "" /
+    #     Tree(T))
 
-    tv = TabViewer(
-        ["Info",  "Docs", "Constructors", "Methods"],
-        [
-        Pager(info; width=tabwidth, page_lines=tab_height), 
-        Pager(parse_md(get_docstring(T)[1]); width=tabwidth, page_lines=tab_height), 
-        Pager(constructors_content; width=tabwidth, page_lines=tab_height), 
-        Pager(supertypes_methods; width=tabwidth, page_lines=tab_height)
-        ];
-        active_background=[theme.text_accent, theme.docstring, theme.func, theme.func], 
-        active_color="bold black",
-        inactive_color=[theme.text_accent, theme.docstring, theme.func, theme.func],
+    # tv = TabViewer(
+    #     ["Info",  "Docs", "Constructors", "Methods"],
+    #     [
+    #     Pager(info; width=tabwidth, page_lines=tab_height), 
+    #     Pager(parse_md(get_docstring(T)[1]); width=tabwidth, page_lines=tab_height), 
+    #     Pager(constructors_content; width=tabwidth, page_lines=tab_height), 
+    #     Pager(supertypes_methods; width=tabwidth, page_lines=tab_height)
+    #     ];
+    #     active_background=[theme.text_accent, theme.docstring, theme.func, theme.func], 
+    #     active_color="bold black",
+    #     inactive_color=[theme.text_accent, theme.docstring, theme.func, theme.func],
 
-    )
-    play(tv; transient=false) 
-    stop!(tv)
+    # )
+    # play(tv; transient=false) 
+    # stop!(tv)
 end
 
 function inspect(F::Function; documentation::Bool = true)

@@ -151,11 +151,10 @@ Load and highlight the syntax of an entire file
 """
 function load_code_and_highlight(path::AbstractString)::String
     lines = readlines(path)
-    code =
-        [highlight_syntax(ln; style = true) for ln in lines]
+    code = [highlight_syntax(ln; style = true) for ln in lines]
 
     # clean
     clean(line) = replace(line, "    {/    }" => "")
-    codelines = clean.(code)  
+    codelines = clean.(code)
     return join(codelines, "\n")
 end

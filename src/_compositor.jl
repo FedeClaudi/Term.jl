@@ -98,10 +98,11 @@ compositor_placeholder(s, h, w, c) = begin
     h = h isa Int ? h : fint(console_height() * h)
     w = w isa Int ? w : fint(console_width() * w)
     PlaceHolder(
-    h, w;
-    style = c,
-    text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($h × $w){/white}",
-)
+        h,
+        w;
+        style = c,
+        text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($h × $w){/white}",
+    )
 end
 
 """

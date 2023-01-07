@@ -19,20 +19,24 @@ import ..Layout: Spacer, vLine, vstack, hLine, hstack
 import ..Compositors: Compositor, render, update!
 
 export AbstractWidget, refresh!, play, key_press, shouldupdate, frame, stop!
-export Pager, TabViewer
+export Pager
 export SimpleMenu, ButtonsMenu, MultiSelectMenu
 export InputBox, TextWidget, Button, ToggleButton
 export Gallery
 export App
 
 include("_input.jl")
+
+# ------------------------------- base widgets ------------------------------- #
 include("abstract_widget.jl")
-include("pager.jl")
-include("gallery.jl")
-include("menus.jl")
 include("widgets.jl")
+include("pager.jl")
 include("buttons.jl")
-include("tabviewer.jl")
+include("menus.jl")
+
+# -------------------------------- containers -------------------------------- #
+include("abstract_container.jl")
+include("gallery.jl")
 include("app.jl")
 
 end

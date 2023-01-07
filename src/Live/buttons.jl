@@ -1,16 +1,13 @@
-
 # ---------------------------------------------------------------------------- #
-#                                    BUTTON                                    #
+#                                AbstractButton                                #
 # ---------------------------------------------------------------------------- #
-
 abstract type AbstractButton <: AbstractWidget end
-
 
 """
 - {white bold}space, enter{/white bold}: press button
 """
-function key_press(b::AbstractButton, ::Enter) 
-    if b.status == :not_pressed 
+function key_press(b::AbstractButton, ::Enter)
+    if b.status == :not_pressed
         b.lastpressed = Dates.value(now())
         b.status = :pressed
     else
@@ -22,7 +19,52 @@ end
 
 key_press(b::AbstractButton, ::SpaceBar) = key_press(b, Enter())
 
-# ---------------------------------- button ---------------------------------- #
+"""
+    make_buttons_panels(
+        pressed_text_style,
+        pressed_background,
+        not_pressed_text_style,
+        width,
+        height,
+    )
+
+Create styled `Panel`s to visualize active/inactive buttons
+"""
+function make_buttons_panels(
+    pressed_text_style,
+    pressed_background,
+    not_pressed_text_style,
+    width,
+    height,
+)
+    pressed = Panel(
+        "{$pressed_text_style on_$pressed_background}" *
+        message *
+        "{/$pressed_text_style on_$pressed_background}";
+        style = pressed_text_style * " on_$pressed_background",
+        width = width,
+        height = height,
+        justify = :center,
+        background = pressed_background,
+        kwargs...,
+    )
+
+    not_pressed = Panel(
+        "{$not_pressed_text_style}" * message * "{/$not_pressed_text_style}";
+        style = not_pressed_text_style,
+        width = width,
+        height = height,
+        justify = :center,
+        kwargs...,
+    )
+
+    return pressed, not_pressed
+end
+
+# ---------------------------------------------------------------------------- #
+#                                    Button                                    #
+# ---------------------------------------------------------------------------- #
+# ------------------------------- constructors ------------------------------- #
 
 @with_repr mutable struct Button <: AbstractButton
     internals::LiveInternals
@@ -30,43 +72,39 @@ key_press(b::AbstractButton, ::SpaceBar) = key_press(b, Enter())
     pressed_display::Panel
     not_pressed_display::Panel
     status::Symbol
-    callback::Union{Nothing, Function}
+    callback::Union{Nothing,Function}
     lastpressed::Int
 end
-
 
 function Button(
     message::String;
     pressed_text_style = "bold white",
     pressed_background = "red",
     not_pressed_text_style = "red",
-    width::Int=10,
-    height::Int=3,
-    kwargs...
+    width::Int = 10,
+    height::Int = 3,
+    kwargs...,
 )
-    pressed = Panel(
-        "{$pressed_text_style on_$pressed_background}" * message * "{/$pressed_text_style on_$pressed_background}";
-        style=pressed_text_style * " on_$pressed_background",
-        width=width, height=height,
-        justify=:center, 
-        background=pressed_background,
-        kwargs...
-    )
-
-    not_pressed = Panel(
-        "{$not_pressed_text_style}" * message * "{/$not_pressed_text_style}";
-        style=not_pressed_text_style,
-        width=width, height=height,
-        justify=:center, 
-        kwargs...
+    pressed, not_pressed = make_buttons_panels(
+        pressed_text_style,
+        pressed_background,
+        not_pressed_text_style,
+        width,
+        height,
     )
 
     return Button(
-        LiveInternals(), Measure(height, width), pressed, not_pressed, :not_pressed, nothing, 0
+        LiveInternals(),
+        Measure(height, width),
+        pressed,
+        not_pressed,
+        :not_pressed,
+        nothing,
+        0,
     )
 end
 
-
+# ----------------------------------- frame ---------------------------------- #
 function frame(b::Button; kwargs...)
     return if b.status == :pressed
         currtime = Dates.value(now())
@@ -81,13 +119,10 @@ function frame(b::Button; kwargs...)
     end
 end
 
-
-
-
-
-# ------------------------------- toggle button ------------------------------ #
-
-
+# ---------------------------------------------------------------------------- #
+#                                 TOGGLE BUTTON                                #
+# ---------------------------------------------------------------------------- #
+# ------------------------------- constructors ------------------------------- #
 """
 A button. Pressing it toggles its status between 
 activated and not.
@@ -98,7 +133,7 @@ activated and not.
     pressed_display::Panel
     not_pressed_display::Panel
     status::Symbol
-    callback::Union{Nothing, Function}
+    callback::Union{Nothing,Function}
     lastpressed::Int
 end
 
@@ -107,33 +142,30 @@ function ToggleButton(
     pressed_text_style = "bold white",
     pressed_background = "red",
     not_pressed_text_style = "red",
-    width::Int=10,
-    height::Int=3,
-    kwargs...
+    width::Int = 10,
+    height::Int = 3,
+    kwargs...,
 )
-    pressed = Panel(
-        "{$pressed_text_style on_$pressed_background}" * message * "{/$pressed_text_style on_$pressed_background}";
-        style=pressed_text_style * " on_$pressed_background",
-        width=width, height=height,
-        justify=:center, 
-        background=pressed_background,
-        kwargs...
-    )
-
-    not_pressed = Panel(
-        "{$not_pressed_text_style}" * message * "{/$not_pressed_text_style}";
-        style=not_pressed_text_style,
-        width=width, height=height,
-        justify=:center, 
-        kwargs...
+    pressed, not_pressed = make_buttons_panels(
+        pressed_text_style,
+        pressed_background,
+        not_pressed_text_style,
+        width,
+        height,
     )
 
     return ToggleButton(
-        LiveInternals(), Measure(height, width), pressed, not_pressed, :not_pressed, nothing, 0
+        LiveInternals(),
+        Measure(height, width),
+        pressed,
+        not_pressed,
+        :not_pressed,
+        nothing,
+        0,
     )
 end
 
-
+# ----------------------------------- frame ---------------------------------- #
 function frame(b::ToggleButton; kwargs...)
     return if b.status == :pressed
         b.pressed_display
@@ -141,4 +173,3 @@ function frame(b::ToggleButton; kwargs...)
         b.not_pressed_display
     end
 end
-

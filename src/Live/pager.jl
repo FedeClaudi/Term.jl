@@ -1,3 +1,4 @@
+# ------------------------------- constructors ------------------------------- #
 """
 A `Pager` is a widget for visualizing long texts a few lines at the time. 
 It shows a few lines of a longer text and allows users to move up and down the text
@@ -13,20 +14,27 @@ using keys such as arrow up and arrow down.
     page_lines::Int
 end
 
+function Pager(
+    content::String;
+    page_lines::Int = min(console_height() - 5, 25),
+    title::String = "Term.jl PAGER",
+    width::Int = console_width(),
+    line_numbers::Bool = false,
+)
+    page_lines = min(page_lines, console_height() - 8)
 
-function Pager(content::String; page_lines::Int = min(console_height()-5, 25), title::String = "Term.jl PAGER", width::Int=console_width(), line_numbers::Bool=false)
-    page_lines = min(page_lines, console_height()-8)
+    line_numbers && (
+        content = join(
+            map(iln -> "{dim}$(iln[1])  {/dim}" * iln[2], enumerate(split(content, "\n"))),
+            "\n",
+        )
+    )
 
-    line_numbers && (content = join(map(iln -> "{dim}$(iln[1])  {/dim}" * iln[2], enumerate(split(content, "\n"))), "\n"))
-
-    content = split(
-        string(
-            RenderableText(content; width=width-6)
-        ), "\n")
+    content = split(string(RenderableText(content; width = width - 6)), "\n")
 
     return Pager(
         LiveInternals(),
-        Measure(page_lines+4, width),
+        Measure(page_lines + 4, width),
         content,
         title,
         length(content),
@@ -42,7 +50,7 @@ end
 
 Create a Panel with, as content, the currently visualized lines in the Pager.
 """
-function frame(pager::Pager; omit_panel=false)::AbstractRenderable
+function frame(pager::Pager; omit_panel = false)::AbstractRenderable
     i, Δi = pager.curr_line, pager.page_lines
 
     page = if Δi >= pager.tot_lines
@@ -54,32 +62,41 @@ function frame(pager::Pager; omit_panel=false)::AbstractRenderable
         page_lines = pager.page_lines
         scrollbar_lines = min(pager.page_lines, 6)
         scrollbar_lines_half = scrollbar_lines // 2
-        scrollbar = vLine(scrollbar_lines; style="white on_white")
-    
-        p = (i)/(pager.tot_lines-Δi)  # progress in the file
+        scrollbar = vLine(scrollbar_lines; style = "white on_white")
+
+        p = (i) / (pager.tot_lines - Δi)  # progress in the file
         # p = min(p, 0.99)
 
         scrollbar_center = scrollbar_lines_half + p * (page_lines - scrollbar_lines)
 
         # scrollbar_center = p * (page_lines) |> round |> Int
         nspaces_above = max(0, scrollbar_center - scrollbar_lines_half) |> round |> Int
-        nspaces_below = max(0, page_lines - scrollbar_lines - nspaces_above) |> round |> Int
-    
+        nspaces_below =
+            max(0, page_lines - scrollbar_lines - nspaces_above) |> round |> Int
+
         scrollbar = if nspaces_above == 0
-            below = RenderableText(join(repeat([" \n"], nspaces_below+1)); style="on_gray23")
+            below = RenderableText(
+                join(repeat([" \n"], nspaces_below + 1));
+                style = "on_gray23",
+            )
             scrollbar / below
         elseif nspaces_below == 0
-            above = RenderableText(join(repeat([" \n"], nspaces_above+1)); style="on_gray23")
+            above = RenderableText(
+                join(repeat([" \n"], nspaces_above + 1));
+                style = "on_gray23",
+            )
             above / scrollbar
         else
-            above = RenderableText(join(repeat([" \n"], nspaces_above)); style="on_gray23")
-            below = RenderableText(join(repeat([" \n"], nspaces_below)); style="on_gray23")
+            above = RenderableText(join(repeat([" \n"], nspaces_above)); style = "on_gray23")
+            below = RenderableText(
+                join(repeat([" \n"], nspaces_below));
+                style = "on_gray23",
+            )
             scrollbar = above / scrollbar / below
         end
 
         page_content * scrollbar
     end
-
 
     # return content
     omit_panel && return "  " * RenderableText(page)
@@ -141,7 +158,7 @@ key_press(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
 
 - {bold white}h{/bold white}: toggle help message display
 """
-function key_press(p::Pager, c::Char)::Tuple{Bool, Nothing}
+function key_press(p::Pager, c::Char)::Tuple{Bool,Nothing}
     c == ']' && key_press(p, ArrowRight())
     c == '[' && key_press(p, ArrowLeft())
 
@@ -150,7 +167,7 @@ function key_press(p::Pager, c::Char)::Tuple{Bool, Nothing}
 
     c == 'q' && return (true, nothing)
     c == 'h' && begin
-    toggle_help(p)
+        toggle_help(p)
         return (false, nothing)
     end
     return (false, nothing)

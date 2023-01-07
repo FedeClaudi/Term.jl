@@ -7,7 +7,6 @@ using Term.Compositors
 
 import Term.LiveWidgets: AbstractWidget, KeyInput, ArrowRight, ArrowLeft, ArrowUp, ArrowDown
 
-
 filepath = "././src/live/abstract_widget.jl"
 code = load_code_and_highlight(filepath)
 text = """
@@ -18,40 +17,45 @@ Quisque maximus purus ex, id congue ante egestas nec. Phasellus id finibus augue
 Curabitur mattis malesuada sapien, eget faucibus risus. Suspendisse mattis, velit id vehicula pretium, tortor odio fermentum magna, id fringilla est tellus id tellus. Nam mattis sem urna, id volutpat lacus maximus eu. Nullam a orci eu quam accumsan rhoncus molestie a dolor. Morbi faucibus hendrerit quam, sodales ullamcorper nunc. Vivamus aliquet quam leo, sit amet gravida nisl cursus vitae. Nulla justo justo, varius non dignissim nec, egestas non erat. Quisque interdum magna id eros efficitur mollis. Maecenas tincidunt risus at nisl aliquam suscipit. Mauris odio dolor, consectetur a rutrum ac, gravida id ligula. Nulla ac sapien erat. Morbi aliquet arcu sed eros semper sollicitudin. 
 """
 
-
-layout = :(
-    (A(20, $(0.6)) * B(20, $(0.4)))/
-    (C(5, 0.8) * D(5, 0.2))
-    
-    )
+layout = :((A(20, $(0.6)) * B(20, $(0.4))) / (C(5, 0.8) * D(5, 0.2)))
 compositor = Compositor(layout)
 # print(compositor)
 
-
-widgets = Dict{Symbol, AbstractWidget}(
-    :A => TextWidget(text; width=compositor.elements[:A].w, height=compositor.elements[:A].h-1, as_panel=true),
-    :B => Pager(text; width=compositor.elements[:B].w, page_lines=compositor.elements[:B].h-5),
-    :C => InputBox(; width=compositor.elements[:C].w, height=compositor.elements[:C].h-1),
-    :D => Button("launch"; width=compositor.elements[:D].w, height=compositor.elements[:D].h-1),
+widgets = Dict{Symbol,AbstractWidget}(
+    :A => TextWidget(
+        text;
+        width = compositor.elements[:A].w,
+        height = compositor.elements[:A].h - 1,
+        as_panel = true,
+    ),
+    :B => Pager(
+        text;
+        width = compositor.elements[:B].w,
+        page_lines = compositor.elements[:B].h - 5,
+    ),
+    :C => InputBox(;
+        width = compositor.elements[:C].w,
+        height = compositor.elements[:C].h - 1,
+    ),
+    :D => Button(
+        "launch";
+        width = compositor.elements[:D].w,
+        height = compositor.elements[:D].h - 1,
+    ),
 )
 
-
-transition_rules = Dict{Tuple{Symbol, KeyInput},Symbol}(
+transition_rules = Dict{Tuple{Symbol,KeyInput},Symbol}(
     (:A, ArrowRight()) => :B,
     (:A, ArrowDown()) => :C,
-    
     (:B, ArrowLeft()) => :A,
     (:B, ArrowDown()) => :C,
-
     (:C, ArrowUp()) => :A,
     (:C, ArrowRight()) => :D,
-    
     (:D, ArrowUp()) => :A,
     (:D, ArrowLeft()) => :C,
 )
 
 app = App(layout, widgets, transition_rules)
-
 
 play(app)
 

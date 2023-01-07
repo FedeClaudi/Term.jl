@@ -12,19 +12,24 @@ Multiple pagers are visualized via a Gallry widget.
 filepath1 = "././src/live/abstract_widget.jl"
 filepath2 = "././src/live/_input.jl"
 
-
 gallery = Gallery(
     [
-        Pager(load_code_and_highlight(filepath1); 
-                    page_lines = 40, title = filepath1, line_numbers=true,
-            width = console_width()-6,
+        Pager(
+            load_code_and_highlight(filepath1);
+            page_lines = 40,
+            title = filepath1,
+            line_numbers = true,
+            width = console_width() - 6,
         ),
-        Pager(load_code_and_highlight(filepath2); 
-                    page_lines = 40, title = filepath2, line_numbers=true,
-            width = console_width()-6,
+        Pager(
+            load_code_and_highlight(filepath2);
+            page_lines = 40,
+            title = filepath2,
+            line_numbers = true,
+            width = console_width() - 6,
         ),
     ];
-    height=50
+    height = 50,
 )
 
-LiveWidgets.play(gallery; transient=true)
+LiveWidgets.play(gallery; transient = true)

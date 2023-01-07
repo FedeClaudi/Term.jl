@@ -15,7 +15,6 @@ struct SpaceBar <: KeyInput end
 struct Esc <: KeyInput end
 struct Del <: KeyInput end
 
-
 KEYs = Dict{Int,KeyInput}(
     13 => Enter(),
     27 => Esc(),
@@ -32,7 +31,6 @@ KEYs = Dict{Int,KeyInput}(
     1008 => PageDownKey(),
 )
 
-
 """
 toggle_help(live::AbstractWidget; help_widget::Union{Nothing, AbstractWidget}=nothing)
 
@@ -44,7 +42,7 @@ directly specify for which widget to look up the help message for with `help_wid
 The help message itself is made up of the docstring for the `live` struct and the docstrings
 of all methods for `key_press(typeof(live), ::Any)`.
 """
-function toggle_help(live; help_widget=nothing)
+function toggle_help(live; help_widget = nothing)
     internals = live.internals
     help_widget = something(help_widget, live)
 
@@ -59,7 +57,7 @@ function toggle_help(live; help_widget=nothing)
         try
             sig = m.sig.types[3]
             sig ∈ added_sigs && return ""
-            docstr = dcs[bd].docs[Tuple{m.sig.types[2], m.sig.types[3]}].text[1]
+            docstr = dcs[bd].docs[Tuple{m.sig.types[2],m.sig.types[3]}].text[1]
             push!(added_sigs, sig)
             return docstr
         catch
@@ -68,33 +66,32 @@ function toggle_help(live; help_widget=nothing)
     end
 
     width = console_width()
-    methods_docs = map(
-        m -> RenderableText(get_method_docstring(m); width=width-10),
-        key_methods
-    )  
+    methods_docs =
+        map(m -> RenderableText(get_method_docstring(m); width = width - 10), key_methods)
 
     # compose help tooltip
-    docstring = RenderableText(getdocs(help_widget); width=width-10)
-    help_message = isnothing(help_widget.internals.help_message) ? docstring : docstring / RenderableText(help_widget.internals.help_message; width=width-10)
+    docstring = RenderableText(getdocs(help_widget); width = width - 10)
+    help_message =
+        isnothing(help_widget.internals.help_message) ? docstring :
+        docstring / RenderableText(help_widget.internals.help_message; width = width - 10)
 
-    messages =  [
-        RenderableText(md"#### Widget description"; width=width-10),
+    messages = [
+        RenderableText(md"#### Widget description"; width = width - 10),
         help_message,
-        "",        RenderableText(md"#### Controls "; width=width-10),
-        methods_docs...
-        ]
-
+        "",
+        RenderableText(md"#### Controls "; width = width - 10),
+        methods_docs...,
+    ]
 
     # create full message
     help_message = Panel(
-        messages; 
-        width=width,
-        title="$(typeof(help_widget)) help",
-        title_style="default bold blue",
-        title_justify=:center,
-        style="dim",
-        )
-
+        messages;
+        width = width,
+        title = "$(typeof(help_widget)) help",
+        title_style = "default bold blue",
+        title_justify = :center,
+        style = "dim",
+    )
 
     # show/hide message
     if internals.help_shown
@@ -102,7 +99,9 @@ function toggle_help(live; help_widget=nothing)
         internals.help_shown = false
 
         # go to the top of the error message and delete everything
-        h = console_height() - length(internals.prevcontentlines) - help_message.measure.h - 1
+        h =
+            console_height() - length(internals.prevcontentlines) - help_message.measure.h -
+            1
         move_to_line(stdout, h)
         cleartoend(stdout)
 
@@ -119,7 +118,6 @@ function toggle_help(live; help_widget=nothing)
     internals.prevcontentlines = String[]
 end
 
-
 """
     keyboard_input(live::AbstractWidget)
 
@@ -132,12 +130,12 @@ for the `AbstractWidget` with the corresponding
 use that.
 If the input was `q` it signals that the display should be stopped
 """
-function keyboard_input(live)::Tuple{Bool, Any}
+function keyboard_input(live)::Tuple{Bool,Any}
     if bytesavailable(terminal.in_stream) > 0
         c = readkey(terminal.in_stream) |> Int
 
         c in keys(KEYs) && begin
-            key = KEYs[Int(c)]    
+            key = KEYs[Int(c)]
             retval = key_press(live, key)
             return (live.internals.should_stop, retval)
         end

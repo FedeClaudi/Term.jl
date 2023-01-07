@@ -36,18 +36,17 @@ each `LayoutElement` if there is one, the placeholder otherwise.
     placeholder::PlaceHolder
 
     function LayoutElement(
-            id::Symbol,
-            h::Number,
-            w::Number,
-            renderable::Union{Nothing,String,AbstractRenderable},
-            placeholder::PlaceHolder)
-            h = h isa Int ? h : fint(console_height() * h)
-            w = w isa Int ? w : fint(console_width() * w)
-            return new(id, h,w, renderable, placeholder)
+        id::Symbol,
+        h::Number,
+        w::Number,
+        renderable::Union{Nothing,String,AbstractRenderable},
+        placeholder::PlaceHolder,
+    )
+        h = h isa Int ? h : fint(console_height() * h)
+        w = w isa Int ? w : fint(console_width() * w)
+        return new(id, h, w, renderable, placeholder)
     end
 end
-
-
 
 Base.size(e::LayoutElement) = (e.h, e.w)
 
@@ -150,8 +149,8 @@ function update!(
 
     # if content is too small, pad it
     elem = compositor.elements[id]
-    height(content) < elem.h && (content = vertical_pad(content; height=elem.h))
-    width(content) < elem.w && (content = pad(content; width=elem.w, method=:center))
+    height(content) < elem.h && (content = vertical_pad(content; height = elem.h))
+    width(content) < elem.w && (content = pad(content; width = elem.w, method = :center))
 
     # check that the shapes match
     if elem.w > width(content) || elem.h > height(content)

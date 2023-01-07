@@ -100,15 +100,10 @@ This is where you print the content of your foot notes:
 """,
 )
 
+page1 = Pager(text; width = 80)
+page2 = Pager(text; width = 80)
+page3 = Pager(text; width = 80)
 
-page1 = Pager(text; width=80)
-page2 = Pager(text; width=80)
-page3 = Pager(text; width=80)
-
-gallery = Gallery(
-    [page1, page2, page3]
-)
+gallery = Gallery([page1, page2, page3])
 play(gallery)
 println("done")
-
-

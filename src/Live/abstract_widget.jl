@@ -1,69 +1,18 @@
-abstract type AbstractWidget end
-
-# ---------------------------------------------------------------------------- #
-#                                LIVE INTERNALS                                #
-# ---------------------------------------------------------------------------- #
-"""
-struct LiveInternals
-    iob::IOBuffer
-    ioc::IOContext
-    term::AbstractTerminal
-    prevcontent::Union{Nothing, AbstractRenderable, String}
-    prevcontentlines::Vector{String}
-    raw_mode_enabled::Bool
-    last_update::Union{Nothing, Int}
-    refresh_Δt::Int
-    help_shown::Bool
-end
-
-`LiveInternals` handles "under the hood" work for live widgets. 
-It takes care of keeping track of information such as the content
-displayed at the last refresh of the widget to inform the printing
-of the widget's content at the next refresh.
-
-LiveInternals also holds linked_widgets which can be used to link to 
-other widgets to access their internal variables.
-"""
-@with_repr mutable struct LiveInternals
-    iob::IOBuffer
-    ioc::IOContext
-    term::AbstractTerminal
-    prevcontent::Union{Nothing, AbstractRenderable}
-    prevcontentlines::Vector{String}
-    raw_mode_enabled::Bool
-    last_update::Union{Nothing, Int}
-    refresh_Δt::Int
-    help_shown::Bool
-    help_message::Union{Nothing, String}
-    should_stop::Bool
-
-    function LiveInternals(; refresh_rate::Int=60, help_message=nothing)
-        # get output buffers
-        iob = IOBuffer()
-        ioc = IOContext(iob, :displaysize=>displaysize(stdout))
-
-        # prepare terminal 
-        raw_mode_enabled = try
-            raw!(terminal, true)
-            true
-        catch err
-            @debug "Unable to enter raw mode: " exception=(err, catch_backtrace())
-            false
-        end
-
-        # hide the cursor
-        raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
-        return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate), false, help_message, false,)
-    end
-end
-
 # ---------------------------------------------------------------------------- #
 #                                ABSTRACT WIDGET                               #
 # ---------------------------------------------------------------------------- #
+"""
+    AbstractWidget
 
+Abstract widgets must have two onligatory fields:
+
+    internals::LiveInternals
+    measure::Measure
+"""
+abstract type AbstractWidget end
 
 """
-Get the current conttent of a live display
+Get the current conttent of a widget
 """
 frame(::AbstractWidget) = error("Not implemented")
 
@@ -77,14 +26,17 @@ function keypress end
 key_press(::AbstractWidget, ::KeyInput) = nothing
 
 """
-- {bold white}enter, esc{/bold white}: quit program, possibly returning a value
+- {bold white}enter{/bold white}: quit program, possibly returning a value
 """
-function key_press(live::AbstractWidget, ::Enter) 
+function key_press(live::AbstractWidget, ::Enter)
     live.internals.should_stop = true
     return nothing
 end
 
-function key_press(live::AbstractWidget, ::Esc) 
+"""
+- {bold white}esc{/bold white}: quit program, without returning a value
+"""
+function key_press(live::AbstractWidget, ::Esc)
     live.internals.should_stop = true
     return nothing
 end
@@ -94,15 +46,14 @@ end
 
 - {bold white}h{/bold white}: toggle help message display
 """
-function key_press(live::AbstractWidget, c::Char)::Tuple{Bool, Nothing}
+function key_press(live::AbstractWidget, c::Char)::Tuple{Bool,Nothing}
     c == 'q' && return (true, nothing)
     c == 'h' && begin
-    toggle_help(live)
+        toggle_help(live)
         return (false, nothing)
     end
     return (false, nothing)
 end
-
 
 """
     shouldupdate(live::AbstractWidget)::Bool
@@ -146,13 +97,11 @@ function replace_line(internals::LiveInternals, newline)
     println(internals.ioc, newline)
 end
 
-
 # function read_stdout_output(internals::LiveInternals)
 #     write(internals.ioc, internals.pipe)
 #     out = String(take!(internals.ioc))
 #     length(out) > 0 ? out : nothing
 # end
-
 
 """
     refresh!(live::AbstractWidget)::Tuple{Bool, Any}
@@ -165,7 +114,7 @@ a discrepancy occurs the lines gets re-written.
 This is all done printing to a buffer first and then to `stdout` to avoid
 jitter.
 """
-function refresh!(live::AbstractWidget)::Tuple{Bool, Any}
+function refresh!(live::AbstractWidget)::Tuple{Bool,Any}
     # check for keyboard inputs
     shouldstop, retval = keyboard_input(live)
     shouldstop && return (false, retval)
@@ -175,10 +124,11 @@ function refresh!(live::AbstractWidget)::Tuple{Bool, Any}
 
     # get new content
     internals = live.internals
-    content::Union{String, AbstractRenderable} = frame(live)
+    content::Union{String,AbstractRenderable} = frame(live)
     content_lines::Vector{String} = split(string(content), "\n")
     nlines::Int = length(content_lines)
-    nlines_prev::Int = isnothing(internals.prevcontentlines) ? 0 : length(internals.prevcontentlines)
+    nlines_prev::Int =
+        isnothing(internals.prevcontentlines) ? 0 : length(internals.prevcontentlines)
     old_lines = internals.prevcontentlines
     nlines_prev == 0 && print(internals.ioc, "\n")
 
@@ -190,15 +140,17 @@ function refresh!(live::AbstractWidget)::Tuple{Bool, Any}
     up(internals.ioc, nlines_prev)
     for i in 1:nlines
         line = content_lines[i]
-        
+
         # avoid re-writing unchanged lines
-        !isnothing(internals.prevcontent) && nlines_prev > i && begin
-            old_line = old_lines[i]
-            line == old_line && begin
-                down(internals.ioc)
-                continue
+        !isnothing(internals.prevcontent) &&
+            nlines_prev > i &&
+            begin
+                old_line = old_lines[i]
+                line == old_line && begin
+                    down(internals.ioc)
+                    continue
+                end
             end
-        end
 
         # re-write line
         replace_line(internals, line)
@@ -240,21 +192,89 @@ function stop!(live::AbstractWidget)
     nothing
 end
 
-
 """
     play(live::AbstractWidget; transient::Bool=true)
 
 Keep refreshing a renderable, until the user interrupts it. 
 """
-function play(live::AbstractWidget; transient::Bool=true)
+function play(live::AbstractWidget; transient::Bool = true)
     Base.start_reading(stdin)
 
     retval = nothing
     while true
-        should_continue, retval = refresh!(live) 
+        should_continue, retval = refresh!(live)
         should_continue || break
     end
     stop!(live)
     transient && erase!(live)
     return retval
+end
+
+# ---------------------------------------------------------------------------- #
+#                                LIVE INTERNALS                                #
+# ---------------------------------------------------------------------------- #
+"""
+struct LiveInternals
+    iob::IOBuffer
+    ioc::IOContext
+    term::AbstractTerminal
+    prevcontent::Union{Nothing, AbstractRenderable, String}
+    prevcontentlines::Vector{String}
+    raw_mode_enabled::Bool
+    last_update::Union{Nothing, Int}
+    refresh_Δt::Int
+    help_shown::Bool
+end
+
+`LiveInternals` handles "under the hood" work for live widgets. 
+It takes care of keeping track of information such as the content
+displayed at the last refresh of the widget to inform the printing
+of the widget's content at the next refresh.
+
+LiveInternals also holds linked_widgets which can be used to link to 
+other widgets to access their internal variables.
+"""
+@with_repr mutable struct LiveInternals
+    iob::IOBuffer
+    ioc::IOContext
+    term::AbstractTerminal
+    prevcontent::Union{Nothing,AbstractRenderable}
+    prevcontentlines::Vector{String}
+    raw_mode_enabled::Bool
+    last_update::Union{Nothing,Int}
+    refresh_Δt::Int
+    help_shown::Bool
+    help_message::Union{Nothing,String}
+    should_stop::Bool
+
+    function LiveInternals(; refresh_rate::Int = 60, help_message = nothing)
+        # get output buffers
+        iob = IOBuffer()
+        ioc = IOContext(iob, :displaysize => displaysize(stdout))
+
+        # prepare terminal 
+        raw_mode_enabled = try
+            raw!(terminal, true)
+            true
+        catch err
+            @debug "Unable to enter raw mode: " exception = (err, catch_backtrace())
+            false
+        end
+
+        # hide the cursor
+        raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
+        return new(
+            iob,
+            ioc,
+            terminal,
+            nothing,
+            String[],
+            raw_mode_enabled,
+            nothing,
+            (Int ∘ round)(1000 / refresh_rate),
+            false,
+            help_message,
+            false,
+        )
+    end
 end
