@@ -12,17 +12,22 @@ mutable struct TabViewer <: AbstractWidget
 end
 
 
-function TabViewer(titles::Vector, tabs::Vector)
+function TabViewer(titles::Vector, tabs::Vector; kwargs...)
     @assert length(titles) == length(tabs)
 
-    tabs_width = map(t -> t.measure.w, tabs) |> maximum
-    tabs_height = map(t -> t.measure.h, tabs) |> maximum
-    @assert tabs_width <= console_width()-26 "Not enough space to render tab viewer"
+    if length(tabs) > 1
+        tabs_width = map(t -> t.measure.w, tabs) |> maximum
+        tabs_height = map(t -> t.measure.h, tabs) |> maximum
+    else
+        tabs_height, tabs_width = tabs[1].measure.h, tabs[1].measure.w
+    end
+    minwidth = console_width()-26
+    @assert tabs_width <= minwidth "Not enough space to render tab viewer. got $tabs_width instead of $minwidth"
     measure = Measure(
         tabs_height + 4,
         tabs_width,
     )
-    return TabViewer(LiveInternals(), measure, ButtonsMenu(titles; width=15), tabs, :menu)
+    return TabViewer(LiveInternals(), measure, ButtonsMenu(titles; width=15, kwargs...), tabs, :menu)
 end
 
 function frame(tb::TabViewer; kwargs...)
@@ -34,7 +39,7 @@ function frame(tb::TabViewer; kwargs...)
         style = tb.context == :tab ? "dim" : "hidden"
 
     )
-    mn = Panel(frame(tb.menu); 
+    mn = Panel(string(frame(tb.menu)); 
         width=tb.menu.measure.w+2, height=tb.measure.h,
         padding=(0, 0, 1, 1),
         style = tb.context != :tab ? "dim" : "hidden",

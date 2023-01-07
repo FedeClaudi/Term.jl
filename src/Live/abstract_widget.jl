@@ -52,7 +52,6 @@ other widgets to access their internal variables.
 
         # hide the cursor
         raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
-
         return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate), false, false,)
     end
 end
@@ -230,6 +229,8 @@ end
 Restore normal terminal behavior.
 """
 function stop!(live::AbstractWidget)
+    Base.stop_reading(stdin)
+
     internals = live.internals
     print(internals.term.out_stream, "\x1b[?25h") # unhide cursor
     raw!(internals.term, false)
@@ -243,6 +244,8 @@ end
 Keep refreshing a renderable, until the user interrupts it. 
 """
 function play(live::AbstractWidget; transient::Bool=true)
+    Base.start_reading(stdin)
+
     retval = nothing
     while true
         should_continue, retval = refresh!(live) 

@@ -4,7 +4,6 @@ using REPL.Terminals: raw!, AbstractTerminal
 using Dates
 import Base.Docs: doc as getdocs
 using Markdown
-Base.start_reading(stdin)
 
 import MyterialColors: pink
 

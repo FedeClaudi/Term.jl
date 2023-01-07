@@ -26,7 +26,7 @@ import ..Tprint: tprintln
 import ..Repr: termshow
 using ..LiveWidgets
 import ..TermMarkdown: parse_md
-import ..Consoles: console_width
+import ..Consoles: console_width, console_height
 import ..Style: apply_style
 
 include("_inspect.jl")
@@ -166,31 +166,34 @@ function inspect(
     type_name = apply_style(string(T), theme.repr_name * " bold")
 
 
+    # create tabview widget
+    tabwidth = console_width() - 26
+    tab_height = 25
+    info = string(
+        Panel(type_name / ("  " * line * fields); fit=false, 
+                width=tabwidth-10, justify=:center,
+                title="Fields", title_style="bright_blue bold",
+                style="bright_blue dim"
+        ) /
+        hLine(tabwidth-10; style="dim") / 
+        "" /
+        Tree(T))
+
     tv = TabViewer(
+        ["Info",  "Docs", "Constructors", "Methods"],
         [
-            PagerTab("Info", 
-                string(
-                Panel(type_name / ("  " * line * fields); fit=false, 
-                        width=console_width()-33, justify=:center,
-                        title="Fields", title_style="bright_blue bold",
-                        style="bright_blue dim"
-                ) /
-                hLine(console_width()-33; style="dim") / 
-                "" /
-                Tree(T))
-            
-            ),
-            PagerTab("documentation", parse_md(get_docstring(T)[1]; width=console_width()-33)),
-            PagerTab("Constructors", constructors_content),
-            PagerTab("Methods", supertypes_methods),
-        ]
+        Pager(info; width=tabwidth, page_lines=tab_height), 
+        Pager(parse_md(get_docstring(T)[1]); width=tabwidth, page_lines=tab_height), 
+        Pager(constructors_content; width=tabwidth, page_lines=tab_height), 
+        Pager(supertypes_methods; width=tabwidth, page_lines=tab_height)
+        ];
+        active_background=[theme.text_accent, theme.docstring, theme.func, theme.func], 
+        active_color="bold black",
+        inactive_color=[theme.text_accent, theme.docstring, theme.func, theme.func],
+
     )
-
-
-    LiveDisplays.play(tv) 
-
+    play(tv; transient=false) 
     stop!(tv)
-    println("done")
 end
 
 function inspect(F::Function; documentation::Bool = true)

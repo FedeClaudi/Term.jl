@@ -110,37 +110,52 @@ Styling reflects which option is currently selected
     function ButtonsMenu(
         titles::Vector;
         width=default_width(),
-        active_color::String="black",
-        active_background::String="white",
-        inactive_color::String="dim",
+        active_color::Union{Vector, String}="black",
+        active_background::Union{Vector, String}="white",
+        inactive_color::Union{Vector, String}="dim",
+        inactive_background::Union{Vector, String}="default",
         justify::Symbol=:center,
         box::Symbol = :SQUARE,
         panel_kwargs...
         )
+        n = length(titles)
+        active_color = active_color isa String ? repeat([active_color], n) : active_color
+        active_background = active_background isa String ? repeat([active_background], n) : active_background
+        inactive_color = inactive_color isa String ? repeat([inactive_color], n) : inactive_color
+        inactive_background = inactive_background isa String ? repeat([inactive_background], n) : inactive_background
+        @assert length(active_color) == n  "Incorrect number of values for `active_color`"
+        @assert length(active_background) == n  "Incorrect number of values for `active_background`"
+        @assert length(inactive_color) == n  "Incorrect number of values for `inactive_color`"
+        @assert length(inactive_background) == n  "Incorrect number of values for `inactive_background`"
         
-        active_titles = map(t -> 
-            Panel(
-                    "{$(active_color) on_$(active_background)}"*t*"{/$(active_color) on_$(active_background)}";
-                    background=active_background,
-                    style="$(active_color) on_$(active_background)",
+        
+        active_titles, inactive_titles = String[], String[]
+        
+        for (i, t) in enumerate(titles)
+            push!(active_titles,
+                Panel(
+                        "{$(active_color[i]) on_$(active_background[i])}"*t*"{/$(active_color[i]) on_$(active_background[i])}";
+                        background=active_background[i],
+                        style="$(active_color[i]) on_$(active_background[i])",
+                        width=width,
+                        justify=justify,
+                        box=box,
+                        padding=(1, 1, 1, 1)
+                )  |> string 
+            )
+
+            push!(inactive_titles,
+                Panel(
+                    "{$(inactive_color[i]) on_$(inactive_background[i])}"*t*"{/$(inactive_color[i]) on_$(inactive_background[i])}";
+                    background=inactive_background[i],
+                    style=inactive_color[i],
                     width=width,
                     justify=justify,
                     box=box,
                     padding=(1, 1, 1, 1)
+            ) |> string 
             )
-            , titles) .|> string |> collect
-
-        inactive_titles = map(t -> 
-        Panel(
-            t;
-            background="default",
-            style=inactive_color,
-            width=width,
-            justify=justify,
-            box=box,
-            padding=(1, 1, 1, 1)
-    )
-            , titles) .|> string |> collect
+        end
     
         return new(
             LiveInternals(), 

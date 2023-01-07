@@ -6,6 +6,7 @@ import Term: load_code_and_highlight
 
 # clear() 
 
+using Term
+using Term.Introspection
 
-
-LiveWidgets.play(InputBox())
+inspect(Panel)

@@ -11,7 +11,10 @@ mn = if retval == 1
     SimpleMenu(["One", "Two", "Three"]; active_style="white bold",inactive_style="dim",)
 elseif retval == 2
     println("\n This is an example of a ButtonsMenu")
-    ButtonsMenu(["One", "Two", "Three"]; width=20)
+    ButtonsMenu(["One", "Two", "Three"]; width=20, 
+            active_background=["green", "white", "red"], active_color="bold black",
+            inactive_color=["green", "white", "red"],
+            )
 elseif retval == 3
     println("\n This is an example of a MultiSelectMenu")
     MultiSelectMenu(["One ",  "two", "three"])
