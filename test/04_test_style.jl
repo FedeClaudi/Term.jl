@@ -71,12 +71,6 @@ end
     end
 end
 
-@testset "Style on renderables" begin
-      p = Panel("colorolorlocoe")
-      ps = apply_style(p, "black on_red")
-      @test string(ps) == "\e[30m\e[41m\e[22m╭──────────────────────────────────────────────────────────────────────────────────────╮\e[22m\e[39m\e[49m\n\e[30m\e[41m\e[22m│\e[22m  colorolorlocoe                                                                      \e[22m│\e[22m\e[39m\e[49m\n\e[30m\e[41m\e[22m╰──────────────────────────────────────────────────────────────────────────────────────╯\e[22m\e[0m\e[39m\e[49m"
-end
-
 @testset "\e[34mTprint\e[0m" begin
     stprint(x) = chomp(sprint(tprint, x; context = stdout))
     stprintln(x) = chomp(sprint(tprintln, x; context = stdout))

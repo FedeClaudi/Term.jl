@@ -15,7 +15,7 @@ import ..Measures: width as get_width
 using ..Consoles
 import ..Repr: @with_repr, termshow
 import ..Style: apply_style
-import ..Layout: Spacer, vLine, vstack
+import ..Layout: Spacer, vLine, vstack, hLine
 import ..Compositors: Compositor, render, update!
 
 export AbstractWidget, refresh!, play, key_press, shouldupdate, frame, stop!

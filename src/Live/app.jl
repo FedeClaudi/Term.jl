@@ -33,9 +33,7 @@ end
 function frame(app::App; kwargs...)
     for (name, widget) in pairs(app.widgets)
         content = frame(widget)
-        background = app.active == name ? "red" : "default"
-        content = apply_style(content, "on_$background")
-
+        content = app.active == name ? hLine(content.measure.w)/content : "" / content
         update!(app.compositor, name, content)
     end
     return render(app.compositor)

@@ -52,7 +52,7 @@ function frame(pager::Pager; omit_panel=false)::AbstractRenderable
 
         # make a scroll bar
         page_lines = pager.page_lines
-        scrollbar_lines = 6
+        scrollbar_lines = min(pager.page_lines, 6)
         scrollbar_lines_half = scrollbar_lines // 2
         scrollbar = vLine(scrollbar_lines; style="white on_white")
     
@@ -87,7 +87,7 @@ function frame(pager::Pager; omit_panel=false)::AbstractRenderable
         page,
         fit = false,
         width = pager.measure.w,
-        padding = (2, 0, 1, 1),
+        padding = (2, 0, 1, 0),
         subtitle = "Lines: $i:$(i+Δi) of $(pager.tot_lines)",
         subtitle_style = "bold dim",
         subtitle_justify = :right,
@@ -99,14 +99,14 @@ end
 
 # --------------------------------- controls --------------------------------- #
 """
-- {bold white}arrow down{/bold white}: move to the next line
+- {bold white}arrow down, '.'{/bold white}: move to the next line
 """
 function key_press(p::Pager, ::ArrowDown)
     p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + 1)
 end
 
 """
-- {bold white}arrow up{/bold white}: move to the previous line
+- {bold white}arrow up, ','{/bold white}: move to the previous line
 """
 function key_press(p::Pager, ::ArrowUp)
     p.curr_line = max(1, p.curr_line - 1)
@@ -144,6 +144,9 @@ key_press(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
 function key_press(p::Pager, c::Char)::Tuple{Bool, Nothing}
     c == ']' && key_press(p, ArrowRight())
     c == '[' && key_press(p, ArrowLeft())
+
+    c == ',' && key_press(p, ArrowLeft())
+    c == '.' && key_press(p, ArrowRight())
 
     c == 'q' && return (true, nothing)
     c == 'h' && begin
