@@ -21,7 +21,7 @@ import ..Layout: Spacer, vLine, vstack
 export AbstractWidget, refresh!, play, key_press, shouldupdate, frame, stop!
 export Pager, TabViewer
 export SimpleMenu, ButtonsMenu, MultiSelectMenu
-export InputBox, TextWidget
+export InputBox, TextWidget, Button
 
 include("input.jl")
 include("abstract_widget.jl")

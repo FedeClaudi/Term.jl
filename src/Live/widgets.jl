@@ -101,3 +101,69 @@ function key_press(ib::InputBox, c::Char)::Tuple{Bool, Nothing}
     end
     return (false, nothing)
 end
+
+
+# ---------------------------------------------------------------------------- #
+#                                    BUTTON                                    #
+# ---------------------------------------------------------------------------- #
+
+"""
+A button. 
+"""
+@with_repr mutable struct Button <: AbstractWidget
+    internals::LiveInternals
+    measure::Measure
+    pressed_display::Panel
+    not_pressed_display::Panel
+    status::Symbol
+    callback::Union{Nothing, Function}
+end
+
+
+function Button(
+    message::String;
+    pressed_text_style = "bold white",
+    pressed_background = "red",
+    not_pressed_text_style = "red",
+    width::Int=10,
+    height::Int=3,
+    kwargs...
+)
+    pressed = Panel(
+        "{$pressed_text_style on_$pressed_background}" * message * "{/$pressed_text_style on_$pressed_background}";
+        style=pressed_text_style * " on_$pressed_background",
+        width=width, height=height,
+        background=pressed_background,
+        kwargs...
+    )
+
+    not_pressed = Panel(
+        "{$not_pressed_text_style}" * message * "{/$not_pressed_text_style}";
+        style=not_pressed_text_style,
+        width=width, height=height,
+        kwargs...
+    )
+
+    return Button(
+        LiveInternals(), Measure(height, width), pressed, not_pressed, :not_pressed, nothing
+    )
+end
+
+
+function frame(b::Button; kwargs...)
+    return if b.status == :pressed
+        b.pressed_display
+    else
+        b.not_pressed_display
+    end
+end
+
+function key_press(b::Button, ::Enter) 
+    if b.status == :not_pressed 
+        b.status = :pressed
+    else
+        b.status = :not_pressed
+        isnothing(b.callback) || return b.callback(b)
+    end
+    return nothing
+end

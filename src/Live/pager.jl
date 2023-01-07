@@ -21,7 +21,7 @@ function Pager(content::String; page_lines::Int = 10, title::String = "Term.jl P
 
     content = split(
         string(
-            RenderableText(content; width=width-8)
+            RenderableText(content; width=width-6)
         ), "\n")
 
     return Pager(
@@ -48,8 +48,6 @@ function frame(pager::Pager; omit_panel=false)::AbstractRenderable
     page = if Δi >= pager.tot_lines
         join(pager.content, "\n")
     else
-
-    
         page_content = join(pager.content[i:min(pager.tot_lines, i + Δi)], "\n")
 
         # make a scroll bar
@@ -70,9 +68,9 @@ function frame(pager::Pager; omit_panel=false)::AbstractRenderable
 
 
     # return content
-    omit_panel && return RenderableText(page)
+    omit_panel && return "  " * RenderableText(page)
     return Panel(
-        scrollbar,
+        page,
         fit = false,
         width = pager.measure.w,
         padding = (2, 0, 1, 1),

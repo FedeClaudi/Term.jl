@@ -15,11 +15,11 @@ end
 function TabViewer(titles::Vector, tabs::Vector)
     @assert length(titles) == length(tabs)
 
-
     tabs_width = map(t -> t.measure.w, tabs) |> maximum
-    @assert tabs_width <= console_width()-20 "Not enough space to render tab viewer"
+    tabs_height = map(t -> t.measure.h, tabs) |> maximum
+    @assert tabs_width <= console_width()-26 "Not enough space to render tab viewer"
     measure = Measure(
-        map(t -> t.measure.h, tabs) |> maximum,
+        tabs_height + 4,
         tabs_width,
     )
     return TabViewer(LiveInternals(), measure, ButtonsMenu(titles; width=15), tabs, :menu)
@@ -27,16 +27,17 @@ end
 
 function frame(tb::TabViewer; kwargs...)
     tab = Panel(
-        frame(tb.tabs[tb.menu.active]; omit_panel = true);
-        width=tb.tabs[tb.menu.active].measure.w,
-        padding=(2, 2, 1, 1), 
-        style = tb.context == :tab ? "default" : "hidden"
+        frame(tb.tabs[tb.menu.active]; omit_panel = false);
+        width=tb.tabs[tb.menu.active].measure.w+4,
+        height=tb.measure.h,
+        padding=(1, 1, 0, 0), 
+        style = tb.context == :tab ? "dim" : "hidden"
 
     )
     mn = Panel(frame(tb.menu); 
         width=tb.menu.measure.w+2, height=tb.measure.h,
         padding=(0, 0, 1, 1),
-        style = tb.context != :tab ? "default" : "hidden",
+        style = tb.context != :tab ? "dim" : "hidden",
         justify=:center,
         )
     
@@ -58,8 +59,13 @@ function key_press(tb::TabViewer, ::ArrowLeft)
 end
 
 function key_press(tb::TabViewer, ::Enter) 
-    tb.internals.should_stop = true
-    return nothing
+    if tb.context == :menu
+        tb.internals.should_stop = true
+        return nothing
+    else
+        tab = tb.tabs[tb.menu.active]
+        return key_press(tab, Enter())
+    end
 end
 
 function key_press(tb::TabViewer, ::Esc) 

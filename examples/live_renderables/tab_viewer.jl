@@ -71,13 +71,21 @@ Of course you can have classic lists:
 """,
 )
 
-options = ["pager", "input box", "text box"]
+
+tab_width = console_width()-26  # important for this to be small enough so that we can fit everything
+
+
+options = ["pager", "input box", "text box", "button"]
 tabs = [
-    Pager(text; page_lines = 40, title = "", line_numbers=true, width=console_width()-20),
-    InputBox(; width = console_width()-20),
-    TextWidget("This is just an example text"; width=console_width()-20),
+    Pager(text; page_lines = 40, title = "Example pager", line_numbers=true, width=tab_width),
+    InputBox(; width = tab_width),
+    TextWidget("This is just an example text"; width=tab_width),
+    Button("Just a button"; 
+        pressed_text_style = "bold white", not_pressed_text_style = "red", pressed_background="red",
+        width=30, justify=:center)
 ]
 
 tb = TabViewer(options, tabs)
 LiveWidgets.play(tb)
+
 
