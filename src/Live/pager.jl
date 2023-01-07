@@ -52,16 +52,30 @@ function frame(pager::Pager; omit_panel=false)::AbstractRenderable
 
         # make a scroll bar
         page_lines = pager.page_lines
-        scrollbar_lines = 5
+        scrollbar_lines = 6
+        scrollbar_lines_half = scrollbar_lines // 2
         scrollbar = vLine(scrollbar_lines; style="white on_white")
     
-        p = (i+Δi/2)/pager.tot_lines
-        scrollbar_center =   p * (page_lines) 
-        nspaces_above = max(0, scrollbar_center-scrollbar_lines/2)|> round |> Int
+        p = (i)/(pager.tot_lines-Δi)  # progress in the file
+        # p = min(p, 0.99)
+
+        scrollbar_center = scrollbar_lines_half + p * (page_lines - scrollbar_lines)
+
+        # scrollbar_center = p * (page_lines) |> round |> Int
+        nspaces_above = max(0, scrollbar_center - scrollbar_lines_half) |> round |> Int
+        nspaces_below = max(0, page_lines - scrollbar_lines - nspaces_above) |> round |> Int
     
-        above = RenderableText(join(repeat([" \n"], nspaces_above)); style="on_gray23")
-        below = RenderableText(join(repeat([" \n"], page_lines - scrollbar_lines - nspaces_above)); style="on_gray23")
-        scrollbar = above / scrollbar / below
+        scrollbar = if nspaces_above == 0
+            below = RenderableText(join(repeat([" \n"], nspaces_below+1)); style="on_gray23")
+            scrollbar / below
+        elseif nspaces_below == 0
+            above = RenderableText(join(repeat([" \n"], nspaces_above+1)); style="on_gray23")
+            above / scrollbar
+        else
+            above = RenderableText(join(repeat([" \n"], nspaces_above)); style="on_gray23")
+            below = RenderableText(join(repeat([" \n"], nspaces_below)); style="on_gray23")
+            scrollbar = above / scrollbar / below
+        end
 
         page_content * scrollbar
     end
