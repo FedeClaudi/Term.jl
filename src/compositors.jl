@@ -151,7 +151,7 @@ function update!(
     # if content is too small, pad it
     elem = compositor.elements[id]
     height(content) < elem.h && (content = vertical_pad(content; height=elem.h))
-    width(content) < elem.w && (content = pad(content, elem.w))
+    width(content) < elem.w && (content = pad(content; width=elem.w, method=:center))
 
     # check that the shapes match
     if elem.w > width(content) || elem.h > height(content)

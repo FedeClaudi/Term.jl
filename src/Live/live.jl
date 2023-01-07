@@ -7,7 +7,7 @@ using Markdown
 
 import MyterialColors: pink
 
-import Term: default_width, reshape_text
+import Term: default_width, reshape_text, TERM_THEME, fint
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Panels: Panel
 import ..Measures: Measure
@@ -15,20 +15,21 @@ import ..Measures: width as get_width
 using ..Consoles
 import ..Repr: @with_repr, termshow
 import ..Style: apply_style
-import ..Layout: Spacer, vLine, vstack, hLine
+import ..Layout: Spacer, vLine, vstack, hLine, hstack
 import ..Compositors: Compositor, render, update!
 
 export AbstractWidget, refresh!, play, key_press, shouldupdate, frame, stop!
 export Pager, TabViewer
 export SimpleMenu, ButtonsMenu, MultiSelectMenu
-export InputBox, TextWidget, Button
+export InputBox, TextWidget, Button, ToggleButton
 export App
 
-include("input.jl")
+include("_input.jl")
 include("abstract_widget.jl")
 include("pager.jl")
-include("menu.jl")
+include("menus.jl")
 include("widgets.jl")
+include("buttons.jl")
 include("tabviewer.jl")
 include("app.jl")
 

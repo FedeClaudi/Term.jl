@@ -34,9 +34,10 @@ other widgets to access their internal variables.
     last_update::Union{Nothing, Int}
     refresh_Δt::Int
     help_shown::Bool
+    help_message::Union{Nothing, String}
     should_stop::Bool
 
-    function LiveInternals(; refresh_rate::Int=60)
+    function LiveInternals(; refresh_rate::Int=60, help_message=nothing)
         # get output buffers
         iob = IOBuffer()
         ioc = IOContext(iob, :displaysize=>displaysize(stdout))
@@ -52,7 +53,7 @@ other widgets to access their internal variables.
 
         # hide the cursor
         raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
-        return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate), false, false,)
+        return new(iob, ioc,  terminal, nothing, String[], raw_mode_enabled, nothing, (Int ∘ round)(1000/refresh_rate), false, help_message, false,)
     end
 end
 
@@ -217,7 +218,7 @@ Erase a widget from the terminal.
 """
 function erase!(live::AbstractWidget)
     isnothing(live.internals.prevcontent) && return
-    
+
     nlines = live.internals.prevcontent.measure.h
     up(live.internals.ioc, nlines)
     cleartoend(live.internals.ioc)

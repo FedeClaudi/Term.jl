@@ -21,7 +21,7 @@ Curabitur mattis malesuada sapien, eget faucibus risus. Suspendisse mattis, veli
 
 layout = :(
     (A(20, $(0.6)) * B(20, $(0.4)))/
-    C(5, 1.0)
+    (C(5, 0.8) * D(5, 0.2))
     
     )
 compositor = Compositor(layout)
@@ -29,19 +29,25 @@ compositor = Compositor(layout)
 
 
 widgets = Dict{Symbol, AbstractWidget}(
-    :A => Pager(text; width=compositor.elements[:A].w, page_lines=compositor.elements[:A].h-5),
+    :A => TextWidget(text; width=compositor.elements[:A].w, height=compositor.elements[:A].h-1, as_panel=true),
     :B => Pager(text; width=compositor.elements[:B].w, page_lines=compositor.elements[:B].h-5),
-    :C => Pager(text; width=compositor.elements[:C].w, page_lines=compositor.elements[:C].h-5),
+    :C => InputBox(; width=compositor.elements[:C].w, height=compositor.elements[:C].h-1),
+    :D => Button("launch"; width=compositor.elements[:D].w, height=compositor.elements[:D].h-1),
 )
 
 
 transition_rules = Dict{Tuple{Symbol, KeyInput},Symbol}(
     (:A, ArrowRight()) => :B,
-    (:B, ArrowLeft()) => :A,
-    (:C, ArrowUp()) => :A,
-    (:B, ArrowDown()) => :C,
     (:A, ArrowDown()) => :C,
+    
+    (:B, ArrowLeft()) => :A,
+    (:B, ArrowDown()) => :C,
 
+    (:C, ArrowUp()) => :A,
+    (:C, ArrowRight()) => :D,
+    
+    (:D, ArrowUp()) => :A,
+    (:D, ArrowLeft()) => :C,
 )
 
 app = App(layout, widgets, transition_rules)
@@ -49,4 +55,5 @@ app = App(layout, widgets, transition_rules)
 
 play(app)
 
-
+# TODO horizontal menu
+# TODO gallery

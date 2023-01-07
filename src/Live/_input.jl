@@ -74,11 +74,13 @@ function toggle_help(live; help_widget=nothing)
     )  
 
     # compose help tooltip
+    docstring = RenderableText(getdocs(help_widget); width=width-10)
+    help_message = isnothing(help_widget.internals.help_message) ? docstring : docstring / RenderableText(help_widget.internals.help_message; width=width-10)
+
     messages =  [
-        RenderableText(md"#### widget description"; width=width-10),
-        RenderableText(getdocs(help_widget); width=width-10),
-        "",
-        RenderableText(md"#### Controls "; width=width-10),
+        RenderableText(md"#### Widget description"; width=width-10),
+        help_message,
+        "",        RenderableText(md"#### Controls "; width=width-10),
         methods_docs...
         ]
 

@@ -10,21 +10,21 @@ abstract type AbstractMenu <: AbstractWidget end
 
 # --------------------------------- controls --------------------------------- #
 """ 
-- {bold white}arrow down{/bold white}: select a next option if one is available
+- {bold white}arrow down/right{/bold white}: select a next option if one is available
 """
-function key_press(mn::AbstractMenu, ::ArrowDown) 
+function key_press(mn::AbstractMenu, ::Union{ArrowRight, ArrowDown}) 
     mn.active = min(mn.active+1, mn.n_titles)
 end
 
 """
-- {bold white}arrow up{/bold white}: select a previos option if one is available
+- {bold white}arrow up/left{/bold white}: select a previos option if one is available
 """
-function key_press(mn::AbstractMenu, ::ArrowUp) 
+function key_press(mn::AbstractMenu, ::Union{ArrowLeft, ArrowUp}) 
     mn.active =  max(1, mn.active-1)
 end
 
 """
-- {bold white}enter{/bold white}: select the current option.
+- {bold white}enter{/bold white}: select the current option, quit program and return selection.
 """
 function key_press(mn::AbstractMenu, ::Enter)
     mn.internals.should_stop = true
@@ -40,7 +40,11 @@ function frame(mn::AbstractMenu; kwargs...)
     titles = map(
         i -> i == mn.active ? mn.active_titles[i] : mn.inactive_titles[i], 1:mn.n_titles
     ) 
-    return vstack(titles)
+    return if mn.layout == :vertical
+        vstack(titles...)
+    else
+        hstack(titles...)
+    end
 end
 
 
@@ -59,6 +63,7 @@ The currently selected option is highlighted with a different style.
     inactive_titles::Vector{String}
     n_titles::Int
     active::Int
+    layout::Symbol
 
     function SimpleMenu(
         titles::Vector;
@@ -66,9 +71,13 @@ The currently selected option is highlighted with a different style.
         active_style::String="white bold",
         inactive_style::String="dim",
         active_symbol="❯",
+        layout::Symbol = :vertical
         )
         
-        max_titles_width = min(width, maximum(get_width.(titles)) + textwidth(active_symbol)+1) 
+        max_titles_width = layout==:vertical ?
+             min(width, maximum(get_width.(titles)) + textwidth(active_symbol)+1)  :
+             width
+
         active_titles = map(t -> 
             RenderableText(
                     active_symbol*" "*t;
@@ -90,6 +99,7 @@ The currently selected option is highlighted with a different style.
             inactive_titles,
             length(titles),
             1,
+            layout
             )
     end
 end
@@ -106,18 +116,23 @@ Styling reflects which option is currently selected
     inactive_titles::Vector{String}
     n_titles::Int
     active::Int
+    layout::Symbol
 
     function ButtonsMenu(
         titles::Vector;
-        width=default_width(),
+        width::Int=console_width(),
         active_color::Union{Vector, String}="black",
         active_background::Union{Vector, String}="white",
         inactive_color::Union{Vector, String}="dim",
         inactive_background::Union{Vector, String}="default",
         justify::Symbol=:center,
         box::Symbol = :SQUARE,
+        layout::Symbol=:vertical,
+        height::Union{Nothing, Int} = nothing,
         panel_kwargs...
         )
+
+        # get parameters for each button
         n = length(titles)
         active_color = active_color isa String ? repeat([active_color], n) : active_color
         active_background = active_background isa String ? repeat([active_background], n) : active_background
@@ -128,8 +143,9 @@ Styling reflects which option is currently selected
         @assert length(inactive_color) == n  "Incorrect number of values for `inactive_color`"
         @assert length(inactive_background) == n  "Incorrect number of values for `inactive_background`"
         
-        
-        active_titles, inactive_titles = String[], String[]
+        # make a panel for each button
+        active_titles, inactive_titles = Panel[], Panel[]
+        button_width = layout == :vertical ? width : fint(width / n)
         
         for (i, t) in enumerate(titles)
             push!(active_titles,
@@ -137,11 +153,12 @@ Styling reflects which option is currently selected
                         "{$(active_color[i]) on_$(active_background[i])}"*t*"{/$(active_color[i]) on_$(active_background[i])}";
                         background=active_background[i],
                         style="$(active_color[i]) on_$(active_background[i])",
-                        width=width,
+                        width=button_width,
                         justify=justify,
                         box=box,
+                        height=height,
                         padding=(1, 1, 1, 1)
-                )  |> string 
+                )   
             )
 
             push!(inactive_titles,
@@ -149,21 +166,30 @@ Styling reflects which option is currently selected
                     "{$(inactive_color[i]) on_$(inactive_background[i])}"*t*"{/$(inactive_color[i]) on_$(inactive_background[i])}";
                     background=inactive_background[i],
                     style=inactive_color[i],
-                    width=width,
+                    width=button_width,
                     justify=justify,
                     box=box,
+                    height=height,
                     padding=(1, 1, 1, 1)
-            ) |> string 
+            )  
             )
+        end
+
+        measure = if layout == :vertical
+            Measure(something(height, length(titles)), width)
+        else
+            hmax = maximum(map(p -> p.measure.h, inactive_titles))
+            Measure(something(height, hmax), button_width)
         end
     
         return new(
             LiveInternals(), 
-            Measure(length(titles), width),
-            active_titles,
-            inactive_titles,
+            measure,
+            string.(active_titles),
+            string.(inactive_titles),
             length(titles),
             1,
+            layout,
             )
     end
 end

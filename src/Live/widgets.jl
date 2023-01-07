@@ -13,14 +13,20 @@ TextWidget just shows a piece of text.
     internals::LiveInternals
     measure::Measure
     text::String
+    as_panel::Bool
 end
 
-TextWidget(; width=console_width(), height=5) = TextWidget(LiveInternals(), Measure(height, width), "")
+TextWidget(; width=console_width(), height=5, as_panel=true) = TextWidget(LiveInternals(), Measure(height, width), "", as_panel)
 
-TextWidget(text::String; width=console_width(), height=Measure(text).h) = TextWidget(LiveInternals(), Measure(height, width), text)
+TextWidget(text::String; width=console_width(), height=Measure(text).h, as_panel=true) = TextWidget(LiveInternals(), Measure(height, width), text, as_panel)
 
 function frame(tw::TextWidget; kwargs...)
-    txt = reshape_text(tw.text, tw.measure.w)
+    tw.as_panel && return Panel(
+        tw.text, width=tw.measure.w, height=tw.measure.h+1, fit=false, style="dim"
+    )
+    
+    text = reshape_text(tw.text, tw.measure.w-4)
+    
     tw.text = txt
     
     lines = split(txt, "\n")
@@ -58,12 +64,12 @@ function frame(ib::InputBox; kwargs...)
     end
     blinker = ib.blinker_status == :on ? " " : "{on_white} {/on_white}"
 
+    # get text to display
     text = isnothing(ib.input_text) ? "{dim}start typing...{/dim}" : ib.input_text * blinker
-
 
     return Panel(
         text;
-        width=ib.measure.w-7,
+        width=ib.measure.w,
         height=ib.measure.h,
     )
 end
@@ -102,68 +108,3 @@ function key_press(ib::InputBox, c::Char)::Tuple{Bool, Nothing}
     return (false, nothing)
 end
 
-
-# ---------------------------------------------------------------------------- #
-#                                    BUTTON                                    #
-# ---------------------------------------------------------------------------- #
-
-"""
-A button. 
-"""
-@with_repr mutable struct Button <: AbstractWidget
-    internals::LiveInternals
-    measure::Measure
-    pressed_display::Panel
-    not_pressed_display::Panel
-    status::Symbol
-    callback::Union{Nothing, Function}
-end
-
-
-function Button(
-    message::String;
-    pressed_text_style = "bold white",
-    pressed_background = "red",
-    not_pressed_text_style = "red",
-    width::Int=10,
-    height::Int=3,
-    kwargs...
-)
-    pressed = Panel(
-        "{$pressed_text_style on_$pressed_background}" * message * "{/$pressed_text_style on_$pressed_background}";
-        style=pressed_text_style * " on_$pressed_background",
-        width=width, height=height,
-        background=pressed_background,
-        kwargs...
-    )
-
-    not_pressed = Panel(
-        "{$not_pressed_text_style}" * message * "{/$not_pressed_text_style}";
-        style=not_pressed_text_style,
-        width=width, height=height,
-        kwargs...
-    )
-
-    return Button(
-        LiveInternals(), Measure(height, width), pressed, not_pressed, :not_pressed, nothing
-    )
-end
-
-
-function frame(b::Button; kwargs...)
-    return if b.status == :pressed
-        b.pressed_display
-    else
-        b.not_pressed_display
-    end
-end
-
-function key_press(b::Button, ::Enter) 
-    if b.status == :not_pressed 
-        b.status = :pressed
-    else
-        b.status = :not_pressed
-        isnothing(b.callback) || return b.callback(b)
-    end
-    return nothing
-end

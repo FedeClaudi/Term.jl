@@ -145,8 +145,8 @@ function key_press(p::Pager, c::Char)::Tuple{Bool, Nothing}
     c == ']' && key_press(p, ArrowRight())
     c == '[' && key_press(p, ArrowLeft())
 
-    c == ',' && key_press(p, ArrowLeft())
-    c == '.' && key_press(p, ArrowRight())
+    c == ',' && key_press(p, ArrowUp())
+    c == '.' && key_press(p, ArrowDown())
 
     c == 'q' && return (true, nothing)
     c == 'h' && begin
