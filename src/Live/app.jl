@@ -14,15 +14,17 @@ An `App` is a collection of widgets.
     internals::LiveInternals
     measure::Measure
     compositor::Compositor
-    widgets::Dict{Symbol,AbstractWidget}
-    transition_rules::Dict{Tuple{Symbol,KeyInput},Symbol}
+    widgets::AbstractDict{Symbol,AbstractWidget}
+    transition_rules::AbstractDict{Tuple{Symbol,KeyInput},Symbol}
     active::Symbol
+    on_draw::Union{Nothing, Function}
 end
 
 function App(
     layout::Expr,
-    widgets::Dict,
-    transition_rules::Union{Nothing,Dict{Tuple{Symbol,KeyInput},Symbol}},
+    widgets::AbstractDict,
+    transition_rules::Union{Nothing,AbstractDict{Tuple{Symbol,KeyInput},Symbol}};
+    on_draw::Union{Nothing, Function}=nothing
 )
 
     # parse the layout expression and get the compositor
@@ -32,7 +34,7 @@ function App(
     # check that the layout and the widgets match
     layout_keys = compositor.elements |> keys |> collect
     widgets_keys = widgets |> keys |> collect
-    @assert layout_keys == widgets_keys "Mismatch between widget names and layout names"
+    @assert issetequal(layout_keys, widgets_keys) "Mismatch between widget names and layout names"
 
     # check that the widgets have the right size
     for k in layout_keys
@@ -71,11 +73,14 @@ function App(
         widgets,
         transition_rules,
         widgets_keys[1],
+        on_draw
     )
 end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(app::App; kwargs...)
+    isnothing(app.on_draw) || app.on_draw(app)
+    
     for (name, widget) in pairs(app.widgets)
         content = frame(widget)
         content = app.active == name ? hLine(content.measure.w) / content : "" / content
@@ -99,12 +104,16 @@ function key_press(app::App, key::KeyInput)
 end
 
 function key_press(app::App, ::Enter) 
-    live.internals.should_stop = true
-    return nothing
+    widget = get_active(app)
+    if widget isa InputBox || widget isa AbstractButton
+        return key_press(widget, Enter())
+    else
+        return key_press(app, Esc())
+    end
 end
 
 
 function key_press(app::App, ::Esc) 
-    live.internals.should_stop = true
+    app.internals.should_stop = true
     return nothing
 end

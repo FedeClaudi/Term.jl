@@ -60,10 +60,11 @@ InputBox collects and displays user input as text.
     input_text::Union{Nothing,String}
     blinker_update::Int
     blinker_status::Symbol
+    panel_kwargs
 end
 
-function InputBox(; height = 20, width = console_width())
-    InputBox(LiveInternals(), Measure(height, width), nothing, 0, :off)
+function InputBox(; height = 20, width = console_width(), kwargs...)
+    InputBox(LiveInternals(), Measure(height, width), nothing, 0, :off, kwargs)
 end
 
 # ----------------------------------- frame ---------------------------------- #
@@ -79,7 +80,7 @@ function frame(ib::InputBox; kwargs...)
     # get text to display
     text = isnothing(ib.input_text) ? "{dim}start typing...{/dim}" : ib.input_text * blinker
 
-    return Panel(text; width = ib.measure.w, height = ib.measure.h)
+    return Panel(text; width = ib.measure.w, height = ib.measure.h, ib.panel_kwargs...)
 end
 
 # --------------------------------- controls --------------------------------- #

@@ -10,9 +10,9 @@ function key_press(b::AbstractButton, ::Enter)
     if b.status == :not_pressed
         b.lastpressed = Dates.value(now())
         b.status = :pressed
+        isnothing(b.callback) || return b.callback(b)
     else
         b.status = :not_pressed
-        isnothing(b.callback) || return b.callback(b)
     end
     return nothing
 end
@@ -31,11 +31,13 @@ key_press(b::AbstractButton, ::SpaceBar) = key_press(b, Enter())
 Create styled `Panel`s to visualize active/inactive buttons
 """
 function make_buttons_panels(
+    message,
     pressed_text_style,
     pressed_background,
     not_pressed_text_style,
     width,
-    height,
+    height;
+    kwargs...
 )
     pressed = Panel(
         "{$pressed_text_style on_$pressed_background}" *
@@ -86,11 +88,13 @@ function Button(
     kwargs...,
 )
     pressed, not_pressed = make_buttons_panels(
+        message,
         pressed_text_style,
         pressed_background,
         not_pressed_text_style,
         width,
-        height,
+        height;
+        kwargs...
     )
 
     return Button(
@@ -147,11 +151,13 @@ function ToggleButton(
     kwargs...,
 )
     pressed, not_pressed = make_buttons_panels(
+        message,
         pressed_text_style,
         pressed_background,
         not_pressed_text_style,
         width,
-        height,
+        height;
+        kwargs...
     )
 
     return ToggleButton(
