@@ -15,18 +15,22 @@ TextWidget just shows a piece of text.
     measure::Measure
     text::String
     as_panel::Bool
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 end
 
-TextWidget(; width = console_width(), height = 5, as_panel = true, on_draw::Union{Nothing, Function} = nothing) =
-    TextWidget(LiveInternals(), Measure(height, width), "", as_panel, on_draw)
+TextWidget(;
+    width = console_width(),
+    height = 5,
+    as_panel = true,
+    on_draw::Union{Nothing,Function} = nothing,
+) = TextWidget(LiveInternals(), Measure(height, width), "", as_panel, on_draw)
 
 TextWidget(
     text::String;
     width = console_width(),
     height = Measure(text).h,
     as_panel = true,
-    on_draw::Union{Nothing, Function} = nothing,
+    on_draw::Union{Nothing,Function} = nothing,
 ) = TextWidget(LiveInternals(), Measure(height, width), text, as_panel, on_draw)
 
 # ----------------------------------- frame ---------------------------------- #
@@ -65,17 +69,21 @@ InputBox collects and displays user input as text.
     blinker_update::Int
     blinker_status::Symbol
     panel_kwargs
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 end
 
-function InputBox(; height = 20, width = console_width(), on_draw::Union{Nothing, Function}=nothing, kwargs...)
+function InputBox(;
+    height = 20,
+    width = console_width(),
+    on_draw::Union{Nothing,Function} = nothing,
+    kwargs...,
+)
     InputBox(LiveInternals(), Measure(height, width), nothing, 0, :off, kwargs, on_draw)
 end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(ib::InputBox; kwargs...)
     isnothing(ib.on_draw) || on_draw(ib)
-
 
     # create blinking symbol
     currtime = Dates.value(now())

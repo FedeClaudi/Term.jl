@@ -123,17 +123,19 @@ function style_methods(methods::Union{Vector{Base.Method},Base.MethodList}, widt
         # method source
         modul = "{bold dim $col}" * string(m.module) * "{/bold dim $col}"
         source = "{dim}$(m.file):$(m.line){/dim}"
-        code = Panel(code; width=width, style="$panel_col dim",
+        code = Panel(
+            code;
+            width = width,
+            style = "$panel_col dim",
             title = modul,
-            subtitle=source,
-            subtitle_justify=:right,
-            padding=(4, 4, 1, 1)
+            subtitle = source,
+            subtitle_justify = :right,
+            padding = (4, 4, 1, 1),
         )
-
 
         # method number
         num = "\n{$fn_col dim}($i){/$fn_col dim} "
-        push!(mets,  (num * code)/""/"")
+        push!(mets, (num * code) / "" / "")
     end
     return mets
 end
@@ -150,22 +152,17 @@ Flags can be used to choose the level of detail in the information presented:
 """
 function inspect(T::Union{Union,DataType};)
     # get app size
-    layout = :(
-        A(3, 1.0) / B(37, 1.0)
-    )
+    layout = :(A(3, 1.0) / B(37, 1.0))
     comp = Compositor(layout)
     widget_width = comp.elements[:B].w - 6
     widget_height = comp.elements[:B].h - 10
 
     # get app content
-    constructors_content = join(string.(
-            style_methods(Base.methods(T), widget_width-12)
-    ), "\n")
+    constructors_content =
+        join(string.(style_methods(Base.methods(T), widget_width - 12)), "\n")
 
     _methods = vcat(methodswith.(getsupertypes(T)[1:(end - 1)])...)
-    supertypes_methods = join(string.(
-            style_methods(_methods, widget_width-12)
-    ), "\n")
+    supertypes_methods = join(string.(style_methods(_methods, widget_width - 12)), "\n")
 
     theme = TERM_THEME[]
     field_names = apply_style.(string.(fieldnames(T)), theme.repr_accent)
@@ -176,58 +173,56 @@ function inspect(T::Union{Union,DataType};)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
     type_name = apply_style(string(T), theme.repr_name * " bold")
 
-
-
     # create app
     menu = ButtonsMenu(
         ["Info", "Docs", "Constructors", "methods"];
         width = comp.elements[:A].w,
-        height = comp.elements[:A].h-1,
-        layout=:horizontal
-        )
-
+        height = comp.elements[:A].h - 1,
+        layout = :horizontal,
+    )
 
     gallery_widgets = [
         Pager(
             string(
-                Panel(type_name / ("  " * line * fields); fit=false, 
-                        width=widget_width-10, justify=:center,
-                        title="Fields", title_style="bright_blue bold",
-                        style="bright_blue dim"
-                ) /
-                hLine(widget_width-10; style="dim") / 
-                "" /
-                Tree(T)
+                Panel(
+                    type_name / ("  " * line * fields);
+                    fit = false,
+                    width = widget_width - 10,
+                    justify = :center,
+                    title = "Fields",
+                    title_style = "bright_blue bold",
+                    style = "bright_blue dim",
+                ) / hLine(widget_width - 10; style = "dim") / "" / Tree(T),
             );
-            width=widget_width, 
-            page_lines=widget_height
+            width = widget_width,
+            page_lines = widget_height,
         ),
-        Pager(parse_md(get_docstring(T)[1]); width=widget_width, page_lines=widget_height), 
-        Pager(constructors_content; width=widget_width, page_lines=widget_height), 
-        Pager(supertypes_methods; width=widget_width, page_lines=widget_height)
+        Pager(
+            parse_md(get_docstring(T)[1]);
+            width = widget_width,
+            page_lines = widget_height,
+        ),
+        Pager(constructors_content; width = widget_width, page_lines = widget_height),
+        Pager(supertypes_methods; width = widget_width, page_lines = widget_height),
     ]
-
-
 
     widgets = OrderedDict(
         :A => menu,
-        :B => Gallery(gallery_widgets; 
+        :B => Gallery(
+            gallery_widgets;
             width = comp.elements[:B].w,
             height = comp.elements[:B].h - 1,
-            show_panel=false,
-        )
+            show_panel = false,
+        ),
     )
 
     function cb(app)
         app.widgets[:A].active = app.widgets[:B].active
     end
 
-
-    app = App(
-        layout, widgets; on_draw = cb
-    )
-    app.active=:B
-    play(app; transient=false) 
+    app = App(layout, widgets; on_draw = cb)
+    app.active = :B
+    play(app; transient = false)
 end
 
 function inspect(F::Function; documentation::Bool = true)

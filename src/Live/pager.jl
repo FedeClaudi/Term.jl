@@ -12,7 +12,7 @@ using keys such as arrow up and arrow down.
     tot_lines::Int
     curr_line::Int
     page_lines::Int
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 end
 
 function Pager(
@@ -21,7 +21,7 @@ function Pager(
     title::String = "Term.jl PAGER",
     width::Int = console_width(),
     line_numbers::Bool = false,
-    on_draw::Union{Nothing, Function} = nothing,
+    on_draw::Union{Nothing,Function} = nothing,
 )
     page_lines = min(page_lines, console_height() - 8)
 

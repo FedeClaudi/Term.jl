@@ -17,14 +17,14 @@ An `App` is a collection of widgets.
     widgets::AbstractDict{Symbol,AbstractWidget}
     transition_rules::AbstractDict{Tuple{Symbol,KeyInput},Symbol}
     active::Symbol
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 end
 
 function App(
     layout::Expr,
     widgets::AbstractDict,
-    transition_rules::Union{Nothing,AbstractDict{Tuple{Symbol,KeyInput},Symbol}}=nothing;
-    on_draw::Union{Nothing, Function}=nothing
+    transition_rules::Union{Nothing,AbstractDict{Tuple{Symbol,KeyInput},Symbol}} = nothing;
+    on_draw::Union{Nothing,Function} = nothing,
 )
 
     # parse the layout expression and get the compositor
@@ -73,14 +73,14 @@ function App(
         widgets,
         transition_rules,
         widgets_keys[1],
-        on_draw
+        on_draw,
     )
 end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(app::App; kwargs...)
     isnothing(app.on_draw) || app.on_draw(app)
-    
+
     for (name, widget) in pairs(app.widgets)
         content = frame(widget)
         content = app.active == name ? hLine(content.measure.w) / content : "" / content
@@ -103,7 +103,7 @@ function key_press(app::App, key::KeyInput)
     end
 end
 
-function key_press(app::App, ::Enter) 
+function key_press(app::App, ::Enter)
     widget = get_active(app)
     if widget isa InputBox || widget isa AbstractButton
         return key_press(widget, Enter())
@@ -112,8 +112,7 @@ function key_press(app::App, ::Enter)
     end
 end
 
-
-function key_press(app::App, ::Esc) 
+function key_press(app::App, ::Esc)
     app.internals.should_stop = true
     return nothing
 end

@@ -37,7 +37,7 @@ function make_buttons_panels(
     not_pressed_text_style,
     width,
     height;
-    kwargs...
+    kwargs...,
 )
     pressed = Panel(
         "{$pressed_text_style on_$pressed_background}" *
@@ -76,7 +76,7 @@ end
     status::Symbol
     callback::Union{Nothing,Function}
     lastpressed::Int
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 end
 
 function Button(
@@ -86,7 +86,7 @@ function Button(
     not_pressed_text_style = "red",
     width::Int = 10,
     height::Int = 3,
-    on_draw::Union{Nothing, Function} = nothing,
+    on_draw::Union{Nothing,Function} = nothing,
     kwargs...,
 )
     pressed, not_pressed = make_buttons_panels(
@@ -96,7 +96,7 @@ function Button(
         not_pressed_text_style,
         width,
         height;
-        kwargs...
+        kwargs...,
     )
 
     return Button(
@@ -144,7 +144,7 @@ activated and not.
     status::Symbol
     callback::Union{Nothing,Function}
     lastpressed::Int
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 end
 
 function ToggleButton(
@@ -154,7 +154,7 @@ function ToggleButton(
     not_pressed_text_style = "red",
     width::Int = 10,
     height::Int = 3,
-    on_draw::Union{Nothing, Function} = nothing,
+    on_draw::Union{Nothing,Function} = nothing,
     kwargs...,
 )
     pressed, not_pressed = make_buttons_panels(
@@ -164,7 +164,7 @@ function ToggleButton(
         not_pressed_text_style,
         width,
         height;
-        kwargs...
+        kwargs...,
     )
 
     return ToggleButton(
@@ -182,7 +182,7 @@ end
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::ToggleButton; kwargs...)
     isnothing(b.on_draw) || on_draw(b)
-    
+
     return if b.status == :pressed
         b.pressed_display
     else

@@ -67,7 +67,7 @@ The currently selected option is highlighted with a different style.
     n_titles::Int
     active::Int
     layout::Symbol
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 
     function SimpleMenu(
         titles::Vector;
@@ -76,7 +76,7 @@ The currently selected option is highlighted with a different style.
         inactive_style::String = "dim",
         active_symbol = "❯",
         layout::Symbol = :vertical,
-        on_draw::Union{Nothing, Function} = nothing,
+        on_draw::Union{Nothing,Function} = nothing,
     )
         max_titles_width =
             layout == :vertical ?
@@ -132,7 +132,7 @@ Styling reflects which option is currently selected
     n_titles::Int
     active::Int
     layout::Symbol
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 
     function ButtonsMenu(
         titles::Vector;
@@ -145,7 +145,7 @@ Styling reflects which option is currently selected
         box::Symbol = :SQUARE,
         layout::Symbol = :vertical,
         height::Union{Nothing,Int} = nothing,
-        on_draw::Union{Nothing, Function} = nothing,
+        on_draw::Union{Nothing,Function} = nothing,
         panel_kwargs...,
     )
 
@@ -168,7 +168,7 @@ Styling reflects which option is currently selected
         # make a panel for each button
         active_titles, inactive_titles = Panel[], Panel[]
         button_width = layout == :vertical ? width : fint(width / n)
-        button_height = layout == :vertical ? fint(height/n) : height
+        button_height = layout == :vertical ? fint(height / n) : height
 
         for (i, t) in enumerate(titles)
             push!(
@@ -244,14 +244,14 @@ Color indicates current active option, ticks selected options
     n_titles::Int
     selected_sym::String
     notselected_sym::String
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 
     function MultiSelectMenu(
         options::Vector;
         active_style::String = "white bold",
         inactive_style::String = "dim",
         width::Int = console_width(),
-        on_draw::Union{Nothing, Function} = nothing,
+        on_draw::Union{Nothing,Function} = nothing,
     )
         selected_sym = apply_style("✔ ", active_style)
         notselected_sym = apply_style("□ ", inactive_style)

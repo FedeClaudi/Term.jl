@@ -27,5 +27,3 @@ println("\nPlease choose an option:")
 retval = LiveWidgets.play(mn; transient = false)
 
 print("The menu returned the value: $retval")
-
-

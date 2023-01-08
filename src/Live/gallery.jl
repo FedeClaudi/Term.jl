@@ -7,15 +7,15 @@ A `Gallery` containes multiple widgets, but only shows one at the time.
     widgets::Vector{AbstractWidget}
     active::Int
     show_panel::Bool
-    on_draw::Union{Nothing, Function}
+    on_draw::Union{Nothing,Function}
 end
 
 function Gallery(
     widgets::Vector;
     height::Int = console_height() - 5,
     width::Int = console_width(),
-    show_panel::Bool=true,
-    on_draw::Union{Nothing, Function} = nothing,
+    show_panel::Bool = true,
+    on_draw::Union{Nothing,Function} = nothing,
 )
     # measure widgets
     widgets_measures = getfield.(widgets, :measure)
@@ -42,13 +42,12 @@ key_press(gal::Gallery, ::ArrowLeft) = activate_previous(gal)
 
 key_press(gal::Gallery, key::KeyInput) = key_press(get_active(gal), key)
 
-function key_press(gal::Gallery, ::Enter) 
+function key_press(gal::Gallery, ::Enter)
     gal.internals.should_stop = true
     return nothing
 end
 
-
-function key_press(gal::Gallery, ::Esc) 
+function key_press(gal::Gallery, ::Esc)
     gal.internals.should_stop = true
     return nothing
 end

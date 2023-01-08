@@ -12,7 +12,6 @@ import Term.Links: Link
 
 import Base.Docs: Binding, getdoc, meta, resolve
 
-
 obj = Panel
 mod = parentmodule(obj)
 _methods = methods(obj)
@@ -25,16 +24,15 @@ multidoc = dict[binding]
 
 for m in _methods
     println("\n\n\n")
-    print(hLine(; style="red"))
+    print(hLine(; style = "red"))
     println(m)
     sig = m.sig.types
     length(sig) == 1 && continue
 
-    sig = if length(sig) ==
-            Tuple{}
-        else
-            Tuple{sig[2:end]...}
-        end
+    sig = if length(sig) == Tuple{}
+    else
+        Tuple{sig[2:end]...}
+    end
     println(sig)
     try
         tprintln(multidoc.docs[sig].text[1])
@@ -49,8 +47,6 @@ end
 
 #     println(multidoc)
 # end
-
-
 
 # """
 # Get the docstring for a specific method disgnature. 
@@ -72,7 +68,6 @@ end
 #     end
 # end
 
-
 # function render_method(m::Method)
 #     sig, m = split(string(m), " in ")
 #     modul, file = split(m, " at ")
@@ -82,7 +77,6 @@ end
 #     return highlight_syntax(sig) / modul / source
 # end
 
-
 # _methods = methods(Panel)
 # docs = get_method_docstring.(Panel, _methods)
 
@@ -90,5 +84,5 @@ end
 # for (m, d) in zip(_methods, docs)
 #     println(render_method(m))
 #     tprintln(d)
-    
+
 # end

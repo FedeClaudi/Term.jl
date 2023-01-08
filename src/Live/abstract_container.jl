@@ -57,7 +57,6 @@ function key_press(container::AbstractWidgetContainer, ::Enter)
     end
 end
 
-
 function key_press(container::AbstractWidgetContainer, c::Char)::Tuple{Bool,Nothing}
     widget = get_active(container)
 

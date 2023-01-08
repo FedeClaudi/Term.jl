@@ -24,45 +24,35 @@ using Term.Compositors
 
 # ------------------------------- app elements ------------------------------- #
 # print this compositor if you want to see the layout
-layout = :(
-    A(21, 0.4) * (
-        R(6, 0.6) /
-        G(6, 0.6) /
-        B(6, 0.6) /
-        b(3, 0.6)
-    )
-) 
+layout = :(A(21, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(3, 0.6)))
 template = Compositor(layout)
 
 element_width(elem::Symbol) = template.elements[elem].w
 element_height(elem::Symbol) = template.elements[elem].h - 1 # the -1 is to account for focus marker
 
 # create some widgets
-rgb_visualizer = TextWidget("";
-    width = element_width(:A),
-    height = element_height(:A),
-)
+rgb_visualizer = TextWidget(""; width = element_width(:A), height = element_height(:A))
 
 R = InputBox(
     width = element_width(:R),
     height = element_height(:R),
     title = "R value",
-    style="red",
-    title_justify=:center
+    style = "red",
+    title_justify = :center,
 )
 G = InputBox(
     width = element_width(:G),
     height = element_height(:G),
     title = "G value",
-    style="green",
-    title_justify=:center
+    style = "green",
+    title_justify = :center,
 )
 B = InputBox(
     width = element_width(:B),
     height = element_height(:B),
     title = "B value",
-    style="blue",
-    title_justify=:center
+    style = "blue",
+    title_justify = :center,
 )
 
 button = Button(
@@ -81,18 +71,15 @@ widgets = OrderedDict{Symbol,AbstractWidget}(
     :b => button,
 )
 
-
 # create transition rules
 transition_rules = OrderedDict{Tuple{Symbol,KeyInput},Symbol}(
     (:A, ArrowRight()) => :R,
     (:R, ArrowDown()) => :G,
     (:G, ArrowDown()) => :B,
     (:B, ArrowDown()) => :b,
-
     (:b, ArrowUp()) => :B,
     (:B, ArrowUp()) => :G,
     (:G, ArrowUp()) => :R,
-
     (:R, ArrowLeft()) => :A,
     (:G, ArrowLeft()) => :A,
     (:B, ArrowLeft()) => :A,
@@ -112,7 +99,6 @@ function get_color(ib::InputBox)
     return color
 end
 
-
 # define a callback function to update rgb_visalizer at each frame
 function update_visualizer(app::App)
     r = get_color(app.widgets[:R])
@@ -121,9 +107,11 @@ function update_visualizer(app::App)
 
     viz = app.widgets[:A]
 
-    viz.text =  "(r:$r, g:$g, b:$b)" / apply_style(
-        join(repeat([" "^(viz.measure.w-6)], viz.measure.h-3), "\n"), "on_($r, $g, $b)"
-    )
+    viz.text =
+        "(r:$r, g:$g, b:$b)" / apply_style(
+            join(repeat([" "^(viz.measure.w - 6)], viz.measure.h - 3), "\n"),
+            "on_($r, $g, $b)",
+        )
 end
 
 function set_random_color(::Button)
