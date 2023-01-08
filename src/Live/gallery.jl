@@ -7,13 +7,15 @@ A `Gallery` containes multiple widgets, but only shows one at the time.
     widgets::Vector{AbstractWidget}
     active::Int
     show_panel::Bool
+    on_draw::Union{Nothing, Function}
 end
 
 function Gallery(
     widgets::Vector;
     height::Int = console_height() - 5,
     width::Int = console_width(),
-    show_panel::Bool=true
+    show_panel::Bool=true,
+    on_draw::Union{Nothing, Function} = nothing,
 )
     # measure widgets
     widgets_measures = getfield.(widgets, :measure)
@@ -23,7 +25,7 @@ function Gallery(
     @assert max_w < (width - 4) "Gallery width set to $width but a widget has width $max_w, $(width - max_w - 5) above the limit."
     @assert max_h < (height - 4) "Gallery width set to $height but a widget has height $max_h, $(height - max_h - 5) above the limit."
 
-    return Gallery(LiveInternals(), Measure(height, width), widgets, 1, show_panel)
+    return Gallery(LiveInternals(), Measure(height, width), widgets, 1, show_panel, on_draw)
 end
 
 """
@@ -52,15 +54,19 @@ function key_press(gal::Gallery, ::Esc)
 end
 
 # ----------------------------------- frame ---------------------------------- #
-frame(gal::Gallery; kwargs...) = Panel(
-    frame(get_active(gal));
-    title = gal.show_panel ? "Widget $(gal.active)/$(length(gal.widgets))" : nothing,
-    justify = :center,
-    style = gal.show_panel ? "dim" : "hidden",
-    title_style = "default",
-    title_justify = :center,
-    fit = false,
-    width = gal.measure.w,
-    height = gal.measure.h,
-    padding = (1, 1, 1, 1),
-)
+function frame(gal::Gallery; kwargs...)
+    isnothing(gal.on_draw) || on_draw(gal)
+
+    Panel(
+        frame(get_active(gal));
+        title = gal.show_panel ? "Widget $(gal.active)/$(length(gal.widgets))" : nothing,
+        justify = :center,
+        style = gal.show_panel ? "dim" : "hidden",
+        title_style = "default",
+        title_justify = :center,
+        fit = false,
+        width = gal.measure.w,
+        height = gal.measure.h,
+        padding = (1, 1, 1, 1),
+    )
+end

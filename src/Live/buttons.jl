@@ -76,6 +76,7 @@ end
     status::Symbol
     callback::Union{Nothing,Function}
     lastpressed::Int
+    on_draw::Union{Nothing, Function}
 end
 
 function Button(
@@ -85,6 +86,7 @@ function Button(
     not_pressed_text_style = "red",
     width::Int = 10,
     height::Int = 3,
+    on_draw::Union{Nothing, Function} = nothing,
     kwargs...,
 )
     pressed, not_pressed = make_buttons_panels(
@@ -105,11 +107,14 @@ function Button(
         :not_pressed,
         nothing,
         0,
+        on_draw,
     )
 end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::Button; kwargs...)
+    isnothing(b.on_draw) || on_draw(b)
+
     return if b.status == :pressed
         currtime = Dates.value(now())
         if currtime - b.lastpressed > 100
@@ -139,6 +144,7 @@ activated and not.
     status::Symbol
     callback::Union{Nothing,Function}
     lastpressed::Int
+    on_draw::Union{Nothing, Function}
 end
 
 function ToggleButton(
@@ -148,6 +154,7 @@ function ToggleButton(
     not_pressed_text_style = "red",
     width::Int = 10,
     height::Int = 3,
+    on_draw::Union{Nothing, Function} = nothing,
     kwargs...,
 )
     pressed, not_pressed = make_buttons_panels(
@@ -168,11 +175,14 @@ function ToggleButton(
         :not_pressed,
         nothing,
         0,
+        on_draw,
     )
 end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::ToggleButton; kwargs...)
+    isnothing(b.on_draw) || on_draw(b)
+    
     return if b.status == :pressed
         b.pressed_display
     else

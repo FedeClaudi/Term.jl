@@ -12,6 +12,7 @@ using keys such as arrow up and arrow down.
     tot_lines::Int
     curr_line::Int
     page_lines::Int
+    on_draw::Union{Nothing, Function}
 end
 
 function Pager(
@@ -20,6 +21,7 @@ function Pager(
     title::String = "Term.jl PAGER",
     width::Int = console_width(),
     line_numbers::Bool = false,
+    on_draw::Union{Nothing, Function} = nothing,
 )
     page_lines = min(page_lines, console_height() - 8)
 
@@ -40,6 +42,7 @@ function Pager(
         length(content),
         1,
         page_lines,
+        on_draw,
     )
 end
 
@@ -51,6 +54,8 @@ end
 Create a Panel with, as content, the currently visualized lines in the Pager.
 """
 function frame(pager::Pager; omit_panel = false)::AbstractRenderable
+    isnothing(frame.on_draw) || on_draw(frame)
+
     i, Δi = pager.curr_line, pager.page_lines
 
     page = if Δi >= pager.tot_lines
