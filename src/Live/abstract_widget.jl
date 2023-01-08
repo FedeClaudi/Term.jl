@@ -75,10 +75,13 @@ end
 """
     AbstractWidget
 
-Abstract widgets must have two onligatory fields:
+Abstract widgets must have two obligatory fields:
 
     internals::LiveInternals
     measure::Measure
+
+and one optional one
+    on_draw::Union{Nothing, Function} = nothing
 """
 abstract type AbstractWidget end
 
@@ -259,6 +262,7 @@ function stop!(widget::AbstractWidget)
 
     internals = widget.internals
     print(internals.term.out_stream, "\x1b[?25h") # unhide cursor
+    print(stdout, "\x1b[?25h")
     raw!(internals.term, false)
     nothing
 end

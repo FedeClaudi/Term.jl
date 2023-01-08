@@ -23,7 +23,7 @@ end
 function App(
     layout::Expr,
     widgets::AbstractDict,
-    transition_rules::Union{Nothing,AbstractDict{Tuple{Symbol,KeyInput},Symbol}};
+    transition_rules::Union{Nothing,AbstractDict{Tuple{Symbol,KeyInput},Symbol}}=nothing;
     on_draw::Union{Nothing, Function}=nothing
 )
 

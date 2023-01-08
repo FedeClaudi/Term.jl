@@ -6,12 +6,14 @@ A `Gallery` containes multiple widgets, but only shows one at the time.
     measure::Measure
     widgets::Vector{AbstractWidget}
     active::Int
+    show_panel::Bool
 end
 
 function Gallery(
     widgets::Vector;
     height::Int = console_height() - 5,
     width::Int = console_width(),
+    show_panel::Bool=true
 )
     # measure widgets
     widgets_measures = getfield.(widgets, :measure)
@@ -21,7 +23,7 @@ function Gallery(
     @assert max_w < (width - 4) "Gallery width set to $width but a widget has width $max_w, $(width - max_w - 5) above the limit."
     @assert max_h < (height - 4) "Gallery width set to $height but a widget has height $max_h, $(height - max_h - 5) above the limit."
 
-    return Gallery(LiveInternals(), Measure(height, width), widgets, 1)
+    return Gallery(LiveInternals(), Measure(height, width), widgets, 1, show_panel)
 end
 
 """
@@ -52,9 +54,9 @@ end
 # ----------------------------------- frame ---------------------------------- #
 frame(gal::Gallery; kwargs...) = Panel(
     frame(get_active(gal));
-    title = "Widget $(gal.active)/$(length(gal.widgets))",
+    title = gal.show_panel ? "Widget $(gal.active)/$(length(gal.widgets))" : nothing,
     justify = :center,
-    style = "dim",
+    style = gal.show_panel ? "dim" : "hidden",
     title_style = "default",
     title_justify = :center,
     fit = false,

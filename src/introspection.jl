@@ -2,7 +2,7 @@ module Introspection
 
 using InteractiveUtils
 import InteractiveUtils: supertypes as getsupertypes
-
+import OrderedCollections: OrderedDict
 import MyterialColors: pink, pink_light, orange, grey_dark, light_green
 
 import Term:
@@ -15,7 +15,10 @@ import Term:
     expr2string,
     default_width,
     TERM_THEME,
-    highlight_syntax
+    highlight_syntax,
+    load_code_and_highlight,
+    str_trunc,
+    reshape_text
 
 import ..Renderables: RenderableText
 import ..Panels: Panel
@@ -25,9 +28,12 @@ import ..Layout: hLine, vLine, Spacer, rvstack, lvstack
 import ..Tprint: tprintln
 import ..Repr: termshow
 using ..LiveWidgets
+import ..LiveWidgets: ArrowDown, ArrowUp
 import ..TermMarkdown: parse_md
 import ..Consoles: console_width, console_height
 import ..Style: apply_style
+import ..Compositors: Compositor
+import ..Links: Link
 
 include("_inspect.jl")
 
@@ -104,20 +110,30 @@ end
 #                             INTROSPECT DATATYPES                             #
 # ---------------------------------------------------------------------------- #
 
-function style_methods(methods::Union{Vector{Base.Method},Base.MethodList})
+function style_methods(methods::Union{Vector{Base.Method},Base.MethodList}, width::Int)
     mets = []
     fn_col = TERM_THEME[].func
+    panel_col = TERM_THEME[].text_accent
+    col = TERM_THEME[].inspect_highlight
     for (i, m) in enumerate(methods)
-        _name = split(string(m), " in ")[1]
-        code = (occursin(_name, string(m.name)) ? split(_name, string(m.name))[2] : _name)
+        # method code
+        code = split(string(m), " in ")[1] |> highlight_syntax
+        code = reshape_text(apply_style(code), width - 20; ignore_markup = true)
 
-        code = replace(code, string(m.name) => "")
-        code = RenderableText(
-            "     {$pink dim}($i){/$pink dim}  {$(fn_col)}$(m.name){/$(fn_col)}" * code,
+        # method source
+        modul = "{bold dim $col}" * string(m.module) * "{/bold dim $col}"
+        source = "{dim}$(m.file):$(m.line){/dim}"
+        code = Panel(code; width=width, style="$panel_col dim",
+            title = modul,
+            subtitle=source,
+            subtitle_justify=:right,
+            padding=(4, 4, 1, 1)
         )
 
-        dest = RenderableText("{dim italic} $(m.file):$(m.line){/dim italic}")
-        push!(mets, string(code / dest))
+
+        # method number
+        num = "\n{$fn_col dim}($i){/$fn_col dim} "
+        push!(mets,  (num * code)/""/"")
     end
     return mets
 end
@@ -133,32 +149,23 @@ Flags can be used to choose the level of detail in the information presented:
  - supertypes: show methods using `T`'s supertypes in their signature
 """
 function inspect(T::Union{Union,DataType};)
-    constructors_content = join(
-        string.(
-            Panel.(
-                style_methods(Base.methods(T));
-                fit = false,
-                width = console_width() - 33,
-                padding = (0, 0, 0, 0),
-                style = "hidden",
-            )
-        ),
-        '\n',
+    # get app size
+    layout = :(
+        A(3, 1.0) / B(37, 1.0)
     )
+    comp = Compositor(layout)
+    widget_width = comp.elements[:B].w - 6
+    widget_height = comp.elements[:B].h - 10
+
+    # get app content
+    constructors_content = join(string.(
+            style_methods(Base.methods(T), widget_width-12)
+    ), "\n")
 
     _methods = vcat(methodswith.(getsupertypes(T)[1:(end - 1)])...)
-    supertypes_methods = join(
-        string.(
-            Panel.(
-                style_methods(_methods);
-                fit = false,
-                width = console_width() - 33,
-                padding = (0, 0, 0, 0),
-                style = "hidden",
-            )
-        ),
-        "\n",
-    )
+    supertypes_methods = join(string.(
+            style_methods(_methods, widget_width-12)
+    ), "\n")
 
     theme = TERM_THEME[]
     field_names = apply_style.(string.(fieldnames(T)), theme.repr_accent)
@@ -169,35 +176,58 @@ function inspect(T::Union{Union,DataType};)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
     type_name = apply_style(string(T), theme.repr_name * " bold")
 
-    # create tabview widget
-    error("make app")
-    # tabwidth = console_width() - 26
-    # tab_height = 25
-    # info = string(
-    #     Panel(type_name / ("  " * line * fields); fit=false, 
-    #             width=tabwidth-10, justify=:center,
-    #             title="Fields", title_style="bright_blue bold",
-    #             style="bright_blue dim"
-    #     ) /
-    #     hLine(tabwidth-10; style="dim") / 
-    #     "" /
-    #     Tree(T))
 
-    # tv = TabViewer(
-    #     ["Info",  "Docs", "Constructors", "Methods"],
-    #     [
-    #     Pager(info; width=tabwidth, page_lines=tab_height), 
-    #     Pager(parse_md(get_docstring(T)[1]); width=tabwidth, page_lines=tab_height), 
-    #     Pager(constructors_content; width=tabwidth, page_lines=tab_height), 
-    #     Pager(supertypes_methods; width=tabwidth, page_lines=tab_height)
-    #     ];
-    #     active_background=[theme.text_accent, theme.docstring, theme.func, theme.func], 
-    #     active_color="bold black",
-    #     inactive_color=[theme.text_accent, theme.docstring, theme.func, theme.func],
 
-    # )
-    # play(tv; transient=false) 
-    # stop!(tv)
+    # create app
+    menu = ButtonsMenu(
+        ["Info", "Docs", "Constructors", "methods"];
+        width = comp.elements[:A].w,
+        height = comp.elements[:A].h-1,
+        layout=:horizontal
+        )
+
+
+    gallery_widgets = [
+        Pager(
+            string(
+                Panel(type_name / ("  " * line * fields); fit=false, 
+                        width=widget_width-10, justify=:center,
+                        title="Fields", title_style="bright_blue bold",
+                        style="bright_blue dim"
+                ) /
+                hLine(widget_width-10; style="dim") / 
+                "" /
+                Tree(T)
+            );
+            width=widget_width, 
+            page_lines=widget_height
+        ),
+        Pager(parse_md(get_docstring(T)[1]); width=widget_width, page_lines=widget_height), 
+        Pager(constructors_content; width=widget_width, page_lines=widget_height), 
+        Pager(supertypes_methods; width=widget_width, page_lines=widget_height)
+    ]
+
+
+
+    widgets = OrderedDict(
+        :A => menu,
+        :B => Gallery(gallery_widgets; 
+            width = comp.elements[:B].w,
+            height = comp.elements[:B].h - 1,
+            show_panel=false,
+        )
+    )
+
+    function cb(app)
+        app.widgets[:A].active = app.widgets[:B].active
+    end
+
+
+    app = App(
+        layout, widgets; on_draw = cb
+    )
+    app.active=:B
+    play(app; transient=false) 
 end
 
 function inspect(F::Function; documentation::Bool = true)

@@ -56,6 +56,11 @@ mutable struct Panel <: AbstractPanel
     segments::Vector
     measure::Measure
 
+    """
+        Panel(x1, x2; kwargs...)
+
+    Catch construction with exactly two items passed
+    """
     function Panel(x1, x2; kwargs...)
         # this is necessary to handle the special case in which 2 objs are passed
         # but they are not segments/measure

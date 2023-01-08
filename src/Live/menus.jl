@@ -161,6 +161,7 @@ Styling reflects which option is currently selected
         # make a panel for each button
         active_titles, inactive_titles = Panel[], Panel[]
         button_width = layout == :vertical ? width : fint(width / n)
+        button_height = layout == :vertical ? fint(height/n) : height
 
         for (i, t) in enumerate(titles)
             push!(
@@ -174,7 +175,7 @@ Styling reflects which option is currently selected
                     width = button_width,
                     justify = justify,
                     box = box,
-                    height = height,
+                    height = button_height,
                     padding = (1, 1, 1, 1),
                 ),
             )
@@ -190,7 +191,7 @@ Styling reflects which option is currently selected
                     width = button_width,
                     justify = justify,
                     box = box,
-                    height = height,
+                    height = button_height,
                     padding = (1, 1, 1, 1),
                 ),
             )
@@ -200,7 +201,7 @@ Styling reflects which option is currently selected
             Measure(something(height, length(titles)), width)
         else
             hmax = maximum(map(p -> p.measure.h, inactive_titles))
-            Measure(something(height, hmax), button_width)
+            Measure(something(height, hmax), width)
         end
 
         return new(

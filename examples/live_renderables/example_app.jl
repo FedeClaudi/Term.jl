@@ -20,6 +20,7 @@ using Term.Consoles
 import Term.LiveWidgets: AbstractWidget, KeyInput, ArrowRight, ArrowLeft, ArrowUp, ArrowDown
 import OrderedCollections: OrderedDict
 import Term: apply_style
+using Term.Compositors
 
 # ------------------------------- app elements ------------------------------- #
 # print this compositor if you want to see the layout
