@@ -1,3 +1,6 @@
+"""
+A `Gallery` containes multiple widgets, but only shows one at the time. 
+"""
 @with_repr mutable struct Gallery <: AbstractWidgetContainer
     internals::LiveInternals
     measure::Measure
@@ -22,6 +25,8 @@ function Gallery(
 end
 
 """
+$(default_container_commands)
+
 - {bold white}key right{/bold white}: next gallery item
 """
 key_press(gal::Gallery, ::ArrowRight) = activate_next(gal)
@@ -32,6 +37,17 @@ key_press(gal::Gallery, ::ArrowRight) = activate_next(gal)
 key_press(gal::Gallery, ::ArrowLeft) = activate_previous(gal)
 
 key_press(gal::Gallery, key::KeyInput) = key_press(get_active(gal), key)
+
+function key_press(gal::Gallery, ::Enter) 
+    gal.internals.should_stop = true
+    return nothing
+end
+
+
+function key_press(gal::Gallery, ::Esc) 
+    gal.internals.should_stop = true
+    return nothing
+end
 
 # ----------------------------------- frame ---------------------------------- #
 frame(gal::Gallery; kwargs...) = Panel(

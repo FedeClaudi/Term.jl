@@ -10,7 +10,7 @@ An `App` is a collection of widgets.
     Transition rules bind keys to "movement" in the app to change
     focus to a different widget
 """
-@with_repr mutable struct App <: AbstractWidgAbstractWidgetContaineret
+@with_repr mutable struct App <: AbstractWidgetContainer
     internals::LiveInternals
     measure::Measure
     compositor::Compositor
@@ -85,6 +85,9 @@ function frame(app::App; kwargs...)
 end
 
 # --------------------------------- controls --------------------------------- #
+"""
+$(default_container_commands)
+"""
 function key_press(app::App, key::KeyInput)
     # see if a rule has been implemented
     app.active = try
@@ -95,7 +98,13 @@ function key_press(app::App, key::KeyInput)
     end
 end
 
-function key_press(app::App, ::Esc)
-    app.internals.should_stop = true
+function key_press(app::App, ::Enter) 
+    live.internals.should_stop = true
+    return nothing
+end
+
+
+function key_press(app::App, ::Esc) 
+    live.internals.should_stop = true
     return nothing
 end

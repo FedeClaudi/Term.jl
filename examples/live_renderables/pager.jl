@@ -12,6 +12,8 @@ Multiple pagers are visualized via a Gallry widget.
 filepath1 = "././src/live/abstract_widget.jl"
 filepath2 = "././src/live/_input.jl"
 
+@assert console_width() > 100 "This example works best in a wide enough temrinal"
+
 gallery = Gallery(
     [
         Pager(

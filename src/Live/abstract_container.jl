@@ -8,7 +8,7 @@ AbstractWidgetContainer must have two obligatory fields:
 """
 abstract type AbstractWidgetContainer <: AbstractWidget end
 
-get_active(container::AbstractWidgetContainer) = container.widgets[widget.active]
+get_active(container::AbstractWidgetContainer) = container.widgets[container.active]
 
 """
     activate_next(container::AbstractWidgetContainer)
@@ -29,6 +29,16 @@ end
 
 # --------------------------------- controls --------------------------------- #
 
+default_container_commands = """
+- {bold white}esc{/bold white}: quit program, without returning a value
+
+- {bold white}q{/bold white}: quit program without returning anything
+
+- {bold white}h{/bold white}: toggle help message display
+
+- {bold white}w{/bold white}: toggle help message display for currently active widget
+"""
+
 """
 - {bold white}esc{/bold white}: quit program, without returning a value
 
@@ -46,6 +56,7 @@ function key_press(container::AbstractWidgetContainer, ::Enter)
         return key_press(container, Esc())
     end
 end
+
 
 function key_press(container::AbstractWidgetContainer, c::Char)::Tuple{Bool,Nothing}
     widget = get_active(container)

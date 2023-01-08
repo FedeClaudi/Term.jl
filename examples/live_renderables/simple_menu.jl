@@ -28,4 +28,4 @@ retval = LiveWidgets.play(mn; transient = false)
 
 print("The menu returned the value: $retval")
 
-# TODO make text appear
+
