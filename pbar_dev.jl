@@ -1,5 +1,5 @@
 using Term
-using Term.LiveDisplays
+using Term.LiveWidgets
 using Term.Consoles
 using Term.Progress
 
@@ -10,8 +10,9 @@ job = addjob!(pbar; N = 100)
 start!(pbar)
 for i in 1:100
     Progress.update!(job)
-    i % 25 == 0 && println("We can print from here too")
-    LiveDisplays.refresh!(pbar) || break
+    # i % 25 == 0 && println("We can print from here too")
+    LiveWidgets.refresh!(pbar) 
+    sleep(0.01)
 end
 Progress.stop!(pbar)
 
