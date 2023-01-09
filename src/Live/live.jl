@@ -4,6 +4,7 @@ using REPL.Terminals: raw!, AbstractTerminal
 using Dates
 import Base.Docs: doc as getdocs
 using Markdown
+using AbstractTrees
 
 import MyterialColors: pink
 
@@ -29,6 +30,7 @@ include("_input.jl")
 
 # ------------------------------- base widgets ------------------------------- #
 include("abstract_widget.jl")
+include("help.jl")
 include("widgets.jl")
 include("pager.jl")
 include("buttons.jl")

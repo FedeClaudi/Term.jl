@@ -7,6 +7,7 @@ using keys such as arrow up and arrow down.
 @with_repr mutable struct Pager <: AbstractWidget
     internals::LiveInternals
     measure::Measure
+    controls::AbstractDict
     content::Vector{String}
     title::String
     tot_lines::Int
@@ -15,8 +16,62 @@ using keys such as arrow up and arrow down.
     on_draw::Union{Nothing,Function}
 end
 
+
+
+# --------------------------------- controls --------------------------------- #
+"""
+move to the next line
+"""
+next_line(p::Pager, ::Union{Char, ArrowDown}) = p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + 1)
+
+"""
+move to the previous line
+"""
+prev_line(p::Pager, ::Union{Char, ArrowUp}) = p.curr_line = max(1, p.curr_line - 1)
+
+"""
+move to the next page
+"""
+next_page(p::Pager, ::Union{PageDownKey, ArrowRight, Char}) = p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + p.page_lines)
+
+
+"""
+move to the previous page
+"""
+prev_page(p::Pager, ::Union{PageUpKey, ArrowLeft, Char}) = p.curr_line = max(1, p.curr_line - p.page_lines)
+
+
+"""
+move to first line
+"""
+home(p::Pager, ::HomeKey) = p.curr_line = 1
+
+"""
+move to the last line
+"""
+toend(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
+
+
+
+pager_controls = Dict(
+    ArrowRight() => next_page,
+    ']' => next_page,
+    ArrowLeft() => prev_page,
+    '[' => prev_page,
+    ArrowDown() => next_line,
+    ArrowUp() => prev_line,
+    HomeKey() => home,
+    EndKey() => toend,
+    Esc() => quit,
+    'q' => quit,
+    'h' => toggle_help,
+)
+
+
+
 function Pager(
     content::String;
+    controls::AbstractDict = pager_controls,
     page_lines::Int = min(console_height() - 5, 25),
     title::String = "Term.jl PAGER",
     width::Int = console_width(),
@@ -37,6 +92,7 @@ function Pager(
     return Pager(
         LiveInternals(),
         Measure(page_lines + 4, width),
+        controls,
         content,
         title,
         length(content),
@@ -119,61 +175,3 @@ function frame(pager::Pager; omit_panel = false)::AbstractRenderable
     )
 end
 
-# --------------------------------- controls --------------------------------- #
-"""
-- {bold white}arrow down, '.'{/bold white}: move to the next line
-"""
-function key_press(p::Pager, ::ArrowDown)
-    p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + 1)
-end
-
-"""
-- {bold white}arrow up, ','{/bold white}: move to the previous line
-"""
-function key_press(p::Pager, ::ArrowUp)
-    p.curr_line = max(1, p.curr_line - 1)
-end
-
-"""
-- {bold white}page down, arrow right, ']'{/bold white}: move to the next page
-"""
-function key_press(p::Pager, ::Union{PageDownKey,ArrowRight})
-    p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + p.page_lines)
-end
-
-"""
-- {bold white}page up, arrow left, '['{/bold white}: move to the previous page
-"""
-function key_press(p::Pager, ::Union{PageUpKey,ArrowLeft})
-    p.curr_line = max(1, p.curr_line - p.page_lines)
-end
-
-"""
-- {bold white}home key{/bold white}: move to first line
-"""
-key_press(p::Pager, ::HomeKey) = p.curr_line = 1
-
-"""
-- {bold white}end key{/bold white}: move to the last line
-"""
-key_press(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
-
-"""
-- {bold white}q{/bold white}: quit program without returning anything
-
-- {bold white}h{/bold white}: toggle help message display
-"""
-function key_press(p::Pager, c::Char)::Tuple{Bool,Nothing}
-    c == ']' && key_press(p, ArrowRight())
-    c == '[' && key_press(p, ArrowLeft())
-
-    c == ',' && key_press(p, ArrowUp())
-    c == '.' && key_press(p, ArrowDown())
-
-    c == 'q' && return (true, nothing)
-    c == 'h' && begin
-        toggle_help(p)
-        return (false, nothing)
-    end
-    return (false, nothing)
-end

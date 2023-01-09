@@ -5,6 +5,7 @@ import InteractiveUtils: supertypes as getsupertypes
 import OrderedCollections: OrderedDict
 import MyterialColors: pink, pink_light, orange, grey_dark, light_green
 
+
 import Term:
     highlight,
     escape_brackets,
@@ -28,7 +29,7 @@ import ..Layout: hLine, vLine, Spacer, rvstack, lvstack
 import ..Tprint: tprintln
 import ..Repr: termshow
 using ..LiveWidgets
-import ..LiveWidgets: ArrowDown, ArrowUp
+import ..LiveWidgets: ArrowDown, ArrowUp, KeyInput
 import ..TermMarkdown: parse_md
 import ..Consoles: console_width, console_height
 import ..Style: apply_style
@@ -110,32 +111,24 @@ end
 #                             INTROSPECT DATATYPES                             #
 # ---------------------------------------------------------------------------- #
 
-function style_methods(methods::Union{Vector{Base.Method},Base.MethodList}, width::Int)
+function style_methods(methods::Union{Vector{Base.Method},Base.MethodList}, docstrings::Vector, width::Int)
     mets = []
     fn_col = TERM_THEME[].func
     panel_col = TERM_THEME[].text_accent
     col = TERM_THEME[].inspect_highlight
-    for (i, m) in enumerate(methods)
+
+    for (i, (m, docs)) in enumerate(zip(methods, docstrings))
         # method code
         code = split(string(m), " in ")[1] |> highlight_syntax
         code = reshape_text(apply_style(code), width - 20; ignore_markup = true)
 
+        # get docstring
+        docs = parse_md(something(docs, ""); width=width-20)
+
         # method source
         modul = "{bold dim $col}" * string(m.module) * "{/bold dim $col}"
         source = "{dim}$(m.file):$(m.line){/dim}"
-        code = Panel(
-            code;
-            width = width,
-            style = "$panel_col dim",
-            title = modul,
-            subtitle = source,
-            subtitle_justify = :right,
-            padding = (4, 4, 1, 1),
-        )
-
-        # method number
-        num = "\n{$fn_col dim}($i){/$fn_col dim} "
-        push!(mets, (num * code) / "" / "")
+        push!(mets, docs/""/(modul * " " * code)/""/source)
     end
     return mets
 end
@@ -157,13 +150,7 @@ function inspect(T::Union{Union,DataType};)
     widget_width = comp.elements[:B].w - 6
     widget_height = comp.elements[:B].h - 10
 
-    # get app content
-    constructors_content =
-        join(string.(style_methods(Base.methods(T), widget_width - 12)), "\n")
-
-    _methods = vcat(methodswith.(getsupertypes(T)[1:(end - 1)])...)
-    supertypes_methods = join(string.(style_methods(_methods, widget_width - 12)), "\n")
-
+    # get fields
     theme = TERM_THEME[]
     field_names = apply_style.(string.(fieldnames(T)), theme.repr_accent)
     field_types = apply_style.(map(f -> "::" * string(f), T.types), theme.repr_type)
@@ -173,9 +160,17 @@ function inspect(T::Union{Union,DataType};)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
     type_name = apply_style(string(T), theme.repr_name * " bold")
 
+    # get app content
+    type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width - 20)
+    methods_pagers = map(
+        m -> Pager(string(m); width = widget_width-6, page_lines = widget_height-5),
+        type_methods
+    ) |> collect
+
+
     # create app
     menu = ButtonsMenu(
-        ["Info", "Docs", "Constructors", "methods"];
+        ["Info", "Methods"];
         width = comp.elements[:A].w,
         height = comp.elements[:A].h - 1,
         layout = :horizontal,
@@ -197,30 +192,34 @@ function inspect(T::Union{Union,DataType};)
             width = widget_width,
             page_lines = widget_height,
         ),
-        Pager(
-            parse_md(get_docstring(T)[1]);
-            width = widget_width,
-            page_lines = widget_height,
-        ),
-        Pager(constructors_content; width = widget_width, page_lines = widget_height),
-        Pager(supertypes_methods; width = widget_width, page_lines = widget_height),
+        Gallery(
+            methods_pagers;
+            width = comp.elements[:B].w - 6,
+            height = comp.elements[:B].h - 6,
+            show_panel = true,
+        )
     ]
 
     widgets = OrderedDict(
         :A => menu,
         :B => Gallery(
             gallery_widgets;
-            width = comp.elements[:B].w,
+            width = comp.elements[:B].w - 1,
             height = comp.elements[:B].h - 1,
             show_panel = false,
         ),
     )
 
+    transition_rules = OrderedDict{Tuple{Symbol,KeyInput},Symbol}(
+    (:A, ArrowDown()) => :B,
+    (:B, ArrowUp()) => :A,
+    )
+
     function cb(app)
-        app.widgets[:A].active = app.widgets[:B].active
+        app.widgets[:B].active = app.widgets[:A].active
     end
 
-    app = App(layout, widgets; on_draw = cb)
+    app = App(layout, widgets, transition_rules; on_draw = cb)
     app.active = :B
     play(app; transient = false)
 end

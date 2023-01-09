@@ -17,7 +17,7 @@ These are the steps:
 using Term
 using Term.LiveWidgets
 using Term.Consoles
-import Term.LiveWidgets: AbstractWidget, KeyInput, ArrowRight, ArrowLeft, ArrowUp, ArrowDown
+import Term.LiveWidgets: AbstractWidget, KeyInput, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, set_active
 import OrderedCollections: OrderedDict
 import Term: apply_style
 using Term.Compositors

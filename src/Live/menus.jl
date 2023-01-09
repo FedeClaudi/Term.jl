@@ -11,27 +11,34 @@ and using Enter to select an option.
 abstract type AbstractMenu <: AbstractWidget end
 
 # --------------------------------- controls --------------------------------- #
-""" 
-- {bold white}arrow down/right{/bold white}: select a next option if one is available
-"""
-function key_press(mn::AbstractMenu, ::Union{ArrowRight,ArrowDown})
-    mn.active = min(mn.active + 1, mn.n_titles)
-end
 
-"""
-- {bold white}arrow up/left{/bold white}: select a previos option if one is available
-"""
-function key_press(mn::AbstractMenu, ::Union{ArrowLeft,ArrowUp})
-    mn.active = max(1, mn.active - 1)
-end
+menu_activate_next(mn::AbstractMenu, ::Any) = mn.active = min(mn.active + 1, mn.n_titles)
 
-"""
-- {bold white}enter{/bold white}: select the current option, quit program and return selection.
-"""
-function key_press(mn::AbstractMenu, ::Enter)
+menu_activate_prev(mn::AbstractMenu, ::Any) = mn.active = max(1, mn.active - 1)
+
+function menu_return_value(mn::AbstractMenu, ::Enter)
     mn.internals.should_stop = true
     return mn.active
 end
+
+vert_menu_controls = Dict(
+    ArrowDown() => menu_activate_next,
+    ArrowUp() => menu_activate_prev,
+    Enter() => menu_return_value,
+    Esc() => quit,
+    'q' => quit,
+    'h' => toggle_help,
+)
+
+
+hor_menu_controls = Dict(
+    ArrowRight() => menu_activate_next,
+    ArrowLeft() => menu_activate_prev,
+    Enter() => menu_return_value,
+    Esc() => quit,
+    'q' => quit,
+    'h' => toggle_help,
+)
 
 # ----------------------------------- frame ---------------------------------- #
 """
@@ -62,6 +69,7 @@ The currently selected option is highlighted with a different style.
 @with_repr mutable struct SimpleMenu <: AbstractMenu
     internals::LiveInternals
     measure::Measure
+    controls::AbstractDict
     active_titles::Vector{String}
     inactive_titles::Vector{String}
     n_titles::Int
@@ -71,6 +79,7 @@ The currently selected option is highlighted with a different style.
 
     function SimpleMenu(
         titles::Vector;
+        controls::Union{Nothing, AbstractDict} = nothing,
         width = default_width(),
         active_style::String = "white bold",
         inactive_style::String = "dim",
@@ -78,6 +87,11 @@ The currently selected option is highlighted with a different style.
         layout::Symbol = :vertical,
         on_draw::Union{Nothing,Function} = nothing,
     )
+
+        controls = something(controls,
+            layout == :vertical ? vert_menu_controls : hor_menu_controls
+        )
+
         max_titles_width =
             layout == :vertical ?
             min(width, maximum(get_width.(titles)) + textwidth(active_symbol) + 1) : width
@@ -109,6 +123,7 @@ The currently selected option is highlighted with a different style.
         return new(
             LiveInternals(),
             Measure(length(titles), width),
+            controls,
             active_titles,
             inactive_titles,
             length(titles),
@@ -127,6 +142,7 @@ Styling reflects which option is currently selected
 @with_repr mutable struct ButtonsMenu <: AbstractMenu
     internals::LiveInternals
     measure::Measure
+    controls::AbstractDict
     active_titles::Vector{String}
     inactive_titles::Vector{String}
     n_titles::Int
@@ -136,6 +152,7 @@ Styling reflects which option is currently selected
 
     function ButtonsMenu(
         titles::Vector;
+        controls::Union{Nothing, AbstractDict} = nothing,
         width::Int = console_width(),
         active_color::Union{Vector,String} = "black",
         active_background::Union{Vector,String} = "white",
@@ -148,6 +165,10 @@ Styling reflects which option is currently selected
         on_draw::Union{Nothing,Function} = nothing,
         panel_kwargs...,
     )
+
+        controls = something(controls,
+            layout == :vertical ? vert_menu_controls : hor_menu_controls
+        )
 
         # get parameters for each button
         n = length(titles)
@@ -214,6 +235,7 @@ Styling reflects which option is currently selected
         return new(
             LiveInternals(),
             measure,
+            controls,
             string.(active_titles),
             string.(inactive_titles),
             length(titles),
@@ -235,6 +257,7 @@ Color indicates current active option, ticks selected options
 @with_repr mutable struct MultiSelectMenu <: AbstractMenu
     internals::LiveInternals
     measure::Measure
+    controls::AbstractDict
     options::Vector
     active_style::String
     inactive_style::String
@@ -245,48 +268,14 @@ Color indicates current active option, ticks selected options
     selected_sym::String
     notselected_sym::String
     on_draw::Union{Nothing,Function}
-
-    function MultiSelectMenu(
-        options::Vector;
-        active_style::String = "white bold",
-        inactive_style::String = "dim",
-        width::Int = console_width(),
-        on_draw::Union{Nothing,Function} = nothing,
-    )
-        selected_sym = apply_style("✔ ", active_style)
-        notselected_sym = apply_style("□ ", inactive_style)
-
-        max_titles_width = min(width, maximum(get_width.(options)) + 2)
-
-        new(
-            LiveInternals(),
-            Measure(length(options), width),
-            options,
-            active_style,
-            inactive_style,
-            max_titles_width,
-            Int[],
-            1,
-            length(options),
-            selected_sym,
-            notselected_sym,
-            on_draw,
-        )
-    end
 end
 
-"""
-- {bold white}enter{bold white}: return selected options
-"""
-function key_press(mn::MultiSelectMenu, ::Enter)
+function menu_return_value(mn::MultiSelectMenu, ::Enter)
     mn.internals.should_stop = true
     return mn.selected
 end
 
-"""
-- {bold white}space bar{/bold white}: select current option
-"""
-function key_press(mn::MultiSelectMenu, ::SpaceBar)
+function multi_select_toggle(mn::MultiSelectMenu, ::SpaceBar)
     active = mn.active
     if active ∈ mn.selected
         deleteat!(mn.selected, mn.selected .== active)
@@ -294,6 +283,49 @@ function key_press(mn::MultiSelectMenu, ::SpaceBar)
         push!(mn.selected, active)
     end
 end
+
+
+multi_select_controls = Dict(
+    ArrowDown() => menu_activate_next,
+    ArrowUp() => menu_activate_prev,
+    SpaceBar() => multi_select_toggle,
+    Enter() => menu_return_value,
+    Esc() => quit,
+    'q' => quit,
+    'h' => toggle_help,
+)
+
+
+function MultiSelectMenu(
+    options::Vector;
+    controls::AbstractDict = multi_select_controls,
+    active_style::String = "white bold",
+    inactive_style::String = "dim",
+    width::Int = console_width(),
+    on_draw::Union{Nothing,Function} = nothing,
+)
+    selected_sym = apply_style("✔ ", active_style)
+    notselected_sym = apply_style("□ ", inactive_style)
+
+    max_titles_width = min(width, maximum(get_width.(options)) + 2)
+
+    MultiSelectMenu(
+        LiveInternals(),
+        Measure(length(options), width),
+        controls,
+        options,
+        active_style,
+        inactive_style,
+        max_titles_width,
+        Int[],
+        1,
+        length(options),
+        selected_sym,
+        notselected_sym,
+        on_draw,
+    )
+end
+
 
 function frame(mn::MultiSelectMenu; kwargs...)
     isnothing(mn.on_draw) || on_draw(mn)

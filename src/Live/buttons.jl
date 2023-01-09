@@ -3,10 +3,8 @@
 # ---------------------------------------------------------------------------- #
 abstract type AbstractButton <: AbstractWidget end
 
-"""
-- {white bold}space, enter{/white bold}: press button
-"""
-function key_press(b::AbstractButton, ::Enter)
+
+function press_button(b::AbstractButton, ::Union{SpaceBar, Enter})
     if b.status == :not_pressed
         b.lastpressed = Dates.value(now())
         b.status = :pressed
@@ -17,7 +15,15 @@ function key_press(b::AbstractButton, ::Enter)
     return nothing
 end
 
-key_press(b::AbstractButton, ::SpaceBar) = key_press(b, Enter())
+
+
+button_controls = Dict(
+    'q' => quit,
+    Esc() => quit,
+    Enter() => press_button,
+    SpaceBar() => press_button,
+)
+
 
 """
     make_buttons_panels(
@@ -71,6 +77,7 @@ end
 @with_repr mutable struct Button <: AbstractButton
     internals::LiveInternals
     measure::Measure
+    controls::AbstractDict
     pressed_display::Panel
     not_pressed_display::Panel
     status::Symbol
@@ -81,6 +88,7 @@ end
 
 function Button(
     message::String;
+    controls::AbstractDict = button_controls,
     pressed_text_style = "bold white",
     pressed_background = "red",
     not_pressed_text_style = "red",
@@ -102,6 +110,7 @@ function Button(
     return Button(
         LiveInternals(),
         Measure(height, width),
+        controls,
         pressed,
         not_pressed,
         :not_pressed,
@@ -139,6 +148,7 @@ activated and not.
 @with_repr mutable struct ToggleButton <: AbstractButton
     internals::LiveInternals
     measure::Measure
+    controls::AbstractDict
     pressed_display::Panel
     not_pressed_display::Panel
     status::Symbol
@@ -149,6 +159,7 @@ end
 
 function ToggleButton(
     message::String;
+    controls::AbstractDict = button_controls,
     pressed_text_style = "bold white",
     pressed_background = "red",
     not_pressed_text_style = "red",
@@ -170,6 +181,7 @@ function ToggleButton(
     return ToggleButton(
         LiveInternals(),
         Measure(height, width),
+        controls,
         pressed,
         not_pressed,
         :not_pressed,

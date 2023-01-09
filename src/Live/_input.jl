@@ -1,3 +1,11 @@
+# ---------------------------------------------------------------------------- #
+#                                     HELP                                     #
+# ---------------------------------------------------------------------------- #
+
+
+# ---------------------------------------------------------------------------- #
+#                               KEYBOARD CONTROLS                              #
+# ---------------------------------------------------------------------------- #
 
 abstract type KeyInput end
 
@@ -31,97 +39,22 @@ KEYs = Dict{Int,KeyInput}(
     1008 => PageDownKey(),
 )
 
-"""
-toggle_help(live::AbstractWidget; help_widget::Union{Nothing, AbstractWidget}=nothing)
 
-Toggle help tooltip display for a widget widget.
+catch_retval(retvals::Vector, retval) = push!(retvals, retval)
+catch_retval(::Vector, ::Nothing) = return
 
-By default the help message of `live` is shown, but for "nested" widgets one can 
-directly specify for which widget to look up the help message for with `help_widget`.
 
-The help message itself is made up of the docstring for the `live` struct and the docstrings
-of all methods for `key_press(typeof(live), ::Any)`.
-"""
-function toggle_help(live; help_widget = nothing)
-    internals = live.internals
-    help_widget = something(help_widget, live)
-
-    # get the docstring for each key_press method for the widget
-    key_methods = methods(key_press, (typeof(help_widget), LiveWidgets.KeyInput))
-
-    dcs = Docs.meta(LiveWidgets)
-    bd = Base.Docs.Binding(LiveWidgets, :key_press)
-
-    added_sigs = []
-    function get_method_docstring(m)
-        try
-            sig = m.sig.types[3]
-            sig ∈ added_sigs && return ""
-            docstr = dcs[bd].docs[Tuple{m.sig.types[2],m.sig.types[3]}].text[1]
-            push!(added_sigs, sig)
-            return docstr
-        catch
-            return ""
-        end
-    end
-
-    width = console_width()
-    methods_docs =
-        map(m -> RenderableText(get_method_docstring(m); width = width - 10), key_methods)
-
-    # compose help tooltip
-    docstring = RenderableText(getdocs(help_widget); width = width - 10)
-    help_message =
-        isnothing(help_widget.internals.help_message) ? docstring :
-        docstring / RenderableText(help_widget.internals.help_message; width = width - 10)
-
-    messages = [
-        RenderableText(md"#### Widget description"; width = width - 10),
-        help_message,
-        "",
-        RenderableText(md"#### Controls "; width = width - 10),
-        methods_docs...,
-    ]
-
-    # create full message
-    help_message = Panel(
-        messages;
-        width = width,
-        title = "$(typeof(help_widget)) help",
-        title_style = "default bold blue",
-        title_justify = :center,
-        style = "dim",
-    )
-
-    # show/hide message
-    if internals.help_shown
-        # hide it
-        internals.help_shown = false
-
-        # go to the top of the error message and delete everything
-        h =
-            console_height() - length(internals.prevcontentlines) - help_message.measure.h -
-            1
-        move_to_line(stdout, h)
-        cleartoend(stdout)
-
-        # move cursor back to the top of the live to re-print it in the right position
-        move_to_line(stdout, console_height() - length(internals.prevcontentlines))
-    else
-        # show it
-        erase!(live)
-        println(stdout, help_message)
-        internals.help_shown = true
-    end
-
-    internals.prevcontent = nothing
-    internals.prevcontentlines = String[]
+function is_container(widget)::Bool
+    wtype = typeof(widget)
+    return hasfield(wtype, :widgets) && hasfield(wtype, :active)
 end
 
-"""
-    keyboard_input(live::AbstractWidget)
 
-Read an user keyboard input during live display.
+
+"""
+    keyboard_input(widget::AbstractWidget)
+
+Read an user keyboard input during widget display.
 
 If there are bytes available at `stdin`, read them.
 If it's a special character (e.g. arrows) call `key_press`
@@ -130,18 +63,40 @@ for the `AbstractWidget` with the corresponding
 use that.
 If the input was `q` it signals that the display should be stopped
 """
-function keyboard_input(live)::Tuple{Bool,Any}
+function keyboard_input(widget)::Vector
+    retvals = []
     if bytesavailable(terminal.in_stream) > 0
-        c = readkey(terminal.in_stream) |> Int
+        # get input
+        c = readkey(terminal.in_stream) 
+        c = haskey(KEYs, Int(c)) ? KEYs[Int(c)] : Char(c)
 
-        c in keys(KEYs) && begin
-            key = KEYs[Int(c)]
-            retval = key_press(live, key)
-            return (live.internals.should_stop, retval)
+        # execute command on each subwidget
+        for wdg in PreOrderDFS(widget)
+            controls = wdg.controls
+
+            # for apps, only pass arguments to active widgets
+            wtype = typeof(widget)
+            if hasfield(wtype, :widgets) && hasfield(wtype, :active)
+                
+                active = widget.widgets[widget.active]
+                childs = children(active)
+
+
+                (wdg ∈ [widget, active] || wdg ∈ childs)  || continue
+            end
+
+            # see if a control has been defined for this key
+            haskey(controls, c) && catch_retval(retvals, controls[c](wdg, c))
+
+            # see if we can just pass any character
+            c isa Char && haskey(controls, Char) && catch_retval(retvals, controls[Char](wdg, c))
+
+            # see if a fallback option is available
+            haskey(controls, :setactive) && catch_retval(retvals, controls[:setactive](wdg, c))
         end
-
-        # fallback to char key calls
-        return key_press(live, Char(c))
     end
-    return (false, nothing)
+    return retvals
 end
+
+
+controls_union = Union{KeyInput, Char}

@@ -2,7 +2,7 @@ using Term.LiveWidgets
 
 println("Please choose a menu type:")
 retval =
-    LiveWidgets.play(SimpleMenu(["Simple", "Buttons", "MultiSelect"]); transient = false)
+    LiveWidgets.play(SimpleMenu(["Simple", "Buttons", "MultiSelect"]); transient = false)[1]
 print("\n\n")
 
 # get the selected menu style

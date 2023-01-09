@@ -71,63 +71,43 @@ end
 # ---------------------------------------------------------------------------- #
 #                                ABSTRACT WIDGET                               #
 # ---------------------------------------------------------------------------- #
+
 """
     AbstractWidget
 
-Abstract widgets must have two obligatory fields:
+Abstract widgets must have three obligatory fields:
 
     internals::LiveInternals
     measure::Measure
+    controls:: Dict{Union{KeyInput, Char}, Function}
 
 and one optional one
     on_draw::Union{Nothing, Function} = nothing
 """
 abstract type AbstractWidget end
 
+
+quit(widget::AbstractWidget, ::Any) = begin
+    widget.internals.should_stop = true
+    return nothing
+end
+
+function AbstractTrees.children(widget::AbstractWidget) 
+    hasfield(typeof(widget), :widgets) || return []
+    widget.widgets isa AbstractDict && return collect(values(widget.widgets))
+    return widget.widgets
+end
+
+AbstractTrees.ParentLinks(w::AbstractWidget) = AbstractTrees.ImplicitParents()
+
+
 """
 Get the current conttent of a widget
 """
 frame(::AbstractWidget) = error("Not implemented")
 
-"""
-    keypress
 
-Capture user input during live widgets display.
-"""
-function keypress end
-
-key_press(::AbstractWidget, ::KeyInput) = nothing
-
-"""
-- {bold white}enter{/bold white}: quit program, possibly returning a value
-"""
-function key_press(widget::AbstractWidget, ::Enter)
-    widget.internals.should_stop = true
-    return nothing
-end
-
-"""
-- {bold white}esc{/bold white}: quit program, without returning a value
-"""
-function key_press(widget::AbstractWidget, ::Esc)
-    widget.internals.should_stop = true
-    return nothing
-end
-
-"""
-- {bold white}q{/bold white}: quit program without returning anything
-
-- {bold white}h{/bold white}: toggle help message display
-"""
-function key_press(widget::AbstractWidget, c::Char)::Tuple{Bool,Nothing}
-    c == 'q' && return (true, nothing)
-    c == 'h' && begin
-        toggle_help(widget)
-        return (false, nothing)
-    end
-    return (false, nothing)
-end
-
+# --------------------------------- rendering -------------------------------- #
 """
     shouldupdate(widget::AbstractWidget)::Bool
 
@@ -187,13 +167,13 @@ a discrepancy occurs the lines gets re-written.
 This is all done printing to a buffer first and then to `stdout` to avoid
 jitter.
 """
-function refresh!(widget::AbstractWidget)::Tuple{Bool,Any}
+function refresh!(widget::AbstractWidget)
     # check for keyboard inputs
-    shouldstop, retval = keyboard_input(widget)
-    shouldstop && return (false, retval)
+    retval = keyboard_input(widget)
+    widget.internals.should_stop && return retval
 
     # check if its time to update
-    shouldupdate(widget) || return (true, retval)
+    shouldupdate(widget) || return nothing
 
     # get new content
     internals = widget.internals
@@ -204,10 +184,6 @@ function refresh!(widget::AbstractWidget)::Tuple{Bool,Any}
         isnothing(internals.prevcontentlines) ? 0 : length(internals.prevcontentlines)
     old_lines = internals.prevcontentlines
     nlines_prev == 0 && print(internals.ioc, "\n")
-
-    # get calls to print from user
-    # printed = read_stdout_output(widget.internals)
-    # isnothing(printed) || (scontent = printed / scontent)
 
     # render new content
     up(internals.ioc, nlines_prev)
@@ -233,7 +209,7 @@ function refresh!(widget::AbstractWidget)::Tuple{Bool,Any}
     internals.prevcontent = content
     internals.prevcontentlines = content_lines
     write(stdout, take!(internals.iob))
-    return (true, retval)
+    return nothing
 end
 
 """
@@ -275,9 +251,8 @@ function play(widget::AbstractWidget; transient::Bool = true)
     Base.start_reading(stdin)
 
     retval = nothing
-    while true
-        should_continue, retval = refresh!(widget)
-        should_continue || break
+    while isnothing(retval)
+        retval = refresh!(widget)
     end
     stop!(widget)
     transient && erase!(widget)

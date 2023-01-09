@@ -13,6 +13,7 @@ An `App` is a collection of widgets.
 @with_repr mutable struct App <: AbstractWidgetContainer
     internals::LiveInternals
     measure::Measure
+    controls::AbstractDict
     compositor::Compositor
     widgets::AbstractDict{Symbol,AbstractWidget}
     transition_rules::AbstractDict{Tuple{Symbol,KeyInput},Symbol}
@@ -20,10 +21,26 @@ An `App` is a collection of widgets.
     on_draw::Union{Nothing,Function}
 end
 
+function execute_transition_rule(app::App, key)
+    haskey(app.transition_rules, (app.active, key)) || return
+    app.active = app.transition_rules[(app.active, key)]
+end
+
+
+
+app_controls = Dict(
+    'q' => quit,
+    Esc() => quit,
+    'h' => toggle_help,
+    'w' => active_widget_help,
+    :setactive => execute_transition_rule
+)
+
 function App(
     layout::Expr,
     widgets::AbstractDict,
     transition_rules::Union{Nothing,AbstractDict{Tuple{Symbol,KeyInput},Symbol}} = nothing;
+    controls::AbstractDict = app_controls, 
     on_draw::Union{Nothing,Function} = nothing,
 )
 
@@ -69,6 +86,7 @@ function App(
                            join(transition_rules_message, "\n"),
         ),
         measure,
+        controls,
         compositor,
         widgets,
         transition_rules,
@@ -89,30 +107,3 @@ function frame(app::App; kwargs...)
     return render(app.compositor)
 end
 
-# --------------------------------- controls --------------------------------- #
-"""
-$(default_container_commands)
-"""
-function key_press(app::App, key::KeyInput)
-    # see if a rule has been implemented
-    app.active = try
-        app.transition_rules[(app.active, key)]
-    catch
-        key_press(app.widgets[app.active], key)  # pass action to widget
-        app.active
-    end
-end
-
-function key_press(app::App, ::Enter)
-    widget = get_active(app)
-    if widget isa InputBox || widget isa AbstractButton
-        return key_press(widget, Enter())
-    else
-        return key_press(app, Esc())
-    end
-end
-
-function key_press(app::App, ::Esc)
-    app.internals.should_stop = true
-    return nothing
-end
