@@ -163,8 +163,12 @@ function inspect(T::Union{Union,DataType};)
     # get app content
     type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width - 20)
     methods_pagers = map(
-        m -> Pager(string(m); width = widget_width-6, page_lines = widget_height-5),
-        type_methods
+        m -> Pager(
+            string(m[2]); 
+            title="Method $(m[1]) of $(length(type_methods))",
+            width = widget_width-4, 
+            page_lines = widget_height-7),
+        enumerate(type_methods)
     ) |> collect
 
 
@@ -194,9 +198,9 @@ function inspect(T::Union{Union,DataType};)
         ),
         Gallery(
             methods_pagers;
-            width = comp.elements[:B].w - 6,
-            height = comp.elements[:B].h - 6,
-            show_panel = true,
+            width = widget_width,
+            height = widget_height,
+            show_panel = false,
         )
     ]
 
@@ -204,6 +208,7 @@ function inspect(T::Union{Union,DataType};)
         :A => menu,
         :B => Gallery(
             gallery_widgets;
+            controls = Dict(),
             width = comp.elements[:B].w - 1,
             height = comp.elements[:B].h - 1,
             show_panel = false,
@@ -220,8 +225,7 @@ function inspect(T::Union{Union,DataType};)
     end
 
     app = App(layout, widgets, transition_rules; on_draw = cb)
-    app.active = :B
-    play(app; transient = false)
+    play(app; transient = false);
 end
 
 function inspect(F::Function; documentation::Bool = true)

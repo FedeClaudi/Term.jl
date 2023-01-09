@@ -18,14 +18,8 @@ end
 
 
 
-function isactive(widget::AbstractWidget)
-    par = AbstractTrees.parent(widget)
-    isnothing(par) && return true
-    return widget == get_active(par)
-end
-
-
 function keyboard_input(widget::AbstractWidgetContainer)
+    retvals = []
     if bytesavailable(terminal.in_stream) > 0
         # get input
         c = readkey(terminal.in_stream) 
@@ -33,21 +27,26 @@ function keyboard_input(widget::AbstractWidgetContainer)
 
         # execute command on each subwidget
         for wdg in PreOrderDFS(widget)
+            retval = nothing
             controls = wdg.controls
 
             # only apply to active widget(s)
             isactive(wdg) || continue
 
             # see if a control has been defined for this key
-            haskey(controls, c) && return (controls[c](wdg, c))
+            haskey(controls, c) && (retval = controls[c](wdg, c))
 
             # see if we can just pass any character
-            c isa Char && haskey(controls, Char) && return (controls[Char](wdg, c))
+            c isa Char && haskey(controls, Char) && (retval = controls[Char](wdg, c))
 
             # see if a fallback option is available
             haskey(controls, :setactive) && controls[:setactive](wdg, c)
+
+            # if retval says so, stop looking at other widgets here
+            retval == :stop && break
+            isnothing(retval) || push!(retvals, retval)
         end
     end
-    return nothing
+    return retvals
 end
 

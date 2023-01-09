@@ -17,9 +17,15 @@ get_active(container::AbstractWidgetContainer) = container.widgets[container.act
 
 set_active(container::AbstractWidgetContainer, active) = container.active = active
 
-activate_next_widget(widget::AbstractWidget, ::Any) = widget.active = min(widget.active + 1, length(widget.widgets))
+function activate_next_widget(widget::AbstractWidget, ::Any)
+    widget.active = min(widget.active + 1, length(widget.widgets))
+    return :stop
+end
 
-activate_prev_widget(widget::AbstractWidget, ::Any) = widget.active = max(widget.active - 1, 1)
+function activate_prev_widget(widget::AbstractWidget, ::Any)
+    widget.active = max(widget.active - 1, 1)
+    return :stop
+end
 
 
 # ---------------------------------------------------------------------------- #

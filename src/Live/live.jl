@@ -18,6 +18,7 @@ import ..Repr: @with_repr, termshow
 import ..Style: apply_style
 import ..Layout: Spacer, vLine, vstack, hLine, hstack
 import ..Compositors: Compositor, render, update!
+import ..Tprint: tprint
 
 export AbstractWidget, refresh!, play, key_press, shouldupdate, frame, stop!
 export Pager
@@ -25,6 +26,8 @@ export SimpleMenu, ButtonsMenu, MultiSelectMenu
 export InputBox, TextWidget, Button, ToggleButton
 export Gallery
 export App
+
+const LIVE_DEBUG = Ref(false)
 
 # ----------------------------- keyboard controls ---------------------------- #
 abstract type KeyInput end

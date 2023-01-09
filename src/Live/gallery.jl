@@ -39,8 +39,10 @@ function Gallery(
     max_w = maximum(getfield.(widgets_measures, :w))
     max_h = maximum(getfield.(widgets_measures, :h))
 
-    @assert max_w < (width - 4) "Gallery width set to $width but a widget has width $max_w, $(width - max_w - 5) above the limit."
-    @assert max_h < (height - 4) "Gallery height set to $height but a widget has height $max_h, $(height - max_h - 5) above the limit."
+    Δ = show_panel ? 4 : 2
+
+    @assert max_w < (width - Δ) "Gallery width set to $width but a widget has width $max_w, $(width - max_w - Δ - 1) above the limit."
+    @assert max_h < (height - Δ) "Gallery height set to $height but a widget has height $max_h, $(height - max_h - Δ - 1) above the limit."
 
     gal = Gallery(LiveInternals(), Measure(height, width), controls, nothing, widgets, 1, show_panel, title, on_draw)
     set_as_parent(gal)
@@ -51,8 +53,11 @@ end
 function frame(gal::Gallery; kwargs...)
     isnothing(gal.on_draw) || on_draw(gal)
 
+    content = frame(get_active(gal))
+    gal.show_panel || return content
+
     Panel(
-        frame(get_active(gal));
+        content;
         title = gal.show_panel ? "$(gal.title) $(gal.active)/$(length(gal.widgets))" : nothing,
         justify = :center,
         style = gal.show_panel ? "dim" : "hidden",

@@ -87,15 +87,14 @@ and one optional one
 """
 abstract type AbstractWidget end
 
+# ----------------------------- widget functions ----------------------------- #
 
-function AbstractTrees.children(widget::AbstractWidget) 
-    hasfield(typeof(widget), :widgets) || return []
-    widget.widgets isa AbstractDict && return collect(values(widget.widgets))
-    return widget.widgets
-end
+get_active(::AbstractWidget) = nothing
 
-function AbstractTrees.parent(widget::AbstractWidget)
-    return widget.parent
+function isactive(widget::AbstractWidget)
+    par = AbstractTrees.parent(widget)
+    isnothing(par) && return true
+    return widget == get_active(par) && isactive(par)
 end
 
 
@@ -104,7 +103,7 @@ quit(widget::AbstractWidget, ::Any) = quit(widget)
 function quit(widget::AbstractWidget)
     widget.internals.should_stop = true
     par = AbstractTrees.parent(widget)
-    isnothing(par) || quit(parent)
+    isnothing(par) || quit(par)
     return nothing
 end
 
@@ -116,7 +115,31 @@ Get the current conttent of a widget
 frame(::AbstractWidget) = error("Not implemented")
 
 
-# --------------------------------- rendering -------------------------------- #
+# ------------------------------ tree structure ------------------------------ #
+function AbstractTrees.children(widget::AbstractWidget) 
+    hasfield(typeof(widget), :widgets) || return []
+    widget.widgets isa AbstractDict && return collect(values(widget.widgets))
+    return widget.widgets
+end
+
+function AbstractTrees.parent(widget::AbstractWidget)
+    return widget.parent
+end
+
+function print_node(io, x) 
+    color = isactive(x) ? "green" : "dim red"
+    tprint(
+          io, "{$color}$(typeof(x)){/$color}")
+end
+
+
+Base.print(io::IO, widget::AbstractWidget) = print_tree(print_node, io, widget)
+
+
+# ---------------------------------------------------------------------------- #
+#                                   RENDERING                                  #
+# ---------------------------------------------------------------------------- #
+
 """
     shouldupdate(widget::AbstractWidget)::Bool
 
@@ -159,6 +182,18 @@ function replace_line(internals::LiveInternals, newline)
     println(internals.ioc, newline)
 end
 
+
+function add_debugging_info!(content::AbstractRenderable, widget::AbstractWidget)::AbstractRenderable
+    tree = sprint(print, widget)
+
+    debug_info = Panel(
+        tree;
+        width = content.measure.w,
+    )
+    return debug_info / content
+end
+
+
 """
     refresh!(live::AbstractWidget)::Tuple{Bool, Any}
 
@@ -180,7 +215,12 @@ function refresh!(widget::AbstractWidget)
 
     # get new content
     internals = widget.internals
-    content::Union{String,AbstractRenderable} = frame(widget)
+    content::AbstractRenderable = frame(widget)
+
+    LIVE_DEBUG[] == true && begin
+        content = add_debugging_info!(content, widget)
+    end
+
     content_lines::Vector{String} = split(string(content), "\n")
     nlines::Int = length(content_lines)
     nlines_prev::Int =
