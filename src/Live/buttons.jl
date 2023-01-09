@@ -78,6 +78,7 @@ end
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     pressed_display::Panel
     not_pressed_display::Panel
     status::Symbol
@@ -111,6 +112,7 @@ function Button(
         LiveInternals(),
         Measure(height, width),
         controls,
+        nothing,
         pressed,
         not_pressed,
         :not_pressed,
@@ -149,6 +151,7 @@ activated and not.
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     pressed_display::Panel
     not_pressed_display::Panel
     status::Symbol
@@ -182,6 +185,7 @@ function ToggleButton(
         LiveInternals(),
         Measure(height, width),
         controls,
+        nothing,
         pressed,
         not_pressed,
         :not_pressed,

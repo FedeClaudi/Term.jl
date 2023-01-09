@@ -5,6 +5,7 @@ A `Gallery` containes multiple widgets, but only shows one at the time.
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     widgets::Vector{AbstractWidget}
     active::Int
     show_panel::Bool
@@ -41,7 +42,9 @@ function Gallery(
     @assert max_w < (width - 4) "Gallery width set to $width but a widget has width $max_w, $(width - max_w - 5) above the limit."
     @assert max_h < (height - 4) "Gallery height set to $height but a widget has height $max_h, $(height - max_h - 5) above the limit."
 
-    return Gallery(LiveInternals(), Measure(height, width), controls, widgets, 1, show_panel, title, on_draw)
+    gal = Gallery(LiveInternals(), Measure(height, width), controls, nothing, widgets, 1, show_panel, title, on_draw)
+    set_as_parent(gal)
+    return gal
 end
 
 # ----------------------------------- frame ---------------------------------- #

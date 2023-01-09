@@ -70,6 +70,7 @@ The currently selected option is highlighted with a different style.
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     active_titles::Vector{String}
     inactive_titles::Vector{String}
     n_titles::Int
@@ -124,6 +125,7 @@ The currently selected option is highlighted with a different style.
             LiveInternals(),
             Measure(length(titles), width),
             controls,
+            nothing,
             active_titles,
             inactive_titles,
             length(titles),
@@ -143,6 +145,7 @@ Styling reflects which option is currently selected
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     active_titles::Vector{String}
     inactive_titles::Vector{String}
     n_titles::Int
@@ -236,6 +239,7 @@ Styling reflects which option is currently selected
             LiveInternals(),
             measure,
             controls,
+            nothing,
             string.(active_titles),
             string.(inactive_titles),
             length(titles),
@@ -258,6 +262,7 @@ Color indicates current active option, ticks selected options
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     options::Vector
     active_style::String
     inactive_style::String
@@ -313,6 +318,7 @@ function MultiSelectMenu(
         LiveInternals(),
         Measure(length(options), width),
         controls,
+        nothing,
         options,
         active_style,
         inactive_style,

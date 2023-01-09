@@ -75,11 +75,12 @@ end
 """
     AbstractWidget
 
-Abstract widgets must have three obligatory fields:
+Abstract widgets must have four obligatory fields:
 
     internals::LiveInternals
     measure::Measure
     controls:: Dict{Union{KeyInput, Char}, Function}
+    parent::Union{Nothing, AbstractWidget}
 
 and one optional one
     on_draw::Union{Nothing, Function} = nothing
@@ -87,18 +88,26 @@ and one optional one
 abstract type AbstractWidget end
 
 
-quit(widget::AbstractWidget, ::Any) = begin
-    widget.internals.should_stop = true
-    return nothing
-end
-
 function AbstractTrees.children(widget::AbstractWidget) 
     hasfield(typeof(widget), :widgets) || return []
     widget.widgets isa AbstractDict && return collect(values(widget.widgets))
     return widget.widgets
 end
 
-AbstractTrees.ParentLinks(w::AbstractWidget) = AbstractTrees.ImplicitParents()
+function AbstractTrees.parent(widget::AbstractWidget)
+    return widget.parent
+end
+
+
+quit(widget::AbstractWidget, ::Any) = quit(widget)
+
+function quit(widget::AbstractWidget)
+    widget.internals.should_stop = true
+    par = AbstractTrees.parent(widget)
+    isnothing(par) || quit(parent)
+    return nothing
+end
+
 
 
 """
@@ -150,12 +159,6 @@ function replace_line(internals::LiveInternals, newline)
     println(internals.ioc, newline)
 end
 
-# function read_stdout_output(internals::LiveInternals)
-#     write(internals.ioc, internals.pipe)
-#     out = String(take!(internals.ioc))
-#     length(out) > 0 ? out : nothing
-# end
-
 """
     refresh!(live::AbstractWidget)::Tuple{Bool, Any}
 
@@ -170,7 +173,7 @@ jitter.
 function refresh!(widget::AbstractWidget)
     # check for keyboard inputs
     retval = keyboard_input(widget)
-    widget.internals.should_stop && return retval
+    widget.internals.should_stop && return something(retval, [])
 
     # check if its time to update
     shouldupdate(widget) || return nothing
@@ -258,3 +261,9 @@ function play(widget::AbstractWidget; transient::Bool = true)
     transient && erase!(widget)
     return retval
 end
+
+
+
+
+
+

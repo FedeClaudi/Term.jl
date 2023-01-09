@@ -14,6 +14,7 @@ TextWidget just shows a piece of text.
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     text::String
     as_panel::Bool
     on_draw::Union{Nothing,Function}
@@ -30,7 +31,7 @@ TextWidget(;
     as_panel = true,
     on_draw::Union{Nothing,Function} = nothing,
     controls = text_widget_controls,
-) = TextWidget(LiveInternals(), Measure(height, width), controls, "", as_panel, on_draw)
+) = TextWidget(LiveInternals(), Measure(height, width), controls, nothing, "", as_panel, on_draw)
 
 TextWidget(
     text::String;
@@ -43,6 +44,7 @@ TextWidget(
     LiveInternals(), 
     Measure(height, width), 
     controls, 
+    nothing,
     text, as_panel, on_draw
 )
 
@@ -79,6 +81,7 @@ InputBox collects and displays user input as text.
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     input_text::Union{Nothing,String}
     blinker_update::Int
     blinker_status::Symbol
@@ -122,7 +125,14 @@ function InputBox(;
     controls::AbstractDict = input_box_controls,
     kwargs...,
 )
-    InputBox(LiveInternals(), Measure(height, width), controls, nothing, 0, :off, kwargs, on_draw)
+    InputBox(
+        LiveInternals(),
+        Measure(height, width),
+        controls,
+        nothing, 
+        nothing,
+        0, :off, kwargs, on_draw
+        )
 end
 
 # ----------------------------------- frame ---------------------------------- #

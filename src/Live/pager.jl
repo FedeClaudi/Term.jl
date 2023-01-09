@@ -8,6 +8,7 @@ using keys such as arrow up and arrow down.
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     content::Vector{String}
     title::String
     tot_lines::Int
@@ -93,6 +94,7 @@ function Pager(
         LiveInternals(),
         Measure(page_lines + 4, width),
         controls,
+        nothing,
         content,
         title,
         length(content),

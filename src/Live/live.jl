@@ -26,7 +26,40 @@ export InputBox, TextWidget, Button, ToggleButton
 export Gallery
 export App
 
-include("_input.jl")
+# ----------------------------- keyboard controls ---------------------------- #
+abstract type KeyInput end
+
+struct ArrowLeft <: KeyInput end
+struct ArrowRight <: KeyInput end
+struct ArrowUp <: KeyInput end
+struct ArrowDown <: KeyInput end
+struct DelKey <: KeyInput end
+struct HomeKey <: KeyInput end
+struct EndKey <: KeyInput end
+struct PageUpKey <: KeyInput end
+struct PageDownKey <: KeyInput end
+struct Enter <: KeyInput end
+struct SpaceBar <: KeyInput end
+struct Esc <: KeyInput end
+struct Del <: KeyInput end
+
+KEYs = Dict{Int,KeyInput}(
+    13 => Enter(),
+    27 => Esc(),
+    32 => SpaceBar(),
+    127 => Del(),
+    1000 => ArrowLeft(),
+    1001 => ArrowRight(),
+    1002 => ArrowUp(),
+    1003 => ArrowDown(),
+    1004 => DelKey(),
+    1005 => HomeKey(),
+    1006 => EndKey(),
+    1007 => PageUpKey(),
+    1008 => PageDownKey(),
+)
+
+
 
 # ------------------------------- base widgets ------------------------------- #
 include("abstract_widget.jl")
@@ -40,5 +73,8 @@ include("menus.jl")
 include("abstract_container.jl")
 include("gallery.jl")
 include("app.jl")
+
+
+include("keyboard_input.jl")
 
 end

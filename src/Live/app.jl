@@ -14,6 +14,7 @@ An `App` is a collection of widgets.
     internals::LiveInternals
     measure::Measure
     controls::AbstractDict
+    parent::Union{Nothing, AbstractWidget}
     compositor::Compositor
     widgets::AbstractDict{Symbol,AbstractWidget}
     transition_rules::AbstractDict{Tuple{Symbol,KeyInput},Symbol}
@@ -80,19 +81,23 @@ function App(
     end
 
     msg_style = TERM_THEME[].emphasis
-    return App(
+    app = App(
         LiveInternals(;
             help_message = "\n{$msg_style}Transition rules{/$msg_style}" /
                            join(transition_rules_message, "\n"),
         ),
         measure,
         controls,
+        nothing,
         compositor,
         widgets,
         transition_rules,
         widgets_keys[1],
         on_draw,
     )
+
+    set_as_parent(app)
+    return app
 end
 
 # ----------------------------------- frame ---------------------------------- #
