@@ -67,7 +67,6 @@ Simple text based menu.
 The currently selected option is highlighted with a different style.
 """
 @with_repr mutable struct SimpleMenu <: AbstractMenu
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -122,7 +121,6 @@ The currently selected option is highlighted with a different style.
             collect
 
         return new(
-            LiveInternals(),
             Measure(length(titles), width),
             controls,
             nothing,
@@ -142,7 +140,6 @@ Simple menu in which each option is a `Panel` object.
 Styling reflects which option is currently selected
 """
 @with_repr mutable struct ButtonsMenu <: AbstractMenu
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -236,7 +233,6 @@ Styling reflects which option is currently selected
         end
 
         return new(
-            LiveInternals(),
             measure,
             controls,
             nothing,
@@ -259,7 +255,6 @@ Menu variant for selecting multiple options.
 Color indicates current active option, ticks selected options
 """
 @with_repr mutable struct MultiSelectMenu <: AbstractMenu
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -315,7 +310,6 @@ function MultiSelectMenu(
     max_titles_width = min(width, maximum(get_width.(options)) + 2)
 
     MultiSelectMenu(
-        LiveInternals(),
         Measure(length(options), width),
         controls,
         nothing,

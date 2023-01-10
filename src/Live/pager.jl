@@ -5,7 +5,6 @@ It shows a few lines of a longer text and allows users to move up and down the t
 using keys such as arrow up and arrow down.
 """
 @with_repr mutable struct Pager <: AbstractWidget
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -93,7 +92,6 @@ function Pager(
     content = split(string(RenderableText(content; width = width - 6)), "\n")
 
     return Pager(
-        LiveInternals(),
         Measure(page_lines + 4, width),
         controls,
         nothing,

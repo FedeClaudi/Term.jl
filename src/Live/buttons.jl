@@ -75,7 +75,6 @@ end
 # ------------------------------- constructors ------------------------------- #
 
 @with_repr mutable struct Button <: AbstractButton
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -109,7 +108,6 @@ function Button(
     )
 
     return Button(
-        LiveInternals(),
         Measure(height, width),
         controls,
         nothing,
@@ -148,7 +146,6 @@ A button. Pressing it toggles its status between
 activated and not.
 """
 @with_repr mutable struct ToggleButton <: AbstractButton
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -182,7 +179,6 @@ function ToggleButton(
     )
 
     return ToggleButton(
-        LiveInternals(),
         Measure(height, width),
         controls,
         nothing,

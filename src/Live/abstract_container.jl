@@ -1,8 +1,9 @@
 """
     AbstractWidgetContainer
 
-AbstractWidgetContainer must have two obligatory fields:
-
+`AbstractWidgetContainer` contain multiple other widgets
+and can coordinate their activity. 
+AbstractWidgetContainer must have two obligatory fields on top of AbstractWidget's fields:
     widgets::Vector{AbstractWidget}
     active::Int
 """
@@ -26,8 +27,3 @@ function activate_prev_widget(widget::AbstractWidget, ::Any)
     widget.active = max(widget.active - 1, 1)
     return :stop
 end
-
-
-# ---------------------------------------------------------------------------- #
-#                                keyboard input                                #
-# ---------------------------------------------------------------------------- #

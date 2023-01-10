@@ -235,6 +235,7 @@ function inspect(T::Union{Union,DataType};)
 
     app = App(layout, widgets, transition_rules; on_draw = cb)
     play(app; transient = false);
+    return nothing
 end
 
 function inspect(F::Function; documentation::Bool = true)

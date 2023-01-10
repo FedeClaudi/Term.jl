@@ -2,7 +2,6 @@
 A `Gallery` containes multiple widgets, but only shows one at the time. 
 """
 @with_repr mutable struct Gallery <: AbstractWidgetContainer
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -44,7 +43,7 @@ function Gallery(
     @assert max_w < (width - Δ) "Gallery width set to $width but a widget has width $max_w, $(width - max_w - Δ - 1) above the limit."
     @assert max_h < (height - Δ) "Gallery height set to $height but a widget has height $max_h, $(height - max_h - Δ - 1) above the limit."
 
-    gal = Gallery(LiveInternals(), Measure(height, width), controls, nothing, widgets, 1, show_panel, title, on_draw)
+    gal = Gallery(Measure(height, width), controls, nothing, widgets, 1, show_panel, title, on_draw)
     set_as_parent(gal)
     return gal
 end

@@ -709,7 +709,7 @@ function hLine(
     pad_txt::Bool = true,
 )
     box = BOXES[box]
-    text = apply_style(text)
+    text = apply_style(text) * "{$style}"
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
     _pad = pad_txt ? " " : get_lrow(box, 1, :top; with_left = false)
@@ -721,7 +721,7 @@ function hLine(
         text *
         _pad *
         get_rrow(box, rw - tr, :top; with_right = false) *
-        "{/$style}"
+        "{/$style}{/$style}"
 
     return hLine([Segment(line)], Measure(1, width))
 end

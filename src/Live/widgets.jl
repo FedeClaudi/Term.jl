@@ -11,7 +11,6 @@ Collection of small widgets
 TextWidget just shows a piece of text.
 """
 @with_repr mutable struct TextWidget <: AbstractWidget
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -31,7 +30,7 @@ TextWidget(;
     as_panel = true,
     on_draw::Union{Nothing,Function} = nothing,
     controls = text_widget_controls,
-) = TextWidget(LiveInternals(), Measure(height, width), controls, nothing, "", as_panel, on_draw)
+) = TextWidget(Measure(height, width), controls, nothing, "", as_panel, on_draw)
 
 TextWidget(
     text::String;
@@ -41,7 +40,6 @@ TextWidget(
     on_draw::Union{Nothing,Function} = nothing,
     controls = text_widget_controls,
 ) = TextWidget(
-    LiveInternals(), 
     Measure(height, width), 
     controls, 
     nothing,
@@ -78,7 +76,6 @@ end
 InputBox collects and displays user input as text. 
 """
 @with_repr mutable struct InputBox <: AbstractWidget
-    internals::LiveInternals
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
@@ -126,7 +123,6 @@ function InputBox(;
     kwargs...,
 )
     InputBox(
-        LiveInternals(),
         Measure(height, width),
         controls,
         nothing, 
@@ -141,11 +137,15 @@ function frame(ib::InputBox; kwargs...)
 
     # create blinking symbol
     currtime = Dates.value(now())
-    if currtime - ib.blinker_update > 400
+    if currtime - ib.blinker_update > 300
         ib.blinker_update = currtime
         ib.blinker_status = ib.blinker_status == :on ? :off : :on
     end
-    blinker = ib.blinker_status == :on ? " " : "{on_white} {/on_white}"
+    blinker =  if isactive(ib)
+        ib.blinker_status == :on ? " " : "{on_white} {/on_white}"
+    else
+        ""
+    end
 
     # get text to display
     text = isnothing(ib.input_text) ? "{dim}start typing...{/dim}" : ib.input_text * blinker
