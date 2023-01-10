@@ -169,6 +169,7 @@ function frame(pager::Pager; omit_panel = false)::AbstractRenderable
         page,
         fit = false,
         width = pager.measure.w,
+        height = pager.measure.h+1,
         padding = (2, 0, 1, 0),
         subtitle = "Lines: $(max(1, i)):$(min(i+Δi, pager.tot_lines)) of $(pager.tot_lines)",
         subtitle_style = "bold dim",

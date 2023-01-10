@@ -120,15 +120,22 @@ function style_methods(methods::Union{Vector{Base.Method},Base.MethodList}, docs
     for (i, (m, docs)) in enumerate(zip(methods, docstrings))
         # method code
         code = split(string(m), " in ")[1] |> highlight_syntax
-        code = reshape_text(apply_style(code), width - 20; ignore_markup = true)
+        code = reshape_text(apply_style(code), width; ignore_markup = true)
 
         # get docstring
-        docs = parse_md(something(docs, ""); width=width-20)
+        docs = if !isnothing(docs)
+            docs = parse_md(something(docs, ""); width=width)
+        else
+            docs = "{green}No docstring found{/green}"
+        end
+        docs = hLine(width, "DocString";style="green")/docs/""
 
         # method source
-        modul = "{bold dim $col}" * string(m.module) * "{/bold dim $col}"
+        modul = "{default}Source: {bold $col}" * string(m.module) * "{/bold $col}{/default}"
         source = "{dim}$(m.file):$(m.line){/dim}"
-        push!(mets, docs/""/(modul * " " * code)/""/source)
+
+        out = code/""/ docs
+        push!(mets, out/hLine(width;style="dim")/modul/source)
     end
     return mets
 end
@@ -145,10 +152,9 @@ Flags can be used to choose the level of detail in the information presented:
 """
 function inspect(T::Union{Union,DataType};)
     # get app size
-    layout = :(A(3, 1.0) / B(37, 1.0))
+    layout = :(A(3, 1.0) / B(30, 1.0))
     comp = Compositor(layout)
     widget_width = comp.elements[:B].w - 6
-    widget_height = comp.elements[:B].h - 10
 
     # get fields
     theme = TERM_THEME[]
@@ -160,14 +166,15 @@ function inspect(T::Union{Union,DataType};)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
     type_name = apply_style(string(T), theme.repr_name * " bold")
 
-    # get app content
-    type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width - 20)
+    # get each method as a Pager
+    type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width -12)
     methods_pagers = map(
         m -> Pager(
             string(m[2]); 
             title="Method $(m[1]) of $(length(type_methods))",
             width = widget_width-4, 
-            page_lines = widget_height-7),
+            page_lines = comp.elements[:B].h-7
+            ),
         enumerate(type_methods)
     ) |> collect
 
@@ -180,8 +187,9 @@ function inspect(T::Union{Union,DataType};)
         layout = :horizontal,
     )
 
+    # define widgets that go inside the top level Gallery
     gallery_widgets = [
-        Pager(
+        Pager( # first widget is a pager with metho info
             string(
                 Panel(
                     type_name / ("  " * line * fields);
@@ -194,22 +202,23 @@ function inspect(T::Union{Union,DataType};)
                 ) / hLine(widget_width - 10; style = "dim") / "" / Tree(T),
             );
             width = widget_width,
-            page_lines = widget_height,
+            page_lines = comp.elements[:B].h - 6,
         ),
-        Gallery(
+        Gallery(  # inner gallery shows each method
             methods_pagers;
             width = widget_width,
-            height = widget_height,
+            height = comp.elements[:B].h - 2,
             show_panel = false,
         )
     ]
 
+    # make the app out of a menu and the top level gallery
     widgets = OrderedDict(
         :A => menu,
         :B => Gallery(
             gallery_widgets;
             controls = Dict(),
-            width = comp.elements[:B].w - 1,
+            width = comp.elements[:B].w,
             height = comp.elements[:B].h - 1,
             show_panel = false,
         ),

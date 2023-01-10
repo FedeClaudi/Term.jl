@@ -39,7 +39,7 @@ function Gallery(
     max_w = maximum(getfield.(widgets_measures, :w))
     max_h = maximum(getfield.(widgets_measures, :h))
 
-    Δ = show_panel ? 4 : 2
+    Δ = show_panel ? 4 : 0
 
     @assert max_w < (width - Δ) "Gallery width set to $width but a widget has width $max_w, $(width - max_w - Δ - 1) above the limit."
     @assert max_h < (height - Δ) "Gallery height set to $height but a widget has height $max_h, $(height - max_h - Δ - 1) above the limit."

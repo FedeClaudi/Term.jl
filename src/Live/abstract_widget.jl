@@ -128,8 +128,10 @@ end
 
 function print_node(io, x) 
     color = isactive(x) ? "green" : "dim red"
-    tprint(
-          io, "{$color}$(typeof(x)){/$color}")
+    h, w = x.measure.h, x.measure.w
+
+    msg = "{$color}$(typeof(x)){/$color} {white dim}($h, $w){/white dim}"
+    tprint(io, msg)
 end
 
 

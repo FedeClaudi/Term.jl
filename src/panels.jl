@@ -75,7 +75,6 @@ end
 Base.size(p::Panel) = size(p.measure)
 
 """
----
     Panel(; 
         fit::Bool = false,
         height::Int = 2,
@@ -136,7 +135,6 @@ function Panel(;
 end
 
 """
----
     Panel(
         content::Union{AbstractString,AbstractRenderable};
         fit::Bool = false,
@@ -204,7 +202,6 @@ content_as_renderable(
     RenderableText(content, width = width - Δw, background = background, justify = justify)
 
 """
----
 
     Panel(
         content::Union{AbstractString,AbstractRenderable},
@@ -259,7 +256,6 @@ function Panel(
 end
 
 """
----
     Panel(
         content::Union{AbstractString,AbstractRenderable},
         ::Val{false},
