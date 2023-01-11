@@ -2,6 +2,10 @@ using Term
 using Term.LiveWidgets
 using Term.Tables
 
+"""
+Just a simple widget updating a table visualization.
+"""
+
 function on_draw(widget)
     rand() < .8 && return  # avoid updating at each frame
     n = 10
@@ -22,4 +26,4 @@ wdg = TextWidget(;
 
 
 
-App(wdg) |> play
+App(wdg) |> play;

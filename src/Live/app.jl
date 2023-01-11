@@ -261,6 +261,7 @@ end
 
 
 function add_debugging_info!(content::AbstractRenderable, app::App)::AbstractRenderable
+    # print the app's layout as a TREE
     tree = sprint(print, app)
 
     debug_info = Panel(

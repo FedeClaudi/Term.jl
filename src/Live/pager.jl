@@ -92,7 +92,7 @@ function Pager(
     content = split(string(RenderableText(content; width = width - 6)), "\n")
 
     return Pager(
-        Measure(page_lines + 4, width),
+        Measure(page_lines + 5, width),
         controls,
         nothing,
         content,
@@ -167,7 +167,7 @@ function frame(pager::Pager; omit_panel = false)::AbstractRenderable
         page,
         fit = false,
         width = pager.measure.w,
-        height = pager.measure.h+1,
+        height = pager.measure.h,
         padding = (2, 0, 1, 0),
         subtitle = "Lines: $(max(1, i)):$(min(i+Δi, pager.tot_lines)) of $(pager.tot_lines)",
         subtitle_style = "bold dim",

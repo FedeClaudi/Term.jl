@@ -204,7 +204,7 @@ Styling reflects which option is currently selected
                     justify = justify,
                     box = box,
                     height = button_height,
-                    padding = (1, 1, 1, 1),
+                    panel_kwargs...
                 ),
             )
 
@@ -220,7 +220,7 @@ Styling reflects which option is currently selected
                     justify = justify,
                     box = box,
                     height = button_height,
-                    padding = (1, 1, 1, 1),
+                    panel_kwargs...
                 ),
             )
         end

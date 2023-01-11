@@ -14,6 +14,7 @@ mutable struct Measure
     w::Int
 end
 
+Base.string(M::Measure) = "(h: $(M.h), w: $(M.w))"
 Base.show(io::IO, M::Measure) = print(io, "Measure (h: $(M.h), w: $(M.w))")
 
 """

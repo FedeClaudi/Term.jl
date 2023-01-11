@@ -152,7 +152,7 @@ Flags can be used to choose the level of detail in the information presented:
 """
 function inspect(T::Union{Union,DataType};)
     # get app size
-    layout = :(A(3, 1.0) / B(30, 1.0))
+    layout = :(A(4, 1.0) / B(30, 1.0))
     comp = Compositor(layout)
     widget_width = comp.elements[:B].w - 6
 
@@ -172,8 +172,8 @@ function inspect(T::Union{Union,DataType};)
         m -> Pager(
             string(m[2]); 
             title="Method $(m[1]) of $(length(type_methods))",
-            width = widget_width-4, 
-            page_lines = comp.elements[:B].h-7
+            width = widget_width, 
+            page_lines = comp.elements[:B].h-8
             ),
         enumerate(type_methods)
     ) |> collect
@@ -189,7 +189,7 @@ function inspect(T::Union{Union,DataType};)
 
     # define widgets that go inside the top level Gallery
     gallery_widgets = [
-        Pager( # first widget is a pager with metho info
+        Pager( # first widget is a pager with struct info
             string(
                 Panel(
                     type_name / ("  " * line * fields);
@@ -201,12 +201,12 @@ function inspect(T::Union{Union,DataType};)
                     style = "bright_blue dim",
                 ) / hLine(widget_width - 10; style = "dim") / "" / Tree(T),
             );
-            width = widget_width,
-            page_lines = comp.elements[:B].h - 6,
+            width = comp.elements[:B].w - 1,
+            page_lines = comp.elements[:B].h - 7,
         ),
         Gallery(  # inner gallery shows each method
             methods_pagers;
-            width = widget_width,
+            width = comp.elements[:B].w - 1,
             height = comp.elements[:B].h - 2,
             show_panel = false,
         )

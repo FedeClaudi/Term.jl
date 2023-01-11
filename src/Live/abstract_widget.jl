@@ -38,6 +38,12 @@ frame(::AbstractWidget) = error("Not implemented")
 
 
 # ------------------------------ tree structure ------------------------------ #
+
+"""
+Methods to let the AbstractTrees API handle applications as tree
+structures based on the nesting of widgets.
+"""
+
 function AbstractTrees.children(widget::AbstractWidget) 
     hasfield(typeof(widget), :widgets) || return []
     widget.widgets isa AbstractDict && return collect(values(widget.widgets))
@@ -48,11 +54,17 @@ function AbstractTrees.parent(widget::AbstractWidget)
     return widget.parent
 end
 
+"""
+    print_node(io, x) 
+
+Print function to print a node (widget) in an application's hierarchy tree. 
+It prints the node's stated dimensions vs its content's (calling `frame`).
+Used for debugging
+"""
 function print_node(io, x) 
     color = isactive(x) ? "green" : "dim red"
-    h, w = x.measure.h, x.measure.w
-
-    msg = "{$color}$(typeof(x)){/$color} {white dim}($h, $w){/white dim}"
+    content = frame(x)
+    msg = "{$color}$(typeof(x)){/$color} - Widget shape: $(string(x.measure)), content: $(string(content.measure))"
     tprint(io, msg)
 end
 
