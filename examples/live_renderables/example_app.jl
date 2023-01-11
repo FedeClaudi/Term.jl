@@ -126,4 +126,4 @@ app = App(layout, widgets, transition_rules; on_draw = update_visualizer)
 
 button.callback = set_random_color
 
-play(app)
+play(app);

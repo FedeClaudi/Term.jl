@@ -17,7 +17,7 @@ menu_activate_next(mn::AbstractMenu, ::Any) = mn.active = min(mn.active + 1, mn.
 menu_activate_prev(mn::AbstractMenu, ::Any) = mn.active = max(1, mn.active - 1)
 
 function menu_return_value(mn::AbstractMenu, ::Enter)
-    mn.internals.should_stop = true
+    quit(mn)
     return mn.active
 end
 
@@ -271,7 +271,7 @@ Color indicates current active option, ticks selected options
 end
 
 function menu_return_value(mn::MultiSelectMenu, ::Enter)
-    mn.internals.should_stop = true
+    quit(mn)
     return mn.selected
 end
 

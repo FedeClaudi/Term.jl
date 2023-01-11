@@ -112,6 +112,25 @@ app_controls = Dict(
     :setactive => execute_transition_rule
 )
 
+
+function App(
+    widget::AbstractWidget;
+    width::Union{Int, Nothing} = nothing,
+    height::Union{Int, Nothing} = nothing,
+    controls::AbstractDict = app_controls,
+    on_draw::Union{Nothing,Function} = nothing,
+    on_stop::Union{Nothing,Function} = nothing,
+)
+    width = something(width, widget.measure.w)
+    height = something(height, widget.measure.h)
+
+    layout = :(A($height, $width))
+    return App(
+        layout, Dict{Symbol,AbstractWidget}(:A => widget); controls=controls, on_draw = on_draw, on_stop=on_stop
+    )
+end
+
+
 function App(
     layout::Expr,
     widgets::AbstractDict,
@@ -131,15 +150,16 @@ function App(
     @assert issetequal(layout_keys, widgets_keys) "Mismatch between widget names and layout names"
 
     # check that the widgets have the right size
+    Δh = length(layout_keys) > 1 ? 1 : 0
     for k in layout_keys
         elem, widget = compositor.elements[k], widgets[k]
         @assert widget.measure.w <= elem.w "Widget $(k) has width $(widget.measure.w) but should have $(elem.w) to fit in layout"
-        @assert widget.measure.h <= elem.h - 1 "Widget $(k) has height $(widget.measure.h) but should have $(elem.h-1) to fit in layout"
+        @assert widget.measure.h <= elem.h - Δh "Widget $(k) has height $(widget.measure.h) but should have $(elem.h-Δh) to fit in layout"
 
         widget.measure.w < elem.w &&
             @warn "Widget $(k) has width $(widget.measure.w) but should have $(elem.w) to fit in layout"
-        widget.measure.h < elem.h - 1 &&
-            @warn "Widget $(k) has height $(widget.measure.h) but should have $(elem.h-1) to fit in layout"
+        widget.measure.h < elem.h - Δh &&
+            @warn "Widget $(k) has height $(widget.measure.h) but should have $(elem.h-Δh) to fit in layout"
     end
 
     transition_rules =
@@ -183,7 +203,9 @@ function frame(app::App; kwargs...)
 
     for (name, widget) in pairs(app.widgets)
         content = frame(widget)
-        content = app.active == name ? hLine(content.measure.w) / content : "" / content
+        if length(app.widgets) > 1
+            content = app.active == name ? hLine(content.measure.w) / content : "" / content
+        end
         update!(app.compositor, name, content)
     end
     return render(app.compositor)
@@ -354,7 +376,7 @@ function play(app::App; transient::Bool = true)
     end
     stop!(app)
     transient && erase!(app)
-    return retval
+    return retval[1]
 end
 
 

@@ -32,6 +32,6 @@ gallery = Gallery(
         ),
     ];
     height = 50,
-)
+) |> App
 
 LiveWidgets.play(gallery; transient = true)
