@@ -45,7 +45,7 @@ hor_menu_controls = Dict(
 Render the current state of a menu widget.
 """
 function frame(mn::AbstractMenu; kwargs...)
-    isnothing(mn.on_draw) || on_draw(mn)
+    isnothing(mn.on_draw) || mn.on_draw(mn)
 
     titles = map(
         i -> i == mn.active ? mn.active_titles[i] : mn.inactive_titles[i],
@@ -328,7 +328,7 @@ end
 
 
 function frame(mn::MultiSelectMenu; kwargs...)
-    isnothing(mn.on_draw) || on_draw(mn)
+    isnothing(mn.on_draw) || mn.on_draw(mn)
 
     make_option(i::Int, isactive::Bool, isselected::Bool) = begin
         sym = isselected ? mn.selected_sym : mn.notselected_sym

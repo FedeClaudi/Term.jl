@@ -27,7 +27,7 @@ text_widget_controls = Dict(
 TextWidget(;
     width = console_width(),
     height = 5,
-    as_panel = true,
+    as_panel = false,
     on_draw::Union{Nothing,Function} = nothing,
     controls = text_widget_controls,
 ) = TextWidget(Measure(height, width), controls, nothing, "", as_panel, on_draw)
@@ -36,7 +36,7 @@ TextWidget(
     text::String;
     width = console_width(),
     height = Measure(text).h,
-    as_panel = true,
+    as_panel = false,
     on_draw::Union{Nothing,Function} = nothing,
     controls = text_widget_controls,
 ) = TextWidget(
@@ -48,7 +48,7 @@ TextWidget(
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(tw::TextWidget; kwargs...)
-    isnothing(tw.on_draw) || on_draw(tw)
+    isnothing(tw.on_draw) || tw.on_draw(tw)
 
     tw.as_panel && return Panel(
         tw.text,
@@ -133,7 +133,7 @@ end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(ib::InputBox; kwargs...)
-    isnothing(ib.on_draw) || on_draw(ib)
+    isnothing(ib.on_draw) || ib.on_draw(ib)
 
     # create blinking symbol
     currtime = Dates.value(now())

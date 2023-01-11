@@ -122,7 +122,7 @@ end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::Button; kwargs...)
-    isnothing(b.on_draw) || on_draw(b)
+    isnothing(b.on_draw) || b.on_draw(b)
 
     return if b.status == :pressed
         currtime = Dates.value(now())
@@ -193,7 +193,7 @@ end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::ToggleButton; kwargs...)
-    isnothing(b.on_draw) || on_draw(b)
+    isnothing(b.on_draw) || b.on_draw(b)
 
     return if b.status == :pressed
         b.pressed_display

@@ -376,7 +376,9 @@ function play(app::App; transient::Bool = true)
     end
     stop!(app)
     transient && erase!(app)
-    return retval[1]
+
+    retval = length(retval) > 0 ? retval[1] : retval
+    return retval
 end
 
 

@@ -112,7 +112,7 @@ end
 Create a Panel with, as content, the currently visualized lines in the Pager.
 """
 function frame(pager::Pager; omit_panel = false)::AbstractRenderable
-    isnothing(pager.on_draw) || on_draw(pager)
+    isnothing(pager.on_draw) || pager.on_draw(pager)
 
     i, Δi = pager.curr_line, pager.page_lines
 

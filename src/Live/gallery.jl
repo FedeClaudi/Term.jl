@@ -50,7 +50,7 @@ end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(gal::Gallery; kwargs...)
-    isnothing(gal.on_draw) || on_draw(gal)
+    isnothing(gal.on_draw) || gal.on_draw(gal)
 
     content = frame(get_active(gal))
     gal.show_panel || return content
