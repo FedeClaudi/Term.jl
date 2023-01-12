@@ -23,7 +23,7 @@ function keyboard_input(widget::AbstractWidgetContainer)
     if bytesavailable(terminal.in_stream) > 0
         # get input
         c = readkey(terminal.in_stream) 
-        c = haskey(KEYs, Int(c)) ? KEYs[Int(c)] : Char(c)
+        c = haskey(KEYs, Int(c)) ? KEYs[Int(c)] : Char(c) # ::Union{Char, KeyInput}
 
         # execute command on each subwidget
         for wdg in PreOrderDFS(widget)

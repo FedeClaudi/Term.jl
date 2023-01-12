@@ -224,9 +224,9 @@ function inspect(T::Union{Union,DataType};)
         ),
     )
 
-    transition_rules = OrderedDict{Tuple{Symbol,KeyInput},Symbol}(
-    (:A, ArrowDown()) => :B,
-    (:B, ArrowUp()) => :A,
+    transition_rules = Dict(
+        ArrowDown() => Dict(:A => :B),
+        ArrowUp() => Dict(:B => :A),
     )
 
     function cb(app)

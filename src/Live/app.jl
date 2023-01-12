@@ -85,16 +85,27 @@ An `App` is a collection of widgets.
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
     compositor::Compositor
+    layout::Expr
     widgets::AbstractDict{Symbol,AbstractWidget}
-    transition_rules::AbstractDict{Tuple{Symbol,KeyInput},Symbol}
+    transition_rules::AbstractDict
     active::Symbol
     on_draw::Union{Nothing,Function}
     on_stop::Union{Nothing, Function}
 end
 
+"""
+    execute_transition_rule(app::App, key)
+
+Looks up a `transition_rules` entry matching the current situation. 
+There has to be a ruleset for the key the user pressed and within
+the ruleset there must be an entry matching the currently active 
+widget, otherwise no effect. 
+"""
 function execute_transition_rule(app::App, key)
-    haskey(app.transition_rules, (app.active, key)) || return
-    app.active = app.transition_rules[(app.active, key)]
+    haskey(app.transition_rules, key) || return
+    rulesset = app.transition_rules[key]
+    haskey(rulesset, app.active) || return
+    app.active = rulesset[app.active]
 end
 
 
@@ -134,7 +145,7 @@ end
 function App(
     layout::Expr,
     widgets::AbstractDict,
-    transition_rules::Union{Nothing,AbstractDict{Tuple{Symbol,KeyInput},Symbol}} = nothing;
+    transition_rules::Union{Nothing,AbstractDict} = nothing;
     controls::AbstractDict = app_controls, 
     on_draw::Union{Nothing,Function} = nothing,
     on_stop::Union{Nothing,Function} = nothing,
@@ -149,31 +160,23 @@ function App(
     widgets_keys = widgets |> keys |> collect
     @assert issetequal(layout_keys, widgets_keys) "Mismatch between widget names and layout names"
 
-    # check that the widgets have the right size
-    Δh = length(layout_keys) > 1 ? 1 : 0
-    for k in layout_keys
-        elem, widget = compositor.elements[k], widgets[k]
-        @assert widget.measure.w <= elem.w "Widget $(k) has width $(widget.measure.w) but should have $(elem.w) to fit in layout"
-        @assert widget.measure.h <= elem.h - Δh "Widget $(k) has height $(widget.measure.h) but should have $(elem.h-Δh) to fit in layout"
-
-        widget.measure.w < elem.w &&
-            @warn "Widget $(k) has width $(widget.measure.w) but should have $(elem.w) to fit in layout"
-        widget.measure.h < elem.h - Δh &&
-            @warn "Widget $(k) has height $(widget.measure.h) but should have $(elem.h-Δh) to fit in layout"
-    end
+    # enforce the size of each widget
+    widgets = enforce_app_size(compositor, widgets)
 
     transition_rules =
-        isnothing(transition_rules) ? Dict{Tuple{Symbol,KeyInput},Symbol}() :
+        isnothing(transition_rules) ? Dict() :
         transition_rules
 
-    # make an error message to show transition rules
+    # make a help message to show transition rules
     color = TERM_THEME[].emphasis_light
     transition_rules_message = []
-    for ((at, key), v) in pairs(transition_rules)
-        push!(
-            transition_rules_message,
-            "{$color}$key {/$color} moves from {$(color)}$at {/$color} to {$color}$v {/$color}",
-        )
+    for (key, cmds) in pairs(transition_rules)
+        for (a, b) in pairs(cmds)
+            push!(
+                transition_rules_message,
+                "{$color}$key {/$color} moves from {$(color)}$a {/$color} to {$color}$b {/$color}",
+            )
+        end
     end
 
     msg_style = TERM_THEME[].emphasis
@@ -186,6 +189,7 @@ function App(
         controls,
         nothing,
         compositor,
+        layout,
         widgets,
         transition_rules,
         widgets_keys[1],
@@ -197,9 +201,59 @@ function App(
     return app
 end
 
+"""
+    enforce_app_size(compositor::Compositor, widgets::AbstractDict)
+
+Called when an App is first created to set the size of all widgets.
+"""
+function enforce_app_size(compositor::Compositor, widgets::AbstractDict)
+    _keys = widgets |> keys |> collect
+
+    for k in _keys
+        elem, wdg = compositor.elements[k], widgets[k]
+        wdg.measure = Measure(elem.h-1, elem.w)
+        on_layout_change(wdg, wdg.measure)
+    end
+    return widgets
+end
+
+"""
+    enforce_app_size(app::App, measure::Measure)
+
+Called when a console is resized to adjust the apps layout. 
+"""
+function enforce_app_size(app::App) # , measure::Measure)
+    compositor = Compositor(app.layout)
+    _keys = app.widgets |> keys |> collect
+
+    for k in _keys
+        elem, wdg = compositor.elements[k], app.widgets[k]
+        wdg.measure = Measure(elem.h-1, elem.w)
+        on_layout_change(wdg, wdg.measure)
+    end
+
+    app.compositor = compositor
+end
+
 # ----------------------------------- frame ---------------------------------- #
+function on_layout_change(app::App)
+    console_h, console_w = console_height(), console_width()
+    (console_h >= app.measure.h && console_w == app.measure.w) && return
+
+    erase!(app)
+    clear(stdout)
+
+    # the console is too small, re-design
+    app.measure = Measure(console_h, console_w)
+    enforce_app_size(app)  # , app.measure)
+end
+
+
 function frame(app::App; kwargs...)
     isnothing(app.on_draw) || app.on_draw(app)
+
+    # adjust size to changes in console
+    on_layout_change(app)
 
     for (name, widget) in pairs(app.widgets)
         content = frame(widget)

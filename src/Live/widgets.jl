@@ -24,27 +24,19 @@ text_widget_controls = Dict(
     Esc() => quit,
 )
 
-TextWidget(;
-    width = console_width(),
-    height = 5,
-    as_panel = false,
-    on_draw::Union{Nothing,Function} = nothing,
-    controls = text_widget_controls,
-) = TextWidget(Measure(height, width), controls, nothing, "", as_panel, on_draw)
-
 TextWidget(
     text::String;
-    width = console_width(),
-    height = Measure(text).h,
     as_panel = false,
     on_draw::Union{Nothing,Function} = nothing,
     controls = text_widget_controls,
 ) = TextWidget(
-    Measure(height, width), 
+    Measure(Measure(text).h, console_width()), 
     controls, 
     nothing,
     text, as_panel, on_draw
 )
+
+on_layout_change(t::TextWidget, m::Measure) = t.measure = m
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(tw::TextWidget; kwargs...)
@@ -116,20 +108,20 @@ input_box_controls = Dict(
 
 
 function InputBox(;
-    height = 20,
-    width = console_width(),
     on_draw::Union{Nothing,Function} = nothing,
     controls::AbstractDict = input_box_controls,
     kwargs...,
 )
     InputBox(
-        Measure(height, width),
+        Measure(5, console_width()),
         controls,
         nothing, 
         nothing,
         0, :off, kwargs, on_draw
         )
 end
+
+on_layout_change(ib::InputBox, m::Measure) = ib.measure = m
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(ib::InputBox; kwargs...)

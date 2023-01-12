@@ -23,33 +23,20 @@ import Term: apply_style
 using Term.Compositors
 
 # ------------------------------- app elements ------------------------------- #
-# print this compositor if you want to see the layout
-layout = :(A(21, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(3, 0.6)))
-template = Compositor(layout)
-
-element_width(elem::Symbol) = template.elements[elem].w
-element_height(elem::Symbol) = template.elements[elem].h - 1 # the -1 is to account for focus marker
-
 # create some widgets
-rgb_visualizer = TextWidget(""; width = element_width(:A), height = element_height(:A))
+rgb_visualizer = TextWidget("")
 
 R = InputBox(
-    width = element_width(:R),
-    height = element_height(:R),
     title = "R value",
     style = "red",
     title_justify = :center,
 )
 G = InputBox(
-    width = element_width(:G),
-    height = element_height(:G),
     title = "G value",
     style = "green",
     title_justify = :center,
 )
 B = InputBox(
-    width = element_width(:B),
-    height = element_height(:B),
     title = "B value",
     style = "blue",
     title_justify = :center,
@@ -57,8 +44,6 @@ B = InputBox(
 
 button = Button(
     "random";
-    width = element_width(:b),
-    height = element_height(:b),
     pressed_background = "light_slate_grey",
     not_pressed_text_style = "light_slate_grey",
 )
@@ -72,19 +57,33 @@ widgets = OrderedDict{Symbol,AbstractWidget}(
 )
 
 # create transition rules
-transition_rules = OrderedDict{Tuple{Symbol,KeyInput},Symbol}(
-    (:A, ArrowRight()) => :R,
-    (:R, ArrowDown()) => :G,
-    (:G, ArrowDown()) => :B,
-    (:B, ArrowDown()) => :b,
-    (:b, ArrowUp()) => :B,
-    (:B, ArrowUp()) => :G,
-    (:G, ArrowUp()) => :R,
-    (:R, ArrowLeft()) => :A,
-    (:G, ArrowLeft()) => :A,
-    (:B, ArrowLeft()) => :A,
-    (:b, ArrowLeft()) => :A,
+transition_rules = OrderedDict(
+    ArrowRight() => Dict(
+        :A => :R,
+    ),
+    ArrowLeft() => Dict(
+        :R => :A,
+        :G => :A,
+        :B => :A,
+        :b => :A,
+    ),
+    ArrowDown() => Dict(
+        :R => :G,
+        :G => :B,
+        :B => :b,
+    ),
+    ArrowUp() => Dict(
+        :b => :B,
+        :B => :G,
+        :G => :R,
+    ),
 )
+
+# -------------------------------- app layout -------------------------------- #
+# print this compositor if you want to see the layout
+layout = :(A(22, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(4, 0.6)))
+template = Compositor(layout)  # print this to get an idea of the app layout
+
 
 # --------------------------------- functions -------------------------------- #
 function get_color(ib::InputBox)
@@ -109,7 +108,7 @@ function update_visualizer(app::App)
 
     viz.text =
         "(r:$r, g:$g, b:$b)" / apply_style(
-            join(repeat([" "^(viz.measure.w - 6)], viz.measure.h - 3), "\n"),
+            join(repeat([" "^(viz.measure.w-4)], viz.measure.h), "\n"),
             "on_($r, $g, $b)",
         )
 end
@@ -127,3 +126,18 @@ app = App(layout, widgets, transition_rules; on_draw = update_visualizer)
 button.callback = set_random_color
 
 play(app);
+
+
+
+# TODO app rescaling
+"""
+implement on_layout_change for all widgets
+
+make sure the app layout responds to size changes
+including increases, by "scaling" the layout
+
+TODO find a nice organic way to set and check/update
+app size.
+"""
+
+nothing

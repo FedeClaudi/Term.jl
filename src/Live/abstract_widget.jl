@@ -62,10 +62,20 @@ It prints the node's stated dimensions vs its content's (calling `frame`).
 Used for debugging
 """
 function print_node(io, x) 
-    color = isactive(x) ? "green" : "dim red"
+    color = isactive(x) ? "bright_blue" : "dim blue"
+    style = isactive(x) ? "default" : "dim"
     content = frame(x)
-    msg = "{$color}$(typeof(x)){/$color} - Widget shape: $(string(x.measure)), content: $(string(content.measure))"
-    tprint(io, msg)
+
+    hx, wx = x.measure.h, x.measure.w
+    hc, wc = content.measure.h, content.measure.w
+
+    h_color = hx >= hc ? "dim" : "red"
+    w_color = wx >= wc ? "dim" : "red"
+
+    msg = """{$color}$(typeof(x)){/$color} 
+            {$style}widget:{dim} ($hx, $wx){/dim}{/$style}
+           {$style}content:{dim}  ({$h_color}$hc{/$h_color}, {$w_color}$wc{/$w_color}){/dim}{/$style}"""
+    print(io, apply_style(msg))
 end
 
 

@@ -1,7 +1,7 @@
 module Measures
 
 import Term: rint, remove_ansi, remove_markup, default_width, DEFAULT_ASPECT_RATIO, textlen
-
+import Base: ==
 export Measure
 
 """
@@ -36,11 +36,14 @@ function Measure(str::AbstractString)
 end
 
 Measure(::Nothing) = Measure(0, 0)
+Measure() = Measure(0, 0)
 
 """
 The sum of measures returns a measure with the highest value along each dimension.
 """
 Base.:+(m1::Measure, m2::Measure)::Measure = Measure(m1.h + m2.h, max(m1.w, m2.w))
+
+==(m1::Measure, m2::Measure)::Bool = m1.h == m2.h && m1.w == m2.w
 
 """
     width

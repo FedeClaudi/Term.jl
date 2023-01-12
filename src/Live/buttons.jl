@@ -16,7 +16,6 @@ function press_button(b::AbstractButton, ::Union{SpaceBar, Enter})
 end
 
 
-
 button_controls = Dict(
     'q' => quit,
     Esc() => quit,
@@ -41,8 +40,8 @@ function make_buttons_panels(
     pressed_text_style,
     pressed_background,
     not_pressed_text_style,
-    width,
-    height;
+    height,
+    width;
     kwargs...,
 )
     pressed = Panel(
@@ -69,6 +68,16 @@ function make_buttons_panels(
     return pressed, not_pressed
 end
 
+
+function on_layout_change(b::AbstractButton, m::Measure)
+    pressed, not_pressed = make_buttons_panels(b.style_args..., m.h, m.w; b.style_kwargs...)
+    
+    b.pressed_display = pressed
+    b.not_pressed_display = not_pressed
+    b.measure = m
+end
+
+
 # ---------------------------------------------------------------------------- #
 #                                    Button                                    #
 # ---------------------------------------------------------------------------- #
@@ -84,6 +93,8 @@ end
     callback::Union{Nothing,Function}
     lastpressed::Int
     on_draw::Union{Nothing,Function}
+    style_args
+    style_kwargs
 end
 
 function Button(
@@ -92,33 +103,26 @@ function Button(
     pressed_text_style = "bold white",
     pressed_background = "red",
     not_pressed_text_style = "red",
-    width::Int = 10,
-    height::Int = 3,
     on_draw::Union{Nothing,Function} = nothing,
     kwargs...,
 )
-    pressed, not_pressed = make_buttons_panels(
-        message,
-        pressed_text_style,
-        pressed_background,
-        not_pressed_text_style,
-        width,
-        height;
-        kwargs...,
-    )
 
     return Button(
-        Measure(height, width),
+        Measure(),
         controls,
         nothing,
-        pressed,
-        not_pressed,
+        Panel(),  # place holders
+        Panel(),
         :not_pressed,
         nothing,
         0,
         on_draw,
+        (message, pressed_text_style, pressed_background, not_pressed_text_style),
+        kwargs
     )
 end
+
+
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::Button; kwargs...)
@@ -126,6 +130,7 @@ function frame(b::Button; kwargs...)
 
     return if b.status == :pressed
         currtime = Dates.value(now())
+
         if currtime - b.lastpressed > 100
             b.status = :not_pressed
             b.not_pressed_display
@@ -155,6 +160,8 @@ activated and not.
     callback::Union{Nothing,Function}
     lastpressed::Int
     on_draw::Union{Nothing,Function}
+    style_args
+    style_kwargs
 end
 
 function ToggleButton(
@@ -163,31 +170,22 @@ function ToggleButton(
     pressed_text_style = "bold white",
     pressed_background = "red",
     not_pressed_text_style = "red",
-    width::Int = 10,
-    height::Int = 3,
     on_draw::Union{Nothing,Function} = nothing,
     kwargs...,
 )
-    pressed, not_pressed = make_buttons_panels(
-        message,
-        pressed_text_style,
-        pressed_background,
-        not_pressed_text_style,
-        width,
-        height;
-        kwargs...,
-    )
 
     return ToggleButton(
-        Measure(height, width),
+        Measure(5, 20),
         controls,
         nothing,
-        pressed,
-        not_pressed,
+        Panel(),
+        Panel(),
         :not_pressed,
         nothing,
         0,
         on_draw,
+        (message, pressed_text_style, pressed_background, not_pressed_text_style),
+        kwargs
     )
 end
 
