@@ -79,12 +79,6 @@ transition_rules = OrderedDict(
     ),
 )
 
-# -------------------------------- app layout -------------------------------- #
-# print this compositor if you want to see the layout
-layout = :(A(22, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(4, 0.6)))
-template = Compositor(layout)  # print this to get an idea of the app layout
-
-
 # --------------------------------- functions -------------------------------- #
 function get_color(ib::InputBox)
     text = something(ib.input_text, "0")
@@ -121,7 +115,13 @@ end
 
 # ------------------------------------ run ----------------------------------- #
 # create app and visualize
-app = App(layout, widgets, transition_rules; on_draw = update_visualizer)
+layout = :(A(22, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(4, 0.6)))
+app = App(layout, widgets, 
+        transition_rules; 
+        on_draw = update_visualizer,
+        # width=200,
+        # expand=false,
+    )
 
 button.callback = set_random_color
 
@@ -132,12 +132,6 @@ play(app);
 # TODO app rescaling
 """
 implement on_layout_change for all widgets
-
-make sure the app layout responds to size changes
-including increases, by "scaling" the layout
-
-TODO find a nice organic way to set and check/update
-app size.
 """
 
 nothing

@@ -33,20 +33,27 @@ function Gallery(
     on_draw::Union{Nothing,Function} = nothing,
     title::String="Widget",
 )
-    # measure widgets
-    widgets_measures = getfield.(widgets, :measure)
-    max_w = maximum(getfield.(widgets_measures, :w))
-    max_h = maximum(getfield.(widgets_measures, :h))
-
+    # set widgets size
     Δ = show_panel ? 4 : 0
+    measure = Measure(height, width)
+    for wdg in widgets
+        on_layout_change(wdg, Measure(measure.h - Δ, measure.w - Δ))
+    end
 
-    @assert max_w < (width - Δ) "Gallery width set to $width but a widget has width $max_w, $(width - max_w - Δ - 1) above the limit."
-    @assert max_h < (height - Δ) "Gallery height set to $height but a widget has height $max_h, $(height - max_h - Δ - 1) above the limit."
-
-    gal = Gallery(Measure(height, width), controls, nothing, widgets, 1, show_panel, title, on_draw)
+    gal = Gallery(measure, controls, nothing, widgets, 1, show_panel, title, on_draw)
     set_as_parent(gal)
     return gal
 end
+
+
+function on_layout_change(gal::Gallery, m::Measure)
+    gal.measure = m
+    Δ = gal.show_panel ? 4 : 0
+    for wdg in gal.widgets
+        on_layout_change(wdg, Measure(m.h - Δ, m.w - Δ))
+    end
+end
+
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(gal::Gallery; kwargs...)

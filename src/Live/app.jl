@@ -86,6 +86,9 @@ An `App` is a collection of widgets.
     parent::Union{Nothing, AbstractWidget}
     compositor::Compositor
     layout::Expr
+    width::Int
+    height::Int
+    expand::Bool
     widgets::AbstractDict{Symbol,AbstractWidget}
     transition_rules::AbstractDict
     active::Symbol
@@ -126,18 +129,16 @@ app_controls = Dict(
 
 function App(
     widget::AbstractWidget;
-    width::Union{Int, Nothing} = nothing,
-    height::Union{Int, Nothing} = nothing,
     controls::AbstractDict = app_controls,
-    on_draw::Union{Nothing,Function} = nothing,
-    on_stop::Union{Nothing,Function} = nothing,
+    width=1.0,
+    height=min(40, console_height()),
+    kwargs...
 )
-    width = something(width, widget.measure.w)
-    height = something(height, widget.measure.h)
-
     layout = :(A($height, $width))
     return App(
-        layout, Dict{Symbol,AbstractWidget}(:A => widget); controls=controls, on_draw = on_draw, on_stop=on_stop
+        layout, Dict{Symbol,AbstractWidget}(:A => widget); controls=controls, 
+        height=height, width=fint(width * console_width()), 
+        kwargs...
     )
 end
 
@@ -146,13 +147,16 @@ function App(
     layout::Expr,
     widgets::AbstractDict,
     transition_rules::Union{Nothing,AbstractDict} = nothing;
+    width=console_width(),
+    height=min(40, console_height()),
     controls::AbstractDict = app_controls, 
     on_draw::Union{Nothing,Function} = nothing,
     on_stop::Union{Nothing,Function} = nothing,
+    expand::Bool = true,
 )
 
     # parse the layout expression and get the compositor
-    compositor = Compositor(layout)
+    compositor = Compositor(layout; max_w = min(console_width(), width), max_h = min(console_height(), height))
     measure = render(compositor).measure
 
     # check that the layout and the widgets match
@@ -190,6 +194,9 @@ function App(
         nothing,
         compositor,
         layout,
+        width, 
+        height,
+        expand,
         widgets,
         transition_rules,
         widgets_keys[1],
@@ -222,8 +229,8 @@ end
 
 Called when a console is resized to adjust the apps layout. 
 """
-function enforce_app_size(app::App) # , measure::Measure)
-    compositor = Compositor(app.layout)
+function enforce_app_size(app::App, measure::Measure)
+    compositor = Compositor(app.layout; max_w=measure.w, max_h = measure.h)
     _keys = app.widgets |> keys |> collect
 
     for k in _keys
@@ -237,7 +244,8 @@ end
 
 # ----------------------------------- frame ---------------------------------- #
 function on_layout_change(app::App)
-    console_h, console_w = console_height(), console_width()
+    console_h = min(app.height, console_height())
+    console_w = app.expand ? console_width() :  min(app.width, console_width())
     (console_h >= app.measure.h && console_w == app.measure.w) && return
 
     erase!(app)
@@ -245,7 +253,7 @@ function on_layout_change(app::App)
 
     # the console is too small, re-design
     app.measure = Measure(console_h, console_w)
-    enforce_app_size(app)  # , app.measure)
+    enforce_app_size(app, app.measure)
 end
 
 

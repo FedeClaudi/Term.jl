@@ -8,8 +8,10 @@ using keys such as arrow up and arrow down.
     measure::Measure
     controls::AbstractDict
     parent::Union{Nothing, AbstractWidget}
+    text::AbstractString
     content::Vector{String}
     title::String
+    line_numbers::Bool
     tot_lines::Int
     curr_line::Int
     page_lines::Int
@@ -70,38 +72,56 @@ pager_controls = Dict(
 )
 
 
+"""
+    make_pager_content(content::AbstractString, line_numbers::Bool)::Vector{string}
 
-function Pager(
-    content::String;
-    controls::AbstractDict = pager_controls,
-    page_lines::Int = min(console_height() - 5, 25),
-    title::String = "Term.jl PAGER",
-    width::Int = console_width(),
-    line_numbers::Bool = false,
-    on_draw::Union{Nothing,Function} = nothing,
-)
-    page_lines = min(page_lines, console_height() - 8)
-
-    line_numbers && (
-        content = join(
+Turns a text into a vector of lines with the right size (and optionally line numbers)
+"""
+function make_pager_content(content::AbstractString, line_numbers::Bool, width::Int)::Vector{String}
+    reshaped_content = if line_numbers == true
+        join(
             map(iln -> "{dim}$(iln[1])  {/dim}" * iln[2], enumerate(split(content, "\n"))),
             "\n",
         )
-    )
+    else
+        content
+    end
 
-    content = split(string(RenderableText(content; width = width - 6)), "\n")
+    return split(string(RenderableText(reshaped_content; width = width - 6)), "\n")
+end
 
+
+
+function Pager(
+    text::String;
+    controls::AbstractDict = pager_controls,
+    height = 30,
+    width=console_width(),
+    title::String = "Term.jl PAGER",
+    line_numbers::Bool = false,
+    on_draw::Union{Nothing,Function} = nothing,
+)
+
+    content = make_pager_content(text, line_numbers, width)
     return Pager(
-        Measure(page_lines + 5, width),
+        Measure(height, width),
         controls,
         nothing,
+        text,
         content,
         title,
+        line_numbers,
         length(content),
         1,
-        page_lines,
+        max(height - 5, 1),
         on_draw,
     )
+end
+
+function on_layout_change(p::Pager, m::Measure)
+    p.page_lines = max(m.h - 5, 1)
+    p.content = make_pager_content(p.text, p.line_numbers, m.w)
+    p.measure = m
 end
 
 # ---------------------------------- frame  ---------------------------------- #

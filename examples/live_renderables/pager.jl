@@ -9,29 +9,34 @@ use a pager to view it in the terminal.
 Multiple pagers are visualized via a Gallry widget.
 """
 
+import Term.LiveWidgets: LIVE_DEBUG
+LIVE_DEBUG[] = true
+
 filepath1 = "././src/live/abstract_widget.jl"
 filepath2 = "././src/live/gallery.jl"
 
-@assert console_width() > 100 "This example works best in a wide enough temrinal"
 
 gallery = Gallery(
     [
         Pager(
             load_code_and_highlight(filepath1);
-            page_lines = 40,
+            height = 40,
             title = filepath1,
             line_numbers = true,
             width = console_width() - 6,
         ),
         Pager(
-            load_code_and_highlight(filepath2);
-            page_lines = 40,
+            load_code_and_highlight(filepath2); 
+            height = 40,
             title = filepath2,
             line_numbers = true,
             width = console_width() - 6,
         ),
     ];
     height = 50,
-) |> App
+) 
 
-LiveWidgets.play(gallery; transient = true)
+app = App(gallery)
+play(app; transient = true)
+
+#TODO pager update tot lines, line number...

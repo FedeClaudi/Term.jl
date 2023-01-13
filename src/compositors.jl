@@ -40,10 +40,12 @@ each `LayoutElement` if there is one, the placeholder otherwise.
         h::Number,
         w::Number,
         renderable::Union{Nothing,String,AbstractRenderable},
-        placeholder::PlaceHolder,
+        placeholder::PlaceHolder;
+        max_w::Int = console_width(),
+        max_h::Int = console_height(),
     )
-        h = h isa Int ? h : fint(console_height() * h)
-        w = w isa Int ? w : fint(console_width() * w)
+        h = h isa Int ? h : fint(max_h * h)
+        w = w isa Int ? w : fint(max_w * w)
         return new(id, h, w, renderable, placeholder)
     end
 end
@@ -75,6 +77,8 @@ function Compositor(
     vpad::Int = 0,
     placeholder_size = nothing,
     check::Bool = true,
+    max_w::Int = console_width(),
+    max_h::Int = console_height(),
     kwargs...,
 )
     elements = get_elements_and_sizes(layout; placeholder_size = placeholder_size)
@@ -104,7 +108,9 @@ function Compositor(
             e.args[2],  # height
             e.args[3],  # width
             renderables[n],
-            placeholders[n],
+            placeholders[n];
+            max_w = max_w,
+            max_h = max_h,
         ) for (n, e) in zip(names, elements)
     )
 

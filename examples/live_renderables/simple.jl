@@ -18,12 +18,13 @@ function on_draw(widget)
     )
 end
 
-wdg = TextWidget(;
-    height = 25,
+wdg = TextWidget("";
     as_panel=false,
     on_draw=on_draw,
 )
 
 
 
-App(wdg) |> play;
+app = App(wdg; height=20)
+
+app |> play;

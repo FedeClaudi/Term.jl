@@ -69,12 +69,11 @@ function print_node(io, x)
     hx, wx = x.measure.h, x.measure.w
     hc, wc = content.measure.h, content.measure.w
 
-    h_color = hx >= hc ? "dim" : "red"
-    w_color = wx >= wc ? "dim" : "red"
+    h_color = hx >= hc ? style : "red"
+    w_color = wx >= wc ? style : "red"
 
-    msg = """{$color}$(typeof(x)){/$color} 
-            {$style}widget:{dim} ($hx, $wx){/dim}{/$style}
-           {$style}content:{dim}  ({$h_color}$hc{/$h_color}, {$w_color}$wc{/$w_color}){/dim}{/$style}"""
+    msg = """{$color}$(typeof(x)){/$color} {dim} ($hx, $wx){/dim}
+           {$style}content: ({$h_color}$hc{/$h_color}, {$w_color}$wc{/$w_color}){/$style}"""
     print(io, apply_style(msg))
 end
 

@@ -56,7 +56,7 @@ function frame(tw::TextWidget; kwargs...)
     lines = split(txt, "\n")
     lines = lines[1:min(tw.measure.h, length(lines))]
 
-    return RenderableText(join(lines, "\n"))
+    return RenderableText(join(lines, "\n"); width=tw.measure.w-4)
 end
 
 # ---------------------------------------------------------------------------- #
