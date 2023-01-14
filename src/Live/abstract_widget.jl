@@ -37,6 +37,9 @@ Get the current conttent of a widget
 frame(::AbstractWidget) = error("Not implemented")
 
 
+on_highlighted(content) = hLine(content.measure.w) / content
+on_not_highlighted(content) = "" / content
+
 # ------------------------------ tree structure ------------------------------ #
 
 """

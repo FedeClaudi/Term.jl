@@ -17,6 +17,9 @@ TextWidget just shows a piece of text.
     text::String
     as_panel::Bool
     on_draw::Union{Nothing,Function}
+    on_highlighted::Function
+    on_not_highlighted::Function
+    panel_kwargs
 end
 
 text_widget_controls = Dict(
@@ -28,12 +31,17 @@ TextWidget(
     text::String;
     as_panel = false,
     on_draw::Union{Nothing,Function} = nothing,
+    on_highlighted::Function = on_highlighted,
+    on_not_highlighted::Function = on_not_highlighted,
     controls = text_widget_controls,
+    kwargs...
 ) = TextWidget(
     Measure(Measure(text).h, console_width()), 
     controls, 
     nothing,
-    text, as_panel, on_draw
+    text, as_panel, on_draw, 
+    on_highlighted, on_not_highlighted,
+    kwargs
 )
 
 on_layout_change(t::TextWidget, m::Measure) = t.measure = m
@@ -43,11 +51,11 @@ function frame(tw::TextWidget; kwargs...)
     isnothing(tw.on_draw) || tw.on_draw(tw)
 
     tw.as_panel && return Panel(
-        tw.text,
+        tw.text;
         width = tw.measure.w,
-        height = tw.measure.h + 1,
+        height = tw.measure.h,
         fit = false,
-        style = "dim",
+        tw.panel_kwargs...
     )
 
     txt = reshape_text(tw.text, tw.measure.w - 4)

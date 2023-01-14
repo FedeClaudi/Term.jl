@@ -89,7 +89,7 @@ An `App` is a collection of widgets.
     width::Int
     height::Int
     expand::Bool
-    widgets::AbstractDict{Symbol,AbstractWidget}
+    widgets::AbstractDict
     transition_rules::AbstractDict
     active::Symbol
     on_draw::Union{Nothing,Function}
@@ -266,7 +266,7 @@ function frame(app::App; kwargs...)
     for (name, widget) in pairs(app.widgets)
         content = frame(widget)
         if length(app.widgets) > 1
-            content = app.active == name ? hLine(content.measure.w) / content : "" / content
+            content = app.active == name ? widget.on_highlighted(content) : widget.on_not_highlighted(content)
         end
         update!(app.compositor, name, content)
     end

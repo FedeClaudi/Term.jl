@@ -16,6 +16,8 @@ using keys such as arrow up and arrow down.
     curr_line::Int
     page_lines::Int
     on_draw::Union{Nothing,Function}
+    on_highlighted::Function
+    on_not_highlighted::Function
 end
 
 
@@ -103,6 +105,8 @@ function Pager(
     title::String = "Term.jl PAGER",
     line_numbers::Bool = false,
     on_draw::Union{Nothing,Function} = nothing,
+    on_highlighted::Function = on_highlighted,
+    on_not_highlighted::Function = on_not_highlighted,
 )
 
     content = reshape_pager_content(text, line_numbers, width)
@@ -118,6 +122,7 @@ function Pager(
         1,
         max(height - 5, 1),
         on_draw,
+        on_highlighted, on_not_highlighted,
     )
 end
 
