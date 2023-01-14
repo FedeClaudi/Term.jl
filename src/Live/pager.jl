@@ -73,11 +73,11 @@ pager_controls = Dict(
 
 
 """
-    make_pager_content(content::AbstractString, line_numbers::Bool)::Vector{string}
+    reshape_pager_content(content::AbstractString, line_numbers::Bool)::Vector{string}
 
 Turns a text into a vector of lines with the right size (and optionally line numbers)
 """
-function make_pager_content(content::AbstractString, line_numbers::Bool, width::Int)::Vector{String}
+function reshape_pager_content(content::AbstractString, line_numbers::Bool, width::Int)::Vector{String}
     reshaped_content = if line_numbers == true
         join(
             map(iln -> "{dim}$(iln[1])  {/dim}" * iln[2], enumerate(split(content, "\n"))),
@@ -87,7 +87,10 @@ function make_pager_content(content::AbstractString, line_numbers::Bool, width::
         content
     end
 
+    reshaped_content = reshape_code_string(content, width - 6)
     return split(string(RenderableText(reshaped_content; width = width - 6)), "\n")
+    # return split(reshaped_content, "\n")
+
 end
 
 
@@ -102,7 +105,7 @@ function Pager(
     on_draw::Union{Nothing,Function} = nothing,
 )
 
-    content = make_pager_content(text, line_numbers, width)
+    content = reshape_pager_content(text, line_numbers, width)
     return Pager(
         Measure(height, width),
         controls,
@@ -120,11 +123,63 @@ end
 
 function on_layout_change(p::Pager, m::Measure)
     p.page_lines = max(m.h - 5, 1)
-    p.content = make_pager_content(p.text, p.line_numbers, m.w)
+    p.content = reshape_pager_content(p.text, p.line_numbers, m.w)
+    p.tot_lines = length(p.content)
+    p.curr_line = min(p.curr_line, p.tot_lines - p.page_lines)
     p.measure = m
 end
 
 # ---------------------------------- frame  ---------------------------------- #
+
+
+function make_page_content(pager, i, Δi)
+    if Δi >= pager.tot_lines
+        return join(pager.content, "\n")
+    else
+        return join(pager.content[i:min(pager.tot_lines, i + Δi)], "\n")
+    end
+end
+
+function make_scrollbar(pager, i, Δi)
+    page_lines = pager.page_lines
+    scrollbar_lines = min(pager.page_lines, 6)
+    scrollbar_lines_half = scrollbar_lines // 2
+    scrollbar = vLine(scrollbar_lines; style = "white on_white")
+
+    p = (i) / (pager.tot_lines - Δi)  # progress in the file
+    scrollbar_center = p * (page_lines) |> round |> Int
+    nspaces_above = max(0, scrollbar_center - scrollbar_lines_half) |> round |> Int
+    nspaces_below =
+        max(0, page_lines - scrollbar_lines - nspaces_above) |> round |> Int
+
+    if nspaces_above == 0
+        below = RenderableText(
+            join(repeat([" \n"], nspaces_below + 1));
+            style = "on_gray23",
+        )
+        return scrollbar / below
+    elseif nspaces_below == 0
+        above = RenderableText(
+            join(repeat([" \n"], nspaces_above + 1));
+            style = "on_gray23",
+        )
+        return above / scrollbar
+    else
+        above = RenderableText(join(repeat([" \n"], nspaces_above)); style = "on_gray23")
+        below = RenderableText(
+            join(repeat([" \n"], nspaces_below));
+            style = "on_gray23",
+        )
+        return above / scrollbar / below
+    end
+end
+
+function make_page(pager, i, Δi)
+    page_content = make_page_content(pager, i, Δi)
+    scrollbar = make_scrollbar(pager, i, Δi)
+    return page_content * scrollbar
+end
+
 
 """
     frame(pager::Pager)::AbstractRenderable
@@ -135,51 +190,7 @@ function frame(pager::Pager; omit_panel = false)::AbstractRenderable
     isnothing(pager.on_draw) || pager.on_draw(pager)
 
     i, Δi = pager.curr_line, pager.page_lines
-
-    page = if Δi >= pager.tot_lines
-        join(pager.content, "\n")
-    else
-        page_content = join(pager.content[i:min(pager.tot_lines, i + Δi)], "\n")
-
-        # make a scroll bar
-        page_lines = pager.page_lines
-        scrollbar_lines = min(pager.page_lines, 6)
-        scrollbar_lines_half = scrollbar_lines // 2
-        scrollbar = vLine(scrollbar_lines; style = "white on_white")
-
-        p = (i) / (pager.tot_lines - Δi)  # progress in the file
-        # p = min(p, 0.99)
-
-        scrollbar_center = scrollbar_lines_half + p * (page_lines - scrollbar_lines)
-
-        # scrollbar_center = p * (page_lines) |> round |> Int
-        nspaces_above = max(0, scrollbar_center - scrollbar_lines_half) |> round |> Int
-        nspaces_below =
-            max(0, page_lines - scrollbar_lines - nspaces_above) |> round |> Int
-
-        scrollbar = if nspaces_above == 0
-            below = RenderableText(
-                join(repeat([" \n"], nspaces_below + 1));
-                style = "on_gray23",
-            )
-            scrollbar / below
-        elseif nspaces_below == 0
-            above = RenderableText(
-                join(repeat([" \n"], nspaces_above + 1));
-                style = "on_gray23",
-            )
-            above / scrollbar
-        else
-            above = RenderableText(join(repeat([" \n"], nspaces_above)); style = "on_gray23")
-            below = RenderableText(
-                join(repeat([" \n"], nspaces_below));
-                style = "on_gray23",
-            )
-            scrollbar = above / scrollbar / below
-        end
-
-        page_content * scrollbar
-    end
+    page = make_page(pager, i, Δi)
 
     # return content
     omit_panel && return "  " * RenderableText(page)

@@ -15,7 +15,6 @@ LIVE_DEBUG[] = true
 filepath1 = "././src/live/abstract_widget.jl"
 filepath2 = "././src/live/gallery.jl"
 
-
 gallery = Gallery(
     [
         Pager(
