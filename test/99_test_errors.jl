@@ -1,6 +1,8 @@
-import Term: install_term_stacktrace
+import Term: install_term_stacktrace, TERM_SHOW_LINK_IN_STACKTRACE
+import Term.Errors: StacktraceContext, render_backtrace
 
-install_term_stacktrace()
+install_term_stacktrace(; hide_frames = false)
+TERM_SHOW_LINK_IN_STACKTRACE[] = false
 
 """
 The logic behind these tests is that if something goes
@@ -45,3 +47,37 @@ will be different from the one you'd expect
     #     i + "a"
     # end
 end
+
+@testset "MethodError" begin
+    # kwargs call
+    struct Test3
+        x::Float64
+        y::Int
+
+        # Test3(x, y, z) = new(x, y)
+        Test3(x, y) = new(x, y)
+    end
+    @test_throws MethodError Test3(1; a = :test)
+
+    # convert
+    f(x)::Vector = 2x
+    @test_throws MethodError f(1)
+end
+
+# ! this fails to pass tests for some reason.
+# @testset "ERRORS - backtrace" begin
+#     f2(x) = 2x
+#     f1(x) = 3x
+#     f0(x; kwargs...) = begin
+#         st = stacktrace()
+#         ctx = StacktraceContext(TEST_CONSOLE_WIDTH[])
+#         bt = render_backtrace(ctx, st; kwargs...)
+#         return string(bt)
+#     end
+
+#     bt1 = f0(f2(f1(2)); hide_frames = true)
+#     bt2 = f0(f2(f1(2)); hide_frames = false)
+
+#     IS_WIN || @compare_to_string(string(bt1), "backtrace_1")
+#     IS_WIN || @compare_to_string(string(bt2), "backtrace_2")
+# end

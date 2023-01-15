@@ -52,5 +52,41 @@ subtitle_justify=:right, subtitle_style="yellow default"
 )
 ```
 
+## Nested layouts? No head ache
+If you want to have several nested panels, you might want to make sure that their widths are set correctly so that they fit nicely together. There's a macro for that!
 
-But, that's not enough... so let' see what more we can do!
+```@example nesting
+import Term: @nested_panels
+@nested_panels Panel(
+    Panel(
+        Panel(
+            Panel(
+                ; title="deepest", style="blue", background="blue"
+            ); title="deeper", style="green");
+        title="not so deep");
+    style="red",
+    title="outer"
+) 
+```
+It sets the width of each panel to match their depth. It only works if you're actively calling Panel() in the macro call.
+something like this won't work:
+```@example nesting
+another_panel = Panel("this won't work")
+@nested_panels Panel(
+    Panel(
+        Panel(
+            Panel(
+                another_panel,
+                ; title="deepest", 
+            ); title="deeper", style="green");
+        title="not so deep");
+    style="red",
+    title="outer"
+) 
+
+```
+
+
+This is all nice, but, that's not enough... so let' see what more we can do!
+
+

@@ -23,6 +23,8 @@ makedocs(;
             "basics/renderables.md",
             "basics/tprint.md",
             "basics/console.md",
+            "basics/prompt.md",
+            "basics/markdown.md",
         ],
         "Renderables" => Any[
             "ren/intro.md",
@@ -30,6 +32,7 @@ makedocs(;
             "ren/panel.md",
             "ren/table.md",
             "ren/layout_rens.md",
+            "ren/annotation.md",
             "ren/dendogram.md",
             "ren/tree.md",
         ],
@@ -48,7 +51,6 @@ makedocs(;
             "adv/logging.md",
             "adv/errors_tracebacks.md",
             "adv/introspection.md",
-            "adv/markdown.md",
         ],
         "API" => Any[
             "api/api_term.md",

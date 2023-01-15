@@ -2,8 +2,7 @@ module Tables
 
 import Tables as TablesPkg
 
-import Term: do_by_line, fillin, str_trunc
-import MyterialColors: orange
+import Term: do_by_line, fillin, str_trunc, TERM_THEME
 
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Layout: cvstack, hstack, vstack, pad, vLine, vertical_pad
@@ -15,6 +14,7 @@ using ..Boxes
 
 export Table
 
+theme = TERM_THEME[]
 include("_tables.jl")
 
 """
@@ -75,20 +75,20 @@ Generic constructor for a Table renderable.
 """
 function Table(
     tb::TablesPkg.AbstractColumns;
-    box::Symbol = :MINIMAL_HEAVY_HEAD,
-    style::String = "#9bb3e0",
+    box::Symbol = TERM_THEME[].tb_box,
+    style::String = TERM_THEME[].tb_style,
     hpad::Union{Vector,Int} = 2,
     vpad::Union{Vector,Int} = 0,
     vertical_justify::Symbol = :center,
     show_header::Bool = true,
     header::Union{Nothing,Vector,Tuple} = nothing,
-    header_style::Union{String,Vector,Tuple} = "bold white",
+    header_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_header,
     header_justify::Union{Nothing,Symbol,Vector,Tuple} = nothing,
-    columns_style::Union{String,Vector,Tuple} = "default",
+    columns_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_columns,
     columns_justify::Union{Symbol,Vector,Tuple} = :center,
     columns_widths::Union{Nothing,Int,Vector} = nothing,
     footer::Union{Function,Nothing,Vector,Tuple} = nothing,
-    footer_style::Union{String,Vector,Tuple} = "default",
+    footer_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_footer,
     footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
     compact::Bool = false,
 )
@@ -168,11 +168,14 @@ function Table(
 
     # get the height of each row
     heights = rows_heights(N_rows, show_header, header, rows_values, footer, vpad)
-    # @info "sizes" widths heights    
+    # @info "sizes" widths heights  tb sch
 
-    # create table lines
+    # ----------------------------- create table rows ---------------------------- #
     nrows = length(rows_values)
     lines::Vector{String} = []
+    # @info "creating table" heights widths
+
+    # create a row for the header
     show_header && push!(
         lines,
         table_row(
@@ -191,11 +194,14 @@ function Table(
             :head,
             :head_row,
             style,
-            heights[1],
+            heights[1];
+            # compact = true
         ),
     )
 
+    # add one row at the time
     for (l, row) in enumerate(rows_values)
+        # get the row's content
         I = l + 1
         row = make_row_cells(
             row,
@@ -207,6 +213,7 @@ function Table(
             vertical_justify,
         )
 
+        # prep row params based on line number, header etc...
         if l == 1 && show_header
             bottom = if nrows < 2
                 :bottom
@@ -215,52 +222,36 @@ function Table(
             else
                 :foot_row
             end
-            push!(
-                lines,
-                table_row(
-                    row,
-                    widths,
-                    box,
-                    show_header ? nothing : :top,
-                    :mid,
-                    bottom,
-                    style,
-                    heights[I];
-                    compact = show_header ? false : compact,
-                ),
-            )
+            top = show_header ? nothing : :top
+            mid = :mid
+            _compact = (show_header && (box != BOXES[:NONE])) ? false : compact
+
+            # add additional rows
         elseif l == nrows
-            push!(
-                lines,
-                table_row(
-                    row,
-                    widths,
-                    box,
-                    nothing,
-                    :mid,
-                    isnothing(footer) ? :bottom : :foot_row,
-                    style,
-                    heights[I],
-                ),
-            )
+            top, mid, bottom, _compact =
+                nothing, :mid, isnothing(footer) ? :bottom : :foot_row, false
         else
-            push!(
-                lines,
-                table_row(
-                    row,
-                    widths,
-                    box,
-                    nothing,
-                    :mid,
-                    :row,
-                    style,
-                    heights[I];
-                    compact = compact,
-                ),
-            )
+            top, mid, bottom, _compact = nothing, :mid, :row, compact
         end
+
+        # add it in
+        push!(
+            lines,
+            table_row(
+                row,
+                widths,
+                box,
+                top,
+                mid,
+                bottom,
+                style,
+                heights[I];
+                compact = _compact,
+            ),
+        )
     end
 
+    # add footer
     if !isnothing(footer)
         # get footer style
         footer_justify = something(footer_justify, columns_justify)
@@ -316,24 +307,43 @@ Table(data::AbstractDict; header = nothing, kwargs...) = Table(
 )
 
 """
-    table_row(cells, widths, box, top_level, mid_level, bottom_level, box_style, row_height)
+    function table_row(
+        cells::Vector,
+        widths::Vector,
+        box::Symbol,
+        top_level::Symbol,
+        mid_level::Symbol,
+        bottom_level::Symbol,
+        box_style::String,
+        row_height::Int;
+        compact = false,
+    )
 
 Create a single row of a `Table` renderable. 
 
 Each row is made up of an upper, mid and bottom section. The
 upper and bottom sections are created by rows of the `Box` type.
 The mid section is made up of the row's cells and dividing lines.
+
+## Arguments
+- cells: vector of cells content. Of length equal to the number of columns
+- widths: vector of width of each cell.
+- box: name of the `Box` used to construct the cell's lines
+- top/mid/bottom_level: name of the `Box` level to be used for construction
+- box_style: styling to be applied to box
+- row_height: height of the row
+- compact: if true avoids adding a top layer to the row
 """
 function table_row(
-    cells,
-    widths,
+    cells::Vector,
+    widths::Vector,
     box,
-    top_level,
-    mid_level,
-    bottom_level,
+    top_level::Union{Nothing,Symbol},
+    mid_level::Symbol,
+    bottom_level::Symbol,
     box_style,
-    row_height;
-    compact = false,
+    row_height::Int;
+    compact::Bool = false,
 )
     # get box characters
     mid_level = getfield(box, mid_level)

@@ -1,0 +1,5 @@
+{red}adasd ad sa dsa{green}{/green}{/red}[0m
+{red}{green}ad {blue} sd d ads{/blue}{/green}{/red}[0m[0m
+{red}{green}{blue}ad da dad {/green} asdsa{/blue}{/red}[0m
+{red}{blue}ddfsf {/blue}ad a{/red}[0m[0m
+{red}{/red}[0m

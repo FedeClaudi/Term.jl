@@ -11,7 +11,11 @@ import Term:
     unescape_brackets,
     split_lines,
     TERM_THEME,
-    default_width
+    default_width,
+    plural,
+    reshape_text,
+    remove_markup,
+    reshape_code_string
 
 import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
 import ..Renderables: RenderableText, info, AbstractRenderable
@@ -26,8 +30,6 @@ export @with_repr, termshow, install_term_repr, @showme
 
 include("_repr.jl")
 include("_inspect.jl")
-
-plural(word::AbstractString, n) = n == 1 ? word : word * 's'
 
 """
     termshow
@@ -57,8 +59,8 @@ termshow(io::IO, obj) = print(
         subtitle_justify = :right,
         width = 40,
         justify = :center,
-        style = TERM_THEME[].repr_panel_style,
-        subtitle_style = TERM_THEME[].repr_name_style,
+        style = TERM_THEME[].repr_panel,
+        subtitle_style = TERM_THEME[].repr_name,
     ),
 )
 
@@ -75,8 +77,11 @@ Show an expression's head and arguments.
 """
 function termshow(io::IO, e::Expr; kwargs...)
     content = repr_get_obj_fields_display(e)
-    content =
-        cvstack("{green}$(highlight(string(e))){/green}", hLine(content.measure.w), content)
+    content = cvstack(
+        "{$(TERM_THEME[].emphasis)}$(highlight(string(e))){/$(TERM_THEME[].emphasis)}",
+        hLine(content.measure.w),
+        content,
+    )
     return print(
         io,
         Panel(
@@ -86,8 +91,8 @@ function termshow(io::IO, e::Expr; kwargs...)
             subtitle_justify = :right,
             width = 40,
             justify = :center,
-            style = TERM_THEME[].repr_panel_style,
-            subtitle_style = TERM_THEME[].repr_name_style,
+            style = TERM_THEME[].repr_panel,
+            subtitle_style = TERM_THEME[].repr_name,
         ),
     )
 end
@@ -106,40 +111,36 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
     theme = TERM_THEME[]
 
     # prepare text renderables
-    k = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent_style * " bold")
+    k = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent * " bold")
     ktypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
-            style = theme.repr_type_style * " dim",
+            style = theme.repr_type * " dim",
         )
-    vals =
-        RenderableText.(
-            short_string.(values(obj));
-            style = theme.repr_values_style * " bold",
-        )
+    vals = RenderableText.(short_string.(values(obj)); style = theme.repr_values * " bold")
     vtypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(values(obj)));
-            style = theme.repr_type_style * " dim",
+            style = theme.repr_type * " dim",
         )
 
     # trim if too many
     arrows = if length(k) > 10
         k, ktypes, vals, vtypes = k[1:10], ktypes[1:10], vals[1:10], vtypes[1:10]
 
-        push!(k, RenderableText("⋮"; style = theme.repr_accent_style))
-        push!(ktypes, RenderableText("⋮"; style = theme.repr_type_style * " dim"))
-        push!(vals, RenderableText("⋮"; style = theme.repr_values_style))
-        push!(vtypes, RenderableText("⋮"; style = theme.repr_type_style * " dim"))
+        push!(k, RenderableText("⋮"; style = theme.repr_accent))
+        push!(ktypes, RenderableText("⋮"; style = theme.repr_type * " dim"))
+        push!(vals, RenderableText("⋮"; style = theme.repr_values))
+        push!(vtypes, RenderableText("⋮"; style = theme.repr_type * " dim"))
 
-        vstack(RenderableText.(fill("=>", length(k) - 1); style = "red bold")...)
+        vstack(RenderableText.(fill("=>", length(k) - 1); style = TERM_THEME[].operator)...)
     else
-        vstack(RenderableText.(fill("=>", length(k)); style = "red bold")...)
+        vstack(RenderableText.(fill("=>", length(k)); style = TERM_THEME[].operator)...)
     end
 
     # prepare other renderables
     space = Spacer(length(k), 1)
-    line = vLine(length(k); style = "dim #7e9dd9")
+    line = vLine(length(k); style = "dim $(TERM_THEME[].emphasis)")
 
     _keys_renderables = cvstack(ktypes...) * line * space * cvstack(k...)
     _values_renderables = cvstack(vals...) * space * line * cvstack(vtypes...)
@@ -154,10 +155,10 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
             title_justify = :left,
             width = 40,
             justify = :center,
-            style = theme.repr_panel_style,
-            title_style = theme.repr_name_style,
+            style = theme.repr_panel,
+            title_style = theme.repr_name,
             padding = (2, 2, 1, 1),
-            subtitle = "{bold white}$m{/bold white}{default} $(plural("item", m)){/default}",
+            subtitle = "{$(TERM_THEME[].text_accent)}$m{/$(TERM_THEME[].text_accent)}{default} $(plural("item", m)){/default}",
             subtitle_justify = :right,
         ),
     )
@@ -177,7 +178,7 @@ termshow(io::IO, mtx::AbstractMatrix; kwargs...) = print(
     repr_panel(
         mtx,
         matrix2content(mtx),
-        "{bold white}$(size(mtx, 1)) × $(size(mtx, 2)){/bold white}{default} {/default}",
+        "{$(TERM_THEME[].text_accent)}$(size(mtx, 1)) × $(size(mtx, 2)){/$(TERM_THEME[].text_accent)}{default} {/default}",
     ),
 )
 
@@ -192,7 +193,7 @@ termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
     repr_panel(
         vec,
         vec2content(vec),
-        "{bold white}$(length(vec)){/bold white}{default} items{/default}";
+        "{$(TERM_THEME[].text_accent)}$(length(vec)){/$(TERM_THEME[].text_accent)}{default} items{/default}";
         justify = :left,
         fit = true,
         title = nothing,
@@ -209,6 +210,9 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
     I0 = CartesianIndices(size(arr)[3:end])
     I = I0[1:min(10, length(I0))]
 
+    panel_style = TERM_THEME[].repr_array_panel
+    panel_title_style = TERM_THEME[].repr_array_title
+
     panels::Vector{Union{Panel,Spacer}} = []
     for (n, i) in enumerate(I)
         i_string = join(string.(Tuple(i)), ", ")
@@ -219,10 +223,9 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
                 subtitle = "[:, :, $i_string]",
                 subtitle_justify = :right,
                 width = 60,
-                style = "dim yellow",
+                style = panel_style,
                 subtitle_style = "default",
-                title = "($n)",
-                title_style = "dim bright_blue",
+                fit = true,
             ),
         )
         push!(panels, Spacer(2, 1))
@@ -232,9 +235,9 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
         push!(
             panels,
             Panel(
-                "{dim bright_blue bold underline}$m{/dim bright_blue bold underline}{dim bright_blue} $(plural("frame", m)) omitted{/dim bright_blue}";
+                "{$panel_title_style bold underline}$m{/$panel_title_style bold underline}{$panel_title_style} $(plural("frame", m)) omitted{/$panel_title_style}";
                 width = panels[end - 1].measure.w,
-                style = "dim yellow",
+                style = panel_style,
             ),
         )
     end
@@ -244,7 +247,9 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
         repr_panel(
             arr,
             vstack(panels...),
-            "{white}" * join(string.(size(arr)), " × ") * "{/white}",
+            "{$(TERM_THEME[].text_accent)}" *
+            join(string.(size(arr)), " × ") *
+            "{/$(TERM_THEME[].text_accent)}",
             fit = true,
         ),
     )
@@ -258,17 +263,26 @@ Show a type's arguments, constructors and docstring.
 """
 function termshow(io::IO, obj::DataType; showdocs = true, kwargs...)
     theme = TERM_THEME[]
-    ts = theme.repr_type_style
-    field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent_style)
-    field_types = apply_style.(map(f -> "::" * string(f), obj.types), ts)
+    ts = theme.repr_type
 
-    line = vLine(length(field_names); style = theme.repr_name_style)
+    field_names, field_types = [], []
+    try
+        field_names = apply_style.(string.(fieldnames(obj)), theme.repr_accent)
+        field_types = apply_style.(map(f -> "::" * string(f), obj.types), ts)
+    catch
+        field_names = []
+        field_types = []
+    end
+
+    line = vLine(length(field_names); style = theme.repr_name)
     space = Spacer(length(field_names), 1)
     fields = rvstack(field_names...) * space * lvstack(string.(field_types)...)
 
-    type_name = apply_style(string(obj), theme.repr_name_style * " bold")
-    sup = supertypes(obj)[2]
-    type_name *= " {bright_blue dim}<: $sup{/bright_blue dim}"
+    type_name = apply_style(string(obj), theme.repr_name * " bold")
+    if length(supertypes(obj)) > 1
+        sup = supertypes(obj)[2]
+        type_name *= " {$(theme.repr_array_text) dim}<: $sup{/$(theme.repr_array_text) dim}"
+    end
     content =
         "    " * repr_panel(
             nothing,
@@ -305,6 +319,7 @@ end
 Show a function's methods and docstring.
 """
 function termshow(io::IO, fun::Function; width = min(console_width(io), default_width(io)))
+    theme = TERM_THEME[]
     # get methods
     methods_contents, N = style_function_methods(fun; width = width)
 
@@ -313,8 +328,8 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
         "   " * repr_panel(
             nothing,
             methods_contents,
-            "{white bold}$m{/white bold} $(plural("method", m))",
-            title = "Function: {bold bright_blue}$(string(fun)){/bold bright_blue}",
+            "{$(theme.text_accent)}$m{/$(theme.text_accent)} $(plural("method", m))",
+            title = "Function: {bold $(theme.repr_array_text)}$(string(fun)){/bold $(theme.repr_array_text)}",
             width = width - 8,
             fit = false,
             justify = :left,
@@ -331,7 +346,7 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
     if (m = length(doc) - 100) > 0
         doc = [
             doc[1:min(100, length(doc))]...,
-            "{dim bright_blue}$m $(plural("line", m)) omitted...{/dim bright_blue}",
+            "{dim $(theme.repr_array_text)}$m $(plural("line", m)) omitted...{/dim $(theme.repr_array_text)}",
         ]
     end
     print(io, panel)
@@ -441,12 +456,13 @@ macro showme(expr, show_all_methods = false)
     parse_md(info_msg) |> tprintln
 
     # print args types
-    _type_color = TERM_THEME[].type
-    _string_color = TERM_THEME[].string
+    theme = TERM_THEME[]
+    _type_color = theme.type
+    _string_color = theme.string
     for i in 2:length(expr.args)
         arg = expr.args[i]
         arg = arg isa AbstractString ? "\"$arg\"" : arg
-        "     {blue}⨀{/blue} {white italic}$arg{/white italic}{$_type_color}::$(typeof(arg)){/$_type_color}" |>
+        "     {$(theme.emphasis)}⨀{/$(theme.emphasis)} {$(theme.text_accent) italic}$arg{/$(theme.text_accent) italic}{$_type_color}::$(typeof(arg)){/$_type_color}" |>
         tprintln
     end
 

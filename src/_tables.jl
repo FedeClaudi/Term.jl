@@ -12,11 +12,11 @@ function calc_columns_widths(
     N_rows::Int,
     columns_widths::Union{Nothing,Vector,Int},
     show_header::Bool,
-    header,
-    tb,
-    sch,
-    footer,
-    hpad,
+    header::Union{Tuple,AbstractVector,String,Nothing},
+    tb::TablesPkg.AbstractColumns,
+    sch,  # table schema
+    footer::Union{Tuple,AbstractVector,String,Nothing},
+    hpad::Union{Nothing,Int,AbstractVector},
 )
     if !isnothing(columns_widths)
         columns_widths = expand(columns_widths, N_cols)
@@ -27,6 +27,7 @@ function calc_columns_widths(
     data_widths = collect(map(c -> max(width.(tb[c])...), sch.names))
     footers_widths = isnothing(footer) ? zeros(N_cols) : collect(width.(footer))
     widths = hcat(headers_widths, data_widths, footers_widths)
+
     hpad = isa(hpad, Int) ? fill(hpad, N_rows) : hpad
     widths = Int.([mapslices(x -> max(x...), widths; dims = 2)...] .+ hpad * 2)
     return widths
@@ -133,7 +134,7 @@ function assert_table_arguments(
     # if there were problems, alert user and fail gracefully
     if length(problems) > 0
         @warn "Failed to create Term.Table"
-        warn_color = orange
+        warn_color = "yellow_light"
         tprintln.("  {$warn_color}" .* problems .* "{/$warn_color}"; highlight = true)
     end
     return length(problems) == 0

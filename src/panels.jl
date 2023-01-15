@@ -1,18 +1,16 @@
 module Panels
 
 import Term:
-    reshape_text,
     join_lines,
     fillin,
-    str_trunc,
     ltrim_str,
     default_width,
     remove_ansi,
     get_bg_color,
-    textlen
+    textlen,
+    TERM_THEME
 
-import ..Renderables:
-    AbstractRenderable, RenderablesUnion, Renderable, RenderableText, trim_renderable
+import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
 import ..Style: apply_style
 import ..Segments: Segment
@@ -22,7 +20,7 @@ import ..Measures: width as get_width
 import ..Consoles: console_width, console_height
 using ..Boxes
 
-export Panel, TextBox
+export Panel, TextBox, @nested_panels
 
 abstract type AbstractPanel <: AbstractRenderable end
 
@@ -117,9 +115,6 @@ function Panel(;
     content = ""
     content_measure = Measure(0, 0)
 
-    # get padding
-    padding = padding isa Padding ? padding : Padding(padding...)
-
     # make panel
     return Panel(
         content;
@@ -130,7 +125,7 @@ function Panel(;
         Δh = padding.top + padding.bottom,
         height = height,
         width = width,
-        padding = padding,
+        padding = Padding(padding),
         kwargs...,
     )
 end
@@ -139,8 +134,8 @@ end
 ---
     Panel(
         content::Union{AbstractString,AbstractRenderable};
-        fit::Bool = true,
-        padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+        fit::Bool = false,
+        padding::Union{Nothing,Padding,NTuple} = nothing,
         kwargs...,
     )
 
@@ -155,11 +150,19 @@ the presence and style of titles, box type etc... see [render](@ref) below.
 function Panel(
     content::Union{AbstractString,AbstractRenderable};
     fit::Bool = false,
-    padding::Union{Padding,NTuple} = Padding(2, 2, 0, 0),
+    padding::Union{Nothing,Padding,NTuple} = nothing,
     width::Int = default_width(),
     kwargs...,
 )
-    padding = padding isa Padding ? padding : Padding(padding...)
+    padding = if isnothing(padding)
+        if get(kwargs, :style, "default") == "hidden"
+            Padding(0, 0, 0, 0)
+        else
+            Padding(2, 2, 0, 0)
+        end
+    else
+        Padding(padding)
+    end
 
     # estimate content and panel size 
     content_width = content isa AbstractString ? Measure(content).w : content.measure.w
@@ -170,12 +173,14 @@ function Panel(
     end
 
     # if too large, set fit=false
-    fit =
-        fit ? (!isa(content, AbstractString) ? panel_width <= console_width() : true) :
+    fit = if fit
+        (!isa(content, AbstractString) ? panel_width <= console_width() : true)
+    else
         false
+    end
     width = fit ? min(panel_width, console_width()) : width
 
-    # @info "Ready to make panel" content content_width panel_width width console_width() fit
+    # @debug "Ready to make panel" content content_width panel_width width console_width() fit
     return Panel(content, Val(fit), padding; width = width, kwargs...)
 end
 
@@ -184,24 +189,14 @@ end
 
 Convert any input content to a renderable
 """
-function content_as_renderable(content, width, Δw, justify, background)
-    rt = RenderableText(
-        string(content),
-        width = width - Δw,
-        background = background,
-        justify = justify,
-    )
-    return rt
-end
-
-# function content_as_renderable(content::AbstractString, width, Δw, justify, background)
-#     RenderableText(
-#         string(content),
-#         width = width - Δw,
-#         background = background,
-#         justify = justify,
-#     )
-# end
+content_as_renderable(
+    content,
+    width::Int,
+    Δw::Int,
+    justify::Symbol,
+    background::Union{String,Nothing},
+)::RenderableText =
+    RenderableText(content, width = width - Δw, background = background, justify = justify)
 
 """
 ---
@@ -235,6 +230,7 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # create content
+    # @info "panel fit" width height Δw Δh
     content = content_as_renderable(content, width, Δw, justify, background)
 
     # estimate panel size
@@ -243,7 +239,7 @@ function Panel(
         max(width, content.measure.w + padding.left + padding.right + 2),
     )
 
-    # @info "Creating fitted panel" content.measure panel_measure content
+    # @debug "Creating fitted panel" content.measure panel_measure content
     return render(
         content;
         panel_measure = panel_measure,
@@ -292,9 +288,10 @@ function Panel(
     content = content_as_renderable(content, width, Δw, justify, background)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
+    # @info "panel nofit" width  Δw Δh height panel_measure
 
     # if the content is too tall, exclude some lines
-    if content.measure.h > height - Δh
+    if content.measure.h > height - Δh - 2
         lines_to_drop = content.measure.h - height + Δh + 3
         omit_msg = RenderableText(
             "... content omitted ...",
@@ -309,12 +306,13 @@ function Panel(
                 omit_msg.segments[1]
             ]
         else
-            [omit_msg.segments[1]]
+            # [omit_msg.segments[1]]
+            [content.segments[1]]
         end
         content = Renderable(segments, Measure(segments))
     end
 
-    # @info "creating not fitted panel" content.measure panel_measure width Δw 
+    # @debug "creating not fitted panel" content.measure panel_measure width Δw 
     return render(
         content;
         panel_measure = panel_measure,
@@ -337,7 +335,7 @@ Panel(renderables::Vector{RenderablesUnion}; kwargs...) =
     Panel(vstack(renderables...); kwargs...)
 
 Panel(texts::Vector{AbstractString}; kwargs...) = Panel(join_lines(texts); kwargs...)
-
+Panel(ren::Vector; kwargs...) = Panel(vstack(ren); kwargs...)
 Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwargs...)
 
 # ---------------------------------- render ---------------------------------- #
@@ -348,26 +346,18 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
 Create a Panel's content line.
 """
 function makecontent_line(
-    cline,
-    panel_measure,
-    justify,
-    background,
-    padding,
-    left,
-    right,
-    Δw,
+    cline::Segment,
+    panel_measure::Measure,
+    justify::Symbol,
+    background::Union{Nothing,String},
+    padding::Padding,
+    left::String,
+    right::String,
+    Δw::Int,
 )::Segment
-    line = apply_style(cline) |> rstrip
-    line = if panel_measure.w - textlen(line) > 2
-        pad(cline, panel_measure.w - Δw, justify; bg = background)
-    else
-        line * " "
-    end
-
+    line = pad(cline, panel_measure.w - Δw, justify, ; bg = background).text
     line = pad(line, padding.left, padding.right; bg = background)
-
-    # make line
-    return Segment(left * line * right)
+    return Segment(typeof(cline.text)(left * line * right))
 end
 
 """
@@ -393,9 +383,9 @@ end
 Construct a `Panel`'s content.
 """
 function render(
-    content;
-    box::Symbol = :ROUNDED,
-    style::String = "default",
+    content::Union{Renderable,RenderableText};
+    box::Symbol = TERM_THEME[].box,
+    style::String = TERM_THEME[].line,
     title::Union{String,Nothing} = nothing,
     title_style::Union{Nothing,String} = nothing,
     title_justify::Symbol = :left,
@@ -408,12 +398,11 @@ function render(
     Δw::Int,
     Δh::Int,
     padding::Padding,
-    background = nothing,
+    background::Union{Nothing,String} = nothing,
     kwargs...,
 )::Panel
     background = get_bg_color(background)
     # @info "calling render" content content_measure background
-    # println("Content\n", content)
 
     # create top/bottom rows with titles
     box = BOXES[box]  # get box object from symbol
@@ -447,7 +436,7 @@ function render(
     else
         [Segment(left * "{$background}" * " "^(panel_measure.w - 2) * "{/$background}" * right)]
     end
-    # @info "rendering" panel_measure Δw
+    # @debug "rendering" panel_measure Δw
 
     # check if we need extra lines at the bottom to reach target height
     n_extra = if content_measure.h < panel_measure.h - Δh - 2
@@ -462,11 +451,10 @@ function render(
     ]
 
     # content
-    content_sgs::Vector{Segment} =
-        content.measure.w > 0 ?
+    content_sgs::Vector{Segment} = if content.measure.w > 0
         map(
             s -> makecontent_line(
-                s.text,
+                s,
                 panel_measure,
                 justify,
                 background,
@@ -476,7 +464,10 @@ function render(
                 Δw,
             ),
             content.segments,
-        ) : []
+        )
+    else
+        []
+    end
 
     final_segments = Segment[
         repeat(empty, n_extra)...,                  # lines to reach target height
@@ -486,6 +477,98 @@ function render(
 
     segments = vcat(initial_segments, content_sgs, final_segments)
     return Panel(segments, Measure(segments))
+end
+
+# ---------------------------------------------------------------------------- #
+#                              PANEL LAYOUT MACRO                              #
+# ---------------------------------------------------------------------------- #
+
+"""
+    function parse_layout_args end
+
+Parse the arguments of a `Expr(:call, :Panel, ...)` to 
+add a keyword argument to fix the panel's width. 
+A few diferent menthods are defined to handle different combinations
+of args/kwargs for the Panel call.
+"""
+function parse_layout_args end
+
+""" `Panel` had no args/kwargs """
+function parse_layout_args(depth)
+    w = console_width()
+    Δw = 6
+    kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth))
+    content_args = []
+    return kwargs_arg, content_args
+end
+
+""" `Panel`'s args did not start with an `Expr` (e.g. a string) """
+function parse_layout_args(depth, firstarg, args...)
+    w = console_width()
+    Δw = 6
+    kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth))
+    return kwargs_arg, [firstarg, args...]
+end
+
+""" `Panels`'s first argument was an `Expr`, nested content! """
+function parse_layout_args(depth, firstarg::Expr, args...)
+    w = console_width()
+    Δw = 6
+
+    if firstarg.head == :parameters
+        kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth), firstarg.args...)
+        content_args = collect(args)
+    else
+        kwargs_arg = Expr(:parameters, Expr(:kw, :width, w - Δw * depth))
+        # content_args = length(args) > 1 ? collect(args[2:end]) : []
+        content_args = [firstarg, args...]
+    end
+
+    @debug "in here" firstarg args kwargs_arg content_args
+
+    return kwargs_arg, content_args
+end
+
+"""
+    fix_layout_width(panel_call::Expr, depth::Int)::Expr
+
+Go through an `Expr` with a `:call` to a `Panel` and add a keyword
+argument expression with the correct `width` (using `parse_layout_args`).
+Also go through any other argument to the call to fix inner panels' width.
+"""
+function fix_layout_width(panel_call::Expr, depth::Int)::Expr
+    @debug "Starting" panel_call.args
+    kwargs_arg, content_args = parse_layout_args(depth, panel_call.args[2:end]...)
+
+    @debug "got ready" content_args kwargs_arg
+    for (i, arg) in enumerate(content_args)
+        !isa(arg, Expr) && continue
+
+        if arg.head == :call && arg.args[1] == :Panel
+            content_args[i] = fix_layout_width(arg, depth + 1)
+        end
+    end
+    return Expr(:call, :Panel, kwargs_arg, content_args...)
+end
+
+"""
+    macro nested_panels(layout_call)
+
+Macro to automate layout of multiple nested `Panel`. The width of the
+panels is automatically adjusted based on the depth of eeach nested level.
+
+Uses `fix_layout_width` recursively to add a keyword argument `width` to each
+`Panel`.
+"""
+macro nested_panels(layout_call)
+    if layout_call.head != :call || layout_call.args[1] != :Panel
+        error("Layout only works for nested `Panel`")
+    end
+
+    layout_call = fix_layout_width(layout_call, 0)
+    quote
+        $layout_call
+    end |> esc
 end
 
 # ---------------------------------------------------------------------------- #

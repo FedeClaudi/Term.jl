@@ -44,7 +44,7 @@ If the style information represents a color, `Term` first represents it as a `Ab
 The distinction between `NamedColor`, `BitColor` and `RGBColor` is necessary because the three color styles are represented by a different syntax in the ANSI codes. Naturally, `Term` users won't normally worry about this and can use whichever color formulation is most convenient.
 
 
-# [Panel](@id ThemeDocs)
+# [Theme](@id ThemeDocs)
 Term defines a `Theme` type that carries styling information used throughout. 
 It tells `highlight` what color things should be, it stores the colors of elements of [Tree](@ref TreeDoc), and of the [Repr functionality](@ref ReprDoc).
 
@@ -66,4 +66,12 @@ set_theme(newtheme)
 
 ```@example theme
 set_theme(Theme()) # hide
+```
+
+
+The default theme used by `Term` is tailored for a dark terminal, if you fancy a lighter terminal experience, you might want to:
+```julia
+import Term: set_theme, LightTheme
+
+set_theme(LightTheme)
 ```

@@ -1,5 +1,6 @@
 import Term: inspect, expressiontree, typestree, Dendogram, Tree
 import Term.Consoles: console_width
+import Term: remove_ansi
 
 # define expressions
 e1 = :(2x + 3y + 2)
@@ -45,7 +46,33 @@ end
     end
 end
 
-@testset "Introspect types and modules" begin
-    # @compare_to_string :(inspect(Panel)) "inspect_panel"
-    inspect(Panel)  # find way to fix this
+@testset "Introspect types and funcs" begin
+    abstract type Structy end
+
+    struct MyStr <: Structy
+        x::Int
+        y::Vector
+    end
+    MyStr(x) = MyStr(x, x)
+
+    dosmth(m::MyStr) = print(m.x)
+
+    intro = @capture_out begin
+        inspect(MyStr; methods = true, supertypes = true)
+    end
+    intro = remove_ansi(intro)
+    @test intro isa String
+
+    # intro = @capture_out begin
+    #     inspect(Panel; methods = true, supertypes = true,)
+    # end
+    # @compare_to_string(intro, "introspection_panel")
+    @test_nothrow inspect(Panel; methods = true, supertypes = true)
+
+    intro = @capture_out begin
+        inspect(print)
+    end
+    intro = remove_ansi(intro)
+    # @compare_to_string(intro, "introspection_print")
+    @test intro isa String
 end

@@ -1,13 +1,9 @@
 import Term:
-    get_last_ANSI_code,
     unescape_brackets,
-    remove_brackets,
     escape_brackets,
-    get_ANSI_codes,
     unspace_commas,
     remove_markup,
     replace_text,
-    replace_ansi,
     reshape_text,
     remove_ansi,
     split_lines,
@@ -15,11 +11,15 @@ import Term:
     has_markup,
     cleantext,
     textwidth,
-    nospaces,
     has_ansi,
     textlen,
     fillin,
-    chars
+    chars,
+    justify,
+    str_trunc,
+    reshape_code_string
+
+import Term.Colors: nospaces
 import Term.Style: apply_style
 import Term.Measures: width as get_width
 
@@ -44,6 +44,11 @@ import Term.Measures: width as get_width
 
     @test remove_markup("text with {{double}} squares") == "text with {{double}} squares"
     @test !has_markup("text with {{double}} squares")
+
+    text = "{red}asdasda{/green}a{blue}sda{/blue}sda{/red}"
+
+    @test remove_markup(text) == "asdasdaasdasda"
+    @test remove_markup(text; remove_orphan_tags = false) == "asdasda{/green}asdasda"
 end
 
 @testset "TU_ansi" begin
@@ -69,8 +74,6 @@ end
     for (s1, s2, ltag) in strings
         @test has_ansi(s1)
         @test remove_ansi(s1) == s2
-        @test get_last_ANSI_code(s1) == ltag
-        @test length(get_ANSI_codes(s1)) > 0
     end
 end
 
@@ -87,18 +90,8 @@ end
     @test replace_text(text, 10, 15, ',') == "abcdefghil,,,,,rstuvz"
 
     @test nospaces("a (1, 2, 3) 4") == "a(1,2,3)4"
-    @test remove_brackets("aaa (asdsd) BB") == "aaa asdsd BB"
 
     @test unspace_commas("a, 2, 3") == "a,2,3"
-end
-
-@testset "TU_replace_ansi" begin
-    text = apply_style(
-        "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
-    )
-
-    @test replace_ansi(text) ==
-          "Lorem ¦¦¦¦¦ipsum dolor sit ¦¦¦¦amet, consectetur¦¦¦¦¦¦¦¦¦¦ adipiscing elit, ¦¦¦¦¦¦¦¦¦¦sed do eiusmod tempor incididunt¦¦¦¦¦ ut labore et dolore magna aliqua."
 end
 
 @testset "TU_misc" begin
@@ -117,129 +110,100 @@ asddsa""",
 end
 
 @testset "TU_reshape" begin
-    str = """
-Lorem ipsum {bold}dolor sit{/bold} amet, consectetur adipiscing elit,
-ed do e{red}iusmod tempor incididunt{/red} ut {bold}labore et {underline}dolore{/underline} magna aliqua.{/bold} Ut enim ad minim
-veniam, quis{green} nostrud exercitation {on_black}ullamco laboris nisi ut aliquip ex {/on_black}
-ea commodo consequat.{blue} Duis aute irure dolor in{/blue} reprehenderit 
-in voluptate velit{/green} esse {italic}cillum dolore{/italic}{red} eu{/red}{italic green} fugiat {/italic green}nulla 
-pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident, 
-sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
-id est laborum."""
-
-    str_reshaped = "Lorem ipsum \e[1mdolor sit\e[22m amet, \nconsectetur adipiscing elit,\ned do e\e[31miusmod tempor incididunt\e[39m \nut \e[1mlabore et \e[4mdolore\e[24m\e[1m magna \n\e[1maliqua.\e[22m\e[39m Ut enim ad minim\e[22m\e[1m\nveniam, quis\e[32m nostrud \n\e[32mexercitation \e[40mullamco laboris \n\e[40m\e[32mnisi ut aliquip ex \e[49m\e[32m\e[39m\e[39m\e[32m\e[49m\e[40m\e[39m\e[40m\nea commodo consequat.\e[34m Duis aute \n\e[34mirure dolor in\e[39m reprehenderit \e[39m\e[34m\nin voluptate velit\e[39m\e[3m esse \e[3mcillum \n\e[3mdolore\e[23m\e[31m eu\e[39m\e[23m\e[3m\e[32m fugiat \e[23m\e[3m{/green}nulla \e[23m\npariatur. Excepteur\e[31m sint\e[39m\e[34m \n\e[34moccaecat cupidatat \e[39mnon proident, \e[39m\e[34m\nsunt in culpa qui \e[3mofficia\e[23m \ndeserunt mollit anim \nid est laborum."
-
-    logo_str = """Term.jl is a {#9558B2}Julia{/#9558B2} package for creating styled terminal outputs.
-
-    Term provides a simple {italic green4 bold}markup language{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline} to your text.
-    More complicated text layout can be created using {red}"Renderable"{/red} objects such 
-    as {red}"Panel"{/red} and {red}"TextBox"{/red}.
-    These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code"""
-
-    logo_str_reshaped = "Term.jl is a \e[38;2;149;88;178mJulia\e[39m package for \ncreating styled terminal outputs.\n\nTerm provides a simple \e[3m\e[38;5;28m\e[1mmarkup \n\e[1m\e[38;5;28m\e[3mlanguage\e[23m\e[39m\e[3m\e[22m\e[38;5;28m to add \e[1m\e[38;5;12mcolor\e[22m\e[1m\e[39m\e[1m and \e[1m\e[4mstyles\e[22m\e[38;5;28m\e[24m\e[1m \nto your text.\e[39m\e[1m\e[23m\e[38;5;28m\e[22m\e[1m\nMore complicated text layout can \nbe created using \e[31m\"Renderable\"\e[39m \nobjects such \nas {red}\"Panel\"{/red} and {red}\"TextBox\"{/red}.\nThese can also be nested and \nstacked to create \e[3m\e[38;5;175mfancy\e[23m\e[39m\e[3m and \n\e[4minformative\e[24m\e[3m terminal ouputs for \nyour Julia code"
-
     strings = [
-        (
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit, sed \ndo eiusmod tempor incididunt ut \nlabore et dolore magna aliqua.",
-        ),
-        (
-            "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
-            "Lorem \e[31mipsum dolor sit \e[4mamet, \n\e[4m\e[31mconsectetur\e[24m\e[31m adipiscing elit, \e[39m\e[34msed \n\e[34mdo eiusmod tempor incididunt\e[39m ut \nlabore et dolore magna aliqua.\e[24m\e[4m\e[39m\e[4m\e[39m\e[34m",
-        ),
-        (
-            "Lorem{red}ipsumdolorsit{underline}amet, consectetur{/underline} adipiscing elit, {/red}seddoeiusmo{blue}dtemporincididunt{/blue}ut labore et dolore magna aliqua.",
-            "Lorem\e[31mipsumdolorsit\e[4mamet, \n\e[4m\e[31mconsectetur\e[24m\e[31m adipiscing elit, \n\e[31m\e[39mseddoeiusmo\e[34mdtemporincididunt\e[39mut \nlabore et dolore magna aliqua.\e[24m\e[4m\e[39m\e[4m\e[39m\e[31m",
-        ),
-        (
-            "ต้าอ่วยวาทกรรมอาว์เซี้ยว กระดี๊กระด๊า ช็อปซาดิสต์โมจิดีพาร์ตเมนต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
-            "ต้าอ่วยวาทกรรมอาว์เซี้ยว กระดี๊กระด๊า \nช็อปซาดิสต์โมจิดีพาร์ตเมนต์ อินดอร์วิว \nสี่แยกมาร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน \nยาวีแพลนหงวนสคริปต์ \nแจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า \nบอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ \nบอยคอตต์เฟอร์รี่บึมมาราธอน ",
-        ),
-        (
-            "ต้าอ่วยวาท{red}กรรมอาว์เซี้ยว กระดี๊กระด๊า {/red}ช็อปซาดิสต์โมจิดีพาร์ตเม{blue underline}นต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต{/blue underline}อร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
-            "ต้าอ่วยวาท\e[31mกรรมอาว์เซี้ยว กระดี๊กระด๊า \n\e[31m\e[39mช็อปซาดิสต์โมจิดีพาร์ตเม\e[34m\e[4mต์ อินดอร์วิว \n\e[4m\e[34mสี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต\e[39m\e[24m\e[34m}อร์ฮันนีมูน \nยาวีแพลนหงวนสคริปต์ \nแจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า \nบอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ \nบอยคอตต์เฟอร์รี่บึมมาราธอน \e[39m\e[31m\e[24m\e[4m\e[39m\e[4m",
-        ),
-        (
-            "국가유공자·상이군경 및 전몰군경의 유가족은 법률이 정하는 바에 의하여",
-            "국가유공자·상이군경 및 \n전몰군경의 유가족은 법률이 \n정하는 바에 의하여",
-        ),
-        (
-            "국{red}가유공자·상이군{bold}경 및 전{/bold}몰군경의 유{/red}가족은 법률이 정하는 바에 의하여",
-            "국\e[31m가유공자·상이군\e[1m경 및 \n\e[1m\e[31m전\e[22m\e[31m몰군경의 유\e[39m가족은 법률이 \n정하는 바에 의하여\e[22m\e[1m\e[39m\e[1m",
-        ),
-        (
-            "朗眠裕安無際集正聞進士健音社野件草売規作独特認権価官家複入豚末告設悟自職遠氷育教載最週場仕踪持白炎組特曲強真雅立覧自価宰身訴側善論住理案者券真犯著避銀楽験館稿告",
-            "朗眠裕安無際集正聞進士健音社野件\n草売規作独特認権価官家複入豚末告\n設悟自職遠氷育教載最週場仕踪持白\n炎組特曲強真雅立覧自価宰身訴側善\n論住理案者券真犯著避銀楽験館稿告",
-        ),
-        (
-            "┌────────────────┬────────────────┬────────────────┬────────────────┬──────────────",
-            "┌────────────────┬───────────────\n─┬────────────────┬──────────────\n──┬──────────────",
-        ),
-        (
-            "┌────────────abcde────┬──────────── ────┬────────abcde fghi────────┬────────────────┬──────────────",
-            "┌────────────abcde────┬──────────\n── ────┬────────abcde \nfghi────────┬────────────────┬───\n───────────",
-        ),
-        (
-            "┌─────────{red}───ab{/red}cde────┬──────{green}────── ────┬────────abcde fghi{/green}────────┬────────────────┬──────────────",
-            "┌─────────\e[31m───ab\e[39mcde────\n┬──────\e[32m────── \n\e[32m────┬────────abcde \n\e[32mfghi\e[39m────────┬────────────\n────┬──────────────\e[39m\e[32m\e[39m\e[32m",
-        ),
-        (
-            "┌──────────{red}────{/red}──┬{blue bold}────────────────┬──{/blue bold}──────────────┬────────────────┬──────────────end",
-            "┌──────────\e[31m────\e[39m──┬\e[1m───────────────┬──{/blue}\n\e[1m\e[22m\e[39m}──────────────┬──────────\n──────┬──────────────end\e[39m\e[22m\e[1m",
-        ),
-        (
-            "."^100,
-            ".................................\n.................................\n.................................\n.",
-        ),
-        (
-            ".{red}|||{/red}...."^10,
-            ".\e[31m|||\e[39m.....\e[31m|||{/red\n}.....\e[31m|||\e[39m.....\e[31m|||\n\e[39m\e[31m.....\e[31m|||\e[39m.....|||\e[39m\e[31m.....\e[31m|||\e[39m\e[31m...\n..\e[31m|||\e[39m\e[31m.....\e[31m|||\e[39m.....\e[31m|||\e[39m\e[31m....\e[39m",
-        ),
-        (
-            ".|||...."^10,
-            ".|||.....|||.....|||.....|||.....\n|||.....|||.....|||.....|||.....|\n||.....|||....",
-        ),
-        (str, str_reshaped),
-        (logo_str, logo_str_reshaped),
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Lorem {red}ipsum dolor sit {underline}amet, consectetur{/underline} adipiscing elit, {/red}{blue}sed do eiusmod tempor incididunt{/blue} ut labore et dolore magna aliqua.",
+        "Lorem{red}ipsumdolorsit{underline}amet, consectetur{/underline} adipiscing elit, {/red}seddoeiusmo{blue}dtemporincididunt{/blue}ut labore et dolore magna aliqua.",
+        "ต้าอ่วยวาทกรรมอาว์เซี้ยว กระดี๊กระด๊า ช็อปซาดิสต์โมจิดีพาร์ตเมนต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเตอร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
+        "ต้าอ่วยวาท{red}กรรมอาว์เซี้ยว กระดี๊กระด๊า {/red}ช็อปซาดิสต์โมจิดีพาร์ตเม{blue underline}นต์ อินดอร์วิว สี่แยกมาร์กจ๊อกกี้ โซนี่บัตเต{/blue underline}อร์ฮันนีมูน ยาวีแพลนหงวนสคริปต์ แจ็กพ็อตต่อรองโทรโข่งยากูซ่ารุมบ้า บอมบ์เบอร์รีวีเจดีพาร์ทเมนท์ บอยคอตต์เฟอร์รี่บึมมาราธอน ",
+        "국가유공자·상이군경 및 전몰군경의 유가족은 법률이 정하는 바에 의하여",
+        "국{red}가유공자·상이군{bold}경 및 전{/bold}몰군경의 유{/red}가족은 법률이 정하는 바에 의하여",
+        "朗眠裕安無際集正聞進士健音社野件草売規作独特認権価官家複入豚末告設悟自職遠氷育教載最週場仕踪持白炎組特曲強真雅立覧自価宰身訴側善論住理案者券真犯著避銀楽験館稿告",
+        "┌────────────────┬────────────────┬────────────────┬────────────────┬──────────────",
+        "┌────────────abcde────┬──────────── ────┬────────abcde fghi────────┬────────────────┬──────────────",
+        "┌─────────{red}───ab{/red}cde────┬──────{green}────── ────┬────────abcde fghi{/green}────────┬────────────────┬──────────────",
+        "┌──────────{red}────{/red}──┬{blue bold}────────────────┬──{/blue bold}──────────────┬────────────────┬──────────────end",
+        "."^100,
+        ".{red}|||{/red}...."^10,
+        ".|||...."^10,
     ]
 
     width = 33
     debug = false
-    for (i, (input, expected)) in enumerate(strings)
-        reshaped = reshape_text(input, width)
-        reshaped_no_ansi = remove_ansi(reshaped)
-        lens = length.(split(reshaped_no_ansi, '\n'))
-        if debug && reshaped != expected
-            println("== reshaped == ")
-            println(reshaped)
-            println(repr(reshaped))
-            println("\n== reshaped no ansi == ")
-            println(reshaped_no_ansi)
-            println("\n== expected == ")
-            println(expected)
-        end
-        # FIXME: should work when `length(input) != ncodeunits(input)` using non unit byte characters: see docs.julialang.org/en/v1/manual/strings/#Unicode-and-UTF-8
-        if length(input) == ncodeunits(input) && !occursin('\n', input)
+    for (i, txt) in enumerate(strings)
+        reshaped = reshape_text(txt, width)
+        lens = length.(split(cleantext(reshaped), '\n'))
+
+        # println(width, lens)
+        # println(apply_style(reshaped))
+        # println("_"^width)
+
+        if length(txt) == ncodeunits(txt) && !occursin('\n', txt)
             (debug && any(lens .> width)) && println(lens)
             @test all(lens .≤ width)
         end
-        @test reshaped == expected
+        IS_WIN || @compare_to_string reshaped "reshaped_text_$(i)"
     end
 
     for width in (40, 60, 99)
-        rh = reshape_text(str, width)
-        @test all(textlen.(split(rh, '\n')) .≤ width)
+        rh = reshape_text(strings[1], width)
+        @test all(textlen.(split(rh, '\n'); remove_orphan_tags = true) .≤ width)
     end
+end
 
-    # for i in 5:10
-    #     width = 2^i
-    #     for offset in (-(width ÷ 2)):(width ÷ 2)
-    #         txt = '.'^(2width + offset)
-    #         rt = reshape_text(txt, width)
-    #         len = length.(split(rt, '\n'))
-    #         # @show length(txt) width rt len
-    #         @test all(len[1:(end - 1)] .<= width)
-    #         @test len[end] == (offset > 0 ? offset : width + offset)
-    #     end
-    # end
+@testset "Text justify" begin
+    str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    _str = reshape_text(str, 50)
+
+    IS_WIN || @compare_to_string(justify(str, 150), "justify")
+
+    txt = "adsda\nadasda\nergeer\nxcvxvxvx\naasdada"
+    IS_WIN || @compare_to_string(fillin(txt), "fill_in_1")
+    IS_WIN || @compare_to_string(fillin(txt; bg = "red"), "fill_in_2")
+end
+
+@testset "str_trunc" begin
+    str = "Lorem ipsum dolor sit amet,\n consectetur adipiscing elit, sed do eiusmod \ntempor incididunt ut labore et dolore\n magna aliqua."
+
+    for (i, w) in enumerate((12, 51, 31))
+        IS_WIN || @compare_to_string(str_trunc(str, w), "str_trunc_$(i)")
+    end
+end
+
+@testset "code reshaping" begin
+    codes = [
+        "{#f2d777}Table{/#f2d777}(data::Matrix{Float64}; kwargs::Base.Pairs{Symbol, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})",
+        "{}}, Tuple{{}}, NamedTuple{(), Tuple{{}}}}){#f2d777}Table{/#f2d777}",
+        "{#f2d777}Table{/#f2d777}(tb::Tables.MatrixTable{Matrix{Float64}}; box::Symbol, style::String, hpad::Int64, vpad::Int64, vertical_justify::Symbol, show_header::Bool, header::Nothing, header_style::String, header_justify::Nothing, columns_style::String, columns_justify::Symbol, columns_widths::Nothing, footer::Nothing, footer_style::String, footer_justify::Symbol, compact::Bool)",
+        "{#f2d777}calc_columns_widths{/#f2d777}(N_cols::Int64, N_rows::Int64, columns_widths::Nothing, show_header::Bool, header::Tuple{String, String, String}, tb::Tables.MatrixTable{Matrix{Float64}}, sch::Tables.Schema{(:Column1, :Column2, :Column3), Tuple{Float64, Float64, Float64}}, footer::Nothing, hpad::Vector{Int64})",
+        """(::Term.Tables.var"#1#3"{Tables.MatrixTable{Matrix{Float64}}})(c::Symbol)""",
+    ]
+
+    widths = (32, 65, 88)
+
+    for (i, c) in enumerate(codes), (j, w) in enumerate(widths)
+        reshaped = reshape_code_string(c, w)
+        @test get_width(reshaped) <= w
+        IS_WIN || @compare_to_string reshaped "reshaped_code_$(i)_$(j)"
+    end
+end
+
+@testset "markup reshaping" begin
+    txts = [
+        "{red}dasda asda dadasda{green}aadasdad{/green}dad asd ad ad ad asdad{bold}adada ad as sad ad ada{/red}ad adas sd ads {/bold}",
+        "{red}adasd ad sa dsa{green} ad {blue} sd d ads ad {/blue}da dad {/green} asdsa dad a {/red}",
+        "{red}adasd ad sa dsa{bold} ad {blue} sd d ads ad {/blue}da dad {/bold} asdsa dad a {/red}",
+        "{red}adasd ad sa dsa{green} ad {blue} sd d ads ad da dad {/green} asdsa ddfsf {/blue}ad a {/red}",
+        "{on_red}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} dad {/green} asdsa ddfsf ad a {/on_red}",
+        "{on_(25, 25, 25)}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} {white}dad{/white} asad {/green} asdsa ddfsf ad a {/on_(25, 25, 25)}",
+        "{(220, 180, 150)} pink {bold}pink bold {dodger_blue2} pink bold blue {/dodger_blue2} pink bold {/bold} pink {on_(25, 55, 100)} pink on blue {/(220, 180, 150)} just on blue {/on_(25, 55, 100)} NOW SIMPLE WHITE {red} red red red {/red} white white {underline} underline underline {/underline}",
+    ]
+    widths = (32, 65, 20)
+
+    for (i, txt) in enumerate(txts)
+        for (j, w) in enumerate(widths)
+            reshaped = reshape_text(txt, w)
+            IS_WIN || @compare_to_string reshaped "reshaped_text_markuo_$(j)_$(i)"
+        end
+    end
 end
