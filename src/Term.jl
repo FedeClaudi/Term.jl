@@ -170,24 +170,4 @@ using .Repr: @with_repr, termshow, install_term_repr, @showme
 
 using .Grid
 
-using SnoopPrecompile
-
-@precompile_setup begin
-    originalSTDOUT = stdout
-
-    (outRead, outWrite) = redirect_stdout()
-
-    @precompile_all_calls begin
-        Panel()
-        Panel("test") * Panel(Panel()) / hLine(20) |> tprint
-        termshow(Panel)
-        termshow(Dict(:x => 1))
-        termshow(zeros(4))
-        termshow(zeros(4, 4))
-    end
-
-    close(outRead)
-
-    redirect_stdout(originalSTDOUT)
-end
 end
