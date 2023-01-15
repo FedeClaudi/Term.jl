@@ -4,34 +4,30 @@ using Term.Compositors
 import Term.LiveWidgets: Esc, quit, ArrowLeft, ArrowDown, ArrowRight, ArrowUp
 import Term.Style: apply_style
 
-h,w  = 10, 12
-w2 = console_width() - w*3
+h  = 9
+h2 = 3*h-1
 layout = :(
-(    (A($h, $w) * B($h, $w) * C($h, $w)) /
-    (D($h, $w) * E($h, $w) * F($h, $w)) /
-    (G($h, $w) * H($h, $w) * I($h, $w)) ) * Z(29, $w2)
+(    (A($h, .15) * B($h, .15) * C($h, .15)) /
+    (D($h, .15) * E($h, .15) * F($h, .15)) /
+    (G($h, .15) * H($h, .15) * I($h, .15)) ) * Z($h2, .55)
 )
 
 """
 write a X made of multiple line of characters
 """
-x = RenderableText("""
-xx    xx
+x = RenderableText("""xx    xx
  xx  xx
   xxxx
   xxxx
  xx  xx
-xx    xx
-"""; style="red") |> string
+xx    xx"""; style="red") |> string |> rstrip
 
-o = RenderableText("""
-  oooooo
+o = RenderableText("""  oooooo
  oo    oo
 oo      oo
 oo      oo
  oo    oo
-  oooooo
-"""     ; style="blue") |> string
+  oooooo"""     ; style="blue") |> string |> rstrip
 
 
 set_text(widget, text) = if text == 'x'
@@ -60,7 +56,8 @@ widgets = Dict{Symbol, Any}(
     map(c -> c => TextWidget(""; controls=button_controls, as_panel=true,
         on_highlighted = on_cell_highlighted,
         on_not_highlighted = on_cell_not_highlighted,
-        padding = (0, 0, 0, 0), justify=:center,
+        padding = (1, 0, 0, 0), 
+        justify=:center, style="dim"
     ), (:A, :B, :C, :D, :E, :F, :G, :H, :I))...
 )
 
@@ -128,7 +125,6 @@ transition_rules = Dict(
         :G => :D,
         :H => :E,
         :I => :F,
-        :Z => :A,
     ),
     ArrowRight() => Dict(
         :A => :B,

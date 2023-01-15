@@ -104,11 +104,12 @@ There has to be a ruleset for the key the user pressed and within
 the ruleset there must be an entry matching the currently active 
 widget, otherwise no effect. 
 """
-function execute_transition_rule(app::App, key)
-    haskey(app.transition_rules, key) || return
+function execute_transition_rule(app::App, key)::Bool
+    haskey(app.transition_rules, key) || return false
     rulesset = app.transition_rules[key]
-    haskey(rulesset, app.active) || return
+    haskey(rulesset, app.active) || return false
     app.active = rulesset[app.active]
+    return true
 end
 
 

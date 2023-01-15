@@ -30,6 +30,12 @@ function keyboard_input(widget::AbstractWidgetContainer)
             retval = nothing
             controls = wdg.controls
 
+            # see if key is an app control key
+            haskey(controls, :setactive) && begin
+                control_exectued = controls[:setactive](wdg, c)
+                control_exectued && return retval
+            end
+
             # only apply to active widget(s)
             isactive(wdg) || continue
 
@@ -38,9 +44,6 @@ function keyboard_input(widget::AbstractWidgetContainer)
 
             # see if we can just pass any character
             c isa Char && haskey(controls, Char) && (retval = controls[Char](wdg, c))
-
-            # see if a fallback option is available
-            haskey(controls, :setactive) && controls[:setactive](wdg, c)
 
             # if retval says so, stop looking at other widgets here
             retval == :stop && break
