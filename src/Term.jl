@@ -163,7 +163,7 @@ Measures.Measure(segments::AbstractVector) =
     end
 
 # ---------------------------------- others ---------------------------------- #
-using .Errors: install_term_stacktrace
+using .Errors: install_term_stacktrace, render_backtrace, StacktraceContext
 
 using .Logs: install_term_logger, uninstall_term_logger, TermLogger
 
