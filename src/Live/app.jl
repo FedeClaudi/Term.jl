@@ -275,6 +275,18 @@ function frame(app::App; kwargs...)
 end
 
 
+function add_debugging_info!(content::AbstractRenderable, app::App)::AbstractRenderable
+    # print the app's layout as a TREE
+    tree = sprint(print, app)
+
+    debug_info = Panel(
+        tree;
+        width = content.measure.w,
+    )
+    return debug_info / content
+end
+
+
 
 # ---------------------------------------------------------------------------- #
 #                                   RENDERING                                  #
@@ -320,18 +332,6 @@ Erase a line, write new content and move cursor.
 function replace_line(internals::AppInternals, newline)
     erase_line(internals.ioc)
     println(internals.ioc, newline)
-end
-
-
-function add_debugging_info!(content::AbstractRenderable, app::App)::AbstractRenderable
-    # print the app's layout as a TREE
-    tree = sprint(print, app)
-
-    debug_info = Panel(
-        tree;
-        width = content.measure.w,
-    )
-    return debug_info / content
 end
 
 
