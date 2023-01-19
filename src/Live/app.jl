@@ -144,26 +144,37 @@ function App(
 end
 
 
+
 function App(
-    layout::Expr,
-    widgets::AbstractDict,
-    transition_rules::Union{Nothing,AbstractDict} = nothing;
+    layout::Expr;
+    widgets::Union{Nothing, AbstractDict}=nothing,
+    transition_rules::Union{Nothing,AbstractDict} = nothing,
     width=console_width(),
     height=min(40, console_height()),
     controls::AbstractDict = app_controls, 
     on_draw::Union{Nothing,Function} = nothing,
     on_stop::Union{Nothing,Function} = nothing,
     expand::Bool = true,
-)
+)   
 
     # parse the layout expression and get the compositor
-    compositor = Compositor(layout; max_w = min(console_width(), width), max_h = min(console_height(), height))
+    compositor = Compositor(layout; 
+        max_w = min(console_width(), width), 
+        max_h = min(console_height(), height)
+    )
     measure = render(compositor).measure
+
+    # if widgets are not provided, create empty widgets placeholders
+    widgets = if isnothing(widgets) 
+        make_placeholders(compositor)
+    else
+        widgets
+    end
 
     # check that the layout and the widgets match
     layout_keys = compositor.elements |> keys |> collect
     widgets_keys = widgets |> keys |> collect
-    @assert issetequal(layout_keys, widgets_keys) "Mismatch between widget names and layout names"
+    @assert issetequal(layout_keys, widgets_keys) "Mismatch between widget names and layout names: $layout_keys vs $widgets_keys"
 
     # enforce the size of each widget
     widgets = enforce_app_size(compositor, widgets)
@@ -209,6 +220,32 @@ function App(
     return app
 end
 
+
+"""
+If no widget was passed, create placeholder widgets.
+"""
+function make_placeholders(compositor)
+    elements = compositor.elements
+    colors = if length(elements) > 1
+        getfield.(Palette(blue, pink; N = length(elements)).colors, :string)
+    else
+        [pink]
+    end
+
+    ws = Dict()
+    for (i, (name, elem)) in enumerate(pairs(elements))
+        ws[name] = PlaceHolderWidget(
+                elem.h, 
+                elem.w, 
+                string(name),
+                colors[i]
+            )
+    end
+    return ws
+end
+
+
+
 """
     enforce_app_size(compositor::Compositor, widgets::AbstractDict)
 
@@ -219,8 +256,8 @@ function enforce_app_size(compositor::Compositor, widgets::AbstractDict)
 
     for k in _keys
         elem, wdg = compositor.elements[k], widgets[k]
-        wdg.measure = Measure(elem.h-1, elem.w)
-        on_layout_change(wdg, wdg.measure)
+        wdg.internals.measure = Measure(elem.h, elem.w)
+        on_layout_change(wdg, wdg.internals.measure)
     end
     return widgets
 end
@@ -236,8 +273,8 @@ function enforce_app_size(app::App, measure::Measure)
 
     for k in _keys
         elem, wdg = compositor.elements[k], app.widgets[k]
-        wdg.measure = Measure(elem.h-1, elem.w)
-        on_layout_change(wdg, wdg.measure)
+        wdg.internals.measure = Measure(elem.h, elem.w)
+        on_layout_change(wdg, wdg.internals.measure)
     end
 
     app.compositor = compositor
@@ -245,15 +282,14 @@ end
 
 # ----------------------------------- frame ---------------------------------- #
 function on_layout_change(app::App)
-    console_h = min(app.height, console_height())
-    console_w = app.expand ? console_width() :  min(app.width, console_width())
-    (console_h >= app.measure.h && console_w == app.measure.w) && return
+    new_width = app.expand ? console_width() :  min(app.width, console_width())
+    new_width == app.measure.w && return
 
     erase!(app)
     clear(stdout)
 
     # the console is too small, re-design
-    app.measure = Measure(console_h, console_w)
+    app.measure = Measure(app.measure.h, new_width)
     enforce_app_size(app, app.measure)
 end
 
@@ -265,10 +301,15 @@ function frame(app::App; kwargs...)
     on_layout_change(app)
 
     for (name, widget) in pairs(app.widgets)
-        content = frame(widget)
+        # toggle active
         if length(app.widgets) > 1
-            content = app.active == name ? widget.on_highlighted(content) : widget.on_not_highlighted(content)
+            app.active == name ? 
+                    widget.internals.on_highlighted(widget) : 
+                    widget.internals.on_not_highlighted(widget)
         end
+
+        content = frame(widget)
+
         update!(app.compositor, name, content)
     end
     return render(app.compositor)

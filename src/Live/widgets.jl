@@ -11,14 +11,10 @@ Collection of small widgets
 TextWidget just shows a piece of text.
 """
 @with_repr mutable struct TextWidget <: AbstractWidget
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     text::String
     as_panel::Bool
-    on_draw::Union{Nothing,Function}
-    on_highlighted::Function
-    on_not_highlighted::Function
     panel_kwargs
 end
 
@@ -59,8 +55,6 @@ function frame(tw::TextWidget; kwargs...)
     )
 
     txt = reshape_text(tw.text, tw.measure.w - 4)
-    tw.text = txt
-
     lines = split(txt, "\n")
     lines = lines[1:min(tw.measure.h, length(lines))]
 
@@ -76,14 +70,12 @@ end
 InputBox collects and displays user input as text. 
 """
 @with_repr mutable struct InputBox <: AbstractWidget
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     input_text::Union{Nothing,String}
     blinker_update::Int
     blinker_status::Symbol
     panel_kwargs
-    on_draw::Union{Nothing,Function}
 end
 
 
@@ -116,8 +108,10 @@ input_box_controls = Dict(
 
 
 function InputBox(;
-    on_draw::Union{Nothing,Function} = nothing,
     controls::AbstractDict = input_box_controls,
+    on_draw::Union{Nothing,Function} = nothing,
+    on_highlighted::Function = on_highlighted,
+    on_not_highlighted::Function = on_not_highlighted,
     kwargs...,
 )
     InputBox(
@@ -125,7 +119,7 @@ function InputBox(;
         controls,
         nothing, 
         nothing,
-        0, :off, kwargs, on_draw
+        0, :off, kwargs, on_draw, on_highlighted, on_not_highlighted
         )
 end
 
@@ -152,3 +146,56 @@ function frame(ib::InputBox; kwargs...)
 
     return Panel(text; width = ib.measure.w, height = ib.measure.h, ib.panel_kwargs...)
 end
+
+
+# ---------------------------------------------------------------------------- #
+#                                  PLACEHOLDER                                 #
+# ---------------------------------------------------------------------------- #
+
+
+mutable struct PlaceHolderWidget <: AbstractWidget
+    internals::WidgetInternals
+    controls::AbstractDict
+    color::String
+    style::String
+    name::String
+end
+
+on_layout_change(ph::PlaceHolderWidget, m::Measure) = ph.internals.measure = m
+
+
+function on_highlighted(ph::PlaceHolderWidget)
+    ph.internals.is_highlighted = true
+    ph.style = "bold"
+end
+function on_not_highlighted(ph::PlaceHolderWidget)
+    ph.internals.is_highlighted = false
+    ph.style = "dim"
+end
+
+function PlaceHolderWidget(
+    h::Int, w::Int, name::String, color::String;
+    on_draw::Union{Nothing,Function} = nothing,
+    on_highlighted::Function = on_highlighted,
+    on_not_highlighted::Function = on_not_highlighted,
+    )
+    internals = WidgetInternals(
+        Measure(h, w), nothing, on_draw, on_highlighted, on_not_highlighted, false
+    )
+
+    PlaceHolderWidget(
+        internals, text_widget_controls, color, "dim", name
+    )
+end
+
+function frame(ph::PlaceHolderWidget; kwargs...)
+    isnothing(ph.internals.on_draw) || ph.internals.on_draw(ph)
+
+    m = ph.internals.measure
+    return PlaceHolder(
+        m.h, m.w;
+        style="$(ph.color) $(ph.style)",
+        text = "$(ph.name) ($(m.h), $(m.w)"
+    )
+end
+

@@ -5,6 +5,7 @@ using Dates
 import Base.Docs: doc as getdocs
 using Markdown
 using AbstractTrees
+import MyterialColors: Palette, blue, pink
 
 import MyterialColors: pink
 
@@ -16,7 +17,7 @@ import ..Measures: width as get_width
 using ..Consoles
 import ..Repr: @with_repr, termshow
 import ..Style: apply_style
-import ..Layout: Spacer, vLine, vstack, hLine, hstack
+import ..Layout: Spacer, vLine, vstack, hLine, hstack, PlaceHolder
 import ..Compositors: Compositor, render, update!
 import ..Tprint: tprint
 
@@ -26,6 +27,7 @@ export SimpleMenu, ButtonsMenu, MultiSelectMenu
 export InputBox, TextWidget, Button, ToggleButton
 export Gallery
 export App
+export ArrowDown, ArrowUp, ArrowLeft, ArrowRight, DelKey, HomeKey, EndKey, PageUpKey, PageDownKey, Enter, SpaceBar, Esc, Del
 
 const LIVE_DEBUG = Ref(false)
 

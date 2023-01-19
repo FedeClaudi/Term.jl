@@ -10,7 +10,7 @@ AbstractWidgetContainer must have two obligatory fields on top of AbstractWidget
 abstract type AbstractWidgetContainer <: AbstractWidget end
 
 set_as_parent(container::AbstractWidgetContainer) = map(
-    w -> w.parent = container,
+    w -> w.internals.parent = container,
     (container.widgets isa AbstractDict ? values(container.widgets) : container.widgets)
 )
 

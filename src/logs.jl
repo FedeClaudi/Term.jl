@@ -15,7 +15,8 @@ import Term:
     rint,
     highlight,
     TERM_THEME,
-    str_trunc
+    str_trunc,
+    default_width
 
 import ..Consoles: console_width, console_height, change_scroll_region, move_to_line
 import ..Renderables: AbstractRenderable, RenderableText
@@ -234,7 +235,7 @@ function Logging.handle_message(
     length(msg_lines) > 0 && (
         firstline *=
             "  " * RenderableText(
-                reshape_text(msg_lines[1], console_width() - textlen(firstline) - 1);
+                reshape_text(msg_lines[1], max(default_width(), console_width() - textlen(firstline) - 5));
                 style = logmsg_color,
             )
     )
@@ -246,7 +247,7 @@ function Logging.handle_message(
     for n in 2:length(msg_lines)
         # make sure the text fits in the given space
         txt = RenderableText(
-            reshape_text(msg_lines[n], console_width() - vert_width - 1);
+            reshape_text(msg_lines[n], max(default_width(), console_width() - vert_width - 5));
             style = logmsg_color,
         )
         v = join(repeat([_vert], height(txt)), "\n")

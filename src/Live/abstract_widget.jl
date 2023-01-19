@@ -15,6 +15,15 @@ and one optional one
 """
 abstract type AbstractWidget end
 
+mutable struct WidgetInternals
+    measure::Measure
+    parent::Union{Nothing, AbstractWidget}
+    on_draw::Union{Nothing,Function}
+    on_highlighted::Function
+    on_not_highlighted::Function
+    is_highlighted::Bool
+end
+
 # ----------------------------- widget functions ----------------------------- #
 
 get_active(::AbstractWidget) = nothing
@@ -37,8 +46,8 @@ Get the current conttent of a widget
 frame(::AbstractWidget) = error("Not implemented")
 
 
-on_highlighted(content) = hLine(content.measure.w) / content
-on_not_highlighted(content) = "" / content
+on_highlighted(wdg::AbstractWidget) = wdg.internals.is_highlighted = true
+on_not_highlighted(wdg::AbstractWidget) = wdg.internals.is_highlighted = false
 
 # ------------------------------ tree structure ------------------------------ #
 
@@ -54,7 +63,8 @@ function AbstractTrees.children(widget::AbstractWidget)
 end
 
 function AbstractTrees.parent(widget::AbstractWidget)
-    return widget.parent
+    hasfield(typeof(widget), :parent) && return widget.parent
+    return widget.internals.parent
 end
 
 """
@@ -81,5 +91,6 @@ function print_node(io, x)
 end
 
 
-Base.print(io::IO, widget::AbstractWidget) = print_tree(print_node, io, widget)
+Base.print(io::IO, widget::AbstractWidget) = print_tree(
+    print_node, print, io, widget)
 
