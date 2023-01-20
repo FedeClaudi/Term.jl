@@ -2,14 +2,12 @@
 A `Gallery` containes multiple widgets, but only shows one at the time. 
 """
 @with_repr mutable struct Gallery <: AbstractWidgetContainer
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     widgets::Vector{AbstractWidget}
     active::Int
     show_panel::Bool
     title::String
-    on_draw::Union{Nothing,Function}
 end
 
 
@@ -30,8 +28,10 @@ function Gallery(
     height::Int = console_height() - 5,
     width::Int = console_width(),
     show_panel::Bool = true,
-    on_draw::Union{Nothing,Function} = nothing,
     title::String="Widget",
+    on_draw::Union{Nothing,Function} = nothing,
+    on_activated::Function = on_activated,
+    on_deactivated::Function = on_deactivated,
 )
     # set widgets size
     Δ = show_panel ? 4 : 0
@@ -40,14 +40,18 @@ function Gallery(
         on_layout_change(wdg, Measure(measure.h - Δ, measure.w - Δ))
     end
 
-    gal = Gallery(measure, controls, nothing, widgets, 1, show_panel, title, on_draw)
+    gal = Gallery(
+        WidgetInternals(measure, nothing, 
+            on_draw, on_activated, on_deactivated, false
+        ), 
+        controls, widgets, 1, show_panel, title)
     set_as_parent(gal)
     return gal
 end
 
 
 function on_layout_change(gal::Gallery, m::Measure)
-    gal.measure = m
+    gal.internals.measure = m
     Δ = gal.show_panel ? 4 : 0
     for wdg in gal.widgets
         on_layout_change(wdg, Measure(m.h - Δ, m.w - Δ))
@@ -57,21 +61,23 @@ end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(gal::Gallery; kwargs...)
-    isnothing(gal.on_draw) || gal.on_draw(gal)
+    isnothing(gal.internals.on_draw) || gal.internals.on_draw(gal)
 
     content = frame(get_active(gal))
     gal.show_panel || return content
+
+    style = gal.show_panel && isactive(gal) ? "dim" : "hidden"
 
     Panel(
         content;
         title = gal.show_panel ? "$(gal.title) $(gal.active)/$(length(gal.widgets))" : nothing,
         justify = :center,
-        style = gal.show_panel ? "dim" : "hidden",
+        style = style,
         title_style = "default",
         title_justify = :center,
         fit = false,
-        width = gal.measure.w,
-        height = gal.measure.h,
+        width = gal.internals.measure.w,
+        height = gal.internals.measure.h,
         padding = (1, 1, 1, 1),
     )
 end

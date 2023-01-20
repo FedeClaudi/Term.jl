@@ -67,15 +67,13 @@ Simple text based menu.
 The currently selected option is highlighted with a different style.
 """
 @with_repr mutable struct SimpleMenu <: AbstractMenu
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     active_titles::Vector{String}
     inactive_titles::Vector{String}
     n_titles::Int
     active::Int
     layout::Symbol
-    on_draw::Union{Nothing,Function}
 
     function SimpleMenu(
         titles::Vector;
@@ -86,6 +84,8 @@ The currently selected option is highlighted with a different style.
         active_symbol = "❯",
         layout::Symbol = :vertical,
         on_draw::Union{Nothing,Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
     )
 
         controls = something(controls,
@@ -121,15 +121,17 @@ The currently selected option is highlighted with a different style.
             collect
 
         return new(
-            Measure(length(titles), width),
+            WidgetInternals(
+                Measure(length(titles), width),
+                nothing,
+                on_draw, on_activated, on_deactivated, false
+            ),
             controls,
-            nothing,
             active_titles,
             inactive_titles,
             length(titles),
             1,
             layout,
-            on_draw,
         )
     end
 end
@@ -140,15 +142,13 @@ Simple menu in which each option is a `Panel` object.
 Styling reflects which option is currently selected
 """
 @with_repr mutable struct ButtonsMenu <: AbstractMenu
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     active_titles::Vector{String}
     inactive_titles::Vector{String}
     n_titles::Int
     active::Int
     layout::Symbol
-    on_draw::Union{Nothing,Function}
 
     function ButtonsMenu(
         titles::Vector;
@@ -163,6 +163,8 @@ Styling reflects which option is currently selected
         layout::Symbol = :vertical,
         height::Union{Nothing,Int} = nothing,
         on_draw::Union{Nothing,Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
         panel_kwargs...,
     )
 
@@ -233,15 +235,15 @@ Styling reflects which option is currently selected
         end
 
         return new(
-            measure,
+            WidgetInternals(
+                measure, nothing,
+                on_draw, on_activated, on_deactivated, false),
             controls,
-            nothing,
             string.(active_titles),
             string.(inactive_titles),
             length(titles),
             1,
             layout,
-            on_draw,
         )
     end
 end
@@ -255,9 +257,8 @@ Menu variant for selecting multiple options.
 Color indicates current active option, ticks selected options
 """
 @with_repr mutable struct MultiSelectMenu <: AbstractMenu
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     options::Vector
     active_style::String
     inactive_style::String
@@ -267,7 +268,6 @@ Color indicates current active option, ticks selected options
     n_titles::Int
     selected_sym::String
     notselected_sym::String
-    on_draw::Union{Nothing,Function}
 end
 
 function menu_return_value(mn::MultiSelectMenu, ::Enter)
@@ -303,6 +303,8 @@ function MultiSelectMenu(
     inactive_style::String = "dim",
     width::Int = console_width(),
     on_draw::Union{Nothing,Function} = nothing,
+    on_activated::Function = on_activated,
+    on_deactivated::Function = on_deactivated,
 )
     selected_sym = apply_style("✔ ", active_style)
     notselected_sym = apply_style("□ ", inactive_style)
@@ -310,9 +312,11 @@ function MultiSelectMenu(
     max_titles_width = min(width, maximum(get_width.(options)) + 2)
 
     MultiSelectMenu(
-        Measure(length(options), width),
+        WidgetInternals(
+            Measure(length(options), width), nothing,
+            on_draw, on_activated, on_deactivated, false
+        ),
         controls,
-        nothing,
         options,
         active_style,
         inactive_style,
@@ -322,7 +326,6 @@ function MultiSelectMenu(
         length(options),
         selected_sym,
         notselected_sym,
-        on_draw,
     )
 end
 

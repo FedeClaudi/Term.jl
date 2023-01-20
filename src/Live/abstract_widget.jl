@@ -19,20 +19,25 @@ mutable struct WidgetInternals
     measure::Measure
     parent::Union{Nothing, AbstractWidget}
     on_draw::Union{Nothing,Function}
-    on_highlighted::Function
-    on_not_highlighted::Function
-    is_highlighted::Bool
+    on_activated::Function
+    on_deactivated::Function
+    active::Bool
 end
 
 # ----------------------------- widget functions ----------------------------- #
 
 get_active(::AbstractWidget) = nothing
 
+# isactive(w::AbstractWidget) = w.internals.active
 function isactive(widget::AbstractWidget)
     par = AbstractTrees.parent(widget)
     isnothing(par) && return true
     return widget == get_active(par) && isactive(par)
 end
+
+
+on_activated(wdg::AbstractWidget) = wdg.internals.active = true
+on_deactivated(wdg::AbstractWidget) = wdg.internals.active = false
 
 
 quit(::Nothing) = return
@@ -44,10 +49,6 @@ quit(widget::AbstractWidget) = quit(AbstractTrees.parent(widget))
 Get the current conttent of a widget
 """
 frame(::AbstractWidget) = error("Not implemented")
-
-
-on_highlighted(wdg::AbstractWidget) = wdg.internals.is_highlighted = true
-on_not_highlighted(wdg::AbstractWidget) = wdg.internals.is_highlighted = false
 
 # ------------------------------ tree structure ------------------------------ #
 

@@ -27,16 +27,17 @@ TextWidget(
     text::String;
     as_panel = false,
     on_draw::Union{Nothing,Function} = nothing,
-    on_highlighted::Function = on_highlighted,
-    on_not_highlighted::Function = on_not_highlighted,
+    on_activated::Function = on_activated,
+    on_deactivated::Function = on_deactivated,
     controls = text_widget_controls,
     kwargs...
 ) = TextWidget(
-    Measure(Measure(text).h, console_width()), 
+    internals(
+        Measure(Measure(text).h, console_width()),
+        nothing, on_draw, on_activated, on_deactivated, false
+    ), 
     controls, 
-    nothing,
-    text, as_panel, on_draw, 
-    on_highlighted, on_not_highlighted,
+    text, as_panel, 
     kwargs
 )
 
@@ -44,21 +45,21 @@ on_layout_change(t::TextWidget, m::Measure) = t.measure = m
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(tw::TextWidget; kwargs...)
-    isnothing(tw.on_draw) || tw.on_draw(tw)
-
+    isnothing(tw.internals.on_draw) || tw.internals.on_draw(tw)
+    measure = tw.internals.measure
     tw.as_panel && return Panel(
         tw.text;
-        width = tw.measure.w,
-        height = tw.measure.h,
+        width = measure.w,
+        height = measure.h,
         fit = false,
         tw.panel_kwargs...
     )
 
-    txt = reshape_text(tw.text, tw.measure.w - 4)
+    txt = reshape_text(tw.text, measure.w - 4)
     lines = split(txt, "\n")
-    lines = lines[1:min(tw.measure.h, length(lines))]
+    lines = lines[1:min(measure.h, length(lines))]
 
-    return RenderableText(join(lines, "\n"); width=tw.measure.w-4)
+    return RenderableText(join(lines, "\n"); width=measure.w-4)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -110,16 +111,18 @@ input_box_controls = Dict(
 function InputBox(;
     controls::AbstractDict = input_box_controls,
     on_draw::Union{Nothing,Function} = nothing,
-    on_highlighted::Function = on_highlighted,
-    on_not_highlighted::Function = on_not_highlighted,
+    on_activated::Function = on_activated,
+    on_deactivated::Function = on_deactivated,
     kwargs...,
 )
     InputBox(
-        Measure(5, console_width()),
+        WidgetInternals(
+            Measure(5, console_width()),
+            nothing, on_draw, on_activated, on_deactivated, false
+        ),
         controls,
-        nothing, 
         nothing,
-        0, :off, kwargs, on_draw, on_highlighted, on_not_highlighted
+        0, :off, kwargs,
         )
 end
 
@@ -127,7 +130,7 @@ on_layout_change(ib::InputBox, m::Measure) = ib.measure = m
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(ib::InputBox; kwargs...)
-    isnothing(ib.on_draw) || ib.on_draw(ib)
+    isnothing(ib.internals.on_draw) || ib.internals.on_draw(ib)
 
     # create blinking symbol
     currtime = Dates.value(now())
@@ -135,7 +138,7 @@ function frame(ib::InputBox; kwargs...)
         ib.blinker_update = currtime
         ib.blinker_status = ib.blinker_status == :on ? :off : :on
     end
-    blinker =  if isactive(ib)
+    blinker = if isactive(ib)
         ib.blinker_status == :on ? " " : "{on_white} {/on_white}"
     else
         ""
@@ -143,8 +146,8 @@ function frame(ib::InputBox; kwargs...)
 
     # get text to display
     text = isnothing(ib.input_text) ? "{dim}start typing...{/dim}" : ib.input_text * blinker
-
-    return Panel(text; width = ib.measure.w, height = ib.measure.h, ib.panel_kwargs...)
+    measure = ib.internals.measure
+    return Panel(text; width = measure.w, height = measure.h, ib.panel_kwargs...)
 end
 
 
@@ -164,23 +167,23 @@ end
 on_layout_change(ph::PlaceHolderWidget, m::Measure) = ph.internals.measure = m
 
 
-function on_highlighted(ph::PlaceHolderWidget)
-    ph.internals.is_highlighted = true
+function on_activated(ph::PlaceHolderWidget)
+    ph.internals.active = true
     ph.style = "bold"
 end
-function on_not_highlighted(ph::PlaceHolderWidget)
-    ph.internals.is_highlighted = false
+function on_deactivated(ph::PlaceHolderWidget)
+    ph.internals.active = false
     ph.style = "dim"
 end
 
 function PlaceHolderWidget(
     h::Int, w::Int, name::String, color::String;
     on_draw::Union{Nothing,Function} = nothing,
-    on_highlighted::Function = on_highlighted,
-    on_not_highlighted::Function = on_not_highlighted,
+    on_activated::Function = on_activated,
+    on_deactivated::Function = on_deactivated,
     )
     internals = WidgetInternals(
-        Measure(h, w), nothing, on_draw, on_highlighted, on_not_highlighted, false
+        Measure(h, w), nothing, on_draw, on_activated, on_deactivated, false
     )
 
     PlaceHolderWidget(

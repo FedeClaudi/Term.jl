@@ -84,15 +84,13 @@ end
 # ------------------------------- constructors ------------------------------- #
 
 @with_repr mutable struct Button <: AbstractButton
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     pressed_display::Panel
     not_pressed_display::Panel
     status::Symbol
     callback::Union{Nothing,Function}
     lastpressed::Int
-    on_draw::Union{Nothing,Function}
     style_args
     style_kwargs
 end
@@ -104,19 +102,21 @@ function Button(
     pressed_background = "red",
     not_pressed_text_style = "red",
     on_draw::Union{Nothing,Function} = nothing,
+    on_activated::Function = on_activated,
+    on_deactivated::Function = on_deactivated,
     kwargs...,
 )
 
     return Button(
-        Measure(),
+        WidgetInternals(
+            Measure(), nothing,
+            on_draw, on_activated, on_deactivated, false),
         controls,
-        nothing,
         Panel(),  # place holders
         Panel(),
         :not_pressed,
         nothing,
         0,
-        on_draw,
         (message, pressed_text_style, pressed_background, not_pressed_text_style),
         kwargs
     )
@@ -151,15 +151,13 @@ A button. Pressing it toggles its status between
 activated and not.
 """
 @with_repr mutable struct ToggleButton <: AbstractButton
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     pressed_display::Panel
     not_pressed_display::Panel
     status::Symbol
     callback::Union{Nothing,Function}
     lastpressed::Int
-    on_draw::Union{Nothing,Function}
     style_args
     style_kwargs
 end
@@ -171,19 +169,21 @@ function ToggleButton(
     pressed_background = "red",
     not_pressed_text_style = "red",
     on_draw::Union{Nothing,Function} = nothing,
+    on_activated::Function = on_activated,
+    on_deactivated::Function = on_deactivated,
     kwargs...,
 )
 
     return ToggleButton(
-        Measure(5, 20),
+        WidgetInternals(
+            Measure(), nothing,
+            on_draw, on_activated, on_deactivated, false),
         controls,
-        nothing,
         Panel(),
         Panel(),
         :not_pressed,
         nothing,
         0,
-        on_draw,
         (message, pressed_text_style, pressed_background, not_pressed_text_style),
         kwargs
     )

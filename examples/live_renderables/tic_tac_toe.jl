@@ -54,8 +54,8 @@ button_controls = Dict(
 
 widgets = Dict{Symbol, Any}(
     map(c -> c => TextWidget(""; controls=button_controls, as_panel=true,
-        on_highlighted = on_cell_highlighted,
-        on_not_highlighted = on_cell_not_highlighted,
+        on_activated = on_cell_highlighted,
+        on_deactivated = on_cell_not_highlighted,
         padding = (1, 0, 0, 0), 
         justify=:center, style="dim"
     ), (:A, :B, :C, :D, :E, :F, :G, :H, :I))...

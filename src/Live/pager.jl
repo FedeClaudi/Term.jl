@@ -5,19 +5,15 @@ It shows a few lines of a longer text and allows users to move up and down the t
 using keys such as arrow up and arrow down.
 """
 @with_repr mutable struct Pager <: AbstractWidget
-    measure::Measure
+    internals::WidgetInternals
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
     text::AbstractString
     content::Vector{String}
-    title::String
+    title::Union{Nothing, String}
     line_numbers::Bool
     tot_lines::Int
     curr_line::Int
     page_lines::Int
-    on_draw::Union{Nothing,Function}
-    on_highlighted::Function
-    on_not_highlighted::Function
 end
 
 
@@ -102,18 +98,19 @@ function Pager(
     controls::AbstractDict = pager_controls,
     height = 30,
     width=console_width(),
-    title::String = "Term.jl PAGER",
+    title::Union{Nothing, String} = nothing,
     line_numbers::Bool = false,
     on_draw::Union{Nothing,Function} = nothing,
-    on_highlighted::Function = on_highlighted,
-    on_not_highlighted::Function = on_not_highlighted,
+    on_activated::Function = on_activated,
+    on_deactivated::Function = on_deactivated,
 )
 
     content = reshape_pager_content(text, line_numbers, width)
     return Pager(
-        Measure(height, width),
+        WidgetInternals(
+            Measure(height, width), nothing,
+            on_draw, on_activated, on_deactivated, false),
         controls,
-        nothing,
         text,
         content,
         title,
@@ -121,8 +118,6 @@ function Pager(
         length(content),
         1,
         max(height - 5, 1),
-        on_draw,
-        on_highlighted, on_not_highlighted,
     )
 end
 
@@ -131,7 +126,7 @@ function on_layout_change(p::Pager, m::Measure)
     p.content = reshape_pager_content(p.text, p.line_numbers, m.w)
     p.tot_lines = length(p.content)
     p.curr_line = min(p.curr_line, p.tot_lines - p.page_lines)
-    p.measure = m
+    p.internals.measure = m
 end
 
 # ---------------------------------- frame  ---------------------------------- #
@@ -192,23 +187,25 @@ end
 Create a Panel with, as content, the currently visualized lines in the Pager.
 """
 function frame(pager::Pager; omit_panel = false)::AbstractRenderable
-    isnothing(pager.on_draw) || pager.on_draw(pager)
+    isnothing(pager.internals.on_draw) || pager.internals.on_draw(pager)
 
     i, Δi = pager.curr_line, pager.page_lines
     page = make_page(pager, i, Δi)
+
+    style = isactive(pager) ? pink : "blue dim"
 
     # return content
     omit_panel && return "  " * RenderableText(page)
     return Panel(
         page,
         fit = false,
-        width = pager.measure.w,
-        height = pager.measure.h,
+        width = pager.internals.measure.w,
+        height = pager.internals.measure.h,
         padding = (2, 0, 1, 0),
         subtitle = "Lines: $(max(1, i)):$(min(i+Δi, pager.tot_lines)) of $(pager.tot_lines)",
         subtitle_style = "bold dim",
         subtitle_justify = :right,
-        style = pink,
+        style = style,
         title = pager.title,
         title_style = "bold white",
     )

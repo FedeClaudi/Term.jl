@@ -96,6 +96,10 @@ An `App` is a collection of widgets.
     on_stop::Union{Nothing, Function}
 end
 
+
+isactive(::App) = true
+
+
 """
     execute_transition_rule(app::App, key)
 
@@ -137,8 +141,11 @@ function App(
 )
     layout = :(A($height, $width))
     return App(
-        layout, Dict{Symbol,AbstractWidget}(:A => widget); controls=controls, 
-        height=height, width=fint(width * console_width()), 
+        layout;
+        widgets = Dict{Symbol,AbstractWidget}(:A => widget), 
+        controls=controls, 
+        height=height, 
+        width=fint(width * console_width()), 
         kwargs...
     )
 end
@@ -175,6 +182,8 @@ function App(
     layout_keys = compositor.elements |> keys |> collect
     widgets_keys = widgets |> keys |> collect
     @assert issetequal(layout_keys, widgets_keys) "Mismatch between widget names and layout names: $layout_keys vs $widgets_keys"
+
+    on_activated(widgets[first(widgets_keys)])
 
     # enforce the size of each widget
     widgets = enforce_app_size(compositor, widgets)
@@ -350,14 +359,23 @@ function frame(app::App; kwargs...)
         # toggle active
         if length(app.widgets) > 1
             app.active == name ? 
-                    widget.internals.on_highlighted(widget) : 
-                    widget.internals.on_not_highlighted(widget)
+                    widget.internals.on_activated(widget) : 
+                    widget.internals.on_deactivated(widget)
         end
 
         content = frame(widget)
 
         update!(app.compositor, name, content)
     end
+
+    # reset the activation state of each widget
+    for widget in values(app.widgets)
+        # wasactive, willbeactive = widget.internals.active, isactive(widget)
+        # !wasactive && willbeactive && widget.internals.on_activated(widget)
+        
+        widget.internals.active = isactive(widget)
+    end
+
     return render(app.compositor)
 end
 
