@@ -180,7 +180,8 @@ function App(
     widgets = enforce_app_size(compositor, widgets)
 
     transition_rules =
-        isnothing(transition_rules) ? Dict() :
+        isnothing(transition_rules) ? 
+        infer_transition_rules(layout) :
         transition_rules
 
     # make a help message to show transition rules
@@ -220,6 +221,51 @@ function App(
     return app
 end
 
+"""
+    infer_transition_rules(layout::Expr)::Dict
+
+If no transition rules are passed, infer them from the layout's
+spatial relationships.
+"""
+function infer_transition_rules(layout::Expr)::Dict
+    """ recursively get widgets in a  layout elements """
+    function get_elements(elem::Expr)
+        out = []
+        for node in PreOrderDFS(elem)
+            node isa Expr || continue
+            node.args[1] ∉ (:*, :/) && push!(out, node.args[1])
+        end
+        return out
+    end
+    get_elements(x) = nothing
+
+    transition_rules = Dict(
+        ArrowRight() => Dict(),
+        ArrowLeft() => Dict(),
+        ArrowDown() => Dict(),
+        ArrowUp() => Dict(),
+    )
+
+    for node in PreOrderDFS(layout)
+        if node isa Expr
+            op = node.args[1]
+            op ∈ (:*, :/) || continue
+            source = get_elements(node.args[2])
+            dest = get_elements(node.args[3])
+
+            # store commands to and from widgets
+            first_key, second_key = op == :* ? (ArrowRight(), ArrowLeft()) : (ArrowDown(), ArrowUp())
+            for w in source
+                transition_rules[first_key][w] = dest[1]
+            end
+            for w in dest
+                transition_rules[second_key][w] = source[1]
+            end
+        end
+    end
+
+    return transition_rules
+end
 
 """
 If no widget was passed, create placeholder widgets.

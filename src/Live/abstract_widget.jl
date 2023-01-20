@@ -79,7 +79,8 @@ function print_node(io, x)
     style = isactive(x) ? "default" : "dim"
     content = frame(x)
 
-    hx, wx = x.measure.h, x.measure.w
+    measure = hasfield(typeof(x), :measure) ? x.measure : x.internals.measure
+    hx, wx = measure.h, measure.w
     hc, wc = content.measure.h, content.measure.w
 
     h_color = hx >= hc ? style : "red"
