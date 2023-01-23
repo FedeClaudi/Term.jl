@@ -89,16 +89,19 @@ end
 
 
 """
-- {bold white}enter{/bold white}: new line
+new line
 """
 newline(ib::InputBox, ::Enter) = isnothing(ib.input_text) || (ib.input_text *= "\n")
 
+""" insert space """
 addspace(ib::InputBox, ::SpaceBar) = isnothing(ib.input_text) || (ib.input_text *= " ")
 
+""" delete last character """
 del(ib::InputBox, ::Del) = isnothing(ib.input_text) || begin
     textwidth(ib.input_text) > 0 && (ib.input_text = ib.input_text[1:(end - 1)])
 end
 
+""" add character to input """
 addchar(ib::InputBox, c::Char) = if isnothing(ib.input_text)
         ib.input_text = string(c)
     else
@@ -168,7 +171,9 @@ end
 #                                  PLACEHOLDER                                 #
 # ---------------------------------------------------------------------------- #
 
-
+"""
+Widget with no content to be used as a placeholder for choosing app layout.
+"""
 mutable struct PlaceHolderWidget <: AbstractWidget
     internals::WidgetInternals
     controls::AbstractDict

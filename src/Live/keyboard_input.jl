@@ -1,5 +1,10 @@
 
+"""
+    keyboard_input(widget::AbstractWidget)
 
+Get keyboard input from the terminal and execute the corresponding control function
+if it exists. Returns a list of return values from the control functions.
+"""
 function keyboard_input(widget::AbstractWidget)
     controls = widget.controls
     if bytesavailable(terminal.in_stream) > 0
@@ -17,7 +22,11 @@ function keyboard_input(widget::AbstractWidget)
 end
 
 
+"""
+    keyboard_input(widget::AbstractWidgetContainer) 
 
+Get keyboard input from the terminal and execute the corresponding control function for active widgets.
+"""
 function keyboard_input(widget::AbstractWidgetContainer)
     retvals = []
     if bytesavailable(terminal.in_stream) > 0

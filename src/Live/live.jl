@@ -20,6 +20,7 @@ import ..Style: apply_style
 import ..Layout: Spacer, vLine, vstack, hLine, hstack, PlaceHolder
 import ..Compositors: Compositor, render, update!
 import ..Tprint: tprint
+import ..TermMarkdown: parse_md
 
 export AbstractWidget, refresh!, play, key_press, shouldupdate, frame, stop!
 export Pager

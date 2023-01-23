@@ -3,7 +3,9 @@
 # ---------------------------------------------------------------------------- #
 abstract type AbstractButton <: AbstractWidget end
 
-
+"""
+set the buttoon's state to :presed.
+"""
 function press_button(b::AbstractButton, ::Union{SpaceBar, Enter})
     if b.status == :not_pressed
         b.lastpressed = Dates.value(now())
@@ -28,12 +30,45 @@ function on_layout_change(b::AbstractButton, m::Measure)
     b.internals.measure = m
 end
 
+"""
+    make_button_panel(message, color, text_color, pressed, active, w, h; kwargs...)
+
+Create a panel to display a button.
+"""
+function make_button_panel(message, color, text_color, pressed, active, w, h; kwargs...)
+    if pressed == :active
+        style = "$(text_color) on_$(color)"
+        background = color
+    else
+        style = active ? color : "dim $color"
+        background = ""
+    end
+
+
+    return Panel(
+        "{$text_color on_$(background)}$message{/$text_color on_$(background)}",
+        style = style,
+        width = w,
+        height = h,
+        justify = get(kwargs, :justify, :center),
+        background = background,
+        kwargs...
+    )
+end
+
 
 # ---------------------------------------------------------------------------- #
 #                                    Button                                    #
 # ---------------------------------------------------------------------------- #
 # ------------------------------- constructors ------------------------------- #
 
+"""
+    Button
+
+A button widget.
+It's display changes when pressed.
+A callback can be set to be called when the button is pressed.
+"""
 @with_repr mutable struct Button <: AbstractButton
     internals::WidgetInternals
     controls::AbstractDict
@@ -73,26 +108,6 @@ function Button(
 end
 
 
-function make_button_panel(message, color, text_color, pressed, active, w, h; kwargs...)
-    if pressed == :active
-        style = "$(text_color) on_$(color)"
-        background = color
-    else
-        style = active ? color : "dim $color"
-        background = ""
-    end
-
-
-    return Panel(
-        "{$text_color on_$(background)}$message{/$text_color on_$(background)}",
-        style = style,
-        width = w,
-        height = h,
-        justify = get(kwargs, :justify, :center),
-        background = background,
-        kwargs...
-    )
-end
 
 
 # ----------------------------------- frame ---------------------------------- #

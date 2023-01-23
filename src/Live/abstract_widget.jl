@@ -15,6 +15,12 @@ and one optional one
 """
 abstract type AbstractWidget end
 
+"""
+    WidgetInternals
+
+This struct is used to store the internal state of a widget as well as
+callbacks assigned to it.
+"""
 mutable struct WidgetInternals
     measure::Measure
     parent::Union{Nothing, AbstractWidget}
@@ -25,28 +31,45 @@ mutable struct WidgetInternals
 end
 
 # ----------------------------- widget functions ----------------------------- #
+"""
+    get_active(w::AbstractWidget)
 
+Nothing: no children.
+"""
 get_active(::AbstractWidget) = nothing
 
-# isactive(w::AbstractWidget) = w.internals.active
+"""
+    isactive(w::AbstractWidget)
+
+Returns true if the widget is active, i.e. if it is the active widget
+"""
 function isactive(widget::AbstractWidget)
     par = AbstractTrees.parent(widget)
     isnothing(par) && return true
     return widget == get_active(par) && isactive(par)
 end
 
-
+"""
+Default callback for a widget being activated
+"""
 on_activated(wdg::AbstractWidget) = wdg.internals.active = true
+
+"""
+Default callback for a widget being deactivated
+"""
 on_deactivated(wdg::AbstractWidget) = wdg.internals.active = false
 
-
+"""
+Quit the current app, potentially returning some value.
+"""
+function quit end 
 quit(::Nothing) = return
 quit(widget::AbstractWidget, ::Any) = quit(AbstractTrees.parent(widget))
 quit(widget::AbstractWidget) = quit(AbstractTrees.parent(widget))
 
 
 """
-Get the current conttent of a widget
+Get the current content of a widget
 """
 frame(::AbstractWidget) = error("Not implemented")
 

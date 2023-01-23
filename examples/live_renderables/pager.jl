@@ -10,7 +10,7 @@ Multiple pagers are visualized via a Gallry widget.
 """
 
 import Term.LiveWidgets: LIVE_DEBUG
-LIVE_DEBUG[] = true
+LIVE_DEBUG[] = false
 
 filepath1 = "././src/live/abstract_widget.jl"
 filepath2 = "././src/live/gallery.jl"

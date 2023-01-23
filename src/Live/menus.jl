@@ -12,10 +12,13 @@ abstract type AbstractMenu <: AbstractWidget end
 
 # --------------------------------- controls --------------------------------- #
 
+""" set next item to active """
 menu_activate_next(mn::AbstractMenu, ::Any) = mn.active = min(mn.active + 1, mn.n_titles)
 
+""" set previous item to active """
 menu_activate_prev(mn::AbstractMenu, ::Any) = mn.active = max(1, mn.active - 1)
 
+""" quit menu and return value"""
 function menu_return_value(mn::AbstractMenu, ::Enter)
     quit(mn)
     return mn.active
@@ -27,7 +30,6 @@ vert_menu_controls = Dict(
     Enter() => menu_return_value,
     Esc() => quit,
     'q' => quit,
-    'h' => toggle_help,
 )
 
 
@@ -37,7 +39,6 @@ hor_menu_controls = Dict(
     Enter() => menu_return_value,
     Esc() => quit,
     'q' => quit,
-    'h' => toggle_help,
 )
 
 function on_layout_change(mn::AbstractMenu, m::Measure)
@@ -96,7 +97,11 @@ The currently selected option is highlighted with a different style.
 end
 
 
+""" 
+    active_title(mn::SimpleMenu, i::Int, width::Int)
 
+Return the title of the i-th item of the menu with the active style.
+"""
 function active_title(mn::SimpleMenu, i::Int, width::Int)
     return RenderableText(
         mn.titles[i];
@@ -105,6 +110,11 @@ function active_title(mn::SimpleMenu, i::Int, width::Int)
     ) |> string
 end
 
+""" 
+    inactive_title(mn::SimpleMenu, i::Int, width::Int)
+
+Return the title of the i-th item of the menu with the inactive style.
+"""
 function inactive_title(mn::SimpleMenu, i::Int, width::Int)
     return RenderableText(
         mn.titles[i];
@@ -217,6 +227,11 @@ Styling reflects which option is currently selected
     end
 end
 
+"""
+    active_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kwargs...)
+
+Return the title of the i-th item of the menu with the active style.
+"""
 function active_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kwargs...)
     active_color, active_background = mn.active_style[i], mn.active_background[i]
     return Panel(
@@ -233,6 +248,11 @@ function active_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kw
     )
 end
 
+"""
+    inactive_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kwargs...)
+
+Return the title of the i-th item of the menu with the inactive style.  
+"""
 function inactive_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kwargs...)
     inactive_color, inactive_background = mn.inactive_style[i], mn.inactive_background[i]
     return Panel(
@@ -288,11 +308,17 @@ Color indicates current active option, ticks selected options
     notselected_sym::String
 end
 
+"""
+quit and return selection.
+"""
 function menu_return_value(mn::MultiSelectMenu, ::Enter)
     quit(mn)
     return mn.selected
 end
 
+"""
+Toggle selection status of current active option
+"""
 function multi_select_toggle(mn::MultiSelectMenu, ::SpaceBar)
     active = mn.active
     if active ∈ mn.selected
@@ -310,7 +336,6 @@ multi_select_controls = Dict(
     Enter() => menu_return_value,
     Esc() => quit,
     'q' => quit,
-    'h' => toggle_help,
 )
 
 

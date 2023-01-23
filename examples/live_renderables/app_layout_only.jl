@@ -16,6 +16,12 @@ layout = :(
 app = App(
     layout;
     expand = true,
+    help_message = """
+This is just an example of how to create a simple app without any specific content.
+
+!!! note
+    You can make apps too!
+"""
 )
 
 play(app)

@@ -1,60 +1,54 @@
 """
-toggle_help(live::AbstractWidget; help_widget::Union{Nothing, AbstractWidget}=nothing)
-
-Toggle help tooltip display for a widget widget.
-
-By default the help message of `live` is shown, but for "nested" widgets one can 
-directly specify for which widget to look up the help message for with `help_widget`.
-
-The help message itself is made up of the docstring for the `live` struct and the docstrings
-of all methods for `key_press(typeof(live), ::Any)`.
+display/hide help tooltip
 """
-function toggle_help(live, args...; help_widget = nothing)
-    internals = live.internals
-    help_widget = something(help_widget, live)
+function toggle_help(app::App, args...;)
+    internals = app.internals
+    width = app.measure.w 
+    msg = if !isnothing(internals.help_message) == true
+        parse_md(Markdown.parse(app.internals.help_message); width=width-6)
+    else
+        "{dim} no help message shown{/dim}"
+    end |> RenderableText
 
-    # get the docstring for each key_press method for the widget
-    key_methods = methods(key_press, (typeof(help_widget), LiveWidgets.KeyInput))
+    # get the docstring of the currently active widget
+    active_widget = app.widgets[app.active]
+    widget_msg = something(
+        parse_md(getdocs(active_widget); width=max(20, width-6)), 
+        "{dim} no help message shown{/dim}"
+    ) |> RenderableText
 
-    dcs = Docs.meta(LiveWidgets)
-    bd = Base.Docs.Binding(LiveWidgets, :key_press)
-
-    added_sigs = []
-    function get_method_docstring(m)
-        try
-            sig = m.sig.types[3]
-            sig ∈ added_sigs && return ""
-            docstr = dcs[bd].docs[Tuple{m.sig.types[2],m.sig.types[3]}].text[1]
-            push!(added_sigs, sig)
-            return docstr
-        catch
-            return ""
-        end
+    # get the docstring of each control method
+    col = TERM_THEME[].text_accent
+    all_controls = [pairs(active_widget.controls)..., pairs(app.controls)...]
+    already_added = []
+    controls = []
+    
+    for (k, c) in all_controls
+        (k ∈ already_added || k isa Symbol) && continue
+            
+        push!(
+            controls, 
+            RenderableText("{bold $col} - $(k){/bold $col}: " * parse_md(getdocs(c); width=max(20, width-20)))
+        )
+        push!(already_added, k)
     end
-
-    width = console_width()
-    methods_docs =
-        map(m -> RenderableText(get_method_docstring(m); width = width - 10), key_methods)
-
-    # compose help tooltip
-    docstring = RenderableText(getdocs(help_widget); width = width - 10)
-    help_message =
-        isnothing(help_widget.internals.help_message) ? docstring :
-        docstring / RenderableText(help_widget.internals.help_message; width = width - 10)
-
-    messages = [
-        RenderableText(md"#### Widget description"; width = width - 10),
-        help_message,
+    # create content
+    content = [
+        msg,
         "",
-        RenderableText(md"#### Controls "; width = width - 10),
-        methods_docs...,
-    ]
+        RenderableText(md"#### Active widget: $(typeof(active_widget))"; width = width - 10),
+        "",
+        widget_msg,
+        "",
+        RenderableText(md"#### Controls"; width = width - 10),
+        controls...
+        ]
 
     # create full message
     help_message = Panel(
-        messages;
+        content;
         width = width,
-        title = "$(typeof(help_widget)) help",
+        title = "Help",
         title_style = "default bold blue",
         title_justify = :center,
         style = "dim",
@@ -76,7 +70,7 @@ function toggle_help(live, args...; help_widget = nothing)
         move_to_line(stdout, console_height() - length(internals.prevcontentlines))
     else
         # show it
-        erase!(live)
+        erase!(app)
         println(stdout, help_message)
         internals.help_shown = true
     end
@@ -86,8 +80,3 @@ function toggle_help(live, args...; help_widget = nothing)
 end
 
 
-function active_widget_help(widget, args...)
-    widget.internals.help_shown && toggle_help(widget)
-    active = widget.widgets[widget.active]
-    toggle_help(widget, args...;  help_widget=active)
-end

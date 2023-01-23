@@ -101,12 +101,7 @@ isactive(::App) = true
 
 
 """
-    execute_transition_rule(app::App, key)
-
-Looks up a `transition_rules` entry matching the current situation. 
-There has to be a ruleset for the key the user pressed and within
-the ruleset there must be an entry matching the currently active 
-widget, otherwise no effect. 
+Execute a transition rule to switch focus to another widget.
 """
 function execute_transition_rule(app::App, key)::Bool
     haskey(app.transition_rules, key) || return false
@@ -127,11 +122,20 @@ app_controls = Dict(
     'q' => quit,
     Esc() => quit,
     'h' => toggle_help,
-    'w' => active_widget_help,
     :setactive => execute_transition_rule
 )
 
+"""
+    App(
+        widget::AbstractWidget;
+        controls::AbstractDict = app_controls,
+        width=1.0,
+        height=min(40, console_height()),
+        kwargs...
+    )
 
+Convenience constructor for an `App` with a single widget.
+"""
 function App(
     widget::AbstractWidget;
     controls::AbstractDict = app_controls,
@@ -162,6 +166,7 @@ function App(
     on_draw::Union{Nothing,Function} = nothing,
     on_stop::Union{Nothing,Function} = nothing,
     expand::Bool = true,
+    help_message::Union{Nothing,String} = nothing,
 )   
 
     # parse the layout expression and get the compositor
@@ -193,23 +198,10 @@ function App(
         infer_transition_rules(layout) :
         transition_rules
 
-    # make a help message to show transition rules
-    color = TERM_THEME[].emphasis_light
-    transition_rules_message = []
-    for (key, cmds) in pairs(transition_rules)
-        for (a, b) in pairs(cmds)
-            push!(
-                transition_rules_message,
-                "{$color}$key {/$color} moves from {$(color)}$a {/$color} to {$color}$b {/$color}",
-            )
-        end
-    end
-
     msg_style = TERM_THEME[].emphasis
     app = App(
         AppInternals(;
-            help_message = "\n{$msg_style}Transition rules{/$msg_style}" /
-                           join(transition_rules_message, "\n"),
+            help_message = help_message,
         ),
         measure,
         controls,
@@ -336,6 +328,12 @@ function enforce_app_size(app::App, measure::Measure)
 end
 
 # ----------------------------------- frame ---------------------------------- #
+
+"""
+    on_layout_change(app::App)
+
+Called when the console is resized to adjust the apps layout.
+"""
 function on_layout_change(app::App)
     new_width = app.expand ? console_width() :  min(app.width, console_width())
     new_width == app.measure.w && return
@@ -348,7 +346,11 @@ function on_layout_change(app::App)
     enforce_app_size(app, app.measure)
 end
 
+"""
+    frame(app::App)
 
+Render the app and its content.
+"""
 function frame(app::App; kwargs...)
     isnothing(app.on_draw) || app.on_draw(app)
 
@@ -379,7 +381,11 @@ function frame(app::App; kwargs...)
     return render(app.compositor)
 end
 
+"""
+    add_debugging_info!(content::AbstractRenderable, app::App)::AbstractRenderable
 
+Add debugging information to the top of the app.
+"""
 function add_debugging_info!(content::AbstractRenderable, app::App)::AbstractRenderable
     # print the app's layout as a TREE
     tree = sprint(print, app)

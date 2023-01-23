@@ -17,8 +17,6 @@ gallery_controls = Dict(
     ArrowLeft() => activate_prev_widget,
     'q' => quit,
     Esc() => quit,
-    'h' => toggle_help,
-    'w' => active_widget_help,
 )
 
 

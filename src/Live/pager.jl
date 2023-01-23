@@ -66,7 +66,6 @@ pager_controls = Dict(
     EndKey() => toend,
     Esc() => quit,
     'q' => quit,
-    'h' => toggle_help,
 )
 
 
@@ -131,7 +130,11 @@ end
 
 # ---------------------------------- frame  ---------------------------------- #
 
+"""
+    make_page_content(pager::Pager, i::Int, Δi::Int)::String
 
+Returns the content of the page as a string
+"""
 function make_page_content(pager, i, Δi)
     if Δi >= pager.tot_lines
         return join(pager.content, "\n")
@@ -140,6 +143,11 @@ function make_page_content(pager, i, Δi)
     end
 end
 
+"""
+    make_scrollbar(pager::Pager, i::Int, Δi::Int)::String
+
+Generate a scrollbar display to show progress in the pager's content.
+"""
 function make_scrollbar(pager, i, Δi)
     page_lines = pager.page_lines
     scrollbar_lines = min(pager.page_lines, 6)
