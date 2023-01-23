@@ -9,9 +9,7 @@ Example on how to create a simple app without any specific content,
 just to specify the widget's layout.
 """
 
-layout = :(
-    (r(10, 0.5)* g(10, 0.5))/ b(10, 1.0)
-)
+layout = :((r(10, 0.5) * g(10, 0.5)) / b(10, 1.0))
 
 app = App(
     layout;
@@ -21,9 +19,7 @@ This is just an example of how to create a simple app without any specific conte
 
 !!! note
     You can make apps too!
-"""
+""",
 )
 
 play(app)
-
-

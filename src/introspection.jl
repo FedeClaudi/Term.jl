@@ -5,7 +5,6 @@ import InteractiveUtils: supertypes as getsupertypes
 import OrderedCollections: OrderedDict
 import MyterialColors: pink, pink_light, orange, grey_dark, light_green
 
-
 import Term:
     highlight,
     escape_brackets,
@@ -111,7 +110,11 @@ end
 #                             INTROSPECT DATATYPES                             #
 # ---------------------------------------------------------------------------- #
 
-function style_methods(methods::Union{Vector{Base.Method},Base.MethodList}, docstrings::Vector, width::Int)
+function style_methods(
+    methods::Union{Vector{Base.Method},Base.MethodList},
+    docstrings::Vector,
+    width::Int,
+)
     mets = []
     fn_col = TERM_THEME[].func
     panel_col = TERM_THEME[].text_accent
@@ -124,18 +127,18 @@ function style_methods(methods::Union{Vector{Base.Method},Base.MethodList}, docs
 
         # get docstring
         docs = if !isnothing(docs)
-            docs = parse_md(something(docs, ""); width=width)
+            docs = parse_md(something(docs, ""); width = width)
         else
             docs = "{green}No docstring found{/green}"
         end
-        docs = hLine(width, "DocString";style="green")/docs/""
+        docs = hLine(width, "DocString"; style = "green") / docs / ""
 
         # method source
         modul = "{default}Source: {bold $col}" * string(m.module) * "{/bold $col}{/default}"
         source = "{dim}$(m.file):$(m.line){/dim}"
 
-        out = code/""/ docs
-        push!(mets, out/hLine(width;style="dim")/modul/source)
+        out = code / "" / docs
+        push!(mets, out / hLine(width; style = "dim") / modul / source)
     end
     return mets
 end
@@ -167,17 +170,17 @@ function inspect(T::Union{Union,DataType};)
     type_name = apply_style(string(T), theme.repr_name * " bold")
 
     # get each method as a Pager
-    type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width -12)
-    methods_pagers = map(
-        m -> Pager(
-            string(m[2]); 
-            title="Method $(m[1]) of $(length(type_methods))",
-            width = widget_width, 
-            page_lines = comp.elements[:B].h-8
+    type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width - 12)
+    methods_pagers =
+        map(
+            m -> Pager(
+                string(m[2]);
+                title = "Method $(m[1]) of $(length(type_methods))",
+                width = widget_width,
+                page_lines = comp.elements[:B].h - 8,
             ),
-        enumerate(type_methods)
-    ) |> collect
-
+            enumerate(type_methods),
+        ) |> collect
 
     # create app
     menu = ButtonsMenu(
@@ -209,7 +212,7 @@ function inspect(T::Union{Union,DataType};)
             width = comp.elements[:B].w - 1,
             height = comp.elements[:B].h - 2,
             show_panel = false,
-        )
+        ),
     ]
 
     # make the app out of a menu and the top level gallery
@@ -224,17 +227,14 @@ function inspect(T::Union{Union,DataType};)
         ),
     )
 
-    transition_rules = Dict(
-        ArrowDown() => Dict(:A => :B),
-        ArrowUp() => Dict(:B => :A),
-    )
+    transition_rules = Dict(ArrowDown() => Dict(:A => :B), ArrowUp() => Dict(:B => :A))
 
     function cb(app)
         app.widgets[:B].active = app.widgets[:A].active
     end
 
     app = App(layout, widgets, transition_rules; on_draw = cb)
-    play(app; transient = false);
+    play(app; transient = false)
     return nothing
 end
 

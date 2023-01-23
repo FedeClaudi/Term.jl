@@ -25,7 +25,7 @@ gallery = Gallery(
             width = console_width() - 6,
         ),
         Pager(
-            load_code_and_highlight(filepath2); 
+            load_code_and_highlight(filepath2);
             height = 40,
             title = filepath2,
             line_numbers = true,
@@ -33,7 +33,7 @@ gallery = Gallery(
         ),
     ];
     height = 50,
-) 
+)
 
 app = App(gallery)
 play(app; transient = true)

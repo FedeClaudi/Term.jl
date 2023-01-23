@@ -6,7 +6,7 @@ abstract type AbstractButton <: AbstractWidget end
 """
 set the buttoon's state to :presed.
 """
-function press_button(b::AbstractButton, ::Union{SpaceBar, Enter})
+function press_button(b::AbstractButton, ::Union{SpaceBar,Enter})
     if b.status == :not_pressed
         b.lastpressed = Dates.value(now())
         b.status = :pressed
@@ -17,14 +17,8 @@ function press_button(b::AbstractButton, ::Union{SpaceBar, Enter})
     return nothing
 end
 
-
-button_controls = Dict(
-    'q' => quit,
-    Esc() => quit,
-    Enter() => press_button,
-    SpaceBar() => press_button,
-)
-
+button_controls =
+    Dict('q' => quit, Esc() => quit, Enter() => press_button, SpaceBar() => press_button)
 
 function on_layout_change(b::AbstractButton, m::Measure)
     b.internals.measure = m
@@ -44,7 +38,6 @@ function make_button_panel(message, color, text_color, pressed, active, w, h; kw
         background = ""
     end
 
-
     return Panel(
         "{$text_color on_$(background)}$message{/$text_color on_$(background)}",
         style = style,
@@ -52,10 +45,9 @@ function make_button_panel(message, color, text_color, pressed, active, w, h; kw
         height = h,
         justify = get(kwargs, :justify, :center),
         background = background,
-        kwargs...
+        kwargs...,
     )
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                                    Button                                    #
@@ -91,11 +83,8 @@ function Button(
     on_deactivated::Function = on_deactivated,
     kwargs...,
 )
-
     return Button(
-        WidgetInternals(
-            Measure(), nothing,
-            on_draw, on_activated, on_deactivated, false),
+        WidgetInternals(Measure(), nothing, on_draw, on_activated, on_deactivated, false),
         controls,
         message,
         :not_pressed,
@@ -103,12 +92,9 @@ function Button(
         0,
         color,
         text_color,
-        kwargs
+        kwargs,
     )
 end
-
-
-
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::Button; kwargs...)
@@ -135,7 +121,7 @@ function frame(b::Button; kwargs...)
         isactive(b),
         b.internals.measure.w,
         b.internals.measure.h;
-        kwargs...
+        kwargs...,
     )
 end
 
@@ -169,20 +155,17 @@ function ToggleButton(
     on_deactivated::Function = on_deactivated,
     kwargs...,
 )
-
-return Button(
-    WidgetInternals(
-        Measure(), nothing,
-        on_draw, on_activated, on_deactivated, false),
-    controls,
-    message,
-    :not_pressed,
-    nothing,
-    0,
-    color,
-    text_color,
-    kwargs
-)
+    return Button(
+        WidgetInternals(Measure(), nothing, on_draw, on_activated, on_deactivated, false),
+        controls,
+        message,
+        :not_pressed,
+        nothing,
+        0,
+        color,
+        text_color,
+        kwargs,
+    )
 end
 
 # ----------------------------------- frame ---------------------------------- #
@@ -203,6 +186,6 @@ function frame(b::ToggleButton; kwargs...)
         isactive(b),
         b.internals.measure.w,
         b.internals.measure.h;
-        kwargs...
+        kwargs...,
     )
 end

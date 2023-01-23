@@ -23,7 +23,7 @@ callbacks assigned to it.
 """
 mutable struct WidgetInternals
     measure::Measure
-    parent::Union{Nothing, AbstractWidget}
+    parent::Union{Nothing,AbstractWidget}
     on_draw::Union{Nothing,Function}
     on_activated::Function
     on_deactivated::Function
@@ -62,11 +62,10 @@ on_deactivated(wdg::AbstractWidget) = wdg.internals.active = false
 """
 Quit the current app, potentially returning some value.
 """
-function quit end 
+function quit end
 quit(::Nothing) = return
 quit(widget::AbstractWidget, ::Any) = quit(AbstractTrees.parent(widget))
 quit(widget::AbstractWidget) = quit(AbstractTrees.parent(widget))
-
 
 """
 Get the current content of a widget
@@ -80,7 +79,7 @@ Methods to let the AbstractTrees API handle applications as tree
 structures based on the nesting of widgets.
 """
 
-function AbstractTrees.children(widget::AbstractWidget) 
+function AbstractTrees.children(widget::AbstractWidget)
     hasfield(typeof(widget), :widgets) || return []
     widget.widgets isa AbstractDict && return collect(values(widget.widgets))
     return widget.widgets
@@ -98,7 +97,7 @@ Print function to print a node (widget) in an application's hierarchy tree.
 It prints the node's stated dimensions vs its content's (calling `frame`).
 Used for debugging
 """
-function print_node(io, x) 
+function print_node(io, x)
     color = isactive(x) ? "bright_blue" : "dim blue"
     style = isactive(x) ? "default" : "dim"
     content = frame(x)
@@ -115,7 +114,4 @@ function print_node(io, x)
     print(io, apply_style(msg))
 end
 
-
-Base.print(io::IO, widget::AbstractWidget) = print_tree(
-    print_node, print, io, widget)
-
+Base.print(io::IO, widget::AbstractWidget) = print_tree(print_node, print, io, widget)

@@ -83,7 +83,7 @@ An `App` is a collection of widgets.
     internals::AppInternals
     measure::Measure
     controls::AbstractDict
-    parent::Union{Nothing, AbstractWidget}
+    parent::Union{Nothing,AbstractWidget}
     compositor::Compositor
     layout::Expr
     width::Int
@@ -93,12 +93,10 @@ An `App` is a collection of widgets.
     transition_rules::AbstractDict
     active::Symbol
     on_draw::Union{Nothing,Function}
-    on_stop::Union{Nothing, Function}
+    on_stop::Union{Nothing,Function}
 end
 
-
 isactive(::App) = true
-
 
 """
 Execute a transition rule to switch focus to another widget.
@@ -111,18 +109,16 @@ function execute_transition_rule(app::App, key)::Bool
     return true
 end
 
-
 function quit(app::App)
     app.internals.should_stop = true
     return nothing
 end
 
-
 app_controls = Dict(
     'q' => quit,
     Esc() => quit,
     'h' => toggle_help,
-    :setactive => execute_transition_rule
+    :setactive => execute_transition_rule,
 )
 
 """
@@ -139,45 +135,44 @@ Convenience constructor for an `App` with a single widget.
 function App(
     widget::AbstractWidget;
     controls::AbstractDict = app_controls,
-    width=1.0,
-    height=min(40, console_height()),
-    kwargs...
+    width = 1.0,
+    height = min(40, console_height()),
+    kwargs...,
 )
     layout = :(A($height, $width))
     return App(
         layout;
-        widgets = Dict{Symbol,AbstractWidget}(:A => widget), 
-        controls=controls, 
-        height=height, 
-        width=fint(width * console_width()), 
-        kwargs...
+        widgets = Dict{Symbol,AbstractWidget}(:A => widget),
+        controls = controls,
+        height = height,
+        width = fint(width * console_width()),
+        kwargs...,
     )
 end
 
-
-
 function App(
     layout::Expr;
-    widgets::Union{Nothing, AbstractDict}=nothing,
+    widgets::Union{Nothing,AbstractDict} = nothing,
     transition_rules::Union{Nothing,AbstractDict} = nothing,
-    width=console_width(),
-    height=min(40, console_height()),
-    controls::AbstractDict = app_controls, 
+    width = console_width(),
+    height = min(40, console_height()),
+    controls::AbstractDict = app_controls,
     on_draw::Union{Nothing,Function} = nothing,
     on_stop::Union{Nothing,Function} = nothing,
     expand::Bool = true,
     help_message::Union{Nothing,String} = nothing,
-)   
+)
 
     # parse the layout expression and get the compositor
-    compositor = Compositor(layout; 
-        max_w = min(console_width(), width), 
-        max_h = min(console_height(), height)
+    compositor = Compositor(
+        layout;
+        max_w = min(console_width(), width),
+        max_h = min(console_height(), height),
     )
     measure = render(compositor).measure
 
     # if widgets are not provided, create empty widgets placeholders
-    widgets = if isnothing(widgets) 
+    widgets = if isnothing(widgets)
         make_placeholders(compositor)
     else
         widgets
@@ -194,21 +189,17 @@ function App(
     widgets = enforce_app_size(compositor, widgets)
 
     transition_rules =
-        isnothing(transition_rules) ? 
-        infer_transition_rules(layout) :
-        transition_rules
+        isnothing(transition_rules) ? infer_transition_rules(layout) : transition_rules
 
     msg_style = TERM_THEME[].emphasis
     app = App(
-        AppInternals(;
-            help_message = help_message,
-        ),
+        AppInternals(; help_message = help_message),
         measure,
         controls,
         nothing,
         compositor,
         layout,
-        width, 
+        width,
         height,
         expand,
         widgets,
@@ -255,7 +246,8 @@ function infer_transition_rules(layout::Expr)::Dict
             dest = get_elements(node.args[3])
 
             # store commands to and from widgets
-            first_key, second_key = op == :* ? (ArrowRight(), ArrowLeft()) : (ArrowDown(), ArrowUp())
+            first_key, second_key =
+                op == :* ? (ArrowRight(), ArrowLeft()) : (ArrowDown(), ArrowUp())
             for w in source
                 transition_rules[first_key][w] = dest[1]
             end
@@ -281,17 +273,10 @@ function make_placeholders(compositor)
 
     ws = Dict()
     for (i, (name, elem)) in enumerate(pairs(elements))
-        ws[name] = PlaceHolderWidget(
-                elem.h, 
-                elem.w, 
-                string(name),
-                colors[i]
-            )
+        ws[name] = PlaceHolderWidget(elem.h, elem.w, string(name), colors[i])
     end
     return ws
 end
-
-
 
 """
     enforce_app_size(compositor::Compositor, widgets::AbstractDict)
@@ -315,7 +300,7 @@ end
 Called when a console is resized to adjust the apps layout. 
 """
 function enforce_app_size(app::App, measure::Measure)
-    compositor = Compositor(app.layout; max_w=measure.w, max_h = measure.h)
+    compositor = Compositor(app.layout; max_w = measure.w, max_h = measure.h)
     _keys = app.widgets |> keys |> collect
 
     for k in _keys
@@ -335,7 +320,7 @@ end
 Called when the console is resized to adjust the apps layout.
 """
 function on_layout_change(app::App)
-    new_width = app.expand ? console_width() :  min(app.width, console_width())
+    new_width = app.expand ? console_width() : min(app.width, console_width())
     new_width == app.measure.w && return
 
     erase!(app)
@@ -360,9 +345,8 @@ function frame(app::App; kwargs...)
     for (name, widget) in pairs(app.widgets)
         # toggle active
         if length(app.widgets) > 1
-            app.active == name ? 
-                    widget.internals.on_activated(widget) : 
-                    widget.internals.on_deactivated(widget)
+            app.active == name ? widget.internals.on_activated(widget) :
+            widget.internals.on_deactivated(widget)
         end
 
         content = frame(widget)
@@ -374,7 +358,7 @@ function frame(app::App; kwargs...)
     for widget in values(app.widgets)
         # wasactive, willbeactive = widget.internals.active, isactive(widget)
         # !wasactive && willbeactive && widget.internals.on_activated(widget)
-        
+
         widget.internals.active = isactive(widget)
     end
 
@@ -390,14 +374,9 @@ function add_debugging_info!(content::AbstractRenderable, app::App)::AbstractRen
     # print the app's layout as a TREE
     tree = sprint(print, app)
 
-    debug_info = Panel(
-        tree;
-        width = content.measure.w,
-    )
+    debug_info = Panel(tree; width = content.measure.w)
     return debug_info / content
 end
-
-
 
 # ---------------------------------------------------------------------------- #
 #                                   RENDERING                                  #
@@ -444,7 +423,6 @@ function replace_line(internals::AppInternals, newline)
     erase_line(internals.ioc)
     println(internals.ioc, newline)
 end
-
 
 """
     refresh!(live::AbstractWidget)::Tuple{Bool, Any}
@@ -555,9 +533,3 @@ function play(app::App; transient::Bool = true)
     retval = length(retval) > 0 ? retval[1] : retval
     return retval
 end
-
-
-
-
-
-

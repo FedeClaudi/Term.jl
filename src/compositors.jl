@@ -155,7 +155,8 @@ function update!(
 
     # if content is too small, pad it
     elem = compositor.elements[id]
-    height(content) < elem.h && (content = vertical_pad(content; height = elem.h, method=:top))
+    height(content) < elem.h &&
+        (content = vertical_pad(content; height = elem.h, method = :top))
     width(content) < elem.w && (content = pad(content; width = elem.w, method = :right))
 
     # check that the shapes match

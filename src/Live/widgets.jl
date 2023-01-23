@@ -18,10 +18,7 @@ TextWidget just shows a piece of text.
     panel_kwargs
 end
 
-text_widget_controls = Dict(
-    'q' => quit,
-    Esc() => quit,
-)
+text_widget_controls = Dict('q' => quit, Esc() => quit)
 
 TextWidget(
     text::String;
@@ -30,15 +27,20 @@ TextWidget(
     on_activated::Function = on_activated,
     on_deactivated::Function = on_deactivated,
     controls = text_widget_controls,
-    kwargs...
+    kwargs...,
 ) = TextWidget(
     WidgetInternals(
         Measure(Measure(text).h, console_width()),
-        nothing, on_draw, on_activated, on_deactivated, false
-    ), 
-    controls, 
-    text, as_panel, 
-    Dict(kwargs)
+        nothing,
+        on_draw,
+        on_activated,
+        on_deactivated,
+        false,
+    ),
+    controls,
+    text,
+    as_panel,
+    Dict(kwargs),
 )
 
 on_layout_change(t::TextWidget, m::Measure) = t.internals.measure = m
@@ -52,21 +54,21 @@ function frame(tw::TextWidget; kwargs...)
         width = measure.w,
         height = measure.h,
         fit = false,
-        tw.panel_kwargs...
+        tw.panel_kwargs...,
     )
 
     txt = reshape_text(tw.text, measure.w - 4)
     lines = split(txt, "\n")
 
-    lines =  if isactive(tw)
+    lines = if isactive(tw)
         [
-            lines[1:min(measure.h-1, length(lines))]...,
-            hLine(measure.w-4; style="bold white"),
+            lines[1:min(measure.h - 1, length(lines))]...,
+            hLine(measure.w - 4; style = "bold white"),
         ]
     else
-    lines[1:min(measure.h, length(lines))]
+        lines[1:min(measure.h, length(lines))]
     end
-    return RenderableText(join(lines, "\n"); width=measure.w-4)
+    return RenderableText(join(lines, "\n"); width = measure.w - 4)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -86,8 +88,6 @@ InputBox collects and displays user input as text.
     panel_kwargs
 end
 
-
-
 """
 new line
 """
@@ -97,26 +97,26 @@ newline(ib::InputBox, ::Enter) = isnothing(ib.input_text) || (ib.input_text *= "
 addspace(ib::InputBox, ::SpaceBar) = isnothing(ib.input_text) || (ib.input_text *= " ")
 
 """ delete last character """
-del(ib::InputBox, ::Del) = isnothing(ib.input_text) || begin
-    textwidth(ib.input_text) > 0 && (ib.input_text = ib.input_text[1:(end - 1)])
-end
+del(ib::InputBox, ::Del) =
+    isnothing(ib.input_text) || begin
+        textwidth(ib.input_text) > 0 && (ib.input_text = ib.input_text[1:(end - 1)])
+    end
 
 """ add character to input """
-addchar(ib::InputBox, c::Char) = if isnothing(ib.input_text)
+addchar(ib::InputBox, c::Char) =
+    if isnothing(ib.input_text)
         ib.input_text = string(c)
     else
         ib.input_text *= c
-end
+    end
 
 input_box_controls = Dict(
     Enter() => newline,
-    SpaceBar() => addspace, 
+    SpaceBar() => addspace,
     Del() => del,
     Esc() => quit,
     Char => addchar,
 )
-
-
 
 function InputBox(;
     controls::AbstractDict = input_box_controls,
@@ -128,12 +128,18 @@ function InputBox(;
     InputBox(
         WidgetInternals(
             Measure(5, console_width()),
-            nothing, on_draw, on_activated, on_deactivated, false
+            nothing,
+            on_draw,
+            on_activated,
+            on_deactivated,
+            false,
         ),
         controls,
         nothing,
-        0, :off, kwargs,
-        )
+        0,
+        :off,
+        kwargs,
+    )
 end
 
 on_layout_change(ib::InputBox, m::Measure) = ib.internals.measure = m
@@ -155,17 +161,13 @@ function frame(ib::InputBox; kwargs...)
     end
 
     kwargs = copy(ib.panel_kwargs)
-    
-    kwargs[:style] = get(ib.panel_kwargs, :style, "") * (isactive(ib) ? "" : " dim"
-)
+
+    kwargs[:style] = get(ib.panel_kwargs, :style, "") * (isactive(ib) ? "" : " dim")
     # get text to display
     text = isnothing(ib.input_text) ? "{dim}start typing...{/dim}" : ib.input_text * blinker
     measure = ib.internals.measure
-    return Panel(text; 
-            width = measure.w, height = measure.h, 
-            kwargs...)
+    return Panel(text; width = measure.w, height = measure.h, kwargs...)
 end
-
 
 # ---------------------------------------------------------------------------- #
 #                                  PLACEHOLDER                                 #
@@ -184,7 +186,6 @@ end
 
 on_layout_change(ph::PlaceHolderWidget, m::Measure) = ph.internals.measure = m
 
-
 function on_activated(ph::PlaceHolderWidget)
     ph.internals.active = true
     ph.style = "bold"
@@ -195,18 +196,24 @@ function on_deactivated(ph::PlaceHolderWidget)
 end
 
 function PlaceHolderWidget(
-    h::Int, w::Int, name::String, color::String;
+    h::Int,
+    w::Int,
+    name::String,
+    color::String;
     on_draw::Union{Nothing,Function} = nothing,
     on_activated::Function = on_activated,
     on_deactivated::Function = on_deactivated,
-    )
+)
     internals = WidgetInternals(
-        Measure(h, w), nothing, on_draw, on_activated, on_deactivated, false
+        Measure(h, w),
+        nothing,
+        on_draw,
+        on_activated,
+        on_deactivated,
+        false,
     )
 
-    PlaceHolderWidget(
-        internals, text_widget_controls, color, "dim", name
-    )
+    PlaceHolderWidget(internals, text_widget_controls, color, "dim", name)
 end
 
 function frame(ph::PlaceHolderWidget; kwargs...)
@@ -214,9 +221,9 @@ function frame(ph::PlaceHolderWidget; kwargs...)
 
     m = ph.internals.measure
     return PlaceHolder(
-        m.h, m.w;
-        style="$(ph.color) $(ph.style)",
-        text = "$(ph.name) ($(m.h), $(m.w)"
+        m.h,
+        m.w;
+        style = "$(ph.color) $(ph.style)",
+        text = "$(ph.name) ($(m.h), $(m.w)",
     )
 end
-

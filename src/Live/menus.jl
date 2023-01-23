@@ -32,7 +32,6 @@ vert_menu_controls = Dict(
     'q' => quit,
 )
 
-
 hor_menu_controls = Dict(
     ArrowRight() => menu_activate_next,
     ArrowLeft() => menu_activate_prev,
@@ -65,7 +64,7 @@ The currently selected option is highlighted with a different style.
 
     function SimpleMenu(
         titles::Vector;
-        controls::Union{Nothing, AbstractDict} = nothing,
+        controls::Union{Nothing,AbstractDict} = nothing,
         width = default_width(),
         active_style::String = "white bold",
         inactive_style::String = "dim",
@@ -74,16 +73,19 @@ The currently selected option is highlighted with a different style.
         on_activated::Function = on_activated,
         on_deactivated::Function = on_deactivated,
     )
-
-        controls = something(controls,
-            layout == :vertical ? vert_menu_controls : hor_menu_controls
+        controls = something(
+            controls,
+            layout == :vertical ? vert_menu_controls : hor_menu_controls,
         )
 
         return new(
             WidgetInternals(
                 Measure(length(titles), width),
                 nothing,
-                on_draw, on_activated, on_deactivated, false
+                on_draw,
+                on_activated,
+                on_deactivated,
+                false,
             ),
             controls,
             titles,
@@ -96,18 +98,13 @@ The currently selected option is highlighted with a different style.
     end
 end
 
-
 """ 
     active_title(mn::SimpleMenu, i::Int, width::Int)
 
 Return the title of the i-th item of the menu with the active style.
 """
 function active_title(mn::SimpleMenu, i::Int, width::Int)
-    return RenderableText(
-        mn.titles[i];
-        style = mn.active_style,
-        width = width,
-    ) |> string
+    return RenderableText(mn.titles[i]; style = mn.active_style, width = width) |> string
 end
 
 """ 
@@ -116,11 +113,7 @@ end
 Return the title of the i-th item of the menu with the inactive style.
 """
 function inactive_title(mn::SimpleMenu, i::Int, width::Int)
-    return RenderableText(
-        mn.titles[i];
-        style = mn.inactive_style,
-        width = width,
-    ) |> string
+    return RenderableText(mn.titles[i]; style = mn.inactive_style, width = width) |> string
 end
 
 function frame(mn::SimpleMenu; kwargs...)
@@ -131,14 +124,15 @@ function frame(mn::SimpleMenu; kwargs...)
     m = mn.internals.measure
     max_titles_width =
         mn.layout == :vertical ?
-        min(m.w, maximum(get_width.(titles)) + textwidth(active_symbol) + 1) : 
-        m.w
+        min(m.w, maximum(get_width.(titles)) + textwidth(active_symbol) + 1) : m.w
 
     # make and stack title
     titles = map(
-            i -> i == mn.active ? active_title(mn, i, max_titles_width) : inactive_title(mn, i, max_titles_width),
-            1:length(titles),
-        )
+        i ->
+            i == mn.active ? active_title(mn, i, max_titles_width) :
+            inactive_title(mn, i, max_titles_width),
+        1:length(titles),
+    )
     return if mn.layout == :vertical
         vstack(titles...)
     else
@@ -166,7 +160,7 @@ Styling reflects which option is currently selected
 
     function ButtonsMenu(
         titles::Vector;
-        controls::Union{Nothing, AbstractDict} = nothing,
+        controls::Union{Nothing,AbstractDict} = nothing,
         width::Int = console_width(),
         active_color::Union{Vector,String} = "black",
         active_background::Union{Vector,String} = "white",
@@ -179,9 +173,9 @@ Styling reflects which option is currently selected
         on_deactivated::Function = on_deactivated,
         panel_kwargs...,
     )
-
-        controls = something(controls,
-            layout == :vertical ? vert_menu_controls : hor_menu_controls
+        controls = something(
+            controls,
+            layout == :vertical ? vert_menu_controls : hor_menu_controls,
         )
 
         # get parameters for each button
@@ -200,8 +194,6 @@ Styling reflects which option is currently selected
         @assert length(inactive_color) == n "Incorrect number of values for `inactive_color`"
         @assert length(inactive_background) == n "Incorrect number of values for `inactive_background`"
 
-
-
         measure = if layout == :vertical
             Measure(something(height, length(titles)), width)
         else
@@ -210,9 +202,7 @@ Styling reflects which option is currently selected
         end
 
         return new(
-            WidgetInternals(
-                measure, nothing,
-                on_draw, on_activated, on_deactivated, false),
+            WidgetInternals(measure, nothing, on_draw, on_activated, on_deactivated, false),
             controls,
             titles,
             active_color,
@@ -222,7 +212,7 @@ Styling reflects which option is currently selected
             length(titles),
             1,
             layout,
-            panel_kwargs
+            panel_kwargs,
         )
     end
 end
@@ -244,7 +234,7 @@ function active_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kw
         justify = get(panel_kwargs, :justify, :center),
         box = get(panel_kwargs, :box, :SQUARE),
         height = height,
-        panel_kwargs...
+        panel_kwargs...,
     )
 end
 
@@ -265,7 +255,7 @@ function inactive_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_
         justify = get(panel_kwargs, :justify, :center),
         box = get(panel_kwargs, :box, :SQUARE),
         height = height,
-        panel_kwargs...
+        panel_kwargs...,
     )
 end
 
@@ -276,9 +266,12 @@ function frame(mn::ButtonsMenu; kwargs...)
 
     # make and stack title
     titles = map(
-            i -> i == mn.active ? active_title(mn, i, button_width, button_height; mn.panel_kwargs...) : inactive_title(mn, i, button_width, button_height; mn.panel_kwargs...),
-            1:(mn.n_titles),
-        )
+        i ->
+            i == mn.active ?
+            active_title(mn, i, button_width, button_height; mn.panel_kwargs...) :
+            inactive_title(mn, i, button_width, button_height; mn.panel_kwargs...),
+        1:(mn.n_titles),
+    )
     return if mn.layout == :vertical
         vstack(titles...)
     else
@@ -328,7 +321,6 @@ function multi_select_toggle(mn::MultiSelectMenu, ::SpaceBar)
     end
 end
 
-
 multi_select_controls = Dict(
     ArrowDown() => menu_activate_next,
     ArrowUp() => menu_activate_prev,
@@ -337,7 +329,6 @@ multi_select_controls = Dict(
     Esc() => quit,
     'q' => quit,
 )
-
 
 function MultiSelectMenu(
     options::Vector;
@@ -356,8 +347,12 @@ function MultiSelectMenu(
 
     MultiSelectMenu(
         WidgetInternals(
-            Measure(length(options), width), nothing,
-            on_draw, on_activated, on_deactivated, false
+            Measure(length(options), width),
+            nothing,
+            on_draw,
+            on_activated,
+            on_deactivated,
+            false,
         ),
         controls,
         options,
@@ -372,8 +367,7 @@ function MultiSelectMenu(
     )
 end
 
-
-function make_option(mn::MultiSelectMenu, i::Int, isactive::Bool, isselected::Bool) 
+function make_option(mn::MultiSelectMenu, i::Int, isactive::Bool, isselected::Bool)
     sym = isselected ? mn.selected_sym : mn.notselected_sym
     style = isactive ? mn.active_style : mn.inactive_style
 

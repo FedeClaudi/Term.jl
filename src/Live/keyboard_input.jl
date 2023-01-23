@@ -9,18 +9,17 @@ function keyboard_input(widget::AbstractWidget)
     controls = widget.controls
     if bytesavailable(terminal.in_stream) > 0
         # get input
-        c = readkey(terminal.in_stream) 
+        c = readkey(terminal.in_stream)
         c = haskey(KEYs, Int(c)) ? KEYs[Int(c)] : Char(c)
 
         # see if a control has been defined for this key
-        haskey(controls, c) &&  return controls[c](widget, c)
+        haskey(controls, c) && return controls[c](widget, c)
 
         # see if we can just pass any character
-        c isa Char && haskey(controls, Char) &&  return controls[Char](widget, c)
+        c isa Char && haskey(controls, Char) && return controls[Char](widget, c)
     end
     return []
 end
-
 
 """
     keyboard_input(widget::AbstractWidgetContainer) 
@@ -31,7 +30,7 @@ function keyboard_input(widget::AbstractWidgetContainer)
     retvals = []
     if bytesavailable(terminal.in_stream) > 0
         # get input
-        c = readkey(terminal.in_stream) 
+        c = readkey(terminal.in_stream)
         c = haskey(KEYs, Int(c)) ? KEYs[Int(c)] : Char(c) # ::Union{Char, KeyInput}
 
         # execute command on each subwidget
@@ -61,4 +60,3 @@ function keyboard_input(widget::AbstractWidgetContainer)
     end
     return retvals
 end
-

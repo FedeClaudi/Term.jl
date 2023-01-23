@@ -18,30 +18,29 @@ function get_docstring(obj)
     return doc, unescape_brackets(docstring)
 end
 
-
-
-
 """
     get_methods_with_docstrings(obj::Union{Union, DataType, Function})
 
 Get the docstring for each method for an object (function/datatype).
 """
-function get_methods_with_docstrings(obj::Union{Union, DataType, Function})::Tuple{Vector, Vector}
+function get_methods_with_docstrings(
+    obj::Union{Union,DataType,Function},
+)::Tuple{Vector,Vector}
     # get the parent module and the methods list for the object
     mod = parentmodule(obj)
     mm = methods(obj)
 
     # get the module's multidoc
-    binding = Binding(mod, Symbol(obj))    
+    binding = Binding(mod, Symbol(obj))
     dict = meta(mod)
     multidoc = dict[binding]
-    
+
     # for each module, attempt to get the docstring as markdown
     docstrings = []
     for m in mm
         # cleanup signature
         sig = length(m.sig.types) == 1 ? Tuple{} : Tuple{m.sig.types[2:end]...}
-        
+
         haskey(multidoc.docs, sig) || begin
             push!(docstrings, nothing)
             continue

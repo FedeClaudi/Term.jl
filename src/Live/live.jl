@@ -28,7 +28,19 @@ export SimpleMenu, ButtonsMenu, MultiSelectMenu
 export InputBox, TextWidget, Button, ToggleButton
 export Gallery
 export App
-export ArrowDown, ArrowUp, ArrowLeft, ArrowRight, DelKey, HomeKey, EndKey, PageUpKey, PageDownKey, Enter, SpaceBar, Esc, Del
+export ArrowDown,
+    ArrowUp,
+    ArrowLeft,
+    ArrowRight,
+    DelKey,
+    HomeKey,
+    EndKey,
+    PageUpKey,
+    PageDownKey,
+    Enter,
+    SpaceBar,
+    Esc,
+    Del
 
 const LIVE_DEBUG = Ref(false)
 
@@ -65,8 +77,6 @@ KEYs = Dict{Int,KeyInput}(
     1008 => PageDownKey(),
 )
 
-
-
 # ------------------------------- base widgets ------------------------------- #
 include("abstract_widget.jl")
 include("help.jl")
@@ -79,7 +89,6 @@ include("menus.jl")
 include("abstract_container.jl")
 include("gallery.jl")
 include("app.jl")
-
 
 include("keyboard_input.jl")
 

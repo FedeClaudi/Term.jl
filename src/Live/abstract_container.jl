@@ -14,7 +14,7 @@ Set the parent of all widgets in `container` to `container`.
 """
 set_as_parent(container::AbstractWidgetContainer) = map(
     w -> w.internals.parent = container,
-    (container.widgets isa AbstractDict ? values(container.widgets) : container.widgets)
+    (container.widgets isa AbstractDict ? values(container.widgets) : container.widgets),
 )
 
 """

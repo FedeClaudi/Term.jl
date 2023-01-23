@@ -17,7 +17,8 @@ These are the steps:
 using Term
 using Term.LiveWidgets
 using Term.Consoles
-import Term.LiveWidgets: AbstractWidget, KeyInput, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, set_active
+import Term.LiveWidgets:
+    AbstractWidget, KeyInput, ArrowRight, ArrowLeft, ArrowUp, ArrowDown, set_active
 import OrderedCollections: OrderedDict
 import Term: apply_style
 using Term.Compositors
@@ -26,27 +27,11 @@ using Term.Compositors
 # create some widgets
 rgb_visualizer = TextWidget("")
 
-R = InputBox(
-    title = "R value",
-    style = "red",
-    title_justify = :center,
-)
-G = InputBox(
-    title = "G value",
-    style = "green",
-    title_justify = :center,
-)
-B = InputBox(
-    title = "B value",
-    style = "blue",
-    title_justify = :center,
-)
+R = InputBox(title = "R value", style = "red", title_justify = :center)
+G = InputBox(title = "G value", style = "green", title_justify = :center)
+B = InputBox(title = "B value", style = "blue", title_justify = :center)
 
-button = Button(
-    "random";
-    color = "light_slate_grey",
-    text_color = "white",
-)
+button = Button("random"; color = "light_slate_grey", text_color = "white")
 
 widgets = OrderedDict{Symbol,AbstractWidget}(
     :A => rgb_visualizer,
@@ -58,25 +43,10 @@ widgets = OrderedDict{Symbol,AbstractWidget}(
 
 # create transition rules
 transition_rules = OrderedDict(
-    ArrowRight() => Dict(
-        :A => :R,
-    ),
-    ArrowLeft() => Dict(
-        :R => :A,
-        :G => :A,
-        :B => :A,
-        :b => :A,
-    ),
-    ArrowDown() => Dict(
-        :R => :G,
-        :G => :B,
-        :B => :b,
-    ),
-    ArrowUp() => Dict(
-        :b => :B,
-        :B => :G,
-        :G => :R,
-    ),
+    ArrowRight() => Dict(:A => :R),
+    ArrowLeft() => Dict(:R => :A, :G => :A, :B => :A, :b => :A),
+    ArrowDown() => Dict(:R => :G, :G => :B, :B => :b),
+    ArrowUp() => Dict(:b => :B, :B => :G, :G => :R),
 )
 
 # --------------------------------- functions -------------------------------- #
@@ -102,7 +72,10 @@ function update_visualizer(app::App)
 
     viz.text =
         "(r:$r, g:$g, b:$b)" / apply_style(
-            join(repeat([" "^(viz.internals.measure.w-4)], viz.internals.measure.h), "\n"),
+            join(
+                repeat([" "^(viz.internals.measure.w - 4)], viz.internals.measure.h),
+                "\n",
+            ),
             "on_($r, $g, $b)",
         )
 end
@@ -116,21 +89,17 @@ end
 # ------------------------------------ run ----------------------------------- #
 # create app and visualize
 layout = :(A(22, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(4, 0.6)))
-app = App(layout;
-    widgets = widgets, 
+app = App(
+    layout;
+    widgets = widgets,
     # transition_rules = transition_rules,
     on_draw = update_visualizer,
-    )
+)
 
 button.callback = set_random_color
 
 play(app);
 
-
 # TODO on highlight stuff
-
-
-
-
 
 nothing

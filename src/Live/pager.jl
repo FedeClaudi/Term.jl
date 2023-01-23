@@ -9,37 +9,36 @@ using keys such as arrow up and arrow down.
     controls::AbstractDict
     text::AbstractString
     content::Vector{String}
-    title::Union{Nothing, String}
+    title::Union{Nothing,String}
     line_numbers::Bool
     tot_lines::Int
     curr_line::Int
     page_lines::Int
 end
 
-
-
 # --------------------------------- controls --------------------------------- #
 """
 move to the next line
 """
-next_line(p::Pager, ::Union{Char, ArrowDown}) = p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + 1)
+next_line(p::Pager, ::Union{Char,ArrowDown}) =
+    p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + 1)
 
 """
 move to the previous line
 """
-prev_line(p::Pager, ::Union{Char, ArrowUp}) = p.curr_line = max(1, p.curr_line - 1)
+prev_line(p::Pager, ::Union{Char,ArrowUp}) = p.curr_line = max(1, p.curr_line - 1)
 
 """
 move to the next page
 """
-next_page(p::Pager, ::Union{PageDownKey, ArrowRight, Char}) = p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + p.page_lines)
-
+next_page(p::Pager, ::Union{PageDownKey,ArrowRight,Char}) =
+    p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + p.page_lines)
 
 """
 move to the previous page
 """
-prev_page(p::Pager, ::Union{PageUpKey, ArrowLeft, Char}) = p.curr_line = max(1, p.curr_line - p.page_lines)
-
+prev_page(p::Pager, ::Union{PageUpKey,ArrowLeft,Char}) =
+    p.curr_line = max(1, p.curr_line - p.page_lines)
 
 """
 move to first line
@@ -50,8 +49,6 @@ home(p::Pager, ::HomeKey) = p.curr_line = 1
 move to the last line
 """
 toend(p::Pager, ::EndKey) = p.curr_line = p.tot_lines - p.page_lines
-
-
 
 pager_controls = Dict(
     ArrowRight() => next_page,
@@ -68,13 +65,16 @@ pager_controls = Dict(
     'q' => quit,
 )
 
-
 """
     reshape_pager_content(content::AbstractString, line_numbers::Bool)::Vector{string}
 
 Turns a text into a vector of lines with the right size (and optionally line numbers)
 """
-function reshape_pager_content(content::AbstractString, line_numbers::Bool, width::Int)::Vector{String}
+function reshape_pager_content(
+    content::AbstractString,
+    line_numbers::Bool,
+    width::Int,
+)::Vector{String}
     reshaped_content = if line_numbers == true
         join(
             map(iln -> "{dim}$(iln[1])  {/dim}" * iln[2], enumerate(split(content, "\n"))),
@@ -90,25 +90,27 @@ function reshape_pager_content(content::AbstractString, line_numbers::Bool, widt
 
 end
 
-
-
 function Pager(
     text::String;
     controls::AbstractDict = pager_controls,
     height = 30,
-    width=console_width(),
-    title::Union{Nothing, String} = nothing,
+    width = console_width(),
+    title::Union{Nothing,String} = nothing,
     line_numbers::Bool = false,
     on_draw::Union{Nothing,Function} = nothing,
     on_activated::Function = on_activated,
     on_deactivated::Function = on_deactivated,
 )
-
     content = reshape_pager_content(text, line_numbers, width)
     return Pager(
         WidgetInternals(
-            Measure(height, width), nothing,
-            on_draw, on_activated, on_deactivated, false),
+            Measure(height, width),
+            nothing,
+            on_draw,
+            on_activated,
+            on_deactivated,
+            false,
+        ),
         controls,
         text,
         content,
@@ -157,27 +159,19 @@ function make_scrollbar(pager, i, Δi)
     p = (i) / (pager.tot_lines - Δi)  # progress in the file
     scrollbar_center = p * (page_lines) |> round |> Int
     nspaces_above = max(0, scrollbar_center - scrollbar_lines_half) |> round |> Int
-    nspaces_below =
-        max(0, page_lines - scrollbar_lines - nspaces_above) |> round |> Int
+    nspaces_below = max(0, page_lines - scrollbar_lines - nspaces_above) |> round |> Int
 
     if nspaces_above == 0
-        below = RenderableText(
-            join(repeat([" \n"], nspaces_below + 1));
-            style = "on_gray23",
-        )
+        below =
+            RenderableText(join(repeat([" \n"], nspaces_below + 1)); style = "on_gray23")
         return scrollbar / below
     elseif nspaces_below == 0
-        above = RenderableText(
-            join(repeat([" \n"], nspaces_above + 1));
-            style = "on_gray23",
-        )
+        above =
+            RenderableText(join(repeat([" \n"], nspaces_above + 1)); style = "on_gray23")
         return above / scrollbar
     else
         above = RenderableText(join(repeat([" \n"], nspaces_above)); style = "on_gray23")
-        below = RenderableText(
-            join(repeat([" \n"], nspaces_below));
-            style = "on_gray23",
-        )
+        below = RenderableText(join(repeat([" \n"], nspaces_below)); style = "on_gray23")
         return above / scrollbar / below
     end
 end
@@ -187,7 +181,6 @@ function make_page(pager, i, Δi)
     scrollbar = make_scrollbar(pager, i, Δi)
     return page_content * scrollbar
 end
-
 
 """
     frame(pager::Pager)::AbstractRenderable
@@ -218,4 +211,3 @@ function frame(pager::Pager; omit_panel = false)::AbstractRenderable
         title_style = "bold white",
     )
 end
-

@@ -721,7 +721,8 @@ function hLine(
         text *
         _pad *
         get_rrow(box, rw - tr, :top; with_right = false) *
-        "{/$style}{/$style}"* "\e[0m"
+        "{/$style}{/$style}" *
+        "\e[0m"
 
     return hLine([Segment(line)], Measure(1, width))
 end
