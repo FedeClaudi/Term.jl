@@ -40,22 +40,8 @@ hor_menu_controls = Dict(
     'h' => toggle_help,
 )
 
-# ----------------------------------- frame ---------------------------------- #
-"""
-Render the current state of a menu widget.
-"""
-function frame(mn::AbstractMenu; kwargs...)
-    isnothing(mn.on_draw) || mn.on_draw(mn)
-
-    titles = map(
-        i -> i == mn.active ? mn.active_titles[i] : mn.inactive_titles[i],
-        1:(mn.n_titles),
-    )
-    return if mn.layout == :vertical
-        vstack(titles...)
-    else
-        hstack(titles...)
-    end
+function on_layout_change(mn::AbstractMenu, m::Measure)
+    mn.internals.measure = m
 end
 
 # ---------------------------------------------------------------------------- #
@@ -69,9 +55,10 @@ The currently selected option is highlighted with a different style.
 @with_repr mutable struct SimpleMenu <: AbstractMenu
     internals::WidgetInternals
     controls::AbstractDict
-    active_titles::Vector{String}
-    inactive_titles::Vector{String}
+    titles::Vector{String}
     n_titles::Int
+    active_style::String
+    inactive_style::String
     active::Int
     layout::Symbol
 
@@ -81,7 +68,6 @@ The currently selected option is highlighted with a different style.
         width = default_width(),
         active_style::String = "white bold",
         inactive_style::String = "dim",
-        active_symbol = "❯",
         layout::Symbol = :vertical,
         on_draw::Union{Nothing,Function} = nothing,
         on_activated::Function = on_activated,
@@ -92,34 +78,6 @@ The currently selected option is highlighted with a different style.
             layout == :vertical ? vert_menu_controls : hor_menu_controls
         )
 
-        max_titles_width =
-            layout == :vertical ?
-            min(width, maximum(get_width.(titles)) + textwidth(active_symbol) + 1) : width
-
-        active_titles =
-            map(
-                t -> RenderableText(
-                    active_symbol * " " * t;
-                    style = active_style,
-                    width = max_titles_width,
-                ),
-                titles,
-            ) .|>
-            string |>
-            collect
-
-        inactive_titles =
-            map(
-                t -> RenderableText(
-                    " "^(textwidth(active_symbol) + 1) * t;
-                    style = inactive_style,
-                    width = max_titles_width,
-                ),
-                titles,
-            ) .|>
-            string |>
-            collect
-
         return new(
             WidgetInternals(
                 Measure(length(titles), width),
@@ -127,12 +85,54 @@ The currently selected option is highlighted with a different style.
                 on_draw, on_activated, on_deactivated, false
             ),
             controls,
-            active_titles,
-            inactive_titles,
+            titles,
             length(titles),
+            active_style,
+            inactive_style,
             1,
             layout,
         )
+    end
+end
+
+
+
+function active_title(mn::SimpleMenu, i::Int, width::Int)
+    return RenderableText(
+        mn.titles[i];
+        style = mn.active_style,
+        width = width,
+    ) |> string
+end
+
+function inactive_title(mn::SimpleMenu, i::Int, width::Int)
+    return RenderableText(
+        mn.titles[i];
+        style = mn.inactive_style,
+        width = width,
+    ) |> string
+end
+
+function frame(mn::SimpleMenu; kwargs...)
+    active_symbol = "❯"
+    titles = mn.titles
+
+    # get size
+    m = mn.internals.measure
+    max_titles_width =
+        mn.layout == :vertical ?
+        min(m.w, maximum(get_width.(titles)) + textwidth(active_symbol) + 1) : 
+        m.w
+
+    # make and stack title
+    titles = map(
+            i -> i == mn.active ? active_title(mn, i, max_titles_width) : inactive_title(mn, i, max_titles_width),
+            1:length(titles),
+        )
+    return if mn.layout == :vertical
+        vstack(titles...)
+    else
+        hstack(titles...)
     end
 end
 
@@ -144,11 +144,15 @@ Styling reflects which option is currently selected
 @with_repr mutable struct ButtonsMenu <: AbstractMenu
     internals::WidgetInternals
     controls::AbstractDict
-    active_titles::Vector{String}
-    inactive_titles::Vector{String}
+    titles::Vector{String}
+    active_style::Vector
+    inactive_style::Vector
+    active_background::Vector
+    inactive_background::Vector
     n_titles::Int
     active::Int
     layout::Symbol
+    panel_kwargs
 
     function ButtonsMenu(
         titles::Vector;
@@ -158,10 +162,8 @@ Styling reflects which option is currently selected
         active_background::Union{Vector,String} = "white",
         inactive_color::Union{Vector,String} = "dim",
         inactive_background::Union{Vector,String} = "default",
-        justify::Symbol = :center,
-        box::Symbol = :SQUARE,
         layout::Symbol = :vertical,
-        height::Union{Nothing,Int} = nothing,
+        height::Union{Nothing,Int} = length(titles),
         on_draw::Union{Nothing,Function} = nothing,
         on_activated::Function = on_activated,
         on_deactivated::Function = on_deactivated,
@@ -188,49 +190,12 @@ Styling reflects which option is currently selected
         @assert length(inactive_color) == n "Incorrect number of values for `inactive_color`"
         @assert length(inactive_background) == n "Incorrect number of values for `inactive_background`"
 
-        # make a panel for each button
-        active_titles, inactive_titles = Panel[], Panel[]
-        button_width = layout == :vertical ? width : fint(width / n)
-        button_height = layout == :vertical ? fint(height / n) : height
 
-        for (i, t) in enumerate(titles)
-            push!(
-                active_titles,
-                Panel(
-                    "{$(active_color[i]) on_$(active_background[i])}" *
-                    t *
-                    "{/$(active_color[i]) on_$(active_background[i])}";
-                    background = active_background[i],
-                    style = "$(active_color[i]) on_$(active_background[i])",
-                    width = button_width,
-                    justify = justify,
-                    box = box,
-                    height = button_height,
-                    panel_kwargs...
-                ),
-            )
-
-            push!(
-                inactive_titles,
-                Panel(
-                    "{$(inactive_color[i]) on_$(inactive_background[i])}" *
-                    t *
-                    "{/$(inactive_color[i]) on_$(inactive_background[i])}";
-                    background = inactive_background[i],
-                    style = inactive_color[i],
-                    width = button_width,
-                    justify = justify,
-                    box = box,
-                    height = button_height,
-                    panel_kwargs...
-                ),
-            )
-        end
 
         measure = if layout == :vertical
             Measure(something(height, length(titles)), width)
         else
-            hmax = maximum(map(p -> p.measure.h, inactive_titles))
+            hmax = layout == :vertical ? fint(height / n) : height
             Measure(something(height, hmax), width)
         end
 
@@ -239,12 +204,65 @@ Styling reflects which option is currently selected
                 measure, nothing,
                 on_draw, on_activated, on_deactivated, false),
             controls,
-            string.(active_titles),
-            string.(inactive_titles),
+            titles,
+            active_color,
+            inactive_color,
+            active_background,
+            inactive_background,
             length(titles),
             1,
             layout,
+            panel_kwargs
         )
+    end
+end
+
+function active_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kwargs...)
+    active_color, active_background = mn.active_style[i], mn.active_background[i]
+    return Panel(
+        "{$(active_color) on_$(active_background)}" *
+        mn.titles[i] *
+        "{/$(active_color) on_$(active_background)}";
+        background = active_background,
+        style = "$(active_color) on_$(active_background)",
+        width = width,
+        justify = get(panel_kwargs, :justify, :center),
+        box = get(panel_kwargs, :box, :SQUARE),
+        height = height,
+        panel_kwargs...
+    )
+end
+
+function inactive_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kwargs...)
+    inactive_color, inactive_background = mn.inactive_style[i], mn.inactive_background[i]
+    return Panel(
+        "{$(inactive_color) on_$(inactive_background)}" *
+        mn.titles[i] *
+        "{/$(inactive_color) on_$(inactive_background)}";
+        background = inactive_background,
+        style = inactive_color,
+        width = width,
+        justify = get(panel_kwargs, :justify, :center),
+        box = get(panel_kwargs, :box, :SQUARE),
+        height = height,
+        panel_kwargs...
+    )
+end
+
+function frame(mn::ButtonsMenu; kwargs...)
+    m, n = mn.internals.measure, mn.n_titles
+    button_width = mn.layout == :vertical ? m.w : fint(m.w / n)
+    button_height = mn.layout == :vertical ? fint(m.h / n) : m.h
+
+    # make and stack title
+    titles = map(
+            i -> i == mn.active ? active_title(mn, i, button_width, button_height; mn.panel_kwargs...) : inactive_title(mn, i, button_width, button_height; mn.panel_kwargs...),
+            1:(mn.n_titles),
+        )
+    return if mn.layout == :vertical
+        vstack(titles...)
+    else
+        hstack(titles...)
     end
 end
 
@@ -330,19 +348,19 @@ function MultiSelectMenu(
 end
 
 
+function make_option(mn::MultiSelectMenu, i::Int, isactive::Bool, isselected::Bool) 
+    sym = isselected ? mn.selected_sym : mn.notselected_sym
+    style = isactive ? mn.active_style : mn.inactive_style
+
+    return RenderableText(
+        sym * "{$style}" * mn.options[i] * "{/$style}";
+        width = mn.options_width,
+    )
+end
+
 function frame(mn::MultiSelectMenu; kwargs...)
-    isnothing(mn.on_draw) || mn.on_draw(mn)
+    isnothing(mn.internals.on_draw) || mn.internals.on_draw(mn)
 
-    make_option(i::Int, isactive::Bool, isselected::Bool) = begin
-        sym = isselected ? mn.selected_sym : mn.notselected_sym
-        style = isactive ? mn.active_style : mn.inactive_style
-
-        RenderableText(
-            sym * "{$style}" * mn.options[i] * "{/$style}";
-            width = mn.options_width,
-        )
-    end
-
-    options = map(i -> make_option(i, i == mn.active, i ∈ mn.selected), 1:(mn.n_titles))
+    options = map(i -> make_option(mn, i, i == mn.active, i ∈ mn.selected), 1:(mn.n_titles))
     return vstack(options)
 end

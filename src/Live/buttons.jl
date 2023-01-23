@@ -24,57 +24,8 @@ button_controls = Dict(
 )
 
 
-"""
-    make_buttons_panels(
-        pressed_text_style,
-        pressed_background,
-        not_pressed_text_style,
-        width,
-        height,
-    )
-
-Create styled `Panel`s to visualize active/inactive buttons
-"""
-function make_buttons_panels(
-    message,
-    pressed_text_style,
-    pressed_background,
-    not_pressed_text_style,
-    height,
-    width;
-    kwargs...,
-)
-    pressed = Panel(
-        "{$pressed_text_style on_$pressed_background}" *
-        message *
-        "{/$pressed_text_style on_$pressed_background}";
-        style = pressed_text_style * " on_$pressed_background",
-        width = width,
-        height = height,
-        justify = :center,
-        background = pressed_background,
-        kwargs...,
-    )
-
-    not_pressed = Panel(
-        "{$not_pressed_text_style}" * message * "{/$not_pressed_text_style}";
-        style = not_pressed_text_style,
-        width = width,
-        height = height,
-        justify = :center,
-        kwargs...,
-    )
-
-    return pressed, not_pressed
-end
-
-
 function on_layout_change(b::AbstractButton, m::Measure)
-    pressed, not_pressed = make_buttons_panels(b.style_args..., m.h, m.w; b.style_kwargs...)
-    
-    b.pressed_display = pressed
-    b.not_pressed_display = not_pressed
-    b.measure = m
+    b.internals.measure = m
 end
 
 
@@ -86,21 +37,20 @@ end
 @with_repr mutable struct Button <: AbstractButton
     internals::WidgetInternals
     controls::AbstractDict
-    pressed_display::Panel
-    not_pressed_display::Panel
+    message::String
     status::Symbol
     callback::Union{Nothing,Function}
     lastpressed::Int
-    style_args
-    style_kwargs
+    color::String
+    text_color::String
+    kwargs
 end
 
 function Button(
     message::String;
     controls::AbstractDict = button_controls,
-    pressed_text_style = "bold white",
-    pressed_background = "red",
-    not_pressed_text_style = "red",
+    text_color = "bold white",
+    color = "red",
     on_draw::Union{Nothing,Function} = nothing,
     on_activated::Function = on_activated,
     on_deactivated::Function = on_deactivated,
@@ -112,34 +62,66 @@ function Button(
             Measure(), nothing,
             on_draw, on_activated, on_deactivated, false),
         controls,
-        Panel(),  # place holders
-        Panel(),
+        message,
         :not_pressed,
         nothing,
         0,
-        (message, pressed_text_style, pressed_background, not_pressed_text_style),
+        color,
+        text_color,
         kwargs
     )
 end
 
 
+function make_button_panel(message, color, text_color, pressed, active, w, h; kwargs...)
+    if pressed == :active
+        style = "$(text_color) on_$(color)"
+        background = color
+    else
+        style = active ? color : "dim $color"
+        background = ""
+    end
+
+
+    return Panel(
+        "{$text_color on_$(background)}$message{/$text_color on_$(background)}",
+        style = style,
+        width = w,
+        height = h,
+        justify = get(kwargs, :justify, :center),
+        background = background,
+        kwargs...
+    )
+end
+
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::Button; kwargs...)
-    isnothing(b.on_draw) || b.on_draw(b)
+    isnothing(b.internals.on_draw) || b.internals.on_draw(b)
 
-    return if b.status == :pressed
+    status = if b.status == :pressed
         currtime = Dates.value(now())
 
         if currtime - b.lastpressed > 100
             b.status = :not_pressed
-            b.not_pressed_display
+            :inactive
         else
-            b.pressed_display
+            :active
         end
     else
-        b.not_pressed_display
+        :inactive
     end
+
+    return make_button_panel(
+        b.message,
+        b.color,
+        b.text_color,
+        status,
+        isactive(b),
+        b.internals.measure.w,
+        b.internals.measure.h;
+        kwargs...
+    )
 end
 
 # ---------------------------------------------------------------------------- #
@@ -153,49 +135,59 @@ activated and not.
 @with_repr mutable struct ToggleButton <: AbstractButton
     internals::WidgetInternals
     controls::AbstractDict
-    pressed_display::Panel
-    not_pressed_display::Panel
+    message::String
     status::Symbol
     callback::Union{Nothing,Function}
     lastpressed::Int
-    style_args
-    style_kwargs
+    color::String
+    text_color::String
+    kwargs
 end
 
 function ToggleButton(
     message::String;
     controls::AbstractDict = button_controls,
-    pressed_text_style = "bold white",
-    pressed_background = "red",
-    not_pressed_text_style = "red",
+    text_color = "bold white",
+    color = "red",
     on_draw::Union{Nothing,Function} = nothing,
     on_activated::Function = on_activated,
     on_deactivated::Function = on_deactivated,
     kwargs...,
 )
 
-    return ToggleButton(
-        WidgetInternals(
-            Measure(), nothing,
-            on_draw, on_activated, on_deactivated, false),
-        controls,
-        Panel(),
-        Panel(),
-        :not_pressed,
-        nothing,
-        0,
-        (message, pressed_text_style, pressed_background, not_pressed_text_style),
-        kwargs
-    )
+return Button(
+    WidgetInternals(
+        Measure(), nothing,
+        on_draw, on_activated, on_deactivated, false),
+    controls,
+    message,
+    :not_pressed,
+    nothing,
+    0,
+    color,
+    text_color,
+    kwargs
+)
 end
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(b::ToggleButton; kwargs...)
-    isnothing(b.on_draw) || b.on_draw(b)
+    isnothing(b.internals.on_draw) || b.internals.on_draw(b)
 
-    return if b.status == :pressed
-        b.pressed_display
+    status = if b.status == :pressed
+        :active
     else
-        b.not_pressed_display
+        :inactive
     end
+
+    return make_button_panel(
+        b.message,
+        b.color,
+        b.text_color,
+        status,
+        isactive(b),
+        b.internals.measure.w,
+        b.internals.measure.h;
+        kwargs...
+    )
 end

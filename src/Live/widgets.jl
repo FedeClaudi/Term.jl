@@ -32,16 +32,16 @@ TextWidget(
     controls = text_widget_controls,
     kwargs...
 ) = TextWidget(
-    internals(
+    WidgetInternals(
         Measure(Measure(text).h, console_width()),
         nothing, on_draw, on_activated, on_deactivated, false
     ), 
     controls, 
     text, as_panel, 
-    kwargs
+    Dict(kwargs)
 )
 
-on_layout_change(t::TextWidget, m::Measure) = t.measure = m
+on_layout_change(t::TextWidget, m::Measure) = t.internals.measure = m
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(tw::TextWidget; kwargs...)
@@ -57,8 +57,15 @@ function frame(tw::TextWidget; kwargs...)
 
     txt = reshape_text(tw.text, measure.w - 4)
     lines = split(txt, "\n")
-    lines = lines[1:min(measure.h, length(lines))]
 
+    lines =  if isactive(tw)
+        [
+            lines[1:min(measure.h-1, length(lines))]...,
+            hLine(measure.w-4; style="bold white"),
+        ]
+    else
+    lines[1:min(measure.h, length(lines))]
+    end
     return RenderableText(join(lines, "\n"); width=measure.w-4)
 end
 
@@ -126,7 +133,7 @@ function InputBox(;
         )
 end
 
-on_layout_change(ib::InputBox, m::Measure) = ib.measure = m
+on_layout_change(ib::InputBox, m::Measure) = ib.internals.measure = m
 
 # ----------------------------------- frame ---------------------------------- #
 function frame(ib::InputBox; kwargs...)
@@ -144,10 +151,16 @@ function frame(ib::InputBox; kwargs...)
         ""
     end
 
+    kwargs = copy(ib.panel_kwargs)
+    
+    kwargs[:style] = get(ib.panel_kwargs, :style, "") * (isactive(ib) ? "" : " dim"
+)
     # get text to display
     text = isnothing(ib.input_text) ? "{dim}start typing...{/dim}" : ib.input_text * blinker
     measure = ib.internals.measure
-    return Panel(text; width = measure.w, height = measure.h, ib.panel_kwargs...)
+    return Panel(text; 
+            width = measure.w, height = measure.h, 
+            kwargs...)
 end
 
 

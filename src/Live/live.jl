@@ -9,7 +9,7 @@ import MyterialColors: Palette, blue, pink
 
 import MyterialColors: pink
 
-import Term: default_width, reshape_text, TERM_THEME, fint, reshape_code_string
+import Term: default_width, reshape_text, TERM_THEME, fint, reshape_code_string, remove_ansi
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Panels: Panel
 import ..Measures: Measure

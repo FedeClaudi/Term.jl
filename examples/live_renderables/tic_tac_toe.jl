@@ -4,6 +4,18 @@ using Term.Compositors
 import Term.LiveWidgets: Esc, quit, ArrowLeft, ArrowDown, ArrowRight, ArrowUp
 import Term.Style: apply_style
 
+"""
+More advanced example of how to build a function with 
+a bunch of additional functionality and customization
+compared to usual usage.
+
+The app allows the user to play tic tac toe and to read 
+some instructions about the game. The tic tac toe "gameborad"
+is made of cells. These cells gets highlighted when activated 
+and the user can choose to place an X or an O in the cell.
+"""
+
+# set layout with cells' 3x3 grid and a pager by the side
 h  = 9
 h2 = 3*h-1
 layout = :(
@@ -11,6 +23,12 @@ layout = :(
     (D($h, .15) * E($h, .15) * F($h, .15)) /
     (G($h, .15) * H($h, .15) * I($h, .15)) ) * Z($h2, .55)
 )
+
+
+"""
+The board's cells are TextWidgets, define some function
+to change the widget's text when the user draws and x or a o.
+"""
 
 """
 write a X made of multiple line of characters
@@ -29,20 +47,29 @@ oo      oo
  oo    oo
   oooooo"""     ; style="blue") |> string |> rstrip
 
-
+""" set widget's text"""
 set_text(widget, text) = if text == 'x'
     widget.text = x 
 else
     widget.text = o
 end
 
-function on_cell_highlighted(content)
-    content = apply_style(string(content), "on_gray23") |> RenderableText
+"""
+Define some functions to show when a cell is highlighted
+"""
+
+
+function on_cell_highlighted(cell)
+    cell.panel_kwargs[:style] = "whie on_gray23"
 end
 
-function on_cell_not_highlighted(content)
-    content = apply_style(string(content), "default") |> RenderableText
+function on_cell_not_highlighted(cell)
+    cell.panel_kwargs[:style] = "dim"
 end
+
+"""
+Define keyboard controls
+"""
 
 button_controls = Dict(
     'x' => set_text,
@@ -51,6 +78,9 @@ button_controls = Dict(
     Esc() => quit,
 )
 
+"""
+Create a widget for each cell
+"""
 
 widgets = Dict{Symbol, Any}(
     map(c -> c => TextWidget(""; controls=button_controls, as_panel=true,
@@ -109,6 +139,13 @@ has also made it a popular educational tool and a benchmark
 åproblem for artificial intelligence research.
 """)
 
+
+"""
+Define a custom set of transition rules
+to specify how to move between cells
+using keyboard controls.
+"""
+
 transition_rules = Dict(
     ArrowDown() => Dict(
         :A => :D,
@@ -148,7 +185,7 @@ transition_rules = Dict(
     ),
 )
 
-app = App(layout, widgets, transition_rules)
+app = App(layout; widgets=widgets, transition_rules=transition_rules)
 play(app; transient = false);
 
 

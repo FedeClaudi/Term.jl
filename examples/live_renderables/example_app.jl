@@ -44,8 +44,8 @@ B = InputBox(
 
 button = Button(
     "random";
-    pressed_background = "light_slate_grey",
-    not_pressed_text_style = "light_slate_grey",
+    color = "light_slate_grey",
+    text_color = "white",
 )
 
 widgets = OrderedDict{Symbol,AbstractWidget}(
@@ -102,7 +102,7 @@ function update_visualizer(app::App)
 
     viz.text =
         "(r:$r, g:$g, b:$b)" / apply_style(
-            join(repeat([" "^(viz.measure.w-4)], viz.measure.h), "\n"),
+            join(repeat([" "^(viz.internals.measure.w-4)], viz.internals.measure.h), "\n"),
             "on_($r, $g, $b)",
         )
 end
@@ -116,11 +116,10 @@ end
 # ------------------------------------ run ----------------------------------- #
 # create app and visualize
 layout = :(A(22, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(4, 0.6)))
-app = App(layout, widgets, 
-        transition_rules; 
-        on_draw = update_visualizer,
-        # width=200,
-        # expand=false,
+app = App(layout;
+    widgets = widgets, 
+    # transition_rules = transition_rules,
+    on_draw = update_visualizer,
     )
 
 button.callback = set_random_color
@@ -128,10 +127,10 @@ button.callback = set_random_color
 play(app);
 
 
+# TODO on highlight stuff
 
-# TODO app rescaling
-"""
-implement on_layout_change for all widgets
-"""
+
+
+
 
 nothing

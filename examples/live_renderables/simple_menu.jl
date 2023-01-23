@@ -2,7 +2,7 @@ using Term.LiveWidgets
 
 println("Please choose a menu type:")
 retval =
-    App(SimpleMenu(["Simple", "Buttons", "MultiSelect"])) |> LiveWidgets.play
+    App(SimpleMenu(["Simple", "Buttons", "MultiSelect"]); height=3) |> LiveWidgets.play
 print("\n\n")
 
 # get the selected menu style
@@ -24,6 +24,6 @@ elseif retval == 3
 end
 
 println("\nPlease choose an option:")
-retval = LiveWidgets.play(App(mn); transient = false)
+retval = LiveWidgets.play(App(mn; height=mn.internals.measure.h); transient = false)
 
 print("The menu returned the value: $retval")
