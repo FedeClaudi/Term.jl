@@ -69,7 +69,6 @@ function StacktraceContext(w = default_stacktrace_width())
     )
 end
 
-include("_error_messages.jl")
 include("_errors.jl")
 
 # ---------------------------------------------------------------------------- #
@@ -142,13 +141,10 @@ function install_term_stacktrace(;
 
                 # print message panel if VSCode is not handling that through a second call to this fn
                 (hasfield(typeof(io), :io) && isa(io.io, Base.TTY)) && begin
-                    msg = highlight(error_message(er)) |> apply_style
-                    # msg = replace(msg, RECURSIVE_OPEN_TAG_REGEX => "")
-                    msg = reshape_text(msg, ctx.module_line_w; ignore_markup = true)
-
+                    msg = highlight(sprint(Base.showerror, er)) |> apply_style
                     err_panel = Panel(
                         RenderableText(
-                            reshape_code_string(error_message(er), ctx.module_line_w);
+                            reshape_code_string(msg, ctx.module_line_w);
                             width = ctx.module_line_w,
                         );
                         width = ctx.out_w,

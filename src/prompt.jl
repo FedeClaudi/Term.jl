@@ -89,10 +89,12 @@ struct AnswerValidationError <: Exception
     err
 end
 
-Term.Errors.error_message(e::AnswerValidationError) =
+Base.showerror(io::IO, e::AnswerValidationError) = print(
+    io,
     highlight(
         "TypePrompt expected an answer of type: `$(e.expected_type)`, got `$(e.answer_type)` instead\nConversion to `$(e.expected_type)` failed because of: $(e.err)",
-    ) |> apply_style
+    ) |> apply_style,
+)
 
 # ---------------------------------------------------------------------------- #
 #                                    PROMPT                                    #

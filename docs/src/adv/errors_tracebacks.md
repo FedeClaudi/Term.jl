@@ -37,7 +37,7 @@ install_term_repr() # hide
 install_term_stacktrace(;
     reverse_backtrace = true,  # change me!
     max_n_frames = 30,
-    hide_frames = true,
+    hide_frames = false,
 )
 ```
 

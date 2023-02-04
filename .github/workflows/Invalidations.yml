@@ -1,8 +1,10 @@
 name: Invalidations
 
-on:
+on: 
   pull_request:
-
+    types:
+    - ready_for_review
+    
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: always.

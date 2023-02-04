@@ -48,8 +48,8 @@ default_stacktrace_width(io = stderr)::Int =
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
 # general utils
-include("__text_utils.jl")
 include("_ansi.jl")
+include("__text_utils.jl")
 include("_utils.jl")
 include("_text_reshape.jl")
 
@@ -159,7 +159,7 @@ Measures.Measure(segments::AbstractVector) =
     end
 
 # ---------------------------------- others ---------------------------------- #
-using .Errors: install_term_stacktrace
+using .Errors: install_term_stacktrace, render_backtrace, StacktraceContext
 
 using .Logs: install_term_logger, uninstall_term_logger, TermLogger
 
@@ -185,8 +185,5 @@ using .Grid
 
 using .Prompts
 
-using .Annotations: Annotation
-
-# include("__precompilation.jl")
-
+include("__precompilation.jl")
 end

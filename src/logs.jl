@@ -159,7 +159,7 @@ function style_log_msg_kw_value(logger, v::AbstractVector)
     _style = logger.theme.number
     _size = length(v)
     v = escape_brackets(string(v))
-    v = textlen(v) > 33 ? v[1:30] * "..." : v
+    v = textlen(v) > 60 ? v[1:57] * "..." : v
     v *= "\n {$(logger.theme.text)}$(_size) {/$(logger.theme.text)}{dim}items{/dim}"
     return (v, _style)
 end
@@ -266,7 +266,7 @@ function Logging.handle_message(
     """
 
     # function to reshape all content appropriately
-    w = min(120, (Int ∘ round)((console_width() - 6) / 5))   # six to allow space for vert and =
+    w = min(120, (Int ∘ round)((console_width() - 6) / 5) - 1)   # six to allow space for vert and =
     fmt_str(x, style; f = 1) = RenderableText(string(x); width = f * w - 1, style = style)
     fmt_str(::Function, style; f = 1) = RenderableText("Function"; style = style)
 
