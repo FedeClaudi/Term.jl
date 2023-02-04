@@ -2,6 +2,8 @@ using Term
 import Term.Tables: Table
 import Term.Layout: PlaceHolder
 
+install_term_stacktrace()
+
 """
     This is an example showing how to create tables in Term.jl
 

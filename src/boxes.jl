@@ -168,12 +168,14 @@ function get_title_row(
     justify::Symbol = :left,
 )::Segment
 
-    # if no title just return a r ow
-    if isnothing(title)
-        return Segment(get_row(box, width, row), style)
+    # if no title or no space, just return a row
+    if isnothing(title) || width < 12
+        return Segment("\e[0m{$style}" * get_row(box, width, row) * "{/$(style)}\e[0m")
     else
         title = apply_style(title)
-        title = textlen(title) < width - 8 ? title : str_trunc(title, width - 8)
+        title =
+            (textlen(title) < width - 12 || textlen(title) <= 4) ? title :
+            str_trunc(title, max(1, width - 15))
     end
 
     # compose title line 
@@ -181,30 +183,49 @@ function get_title_row(
 
     open, close, space = "{" * style * "}", "{/" * style * "}", " "
 
-    topen, tclose = "", open
+    topen, tclose = "\e[0m", open
     if !isnothing(title_style)
         topen, tclose = if style == "hidden"
-            "\e[28m" * topen, tclose * "\e[8m"
+            "\e[28m" * "{" * title_style * "}", "{/" * title_style * "}" * open * "\e[8m"
         else
             "{" * title_style * "}", "{/" * title_style * "}" * open
         end
     end
+
+    # get the title
     title = space * topen * title * tclose * space
-    if justify ≡ :left
-        line = open * boxline.left * boxline.mid^4 * title
-        line *= boxline.mid^(width - textlen(line) - 1) * boxline.right * close
-    elseif justify ≡ :right
-        pre_len = width - textlen(title) - 4
-        line = open * get_lrow(box, pre_len, row)
-        line *= title * boxline.mid^3 * boxline.right * close
-    else  # justify :center
-        tl, tr = get_lr_widths(textlen(title))
-        lw, rw = get_lr_widths(width)
-        line =
-            open * get_lrow(box, lw - tl, row) * title * get_rrow(box, rw - tr, row) * close
-        return Segment(line * "\e[0m")
+
+    # only add the title if the box is wide enough
+    if width < 6
+        line = open * boxline.left * boxline.mid^(width - 2) * boxline.right * close
+    else
+        # close the box
+        if justify ≡ :left
+            line = open * boxline.left * boxline.mid^4 * title
+
+            # check if the title is too long
+            if width - textlen(line) - 1 < 1
+                line = open * boxline.left * boxline.mid^2 * title
+            end
+
+            line *= boxline.mid^(max(1, width - textlen(line) - 1)) * boxline.right * close
+        elseif justify ≡ :right
+            pre_len = width - textlen(title) - 4
+            line = open * get_lrow(box, pre_len, row)
+            line *= title * boxline.mid^3 * boxline.right * close
+        else  # justify :center
+            tl, tr = get_lr_widths(textlen(title))
+            lw, rw = get_lr_widths(width)
+            line =
+                open *
+                get_lrow(box, lw - tl, row) *
+                title *
+                get_rrow(box, rw - tr, row) *
+                close
+            return Segment("\e[0m" * line * "\e[0m")
+        end
     end
-    return Segment(line * "\e[0m")
+    return Segment("\e[0m" * line * "\e[0m")
 end
 
 """

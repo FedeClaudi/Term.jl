@@ -1,0 +1,4 @@
+[38;2;242;215;119mTable[39m(data[38;2;206;147;216m::Matrix[39m{{Float64}};[0m
+kwargs[38;2;206;147;216m::Base.Pairs[39m{Symbol,[0m
+Union{{}}, Tuple{{}}, NamedTuple[0m
+{(), Tuple{{}}}})[0m

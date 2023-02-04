@@ -1,0 +1,15 @@
+Term.jl is a {#9558B2}Julia{/#9558B2} package for[0m
+creating styled terminal outputs.[0m
+[0m
+
+Term provides a simple {italic green4 bold}markup{/italic green4 bold}[0m
+{italic green4 bold}language{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline}[0m
+to your text.[0m
+More complicated text layout[0m
+can be created using {red}"Renderable"{/red}[0m
+{red}{/red} objects such[0m
+as {red}"Panel"{/red} and {red}"TextBox"{/red}.
+These can also be nested and[0m
+stacked to create {italic pink3}fancy{/italic pink3} and[0m
+{underline}informative{/underline} terminal ouputs[0m
+for your Julia code[0m

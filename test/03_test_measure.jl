@@ -36,6 +36,7 @@ end
     w = h = 5
     p = Panel(width = w, height = h)
     @test height(p) == h
+    @test height(string(p)) == h
     @test width(p) == w
 
     s = first(p.segments)

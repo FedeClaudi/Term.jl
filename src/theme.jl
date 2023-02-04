@@ -24,6 +24,7 @@ style outputs to terminal.
     number::String         = blue_light
     operator::String       = red
     func::String           = "#f2d777"
+    link::String           = "underline $(light_blue_light)"
 
     # misc
     text::String           = "default"
@@ -41,11 +42,15 @@ style outputs to terminal.
     logmsg::String = "#8abeff"
 
     # tree 
-    tree_title::String  = "$orange italic"
-    tree_node::String   = "$yellow italic"
-    tree_leaf::String   = yellow_light
-    tree_guide::String  = blue
-    tree_max_width::Int = 44
+    tree_mid::String         = blue
+    tree_terminator::String  = blue
+    tree_skip::String        = blue
+    tree_dash::String        = blue
+    tree_trunc::String       = blue
+    tree_pair::String        = red_light
+    tree_keys::String        = yellow
+    tree_title::String       = "bold " * orange
+    tree_max_leaf_width::Int = 44
 
     # repr
     repr_accent::String      = "bold #e0db79"
@@ -104,11 +109,28 @@ style outputs to terminal.
     # table
     tb_style::String   = "#9bb3e0"
     tb_header::String  = "bold white"
-    tb_columns::String = "defualt"
+    tb_columns::String = "default"
     tb_footer::String  = "default"
     tb_box::Symbol     = :MINIMAL_HEAVY_HEAD
+
+    # prompt
+    prompt_text::String           = blue
+    prompt_default_option::String = "underline bold $green"
+    prompt_options::String        = "default"
+
+    # annotations
+    annotation_color::String = blue_light
 end
 
+(t::Theme)(::Function) = t.func
+(t::Theme)(::Number) = t.number
+(t::Theme)(::Union{UnionAll,DataType}) = t.type
+(t::Theme)(::Symbol) = t.symbol
+(t::Theme)(::Expr) = t.expression
+(t::Theme)(::AbstractVector) = t.number
+(t::Theme)(::Any) = t.text
+
+# ---------------------------------- themes ---------------------------------- #
 DarkTheme = Theme(name = "dark")
 
 LightTheme = Theme(
@@ -141,10 +163,14 @@ LightTheme = Theme(
     logmsg = "#8abeff",
 
     # tree 
-    tree_title = "$orange italic",
-    tree_node  = "$yellow_darker italic",
-    tree_leaf  = yellow_dark,
-    tree_guide = blue_darker,
+    tree_mid = blue_darker,
+    tree_terminator = blue_darker,
+    tree_skip = blue_darker,
+    tree_dash = blue_darker,
+    tree_trunc = blue_darker,
+    tree_pair = red_light,
+    tree_keys = red_dark,
+    tree_max_leaf_width = 44,
 
     # repr
     repr_accent      = "bold $yellow_darker",

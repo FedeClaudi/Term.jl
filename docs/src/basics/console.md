@@ -24,7 +24,7 @@ tprintln("This is a very long text"^10)
 it also works for any `Renderable` made with Term:
 
 ```@example
-using Term: tprintln # hide
+using Term: tprintln, Panel # hide
 using Term.Consoles: Console, enable, disable #hide
 
 print(Panel())

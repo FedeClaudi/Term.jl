@@ -88,17 +88,15 @@ You can justify the panel's content to `:left, :center, :right`!
 ```
 And style the title and subtitle, or the whole background too:
 ```@example panel
-import Term: highlight_syntax, apply_style, do_by_line, fillin
-
-syntax_with_bg(t) = do_by_line(ln -> apply_style(ln, "on_red"), fillin(t) |> highlight_syntax)
+import Term: highlight_syntax
 
 Panel(
-    syntax_with_bg("""
+    highlight_syntax("""
 function show_off(x)
     print(x)
 end
 """); 
-    background="on_red"
+    background="on_black", fit=true, style="on_black"
 )
 
 ```

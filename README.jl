@@ -1,7 +1,7 @@
 using Term
 import Term.Renderables: Renderable
 import Term: rint
-import Term: typestree, inspect
+import Term: inspect
 using Term.Layout
 import Term.Measures: height
 
@@ -172,7 +172,7 @@ lorem1 = TextBox(_lorem; width = 62, fit = false, padding = (0, 0, 0, 0))
 lorem2 = TextBox(_lorem; width = 42, fit = false, padding = (0, 0, 0, 0))
 
 expr = :(2x + 2π / θ)
-tree = Renderable(sprint(typestree, Float64))
+tree = Renderable(sprint(Tree, Float64))
 dendo = Renderable(sprint(inspect, expr))
 renderables_info = TextBox(
     """{bold bright_blue}Renderables types{/bold bright_blue}

@@ -25,9 +25,6 @@ tprint(x; highlight = true) = tprint(stdout, x; highlight = highlight)
 
 tprint(io::IO, x; highlight = true) = tprint(io, string(x); highlight = highlight)
 
-tprint(io::IO, ::MIME"text/html", x; highlight = true) =
-    tprint(io, x; highlight = highlight)
-
 """
 ---
     tprint(x::AbstractString)
@@ -54,16 +51,14 @@ Equivalent to `print(x)`
 function tprint(io::IO, x::AbstractRenderable; highlight = true)
     w = console_width()
     x = x.measure.w > console_width() ? trim_renderable(x, w) : x
-    print(io, x; highlight = highlight)
+    print(io, x)
 end
 
-function tprint(io::IO, args...)
+function tprint(io::IO, args...; highlight = true)
     for (n, arg) in enumerate(args)
-        tprint(io, arg)
+        tprint(io, arg; highlight = highlight)
 
-        if n < length(args)
-            args[n + 1] isa AbstractRenderable || print(io, " ")
-        end
+        (n < length(args) && args[n + 1] isa AbstractRenderable) || print(io, " ")
     end
     return nothing
 end
@@ -88,5 +83,7 @@ styling functionality.
 """
 
 tprintln(args...; highlight = true) = tprint(args..., "\n"; highlight = highlight)
+tprintln(io::IO, args...; highlight = true) =
+    tprint(io, args..., "\n"; highlight = highlight)
 
 end

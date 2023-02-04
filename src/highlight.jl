@@ -8,12 +8,12 @@ using Highlights.Format
 highlight_regexes = OrderedDict(
     :number => (r"(?<group>(?<![a-zA-Z0-9_#])\d+(\.\d*)?+([eE][+-]?\d*)?)",),
     :operator =>
-        (r"(?<group>(?<!\{)\/)", r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~])"),
+        (r"(?<group>(?<!\{)\/)", r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~\[\]])"),
     :string => (r"(?<group>[\'\"][\w\n]*[\'\"])",),
     :code => (r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))",),
     :expression => (r"(?<group>\:\(+.+[\)])",),
     :symbol => (r"(?<group>(?<!\:)(?<!\:)\:\w+)",),
-    :emphasis_light => (r"(?<group>[\[\]\(\)])", r"(?<group>@\w+)"),
+    # :emphasis_light => (r"(?<group>[\[\]\(\)])", r"(?<group>@\w+)"),
     :type => (r"(?<group>\:\:[\w\.]*)", r"(?<group>\<\:\w+)"),
 )
 
@@ -23,8 +23,12 @@ highlight_regexes = OrderedDict(
 Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object.
 """
-function highlight(text::AbstractString; theme::Theme = TERM_THEME[])
-    has_ansi(text) && return text
+function highlight(
+    text::AbstractString;
+    theme::Theme = TERM_THEME[],
+    ignore_ansi::Bool = false,
+)
+    (has_ansi(text) && !ignore_ansi) && return text
 
     # highlight with regexes 
     for (symb, rxs) in pairs(highlight_regexes)
@@ -35,7 +39,6 @@ function highlight(text::AbstractString; theme::Theme = TERM_THEME[])
         end
     end
 
-    # return remove_markup(apply_style(text))
     return text
 end
 
@@ -45,33 +48,11 @@ end
 Hilights an entire text as if it was a type of semantically
 relevant text of type :like.
 """
-function highlight(text::AbstractString, like::Symbol; theme::Theme = TERM_THEME[])
-    markup = getfield(theme, like)
-    return apply_style(
-        do_by_line((x) -> "{" * markup * "}" * x * "{/" * markup * "}", chomp(text)),
-    )
-end
+highlight(text::AbstractString, like::Symbol; theme::Theme = TERM_THEME[]) =
+    apply_style(text, getfield(theme, like))
 
 # shorthand to highlight objects based on type
-highlight(x::Union{UnionAll,DataType}; theme::Theme = TERM_THEME[]) =
-    highlight(string(x), :type; theme = theme)
-
-highlight(x::Number; theme::Theme = TERM_THEME[]) =
-    highlight(string(x), :number; theme = theme)
-
-highlight(x::Function; theme::Theme = TERM_THEME[]) =
-    highlight(string(x), :func; theme = theme)
-
-highlight(x::Symbol; theme::Theme = TERM_THEME[]) =
-    highlight(string(x), :symbol; theme = theme)
-
-highlight(x::Expr; theme::Theme = TERM_THEME[]) =
-    highlight(string(x), :expression; theme = theme)
-
-highlight(x::AbstractVector; theme::Theme = TERM_THEME[]) =
-    highlight(string(x), :number; theme = theme)
-
-highlight(x; theme = TERM_THEME[]) = string(x)  # capture all other cases
+highlight(x; theme = TERM_THEME[]) = apply_style(string(x), theme(x)) # capture all other cases
 
 # ------------------------------ Highlighters.jl ----------------------------- #
 
@@ -112,10 +93,8 @@ function highlight_syntax(code::AbstractString; style::Bool = true)
         CodeTheme;
         context = stdout,
     )
-    txt = unescape_brackets(txt)
     style && (txt = apply_style(txt))
-
-    return do_by_line(rstrip, remove_markup(txt))
+    return remove_markup(txt)
 end
 
 """
@@ -130,8 +109,9 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
 
     lines = read_file_lines(path, lineno - δ, lineno + δ)
     linenos = first.(lines)
-    lines = [ln[2] for ln in lines]
-    code = split(highlight_syntax(join(lines); style = true), "\n")
+    code =
+        [highlight_syntax((δ == 0 ? lstrip(ln[2]) : ln[2]); style = true) for ln in lines]
+    code = split(join(code), "\n")
 
     # clean
     clean(line) = replace(line, "    {/    }" => "")
@@ -157,7 +137,6 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
             " ", "grey39"
         end
 
-        # end
         line = textlen(line) > 1 ? lpad(line[dedent:end], 8) : line
         push!(cleaned_lines, symb * " {$color}$n{/$color} " * line)
     end
