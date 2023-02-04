@@ -46,6 +46,9 @@ typename(typedef::Expr) =
         error("Could not parse type-head from: $typedef")
     end
 
+"""
+Create a Panel showing repr content using the current theme's style info.
+"""
 repr_panel(
     obj,
     content,

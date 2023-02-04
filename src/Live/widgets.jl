@@ -218,7 +218,7 @@ end
 
 function frame(ph::PlaceHolderWidget; kwargs...)
     isnothing(ph.internals.on_draw) || ph.internals.on_draw(ph)
-
+    sfd
     m = ph.internals.measure
     return PlaceHolder(
         m.h,
