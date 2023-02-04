@@ -28,23 +28,49 @@ treeguides = Dict(
 #                                     TREE                                     #
 # ---------------------------------------------------------------------------- #
 
+const _TREE_PRINTING_TITLE = Ref{Union{Nothing,String}}(nothing)
+
 """
     print_node(io, node) 
 
 Core function to enable fancy tree printing. Styles the leaf/key of each node.
 """
-function print_node(io, node)
+function print_node(io, node; kw...)
     theme::Theme = TERM_THEME[]
 
-    styled = if node isa AbstractString
-        highlight(node, :string; theme = theme)
-    else
-        styled = highlight(string(node); theme = theme)
+    if isnothing(_TREE_PRINTING_TITLE[]) # print node
+        styled = if node isa AbstractString
+            highlight(node, :string; theme = theme)
+        else
+            styled = highlight(string(node); theme = theme)
+        end
+        reshaped = reshape_text(styled, theme.tree_max_leaf_width)
+        print(io, reshaped)
+    else # print title
+        title = _TREE_PRINTING_TITLE[]
+        print(io, apply_style(title, theme.tree_title))
     end
-    reshaped = reshape_text(styled, theme.tree_max_leaf_width)
-    print(io, reshaped)
+
+    _TREE_PRINTING_TITLE[] = nothing
 end
 
+"""
+    print_key(io, k; kw...)
+
+Print a tree's node's key with some style.
+"""
+function print_key(io, k; kw...)
+    s = TERM_THEME[].tree_keys
+    print(io, apply_style("{s}" * string(k) * "{/s}"))
+end
+
+"""
+    style_guides(tree::String, guides::TreeCharSet, theme::Theme)
+
+Apply style to a tree's guides by inserting it into its string representation.
+Not ideal as it will affect the style of other elements with the same characters 
+like Panels, but ok for no.
+"""
 function style_guides(tree::String, guides::TreeCharSet, theme::Theme)
     return replace_multi(
         tree,
@@ -57,14 +83,28 @@ function style_guides(tree::String, guides::TreeCharSet, theme::Theme)
     )
 end
 
+"""
+    Tree
+
+Renderable tree.
+"""
 struct Tree <: AbstractRenderable
     segments::Vector{Segment}
     measure::Measure
 end
 
 """
-    Tree(tree; guides::Union{TreeCharSet, Symbol}=:standardtree, 
-                theme::Theme=TERM_THEME[], printkeys::Union{Nothing, Bool}=true, kwargs...)
+    Tree(
+        tree;
+        guides::Union{TreeCharSet,Symbol} = :standardtree,
+        theme::Theme = TERM_THEME[],
+        printkeys::Union{Nothing,Bool} = true,
+        print_node_function::Function = print_node,
+        print_key_function::Function = print_key,
+        title::Union{String, Nothing}=nothing,
+        prefix::String = "  ",
+        kwargs...,
+    )
 
 Constructor for `Tree`
 
@@ -77,7 +117,13 @@ Arguments:
 - `guides`: if a symbol, the name of preset tree guides types. Otherwise an instance of
     `AbstractTrees.TreeCharSet`
 - `theme`: `Theme` used to set tree style.
+- `printkeys`: If `true` print keys. If `false` don't print keys. 
 - `print_node_function`: Function used to print nodes.
+- `print_key_function`: Function used to print keys.
+- `title`: Title of the tree.
+- `prefix`: Prefix to be used in `AbstractTrees.print_tree`
+
+
 For other kwargs look at `AbstractTrees.print_tree`
 """
 function Tree(
@@ -86,18 +132,24 @@ function Tree(
     theme::Theme = TERM_THEME[],
     printkeys::Union{Nothing,Bool} = true,
     print_node_function::Function = print_node,
+    print_key_function::Function = print_key,
+    title::Union{String,Nothing} = nothing,
+    prefix::String = "  ",
     kwargs...,
 )
+    _TREE_PRINTING_TITLE[] = title
 
     # print tree
     guides = guides isa Symbol ? treeguides[guides] : guides
     tree = sprint(
         io -> print_tree(
             print_node_function,
+            print_key_function,
             io,
             tree;
             charset = guides,
             printkeys = printkeys,
+            prefix = prefix,
             kwargs...,
         ),
     )

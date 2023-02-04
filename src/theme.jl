@@ -49,6 +49,7 @@ style outputs to terminal.
     tree_trunc::String       = blue
     tree_pair::String        = red_light
     tree_keys::String        = yellow
+    tree_title::String       = "bold " * orange
     tree_max_leaf_width::Int = 44
 
     # repr

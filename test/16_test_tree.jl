@@ -59,7 +59,13 @@ trees = [
             for (k, tree) in enumerate(trees)
                 if VERSION ≥ v"1.7"  # ! not sure why but this fails in older versions: segmentation fault
                     IS_WIN || @compare_to_string string(
-                        Tree(tree; theme = theme, guides = guides_type, printkeys = true),
+                        Tree(
+                            tree;
+                            theme = theme,
+                            guides = guides_type,
+                            printkeys = true,
+                            title = "tree_$(i)_$(j)_$(k)",
+                        ),
                     ) "tree_$(i)_$(j)_$(k)"
                 end
             end
