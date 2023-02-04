@@ -52,21 +52,6 @@ Base.show(io::IO, ::MIME"text/plain", seg::Segment) =
 #                                    LAYOUT                                    #
 # ---------------------------------------------------------------------------- #
 
-"""
-    Term.fillin(segments::Vector{Segment})::Vector{Segment}
-
-Ensure that for each segment the text has the same width
-"""
-function Term.fillin(segments::Vector{Segment})::Vector{Segment}
-    w = maximum(width.(segments))
-
-    filled::Vector{Segment} = []
-    for seg in segments
-        push!(filled, Segment(seg.text * " "^(w - seg.measure.w)))
-    end
-    return filled
-end
-
 # -------------------------------- concatenate ------------------------------- #
 """
 concatenate strings and segments

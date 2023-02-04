@@ -14,7 +14,4 @@ import Term.LiveWidgets:
     Esc,
     Del
 
-
-@testset "LIVE: widget creation" begin
-    
-end
+@testset "LIVE: widget creation" begin end

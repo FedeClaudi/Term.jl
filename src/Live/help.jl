@@ -1,7 +1,7 @@
 """
 display/hide help tooltip
 """
-function toggle_help(app::App, args...;)
+function toggle_help(app, args...;)
     internals = app.internals
     width = app.measure.w
     msg =

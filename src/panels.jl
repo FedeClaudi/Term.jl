@@ -1,14 +1,7 @@
 module Panels
 
 import Term:
-    join_lines,
-    fillin,
-    ltrim_str,
-    default_width,
-    remove_ansi,
-    get_bg_color,
-    textlen,
-    TERM_THEME
+    join_lines, ltrim_str, default_width, remove_ansi, get_bg_color, textlen, TERM_THEME
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
