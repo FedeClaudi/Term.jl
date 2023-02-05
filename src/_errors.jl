@@ -60,7 +60,7 @@ function should_skip(frame::StackFrame, modul)
     mod = something(modul, frame)
     f = get_frame_file(frame)
 
-    bad = mod ∈ ["Base", "Main", nothing, "VSCodeServer", "REPL"]
+    bad = mod ∈ ["Base", nothing, "VSCodeServer", "REPL"]
     bad = bad || mod ∈ STACKTRACE_HIDDEN_MODULES[]
 
     return bad || (

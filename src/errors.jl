@@ -41,6 +41,8 @@ import ..Measures: height
 
 export install_term_stacktrace
 
+const STACKTRACE_PRINTED_ERROR_MSG = Ref(false)
+
 """
 Stores information useful for creating the layout
 of a stack trace visualization.
@@ -140,7 +142,8 @@ function install_term_stacktrace(;
                 end
 
                 # print message panel if VSCode is not handling that through a second call to this fn
-                (hasfield(typeof(io), :io) && isa(io.io, Base.TTY)) && begin
+
+                if STACKTRACE_PRINTED_ERROR_MSG[] == false
                     msg = highlight(sprint(Base.showerror, er)) |> apply_style
                     err_panel = Panel(
                         RenderableText(
@@ -155,6 +158,9 @@ function install_term_stacktrace(;
                         fit = false,
                     )
                     print(io, err_panel)
+                    STACKTRACE_PRINTED_ERROR_MSG[] = true
+                else
+                    STACKTRACE_PRINTED_ERROR_MSG[] = false
                 end
 
             catch cought_err  # catch when something goes wrong during error handling in Term

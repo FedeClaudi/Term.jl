@@ -1,6 +1,0 @@
-[38;2;242;215;119mTable[39m(tb[38;2;206;147;216m::Tables.MatrixTable[39m{Matrix{{Float64}}}; box[38;2;206;147;216m::Symbol[39m,[0m
-style[38;2;206;147;216m::String[39m, hpad[38;2;206;147;216m::Int64[39m, vpad[38;2;206;147;216m::Int64[39m, vertical_justify[38;2;206;147;216m::Symbol[0m[39m
-[38;2;206;147;216m[39m, show_header[38;2;206;147;216m::Bool[39m, header[38;2;206;147;216m::Nothing[39m, header_style[38;2;206;147;216m::String[39m,[0m
-header_justify[38;2;206;147;216m::Nothing[39m, columns_style[38;2;206;147;216m::String[39m, columns_justify[38;2;206;147;216m::[0m[39m
-[38;2;206;147;216mSymbol[39m, columns_widths[38;2;206;147;216m::Nothing[39m, footer[38;2;206;147;216m::Nothing[39m, footer_style[38;2;206;147;216m::S[0m[39m
-[38;2;206;147;216mtring[39m, footer_justify[38;2;206;147;216m::Symbol[39m, compact[38;2;206;147;216m::Bool[39m)[0m
