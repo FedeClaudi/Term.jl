@@ -121,9 +121,8 @@ function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing)
     end
 end
 
-"""
----
 
+"""
     pad(s::Segment, left::Int = 0, right::Int = 0; kwargs...)
 
 Pad a segment.
@@ -720,6 +719,7 @@ function hLine(
         _pad *
         text *
         _pad *
+        "{$style}" *
         get_rrow(box, rw - tr, :top; with_right = false) *
         "{/$style}{/$style}" *
         "\e[0m"

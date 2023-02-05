@@ -19,6 +19,7 @@ less(term_demo) # see demo code
 # Example
 
 ``` julia
+``` julia
 begin
     println(@green "this is green")
     println(@blue "and this is blue")
@@ -42,7 +43,6 @@ const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
 
 default_width(io = stdout)::Int =
     min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
-
 default_stacktrace_width(io = stderr)::Int =
     min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 
