@@ -170,7 +170,7 @@ function get_title_row(
 
     # if no title or no space, just return a row
     if isnothing(title) || width < 12
-        return Segment("{$style}" * get_row(box, width, row) * "{/$(style)}")
+        return Segment("\e[0m{$style}" * get_row(box, width, row) * "{/$(style)}\e[0m")
     else
         title = apply_style(title)
         title =

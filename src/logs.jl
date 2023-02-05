@@ -149,6 +149,33 @@ function handle_progress(logger::TermLogger, prog)
     end
 end
 
+style_log_msg_kw_value(logger, v::Number) = (v, logger.theme.number)
+style_log_msg_kw_value(logger, v::Symbol) = (v, logger.theme.symbol)
+style_log_msg_kw_value(logger, v::AbstractString) = (v, logger.theme.string)
+style_log_msg_kw_value(logger, v::Function) = (v, logger.theme.func)
+style_log_msg_kw_value(logger, v::AbstractRenderable) =
+    ("$(typeof(v))  \e[2m$(v.measure)\e[0m", "default")
+style_log_msg_kw_value(logger, v) = (v, nothing)
+
+function style_log_msg_kw_value(logger, v::AbstractVector)
+    _style = logger.theme.number
+    _size = length(v)
+    v = escape_brackets(string(v))
+    v = textlen(v) > 60 ? v[1:57] * "..." : v
+    v *= "\n {$(logger.theme.text)}$(_size) {/$(logger.theme.text)}{dim}items{/dim}"
+    return (v, _style)
+end
+function style_log_msg_kw_value(logger, v::Union{AbstractArray,AbstractMatrix})
+    _style = logger.theme.number
+    _size = size(v)
+    v = str_trunc("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 60)
+    v *=
+        "\n {dim}shape: {default $(logger.theme.text)}" *
+        join(string.(_size), " × ") *
+        "{/default $(logger.theme.text)}{/dim}"
+    return (v, _style)
+end
+
 """
     handle_message(logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...)
 

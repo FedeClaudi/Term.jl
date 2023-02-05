@@ -190,6 +190,6 @@ end
         code_h = highlight_syntax(code; style = true)
         reshape_code_string(code_h, 30)
 
-        # load_code_and_highlight("@__FILE__", 20)
+        load_code_and_highlight("src/panels.jl", 20)
     end
 end
