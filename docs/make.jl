@@ -52,6 +52,12 @@ makedocs(;
             "adv/errors_tracebacks.md",
             "adv/introspection.md",
         ],
+        "Live" => Any[
+            "live/intro.md",
+            "live/app_intro.md",
+            "live/app_api.md",
+            "live/widgets.md"
+        ],
         "API" => Any[
             "api/api_term.md",
             "api/api_boxes.md",
