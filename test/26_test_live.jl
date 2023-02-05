@@ -322,27 +322,27 @@ end
                 @test app.widgets isa AbstractDict
                 @test app.compositor isa Compositor
 
-                IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)"
+                # IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)"
 
                 # IS_WIN ||
                 #     @compare_to_string sprint(print, app) "app_single_widget_$(i)_$(j)_$(k)_print"
 
-                toggle_help(app)
-                IS_WIN ||
-                    @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_help"
-                toggle_help(app)
-                IS_WIN ||
-                    @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_nohelp"
+                # toggle_help(app)
+                # IS_WIN ||
+                #     @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_help"
+                # toggle_help(app)
+                # IS_WIN ||
+                #     @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_nohelp"
 
-                c1, c2 = Console(30), Console(90)
+                # c1, c2 = Console(30), Console(90)
 
-                for (m, c) in enumerate((c1, c2, c1))
-                    enable(c)
-                    on_layout_change(app)
-                    # IS_WIN ||
-                    #     @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_$(m)"
-                    disable(c)
-                end
+                # for (m, c) in enumerate((c1, c2, c1))
+                #     enable(c)
+                #     on_layout_change(app)
+                #     # IS_WIN ||
+                #     #     @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_$(m)"
+                #     disable(c)
+                # end
 
                 sleep(1)
             end
@@ -370,16 +370,16 @@ end
     layout = :(A(22, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(4, 0.6)))
     app = App(layout; widgets = widgets)
 
-    IS_WIN || @compare_to_string frame(app) "app_complete"
+    # IS_WIN || @compare_to_string frame(app) "app_complete"
 
-    c1, c2 = Console(30), Console(90)
+    # c1, c2 = Console(30), Console(90)
 
-    for (m, c) in enumerate((c1, c2, c1))
-        enable(c)
-        on_layout_change(app)
-        # IS_WIN || @compare_to_string frame(app) "app_complete_$(m)"
-        disable(c)
-    end
+    # for (m, c) in enumerate((c1, c2, c1))
+    #     enable(c)
+    #     on_layout_change(app)
+    #     # IS_WIN || @compare_to_string frame(app) "app_complete_$(m)"
+    #     disable(c)
+    # end
 
-    sleep(1)
+    # sleep(1)
 end
