@@ -1,0 +1,8 @@
+[38;5;12mApp[39m [2m (20, 80)[22m
+[22mcontent: ([22m20[22m, [22m80[22m)[22m
+├─ [38;5;12mPlaceHolderWidget[39m [2m (10, 80)[22m
+│  [22mcontent: ([22m10[22m, [22m80[22m)[22m
+├─ [2m[34mPlaceHolderWidget[22m[39m [2m (10, 40)[22m
+│  [2mcontent: ([2m10[22m, [2m40[22m)[22m
+└─ [2m[34mPlaceHolderWidget[22m[39m [2m (10, 40)[22m
+   [2mcontent: ([2m10[22m, [2m40[22m)[22m

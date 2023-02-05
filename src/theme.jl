@@ -96,7 +96,7 @@ style outputs to terminal.
     md_h6::String                 = "bold $cyan_lighter"
     md_latex::String              = "$yellow_light italic"
     md_code::String               = "$yellow_light italic"
-    md_codeblock_bg::String       = "#262626"
+    md_codeblock_bg::String       = "#202020"
     md_quote::String              = "#5a74f2"
     md_footnote::String           = "#9aacdb"
     md_table_header::String       = "bold yellow"

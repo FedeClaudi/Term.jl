@@ -90,6 +90,13 @@ Compositor(layout)
 easy peasy.
 
 
+Some of you might argue: but this way I need to know exactly what size each element has to have in order to fit in the available terminal real estate... that's annoying! Nope, just use `Float64` as dimensions values to specify that you want to fill that fraction of the available space:
+```@example compositor
+layout = :(A(20, $(0.75)) * B(20, $(0.25)))
+Compositor(layout)
+```
+
+
 ## Compositor content
 Some of you will be thinking: "this is all well and good, but I don't want to just show place holders I've got actual content!". Fair enough, so let's add some.
 
