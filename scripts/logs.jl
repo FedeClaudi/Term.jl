@@ -11,7 +11,7 @@ struct MyStruct
 end
 
 
-@info MyStruct("aa a"^100, zeros(200), 4)   Dict(:z=>zeros(50)) 1 x .+ 2
+@info MyStruct("aa a"^500, zeros(200), 4)   Dict(:z=>zeros(50)) 1 x .+ 2
 
 # @info zeros(20)
 
