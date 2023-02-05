@@ -1,4 +1,4 @@
-# Compositor
+# [Compositor](@id CompositorDocs)
 We've just seen how you can use `grid` to achieve nice layouts very easily. That's great when you have a bunch of renderables of the same size and you want to crate a simple layout. If you want to get fancy using grid is not trivial:
 
 ```@example compositor

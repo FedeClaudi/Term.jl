@@ -40,7 +40,7 @@ TextWidget(
     controls,
     text,
     as_panel,
-    Dict(kwargs),
+    Dict{Symbol, Any}(kwargs),
 )
 
 on_layout_change(t::TextWidget, m::Measure) = t.internals.measure = m
@@ -49,12 +49,23 @@ on_layout_change(t::TextWidget, m::Measure) = t.internals.measure = m
 function frame(tw::TextWidget; kwargs...)
     isnothing(tw.internals.on_draw) || tw.internals.on_draw(tw)
     measure = tw.internals.measure
+
+    style = get(tw.panel_kwargs, :style, "default")
+    style = isactive(tw) ? "bold white " * style : style
+    
+    panel_kwargs = copy(tw.panel_kwargs)
+    if :style ∈ keys(tw.panel_kwargs)
+        panel_kwargs[:style] =  panel_kwargs[:style] * (isactive(tw) ? " bold red" : " dim")
+    else
+        panel_kwargs[:style] = isactive(tw) ? " bold red" : "dim"
+    end
+
     tw.as_panel && return Panel(
         tw.text;
         width = measure.w,
         height = measure.h,
         fit = false,
-        tw.panel_kwargs...,
+        panel_kwargs...,
     )
 
     txt = if !isactive(tw)
