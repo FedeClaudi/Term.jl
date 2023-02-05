@@ -57,18 +57,14 @@ function frame(tw::TextWidget; kwargs...)
         tw.panel_kwargs...,
     )
 
-    txt = reshape_text(tw.text, measure.w - 4)
-    lines = split(txt, "\n")
-
-    lines = if isactive(tw)
-        [
-            lines[1:min(measure.h - 1, length(lines))]...,
-            hLine(measure.w - 4; style = "bold white"),
-        ]
+    txt = if !isactive(tw)
+        reshape_text(tw.text, measure.w - 4)
     else
-        lines[1:min(measure.h, length(lines))]
+        _txt = reshape_text(tw.text, measure.w - 6)
+        vLine(get_height(_txt)) * _txt |> string
     end
-    return RenderableText(join(lines, "\n"); width = measure.w - 4)
+
+    return RenderableText(txt; width = measure.w - 4)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -85,7 +81,7 @@ InputBox collects and displays user input as text.
     input_text::Union{Nothing,String}
     blinker_update::Int
     blinker_status::Symbol
-    panel_kwargs
+    panel_kwargs::Dict{Symbol,Any}
 end
 
 """
@@ -160,13 +156,13 @@ function frame(ib::InputBox; kwargs...)
         ""
     end
 
-    kwargs = copy(ib.panel_kwargs)
+    panel_kwargs = copy(ib.panel_kwargs)
 
-    kwargs[:style] = get(ib.panel_kwargs, :style, "") * (isactive(ib) ? "" : " dim")
+    panel_kwargs[:style] = get(ib.panel_kwargs, :style, "") * (isactive(ib) ? "" : " dim")
     # get text to display
     text = isnothing(ib.input_text) ? "{dim}start typing...{/dim}" : ib.input_text * blinker
     measure = ib.internals.measure
-    return Panel(text; width = measure.w, height = measure.h, kwargs...)
+    return Panel(text; width = measure.w, height = measure.h, panel_kwargs...)
 end
 
 # ---------------------------------------------------------------------------- #
@@ -218,7 +214,6 @@ end
 
 function frame(ph::PlaceHolderWidget; kwargs...)
     isnothing(ph.internals.on_draw) || ph.internals.on_draw(ph)
-    sfd
     m = ph.internals.measure
     return PlaceHolder(
         m.h,

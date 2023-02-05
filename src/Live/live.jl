@@ -14,6 +14,7 @@ import ..Renderables: AbstractRenderable, RenderableText
 import ..Panels: Panel
 import ..Measures: Measure
 import ..Measures: width as get_width
+import ..Measures: height as get_height
 using ..Consoles
 import ..Repr: @with_repr, termshow
 import ..Style: apply_style

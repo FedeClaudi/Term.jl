@@ -41,14 +41,6 @@ widgets = OrderedDict{Symbol,AbstractWidget}(
     :b => button,
 )
 
-# create transition rules
-transition_rules = OrderedDict(
-    ArrowRight() => Dict(:A => :R),
-    ArrowLeft() => Dict(:R => :A, :G => :A, :B => :A, :b => :A),
-    ArrowDown() => Dict(:R => :G, :G => :B, :B => :b),
-    ArrowUp() => Dict(:b => :B, :B => :G, :G => :R),
-)
-
 # --------------------------------- functions -------------------------------- #
 function get_color(ib::InputBox)
     text = something(ib.input_text, "0")
@@ -89,12 +81,7 @@ end
 # ------------------------------------ run ----------------------------------- #
 # create app and visualize
 layout = :(A(22, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(4, 0.6)))
-app = App(
-    layout;
-    widgets = widgets,
-    # transition_rules = transition_rules,
-    on_draw = update_visualizer,
-)
+app = App(layout; widgets = widgets, on_draw = update_visualizer)
 
 button.callback = set_random_color
 

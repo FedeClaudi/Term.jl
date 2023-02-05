@@ -1,6 +1,7 @@
 using Term
 using Term.LiveWidgets
 install_term_logger()
+install_term_stacktrace()
 
 LiveWidgets.LIVE_DEBUG[] = false  # set to true show extra info
 
