@@ -165,10 +165,12 @@ end
                     #     @test mn.internals.measure == Measure(w, height)
                     # end
 
-                    IS_WIN || @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_($l)"
+                    IS_WIN ||
+                        @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_($l)"
 
                     menu_activate_next(mn, 1)
-                    IS_WIN || @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_$(l)_b"
+                    IS_WIN ||
+                        @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_$(l)_b"
 
                     @test menu_return_value(mn, Enter()) == 2
                 end
@@ -295,7 +297,8 @@ end
 
             IS_WIN || @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)"
 
-            IS_WIN || @compare_to_string sprint(print, app) "single_widghet_app_$(j)_$(k)_print"
+            IS_WIN ||
+                @compare_to_string sprint(print, app) "single_widghet_app_$(j)_$(k)_print"
 
             toggle_help(app)
             IS_WIN || @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)_help"
@@ -319,19 +322,23 @@ end
 
                 IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)"
 
-                IS_WIN || @compare_to_string sprint(print, app) "app_single_widget_$(i)_$(j)_$(k)_print"
+                IS_WIN ||
+                    @compare_to_string sprint(print, app) "app_single_widget_$(i)_$(j)_$(k)_print"
 
                 toggle_help(app)
-                IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_help"
+                IS_WIN ||
+                    @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_help"
                 toggle_help(app)
-                IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_nohelp"
+                IS_WIN ||
+                    @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_nohelp"
 
                 c1, c2 = Console(30), Console(90)
 
                 for (m, c) in enumerate((c1, c2, c1))
                     enable(c)
                     on_layout_change(app)
-                    IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_$(m)"
+                    IS_WIN ||
+                        @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_$(m)"
                     disable(c)
                 end
             end

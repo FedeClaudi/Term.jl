@@ -19,7 +19,6 @@ import Term:
     ltrim_str,
     default_width
 
-
 import ..Consoles: console_width, console_height, change_scroll_region, move_to_line
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Style: apply_style
@@ -214,7 +213,6 @@ function Logging.handle_message(
     )
     vline = "  " * vLine(msg.measure.h; style = outline_markup)
     tprint((firstline / vline) * " " * msg; highlight = false)
-
 
     # --------------------------------- contents --------------------------------- #
     # if no kwargs we can just quit
