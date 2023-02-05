@@ -62,6 +62,10 @@ end
         @compare_to_string sprint(io -> show(io, MIME("text/plain"), Rocket2)) "repr_rocket_2_show"
 end
 
+"test function"
+fn(x::Int) = x
+fn(s::String) = s
+
 objs = if VERSION >= v"1.7.1"
     (
         (1, [1, 2, 3]),
@@ -70,7 +74,7 @@ objs = if VERSION >= v"1.7.1"
         (4, zeros(120, 300)),
         (5, zeros(200)),
         (6, zeros(3, 3, 3)),
-        (7, clear),
+        (7, fn),
         (8, :(x / y + √9)),
         (9, zeros(10)),
         (10, zeros(5, 5)),
@@ -81,7 +85,7 @@ else
         (1, [1, 2, 3]),
         (2, Dict(:x => [1, 2, 3], "a" => Dict(:z => "a"))),
         (3, Dict(i => i for i in 1:100)),
-        (7, clear),
+        (7, fn),
     )
 end
 
