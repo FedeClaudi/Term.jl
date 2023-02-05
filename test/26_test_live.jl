@@ -304,6 +304,8 @@ end
             IS_WIN || @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)_help"
             toggle_help(app)
             IS_WIN || @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)_nohelp"
+
+            sleep(1)
         end
     end
 end
@@ -341,6 +343,8 @@ end
                     #     @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_$(m)"
                     disable(c)
                 end
+
+                sleep(1)
             end
         end
     end
@@ -376,4 +380,6 @@ end
         # IS_WIN || @compare_to_string frame(app) "app_complete_$(m)"
         disable(c)
     end
+
+    sleep(1)
 end
