@@ -13,6 +13,8 @@ import Term:
     get_bg_color,
     textlen
 
+import Term
+
 import Term: highlight as highlighter
 import ..Consoles: console_width
 import ..Measures: Measure

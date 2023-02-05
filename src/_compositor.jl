@@ -48,9 +48,14 @@ function get_elements_and_sizes(ex::Expr; placeholder_size = nothing)
     min_h = min_w = typemax(Int)
     for e in elements
         e isa Symbol && continue
-        min_h = min(min_h, e.args[2])
-        min_w = min(min_w, e.args[3])
+
+        h, w = e.args[2], e.args[3]
+        h = h isa Int ? h : fint(console_height() * h)
+        w = w isa Int ? w : fint(console_width() * w)
+        min_h = min(min_h, h)
+        min_w = min(min_w, w)
     end
+
     # fallback size
     h, w = something(placeholder_size, default_size())
     min_h == typemax(Int) && (min_h = h)
@@ -89,12 +94,16 @@ function clean_layout_expr(ex::Expr)
     return ex
 end
 
-compositor_placeholder(s, h, w, c) = PlaceHolder(
-    h,
-    w;
-    style = c,
-    text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($h × $w){/white}",
-)
+compositor_placeholder(s, h, w, c) = begin
+    h = h isa Int ? h : fint(console_height() * h)
+    w = w isa Int ? w : fint(console_width() * w)
+    PlaceHolder(
+        h,
+        w;
+        style = c,
+        text = "{bold underline bright_blue}$s{/bold underline bright_blue} {white}($h × $w){/white}",
+    )
+end
 
 """
     extract_renderable_from_kwargs(s, h, w; kwargs...)

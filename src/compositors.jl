@@ -7,7 +7,8 @@ import ..Layout: PlaceHolder
 import ..Measures: width, height, default_size
 import ..Renderables: AbstractRenderable, RenderableText, Renderable
 import ..Repr: @with_repr, termshow
-import Term: highlight, update!
+import ..Consoles: console_height, console_width
+import Term: highlight, update!, fint
 
 export Compositor
 
@@ -33,6 +34,20 @@ each `LayoutElement` if there is one, the placeholder otherwise.
     w::Int
     renderable::Union{Nothing,String,AbstractRenderable}
     placeholder::PlaceHolder
+
+    function LayoutElement(
+        id::Symbol,
+        h::Number,
+        w::Number,
+        renderable::Union{Nothing,String,AbstractRenderable},
+        placeholder::PlaceHolder;
+        max_w::Int = console_width(),
+        max_h::Int = console_height(),
+    )
+        h = h isa Int ? h : fint(max_h * h)
+        w = w isa Int ? w : fint(max_w * w)
+        return new(id, h, w, renderable, placeholder)
+    end
 end
 
 Base.size(e::LayoutElement) = (e.h, e.w)
@@ -62,6 +77,8 @@ function Compositor(
     vpad::Int = 0,
     placeholder_size = nothing,
     check::Bool = true,
+    max_w::Int = console_width(),
+    max_h::Int = console_height(),
     kwargs...,
 )
     elements = get_elements_and_sizes(layout; placeholder_size = placeholder_size)
@@ -91,7 +108,9 @@ function Compositor(
             e.args[2],  # height
             e.args[3],  # width
             renderables[n],
-            placeholders[n],
+            placeholders[n];
+            max_w = max_w,
+            max_h = max_h,
         ) for (n, e) in zip(names, elements)
     )
 
@@ -134,9 +153,14 @@ function update!(
         return
     end
 
-    # check that the shapes match
+    # if content is too small, pad it
     elem = compositor.elements[id]
-    if elem.w != width(content) || elem.h != height(content)
+    height(content) < elem.h &&
+        (content = vertical_pad(content; height = elem.h, method = :top))
+    width(content) < elem.w && (content = pad(content; width = elem.w, method = :right))
+
+    # check that the shapes match
+    if elem.w > width(content) || elem.h > height(content)
         content_shape = "{red}$(height(content)) × $(width(content)){/red}"
         target_shape = "{bright_blue}$(elem.h) × $(elem.w){/bright_blue}"
         @warn "Shape mismatch while updating compositor element {yellow}`$id`{/yellow}.\nGot $content_shape, expected $target_shape"
@@ -164,7 +188,7 @@ Render a compositor's current layout.
 Get a renderable from each `LayoutElement` in the compositor
 and evaluate the layout expression interpolating the renderables.
 """
-function render(compositor::Compositor; show_placeholders = false)
+function render(compositor::Compositor; show_placeholders = false)::AbstractRenderable
     # evaluate compositor
     elements = getfield.(values(compositor.elements), :id)
     renderables = getfield.(values(compositor.elements), :renderable)
