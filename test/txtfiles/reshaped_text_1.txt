@@ -1,5 +1,0 @@
-Lorem ipsum dolor sit amet,[0m
-consectetur adipiscing elit,[0m
-sed do eiusmod tempor incididunt[0m
-ut labore et dolore magna aliqua.[0m
-[0m

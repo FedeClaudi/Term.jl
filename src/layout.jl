@@ -122,8 +122,6 @@ function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing)
 end
 
 """
----
-
     pad(s::Segment, left::Int = 0, right::Int = 0; kwargs...)
 
 Pad a segment.
@@ -239,6 +237,8 @@ function vertical_pad(text::AbstractString, target_height::Int, method::Symbol)
         vertical_pad(text, above, below)
     end
 end
+
+# vertical_pad(text::AbstractString; height::Int, method::Symbol=:center) = vertical_pad(text, height, method)
 
 """
     vertical_pad(text::AbstractString, above::Int = 0, below::Int = 0)
@@ -712,21 +712,23 @@ function hLine(
     pad_txt::Bool = true,
 )
     box = BOXES[box]
-    text = apply_style(text) * "\e[0m"
+    text = apply_style(text) * "{$style}"
     tl, tr = get_lr_widths(textlen(text))
     lw, rw = get_lr_widths(width)
     _pad = pad_txt ? " " : get_lrow(box, 1, :top; with_left = false)
 
     line =
+        "{$style}" *
         get_lrow(box, lw - tl, :top; with_left = false) *
         _pad *
         text *
         _pad *
         "{$style}" *
         get_rrow(box, rw - tr, :top; with_right = false) *
+        "{/$style}{/$style}" *
         "\e[0m"
 
-    return hLine([Segment(line, style)], Measure(1, width))
+    return hLine([Segment(line)], Measure(1, width))
 end
 
 """
@@ -840,7 +842,7 @@ function PlaceHolder(
             ltrim_str(original, _w - _l) *
             "{default bold white}" *
             text *
-            "{/default bold white}" *
+            "{/default bold white}{$style}" *
             rtrim_str(original, _w + _l),
         )
     end

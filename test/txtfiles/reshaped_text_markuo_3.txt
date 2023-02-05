@@ -1,7 +1,0 @@
-{red}dasda asda dadasda{green}aa{/red}
-{red}{green}dasdad{/green}dad{/red}
-{red}asd ad ad ad asdad{bold}ad{/red}
-{red}{bold}ada ad{/red}{/bold}
-{red}{bold}as sad ad ada{/red}ad{/bold}
-{bold}adas sd ads{/bold}
-{bold}{/bold}

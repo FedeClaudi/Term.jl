@@ -62,6 +62,7 @@ end
 @runner "23_test_link.jl"
 @runner "24_prompts.jl"
 @runner "25_annotations.jl"
+@runner "26_test_live.jl"
 @runner "98_test_examples.jl"
 @runner "99_test_errors.jl"
 

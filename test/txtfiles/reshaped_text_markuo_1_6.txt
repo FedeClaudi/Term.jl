@@ -1,3 +1,0 @@
-{on_(25, 25, 25)}adasd ad sa dsa{green} ad {on_black} sd d ads{/on_black}{/green}{/on_(25, 25, 25)}[0m
-{on_(25, 25, 25)}{green}{on_black}ad da{/on_black} {white}dad{/white} asad {/green} asdsa ddfsf{/on_(25, 25, 25)}[0m
-{on_(25, 25, 25)}ad a {/on_(25, 25, 25)}[0m
