@@ -220,9 +220,9 @@ end
                 @test pag.internals.measure == Measure(h, w)
                 @test pag.content isa Vector{String}
 
-                LieWidgets.prev_line(pag, 'a')
-                LieWidgets.next_line(pag, 'a')
-                LieWidgets.prev_line(pag, 'a')
+                LiveWidgets.prev_line(pag, 'a')
+                LiveWidgets.next_line(pag, 'a')
+                LiveWidgets.prev_line(pag, 'a')
                 next_page(pag, 'a')
                 prev_page(pag, 'a')
                 next_page(pag, 'a')
