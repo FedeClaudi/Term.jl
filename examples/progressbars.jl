@@ -63,7 +63,6 @@ with(pbar) do
         update!(job)
         sleep(0.01)
         i % 25 == 0 && println("We can print from here too")
-        LiveDisplays.refresh!(pbar)
     end
 end
 

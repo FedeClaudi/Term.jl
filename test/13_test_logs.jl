@@ -5,14 +5,20 @@ using Term.Progress
 import ProgressLogging
 import UUIDs: uuid4
 
+struct MyLogsStruct
+    x::String
+    y::Vector
+    z::Int
+end
+
 @testset "\e[34mLOGS test" begin
     install_term_logger()
     println("\nTesting logging, stdout temporarily disabled")
 
-    @suppress_out begin
+    output = @capture_out begin
         @info "my log!"
 
-        @warn "tell us if this was [bold red]undexpected![/bold red]"
+        @warn "tell us if this was {bold red}undexpected!{/bold red}"
 
         x = collect(1:2:20)
         y = x * x'
@@ -27,7 +33,12 @@ import UUIDs: uuid4
 
         sdfs
         s""" 1 + 2
+
+        @info MyStruct("aa a"^100, zeros(200), 4)
     end
+
+    # IS_WIN || @compare_to_string output "logs.txt"
+
     uninstall_term_logger()
 end
 

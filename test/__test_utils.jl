@@ -50,7 +50,7 @@ function highlight_diff(s1::String, s2::String; stop = 500)
     hLine("FIRST", style = "blue") |> tprint
     println(s1)
     hLine("SECOND", style = "blue") |> tprint
-    println(s1)
+    println(s2)
     hLine(style = "dim blue") |> tprint
 
     i = 1
