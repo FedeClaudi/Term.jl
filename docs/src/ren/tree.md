@@ -74,6 +74,7 @@ The style is set by the [`Theme`](@ref ThemeDocs).
 
 ```@example tree
 import Term: Theme
+using MyterialColors
 
 # create a new theme editing the tree style
 theme = Theme(

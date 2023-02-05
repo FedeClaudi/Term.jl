@@ -32,7 +32,7 @@ Make an `App` with an `InputBox` to see how it works!
 
 ### Buttons
 ```@example widgets
-Button("Click me!") |> frame
+Button("Click me please!") |> frame
 ```
 You can specify the color of the text and the button. You can also pass a `callback`: a `Function` that gets called 
 when the button is pressed. 
