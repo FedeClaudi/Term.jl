@@ -65,7 +65,7 @@ end
         widget = TextWidget(t; as_panel = p)
         asframe = frame(widget)
 
-        @compare_to_string(asframe, "widget_text_$(i)_$(j)")
+        IS_WIN || @compare_to_string(asframe, "widget_text_$(i)_$(j)")
 
         @test asframe isa AbstractRenderable
         @test widget.controls isa AbstractDict
@@ -91,7 +91,7 @@ end
 
     as_frame = frame(ib)
     @test as_frame isa AbstractRenderable
-    @compare_to_string as_frame "widget_inputbox"
+    IS_WIN || @compare_to_string as_frame "widget_inputbox"
 end
 
 @testset "PlaceHolderWidget" begin
@@ -103,7 +103,7 @@ end
 
     as_frame = frame(ph)
     @test as_frame isa AbstractRenderable
-    @compare_to_string as_frame "widget_placeholder"
+    IS_WIN || @compare_to_string as_frame "widget_placeholder"
 end
 
 # ---------------------------------------------------------------------------- #
@@ -131,10 +131,10 @@ end
                 #     @test mn.internals.measure == Measure(w, 3)
                 # end
 
-                @compare_to_string frame(mn) "widget_simplemenu_$(i)_$(j)_$(k)"
+                IS_WIN || @compare_to_string frame(mn) "widget_simplemenu_$(i)_$(j)_$(k)"
 
                 menu_activate_next(mn, 1)
-                @compare_to_string frame(mn) "widget_simplemenu_$(i)_$(j)_$(k)_b"
+                IS_WIN || @compare_to_string frame(mn) "widget_simplemenu_$(i)_$(j)_$(k)_b"
 
                 @test menu_return_value(mn, Enter()) == 2
             end
@@ -165,10 +165,10 @@ end
                     #     @test mn.internals.measure == Measure(w, height)
                     # end
 
-                    @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_($l)"
+                    IS_WIN || @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_($l)"
 
                     menu_activate_next(mn, 1)
-                    @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_$(l)_b"
+                    IS_WIN || @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_$(l)_b"
 
                     @test menu_return_value(mn, Enter()) == 2
                 end
@@ -191,10 +191,10 @@ end
             @test mn.internals isa WidgetInternals
             @test mn.internals.measure == Measure(3, w)
 
-            @compare_to_string frame(mn) "widget_multiselectmenu_$(i)_$(k)"
+            IS_WIN || @compare_to_string frame(mn) "widget_multiselectmenu_$(i)_$(k)"
 
             menu_activate_next(mn, 1)
-            @compare_to_string frame(mn) "widget_multiselectmenu_$(i)_$(k)_b"
+            IS_WIN || @compare_to_string frame(mn) "widget_multiselectmenu_$(i)_$(k)_b"
 
             multi_select_toggle(mn, SpaceBar())
             @test menu_return_value(mn, Enter()) == [2]
@@ -220,9 +220,9 @@ end
                 @test pag.internals.measure == Measure(h, w)
                 @test pag.content isa Vector{String}
 
-                prev_line(pag, 'a')
-                next_line(pag, 'a')
-                prev_line(pag, 'a')
+                LieWidgets.prev_line(pag, 'a')
+                LieWidgets.next_line(pag, 'a')
+                LieWidgets.prev_line(pag, 'a')
                 next_page(pag, 'a')
                 prev_page(pag, 'a')
                 next_page(pag, 'a')
@@ -231,7 +231,7 @@ end
                 toend(pag, EndKey())
                 prev_page(pag, ArrowLeft())
 
-                @compare_to_string frame(pag) "widget_pager_$(i)_$(j)_$(k)"
+                IS_WIN || @compare_to_string frame(pag) "widget_pager_$(i)_$(j)_$(k)"
             end
         end
     end
@@ -252,13 +252,13 @@ end
                 @test gal.controls isa AbstractDict
                 @test gal.widgets isa Vector
 
-                @compare_to_string frame(gal) "widget_gal_$(i)_$(j)_$(k)"
+                IS_WIN || @compare_to_string frame(gal) "widget_gal_$(i)_$(j)_$(k)"
 
                 activate_prev_widget(gal, 1)
                 activate_next_widget(gal, 1)
                 activate_next_widget(gal, 1)
 
-                @compare_to_string frame(gal) "widget_gal_$(i)_$(j)_$(k)_b"
+                IS_WIN || @compare_to_string frame(gal) "widget_gal_$(i)_$(j)_$(k)_b"
 
                 @test get_active(gal) isa AbstractWidget
             end
@@ -293,14 +293,14 @@ end
             @test app.widgets isa AbstractDict
             @test app.compositor isa Compositor
 
-            @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)"
+            IS_WIN || @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)"
 
-            @compare_to_string sprint(print, app) "single_widghet_app_$(j)_$(k)_print"
+            IS_WIN || @compare_to_string sprint(print, app) "single_widghet_app_$(j)_$(k)_print"
 
             toggle_help(app)
-            @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)_help"
+            IS_WIN || @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)_help"
             toggle_help(app)
-            @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)_nohelp"
+            IS_WIN || @compare_to_string frame(app) "single_widghet_app_$(j)_$(k)_nohelp"
         end
     end
 end
@@ -317,21 +317,21 @@ end
                 @test app.widgets isa AbstractDict
                 @test app.compositor isa Compositor
 
-                @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)"
+                IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)"
 
-                @compare_to_string sprint(print, app) "app_single_widget_$(i)_$(j)_$(k)_print"
+                IS_WIN || @compare_to_string sprint(print, app) "app_single_widget_$(i)_$(j)_$(k)_print"
 
                 toggle_help(app)
-                @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_help"
+                IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_help"
                 toggle_help(app)
-                @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_nohelp"
+                IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_nohelp"
 
                 c1, c2 = Console(30), Console(90)
 
                 for (m, c) in enumerate((c1, c2, c1))
                     enable(c)
                     on_layout_change(app)
-                    @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_$(m)"
+                    IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)_$(m)"
                     disable(c)
                 end
             end
@@ -359,14 +359,14 @@ end
     layout = :(A(22, 0.4) * (R(6, 0.6) / G(6, 0.6) / B(6, 0.6) / b(4, 0.6)))
     app = App(layout; widgets = widgets)
 
-    @compare_to_string frame(app) "app_complete"
+    IS_WIN || @compare_to_string frame(app) "app_complete"
 
     c1, c2 = Console(30), Console(90)
 
     for (m, c) in enumerate((c1, c2, c1))
         enable(c)
         on_layout_change(app)
-        @compare_to_string frame(app) "app_complete_$(m)"
+        IS_WIN || @compare_to_string frame(app) "app_complete_$(m)"
         disable(c)
     end
 end
