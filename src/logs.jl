@@ -148,7 +148,6 @@ function handle_progress(logger::TermLogger, prog)
     end
 end
 
-
 """
     handle_message(logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...)
 
@@ -180,7 +179,7 @@ function Logging.handle_message(
         end
     end
     fname = split(fname, ".")[end]
-    
+
     # prepare styles
     color = if lvl == Logging.Info
         logger.theme.info
@@ -206,10 +205,13 @@ function Logging.handle_message(
     firstline = "{$color underline bold}@$(string(lvl)){/$color underline bold} {$fn_color }($(_mod)$fname):{/$fn_color }"
 
     # print first line
-    msg = RenderableText(msg; width=console_width() - textlen(firstline) - 1, style=logmsg_color)
-    vline = "  " * vLine(msg.measure.h; style=outline_markup)
-    tprint((firstline/vline) * " " * msg; highlight = false)
-
+    msg = RenderableText(
+        msg;
+        width = console_width() - textlen(firstline) - 1,
+        style = logmsg_color,
+    )
+    vline = "  " * vLine(msg.measure.h; style = outline_markup)
+    tprint((firstline / vline) * " " * msg; highlight = false)
 
     # --------------------------------- contents --------------------------------- #
     # if no kwargs we can just quit
@@ -225,24 +227,23 @@ function Logging.handle_message(
 
     # Create display of type,k->v for each kwarg
     _types = map(t -> t isa Function ? Function : typeof(t), (collect(values(kwargs))))
-    types_w = min(console_width()/5, maximum(width.(string.(_types)))) |> round |> Int
+    types_w = min(console_width() / 5, maximum(width.(string.(_types)))) |> round |> Int
 
     _keys = map(k -> string(k), keys(kwargs))
-    keys_w = min(console_width()/5, maximum(width.(_keys)))|> round |> Int
+    keys_w = min(console_width() / 5, maximum(width.(_keys))) |> round |> Int
 
     _vals = map(v -> highlight(string(v)), collect(values(kwargs)))
-    vals_w = min(console_width()/5*3 - 7, maximum(width.(_vals)) - 7)|> round |> Int
-
+    vals_w = min(console_width() / 5 * 3 - 7, maximum(width.(_vals)) - 7) |> round |> Int
 
     # function to format content, style and shape
     fmt_str(x, style::String, w::Int) = RenderableText(string(x); width = w, style = style)
-    fmt_str(::Function, style::String, w::Int) = RenderableText("Function"; style = style, width=w)
+    fmt_str(::Function, style::String, w::Int) =
+        RenderableText("Function"; style = style, width = w)
 
     # get types, keys and values as RenderableText with style
     ks = fmt_str.(_keys, logger.theme.text_accent, keys_w)
     ts = fmt_str.(_types, "dim " * logger.theme.type, types_w)
     vs = fmt_str.(_vals, "", vals_w)
-
 
     # print all kwargs
     eq = "{$(logger.theme.operator)}={/$(logger.theme.operator)}"

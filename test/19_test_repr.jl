@@ -30,8 +30,6 @@ end
         IS_WIN || @compare_to_string sprint(termshow, T()) "repr_T_struct"
     end
 
-
-
     @with_repr struct MyTestStruct3
         x::String
         y::Array
@@ -39,14 +37,12 @@ end
         a::Panel
         c::String
     end
-    
-    
+
     mts = MyTestStruct3("aa aa"^100, zeros(100, 100), 3, Panel(), "b b b"^100)
-    
+
     VERSION ≥ v"1.7" && begin
         IS_WIN || @compare_to_string sprint(termshow, mts) "mts_repr"
     end
-    
 end
 
 @testset "REPR @with_repr with doc" begin

@@ -4,7 +4,6 @@ import OrderedCollections: OrderedDict
 function repr_get_obj_fields_display(obj)
     theme = TERM_THEME[]
 
-
     field_names = fieldnames(typeof(obj))
     length(field_names) == 0 && return RenderableText(
         "$obj{$(theme.repr_type)}::$(typeof(obj)){/$(theme.repr_type)}",
@@ -29,10 +28,9 @@ function repr_get_obj_fields_display(obj)
     return Table(
         OrderedDict(:field => fields, :value => values);
         hpad = 0,
-        box = :NONE, 
+        box = :NONE,
         show_header = false,
-        compact=true
-
+        compact = true,
     )
 end
 

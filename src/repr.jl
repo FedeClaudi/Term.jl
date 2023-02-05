@@ -112,9 +112,7 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
     theme = TERM_THEME[]
 
     # prepare text renderables
-    _keys = RenderableText.(
-        short_string.(keys(obj)); style = theme.repr_accent * " bold"
-    )
+    _keys = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent * " bold")
     ktypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
@@ -134,16 +132,11 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
         :value => vals,
         :vtype => vtypes,
     )
-    
+
     return print(
         io,
         Panel(
-            Table(
-                content;
-                show_header=false,
-                box=:NONE, hpad=0,
-                compact=true
-            );
+            Table(content; show_header = false, box = :NONE, hpad = 0, compact = true);
             fit = true,
             title = escape_brackets(string(typeof(obj))),
             title_justify = :left,

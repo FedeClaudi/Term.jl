@@ -39,11 +39,13 @@ const DEBUG_ON = Ref(false)
 
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
 const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
+const DEFAULT_CONSOLE_WIDTH = Ref{Int}(88)
+const DEFAULT_STACKTRACE_WIDTH = Ref{Int}(140)
 
 default_width(io = stdout)::Int =
-    min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+    min(DEFAULT_CONSOLE_WIDTH[], something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 default_stacktrace_width(io = stderr)::Int =
-    min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+    min(DEFAULT_STACKTRACE_WIDTH[], something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
@@ -93,7 +95,6 @@ include("grid.jl")
 include("introspection.jl")
 include("prompt.jl")
 include("annotations.jl")
-
 
 export RenderableText, Panel, TextBox, @nested_panels
 export TERM_THEME, highlight

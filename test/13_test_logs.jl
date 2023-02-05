@@ -5,14 +5,11 @@ using Term.Progress
 import ProgressLogging
 import UUIDs: uuid4
 
-
-
 struct MyLogsStruct
     x::String
     y::Vector
     z::Int
 end
-
 
 @testset "\e[34mLOGS test" begin
     install_term_logger()
@@ -36,7 +33,6 @@ end
 
         sdfs
         s""" 1 + 2
-
 
         @info MyStruct("aa a"^100, zeros(200), 4)
     end

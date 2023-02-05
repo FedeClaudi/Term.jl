@@ -41,8 +41,6 @@ import ..Measures: height
 
 export install_term_stacktrace
 
-
-
 const STACKTRACE_PRINTED_ERROR_MSG = Ref(false)
 
 """
@@ -144,7 +142,7 @@ function install_term_stacktrace(;
                 end
 
                 # print message panel if VSCode is not handling that through a second call to this fn
-                
+
                 if STACKTRACE_PRINTED_ERROR_MSG[] == false
                     msg = highlight(sprint(Base.showerror, er)) |> apply_style
                     err_panel = Panel(
