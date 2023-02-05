@@ -2,8 +2,10 @@ import Term: default_width
 import OrderedCollections: OrderedDict
 
 function repr_get_obj_fields_display(obj)
-    field_names = fieldnames(typeof(obj))
     theme = TERM_THEME[]
+
+
+    field_names = fieldnames(typeof(obj))
     length(field_names) == 0 && return RenderableText(
         "$obj{$(theme.repr_type)}::$(typeof(obj)){/$(theme.repr_type)}",
     )
@@ -24,10 +26,14 @@ function repr_get_obj_fields_display(obj)
         push!(values, RenderableText.(val; style = theme.repr_values))
     end
 
-    line = vLine(length(fields); style = theme.repr_line)
-    space = Spacer(length(fields), 1)
+    return Table(
+        OrderedDict(:field => fields, :value => values);
+        hpad = 0,
+        box = :NONE, 
+        show_header = false,
+        compact=true
 
-    return rvstack(fields...) * line * space * lvstack(values...)
+    )
 end
 
 """
@@ -79,7 +85,14 @@ function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsi
 end
 
 function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 50, max_D = 10)
-    max_D = console_width() < 150 ? 5 : max_D
+    max_D = if console_width() > 150
+        max_D
+    elseif console_width() < 80
+        3
+    else
+        5
+    end
+
     N = min(max_items, size(mtx, 1))
     D = min(max_D, size(mtx, 2))
 
@@ -98,7 +111,7 @@ function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 50, max_D =
         headers = "(" .* string.(1:length(columns)) .* ")" |> collect
     end
 
-    # add a column of numbers
+    # add a column of row numbers
     if size(mtx, 1) <= max_items
         pushfirst!(columns, "{dim}(" .* string.(1:length(columns[1])) .* "){/dim}")
     else
