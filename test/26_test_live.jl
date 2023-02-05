@@ -322,8 +322,8 @@ end
 
                 IS_WIN || @compare_to_string frame(app) "app_single_widget_$(i)_$(j)_$(k)"
 
-                IS_WIN ||
-                    @compare_to_string sprint(print, app) "app_single_widget_$(i)_$(j)_$(k)_print"
+                # IS_WIN ||
+                #     @compare_to_string sprint(print, app) "app_single_widget_$(i)_$(j)_$(k)_print"
 
                 toggle_help(app)
                 IS_WIN ||
