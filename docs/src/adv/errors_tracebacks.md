@@ -49,3 +49,4 @@ import Term: STACKTRACE_HIDDEN_MODULES, STACKTRACE_HIDE_FRAMES
 STACKTRACE_HIDDEN_MODULES[] = ["REPL", "OhMyREPL"]  # list names of modules you want ignored in the stacktrace
 STACKTRACE_HIDE_FRAMES[] = false # set to true to hide frame, false to show all of them
 ```
+
