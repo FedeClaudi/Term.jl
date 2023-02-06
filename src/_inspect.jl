@@ -1,4 +1,6 @@
 import Base.Docs: doc as getdocs
+using Base.Docs: meta, Binding
+import Markdown
 
 """
     get_docstring(obj)
@@ -17,37 +19,35 @@ function get_docstring(obj)
 end
 
 """
-    style_methods(methods::Union{Vector{Base.Method}, Base.MethodList}, tohighlight::AbstractString)
+    get_methods_with_docstrings(obj::Union{Union, DataType, Function})
 
-Create a `Renderable` with styled `Method` information for `inspect(::DataType)`
+Get the docstring for each method for an object (function/datatype).
 """
-function style_methods(
-    methods::Union{Vector{Base.Method},Base.MethodList},
-    tohighlight::AbstractString;
-    constructor::Bool = false,
-)
-    txt_col = TERM_THEME[].text
-    fn_col = TERM_THEME[].func
-    highlight_col = TERM_THEME[].inspect_highlight
-    accent_col = TERM_THEME[].inspect_accent
-    mets = []
-    prevmod = ""
-    for (i, m) in enumerate(methods)
-        code = "    - " * split(string(m), " in ")[1] |> highlight_syntax
-        code = replace(code, string(m.name) => "{$fn_col}$(m.name){/$fn_col}")
+function get_methods_with_docstrings(
+    obj::Union{Union,DataType,Function},
+)::Tuple{Vector,Vector}
+    # get the parent module and the methods list for the object
+    mod = parentmodule(obj)
+    mm = methods(obj)
 
-        info =
-            string(m.module) != prevmod ?
-            RenderableText(
-                "{bright_blue}   ────── Methods in {$accent_col underline bold}$(m.module){/$accent_col underline bold} for {$accent_col}$tohighlight{/$accent_col} ──────{/bright_blue}",
-            ) : nothing
-        prevmod = string(m.module)
+    # get the module's multidoc
+    binding = Binding(mod, Symbol(obj))
+    dict = meta(mod)
+    multidoc = dict[binding]
 
-        dest = RenderableText(
-            "\e[0m{dim default italic}             → $(m.file):$(m.line){/dim default italic}",
-        )
-        content = isnothing(info) ? code / dest / "" : info / code / dest / ""
-        push!(mets, content)
+    # for each module, attempt to get the docstring as markdown
+    docstrings = []
+    for m in mm
+        # cleanup signature
+        sig = length(m.sig.types) == 1 ? Tuple{} : Tuple{m.sig.types[2:end]...}
+
+        haskey(multidoc.docs, sig) || begin
+            push!(docstrings, nothing)
+            continue
+        end
+        docs = multidoc.docs[sig].text[1] |> Markdown.parse
+        push!(docstrings, docs)
     end
-    return mets
+
+    return mm, docstrings
 end

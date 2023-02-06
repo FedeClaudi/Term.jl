@@ -1,3 +1,4 @@
+scratch.txt
 *.jl.*.cov
 *.jl.cov
 *.jl.mem

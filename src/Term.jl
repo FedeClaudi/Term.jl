@@ -19,6 +19,7 @@ less(term_demo) # see demo code
 # Example
 
 ``` julia
+``` julia
 begin
     println(@green "this is green")
     println(@blue "and this is blue")
@@ -39,11 +40,13 @@ const DEBUG_ON = Ref(false)
 
 const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
 const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
+const DEFAULT_CONSOLE_WIDTH = Ref{Int}(88)
+const DEFAULT_STACKTRACE_WIDTH = Ref{Int}(140)
 
 default_width(io = stdout)::Int =
-    min(88, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+    min(DEFAULT_CONSOLE_WIDTH[], something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 default_stacktrace_width(io = stderr)::Int =
-    min(140, something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+    min(DEFAULT_STACKTRACE_WIDTH[], something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
 
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
@@ -81,8 +84,6 @@ include("link.jl")
 include("panels.jl")
 include("errors.jl")
 include("tprint.jl")
-include("progress.jl")
-include("logs.jl")
 include("trees.jl")
 include("dendograms.jl")
 include("tables.jl")
@@ -90,7 +91,12 @@ include("markdown.jl")
 include("repr.jl")
 include("compositors.jl")
 include("grid.jl")
+
+# interactive
+include("Live/live.jl")
 include("introspection.jl")
+include("progress.jl")
+include("logs.jl")
 include("prompt.jl")
 include("annotations.jl")
 
@@ -106,6 +112,7 @@ export @with_repr, termshow, @showme
 export Compositor
 export grid
 export inspect
+export Pager
 
 # ----------------------------------- base ----------------------------------- #
 using .Measures
@@ -165,13 +172,9 @@ using .Logs: install_term_logger, uninstall_term_logger, TermLogger
 
 using .Tprint: tprint, tprintln
 
-using .Progress: ProgressBar, ProgressJob, with, @track
-
 using .Trees: Tree
 
 using .Dendograms: Dendogram
-
-using .Introspection: inspect, typestree, expressiontree, inspect
 
 using .Tables: Table
 
@@ -183,7 +186,16 @@ using .Repr: @with_repr, termshow, install_term_repr, @showme
 
 using .Grid
 
+# -------------------------------- interactive ------------------------------- #
+using .LiveWidgets
+
+# ----------------------------- using interactive ---------------------------- #
+using .Progress: ProgressBar, ProgressJob, with, @track
+
+using .Introspection: inspect, typestree, expressiontree, inspect
+
 using .Prompts
 
 include("__precompilation.jl")
+
 end

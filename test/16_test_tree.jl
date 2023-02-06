@@ -1,104 +1,84 @@
-import Term: Tree
+import Term: Tree, TERM_THEME, LightTheme
 import OrderedCollections: OrderedDict
 
-tree_dict = Dict(
-    "nestedasdasdsadasdasdsadsadasdasdasdsadasasdasdassfsdfdsfdsfdsfsdfsdfdsfsdfd" =>
-        Dict("n1" => 1, "n2" => 2),
-)
-
-tree_dict_1 =
-    Dict("nested" => Dict("n1" => 1, "n2" => 2), "nested2" => Dict("n1" => "a", "n2" => 2))
-
-tree_dict_2 = Dict(
-    "nested" => Dict("n1" => 1, "n2" => 2),
-    "leaf2" => 2,
-    "leaf" => 2,
-    "leafme" => "v",
-    "canopy" => "test",
-    ["a"] => :test,
-)
-
-tree_dict_3 = Dict(
-    "nested" => Dict(
-        "deeper" => Dict("aleaf" => "unbeliefable", "leaflet" => "level 3"^20),
-        "n2" => Int,
-        "n3" => 1 + 2,
+trees = [
+    Dict(
+        "nestedasdasdsadasdasdsadsadasdasdasdsadasasdasdassfsdfdsfdsfdsfsdfsdfdsfsdfd" =>
+            Dict("n1" => 1, "n2" => 2),
     ),
-    "nested2" => Dict("n1" => "a", "n2" => 2),
-)
-
-tree_dict_4 = Dict(
-    "nested" => Dict(
-        "deeper" => Dict(
-            "aleaf" => "unbeliefable",
-            "leaflet" => "level 3",
-            "sodeep" => Dict("a" => 4),
+    Dict("nested" => Dict("n1" => 1, "n2" => 2), "nested2" => Dict("n1" => "a", "n2" => 2)),
+    Dict(
+        "nested" => Dict("n1" => 1, "n2" => 2),
+        "leaf2" => 2,
+        "leaf" => 2,
+        "leafme" => "v",
+        "canopy" => "test",
+        ["a"] => :test,
+    ),
+    Dict(
+        "nested" => Dict(
+            "deeper" => Dict("aleaf" => "unbeliefable", "leaflet" => "level 3"^20),
+            "n2" => Int,
+            "n3" => 1 + 2,
         ),
-        "n2" => Int,
-        "n3" => 1 + 2,
-        "adict" => Dict("x" => 2),
+        "nested2" => Dict("n1" => "a", "n2" => 2),
     ),
-    "nested2" => Dict("n1" => "a", "n2" => 2),
-)
-
-tree_dict_order_1 =
-    OrderedDict(3 => OrderedDict(3 => 8, 1 => "a"), 2 => OrderedDict(3 => 8, 1 => "a"))
-
-tree_dict_order_2 = OrderedDict(2 => 1, 3 => OrderedDict(4 => 2, "a" => 2, "b" => 1))
+    Dict(
+        "nested" => Dict(
+            "deeper" => Dict(
+                "aleaf" => "unbeliefable",
+                "leaflet" => "level 3",
+                "sodeep" => Dict("a" => 4),
+            ),
+            "n2" => Int,
+            "n3" => 1 + 2,
+            "adict" => Dict("x" => 2),
+        ),
+        "nested2" => Dict("n1" => "a", "n2" => 2),
+    ),
+    OrderedDict(3 => OrderedDict(3 => 8, 1 => "a"), 2 => OrderedDict(3 => 8, 1 => "a")),
+    OrderedDict(2 => 1, 3 => OrderedDict(4 => 2, "a" => 2, "b" => 1)),
+    [1, 2, [2, 3, 4]],
+    [
+        1,
+        [2, [3, 4], "a"^200],
+        :c,
+        OrderedDict(2 => "a", 1 => :ok, "a" => 2, :test => [1, 2]),
+    ],
+    Int,
+    String,
+    :(print, :(x, y)),
+]
 
 @testset "\e[34mTree" begin
-    # creation
-    @testtree(Tree(tree_dict), 6, 50)
+    thm1 = TERM_THEME[]
+    thm2 = LightTheme
 
-    @testtree(Tree(tree_dict_1), 9, 15)
-
-    @testtree(Tree(tree_dict_2), 11, 18)
-
-    @testtree(Tree(tree_dict_3), 12, 66)
-
-    @testtree(Tree(tree_dict_4), 16, 33)
-
-    @testtree(Tree(tree_dict_order_1), 9, 14)
-    @testtree(Tree(tree_dict_order_2), 8, 14)
-
-    # styling
-    for guides_type in (:standardtree, :boldtree, :asciitree)
-        @test_nothrow Tree(
-            tree_dict;
-            title = string(guides_type),
-            guides_type = guides_type,
-        )
+    for (i, theme) in enumerate((thm1, thm2))
+        for (j, guides_type) in enumerate((:standardtree, :boldtree, :asciitree))
+            for (k, tree) in enumerate(trees)
+                if VERSION ≥ v"1.7"  # ! not sure why but this fails in older versions: segmentation fault
+                    IS_WIN || @compare_to_string string(
+                        Tree(
+                            tree;
+                            theme = theme,
+                            guides = guides_type,
+                            printkeys = true,
+                            title = "tree_$(i)_$(j)_$(k)",
+                        ),
+                    ) "tree_$(i)_$(j)_$(k)"
+                end
+            end
+        end
     end
-
-    @testtree(
-        Tree(
-            tree_dict;
-            title = "my colors",
-            title_style = "bold red",
-            node_style = "blue underline",
-            leaf_style = "green",
-            guides_style = "red dim",
-        ),
-        6,
-        52,
-    )
 
     # test with no errors
     @test_nothrow Tree(Float64)
     @test_nothrow Tree(AbstractFloat)
 
-    # compare to string
-    (VERSION < v"1.7.1" || IS_WIN) || begin
-        @compare_to_string string(Tree(tree_dict)) "tree_1"
-        @compare_to_string string(Tree(tree_dict_1)) "tree_2"
-        @compare_to_string string(Tree(tree_dict_2)) "tree_3"
-        @compare_to_string string(Tree(tree_dict_3)) "tree_4"
-        @compare_to_string string(Tree(tree_dict_order_1)) "tree_5"
-        @compare_to_string string(Tree(tree_dict_order_2)) "tree_6"
-    end
-
     # test printing
-    @test sprint(io -> show(io, Tree(tree_dict_1))) == "Tree: 2 nodes, 0 leaves | Idx: 0"
-    @test sprint(io -> show(io, MIME("text/plain"), Tree(tree_dict_1).segments[1])) ==
-          "Segment{String} \e[2m(size: Measure (h: 1, w: 15))\e[0m"
+    @test sprint(io -> show(io, Tree(trees[1]))) ==
+          "\e[38;5;117mTree <: AbstractRenderable\e[0m \e[2m(h:10, w:80)\e[0m"
+    @test sprint(io -> show(io, MIME("text/plain"), Tree(trees[1]).segments[1])) ==
+          "Segment{String} \e[2m(size: Measure (h: 1, w: 80))\e[0m"
 end

@@ -126,19 +126,22 @@ Get the current console width.
 """
 console_width(io::IO = stdout) = something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2])
 
-struct Console
+mutable struct Console
     height
     width
 end
 
 Console(width) = Console(console_height(), width)
+Console() = Console(console_height(), console_width())
+Base.displaysize(c::Console) = (c.height, c.width)
 
 function enable(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = console.width
-    nothing
+    console
 end
 
-function disable(::Console)
+function disable(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = nothing
+    console
 end
 end

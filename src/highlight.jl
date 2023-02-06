@@ -8,7 +8,7 @@ using Highlights.Format
 highlight_regexes = OrderedDict(
     :number => (r"(?<group>(?<![a-zA-Z0-9_#])\d+(\.\d*)?+([eE][+-]?\d*)?)",),
     :operator =>
-        (r"(?<group>(?<!\{)\/)", r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~])"),
+        (r"(?<group>(?<!\{)\/)", r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~\[\]])"),
     :string => (r"(?<group>[\'\"][\w\n]*[\'\"])",),
     :code => (r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))",),
     :expression => (r"(?<group>\:\(+.+[\)])",),
@@ -142,4 +142,19 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     end
 
     return join(cleaned_lines, "\n")
+end
+
+"""
+    load_code_and_highlight(path::AbstractString)::String
+
+Load and highlight the syntax of an entire file
+"""
+function load_code_and_highlight(path::AbstractString)::String
+    lines = readlines(path)
+    code = [highlight_syntax(ln; style = true) for ln in lines]
+
+    # clean
+    clean(line) = replace(line, "    {/    }" => "")
+    codelines = clean.(code)
+    return join(codelines, "\n")
 end

@@ -1,0 +1,20 @@
+[0m[38;2;236;64;122m╭──────────────────────────────────────────────────────────────────────────────╮[39m[0m
+[38;2;236;64;122m│[39m                                                                              [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa[0m[48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa[0m[48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa[0m[48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa[0m[48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa[0m[48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa[0m[48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa[0m[48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa[0m[48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  aaaaaaaa[0m                                                                  [48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m                                                                            [48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m                                                                            [48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m                                                                            [48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m                                                                            [48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m                                                                            [48;5;237m [49m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m                                                                            [37m[47m│[39m[49m[0m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m                                                                            [37m[47m│[39m[49m[0m [38;2;236;64;122m│[39m
+[38;2;236;64;122m│[39m  [2m                          ... content omitted ...                          [22m [38;2;236;64;122m│[39m
+[38;2;236;64;122m╰────────────────────────────────────────────────────────── [1m[2mLines: 1:9 of 9[22m[22m[38;2;236;64;122m[38;2;236;64;122m ───╯[39m[0m[39m[0m

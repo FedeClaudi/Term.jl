@@ -181,7 +181,7 @@ function get_title_row(
     # compose title line 
     boxline = getfield(box, row)
 
-    open, close, space = "{" * style * "}", "{/" * style * "}", " "
+    open, close, space = "{" * style * "}", "{/" * style * "}\e[0m", " "
 
     topen, tclose = "\e[0m", open
     if !isnothing(title_style)
@@ -222,10 +222,10 @@ function get_title_row(
                 title *
                 get_rrow(box, rw - tr, row) *
                 close
-            return Segment("\e[0m" * line * "\e[0m")
+            return Segment(line)
         end
     end
-    return Segment("\e[0m" * line * "\e[0m")
+    return Segment(line)
 end
 
 """

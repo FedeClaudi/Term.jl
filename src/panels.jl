@@ -1,14 +1,7 @@
 module Panels
 
 import Term:
-    join_lines,
-    fillin,
-    ltrim_str,
-    default_width,
-    remove_ansi,
-    get_bg_color,
-    textlen,
-    TERM_THEME
+    join_lines, ltrim_str, default_width, remove_ansi, get_bg_color, textlen, TERM_THEME
 
 import ..Renderables: AbstractRenderable, RenderablesUnion, Renderable, RenderableText
 import ..Layout: pad, vstack, Padding, lvstack
@@ -56,6 +49,11 @@ mutable struct Panel <: AbstractPanel
     segments::Vector
     measure::Measure
 
+    """
+        Panel(x1, x2; kwargs...)
+
+    Catch construction with exactly two items passed
+    """
     function Panel(x1, x2; kwargs...)
         # this is necessary to handle the special case in which 2 objs are passed
         # but they are not segments/measure
@@ -70,7 +68,6 @@ end
 Base.size(p::Panel) = size(p.measure)
 
 """
----
     Panel(; 
         fit::Bool = false,
         height::Int = 2,
@@ -131,7 +128,6 @@ function Panel(;
 end
 
 """
----
     Panel(
         content::Union{AbstractString,AbstractRenderable};
         fit::Bool = false,
@@ -199,7 +195,6 @@ content_as_renderable(
     RenderableText(content, width = width - Δw, background = background, justify = justify)
 
 """
----
 
     Panel(
         content::Union{AbstractString,AbstractRenderable},
@@ -254,7 +249,6 @@ function Panel(
 end
 
 """
----
     Panel(
         content::Union{AbstractString,AbstractRenderable},
         ::Val{false},
@@ -427,7 +421,7 @@ function render(
     )
 
     # get left/right vertical lines
-    σ(s) = apply_style("\e[0m{" * style * "}" * s * "{/" * style * "}")
+    σ(s) = apply_style("{" * style * "}" * s * "{/" * style * "}")
     left, right = σ(box.mid.left), σ(box.mid.right)
 
     # get an empty padding line

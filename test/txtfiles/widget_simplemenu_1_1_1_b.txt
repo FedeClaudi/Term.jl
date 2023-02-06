@@ -1,0 +1,3 @@
+[2mone    [22m
+[31mtwo    [39m
+[2mthree  [22m

@@ -1,4 +1,4 @@
-# Compositor
+# [Compositor](@id CompositorDocs)
 We've just seen how you can use `grid` to achieve nice layouts very easily. That's great when you have a bunch of renderables of the same size and you want to crate a simple layout. If you want to get fancy using grid is not trivial:
 
 ```@example compositor
@@ -88,6 +88,13 @@ Compositor(layout)
 ```
 
 easy peasy.
+
+
+Some of you might argue: but this way I need to know exactly what size each element has to have in order to fit in the available terminal real estate... that's annoying! Nope, just use `Float64` as dimensions values to specify that you want to fill that fraction of the available space:
+```@example compositor
+layout = :(A(20, $(0.75)) * B(20, $(0.25)))
+Compositor(layout)
+```
 
 
 ## Compositor content

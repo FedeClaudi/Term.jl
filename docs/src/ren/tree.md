@@ -19,7 +19,6 @@ As you can see, the starting point is a `Dict` with `key -> value` entries which
 If you have nested data, just create nested dictionaries!
 
 ```@example tree
-
 data = Dict(
     "a" => 1,
     "b" => Int64,
@@ -32,41 +31,82 @@ data = Dict(
 print(Tree(data))
 ```
 
-Easy! [`Tree`](@ref) has lots of options to allow you to style it as you like:
+Under the hood, `Tree` just leverages [AbstractTrees.jl](https://github.com/JuliaCollections/AbstractTrees.jl) to handle tree-like data structues, so anything that is compatible with that framework will printed as a `Tree`.
 
+
+```@example tree
+# expressions
+Tree(:(print, (:x, :(y+1)))) |> print
+
+# arrays
+Tree([1, [1, 2, [:a, :b, :c]]]) |> print
+
+# and more!
+```
+
+Essentially `Tree` work's with `AbstractTrees` to just produce stylized output. 
+
+!!! tip `Tree` is not a *tree*
+    `Tree` is an `AbstractRenderable`, it is **not** a datastructure for handling tree-like data. It's only meant to be used to *display* trees in your terminal. As such you can't do operations like finding children of nodes or getting a subtree etc. All of that should be done with `AbstractTrees` and `Tree` is only there to display the output
+
+
+As per the note above, `Tree` is a `AbstractRenderable` type so it playes well with other renderables in term. 
+
+```@example tree
+import Term: Panel
+
+data = Dict(
+    "a" => 1,
+    "b" => Int64,
+    "c" => (1, 2, 3),
+)
+
+_tree = Tree(data)
+_info = Panel("This is a panel\nYou can use it to explain\nwhat the contents of the\ntree are!"; width=30, height=_tree.measure.h, subtitle="description")
+
+print(_tree * "  " *_info)
+
+```
+
+### Styling
+Easy! [`Tree`](@ref) has lots of options to allow you to style it as you like.
+The style is set by the [`Theme`](@ref ThemeDocs). 
+
+```@example tree
+import Term: Theme
+using MyterialColors
+
+# create a new theme editing the tree style
+theme = Theme(
+    tree_mid             = blue,
+    tree_terminator       = blue,
+    tree_skip           = blue,
+    tree_dash           = blue,
+    tree_trunc         = blue,
+    tree_pair           = red_light,
+    tree_keys           = yellow,
+    tree_max_leaf_width = 22,
+)
+
+print(
+    Tree(data,
+        theme=theme
+    )
+)
+```
+`tree_max_leaf_width` sets the max width of the display of each leaf while the other values set the color of different elements of the `Tree`. In particular `mid`, `terminator`, `dash` refer to the lines (or guides) of the tree. 
+
+And since we're talking about `guides` you can also use different ones
 ```@example tree
 print(
     Tree(data,
-        title="my custom tree",
-        title_style="red",
-        guides_style="green",
-        guides_type=:boldtree
-    
+        guides=:asciitree
     )
 )
 ```
 
-And of course trees behave just like any renderable so you can create layouts with them:
-```@example 
-import Term: Panel, Tree
-data = Dict(
-    "a" => 1,
-    "b" => Int64,
-    "deep" => Dict(
-            "x" => 1,
-            "y" => :x
-    ),
-)
+there's a couple named guides style, but you can customize things even further using an `AbstractTree.TreeCharSet` if you wish.
 
-tree = Tree(data)
-
-print(
-    ("\n" / tree) * "  " * Panel(tree; fit=true)
-)
-```
-
-!!! tip "Entries order"
-    Used `OrderedCollections.OrderedDict` instead of `Dict` if you want to specify the order of entries in the `Tree`.
 
 ## TypeTree
 As you know, Julia allows for hierarchical types structures. Trees are for visualizing hierarchical data structures. So...

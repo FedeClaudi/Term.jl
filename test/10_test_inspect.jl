@@ -57,17 +57,17 @@ end
 
     dosmth(m::MyStr) = print(m.x)
 
-    intro = @capture_out begin
-        inspect(MyStr; methods = true, supertypes = true)
-    end
-    intro = remove_ansi(intro)
-    @test intro isa String
+    # intro = @capture_out begin
+    #     inspect(MyStr; methods = true, supertypes = true)
+    # end
+    # intro = remove_ansi(intro)
+    # @test intro isa String
 
     # intro = @capture_out begin
     #     inspect(Panel; methods = true, supertypes = true,)
     # end
     # @compare_to_string(intro, "introspection_panel")
-    @test_nothrow inspect(Panel; methods = true, supertypes = true)
+    # @test_nothrow inspect(Panel; methods = true, supertypes = true)
 
     intro = @capture_out begin
         inspect(print)

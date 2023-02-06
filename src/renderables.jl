@@ -4,7 +4,6 @@ import Term:
     split_lines,
     reshape_text,
     ltrim_str,
-    fillin,
     join_lines,
     unescape_brackets_with_space,
     DEBUG_ON,
@@ -13,6 +12,8 @@ import Term:
     text_to_width,
     get_bg_color,
     textlen
+
+import Term
 
 import Term: highlight as highlighter
 import ..Consoles: console_width

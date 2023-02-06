@@ -17,7 +17,7 @@ import Term:
     remove_markup,
     reshape_code_string
 
-import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad
+import ..Layout: vLine, rvstack, lvstack, Spacer, vstack, cvstack, hLine, pad, hstack
 import ..Renderables: RenderableText, info, AbstractRenderable
 import ..Consoles: console_width
 import ..Panels: Panel, TextBox
@@ -25,6 +25,7 @@ import ..Style: apply_style
 import ..Tprint: tprint, tprintln
 import ..Tables: Table
 import ..TermMarkdown: parse_md
+import ..Measures: height
 
 export @with_repr, termshow, install_term_repr, @showme
 
@@ -47,7 +48,7 @@ function termshow end
 ---
     termshow(io::IO, obj)
 
-Generic method for any object not caught my dedicated methods.
+Generic method for any object not caught by dedicated methods.
 Creates a `Panel` with the object's fields and contents.
 """
 termshow(io::IO, obj) = print(
@@ -111,7 +112,7 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
     theme = TERM_THEME[]
 
     # prepare text renderables
-    k = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent * " bold")
+    _keys = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent * " bold")
     ktypes =
         RenderableText.(
             map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
@@ -124,32 +125,18 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
             style = theme.repr_type * " dim",
         )
 
-    # trim if too many
-    arrows = if length(k) > 10
-        k, ktypes, vals, vtypes = k[1:10], ktypes[1:10], vals[1:10], vtypes[1:10]
+    content = OrderedDict(
+        :type => ktypes,
+        :key => _keys,
+        :arrow => RenderableText.(fill("=>", length(_keys)); style = theme.operator),
+        :value => vals,
+        :vtype => vtypes,
+    )
 
-        push!(k, RenderableText("⋮"; style = theme.repr_accent))
-        push!(ktypes, RenderableText("⋮"; style = theme.repr_type * " dim"))
-        push!(vals, RenderableText("⋮"; style = theme.repr_values))
-        push!(vtypes, RenderableText("⋮"; style = theme.repr_type * " dim"))
-
-        vstack(RenderableText.(fill("=>", length(k) - 1); style = TERM_THEME[].operator)...)
-    else
-        vstack(RenderableText.(fill("=>", length(k)); style = TERM_THEME[].operator)...)
-    end
-
-    # prepare other renderables
-    space = Spacer(length(k), 1)
-    line = vLine(length(k); style = "dim $(TERM_THEME[].emphasis)")
-
-    _keys_renderables = cvstack(ktypes...) * line * space * cvstack(k...)
-    _values_renderables = cvstack(vals...) * space * line * cvstack(vtypes...)
-
-    m = length(keys(obj))
     return print(
         io,
         Panel(
-            _keys_renderables * space * arrows * space * _values_renderables;
+            Table(content; show_header = false, box = :NONE, hpad = 0, compact = true);
             fit = true,
             title = escape_brackets(string(typeof(obj))),
             title_justify = :left,
@@ -158,7 +145,6 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
             style = theme.repr_panel,
             title_style = theme.repr_name,
             padding = (2, 2, 1, 1),
-            subtitle = "{$(TERM_THEME[].text_accent)}$m{/$(TERM_THEME[].text_accent)}{default} $(plural("item", m)){/default}",
             subtitle_justify = :right,
         ),
     )
