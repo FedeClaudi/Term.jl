@@ -173,7 +173,7 @@ struct ETAColumn <: AbstractColumn
     padwidth::Int
 
     ETAColumn(job::ProgressJob; style = TERM_THEME[].progress_etacol_default) =
-        new(job, [], Measure(7 + 11, 1), style, 7)
+        new(job, [], Measure(9 + 11, 1), style, 9)
 end
 
 function update!(col::ETAColumn, args...)::String
