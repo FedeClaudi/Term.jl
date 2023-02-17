@@ -158,7 +158,7 @@ function install_term_stacktrace(;
                         fit = false,
                     )
                     print(io, err_panel)
-                    STACKTRACE_PRINTED_ERROR_MSG[] = true
+                    # STACKTRACE_PRINTED_ERROR_MSG[] = true
                 else
                     STACKTRACE_PRINTED_ERROR_MSG[] = false
                 end
