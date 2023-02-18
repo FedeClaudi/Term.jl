@@ -40,6 +40,8 @@ function frame_module(frame::StackFrame)::Union{Nothing,String}
     return m
 end
 
+frame_module(t::Tuple) = frame_module(t[1])
+
 """
 Get module from file path.
 """

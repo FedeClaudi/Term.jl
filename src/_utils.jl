@@ -6,7 +6,7 @@ function get_relative_path(file_path::AbstractString)
     # Use the splitdir() function to split the file path into its individual components
     components = splitpath(file_path)
     return if length(components) > 2
-        "..." * joinpath(components[(end - 2):end]...)
+        joinpath(components[(end - 1):end]...)
     else
         file_path
     end

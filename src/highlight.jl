@@ -8,7 +8,7 @@ using Highlights.Format
 highlight_regexes = OrderedDict(
     :number => (r"(?<group>(?<![a-zA-Z0-9_#])\d+(\.\d*)?+([eE][+-]?\d*)?)",),
     :operator =>
-        (r"(?<group>(?<!\{)\/)", r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~\[\]])"),
+        (r"(?<group>(?<!\{)\/)", r"(?<group>(?![\:\<])[\+\-\*\%\^\&\|\!\=\>\<\~\[\]×])"),
     :string => (r"(?<group>[\'\"][\w\n]*[\'\"])",),
     :code => (r"(?<group>([\`]{3}|[\`]{1})(\n|.)*?([\`]{3}|[\`]{1}))",),
     :expression => (r"(?<group>\:\(+.+[\)])",),

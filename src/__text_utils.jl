@@ -133,7 +133,7 @@ function fix_markup_across_lines(lines::Vector)::Vector
                 i < length(lines) && (lines[i + 1] = "{$markup}" * lines[i + 1])
             end
         end
-        lines[i] = ln * "\e[0m"
+        lines[i] = ln # * "\e[0m"
     end
 
     return lines
@@ -204,7 +204,7 @@ function fix_ansi_across_lines(lines::Vector)::Vector
                 i < length(lines) && (lines[i + 1] = ansi * lines[i + 1])
             end
         end
-        lines[i] = ln # * "\e[0m"
+        lines[i] = ln
     end
 
     return lines

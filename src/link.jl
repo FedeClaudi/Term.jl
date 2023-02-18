@@ -108,6 +108,7 @@ function Link(
 )
     link_dest = isnothing(line_number) ? file_path : "$file_path#$line_number"
     short_path = get_relative_path(file_path)
+    
     display_text = isnothing(line_number) ? short_path : "$short_path $(line_number)"
     link_text =
         "{$(style)}" *
