@@ -1,4 +1,4 @@
-import MyterialColors: orange_light, teal, purple_light
+import MyterialColors: orange_light, teal, purple_light, blue_light
 
 """
 Definition of several type of columns for progress bars.
@@ -29,6 +29,21 @@ mutable struct DescriptionColumn <: AbstractColumn
 end
 
 update!(col::DescriptionColumn, args...)::String = col.text
+
+
+mutable struct TextColumn <: AbstractColumn
+    job::ProgressJob
+    segments::Vector{Segment}
+    measure::Measure
+    text::String
+
+    function TextColumn(job::ProgressJob; style::String = blue_light, text="")
+        seg = Segment(text, style)
+        return new(job, [seg], seg.measure, seg.text)
+    end
+end
+
+update!(col::TextColumn, args...)::String = col.text
 
 # ----------------------------- separator column ----------------------------- #
 struct SeparatorColumn <: AbstractColumn
@@ -141,7 +156,7 @@ struct ElapsedColumn <: AbstractColumn
     padwidth::Int
 
     ElapsedColumn(job::ProgressJob; style = TERM_THEME[].progress_elapsedcol_default) =
-        new(job, [], Measure(6 + 9, 1), style, 6)
+        new(job, [], Measure(1, 6 + 9), style, 6)
 end
 
 function update!(col::ElapsedColumn, args...)::String
@@ -173,7 +188,7 @@ struct ETAColumn <: AbstractColumn
     padwidth::Int
 
     ETAColumn(job::ProgressJob; style = TERM_THEME[].progress_etacol_default) =
-        new(job, [], Measure(9 + 11, 1), style, 9)
+        new(job, [], Measure(1, 9 + 11), style, 9)
 end
 
 function update!(col::ETAColumn, args...)::String
@@ -216,7 +231,7 @@ mutable struct ProgressColumn <: AbstractColumn
 end
 
 function setwidth!(col::ProgressColumn, width::Int)
-    col.measure = Measure(width, 1)
+    col.measure = Measure(1, width)
     return col.nsegs = width
 end
 

@@ -69,7 +69,7 @@ end
 end
 
 @testset "\e[34mProgress columns" begin
-    for colinfo in (:minimal, :default, :spinner, :detailed)
+    for (i, colinfo) in enumerate((:minimal, :default, :spinner, :detailed))
         pbar = ProgressBar(; columns = colinfo)
         @test pbar.columns == get_columns(colinfo)
         @test pbar.columns isa Vector{DataType}
@@ -83,9 +83,12 @@ end
                 sleep(0.01)
             end
         end
+
+        IS_WINDOWS || @compare_to_string render(job)  "pbar_cols_style_$i"
     end
 
-    colkwargs = Dict(:DescriptionColumn => Dict(:style => "red"))
+    mycols = [DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn, TextColumn]
+    colkwargs = Dict(:DescriptionColumn => Dict(:style => "red"), :TextColumn => Dict(:text => "test"))
     pbar = ProgressBar(; columns_kwargs = colkwargs)
     job = addjob!(pbar; N = 10)
     @test job.columns[1].segments[1].text == "\e[31mRunning...\e[39m"
