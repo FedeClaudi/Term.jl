@@ -216,7 +216,8 @@ function add_stack_frame!(
     panel_content = if length(string(frame.file)) > 0
         # get a link renderable pointing to error
         if TERM_SHOW_LINK_IN_STACKTRACE[] == true
-            source_file = Link(string(frame.file), frame.line; style = "underline dim")
+            # source_file = Link(string(frame.file), frame.line; style = "underline dim")
+            source_file = RenderableText(string(frame.file)*":$(frame.line)"; style = "underline dim")
             _out = func_line / source_file
         else
             _out = func_line

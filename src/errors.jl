@@ -21,7 +21,7 @@ import Term:
     reshape_code_string,
     TERM_SHOW_LINK_IN_STACKTRACE
 
-import ..Links: Link
+# import ..Links: Link
 import ..Style: apply_style
 import ..Layout:
     hLine,
