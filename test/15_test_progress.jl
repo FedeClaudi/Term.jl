@@ -87,7 +87,7 @@ end
         end
 
         start!(pbar)
-        IS_WIN || @compare_to_string render(job) "pbar_cols_style_$i"
+        (IS_WIN || colinfo == :detailed) || @compare_to_string render(job) "pbar_cols_style_$i"
     end
 
     mycols =
