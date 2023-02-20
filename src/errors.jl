@@ -21,7 +21,7 @@ import Term:
     reshape_code_string,
     TERM_SHOW_LINK_IN_STACKTRACE
 
-import ..Links: Link
+# import ..Links: Link
 import ..Style: apply_style
 import ..Layout:
     hLine,
@@ -41,8 +41,6 @@ import ..Measures: height
 
 export install_term_stacktrace
 
-const STACKTRACE_PRINTED_ERROR_MSG = Ref(false)
-
 """
 Stores information useful for creating the layout
 of a stack trace visualization.
@@ -56,7 +54,7 @@ struct StacktraceContext
     theme::Theme
 end
 
-function StacktraceContext(w = default_stacktrace_width())
+function StacktraceContext(w = default_stacktrace_width() - 12)
     frame_panel_w = w - 4 - 12 - 3 # panel walls and padding
     module_line_w = w - 4 - 4
     func_name_w = frame_panel_w - 4 - 8 # including (n) before fname
@@ -124,6 +122,7 @@ function install_term_stacktrace(;
                 length(bt) > 0 && print(
                     io,
                     hLine(
+                        ctx.out_w,
                         "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
                         style = "dim $(ctx.theme.err_errmsg)",
                     ),
@@ -143,25 +142,20 @@ function install_term_stacktrace(;
 
                 # print message panel if VSCode is not handling that through a second call to this fn
 
-                if STACKTRACE_PRINTED_ERROR_MSG[] == false
-                    msg = highlight(sprint(Base.showerror, er)) |> apply_style
-                    err_panel = Panel(
-                        RenderableText(
-                            reshape_code_string(msg, ctx.module_line_w);
-                            width = ctx.module_line_w,
-                        );
-                        width = ctx.out_w,
-                        title = "{bold $(ctx.theme.err_errmsg) default underline}$(typeof(er)){/bold $(ctx.theme.err_errmsg) default underline}",
-                        padding = (2, 2, 1, 1),
-                        style = "dim $(ctx.theme.err_errmsg)",
-                        title_justify = :center,
-                        fit = false,
-                    )
-                    print(io, err_panel)
-                    STACKTRACE_PRINTED_ERROR_MSG[] = true
-                else
-                    STACKTRACE_PRINTED_ERROR_MSG[] = false
-                end
+                msg = highlight(sprint(Base.showerror, er)) |> apply_style
+                err_panel = Panel(
+                    RenderableText(
+                        reshape_code_string(msg, ctx.module_line_w);
+                        width = ctx.module_line_w,
+                    );
+                    width = ctx.out_w,
+                    title = "{bold $(ctx.theme.err_errmsg) default underline}$(typeof(er)){/bold $(ctx.theme.err_errmsg) default underline}",
+                    padding = (2, 2, 1, 1),
+                    style = "dim $(ctx.theme.err_errmsg)",
+                    title_justify = :center,
+                    fit = false,
+                )
+                print(io, err_panel)
 
             catch cought_err  # catch when something goes wrong during error handling in Term
                 @error "Term.jl: error while rendering error message: " cought_err

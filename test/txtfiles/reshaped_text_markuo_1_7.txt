@@ -1,6 +1,6 @@
-{(220, 180, 150)} pink {bold}pink bold {dodger_blue2} pink bold{/dodger_blue2}{/bold}{/(220, 180, 150)}[0m
-{(220, 180, 150)}{bold}{dodger_blue2}blue {/dodger_blue2} pink bold {/bold} pink {on_(25, 55, 100)} pink{/on_(25, 55, 100)}{/(220, 180, 150)}[0m
-{(220, 180, 150)}{on_(25, 55, 100)}on blue {/(220, 180, 150)} just on blue {/on_(25, 55, 100)} NOW[0m
-SIMPLE WHITE {red} red red red {/red}[0m
-white white {underline} underline underline{/underline}[0m
-{underline} {/underline}[0m
+{(220, 180, 150)} pink {bold}pink bold {dodger_blue2} pink bold{/dodger_blue2}{/bold}{/(220, 180, 150)}
+{(220, 180, 150)}{bold}{dodger_blue2}blue {/dodger_blue2} pink bold {/bold} pink {on_(25, 55, 100)} pink{/on_(25, 55, 100)}{/(220, 180, 150)}
+{(220, 180, 150)}{on_(25, 55, 100)}on blue {/(220, 180, 150)} just on blue {/on_(25, 55, 100)} NOW
+SIMPLE WHITE {red} red red red {/red}
+white white {underline} underline underline{/underline}
+{underline} {/underline}

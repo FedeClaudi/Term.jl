@@ -1,1 +1,1 @@
-                                                       [4m[38;2;129;212;250m]8;;/Users/federicoclaudi/Documents/Github/Term.jl/src/_tables.jl\...Term.jl/src/_tables.jl]8;;\[24m[39m
+                   [4m[38;2;129;212;250m]8;;file:///Users/federicoclaudi/Documents/Github/Term.jl/src/_tables.jl/Users/federicoclaudi/Documents/Github/Term.jl/src/_tables.jl]8;;[24m[39m

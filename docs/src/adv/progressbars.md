@@ -177,6 +177,35 @@ end
 
 what's that `cols_kwargs`? You can use that to pass additional parameters to each columns, e.g. to set its style.
 
+
+You can also pass a `cols_kwargs` argument to `addjob!` to set the column style for individual jobs!
+```@example prog
+
+pbar = ProgressBar(; expand = true, columns=:detailed, colors="#ffffff", 
+    columns_kwargs = Dict(
+        :ProgressColumn => Dict(:completed_char => '█', :remaining_char => '░'),
+    )
+)
+job = addjob!(pbar; N = 10, description="Test")
+
+job2 = addjob!(
+    pbar; 
+    N = 10, 
+    description="Test2", 
+    columns_kwargs = Dict(
+        :ProgressColumn => Dict(:completed_char => 'x', :remaining_char => '_'),
+    )
+)
+
+with(pbar) do
+    for i in 1:10
+        update!(job)
+        update!(job2)
+        sleep(0.01)
+    end
+end
+```
+
 ### Custom columns
 If there some kind of information that you want to display and Term doesn't have a column for it, just make your own! 
 

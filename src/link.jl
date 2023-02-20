@@ -103,19 +103,26 @@ Build a link given a file path and line number.
 """
 function Link(
     file_path::AbstractString,
-    line_number::Union{Nothing,Integer} = nothing;
+    line_number::Union{Nothing,Integer} = nothing,
+    display_text::Union{Nothing,String} = nothing;
     style = TERM_THEME[].link,
 )
-    link_dest = isnothing(line_number) ? file_path : "$file_path#$line_number"
-    short_path = get_relative_path(file_path)
-    display_text = isnothing(line_number) ? short_path : "$short_path $(line_number)"
+    link_dest =
+        isnothing(line_number) ? "file://" * file_path : "file://$file_path#$line_number"
+    isnothing(display_text) &&
+        (display_text = isnothing(line_number) ? file_path : "$file_path:$line_number")
     link_text =
         "{$(style)}" *
-        "\x1b]8;;$link_dest\x1b\\$display_text\x1b]8;;\x1b\\" *
+        "\e]8;;" *
+        link_dest *
+        "\a" *
+        display_text *
+        "\e]8;;\a" *
         "{/$(style)}" |> apply_style
-    link_measure = Measure(1, textlen(display_text))
 
+    link_measure = Measure(1, textlen(display_text))
     link_string = LinkString(link_text, link_measure.w)
+
     return Link(
         [Segment(link_string)],
         link_measure,

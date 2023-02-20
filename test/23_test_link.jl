@@ -16,20 +16,20 @@ ren = RenderableText("abcd")
 lr = RenderableText(l2 * ren)
 
 @testset "LINK measure" begin
-    @test l1.measure.w == 25
-    @test l2.measure.w == 29
-    @test l3.measure.w == 29
+    @test l1.measure.w == 61
+    @test l2.measure.w == 65
+    @test l3.measure.w == 65
 
     ren_w = ren.measure.w
-    @test (l1 * ren).measure.w == 25 + ren_w
-    @test (l2 * ren).measure.w == 29 + ren_w
-    @test (l3 * ren).measure.w == 29 + ren_w
+    @test (l1 * ren).measure.w == 61 + ren_w
+    @test (l2 * ren).measure.w == 65 + ren_w
+    @test (l3 * ren).measure.w == 65 + ren_w
 
-    @test lr.measure.w == 33
-    @test (lr * ren).measure.w == 37
+    @test lr.measure.w == 69
+    @test (lr * ren).measure.w == 73
 
-    @test (l1 / l2).measure.w == 29
-    @test (l1 / lr).measure.w == 33
+    @test (l1 / l2).measure.w == 65
+    @test (l1 / lr).measure.w == 69
 end
 
 @testset "LINK padding" begin

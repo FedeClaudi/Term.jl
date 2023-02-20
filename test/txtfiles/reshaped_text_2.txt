@@ -1,5 +1,4 @@
-Lorem {red}ipsum dolor sit {underline}amet,{/underline}{/red}[0m
-{red}{underline}consectetur{/underline} adipiscing elit,{/red}[0m
-{red}{/red}{blue}sed do eiusmod tempor incididunt{/blue}[0m
-ut labore et dolore magna aliqua.[0m
-[0m
+Lorem {red}ipsum dolor sit {underline}amet,{/underline}{/red}
+{red}{underline}consectetur{/underline} adipiscing elit,{/red}
+{red}{/red}{blue}sed do eiusmod tempor incididunt{/blue}
+ut labore et dolore magna aliqua.

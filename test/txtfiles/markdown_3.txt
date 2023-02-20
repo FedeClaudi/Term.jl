@@ -1,16 +1,16 @@
-This is an example of markdown content rendered in Term.jl.[0m
-You can use markdown syntax to make words {bold}bold{/bold} and {italic}italic{/italic}[0m
-or insert {#FFF59D italic}`{/#FFF59D italic}[38;2;222;222;222mliterals[39m{#FFF59D italic}`{/#FFF59D italic}.[0m[0m
+This is an example of markdown content rendered in Term.jl.
+You can use markdown syntax to make words {bold}bold{/bold} and {italic}italic{/italic}
+or insert {#FFF59D italic}`{/#FFF59D italic}[38;2;222;222;222mliterals[39m{#FFF59D italic}`{/#FFF59D italic}.[0m
 
-You markdown can include in-line latex {#FFF59D italic}ŁaTeX  frac{{1}}{{2}}{/#FFF59D italic} and[0m
-maths in a new line too:[0m[0m
+You markdown can include in-line latex {#FFF59D italic}ŁaTeX  frac{{1}}{{2}}{/#FFF59D italic} and
+maths in a new line too:[0m
 
 
-     {#FFF59D italic}f(a) = \frac{1}{2\pi}\int_{0}^{2\pi} (\alpha+R\cos(\theta))d\theta{/#FFF59D italic}{/0}{/1}[0m
+     {#FFF59D italic}f(a) = \frac{1}{2\pi}\int_{0}^{2\pi} (\alpha+R\cos(\theta))d\theta{/#FFF59D italic}{/0}{/1}
 [0m
 
-You can also have links: {white bold}Julia{/white bold} {dim}(http://www.julialang.org){/dim}[0m
-and footnotes {#9aacdb}[1]{/#9aacdb} for your content {#9aacdb}[named]{/#9aacdb}.[0m[0m
+You can also have links: {white bold}Julia{/white bold} {dim}(http://www.julialang.org){/dim}
+and footnotes {#9aacdb}[1]{/#9aacdb} for your content {#9aacdb}[named]{/#9aacdb}.[0m
 
 And, of course, you can show some code too:[0m
 
@@ -24,13 +24,13 @@ And, of course, you can show some code too:[0m
 
 You can use "quotes" to highlight a section:[0m
 
-  [38;2;90;116;242m>[39m [37m“[39mMulti-line quotes can be helpful to make a  paragram[0m  
-  [2m[38;2;90;116;242m┃[22m[39m[0m stand out, so that users[0m[0m                               
-  [2m[38;2;90;116;242m┃[22m[39m[0m won't miss it! You can use [1mother inline syntax[22m in[0m      
-  [2m[38;2;90;116;242m┃[22m[39m[0m you [3m[38;2;255;245;157m`[23m[39m[38;2;222;222;222mquotes[39m[3m[38;2;255;245;157m`[23m[39m too.[0m[0m[37m”[39m[0m[0m                                     
+  [38;2;90;116;242m>[39m [37m“[39mMulti-line quotes can be helpful to make a  paragram  
+  [2m[38;2;90;116;242m┃[22m[39m[0m stand out, so that users                               
+  [2m[38;2;90;116;242m┃[22m[39m[0m won't miss it! You can use [1mother inline syntax[22m in      
+  [2m[38;2;90;116;242m┃[22m[39m[0m you [3m[38;2;255;245;157m`[23m[39m[38;2;222;222;222mquotes[39m[3m[38;2;255;245;157m`[23m[39m too.[0m[37m”[39m[0m                                     
 
-but if you really need to grab someone's attention, use[0m
-admonitions:[0m[0m
+but if you really need to grab someone's attention, use
+admonitions:[0m
 
     [2m[34m╭──── [22m[34mNote[0m[22m[39m[2m[34m[2m[34m ────────────────────────────────────────╮[22m[39m[0m[22m[39m
     [2m[34m│[22m[39m  You can use different levels[0m                    [2m[34m│[22m[39m
@@ -45,9 +45,9 @@ admonitions:[0m[0m
     [0m[2m[31m╰──────────────────────────────────────────────────╯[22m[39m[0m[0m
 
     [2m[32m╭──── [22m[32mWow![0m[22m[39m[2m[32m[2m[32m ────────────────────────────────────────╮[22m[39m[0m[22m[39m
-    [2m[32m│[22m[39m  Turns out that admonitions can be pretty[0m        [2m[32m│[22m[39m
-    [2m[32m│[22m[39m  useful![0m[0m                                         [2m[32m│[22m[39m
-    [2m[32m│[22m[39m  What will you use them for?[0m[0m                     [2m[32m│[22m[39m
+    [2m[32m│[22m[39m  Turns out that admonitions can be pretty        [2m[32m│[22m[39m
+    [2m[32m│[22m[39m  useful!                                         [2m[32m│[22m[39m
+    [2m[32m│[22m[39m  What will you use them for?[0m                     [2m[32m│[22m[39m
     [0m[2m[32m╰──────────────────────────────────────────────────╯[22m[39m[0m[0m
 
 [2m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[22m
@@ -70,11 +70,11 @@ and ordered lists too:[0m
 
 
     [2m[34m╭──── [22m[34mTables[0m[22m[39m[2m[34m[2m[34m ──────────────────────────────────────╮[22m[39m[0m[22m[39m
-    [2m[34m│[22m[39m  You can use the [1m[37mMarkdown table syntax[22m[39m [2m(https:[22m[0m   [2m[34m│[22m[39m
-    [2m[34m│[22m[39m  [2m//www[22m[0m[0m                                           [2m[34m│[22m[39m
-    [2m[34m│[22m[39m  [2m.markdownguide.org/extended-sy[22m[0m[0m                  [2m[34m│[22m[39m
-    [2m[34m│[22m[39m  [2mntax/#tables)[22m to insert tables - Term.jl will[0m   [2m[34m│[22m[39m
-    [2m[34m│[22m[39m  convert them to Table object![0m[0m[0m                   [2m[34m│[22m[39m
+    [2m[34m│[22m[39m  You can use the [1m[37mMarkdown table syntax[22m[39m [2m(https:[22m   [2m[34m│[22m[39m
+    [2m[34m│[22m[39m  [2m//www[22m                                           [2m[34m│[22m[39m
+    [2m[34m│[22m[39m  [2m.markdownguide.org/extended-sy[22m                  [2m[34m│[22m[39m
+    [2m[34m│[22m[39m  [2mntax/#tables)[22m to insert tables - Term.jl will   [2m[34m│[22m[39m
+    [2m[34m│[22m[39m  convert them to Table object![0m                   [2m[34m│[22m[39m
     [0m[2m[34m╰──────────────────────────────────────────────────╯[22m[39m[0m[0m
 
      [2m╭───────────┬──────────────┬────────────╮[22m      
@@ -91,5 +91,5 @@ This is where you print the content of your foot notes:[0m
 
 [38;2;154;172;219m[1][39m: Numbered footnote text.[0m                                
 
-[38;2;154;172;219m[note][39m: Named footnote text containing several toplevel[0m     
-elements.[0m[0m                                                   
+[38;2;154;172;219m[note][39m: Named footnote text containing several toplevel     
+elements.[0m                                                   

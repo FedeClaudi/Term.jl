@@ -1,2 +1,2 @@
-{red}adasd ad sa dsa{bold} ad {blue} sd d ads{/blue}{/bold}{/red}[0m
-{red}{bold}{blue}ad {/blue}da dad {/bold} asdsa dad a {/red}[0m
+{red}adasd ad sa dsa{bold} ad {blue} sd d ads{/blue}{/bold}{/red}
+{red}{bold}{blue}ad {/blue}da dad {/bold} asdsa dad a {/red}

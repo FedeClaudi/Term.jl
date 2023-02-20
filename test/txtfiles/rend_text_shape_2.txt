@@ -1,52 +1,52 @@
-Lorem[0m       
-ipsum[0m       
-dolor[0m       
-sit amet,[0m   
-consectetur[0m 
- adipiscing[0m 
- elit,[0m      
-sed do[0m      
-eiusmod[0m     
-tempor[0m      
-incididunt[0m  
-ut labore[0m   
-et dolore[0m   
-magna[0m       
-aliqua.[0m     
-Ut enim[0m     
-ad minim[0m    
-veniam,[0m     
-quis nostru[0m 
-d exercitat[0m 
-ion ullamco[0m 
- laboris[0m    
-nisi ut[0m     
-aliquip[0m     
-ex ea[0m       
-commodo[0m     
-consequat.[0m  
-Duis aute[0m   
-irure[0m       
-dolor[0m       
-in reprehen[0m 
-derit[0m       
-in voluptat[0m 
-e velit[0m     
-esse cillum[0m 
- dolore[0m     
-eu fugiat[0m   
-nulla[0m       
-pariatur.[0m   
-Excepteur[0m   
-sint occaec[0m 
-at cupidata[0m 
-t non[0m       
-proident,[0m   
-sunt in[0m     
-culpa[0m       
-qui officia[0m 
- deserunt[0m   
-mollit[0m      
-anim id[0m     
-est laborum[0m 
-.[0m           
+Lorem       
+ipsum       
+dolor       
+sit amet,   
+consectetur 
+ adipiscing 
+ elit,      
+sed do      
+eiusmod     
+tempor      
+incididunt  
+ut labore   
+et dolore   
+magna       
+aliqua.     
+Ut enim     
+ad minim    
+veniam,     
+quis nostru 
+d exercitat 
+ion ullamco 
+ laboris    
+nisi ut     
+aliquip     
+ex ea       
+commodo     
+consequat.  
+Duis aute   
+irure       
+dolor       
+in reprehen 
+derit       
+in voluptat 
+e velit     
+esse cillum 
+ dolore     
+eu fugiat   
+nulla       
+pariatur.   
+Excepteur   
+sint occaec 
+at cupidata 
+t non       
+proident,   
+sunt in     
+culpa       
+qui officia 
+ deserunt   
+mollit      
+anim id     
+est laborum 
+.           

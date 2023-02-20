@@ -45,8 +45,10 @@ const DEFAULT_STACKTRACE_WIDTH = Ref{Int}(140)
 
 default_width(io = stdout)::Int =
     min(DEFAULT_CONSOLE_WIDTH[], something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
-default_stacktrace_width(io = stderr)::Int =
-    min(DEFAULT_STACKTRACE_WIDTH[], something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
+default_stacktrace_width(io = stderr)::Int = min(
+    DEFAULT_STACKTRACE_WIDTH[],
+    something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2] - 4),
+)
 
 const DEFAULT_ASPECT_RATIO = Ref(4 / 3)  # 4:3 - 16:9 - 21:9
 
