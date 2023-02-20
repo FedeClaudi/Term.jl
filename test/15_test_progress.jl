@@ -97,7 +97,7 @@ end
         :DescriptionColumn => Dict(:style => "red"),
         :TextColumn => Dict(:text => "test"),
     )
-    pbar = ProgressBar(; columns_kwargs = colkwargs)
+    pbar = ProgressBar(; columns = mycols, columns_kwargs = colkwargs)
     job = addjob!(pbar; N = 10)
     @test job.columns[1].segments[1].text == "\e[31mRunning...\e[39m"
 end
