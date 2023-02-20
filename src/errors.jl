@@ -41,7 +41,6 @@ import ..Measures: height
 
 export install_term_stacktrace
 
-
 """
 Stores information useful for creating the layout
 of a stack trace visualization.
@@ -55,7 +54,7 @@ struct StacktraceContext
     theme::Theme
 end
 
-function StacktraceContext(w = default_stacktrace_width())
+function StacktraceContext(w = default_stacktrace_width() - 12)
     frame_panel_w = w - 4 - 12 - 3 # panel walls and padding
     module_line_w = w - 4 - 4
     func_name_w = frame_panel_w - 4 - 8 # including (n) before fname
@@ -123,6 +122,7 @@ function install_term_stacktrace(;
                 length(bt) > 0 && print(
                     io,
                     hLine(
+                        ctx.out_w,
                         "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
                         style = "dim $(ctx.theme.err_errmsg)",
                     ),

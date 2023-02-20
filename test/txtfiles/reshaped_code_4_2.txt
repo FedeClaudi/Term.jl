@@ -1,5 +1,5 @@
-[38;2;242;215;119mcalc_columns_widths[39m(N_cols[38;2;206;147;216m::Int64[39m, N_rows[38;2;206;147;216m::Int64[39m, columns_widths[38;2;206;147;216m:[0m[39m
-[38;2;206;147;216m:Nothing[39m, show_header[38;2;206;147;216m::Bool[39m, header[38;2;206;147;216m::Tuple[39m{{String, String,[0m
-String}}, tb[38;2;206;147;216m::Tables.MatrixTable[39m{Matrix{{Float64}}}, sch[38;2;206;147;216m::Tables.[0m[39m
-[38;2;206;147;216mSchema[39m{([38;2;255;167;38m:Column1[39m, [38;2;255;167;38m:Column2[39m, [38;2;255;167;38m:Column3[39m), Tuple{{Float64, Float64,[0m
-Float64}}}, footer[38;2;206;147;216m::Nothing[39m, hpad[38;2;206;147;216m::Vector[39m{{Int64}})[0m
+[38;2;242;215;119mcalc_columns_widths[39m(N_cols[38;2;206;147;216m::Int64[39m, N_rows[38;2;206;147;216m::Int64[39m, columns_widths[38;2;206;147;216m:[39m
+[38;2;206;147;216m:Nothing[39m, show_header[38;2;206;147;216m::Bool[39m, header[38;2;206;147;216m::Tuple[39m{{String, String,
+String}}, tb[38;2;206;147;216m::Tables.MatrixTable[39m{Matrix{{Float64}}}, sch[38;2;206;147;216m::Tables.[39m
+[38;2;206;147;216mSchema[39m{([38;2;255;167;38m:Column1[39m, [38;2;255;167;38m:Column2[39m, [38;2;255;167;38m:Column3[39m), Tuple{{Float64, Float64,
+Float64}}}, footer[38;2;206;147;216m::Nothing[39m, hpad[38;2;206;147;216m::Vector[39m{{Int64}})

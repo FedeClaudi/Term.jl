@@ -36,11 +36,10 @@ end
 
         @info MyStruct("aa a"^100, zeros(200), 4)
 
-
-        @info "A" zeros(100, 100)  zeros(10) zeros(100, 100, 100)
+        @info "A" zeros(100, 100) zeros(10) zeros(100, 100, 100)
         @info "B" (1, 2)
         @info "C" Panel()
-        @info "D" Dict{Symbol, Number}(Symbol(x)=>x for x in 1:100)
+        @info "D" Dict{Symbol,Number}(Symbol(x) => x for x in 1:100)
     end
 
     # IS_WIN || @compare_to_string output "logs.txt"

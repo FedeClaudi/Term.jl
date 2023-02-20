@@ -107,11 +107,19 @@ function Link(
     display_text::Union{Nothing,String} = nothing;
     style = TERM_THEME[].link,
 )
-    link_dest = isnothing(line_number) ? "file://"*file_path : "file://$file_path#$line_number"
-    isnothing(display_text) && (display_text = isnothing(line_number) ? file_path : "$file_path:$line_number")
-    link_text = "{$(style)}" * "\e]8;;" * link_dest * "\a" * display_text * "\e]8;;\a" * "{/$(style)}" |> apply_style
+    link_dest =
+        isnothing(line_number) ? "file://" * file_path : "file://$file_path#$line_number"
+    isnothing(display_text) &&
+        (display_text = isnothing(line_number) ? file_path : "$file_path:$line_number")
+    link_text =
+        "{$(style)}" *
+        "\e]8;;" *
+        link_dest *
+        "\a" *
+        display_text *
+        "\e]8;;\a" *
+        "{/$(style)}" |> apply_style
 
-    
     link_measure = Measure(1, textlen(display_text))
     link_string = LinkString(link_text, link_measure.w)
 

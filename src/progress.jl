@@ -259,7 +259,7 @@ mutable struct ProgressBar
     columns_kwargs::Dict
 
     transient::Bool
-    colors::Vector{RGBColor}
+    colors::Union{String,Vector{RGBColor}}
     Δt::Float64
 
     buff::IOBuffer  # will be used to store temporarily re-directed stdout
@@ -287,17 +287,13 @@ end
 Create a ProgressBar instance.
 """
 function ProgressBar(;
-    width::Int = default_width(),
+    width::Int                              = default_width(),
     columns::Union{Vector{DataType},Symbol} = :default,
-    columns_kwargs::Dict = Dict(),
-    expand::Bool = false,
-    transient::Bool = false,
-    colors::Vector{RGBColor} = [
-        RGBColor("(1, .05, .05)"),
-        RGBColor("(.05, .05, 1)"),
-        RGBColor("(.05, 1, .05)"),
-    ],
-    refresh_rate::Int = 60,  # FPS of rendering
+    columns_kwargs::Dict                    = Dict(),
+    expand::Bool                            = false,
+    transient::Bool                         = false,
+    colors::Union{String,Vector{RGBColor}}  = [RGBColor("(1, .05, .05)"), RGBColor("(.05, .05, 1)"), RGBColor("(.05, 1, .05)")],
+    refresh_rate::Int                       = 60,  # FPS of rendering
 )
     columns = columns isa Symbol ? get_columns(columns) : columns
 
@@ -348,21 +344,15 @@ function addjob!(
     start::Bool = true,
     transient::Bool = false,
     id = nothing,
+    columns_kwargs::Dict = Dict(),
 )::ProgressJob
     pbar.running && print("\n")
 
     # create Job
     pbar.paused = true
     id = isnothing(id) ? length(pbar.jobs) + 1 : id
-    job = ProgressJob(
-        id,
-        N,
-        description,
-        pbar.columns,
-        pbar.width,
-        pbar.columns_kwargs,
-        transient,
-    )
+    kwargs = merge(pbar.columns_kwargs, columns_kwargs)
+    job = ProgressJob(id, N, description, pbar.columns, pbar.width, kwargs, transient)
 
     # start job
     start && start!(job)
@@ -740,6 +730,7 @@ Get the RGB color of of a progress bar's bar based on progress.
 """
 function jobcolor(pbar::ProgressBar, job::ProgressJob)
     isnothing(job.N) && return "white"
+    pbar.colors isa String && return pbar.colors
 
     α = 0.8 * job.i / job.N
     β = max(sin(π * job.i / job.N) * 0.7, 0.4)

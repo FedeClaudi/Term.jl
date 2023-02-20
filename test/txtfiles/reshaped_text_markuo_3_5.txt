@@ -1,5 +1,5 @@
-{on_red}adasd ad sa dsa{green}{/green}{/on_red}[0m
-{on_red}{green}ad {on_black} sd d ads{/on_black}{/green}{/on_red}[0m[0m
-{on_red}{green}{on_black}ad da{/on_black} dad {/green} asdsa{/on_red}[0m
-{on_red}ddfsf ad a{/on_red}[0m[0m
-{on_red}{/on_red}[0m
+{on_red}adasd ad sa dsa{green}{/green}{/on_red}
+{on_red}{green}ad {on_black} sd d ads{/on_black}{/green}{/on_red}
+{on_red}{green}{on_black}ad da{/on_black} dad {/green} asdsa{/on_red}
+{on_red}ddfsf ad a{/on_red}
+{on_red}{/on_red}

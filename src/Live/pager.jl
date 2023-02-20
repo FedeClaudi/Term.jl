@@ -118,7 +118,7 @@ function Pager(
         line_numbers,
         length(content),
         1,
-        max(height - 5, 1), + "a"
+        max(height - 5, 1),
     )
 end
 

@@ -1,7 +1,7 @@
-[38;2;220;180;150m pink [1mpink bold [38;5;27m pink[39m[38;2;220;180;150m[22m[38;2;220;180;150m[39m[0m
-[38;2;220;180;150m[1m[38;5;27mbold blue [39m[38;2;220;180;150m pink bold[22m[38;2;220;180;150m[39m[0m
-[38;2;220;180;150m[1m[22m[38;2;220;180;150m pink [48;2;25;55;100m pink on blue[49m[38;2;220;180;150m[39m[0m
-[38;2;220;180;150m[48;2;25;55;100m[39m just on blue [49m NOW SIMPLE[0m
- WHITE [31m red red red[39m[0m
-[31m[39m white white [4m underline[24m[0m
-[4munderline [24m[0m
+[38;2;220;180;150m pink [1mpink bold [38;5;27m pink[39m[38;2;220;180;150m[22m[38;2;220;180;150m[39m
+[38;2;220;180;150m[1m[38;5;27mbold blue [39m[38;2;220;180;150m pink bold[22m[38;2;220;180;150m[39m
+[38;2;220;180;150m[1m[22m[38;2;220;180;150m pink [48;2;25;55;100m pink on blue[49m[38;2;220;180;150m[39m
+[38;2;220;180;150m[48;2;25;55;100m[39m just on blue [49m NOW SIMPLE
+ WHITE [31m red red red[39m
+[31m[39m white white [4m underline[24m
+[4munderline [24m

@@ -1,6 +1,8 @@
 using Term.Progress
 import Term.Progress: AbstractColumn, getjob, get_columns, jobcolor
 import Term: install_term_logger, uninstall_term_logger, str_trunc
+import Term.Progress:
+    CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn, TextColumn
 
 using ProgressLogging
 
@@ -84,14 +86,52 @@ end
             end
         end
 
-        IS_WINDOWS || @compare_to_string render(job)  "pbar_cols_style_$i"
+        start!(pbar)
+        IS_WIN || @compare_to_string render(job) "pbar_cols_style_$i"
     end
 
-    mycols = [DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn, TextColumn]
-    colkwargs = Dict(:DescriptionColumn => Dict(:style => "red"), :TextColumn => Dict(:text => "test"))
+    mycols =
+        [DescriptionColumn, CompletedColumn, SeparatorColumn, ProgressColumn, TextColumn]
+    colkwargs = Dict(
+        :DescriptionColumn => Dict(:style => "red"),
+        :TextColumn => Dict(:text => "test"),
+    )
     pbar = ProgressBar(; columns_kwargs = colkwargs)
     job = addjob!(pbar; N = 10)
     @test job.columns[1].segments[1].text == "\e[31mRunning...\e[39m"
+end
+
+@testset "Progress customization" begin
+    pbar = ProgressBar(;
+        expand = true,
+        columns = :detailed,
+        colors = "#ffffff",
+        columns_kwargs = Dict(
+            :ProgressColumn => Dict(:completed_char => '█', :remaining_char => '░'),
+        ),
+    )
+    job = addjob!(pbar; N = 100, description = "Test")
+
+    job2 = addjob!(
+        pbar;
+        N = 100,
+        description = "Test2",
+        columns_kwargs = Dict(
+            :ProgressColumn => Dict(:completed_char => 'x', :remaining_char => '_'),
+        ),
+    )
+
+    with(pbar) do
+        for i in 1:100
+            update!(job)
+            update!(job2)
+            sleep(0.01)
+            i == 45 && break
+        end
+    end
+
+    start!(pbar)  # re-activate
+    IS_WIN || @compare_to_string render(pbar) "pbar_customization"
 end
 
 @testset "\e[34mProgress foreachprogress" begin

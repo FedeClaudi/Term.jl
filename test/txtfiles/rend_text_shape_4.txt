@@ -1,30 +1,30 @@
-Lorem ipsum[0m       
-dolor sit amet,[0m   
-consectetur[0m       
-adipiscing elit,[0m  
-sed do eiusmod[0m    
-tempor incididunt[0m 
- ut labore et[0m     
-dolore magna[0m      
-aliqua. Ut enim[0m   
-ad minim veniam,[0m  
-quis nostrud[0m      
-exercitation[0m      
-ullamco laboris[0m   
-nisi ut aliquip[0m   
-ex ea commodo[0m     
-consequat. Duis[0m   
-aute irure dolor[0m  
-in reprehenderit[0m  
-in voluptate[0m      
-velit esse cillum[0m 
- dolore eu fugiat[0m 
- nulla pariatur.[0m  
-Excepteur sint[0m    
-occaecat cupidata[0m 
-t non proident,[0m   
-sunt in culpa[0m     
-qui officia[0m       
-deserunt mollit[0m   
-anim id est[0m       
-laborum.[0m          
+Lorem ipsum       
+dolor sit amet,   
+consectetur       
+adipiscing elit,  
+sed do eiusmod    
+tempor incididunt 
+ ut labore et     
+dolore magna      
+aliqua. Ut enim   
+ad minim veniam,  
+quis nostrud      
+exercitation      
+ullamco laboris   
+nisi ut aliquip   
+ex ea commodo     
+consequat. Duis   
+aute irure dolor  
+in reprehenderit  
+in voluptate      
+velit esse cillum 
+ dolore eu fugiat 
+ nulla pariatur.  
+Excepteur sint    
+occaecat cupidata 
+t non proident,   
+sunt in culpa     
+qui officia       
+deserunt mollit   
+anim id est       
+laborum.          

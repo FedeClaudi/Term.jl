@@ -182,16 +182,16 @@ Create string display for a log message value.
 function log_value_display end
 
 function log_value_display(x::AbstractArray)
-    a = highlight(str_trunc(string(x), 100); ignore_ansi=true)
+    a = highlight(str_trunc(string(x), 100); ignore_ansi = true)
 
     s = foldl((a, b) -> a * " × " * b, string.(size(x)))
-    b = highlight("{bold dim}Size:  $(s){/bold dim}"; ignore_ansi=true)
+    b = highlight("{bold dim}Size:  $(s){/bold dim}"; ignore_ansi = true)
     return a * "\n" * b
 end
 
-log_value_display(x::AbstractDict) = highlight(str_trunc(string(x), 100); ignore_ansi=true)
+log_value_display(x::AbstractDict) =
+    highlight(str_trunc(string(x), 100); ignore_ansi = true)
 log_value_display(x) = highlight(str_trunc(string(x), 100);)
-
 
 """
     handle_message(logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...)
@@ -275,14 +275,13 @@ function Logging.handle_message(
     types_w = min(console_width() / 5, maximum(width.(string.(_types)))) |> round |> Int
     types_w = max(12, types_w)
 
-    _keys = map(k -> highlight(string(k), theme=logger.theme), keys(kwargs))
+    _keys = map(k -> highlight(string(k), theme = logger.theme), keys(kwargs))
     keys_w = min(console_width() / 5, maximum(width.(_keys))) |> round |> Int
     keys_ = max(12, keys_w)
 
     _vals = map(v -> log_value_display(v), collect(values(kwargs)))
     vals_w = min(console_width() / 5 * 3 - 7, maximum(width.(_vals)) - 7) |> round |> Int
     vals_w = max(12, vals_w)
-
 
     # function to format content, style and shape
     fmt_str(x, style::String, w::Int) = RenderableText(string(x); width = w, style = style)
@@ -293,7 +292,6 @@ function Logging.handle_message(
     ks = fmt_str.(_keys, logger.theme.text_accent, keys_w)
     ts = fmt_str.(_types, "dim " * logger.theme.type, types_w)
     vs = fmt_str.(_vals, "", vals_w)
-
 
     # print all kwargs
     eq = "{$(logger.theme.operator)}={/$(logger.theme.operator)}"

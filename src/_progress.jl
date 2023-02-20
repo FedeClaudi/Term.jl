@@ -30,14 +30,13 @@ end
 
 update!(col::DescriptionColumn, args...)::String = col.text
 
-
 mutable struct TextColumn <: AbstractColumn
     job::ProgressJob
     segments::Vector{Segment}
     measure::Measure
     text::String
 
-    function TextColumn(job::ProgressJob; style::String = blue_light, text="")
+    function TextColumn(job::ProgressJob; style::String = blue_light, text = "")
         seg = Segment(text, style)
         return new(job, [seg], seg.measure, seg.text)
     end
@@ -226,8 +225,14 @@ mutable struct ProgressColumn <: AbstractColumn
     segments::Vector{Segment}
     measure::Measure
     nsegs::Int
+    completed_char::Char
+    remaining_char::Char
 
-    ProgressColumn(job::ProgressJob) = new(job, Vector{Segment}(), Measure(0, 0), 0)
+    ProgressColumn(
+        job::ProgressJob;
+        completed_char::Char = '━',
+        remaining_char::Char = ' ',
+    ) = new(job, Vector{Segment}(), Measure(0, 0), 0, completed_char, remaining_char)
 end
 
 function setwidth!(col::ProgressColumn, width::Int)
@@ -242,11 +247,11 @@ function update!(col::ProgressColumn, color::String, args...)::String
         "{" *
         color *
         " bold}" *
-        '━'^(completed) *
+        col.completed_char^(completed) *
         "{/" *
         color *
         " bold}" *
-        " "^(remaining),
+        col.remaining_char^(remaining),
     )
 end
 

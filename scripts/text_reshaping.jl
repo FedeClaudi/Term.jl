@@ -47,7 +47,7 @@ for text in strings
 
     print("\n\n")
     println("\e[0m" * '_'^width)
-    tprintln(reshape_text(text, width) * Panel(; height=10, width=10))
+    tprintln(reshape_text(text, width) * Panel(; height = 10, width = 10))
     println("\e[0m" * '_'^width)
 end
 
