@@ -8,7 +8,7 @@ import ..Renderables: RenderableText, AbstractRenderable
 import ..Renderables
 import ..Layout: pad
 import Term:
-    get_relative_path, textlen, TERM_THEME, cleantext, excise_link_display_text, remove_ansi
+    textlen, TERM_THEME, cleantext, excise_link_display_text, remove_ansi
 import Term
 
 export Link

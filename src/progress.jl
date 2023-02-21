@@ -352,6 +352,7 @@ function addjob!(
     pbar.paused = true
     id = isnothing(id) ? length(pbar.jobs) + 1 : id
     kwargs = merge(pbar.columns_kwargs, columns_kwargs)
+
     job = ProgressJob(id, N, description, pbar.columns, pbar.width, kwargs, transient)
 
     # start job
@@ -675,6 +676,7 @@ function foreachprogress(
     n = _getn(iter),
     transient = true,
     parallel = false,
+    columns_kwargs = Dict(),
     kwargs...,
 )
     task = nothing
@@ -687,9 +689,10 @@ function foreachprogress(
             start!(pbar)
             task = Threads.@spawn _startrenderloop(pbar)
         end
+        return
 
         # The job tracks the iteration through `iter`
-        job = addjob!(pbar; N = n, transient, kwargs...)
+        job = addjob!(pbar; N = n, transient=transient, columns_kwargs=columns_kwargs, kwargs...)
         if parallel
             Threads.@threads for elem in iter
                 f(elem)
