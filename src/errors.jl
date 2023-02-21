@@ -123,8 +123,7 @@ function install_term_stacktrace(;
                     io,
                     hLine(
                         ctx.out_w,
-                        "{defaul
-                        t bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
+                        "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
                         style = "dim $(ctx.theme.err_errmsg)",
                     ),
                 )
