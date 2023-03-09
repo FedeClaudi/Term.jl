@@ -15,7 +15,7 @@ print(Panel("This is my first panel!"))
 
 """
 By default Panel expands to fit its content. 
-You can use different options to change this beahavior.
+You can use different options to change this behavior.
 """
 
 print("\n\n")

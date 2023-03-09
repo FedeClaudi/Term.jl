@@ -244,7 +244,7 @@ Term parses `MD` types - markdown content - with style!
     Have a look at the docs for more info!
     [docs](https://fedeclaudi.github.io/Term.jl/stable/)
 
-Julia's docstring are parsed as Markdown, and Term turns markdown insto styled terminal output. 
+Julia's docstring are parsed as Markdown, and Term turns markdown into styled terminal output. 
 So you can use term to print styled docstrings and other info to the REPL. 
 
 ```julia

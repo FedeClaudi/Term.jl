@@ -92,7 +92,7 @@ that's right, `Term.jl` can also color the background of your text (by adding `o
 If you just want to **use** `Term.jl`'s style functionality, just make sure to read the admonition below. If you're curious about what's happening under the hood, read on below!
 
 !!! warning "A note on style tags"
-    The style tags used by `Term.jl` have an opening `"{style}"` and closing `"{/style}"` syntax. The style is applied to everything in between. For `"{/style]"` to close `"{style]"` the text in the parentheses must match exactly (excuding `/`), up to the number and position of spaces and the words order. So:
+    The style tags used by `Term.jl` have an opening `"{style}"` and closing `"{/style}"` syntax. The style is applied to everything in between. For `"{/style]"` to close `"{style]"` the text in the parentheses must match exactly (excluding `/`), up to the number and position of spaces and the words order. So:
     ```julia
     "{red} wohoo {/red}"  # works
     "{red} wohoo {/red }" # doesn't
@@ -174,7 +174,7 @@ somehow.
 CurrentModule = Term.Style
 ```
 
-All of this is taken care of by `Term.Style.apply_style` which extracts markup style information from your strings and replaces them with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text bewteen `{...}`) into a `Term.Style.MarkupStyle` object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
+All of this is taken care of by `Term.Style.apply_style` which extracts markup style information from your strings and replaces them with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text between `{...}`) into a `Term.Style.MarkupStyle` object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
 So in summary:
 
 ```julia

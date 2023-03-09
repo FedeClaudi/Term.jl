@@ -28,7 +28,7 @@ test()
 
 ### Term is opinionated
 
-In altering Julia's default stacktraces handling, a few choices where made such as: inveriting the order in which the backtrace's stack frames are shown and hiding frames from `Base` or other packages installed through `Pkg` (similarly to [AbbreviatedStackTraces.jl](https://github.com/BioTurboNick/AbbreviatedStackTraces.jl)).
+In altering Julia's default stacktraces handling, a few choices where made such as: inverting the order in which the backtrace's stack frames are shown and hiding frames from `Base` or other packages installed through `Pkg` (similarly to [AbbreviatedStackTraces.jl](https://github.com/BioTurboNick/AbbreviatedStackTraces.jl)).
 When installing `Term`'s stacktrace system with `install_term_stacktrace`, you can use the keyword arguments to alter this behavior
     
 ```@example
