@@ -5,85 +5,85 @@ data = hcat(t, rand(Int8, length(t)))
 Table(data) # or use a matrix!</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr38_2" style="color:#9bb3e0">            ╷            </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr37"><span class="sgr1">  Column1  </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr37"><span class="sgr1">  Column2  </span></span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╺━━━━━━━━━━━┿━━━━━━━━━━━╸</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    112    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -52    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -33    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    27     <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    14     <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -92    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">            ╵            </span>
 </code></pre><p>nothing spectacular so far, but <code>Table</code> has a ton of options.</p><h3 id="Box-style"><a class="docs-heading-anchor" href="#Box-style">Box style</a><a id="Box-style-1"></a><a class="docs-heading-anchor-permalink" href="#Box-style" title="Permalink"></a></h3><p>You can adjust the box used and its style</p><pre><code class="language-julia hljs">Table(data; box=:ROUNDED, style=&quot;red&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr31">╭───────────┬───────────╮</span>
 <span class="sgr31">│</span><span class="sgr37"><span class="sgr1">  Column1  </span></span><span class="sgr31">│</span><span class="sgr37"><span class="sgr1">  Column2  </span></span><span class="sgr31">│</span>
 <span class="sgr31">├───────────┼───────────┤</span>
-<span class="sgr31">│</span>     1     <span class="sgr31">│</span>    112    <span class="sgr31">│</span>
+<span class="sgr31">│</span>     1     <span class="sgr31">│</span>    -52    <span class="sgr31">│</span>
 <span class="sgr31">├───────────┼───────────┤</span>
-<span class="sgr31">│</span>     2     <span class="sgr31">│</span>    -33    <span class="sgr31">│</span>
+<span class="sgr31">│</span>     2     <span class="sgr31">│</span>    27     <span class="sgr31">│</span>
 <span class="sgr31">├───────────┼───────────┤</span>
-<span class="sgr31">│</span>     3     <span class="sgr31">│</span>    14     <span class="sgr31">│</span>
+<span class="sgr31">│</span>     3     <span class="sgr31">│</span>    -92    <span class="sgr31">│</span>
 <span class="sgr31">╰───────────┴───────────╯</span>
 </code></pre><pre><code class="language-julia hljs">Table(data; box=:SIMPLE, style=&quot;dim bold&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr2">                         </span>
 <span class="sgr2"> </span><span class="sgr37"><span class="sgr1">  Column1  </span></span><span class="sgr2"> </span><span class="sgr37"><span class="sgr1">  Column2  </span></span><span class="sgr2"> </span>
 <span class="sgr2"> ─────────────────────── </span>
-<span class="sgr2"> </span>     1     <span class="sgr2"> </span>    112    <span class="sgr2"> </span>
+<span class="sgr2"> </span>     1     <span class="sgr2"> </span>    -52    <span class="sgr2"> </span>
 <span class="sgr2">                         </span>
-<span class="sgr2"> </span>     2     <span class="sgr2"> </span>    -33    <span class="sgr2"> </span>
+<span class="sgr2"> </span>     2     <span class="sgr2"> </span>    27     <span class="sgr2"> </span>
 <span class="sgr2">                         </span>
-<span class="sgr2"> </span>     3     <span class="sgr2"> </span>    14     <span class="sgr2"> </span>
+<span class="sgr2"> </span>     3     <span class="sgr2"> </span>    -92    <span class="sgr2"> </span>
 <span class="sgr2">                         </span>
 </code></pre><pre><code class="language-julia hljs">Table(data; box=:MINIMAL_DOUBLE_HEAD, style=&quot;dim bold green&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32"><span class="sgr2">            ╷            </span></span>
 <span class="sgr32"><span class="sgr2"> </span></span><span class="sgr37"><span class="sgr1">  Column1  </span></span><span class="sgr32"><span class="sgr2">│</span></span><span class="sgr37"><span class="sgr1">  Column2  </span></span><span class="sgr32"><span class="sgr2"> </span></span>
 <span class="sgr32"><span class="sgr2"> ═══════════╪═══════════ </span></span>
-<span class="sgr32"><span class="sgr2"> </span></span>     1     <span class="sgr32"><span class="sgr2">│</span></span>    112    <span class="sgr32"><span class="sgr2"> </span></span>
+<span class="sgr32"><span class="sgr2"> </span></span>     1     <span class="sgr32"><span class="sgr2">│</span></span>    -52    <span class="sgr32"><span class="sgr2"> </span></span>
 <span class="sgr32"><span class="sgr2"> ───────────┼─────────── </span></span>
-<span class="sgr32"><span class="sgr2"> </span></span>     2     <span class="sgr32"><span class="sgr2">│</span></span>    -33    <span class="sgr32"><span class="sgr2"> </span></span>
+<span class="sgr32"><span class="sgr2"> </span></span>     2     <span class="sgr32"><span class="sgr2">│</span></span>    27     <span class="sgr32"><span class="sgr2"> </span></span>
 <span class="sgr32"><span class="sgr2"> ───────────┼─────────── </span></span>
-<span class="sgr32"><span class="sgr2"> </span></span>     3     <span class="sgr32"><span class="sgr2">│</span></span>    14     <span class="sgr32"><span class="sgr2"> </span></span>
+<span class="sgr32"><span class="sgr2"> </span></span>     3     <span class="sgr32"><span class="sgr2">│</span></span>    -92    <span class="sgr32"><span class="sgr2"> </span></span>
 <span class="sgr32"><span class="sgr2">            ╵            </span></span>
 </code></pre><h3 id="Header"><a class="docs-heading-anchor" href="#Header">Header</a><a id="Header-1"></a><a class="docs-heading-anchor-permalink" href="#Header" title="Permalink"></a></h3><p>You can set the header style:</p><pre><code class="language-julia hljs">Table(data; header_style=&quot;bold green&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr38_2" style="color:#9bb3e0">            ╷            </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1">  Column1  </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr32"><span class="sgr1">  Column2  </span></span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╺━━━━━━━━━━━┿━━━━━━━━━━━╸</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    112    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -52    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -33    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    27     <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    14     <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -92    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">            ╵            </span>
 </code></pre><p>and setting each style independently</p><pre><code class="language-julia hljs">Table(data; header_style=[&quot;bold green&quot;, &quot;dim&quot;])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr38_2" style="color:#9bb3e0">            ╷            </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1">  Column1  </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr2">  Column2  </span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╺━━━━━━━━━━━┿━━━━━━━━━━━╸</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    112    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -52    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -33    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    27     <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    14     <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -92    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">            ╵            </span>
 </code></pre><p>you can also set what the header should be and if it should be left-center-right justified:</p><pre><code class="language-julia hljs">Table(data; header=[&quot;A&quot;, &quot;B&quot;], header_justify=[:left, :right])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr38_2" style="color:#9bb3e0">      ╷        </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr37"><span class="sgr1"> A   </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr37"><span class="sgr1">     B </span></span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╺━━━━━┿━━━━━━━╸</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>  1  <span class="sgr38_2" style="color:#9bb3e0">│</span>  112  <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>  1  <span class="sgr38_2" style="color:#9bb3e0">│</span>  -52  <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶─────┼───────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>  2  <span class="sgr38_2" style="color:#9bb3e0">│</span>  -33  <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>  2  <span class="sgr38_2" style="color:#9bb3e0">│</span>  27   <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶─────┼───────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>  3  <span class="sgr38_2" style="color:#9bb3e0">│</span>  14   <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>  3  <span class="sgr38_2" style="color:#9bb3e0">│</span>  -92  <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">      ╵        </span>
 </code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>For all parameters that apply to the header, columns and footer; you can either pass a single parameter or a vector of parameters. If a single parameter is passed, it will be applied to all the columns, otherwise each element of the vector is applied to each column.</p></div></div><h3 id="Footer"><a class="docs-heading-anchor" href="#Footer">Footer</a><a id="Footer-1"></a><a class="docs-heading-anchor-permalink" href="#Footer" title="Permalink"></a></h3><p>Very similar to the header, but at the bottom:</p><pre><code class="language-julia hljs">Table(data; footer=[&quot;A&quot;, &quot;B&quot;], footer_justify=[:left, :right], footer_style=&quot;bold green&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr38_2" style="color:#9bb3e0">            ╷            </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr37"><span class="sgr1">  Column1  </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr37"><span class="sgr1">  Column2  </span></span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╺━━━━━━━━━━━┿━━━━━━━━━━━╸</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    112    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -52    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -33    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    27     <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    14     <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -92    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1"> A         </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr32"><span class="sgr1">         B </span></span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">            ╵            </span>
 </code></pre><p>a nice little thing: use functions to create a footer: Table(data; footer=sum)</p><h3 id="Columns"><a class="docs-heading-anchor" href="#Columns">Columns</a><a id="Columns-1"></a><a class="docs-heading-anchor-permalink" href="#Columns" title="Permalink"></a></h3><p>Like for header and footer you can set the style and justification of the columns, all together or independently:</p><pre><code class="language-julia hljs">Table(data; columns_style=[&quot;bold green&quot;, &quot;dim&quot;], columns_justify=[:left, :right])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr38_2" style="color:#9bb3e0">            ╷            </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr37"><span class="sgr1"> Column1   </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr37"><span class="sgr1">   Column2 </span></span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╺━━━━━━━━━━━┿━━━━━━━━━━━╸</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1"> 1         </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr2">       112 </span><span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1"> 1         </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr2">       -52 </span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1"> 2         </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr2">       -33 </span><span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1"> 2         </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr2">        27 </span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────┼───────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1"> 3         </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr2">        14 </span><span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span><span class="sgr32"><span class="sgr1"> 3         </span></span><span class="sgr38_2" style="color:#9bb3e0">│</span><span class="sgr2">       -92 </span><span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">            ╵            </span>
 </code></pre><p>but there&#39;s more (there always is, isn&#39;t it?):</p><pre><code class="language-julia hljs">import Term.Layout: PlaceHolder
 ph1 = PlaceHolder(3, 12)
@@ -156,11 +156,11 @@ Table(data; hpad=20)</code></pre><pre class="documenter-example-output"><code cl
 <span class="sgr37"><span class="sgr1">                   </span></span><span class="sgr38_2" style="color:#9bb3e0"> </span>                                                                             
 <span class="sgr38_2" style="color:#9bb3e0">╺━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>                  
 <span class="sgr38_2" style="color:#9bb3e0">━━━━━━━━━━━━━━━━━╸</span>                                                                               
-<span class="sgr38_2" style="color:#9bb3e0"> </span>                       1                       <span class="sgr38_2" style="color:#9bb3e0">│</span>                      -49                      <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>                       1                       <span class="sgr38_2" style="color:#9bb3e0">│</span>                      -89                      <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────────────────────────────────────────┼───────────────────────────────────────────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>                       2                       <span class="sgr38_2" style="color:#9bb3e0">│</span>                     -118                      <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>                       2                       <span class="sgr38_2" style="color:#9bb3e0">│</span>                      -64                      <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">╶───────────────────────────────────────────────┼───────────────────────────────────────────────╴</span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>                       3                       <span class="sgr38_2" style="color:#9bb3e0">│</span>                      55                       <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>                       3                       <span class="sgr38_2" style="color:#9bb3e0">│</span>                      91                       <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">                                                ╵                                                </span>
 </code></pre><p>and</p><pre><code class="language-julia hljs">Table(data; vpad=5)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr38_2" style="color:#9bb3e0">            ╷            </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
@@ -180,7 +180,7 @@ Table(data; hpad=20)</code></pre><pre class="documenter-example-output"><code cl
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -49    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     1     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -89    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
@@ -192,7 +192,7 @@ Table(data; hpad=20)</code></pre><pre class="documenter-example-output"><code cl
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>   -118    <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     2     <span class="sgr38_2" style="color:#9bb3e0">│</span>    -64    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
@@ -204,7 +204,7 @@ Table(data; hpad=20)</code></pre><pre class="documenter-example-output"><code cl
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
-<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    55     <span class="sgr38_2" style="color:#9bb3e0"> </span>
+<span class="sgr38_2" style="color:#9bb3e0"> </span>     3     <span class="sgr38_2" style="color:#9bb3e0">│</span>    91     <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>           <span class="sgr38_2" style="color:#9bb3e0">│</span>           <span class="sgr38_2" style="color:#9bb3e0"> </span>
@@ -236,4 +236,4 @@ Table(data;
 <span class="sgr38_2" style="color:#9bb3e0"> ─────────────────────── </span>
 <span class="sgr38_2" style="color:#9bb3e0"> </span>         <span class="sgr38_2" style="color:#9bb3e0"> </span> <span class="sgr31"><span class="sgr1">3</span></span> params    <span class="sgr38_2" style="color:#9bb3e0"> </span>
 <span class="sgr38_2" style="color:#9bb3e0">                         </span>
-</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../panel/">« Panel</a><a class="docs-footer-nextpage" href="../layout_rens/">Layout renderables »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Monday 20 February 2023 03:09">Monday 20 February 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../panel/">« Panel</a><a class="docs-footer-nextpage" href="../layout_rens/">Layout renderables »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Saturday 11 March 2023 20:36">Saturday 11 March 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
