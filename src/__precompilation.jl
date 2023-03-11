@@ -36,7 +36,7 @@ SnoopPrecompile.verbose[] = false
 
     ```julia
     function say_hi(x)
-        print("Hellow World")
+        print("Hello World")
     end
     ```
 
@@ -45,7 +45,7 @@ SnoopPrecompile.verbose[] = false
     You can use "quotes" to highlight a section:
 
     > Multi-line quotes can be helpful to make a 
-    > paragram stand out, so that users won't miss it!
+    > paragraph stand out, so that users won't miss it!
     > You can use **other inline syntax** in you `quotes` too.
 
     but if you really need to grab someone's attention, use admonitions:

@@ -21,7 +21,7 @@ There's a lot more to apps, but for now we can start with some simple examples
 
 ```
 
-Easy. Now to *use* the app you'd call `play(app)`. This starts an interactive session in which the app continously refreshes its display and reacts to user input until the app is exited by pressing `q` or `Esc`.
+Easy. Now to *use* the app you'd call `play(app)`. This starts an interactive session in which the app continuously refreshes its display and reacts to user input until the app is exited by pressing `q` or `Esc`.
 Unfortunately we can't do that here in the docs, but we can use `frame` to see what the app would look like
 when we start it:
 
@@ -48,7 +48,7 @@ For example:
 says that the widget `r` should take up 10 lines and half of the available width.
 
 In addition to elements, you can use `*` and `/` to specify the relation between elements: `*` means "to the side of" and `/` means "above".
-Combined with parenteses you can get some pretty complex layouts. For example:
+Combined with parentheses you can get some pretty complex layouts. For example:
 
 ```@example app
 layout = :(
@@ -70,13 +70,13 @@ Note that you can always specify the `width` and `height` of the app. If you don
 !!! tip "Responsive layout"
     If you use a `Float` to specify your layout elements size, the app will automatically resize the elements when the terminal 
     size is reduced. If you also want your app to expand to fill in the whole terminal is the terminal is enlarged, you can use
-    `expand` keyworad argument for `App`. 
+    `expand` keyword argument for `App`. 
 
 
 
 ### Adding widgets
 To create an app with multiple widgets, you'll need the layout info as shown above and a `Dict` with 
-the widgets you want your app to display. The keys in the `Dict` need to match the layout elemnts names.
+the widgets you want your app to display. The keys in the `Dict` need to match the layout elements names.
 For example, to create an app showing two pieces of text.
 
 ```@example app
@@ -85,7 +85,7 @@ layout = :(a(25, .5) * b(25, .5))
 
 widgets = Dict(
     :a => TextWidget("""To create an app with multiple widgets, you'll need the layout info as shown above and a `Dict` with 
-the widgets you want your app to display. The keys in the `Dict` need to match the layout elemnts names.
+the widgets you want your app to display. The keys in the `Dict` need to match the layout elements names.
 For example, to create an app showing two pieces of text.
 """; as_panel=true),
     :b => TextWidget("""
@@ -106,7 +106,7 @@ For example, if you have a widget that is a button and it get's pressed by using
 will only work if the button is active.
 
 To change the currently active widget you can "navigate" through the app using arrow keys. 
-`App` analyzes the `layout` of the app to infer the relative position of the wedgets and set up the navigation accordingly.
+`App` analyzes the `layout` of the app to infer the relative position of the widgets and set up the navigation accordingly.
 To test this, use `play` on the app we just created and then left/right arrow to change focus!
 (Don't forget to use `q` to exit the app when you're done)
 

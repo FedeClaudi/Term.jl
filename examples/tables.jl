@@ -36,7 +36,7 @@ print(
 """
 For most of the options, you can either pass a single value
 (which gets applied to a whole column/row) or a vector of values
-to e.g. specify the style of each column indpendently.
+to e.g. specify the style of each column independently.
 
 You can use vertical/horizontal padding to space out the table.
 """

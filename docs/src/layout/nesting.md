@@ -47,7 +47,7 @@ main_text = TextBox(
     width=60, fit=false, style="bright_blue dim", justify=:left
 )
 
-Panel(title, summary, main_text; style="#9bb3e0", subtitle="Techical details", 
+Panel(title, summary, main_text; style="#9bb3e0", subtitle="Technical details", 
 subtitle_justify=:right, subtitle_style="yellow default"
 )
 ```

@@ -69,7 +69,7 @@ import Term: highlight_syntax, TERM_THEME, Panel
     txt = """Annotation("main text", "this"=>"annotation: extra info", "main text"=>("with style", "green"))"""
     @test_throws AssertionError Annotation(
         highlight_syntax(txt),
-        "Annotation" => "contructor",
+        "Annotation" => "constructor",
         "main text" => "text to be annotated",
         "\"this\"=>\"annotation: extra info\"" => "simple annotation, no style",
         """"main text"=>("with style", "green"))""" => "annotation with extra style info",

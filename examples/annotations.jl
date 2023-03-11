@@ -16,7 +16,7 @@ txt = """Annotation("main text", "this"=>"annotation: extra info", "main text"=>
 ex = "\"to annotate\"=>(\"annotation message\", \"red\")"
 ann = Annotation(
     highlight_syntax(txt),
-    "Annotation" => ("contructor", TERM_THEME[].func),
+    "Annotation" => ("constructor", TERM_THEME[].func),
     "main text" => "text to be annotated.\nSubstrings of this will be annotated with extra info.",
     "\"this\"=>\"annotation: extra info\"" => "simple annotation, no style. Just passed as a `Pair`",
     """"main text"=>("with style", "green"))""" => (

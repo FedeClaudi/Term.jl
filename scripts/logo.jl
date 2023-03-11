@@ -56,7 +56,7 @@ function make_logo()
         Term provides a simple {italic green4 bold}markup language{/italic green4 bold} to add {bold bright_blue}color{/bold bright_blue} and {bold underline}styles{/bold underline} to your text.
         More complicated text layout can be created using $(as_code("Renderable")) objects such 
         as $(as_code("Panel")) and $(as_code("TextBox")).
-        These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal ouputs for your Julia code""";
+        These can also be nested and stacked to create {italic pink3}fancy{/italic pink3} and {underline}informative{/underline} terminal outputs for your Julia code""";
         width = 35,
         height = circles.measure.h,
         fit = false,

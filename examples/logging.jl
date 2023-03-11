@@ -7,7 +7,7 @@ so you can use Julia's logging functionality as you would normally
 
 import Term: install_term_logger, uninstall_term_logger, Panel
 
-# insall term's logger as the global logger
+# install term's logger as the global logger
 install_term_logger()
 
 # log
