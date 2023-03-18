@@ -182,7 +182,7 @@ Create string display for a log message value.
 function log_value_display end
 
 function log_value_display(x::AbstractArray)
-    a = highlight(str_trunc(string(x), 100); ignore_ansi = true)
+    a = highlight(str_trunc(string(x), 1000); ignore_ansi = true)
 
     s = foldl((a, b) -> a * " × " * b, string.(size(x)))
     b = highlight("{bold dim}Size:  $(s){/bold dim}"; ignore_ansi = true)
@@ -190,8 +190,8 @@ function log_value_display(x::AbstractArray)
 end
 
 log_value_display(x::AbstractDict) =
-    highlight(str_trunc(string(x), 100); ignore_ansi = true)
-log_value_display(x) = highlight(str_trunc(string(x), 100);)
+    highlight(str_trunc(string(x), 1000); ignore_ansi = true)
+log_value_display(x) = highlight(str_trunc(string(x), 1000);)
 
 """
     handle_message(logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...)

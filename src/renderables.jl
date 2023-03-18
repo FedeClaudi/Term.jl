@@ -143,8 +143,8 @@ function RenderableText(
     text = apply_style(text)
 
     style = isnothing(style) ? "" : style
-    background = isnothing(background) ? "" : get_bg_color(background)
-    style = style * background
+    # background = isnothing(background) ? "" : get_bg_color(background)
+    # style = style * background
 
     style_init, style_finish = get_style_codes(MarkupStyle(style))
 
@@ -168,7 +168,7 @@ function RenderableText(
         rt
     else
         text = join_lines([seg.text for seg in rt.segments])
-        RenderableText(text; style = style, width = width)
+        RenderableText(text; style = style, width = width, kwargs...)
     end
 end
 
