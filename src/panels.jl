@@ -192,7 +192,7 @@ content_as_renderable(
     justify::Symbol,
     background::Union{String,Nothing},
 )::RenderableText =
-    RenderableText(content, width = width - Δw, background = background, justify = justify)
+    RenderableText(content; width = width - Δw, background = background, justify = justify)
 
 """
 
@@ -225,7 +225,7 @@ function Panel(
     Δh = padding.top + padding.bottom
 
     # create content
-    # @info "panel fit" width height Δw Δh
+    # @info "panel fit" width height Δw Δh background
     content = content_as_renderable(content, width, Δw, justify, background)
 
     # estimate panel size
@@ -282,7 +282,7 @@ function Panel(
     content = content_as_renderable(content, width, Δw, justify, background)
     height = something(height, content.measure.h + Δh + 2)
     panel_measure = Measure(height, width)
-    # @info "panel nofit" width  Δw Δh height panel_measure
+    # @info "panel nofit" width  Δw Δh height panel_measure background content.measure
 
     # if the content is too tall, exclude some lines
     if content.measure.h > height - Δh - 2
@@ -292,6 +292,7 @@ function Panel(
             style = "dim",
             width = content.measure.w,
             justify = :center,
+            background = background,
         )
 
         segments = if lines_to_drop < content.measure.h

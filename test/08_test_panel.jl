@@ -321,6 +321,17 @@ end
 end
 
 @testset "\e[34mPanel - background" begin
+    p = Panel(
+        RenderableText(
+            "testste";
+            style = "white on_red",
+            background = "on_blue",
+            width = 25,
+        );
+        background = "green",
+    )
+    IS_WIN || @compare_to_string p "panel_background_1"
+
     p = Panel(apply_style(
         """
     asasd
@@ -331,8 +342,7 @@ ads
         "on_blue",
     ); background = "on_red", fit = true)
 
-    @test string(p) ==
-          "\e[0m\e[22m╭──────────────────────╮\e[22m\e[0m\n\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44m    asasd\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[22m│\e[22m\n\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44masdasadas\e[49m\e[41m         \e[49m\e[49m\e[41m  \e[49m\e[22m│\e[22m\n\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44masdsasdasdsadasdsa\e[49m\e[49m\e[41m  \e[49m\e[22m│\e[22m\n\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44mads\e[49m\e[41m               \e[49m\e[49m\e[41m  \e[49m\e[22m│\e[22m\n\e[22m│\e[22m\e[41m  \e[49m\e[41m\e[44m    \e[49m\e[41m              \e[49m\e[49m\e[41m  \e[49m\e[22m│\e[22m\n\e[0m\e[22m╰──────────────────────╯\e[22m\e[0m\e[0m"
+    IS_WIN || @compare_to_string p "panel_background_2"
 end
 
 @testset "\e[34mPANEL - UnicodePlots" begin

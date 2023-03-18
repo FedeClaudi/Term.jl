@@ -220,6 +220,7 @@ function add_stack_frame!(
             source_file = RenderableText(
                 string(frame.file) * ":$(frame.line)";
                 style = "underline dim",
+                width = ctx.func_name_w,
             )
             _out = func_line / source_file
         else
