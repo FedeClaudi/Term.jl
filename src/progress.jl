@@ -692,7 +692,13 @@ function foreachprogress(
         return
 
         # The job tracks the iteration through `iter`
-        job = addjob!(pbar; N = n, transient=transient, columns_kwargs=columns_kwargs, kwargs...)
+        job = addjob!(
+            pbar;
+            N = n,
+            transient = transient,
+            columns_kwargs = columns_kwargs,
+            kwargs...,
+        )
         if parallel
             Threads.@threads for elem in iter
                 f(elem)

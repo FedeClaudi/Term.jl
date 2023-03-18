@@ -192,10 +192,7 @@ content_as_renderable(
     justify::Symbol,
     background::Union{String,Nothing},
 )::RenderableText =
-    RenderableText(content; width = width - Δw, 
-            background = background, 
-            justify = justify
-    )
+    RenderableText(content; width = width - Δw, background = background, justify = justify)
 
 """
 
@@ -295,7 +292,7 @@ function Panel(
             style = "dim",
             width = content.measure.w,
             justify = :center,
-            background=background,
+            background = background,
         )
 
         segments = if lines_to_drop < content.measure.h

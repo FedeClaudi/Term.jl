@@ -7,8 +7,7 @@ import ..Style: apply_style
 import ..Renderables: RenderableText, AbstractRenderable
 import ..Renderables
 import ..Layout: pad
-import Term:
-    textlen, TERM_THEME, cleantext, excise_link_display_text, remove_ansi
+import Term: textlen, TERM_THEME, cleantext, excise_link_display_text, remove_ansi
 import Term
 
 export Link

@@ -176,7 +176,7 @@ function parse_md(
                "{$(theme.md_code)}`{/$(theme.md_code)}"
     else
         panel = Panel(
-            RenderableText(syntax; style="on_$(theme.md_codeblock_bg)");
+            RenderableText(syntax; style = "on_$(theme.md_codeblock_bg)");
             style = "white on_$(theme.md_codeblock_bg)",
             box = :SQUARE,
             subtitle = length(code.language) > 0 ? code.language : nothing,

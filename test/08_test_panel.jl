@@ -312,7 +312,6 @@ end
     end
 end
 
-
 @testset "\e[34mPanel - padding" begin
     p = Panel("°"^24; padding = (4, 4, 2, 2), fit = false)
     @testpanel(p, 7, default_width())
@@ -322,9 +321,16 @@ end
 end
 
 @testset "\e[34mPanel - background" begin
-    p = Panel(RenderableText("testste"; style="white on_red", background="on_blue", width=25); background="green")
+    p = Panel(
+        RenderableText(
+            "testste";
+            style = "white on_red",
+            background = "on_blue",
+            width = 25,
+        );
+        background = "green",
+    )
     IS_WIN || @compare_to_string p "panel_background_1"
-
 
     p = Panel(apply_style(
         """
@@ -336,9 +342,7 @@ ads
         "on_blue",
     ); background = "on_red", fit = true)
 
-
     IS_WIN || @compare_to_string p "panel_background_2"
-
 end
 
 @testset "\e[34mPANEL - UnicodePlots" begin
