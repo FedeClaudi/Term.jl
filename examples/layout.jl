@@ -11,7 +11,7 @@ separate. Term.jl has got your back.
 
 """
 Let's start with stacking. 
-You can use `*` to horizzontally stack content, and `/` to stack it
+You can use `*` to horizontally stack content, and `/` to stack it
 vertically.
 """
 
@@ -27,7 +27,7 @@ println(s1 / s2)
 
 # with panels (and text boxes)
 p1 = Panel("content {blue}content{/blue} "^10; fit = false, width = 30)
-tb1 = TextBox("this is a text boox! "^5; width = 66)
+tb1 = TextBox("this is a text box! "^5; width = 66)
 
 println(p1 * tb1)
 println(p1 / tb1)
@@ -41,7 +41,7 @@ Now, stacking things is great, but want if you want some space between them?
 """
 space = Spacer(p1.measure.h, 20)  # create empty space with same height as p1!
 
-# horizzontally stack everything and print!
+# horizontally stack everything and print!
 top = p1 * space * p1
 println(top)
 

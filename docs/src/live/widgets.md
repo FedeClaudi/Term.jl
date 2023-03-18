@@ -76,7 +76,7 @@ Pager("This is a pager. It lets you display a lot of text in a scrollable window
 
 ### Gallery
 
-A `Gallery` is somewhat inbetween a widget and an `App`. It's a container for other widgets. 
+A `Gallery` is somewhat in between a widget and an `App`. It's a container for other widgets. 
 Only one widget at the time is displayed in the space taken by the `Gallery`.
 
 ```@example widgets
@@ -97,7 +97,7 @@ A new widget type needs to be defined as a `mutable struct` and it needs to have
     controls::AbstractDict
 ```
 
-`WidgetInternals` is a struct that contains the state of the widget. It keeps track of thigns like the size 
+`WidgetInternals` is a struct that contains the state of the widget. It keeps track of things like the size 
 of the widget and the three callback functions `on_draw`, `on_activated` and `on_deactivated`. 
 These are optional functions that are called when `frame` is called on a widget or when the widget is activated or deactivated.
 The activated/deactivated functions can be used to change the appearance of the widget to signal to the user that the widget is active or not.

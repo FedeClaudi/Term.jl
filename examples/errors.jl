@@ -9,7 +9,7 @@ might want this, but it's easier to turn on.
 
 NOTE: this is a preliminary feature, there might be bugs and not all error
 types may be correctly represented. While generally useful, it might be best
-to hold back on this feature for code that needs to reliably print acurate
+to hold back on this feature for code that needs to reliably print accurate
 error information.
 """
 

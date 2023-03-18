@@ -82,7 +82,7 @@ to wrap any loop with a progress bar display.
 end
 
 """
-You can customiza what kind of information should show in your progress bar and what it 
+You can customize what kind of information should show in your progress bar and what it 
 should look like. Each bit of information (the text, the percentage count...) is a 
 "column" and you can choose which columns to display and in which order:
 """

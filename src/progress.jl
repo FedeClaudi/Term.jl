@@ -352,7 +352,6 @@ function addjob!(
     pbar.paused = true
     id = isnothing(id) ? length(pbar.jobs) + 1 : id
     kwargs = merge(pbar.columns_kwargs, columns_kwargs)
-
     job = ProgressJob(id, N, description, pbar.columns, pbar.width, kwargs, transient)
 
     # start job

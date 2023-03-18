@@ -31,7 +31,7 @@ data = Dict(
 print(Tree(data))
 ```
 
-Under the hood, `Tree` just leverages [AbstractTrees.jl](https://github.com/JuliaCollections/AbstractTrees.jl) to handle tree-like data structues, so anything that is compatible with that framework will printed as a `Tree`.
+Under the hood, `Tree` just leverages [AbstractTrees.jl](https://github.com/JuliaCollections/AbstractTrees.jl) to handle tree-like data structures, so anything that is compatible with that framework will printed as a `Tree`.
 
 
 ```@example tree
@@ -50,7 +50,7 @@ Essentially `Tree` work's with `AbstractTrees` to just produce stylized output.
     `Tree` is an `AbstractRenderable`, it is **not** a datastructure for handling tree-like data. It's only meant to be used to *display* trees in your terminal. As such you can't do operations like finding children of nodes or getting a subtree etc. All of that should be done with `AbstractTrees` and `Tree` is only there to display the output
 
 
-As per the note above, `Tree` is a `AbstractRenderable` type so it playes well with other renderables in term. 
+As per the note above, `Tree` is a `AbstractRenderable` type so it plays well with other renderables in term. 
 
 ```@example tree
 import Term: Panel
