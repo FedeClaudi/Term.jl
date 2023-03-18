@@ -138,6 +138,8 @@ function Tree(
     kwargs...,
 )
     _TREE_PRINTING_TITLE[] = title
+    _theme = TERM_THEME[]
+    TERM_THEME[] = theme
 
     # print tree
     guides = guides isa Symbol ? treeguides[guides] : guides
@@ -168,6 +170,9 @@ function Tree(
 
     # turn into a renderable
     rt = RenderableText(tree)
+
+    # restore theme
+    TERM_THEME[] = _theme
     return Tree(rt.segments, rt.measure)
 end
 
