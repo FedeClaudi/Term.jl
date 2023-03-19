@@ -218,8 +218,7 @@ function add_stack_frame!(
         if TERM_SHOW_LINK_IN_STACKTRACE[] == true
             # source_file = Link(string(frame.file), frame.line; style = "underline dim")
             source_file = RenderableText(
-                string(frame.file) * ":$(frame.line)";
-                style = "underline dim",
+                apply_style(string(frame.file) * ":$(frame.line)", "underline dim");
                 width = ctx.func_name_w,
             )
             _out = func_line / source_file

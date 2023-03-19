@@ -54,7 +54,7 @@ struct StacktraceContext
     theme::Theme
 end
 
-function StacktraceContext(w = default_stacktrace_width() - 12)
+function StacktraceContext(w = default_stacktrace_width())
     frame_panel_w = w - 4 - 12 - 3 # panel walls and padding
     module_line_w = w - 4 - 4
     func_name_w = frame_panel_w - 4 - 8 # including (n) before fname
