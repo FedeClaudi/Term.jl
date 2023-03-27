@@ -252,7 +252,7 @@ abstract type AbstractDefaultPrompt <: AbstractOptionsPrompt end
     default_answer_style::String
 
     function DefaultPrompt(options::Vector, default::Int, prompt::String, args...)
-        @assert default > 0 && default < length(options) "Default answer number: $default not valid"
+        @assert default > 0 && default <= length(options) "Default answer number: $default not valid"
         new(options, default, prompt, args...)
     end
 end
