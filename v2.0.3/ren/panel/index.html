@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Panel · Term.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://FedeClaudi.github.io/Term.jl/ren/panel/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">Term.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox"/><label class="tocitem" for="menuitem-2"><span class="docs-label">Basics</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../basics/basics/">Intro</a></li><li><a class="tocitem" href="../../basics/styled_text/">Styled text</a></li><li><a class="tocitem" href="../../basics/colors_and_theme/">Colors</a></li><li><a class="tocitem" href="../../basics/renderables/">Renderables</a></li><li><a class="tocitem" href="../../basics/tprint/">tprint</a></li><li><a class="tocitem" href="../../basics/console/">Console</a></li><li><a class="tocitem" href="../../basics/prompt/">Prompt</a></li><li><a class="tocitem" href="../../basics/markdown/">Markdown</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox" checked/><label class="tocitem" for="menuitem-3"><span class="docs-label">Renderables</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../intro/">Renderables</a></li><li><a class="tocitem" href="../text/">RenderableText</a></li><li class="is-active"><a class="tocitem" href>Panel</a><ul class="internal"><li><a class="tocitem" href="#Size-and-fitting"><span>Size &amp; fitting</span></a></li><li><a class="tocitem" href="#Padding"><span>Padding</span></a></li><li class="toplevel"><a class="tocitem" href="#TBoxDoc"><span>TextBox</span></a></li></ul></li><li><a class="tocitem" href="../table/">Table</a></li><li><a class="tocitem" href="../layout_rens/">Layout renderables</a></li><li><a class="tocitem" href="../annotation/">Annotation</a></li><li><a class="tocitem" href="../dendogram/">Dendogram</a></li><li><a class="tocitem" href="../tree/">Tree</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">Layout</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../layout/layout/">Layout</a></li><li><a class="tocitem" href="../../layout/nesting/">Nesting</a></li><li><a class="tocitem" href="../../layout/stacking/">Stacking</a></li><li><a class="tocitem" href="../../layout/justify/">Justify</a></li><li><a class="tocitem" href="../../layout/grid/">Grid</a></li><li><a class="tocitem" href="../../layout/compositor/">Compositor</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-5" type="checkbox"/><label class="tocitem" for="menuitem-5"><span class="docs-label">Advanced</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../adv/adv/">Intro</a></li><li><a class="tocitem" href="../../adv/repr/">Term Repr</a></li><li><a class="tocitem" href="../../adv/progressbars/">Progress bars</a></li><li><a class="tocitem" href="../../adv/logging/">Logging</a></li><li><a class="tocitem" href="../../adv/errors_tracebacks/">Errors</a></li><li><a class="tocitem" href="../../adv/introspection/">Introspection</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-6" type="checkbox"/><label class="tocitem" for="menuitem-6"><span class="docs-label">Live</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../live/intro/">Live widgets</a></li><li><a class="tocitem" href="../../live/app_intro/">App</a></li><li><a class="tocitem" href="../../live/widgets/">Widgets</a></li><li><a class="tocitem" href="../../live/keyboard_input/">Keyboard input</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-7" type="checkbox"/><label class="tocitem" for="menuitem-7"><span class="docs-label">API</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../api/api_term/">Term</a></li><li><a class="tocitem" href="../../api/api_boxes/">Boxes</a></li><li><a class="tocitem" href="../../api/api_colors/">Colors</a></li><li><a class="tocitem" href="../../api/api_console/">Consoles</a></li><li><a class="tocitem" href="../../api/api_compositors/">Compositors</a></li><li><a class="tocitem" href="../../api/api_dendograms/">Dendograms</a></li><li><a class="tocitem" href="../../api/api_errors/">Errors</a></li><li><a class="tocitem" href="../../api/api_grid/">Grid</a></li><li><a class="tocitem" href="../../api/api_introspection/">Introspection</a></li><li><a class="tocitem" href="../../api/api_layout/">Layout</a></li><li><a class="tocitem" href="../../api/api_logs/">Logs</a></li><li><a class="tocitem" href="../../api/api_markdown/">Term Markdown</a></li><li><a class="tocitem" href="../../api/api_measures/">Measures</a></li><li><a class="tocitem" href="../../api/api_panels/">Panels</a></li><li><a class="tocitem" href="../../api/api_renderables/">Renderables</a></li><li><a class="tocitem" href="../../api/api_repr/">REPR</a></li><li><a class="tocitem" href="../../api/api_segments/">Segments</a></li><li><a class="tocitem" href="../../api/api_style/">Style</a></li><li><a class="tocitem" href="../../api/api_tables/">Tables</a></li><li><a class="tocitem" href="../../api/api_tprint/">Tprint</a></li><li><a class="tocitem" href="../../api/api_trees/">Trees</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Renderables</a></li><li class="is-active"><a href>Panel</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Panel</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/FedeClaudi/Term.jl/blob/master/docs/src/ren/panel.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="PanelDocs"><a class="docs-heading-anchor" href="#PanelDocs">Panel</a><a id="PanelDocs-1"></a><a class="docs-heading-anchor-permalink" href="#PanelDocs" title="Permalink"></a></h1><p>Okay, time to move beyond simple text. It&#39;s time for:</p><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr38_5" style="color:#ffd700"><span class="sgr1">╭──── </span></span><span class="sgr1"><span class="sgr32">T...</span><span class="sgr38_5" style="color:#ffd700"> ──────╮</span></span>
+<span class="sgr38_5" style="color:#ffd700"><span class="sgr1">│</span></span>    <span class="sgr31">awesome</span>     <span class="sgr38_5" style="color:#ffd700"><span class="sgr1">│</span></span>
+<span class="sgr38_5" style="color:#ffd700"><span class="sgr1">╰─────── </span></span><span class="sgr1"><span class="sgr34">P...</span><span class="sgr38_5" style="color:#ffd700"> ───╯</span></span></code></pre><p>Simply put, a <code>Panel</code> shows a piece of content (generally a styled string, but it can be any <code>Renderable</code> really) surrounded by a box. Simple but effective.</p><p>Well not that simple actually because <a href="../../api/api_panels/#Term.Panels.Panel"><code>Term.Panels.Panel</code></a> is the first renderable that allows you lots of options to personalize its appearance. For instance the panel printed above is given by:</p><pre><code class="language-julia hljs">    Panel(
+        &quot;{red}awesome{/red}&quot;,
+        title=&quot;Term&#39;s&quot;,
+        title_style=&quot;bold green&quot;,
+        style=&quot;gold1 bold&quot;,
+        subtitle=&quot;Panels&quot;,
+        subtitle_style=&quot;bold blue&quot;,
+        subtitle_justify=:right,
+        width=18,
+        justify=:center
+    )</code></pre><p>The first argument is the content, the rest is styling options. As you can see you can specify the titles and subtitles (or leave them out if you prefer, do your thing!), their appearance (via <code>markup</code> style information) and their position (<code>:left, :center</code> or <code>:right</code>). The <code>style</code> argument sets the style of the box itself (and title/subtitle if they don&#39;t have dedicated style information).</p><p>The box is created using <code>Term</code>&#39;s own <code>Box</code> type! It&#39;s not worth going too much into exactly how it works, but it&#39;s worth pointing out that there&#39;s loads of types of boxes:</p><pre><code class="nohighlight hljs">ASCII,
+ASCII2,
+ASCII_DOUBLE_HEAD,
+SQUARE,
+SQUARE_DOUBLE_HEAD,
+MINIMAL,
+MINIMAL_HEAVY_HEAD
+MINIMAL_DOUBLE_HEAD,
+SIMPLE,
+SIMPLE_HEAD,
+SIMPLE_HEAVY,
+HORIZONTALS,
+ROUNDED,
+HEAVY
+HEAVY_EDGE,
+HEAVY_HEAD,
+DOUBLE,
+DOUBLE_EDGE</code></pre><p>And you can use any of these with your panels:</p><pre><code class="language-julia hljs">import Term: Panel
+
+print(
+    Panel(width=8, box=:DOUBLE, style=&quot;green&quot;) *
+    Panel(width=8, box=:HEAVY, style=&quot;white&quot;) *
+    Panel(width=8, box=:ROUNDED, style=&quot;red&quot;),
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32">╔══════╗</span><span class="sgr37">┏━━━━━━┓</span><span class="sgr31">╭──────╮</span>
+<span class="sgr32">║</span>      <span class="sgr32">║</span><span class="sgr37">┃</span>      <span class="sgr37">┃</span><span class="sgr31">│</span>      <span class="sgr31">│</span>
+<span class="sgr32">╚══════╝</span><span class="sgr37">┗━━━━━━┛</span><span class="sgr31">╰──────╯</span></code></pre><p>Let&#39;s look at some more examples:</p><pre><code class="language-julia hljs">print(
+    Panel(&quot;this panel has fixed width, text on the left&quot;; width = 66, justify = :left),
+    Panel(&quot;this one too, but the text is at the center!&quot;; width = 66, justify = :center),
+    Panel(&quot;the text is here!&quot;; width = 66, justify = :right),
+)
+print(&quot;\n&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭────────────────────────────────────────────────────────────────╮
+│  this panel has fixed width, text on the left                  │
+╰────────────────────────────────────────────────────────────────╯
+╭────────────────────────────────────────────────────────────────╮
+│          this one too, but the text is at the center!          │
+╰────────────────────────────────────────────────────────────────╯
+╭────────────────────────────────────────────────────────────────╮
+│                                             the text is here!  │
+╰────────────────────────────────────────────────────────────────╯</code></pre><p>You can justify the panel&#39;s content to <code>:left, :center, :right</code>!</p><pre><code class="language-julia hljs">    Panel(&quot;Titles have style too!!&quot;; width = 60, justify = :center, title=&quot;My Title&quot;, title_style=&quot;red bold&quot;, title_justify=:right, subtitle=&quot;Made with Term&quot;, subtitle_style=&quot;dim&quot;, subtitle_justify=:left
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭───────────────────────────────────────────── <span class="sgr31"><span class="sgr1">My Title</span></span> ───╮
+│                 Titles have style too!!                  │
+╰──── <span class="sgr2">Made with Term</span> ──────────────────────────────────────╯
+</code></pre><p>And style the title and subtitle, or the whole background too:</p><pre><code class="language-julia hljs">import Term: highlight_syntax
+
+Panel(
+    highlight_syntax(&quot;&quot;&quot;
+function show_off(x)
+    print(x)
+end
+&quot;&quot;&quot;);
+    background=&quot;on_black&quot;, fit=true, style=&quot;on_black&quot;
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr40">╭────────────────────────╮</span>
+<span class="sgr40">│  </span><span class="sgr38_2" style="color:#7a93f5">function</span><span class="sgr38_2" style="color:#dedede"> </span><span class="sgr38_2" style="color:#e8d472">show_off</span><span class="sgr38_2" style="color:#e38864">(</span><span class="sgr38_2" style="color:#dedede">x</span><span class="sgr38_2" style="color:#e38864">)</span><span class="sgr40"><span class="sgr38_2" style="color:#dedede">  │</span></span><span class="sgr38_2" style="color:#dedede">
+<span class="sgr40">│  </span>    </span><span class="sgr38_2" style="color:#e8d472">print</span><span class="sgr38_2" style="color:#e38864">(</span><span class="sgr38_2" style="color:#dedede">x</span><span class="sgr38_2" style="color:#e38864">)</span><span class="sgr40"><span class="sgr38_2" style="color:#dedede">          │</span></span><span class="sgr38_2" style="color:#dedede">
+<span class="sgr40">│  </span></span><span class="sgr38_2" style="color:#7a93f5">end</span><span class="sgr40"><span class="sgr38_2" style="color:#dedede">                   │</span></span><span class="sgr38_2" style="color:#dedede">
+<span class="sgr40">│  </span></span><span class="sgr40">                      │</span>
+<span class="sgr40">╰────────────────────────╯</span>
+</code></pre><p>By the way, <code>Panels</code> are not limited to having strings as content, they can have other renderables too (multiple ones in fact)!</p><pre><code class="language-julia hljs">Panel(
+        Panel(width=18, style=&quot;green&quot;),
+        Panel(width=18, style=&quot;white&quot;),
+        Panel(width=18, style=&quot;red&quot;),
+        title=&quot;so many panels!&quot;,
+        fit=true,
+        title_justify=:left,
+        title_style=&quot;bold red&quot;
+    )</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──── <span class="sgr31"><span class="sgr1">so...</span></span> ───────────╮
+│  <span class="sgr32">╭────────────────╮</span>  │
+│  <span class="sgr32">│</span>                <span class="sgr32">│</span>  │
+│  <span class="sgr32">╰────────────────╯</span>  │
+│  <span class="sgr37">╭────────────────╮</span>  │
+│  <span class="sgr37">│</span>                <span class="sgr37">│</span>  │
+│  <span class="sgr37">╰────────────────╯</span>  │
+│  <span class="sgr31">╭────────────────╮</span>  │
+│  <span class="sgr31">│</span>                <span class="sgr31">│</span>  │
+│  <span class="sgr31">╰────────────────╯</span>  │
+╰──────────────────────╯
+</code></pre><h2 id="Size-and-fitting"><a class="docs-heading-anchor" href="#Size-and-fitting">Size &amp; fitting</a><a id="Size-and-fitting-1"></a><a class="docs-heading-anchor-permalink" href="#Size-and-fitting" title="Permalink"></a></h2><p>By default <code>Panel</code> tries to fit your content:</p><pre><code class="language-julia hljs">print(Panel(&quot;.&quot;^10))
+print(Panel(&quot;.&quot;^30))
+print(Panel(&quot;.&quot;^60))</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────────────────────────────────────────────────────────────────────────╮
+│  ..........                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│  ..............................                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│  ............................................................                │
+╰──────────────────────────────────────────────────────────────────────────────╯</code></pre><p>but you can change this by passing a <code>width</code> value. In fact you can se a height too:</p><pre><code class="language-julia hljs">Panel(&quot;.&quot;^10; height=5, width=20)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────────────╮
+│  ..........      │
+│                  │
+│                  │
+╰──────────────────╯
+</code></pre><p>Alternatively, you can use <code>fit=false</code>. </p><pre><code class="language-julia hljs">Panel(&quot;.&quot;^10; fit=false)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────────────────────────────────────────────────────────────────────────╮
+│  ..........                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+</code></pre><p>this will make all panels have the same width (unless you specify a width). The main difference is that if the content is larger than the panel, it will be truncated, which is not what happens if <code>fit=true</code>&quot;</p><pre><code class="language-julia hljs">p1 = Panel(&quot;.&quot;^10; height=5, width=60)
+print(Panel(p1; height=2, width=30))  # fit=true -&gt; expand out panel, width/height ignored
+print(Panel(p1; height=10, width=30, fit=false))  # fit=false -&gt; truncate the content
+print(Panel(&quot;very long text&quot;^20; height=10, width=30, fit=false))  # text is reshaped to fit the panel</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭────────────────────────────╮
+│  ╭──────────────────────   │
+╰────────────────────────────╯
+╭────────────────────────────╮
+│  ╭──────────────────────   │
+│  ───────────────────────   │
+│  ─────────────╮            │
+│  │  ..........             │
+│                            │
+│                            │
+│       │                    │
+│  <span class="sgr2">... content omitted ... </span>  │
+╰────────────────────────────╯
+╭────────────────────────────╮
+│  very long textvery        │
+│  long textvery long        │
+│  textvery long textvery    │
+│  long textvery long        │
+│  textvery long textvery    │
+│  long textvery long        │
+│  textvery long textvery    │
+│  <span class="sgr2">... content omitted ... </span>  │
+╰────────────────────────────╯</code></pre><h2 id="Padding"><a class="docs-heading-anchor" href="#Padding">Padding</a><a id="Padding-1"></a><a class="docs-heading-anchor-permalink" href="#Padding" title="Permalink"></a></h2><p>You&#39;ll notice in the example above that there&#39;s still some space between the panel&#39;s borders and its content. That&#39;s padding. You can change how much padding to have to the left, right, top and bottom (in number of spaces/lines):</p><pre><code class="language-julia hljs">inner = Panel(height=4, width=8, background=&quot;on_#262626&quot;, style=&quot;bold red&quot;)
+print(
+    Panel(inner; fit=false, padding=(0, 0, 0, 0)),
+    Panel(inner; fit=false, padding=(3, 1, 3, 1)),
+    Panel(inner; fit=false, padding=(20, 3, 3, 1)),
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">╭──────────────────────────────────────────────────────────────────────────────╮
+│<span class="sgr31"><span class="sgr1">╭──────╮</span></span>                                                                      │
+│<span class="sgr31"><span class="sgr1">│</span></span><span class="sgr48_5" style="background:#262626">      </span><span class="sgr31"><span class="sgr1">│</span></span>                                                                      │
+│<span class="sgr31"><span class="sgr1">│</span></span><span class="sgr48_5" style="background:#262626">      </span><span class="sgr31"><span class="sgr1">│</span></span>                                                                      │
+│<span class="sgr31"><span class="sgr1">╰──────╯</span></span>                                                                      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│   <span class="sgr31"><span class="sgr1">╭──────╮</span></span>                                                                   │
+│   <span class="sgr31"><span class="sgr1">│</span></span><span class="sgr48_5" style="background:#262626">      </span><span class="sgr31"><span class="sgr1">│</span></span>                                                                   │
+│   <span class="sgr31"><span class="sgr1">│</span></span><span class="sgr48_5" style="background:#262626">      </span><span class="sgr31"><span class="sgr1">│</span></span>                                                                   │
+│   <span class="sgr31"><span class="sgr1">╰──────╯</span></span>                                                                   │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                    <span class="sgr31"><span class="sgr1">╭──────╮</span></span>                                                  │
+│                    <span class="sgr31"><span class="sgr1">│</span></span><span class="sgr48_5" style="background:#262626">      </span><span class="sgr31"><span class="sgr1">│</span></span>                                                  │
+│                    <span class="sgr31"><span class="sgr1">│</span></span><span class="sgr48_5" style="background:#262626">      </span><span class="sgr31"><span class="sgr1">│</span></span>                                                  │
+│                    <span class="sgr31"><span class="sgr1">╰──────╯</span></span>                                                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯</code></pre><p>The syntax is <code>(left, right, top, bottom)</code> and the default is <code>(2, 2, 0, 0)</code>.</p><h1 id="TBoxDoc"><a class="docs-heading-anchor" href="#TBoxDoc">TextBox</a><a id="TBoxDoc-1"></a><a class="docs-heading-anchor-permalink" href="#TBoxDoc" title="Permalink"></a></h1><p>Sometimes you want to have the benefits of <code>Panel</code> (you can control the height, width, padding, justification, titles...) without actually showing the panel itself. Introduce: <code>TextBox</code>.</p><pre><code class="language-julia hljs">using Term: TextBox
+TextBox(&quot;A very long piece of text&quot;^10; title=&quot;TEXT&quot;, width=30, fit=false)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">      TEXT                    
+   A very long piece          
+   of textA very long         
+   piece of textA very        
+   long piece of textA        
+   very long piece of         
+   textA very long piece      
+   of textA very long         
+   piece of textA very        
+   long piece of textA        
+   very long piece of         
+   textA very long piece      
+   of textA very long         
+   piece of text              
+                              
+</code></pre><p>Easy peasy!</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../text/">« RenderableText</a><a class="docs-footer-nextpage" href="../table/">Table »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Wednesday 26 April 2023 01:06">Wednesday 26 April 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
