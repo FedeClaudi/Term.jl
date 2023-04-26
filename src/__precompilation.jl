@@ -2,10 +2,10 @@
 # ---------------------------------------------------------------------------- #
 #                                PRECOMPILATION                                #
 # ---------------------------------------------------------------------------- #
-using SnoopPrecompile
-SnoopPrecompile.verbose[] = false
+using PrecompileTools
+PrecompileTools.verbose[] = false
 
-@precompile_setup begin
+@setup_workload begin
     txt = join(
         repeat(["this is a random {red}text{/red} to test {bold}precompilation"], 10),
         "\n",
@@ -143,7 +143,7 @@ end
 
     junkio = IOBuffer()  # from https://github.com/timholy/SnoopCompile.jl/issues/308
 
-    @precompile_all_calls begin
+    @compile_workload begin
         reshape_text(txt, 10)
         print(junkio, Panel())
         tprint(junkio, Panel())
