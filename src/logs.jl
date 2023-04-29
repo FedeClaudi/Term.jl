@@ -17,7 +17,9 @@ import Term:
     TERM_THEME,
     str_trunc,
     ltrim_str,
-    default_width
+    default_width,
+    NOCOLOR,
+    cleantext
 
 import ..Consoles: console_width, console_height, change_scroll_region, move_to_line
 import ..Renderables: AbstractRenderable, RenderableText
@@ -88,8 +90,9 @@ Logging.catch_exceptions(logger::TermLogger) = true
 
 Print the final line of a log message with style and date info
 """
-function print_closing_line(color::String, width::Int = 48)
+function print_closing_line(io::IO, color::String, width::Int = 48)
     tprintln(
+        io,
         "  {$color bold dim}$(BOXES[:ROUNDED].bottom.left)" *
         "$(BOXES[:ROUNDED].row.mid)"^(width) *
         "{/$color bold dim}",
@@ -98,6 +101,7 @@ function print_closing_line(color::String, width::Int = 48)
     _time = Dates.format(Dates.now(), "HH:MM:SS")
     pad = width - textlen(_date * _time) - 2
     return tprintln(
+        io,
         " "^pad * "{dim}$_date{/dim} {bold dim underline}$_time{/bold dim underline}";
         highlight = false,
     )
@@ -193,28 +197,7 @@ log_value_display(x::AbstractDict) =
     highlight(str_trunc(string(x), 1000); ignore_ansi = true)
 log_value_display(x) = highlight(str_trunc(string(x), 1000);)
 
-"""
-    handle_message(logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...)
-
-Handle printing of log messages, with style!.
-
-In addition to the log message and info such as file/line and time of log, 
-it prints kwargs styled by their type.
-"""
-function Logging.handle_message(
-    logger::TermLogger,
-    lvl,
-    msg,
-    _mod,
-    group,
-    id,
-    file,
-    line;
-    kwargs...,
-)
-    # handle log progress
-    _progress = asprogress(lvl, msg, _mod, group, id, file, line; kwargs...)
-    isnothing(_progress) || return handle_progress(logger, _progress)
+function print_log_message(io, logger, lvl, msg, _mod, file, line, kwargs)
 
     # get name of function where logging message was called from
     fname = ""
@@ -256,12 +239,12 @@ function Logging.handle_message(
         style = logmsg_color,
     )
     vline = "  " * vLine(msg.measure.h; style = outline_markup)
-    tprint((firstline / vline) * " " * msg; highlight = false)
+    tprint(io, (firstline / vline) * " " * msg; highlight = false)
 
     # --------------------------------- contents --------------------------------- #
     # if no kwargs we can just quit
     if length(kwargs) == 0
-        print_closing_line(color)
+        print_closing_line(io, color)
         return nothing
     end
 
@@ -295,7 +278,8 @@ function Logging.handle_message(
 
     # print all kwargs
     eq = "{$(logger.theme.operator)}={/$(logger.theme.operator)}"
-    tprintln("  $vert"; highlight = false)
+    tprint(io, "  $vert"; highlight = false)
+    print(io, "\n")
     for (t, k, v) in zip(ts, ks, vs)
         # get the height of the tallest piece of content on this line
         h = maximum(height.([k, v, t]))
@@ -309,9 +293,41 @@ function Logging.handle_message(
         line = join(repeat(["  $vert"], h), "\n")
         equal = vertical_pad(eq, h, :top)
 
-        hstack(line, t, k, equal, v; pad = 1) |> tprint
+        ll = hstack(line, t, k, equal, v; pad = 1)
+        tprint(io, ll)
     end
-    return print_closing_line(color)
+    print_closing_line(io, color)
+end
+
+"""
+    handle_message(logger::TermLogger, lvl, msg, _mod, group, id, file, line; kwargs...)
+
+Handle printing of log messages, with style!.
+
+In addition to the log message and info such as file/line and time of log, 
+it prints kwargs styled by their type.
+"""
+function Logging.handle_message(
+    logger::TermLogger,
+    lvl,
+    msg,
+    _mod,
+    group,
+    id,
+    file,
+    line;
+    kwargs...,
+)
+    # handle log progress
+    _progress = asprogress(lvl, msg, _mod, group, id, file, line; kwargs...)
+    isnothing(_progress) || return handle_progress(logger, _progress)
+
+    # generate log 
+    logged = sprint(print_log_message, logger, lvl, msg, _mod, file, line, kwargs)
+
+    # restore stdout
+    NOCOLOR[] && (logged = cleantext(logged))
+    print(logged)
 end
 
 # ---------------------------- install term logger --------------------------- #

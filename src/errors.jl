@@ -19,7 +19,9 @@ import Term:
     STACKTRACE_HIDDEN_MODULES,
     STACKTRACE_HIDE_FRAMES,
     reshape_code_string,
-    TERM_SHOW_LINK_IN_STACKTRACE
+    TERM_SHOW_LINK_IN_STACKTRACE,
+    NOCOLOR,
+    cleantext
 
 # import ..Links: Link
 import ..Style: apply_style
@@ -75,6 +77,69 @@ include("_errors.jl")
 #                              INSTALL STACKTRACE                              #
 # ---------------------------------------------------------------------------- #
 
+function print_term_error(io::IO, er, bt, reverse_backtrace, max_n_frames, hide_frames)
+    try
+        # create a StacktraceContext
+        ctx = StacktraceContext()
+
+        # print an hLine with the error name
+        ename = string(typeof(er))
+        length(bt) > 0 && print(
+            io,
+            hLine(
+                ctx.out_w,
+                "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
+                style = "dim $(ctx.theme.err_errmsg)",
+            ),
+        )
+
+        # print error backtrace or panel
+        if length(bt) > 0
+            rendered_bt = render_backtrace(
+                ctx,
+                bt;
+                reverse_backtrace = reverse_backtrace,
+                max_n_frames = max_n_frames,
+                hide_frames = hide_frames,
+            )
+            print(io, rendered_bt)
+        end
+
+        # print message panel if VSCode is not handling that through a second call to this fn
+
+        msg = highlight(sprint(Base.showerror, er)) |> apply_style
+        err_panel = Panel(
+            RenderableText(
+                reshape_code_string(msg, ctx.module_line_w);
+                width = ctx.module_line_w,
+            );
+            width = ctx.out_w,
+            title = "{bold $(ctx.theme.err_errmsg) default underline}$(typeof(er)){/bold $(ctx.theme.err_errmsg) default underline}",
+            padding = (2, 2, 1, 1),
+            style = "dim $(ctx.theme.err_errmsg)",
+            title_justify = :center,
+            fit = false,
+        )
+        print(io, err_panel)
+
+    catch cought_err  # catch when something goes wrong during error handling in Term
+        @error "Term.jl: error while rendering error message: " cought_err
+
+        for (i, (exc, _bt)) in enumerate(current_exceptions())
+            i == 1 && println(io, "Error during term's stacktrace generation:")
+            Base.show_backtrace(io, _bt)
+            print('\n'^3)
+            Base.showerror(io, exc)
+        end
+
+        print('\n'^5)
+        println(io, "Original error:")
+        Base.show_backtrace(io, bt)
+        print('\n'^3)
+        Base.showerror(io, er)
+    end
+end
+
 """
     install_term_stacktrace(; reverse_backtrace::Bool = true, max_n_frames::Int = 30)
 
@@ -113,66 +178,17 @@ function install_term_stacktrace(;
                 return
             end
 
-            try
-                # create a StacktraceContext
-                ctx = StacktraceContext()
-
-                # print an hLine with the error name
-                ename = string(typeof(er))
-                length(bt) > 0 && print(
-                    io,
-                    hLine(
-                        ctx.out_w,
-                        "{default bold $(ctx.theme.err_errmsg)}$ename{/default bold $(ctx.theme.err_errmsg)}";
-                        style = "dim $(ctx.theme.err_errmsg)",
-                    ),
-                )
-
-                # print error backtrace or panel
-                if length(bt) > 0
-                    rendered_bt = render_backtrace(
-                        ctx,
-                        bt;
-                        reverse_backtrace = $(reverse_backtrace),
-                        max_n_frames = $(max_n_frames),
-                        hide_frames = $(hide_frames),
-                    )
-                    print(io, rendered_bt)
-                end
-
-                # print message panel if VSCode is not handling that through a second call to this fn
-
-                msg = highlight(sprint(Base.showerror, er)) |> apply_style
-                err_panel = Panel(
-                    RenderableText(
-                        reshape_code_string(msg, ctx.module_line_w);
-                        width = ctx.module_line_w,
-                    );
-                    width = ctx.out_w,
-                    title = "{bold $(ctx.theme.err_errmsg) default underline}$(typeof(er)){/bold $(ctx.theme.err_errmsg) default underline}",
-                    padding = (2, 2, 1, 1),
-                    style = "dim $(ctx.theme.err_errmsg)",
-                    title_justify = :center,
-                    fit = false,
-                )
-                print(io, err_panel)
-
-            catch cought_err  # catch when something goes wrong during error handling in Term
-                @error "Term.jl: error while rendering error message: " cought_err
-
-                for (i, (exc, _bt)) in enumerate(current_exceptions())
-                    i == 1 && println("Error during term's stacktrace generation:")
-                    Base.show_backtrace(io, _bt)
-                    print(io, '\n'^3)
-                    Base.showerror(io, exc)
-                end
-
-                print(io, '\n'^5)
-                println(io, "Original error:")
-                Base.show_backtrace(io, bt)
-                print(io, '\n'^3)
-                Base.showerror(io, er)
-            end
+            # print
+            err = sprint(
+                print_term_error,
+                er,
+                bt,
+                $(reverse_backtrace),
+                $(max_n_frames),
+                $(hide_frames),
+            )
+            NOCOLOR[] && (err = cleantext(err))
+            print(io, err)
         end
     end
 end

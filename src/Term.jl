@@ -42,6 +42,7 @@ const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
 const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
 const DEFAULT_CONSOLE_WIDTH = Ref{Int}(88)
 const DEFAULT_STACKTRACE_WIDTH = Ref{Int}(140)
+const NOCOLOR = Ref{Bool}(false)
 
 default_width(io = stdout)::Int =
     min(DEFAULT_CONSOLE_WIDTH[], something(ACTIVE_CONSOLE_WIDTH[], displaysize(io)[2]))
