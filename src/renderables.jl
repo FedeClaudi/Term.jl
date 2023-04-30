@@ -11,7 +11,9 @@ import Term:
     str_trunc,
     text_to_width,
     get_bg_color,
-    textlen
+    textlen,
+    NOCOLOR,
+    cleantext
 
 import Term
 
@@ -56,7 +58,8 @@ Base.String(r::AbstractRenderable) = Base.string(r)
 Print a renderable to an IO
 """
 function Base.print(io::IO, renderable::AbstractRenderable; highlight = true)
-    ren = unescape_brackets_with_space(string(renderable))
+    ren = unescape_brackets_with_space(string(renderable)) |> apply_style
+    NOCOLOR[] && (ren = cleantext(ren))
     return println(io, ren)
 end
 

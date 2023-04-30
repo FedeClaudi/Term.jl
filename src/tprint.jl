@@ -1,6 +1,7 @@
 module Tprint
 
-import Term: unescape_brackets, escape_brackets, has_markup, reshape_text
+import Term:
+    unescape_brackets, escape_brackets, has_markup, reshape_text, NOCOLOR, cleantext
 import Term: highlight as highlighter
 import ..Measures: Measure
 import ..Renderables: AbstractRenderable, trim_renderable, RenderableText
@@ -9,6 +10,12 @@ import ..Layout: hstack
 import ..Consoles: console_width
 
 export tprint, tprintln
+
+function sprint_no_color(x)
+    o = sprint(print, x)
+    NOCOLOR[] && (o = cleantext(o))
+    return o
+end
 
 """
     tprint
@@ -37,7 +44,7 @@ function tprint(io::IO, x::AbstractString; highlight = true)
     x =
         Measure(x).w <= console_width(io) ? x :
         string(RenderableText(string(x), width = console_width(io)))
-    print(io, x)
+    print(io, sprint_no_color(x))
 end
 
 """
@@ -51,7 +58,7 @@ Equivalent to `print(x)`
 function tprint(io::IO, x::AbstractRenderable; highlight = true)
     w = console_width()
     x = x.measure.w > console_width() ? trim_renderable(x, w) : x
-    print(io, x)
+    print(io, sprint_no_color(x))
 end
 
 function tprint(io::IO, args...; highlight = true)
