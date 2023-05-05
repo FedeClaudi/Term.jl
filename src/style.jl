@@ -67,8 +67,8 @@ function MarkupStyle(markup)
             style.color = get_color(code)
         elseif is_background(code)
             style.background = get_color(code; bg = true)
-        elseif code != "nothing"
-            @debug "Code type not recognized: $code"
+        # elseif code != "nothing"
+        #     @debug "Code type not recognized: $code"
         end
     end
     return style
@@ -101,9 +101,9 @@ function get_style_codes(style::MarkupStyle)
         elseif attr != :tag && value == true  # MODES
             code = CODES[attr]
         else
-            if value != false && attr != :tag
-                @debug "Attr/value not recognized or not set" attr value
-            end
+            # if value != false && attr != :tag
+            #     @debug "Attr/value not recognized or not set" attr value
+            # end
             continue
         end
 

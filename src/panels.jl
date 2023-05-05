@@ -519,7 +519,7 @@ function parse_layout_args(depth, firstarg::Expr, args...)
         content_args = [firstarg, args...]
     end
 
-    @debug "in here" firstarg args kwargs_arg content_args
+    # @debug "in here" firstarg args kwargs_arg content_args
 
     return kwargs_arg, content_args
 end
@@ -532,10 +532,10 @@ argument expression with the correct `width` (using `parse_layout_args`).
 Also go through any other argument to the call to fix inner panels' width.
 """
 function fix_layout_width(panel_call::Expr, depth::Int)::Expr
-    @debug "Starting" panel_call.args
+    # @debug "Starting" panel_call.args
     kwargs_arg, content_args = parse_layout_args(depth, panel_call.args[2:end]...)
 
-    @debug "got ready" content_args kwargs_arg
+    # @debug "got ready" content_args kwargs_arg
     for (i, arg) in enumerate(content_args)
         !isa(arg, Expr) && continue
 
