@@ -110,13 +110,23 @@ To change the currently active widget you can "navigate" through the app using a
 To test this, use `play` on the app we just created and then left/right arrow to change focus!
 (Don't forget to use `q` to exit the app when you're done)
 
-Sometimes you want different ways to specify which widget should be active, either by using an arrow key or by pressing a specific key.
-You can pass `transition_rules` to `App` to use your own set of rules. `transition_rules` should be a `Dict` with `KeyInput` types as key and a `Dict` of pairs `Symbol => Symbol`. The interpretation is that the symbols indicate the current and next widget to be active when the key is pressed. For example:
-
-```julia
-transition_rules = Dict(
-    ArrowRight() => Dict(:a => :b),
-    ArrowLeft() => Dict(:b => :a),
+### Activating widgets by keyboard input
+Sometimes you want different ways to specify which widget should be active, either by using an arrow key or by pressing a specific key. While there are some defaults for simple apps, you will likely need to specify these "transition rules" manually for most layouts. This is done by passing a `Dict` as the keyword argument `transition_rules` when you create your `App`.  The keys of `transition_rules` should be of type `KeyInput`, and the values should of type `Dict`, mapping symbols to symbols. The wording can get complicated with these nested dictionaries, so the example below hopefully explains how to define apropriate transition rules:
+```
+App(
+    # Layout: 3 columns (a b c), with b split in the middle
+    :(a(10, 0.2) * (b1(5, 0.2) / b2(5, 0.2)) * c(10, 0.2)); 
+    widgets = Dict(
+        :a => TextWidget("Box 1", as_panel=true),
+        :b1 => TextWidget("Box 2.1", as_panel=true),
+        :b2 => TextWidget("Box 2.2", as_panel=true),
+        :c => TextWidget("Box 3", as_panel=true),
+    ), transition_rules = Dict(
+        ArrowRight() => Dict(:a => :b1, :b1=>:c, :b2=>:c),
+        ArrowLeft() => Dict(:c => :b1, :b1=>:a, :b2=>:a),
+        ArrowDown() => Dict(:b1 => :b2),
+        ArrowUp() => Dict(:b2 => :b1),
+    )
 )
 ```
-implements the transition rules from the example above. 
+To mentally parse the first transition rule, you should think "When ArrowRight is pressed, if :a is selected, move to :b1. If :b1 is selected, move to :c. If :b2 is selected, move to :c."
