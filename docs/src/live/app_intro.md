@@ -5,7 +5,7 @@ An app has some content. This content is in the form of `AbstractWidget` element
 There's a lot more to apps, but for now we can start with some simple examples
 
 ### A first example
-We start with a simple example: an app that only shows one single widget. a `TextWidget` displaying a bit of text. 
+We start with a simple example: an app that only shows one single widget. a `TextWidget` displaying a bit of text. Note that Term 2.0 is required to create live widgets.
 
 ```@example app
 using Term
