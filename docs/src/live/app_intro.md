@@ -5,7 +5,7 @@ An app has some content. This content is in the form of `AbstractWidget` element
 There's a lot more to apps, but for now we can start with some simple examples
 
 ### A first example
-We start with a simple example: an app that only shows one single widget. a `TextWidget` displaying a bit of text. 
+We start with a simple example: an app that only shows one single widget. a `TextWidget` displaying a bit of text. As the output is quite long, we supress the it to avoid cluttering this page.
 
 ```@example app
 using Term
@@ -17,7 +17,7 @@ The starting point of any good "live" or interactive terminal display is an `App
 An app has some content. This content is in the form of `AbstractWidget` elements. These widgets are single content elements that serve a specific function, for example displaying some text or acting as buttons etc. More on widgets later. In addition to knowing **what** is in an app, we also need to specify **how** it should look like. Specifically, how should the different widgets be layed out.  So in addition to creating widgets, you will need to specify a layout for your app. 
 There's a lot more to apps, but for now we can start with some simple examples
 """)
-)
+);
 
 ```
 
