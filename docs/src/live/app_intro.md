@@ -69,7 +69,7 @@ Note that you can always specify the `width` and `height` of the app. If you don
 
 !!! tip "Responsive layout"
     If you use a `Float` to specify your layout elements size, the app will automatically resize the elements when the terminal 
-    size is reduced. If you also want your app to expand to fill in the whole terminal is the terminal is enlarged, you can use
+    size is reduced. If you also want your app to expand to fill in the whole terminal if the terminal is enlarged, you can use
     `expand` keyword argument for `App`. 
 
 
