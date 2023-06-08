@@ -5,7 +5,7 @@ An app has some content. This content is in the form of `AbstractWidget` element
 There's a lot more to apps, but for now we can start with some simple examples
 
 ### A first example
-We start with a simple example: an app that only shows one single widget. a `TextWidget` displaying a bit of text. As the output is quite long, we supress the it to avoid cluttering this page.
+We start with a simple example: an app that only shows one single widget. a `TextWidget` displaying a bit of text. As the output is quite long, we supress the it to avoid cluttering this page. Note that Term 2.0 is required to create live widgets.
 
 ```@example app
 using Term
@@ -69,7 +69,7 @@ Note that you can always specify the `width` and `height` of the app. If you don
 
 !!! tip "Responsive layout"
     If you use a `Float` to specify your layout elements size, the app will automatically resize the elements when the terminal 
-    size is reduced. If you also want your app to expand to fill in the whole terminal is the terminal is enlarged, you can use
+    size is reduced. If you also want your app to expand to fill in the whole terminal if the terminal is enlarged, you can use
     `expand` keyword argument for `App`. 
 
 

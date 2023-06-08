@@ -42,7 +42,41 @@ export inspect, typestree, expressiontree
 # ---------------------------------------------------------------------------- #
 #                                TYPES HIERARCHY                               #
 # ---------------------------------------------------------------------------- #
+"""
+    typestree(T)
+    typestree(io::IO, T)
 
+Print the type hierarchy for `T` in a pretty format. This is 
+done using colors, indentation and unicode for maximal readability.
+The output included all supertypes, and one level of subtypes.
+
+This function is not exported, so to use it you need to 
+use the `Term.typestree` syntax, or import it manually by
+`import Term: typestree`
+
+# Example
+Below is an example showing the type tree for `Integer`. Note 
+that the colors of the output are not included in this docstring.
+```jldoctest
+julia> Term.typestree(Integer)
+╭────────────── Types hierarchy ───╮
+│                                  │
+│  Number                          │
+│ ━━━━━━━━                         │
+│    │                             │
+│    ├── Complex                   │
+│    └── Real                      │
+│        ├── Rational              │
+│        ├── AbstractIrrational    │
+│        ├── Integer               │
+│        │   ├── Signed            │
+│        │   ├── Unsigned          │
+│        │   └── Bool              │
+│        └── AbstractFloat         │
+│                                  │
+╰──────────────────────────────────╯
+```
+"""
 typestree(io::IO, T::DataType) = print(
     io,
     Panel(
