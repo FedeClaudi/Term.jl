@@ -67,8 +67,8 @@ function MarkupStyle(markup)
             style.color = get_color(code)
         elseif is_background(code)
             style.background = get_color(code; bg = true)
-        # elseif code != "nothing"
-        #     @debug "Code type not recognized: $code"
+            # elseif code != "nothing"
+            #     @debug "Code type not recognized: $code"
         end
     end
     return style
