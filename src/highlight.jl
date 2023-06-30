@@ -116,7 +116,7 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     code = split(join(code), "\n")
 
     # clean
-    clean(line) = replace(line, "    {/    }" => "")
+    clean(line) = replace(line, "    {/    }" => "", '\r' => "")
     codelines = clean.(code)  # [10-δ:10+δ]
     linenos = linenos  # [10-δ:10+δ]
 
