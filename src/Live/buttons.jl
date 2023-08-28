@@ -155,7 +155,7 @@ function ToggleButton(
     on_deactivated::Function = on_deactivated,
     kwargs...,
 )
-    return Button(
+    return ToggleButton(
         WidgetInternals(Measure(), nothing, on_draw, on_activated, on_deactivated, false),
         controls,
         message,
