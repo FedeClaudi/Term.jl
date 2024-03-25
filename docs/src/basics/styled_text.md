@@ -86,7 +86,7 @@ that's right, `Term.jl` can also color the background of your text (by adding `o
 
 !!! info "Where did my brackets go!?!?"
     Perhaps you've tried something like `tprint("This is {my} text")` and got surprised when the output was `"This is text"`. If so, read on. What happened there is that `Term.jl` interprets anything with single squared parentheses (`{...}`) as style information
-    and removes that from your text output. So in the example it treated `{my}` as a markup style tag and removed it from the text, but `my` is not a valid style so it was ultimately ignored. If you want to use `[]` in your text, you simply need to use double brackets: `tprint("This is {{my}} text")` will print `"This is {my} text"` as expected. 
+    and removes that from your text output. So in the example it treated `{my}` as a markup style tag and removed it from the text, but `my` is not a valid style so it was ultimately ignored. If you want to use `{}` in your text, you simply need to use double brackets: `tprint("This is {{my}} text")` will print `"This is {my} text"` as expected. 
 
 
 If you just want to **use** `Term.jl`'s style functionality, just make sure to read the admonition below. If you're curious about what's happening under the hood, read on below!
