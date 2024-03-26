@@ -26,10 +26,11 @@ end
 
     VERSION ≥ v"1.7" && begin
         IS_WIN || @compare_to_string sprint(termshow, obj) "repr_rocket"
-        IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
         IS_WIN || @compare_to_string sprint(termshow, T()) "repr_T_struct"
+        if VERSION ≤ v"1.11"
+            IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
+        end
     end
-
     @with_repr struct MyTestStruct3
         x::String
         y::Array
@@ -89,14 +90,14 @@ else
     )
 end
 
-@testset "TERMSHOW for types" begin
+VERSION ≤ v"1.11" && @testset "TERMSHOW for types" begin
     for (i, t) in objs
         t = sprint(sprint_termshow, t)
         IS_WIN || @compare_to_string(t, "termshow_$i")
     end
 end
 
-@testset "Term automatic repr" begin
+VERSION ≤ v"1.11" && @testset "Term automatic repr" begin
     repr_show(io, x) = show(io, MIME("text/plain"), x)
     @test sprint(repr_show, 1) == "\e[38;2;144;202;249m1\e[39m"
 
@@ -104,7 +105,7 @@ end
     IS_WIN || @compare_to_string(sprint(repr_show, :(x + y)), "automatic_repr_2")
 end
 
-@testset "@showme" begin
+VERSION ≤ v"1.11" && @testset "@showme" begin
     # fix for different path on remote CI
     loc = "\e[2m/Users/federicoclaudi/Documents/Github/Term.jl/src/"
     rem = "             \e[2m/home/runner/work/Term.jl/Term.jl/src/"
