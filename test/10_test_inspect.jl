@@ -13,11 +13,15 @@ e7 = :(2x + 3 * √(3x^2))
 e8 = :(print(lstrip("test")))
 expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
 
+bool_env(key, default="false") = tryparse(Bool, get(ENV, key, default))
+
 # save expressions to file (for later comparisons)
-for (i, e) in enumerate(expressions)
-    tofile(string(Dendogram(e)), "./txtfiles/dendo_expr_$i.txt")
-    tofile(string(Tree(e)), "./txtfiles/tree_expr_$i.txt")
-    tofile(sprint(expressiontree, e), "./txtfiles/exptree_expr_$i.txt")
+if !(bool_env("CI") || bool_env("PKGEVAL") || bool_env("JULIA_PKGEVAL"))
+    for (i, e) in enumerate(expressions)
+        tofile(string(Dendogram(e)), "./txtfiles/dendo_expr_$i.txt")
+        tofile(string(Tree(e)), "./txtfiles/tree_expr_$i.txt")
+        tofile(sprint(expressiontree, e), "./txtfiles/exptree_expr_$i.txt")
+    end
 end
 
 @testset "Inspect: expressions" begin
