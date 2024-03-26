@@ -1,7 +1,7 @@
 name: CI
 on:
-  # push:
-  #  branches:  [ master]
+  push:
+   branches:  [ master]
   pull_request:
     types:
     - opened
@@ -18,6 +18,7 @@ jobs:
         version:
           - '1.6'
           - '1' # latest 1.X
+          - '~1.11.0-0'  # upcoming julia version, next `rc`
         os:
           - ubuntu-latest
           - windows-latest
@@ -25,16 +26,16 @@ jobs:
         arch:
           - x64
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v3
+      - uses: julia-actions/setup-julia@latest
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - uses: julia-actions/cache@v1
-      - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-runtest@v1
-      - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
+      - uses: julia-actions/julia-buildpkg@latest
+      - uses: julia-actions/julia-runtest@latest
+      - uses: julia-actions/julia-processcoverage@latest
+      - uses: codecov/codecov-action@v3
         with:
           file: lcov.info
 
@@ -44,7 +45,7 @@ jobs:
       - uses: julia-actions/setup-julia@latest
         with:
           version: '1' # latest 1.X
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Install JuliaFormatter and format
         # This will use the latest version by default but you can set the version like so:
         #
