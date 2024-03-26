@@ -87,7 +87,7 @@ end
         end
 
         start!(pbar)
-        (IS_WIN || colinfo ∉ (:detailed, :spinner)) ||
+        (!IS_WIN && colinfo ∈ [:spinner]) &&
             @compare_to_string render(job) "pbar_cols_style_$i"
     end
 
