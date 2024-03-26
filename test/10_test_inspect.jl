@@ -13,7 +13,7 @@ e7 = :(2x + 3 * √(3x^2))
 e8 = :(print(lstrip("test")))
 expressions = (e1, e2, e3, e4, e5, e6, e7, e8)
 
-bool_env(key, default="false") = tryparse(Bool, get(ENV, key, default))
+bool_env(key, default = "false") = tryparse(Bool, get(ENV, key, default))
 
 # save expressions to file (for later comparisons)
 if !(bool_env("CI") || bool_env("PKGEVAL") || bool_env("JULIA_PKGEVAL"))
