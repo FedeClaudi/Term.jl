@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-   branches:  [ master]
+   branches: [master]
   pull_request:
     types:
     - opened
@@ -23,7 +23,6 @@ jobs:
         version:
           - '1.6'
           - '1' # latest 1.X
-          - '~1.11.0-0'  # upcoming julia version, next `rc`
         experimental:
           - false
         os:
@@ -32,6 +31,10 @@ jobs:
           - macOS-latest
         arch: [x64]
         include:
+          - os: ubuntu-latest
+            experimental: true
+            version: '~1.11.0-0'  # upcoming julia version, next `rc`
+            arch: x64
           - os: ubuntu-latest
             experimental: true
             version: 'nightly'
