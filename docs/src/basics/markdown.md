@@ -1,5 +1,5 @@
 # Markdown
-If you've had a loot at the `REPR` section, you might have noticed that Term is doing some fancy print out of the functions docstrings. That's because docstrings in Julia are represented as Markdown text and Term can parse it nicely!
+If you've had a look at the `REPR` section, you might have noticed that Term is doing some fancy print out of the functions docstrings. That's because docstrings in Julia are represented as Markdown text and Term can parse it nicely!
 
 Let's have a look.
 
