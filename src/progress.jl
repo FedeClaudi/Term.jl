@@ -688,7 +688,6 @@ function foreachprogress(
             start!(pbar)
             task = Threads.@spawn _startrenderloop(pbar)
         end
-        return
 
         # The job tracks the iteration through `iter`
         job = addjob!(
