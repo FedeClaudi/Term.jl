@@ -3,7 +3,7 @@
 [![Dev docs](https://img.shields.io/badge/docs-stable-blue.svg)](https://fedeclaudi.github.io/Term.jl/dev/)
 [![JuliaHub deps](https://juliahub.com/docs/Term/deps.svg)](https://juliahub.com/ui/Packages/Term/Ctj9q?t=2)
 [![PkgEval](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/T/Term.named.svg)](https://juliaci.github.io/NanosoldierReports/pkgeval_badges/T/Term.html)
-[![Term.jl Downloads](https://shields.io/endpoint?url=https://pkgs.genieframework.com/api/v1/badge/Term)](https://pkgs.genieframework.com?packages=Term)
+[![Term.jl Downloads](https://img.shields.io/badge/dynamic/json?url=http%3A%2F%2Fjuliapkgstats.com%2Fapi%2Fv1%2Fmonthly_downloads%2FTerm&query=total_requests&suffix=%2Fmonth&label=Downloads)](http://juliapkgstats.com/pkg/Term)
 
 ![](readme.png)
 
