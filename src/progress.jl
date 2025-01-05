@@ -112,7 +112,7 @@ mutable struct ProgressJob
     )
         return new(
             id,
-            isnothing(N) ? 0 : 1,
+            0,
             N,
             description,
             columns,
@@ -183,9 +183,11 @@ end
 Update a job's progress `i` by setting its value or adding `+1`.
 """
 function update!(job::ProgressJob; i = nothing)
-    (!isnothing(job.N) && job.i ≥ job.N) && return stop!(job)
-
-    job.i += something(i, 1)
+    if !isnothing(job.N) && job.i ≥ job.N
+        stop!(job)
+    else
+        job.i += something(i, 1)
+    end
     return nothing
 end
 
@@ -249,7 +251,8 @@ Arguments:
     - `running`: true if the progress bar is active
     - `paused`: false when the bar is running but briefly paused (e.g. to update `jobs`)
     - `task`: references a `Task` for updating the progress bar in parallel
-    - `renderstatus`: a `RenderStatus` instance.
+    - `renderstatus`: a `RenderStatus` instance
+    - `extra_info`: a `Dict{String,<:Any}` to show extra information.
 """
 mutable struct ProgressBar
     jobs::Vector{ProgressJob}
@@ -267,21 +270,23 @@ mutable struct ProgressBar
     paused::Bool
     task::Union{Task,Nothing}
     renderstatus::Any
+    extra_info::Union{Dict{String,<:Any},Nothing}
 end
 
 """
     ProgressBar(;
-        width::Int=$(default_width()),
+        width::Int = $(default_width()),
         columns::Union{Vector{DataType}, Symbol} = :default,
         columns_kwargs::Dict = Dict(),
-        expand::Bool=false,
+        expand::Bool = false,
         transient::Bool = false,
         colors::Vector{RGBColor} = [
             RGBColor("(1, .05, .05)"),
             RGBColor("(.05, .05, 1)"),
             RGBColor("(.05, 1, .05)"),
         ],
-        refresh_rate::Int=60,  # FPS of rendering
+        refresh_rate::Int = 60,  # FPS of rendering
+        extra_info::Union{Dict{String,<:Any},Nothing} = nothing,
     )
 
 Create a ProgressBar instance.
@@ -294,6 +299,7 @@ function ProgressBar(;
     transient::Bool                         = false,
     colors::Union{String,Vector{RGBColor}}  = [RGBColor("(1, .05, .05)"), RGBColor("(.05, .05, 1)"), RGBColor("(.05, 1, .05)")],
     refresh_rate::Int                       = 60,  # FPS of rendering
+    extra_info::Union{Dict{String,<:Any},Nothing} = nothing,
 )
     columns = columns isa Symbol ? get_columns(columns) : columns
 
@@ -313,6 +319,7 @@ function ProgressBar(;
         false,
         nothing,
         RenderStatus(),
+        extra_info,
     )
 end
 
@@ -485,7 +492,7 @@ function render(pbar::ProgressBar)
     end
 
     # get variables
-    njobs, height = length(pbar.jobs) + 1, console_height()
+    njobs, height = 1 + length(pbar.jobs) + length(pbar.extra_info), console_height()
     iob = pbar.buff
 
     # on the first render, create sticky region
@@ -520,6 +527,14 @@ function render(pbar::ProgressBar)
         contents = render(job, pbar)
         coda = last ? "" : "\n"
         write(iob, contents * coda)
+    end
+
+    # render the extra information
+    if !isnothing(pbar.extra_info)
+        max_len = maximum(length.(keys(pbar.extra_info)))
+        for (k, v) in pbar.extra_info
+            write(iob, "\n" * k * " "^(max_len - length(k)) * " : " * string(v))
+        end
     end
 
     # restore position and write
