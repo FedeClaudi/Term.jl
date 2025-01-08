@@ -2,10 +2,13 @@ module LiveWidgets
 import REPL
 import REPL.Terminals: raw!, AbstractTerminal
 import REPL.TerminalMenus: readkey
-const terminal = @static if isdefined(REPL.TerminalMenus, :default_terminal)
-    REPL.TerminalMenus.default_terminal()
-else
-    REPL.TerminalMenus.terminal
+
+function get_terminal()
+    return @static if isdefined(REPL.TerminalMenus, :default_terminal)
+        REPL.TerminalMenus.default_terminal()
+    else
+        REPL.TerminalMenus.terminal
+    end
 end
 
 using Dates

@@ -42,7 +42,7 @@ other widgets to access their internal variables.
 
         # prepare terminal 
         raw_mode_enabled = try
-            raw!(terminal, true)
+            raw!(get_terminal(), true)
             true
         catch err
             @debug "Unable to enter raw mode: " exception = (err, catch_backtrace())
@@ -50,11 +50,11 @@ other widgets to access their internal variables.
         end
 
         # hide the cursor
-        raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
+        raw_mode_enabled && print(get_terminal().out_stream, "\x1b[?25l")
         return new(
             iob,
             ioc,
-            terminal,
+            get_terminal(),
             nothing,
             String[],
             raw_mode_enabled,
