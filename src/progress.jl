@@ -270,7 +270,7 @@ mutable struct ProgressBar
     paused::Bool
     task::Union{Task,Nothing}
     renderstatus::Any
-    extra_info::Union{Dict{String,<:Any},Nothing}
+    extra_info::Dict{String,<:Any}
 end
 
 """
@@ -286,7 +286,7 @@ end
             RGBColor("(.05, 1, .05)"),
         ],
         refresh_rate::Int = 60,  # FPS of rendering
-        extra_info::Union{Dict{String,<:Any},Nothing} = nothing,
+        extra_info::Dict{String,<:Any} = Dict{String,Any}(),
     )
 
 Create a ProgressBar instance.
@@ -299,7 +299,7 @@ function ProgressBar(;
     transient::Bool                         = false,
     colors::Union{String,Vector{RGBColor}}  = [RGBColor("(1, .05, .05)"), RGBColor("(.05, .05, 1)"), RGBColor("(.05, 1, .05)")],
     refresh_rate::Int                       = 60,  # FPS of rendering
-    extra_info::Union{Dict{String,<:Any},Nothing} = nothing,
+    extra_info::Dict{String,<:Any}          = Dict{String,Any}(),
 )
     columns = columns isa Symbol ? get_columns(columns) : columns
 
@@ -530,7 +530,7 @@ function render(pbar::ProgressBar)
     end
 
     # render the extra information
-    if !isnothing(pbar.extra_info)
+    if !isempty(pbar.extra_info)
         max_len = maximum(length.(keys(pbar.extra_info)))
         for (k, v) in pbar.extra_info
             write(iob, "\n" * k * " "^(max_len - length(k)) * " : " * string(v))
