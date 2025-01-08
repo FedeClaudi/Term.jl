@@ -15,19 +15,19 @@ using ProgressLogging
 
     j1 = addjob!(pbar; description = "test", N = 10)
     @test render(j1) isa String  # coverage
-    @test jobcolor(j1) == "(190, 35, 112)"
+    @test jobcolor(j1) == "(209, 16, 112)"
 
     @test j1.id == 1
     @test j1.N == 10
-    @test j1.i == 1
+    @test j1.i == 0
     @test j1.description == "test"
     @test j1.started
     @test j1.columns isa Vector{AbstractColumn}
 
     update!(j1)
-    @test j1.i == 2
+    @test j1.i == 1
     update!(j1; i = 10)
-    @test j1.i == 12
+    @test j1.i == 11
 
     @test getjob(pbar, j1.id).id == j1.id
 
