@@ -7,9 +7,9 @@ if it exists. Returns a list of return values from the control functions.
 """
 function keyboard_input(widget::AbstractWidget)
     controls = widget.controls
-    if bytesavailable(terminal.in_stream) > 0
+    if bytesavailable(get_terminal().in_stream) > 0
         # get input
-        c = readkey(terminal.in_stream)
+        c = readkey(get_terminal().in_stream)
         c = haskey(KEYs, Int(c)) ? KEYs[Int(c)] : Char(c)
 
         # see if a control has been defined for this key
@@ -28,9 +28,9 @@ Get keyboard input from the terminal and execute the corresponding control funct
 """
 function keyboard_input(widget::AbstractWidgetContainer)
     retvals = []
-    if bytesavailable(terminal.in_stream) > 0
+    if bytesavailable(get_terminal().in_stream) > 0
         # get input
-        c = readkey(terminal.in_stream)
+        c = readkey(get_terminal().in_stream)
         c = haskey(KEYs, Int(c)) ? KEYs[Int(c)] : Char(c) # ::Union{Char, KeyInput}
 
         # execute command on each subwidget

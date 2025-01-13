@@ -35,26 +35,31 @@ other widgets to access their internal variables.
     help_message::Union{Nothing,String}
     should_stop::Bool
 
-    function AppInternals(; refresh_rate::Int = 60, help_message = nothing)
+    function AppInternals(;
+        refresh_rate::Int = 60,
+        help_message = nothing,
+        suppress_output = false,
+    )
         # get output buffers
         iob = IOBuffer()
         ioc = IOContext(iob, :displaysize => displaysize(stdout))
 
         # prepare terminal 
         raw_mode_enabled = try
-            raw!(terminal, true)
+            raw!(get_terminal(), true)
             true
         catch err
-            @debug "Unable to enter raw mode: " exception = (err, catch_backtrace())
+            suppress_output ||
+                @warn "Unable to enter raw mode: " exception = (err, catch_backtrace())
             false
         end
 
         # hide the cursor
-        raw_mode_enabled && print(terminal.out_stream, "\x1b[?25l")
+        raw_mode_enabled && print(get_terminal().out_stream, "\x1b[?25l")
         return new(
             iob,
             ioc,
-            terminal,
+            get_terminal(),
             nothing,
             String[],
             raw_mode_enabled,
