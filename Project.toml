@@ -1,7 +1,7 @@
 name = "Term"
 uuid = "22787eb5-b846-44ae-b979-8e399b8463ab"
 authors = ["FedeClaudi <federicoclaudi@protonmail.com> and contributors"]
-version = "2.0.6"
+version = "2.0.7"
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
