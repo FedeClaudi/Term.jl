@@ -260,6 +260,32 @@ end
 
 done!
 
+## Display additional variables
+You can add any variables you want to inspect below the progress bar and manually update them within the loop.
+
+The type of the extra variable must be `Dict{String,<:Any}`, see the example below.
+
+```julia
+using Term.Progress, Dates
+a = 10
+iteration_time = NaN
+extra_info = Dict("Speed" => "$iteration_time s/it", "Start time" => now(), "a" => a)
+pbar = ProgressBar(; extra_info)
+job = addjob!(pbar; N = 5)
+start!(pbar)
+for i in 1:5
+    iteration_time = @elapsed begin
+        println("Epoch $i")
+        pbar.extra_info["a"] = 10 - i
+        pbar.extra_info["Speed"] = "$iteration_time s/it"
+        update!(job)
+        render(pbar)
+        sleep(1)
+    end
+end
+stop!(pbar)
+```
+
 ## For each progress
 Want to just wrap an iterable in a progress bar rendering? Check this out.
 
