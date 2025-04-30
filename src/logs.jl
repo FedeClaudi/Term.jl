@@ -146,7 +146,9 @@ function handle_progress(logger::TermLogger, prog)
 
     # render
     if all(map(j -> j.finished, pbar.jobs))
-        map(j -> removejob!(pbar, j), pbar.jobs)
+        while length(pbar.jobs) > 0
+            removejob!(pbar, first(pbar.jobs))
+        end
         stop!(pbar)
     else
         render(pbar, logger.io)

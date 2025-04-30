@@ -151,21 +151,19 @@ end
     end
 end
 @testset "\e[34mProgress ProgressLogging custom io" begin
-    begin # Test with custom io
-        buffer = IOBuffer()
-        io = IOContext(buffer, :displaysize => (30, 1000), :color => false)
+    buffer = IOBuffer()
+    io = IOContext(buffer, :displaysize => (30, 1000), :color => false)
 
-        logger = Term.Logs.TermLogger(io, Term.TERM_THEME[])
-        global_logger(logger)
+    logger = Term.Logs.TermLogger(io, Term.TERM_THEME[])
+    global_logger(logger)
 
-        @info "logger message"
-        out = String(take!(buffer))
-        @test occursin("logger message", out)
+    @info "logger message"
+    out = String(take!(buffer))
+    @test occursin("logger message", out)
 
-        @progress "loop" for j in 1:10
-            sleep(0.1)
-        end
-        out = String(take!(buffer))
-        @test occursin("90%", out) # Check it runs to completion
+    @progress "loop" for j in 1:10
+        sleep(0.1)
     end
+    out = String(take!(buffer))
+    @test occursin("90%", out) # Check it runs to completion
 end
