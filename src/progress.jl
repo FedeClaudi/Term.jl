@@ -186,7 +186,7 @@ function update!(job::ProgressJob; i = nothing)
     if !isnothing(job.N) && job.i ≥ job.N
         stop!(job)
     else
-        job.i += something(i, 1)
+        job.i = something(i, 1 + job.i)
     end
     return nothing
 end
