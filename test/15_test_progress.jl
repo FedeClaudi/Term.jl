@@ -5,6 +5,7 @@ import Term.Progress:
     CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn, TextColumn
 
 using ProgressLogging
+import ProgressLogging.Logging.global_logger
 
 @testset "\e[34mProgress - jobs" begin
     pbar = ProgressBar()
@@ -27,7 +28,7 @@ using ProgressLogging
     update!(j1)
     @test j1.i == 1
     update!(j1; i = 10)
-    @test j1.i == 11
+    @test j1.i == 10 # ? In what situation would we want to += i?
 
     @test getjob(pbar, j1.id).id == j1.id
 
@@ -142,12 +143,31 @@ end
         end
     end
 end
-# @testset "\e[34mProgress ProgressLogging" begin
-#     install_term_logger()
+@testset "\e[34mProgress ProgressLogging" begin
+    install_term_logger()
 
-#     @test_nothrow begin
-#         @progress "inner... $i" for j in  1:10
-#             sleep(0.01)
-#         end
-#     end
-# end
+    @test_nothrow begin
+        @progress "loop" for j in 1:10
+            sleep(0.01)
+        end
+    end
+end
+@testset "\e[34mProgress ProgressLogging custom io" begin
+    begin # Test with custom io
+        buffer = IOBuffer()
+        io = IOContext(buffer, :displaysize => (30, 1000), :color => false)
+
+        logger = Term.Logs.TermLogger(io, Term.TERM_THEME[])
+        global_logger(logger)
+
+        @info "logger message"
+        out = String(take!(buffer))
+        @test occursin("logger message", out)
+
+        @progress "loop" for j in 1:10
+            sleep(0.1)
+        end
+        out = String(take!(buffer))
+        @test occursin("90%", out) # Check it runs to completion
+    end
+end
