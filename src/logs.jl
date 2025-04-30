@@ -149,7 +149,7 @@ function handle_progress(logger::TermLogger, prog)
         map(j -> removejob!(pbar, j), pbar.jobs)
         stop!(pbar)
     else
-        render(pbar)
+        render(pbar, logger.io)
     end
 end
 
@@ -324,6 +324,8 @@ function Logging.handle_message(
 
     # generate log
     logged = sprint(print_log_message, logger, lvl, msg, _mod, file, line, kwargs)
+    write(logger.io, logged)
+    flush(logger.io)
 
     # restore stdout
     NOCOLOR[] && (logged = cleantext(logged))
