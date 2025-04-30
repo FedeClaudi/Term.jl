@@ -465,22 +465,22 @@ function render(job::ProgressJob)::String
 end
 
 """
-    render(job::ProgressJob, pbar::ProgressBar)::String
+    render(pbar::ProgressBar, [io=stdout])::String
 
 Render a `ProgressBar`.
 
 When a progress bar is first rendered, this function uses
 ANSI codes to change the scrolling region of the terminal
 window to create a space at the bottom where the bar's visuals
-can be displayed. This allows for thext printed to `stdout` to
+can be displayed. This allows for text printed to `stdout` to
 still be visualized. On subsequent calls, this function
 ensures that the height of the reserved space matches the
 number of running jobs.
 
-All fo this requires a bit of careful work in moving the
+All of this requires a bit of careful work in moving the
 cursor around and doing ANSI magic.
 """
-function render(pbar::ProgressBar)
+function render(pbar::ProgressBar, io = stdout)
     # check if running
     pbar.running || return nothing
 
@@ -539,7 +539,8 @@ function render(pbar::ProgressBar)
 
     # restore position and write
     move_to_line(iob, pbar.renderstatus.scrollline)
-    return print(String(take!(iob)))
+    write(io, String(take!(iob)))
+    return flush(io)
 end
 
 # ---------------------------------------------------------------------------- #
