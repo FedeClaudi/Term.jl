@@ -146,10 +146,8 @@ end
 @testset "\e[34mProgress ProgressLogging" begin
     install_term_logger()
 
-    @test_nothrow begin
-        @progress "loop" for j in 1:10
-            sleep(0.01)
-        end
+    @progress "loop" for j in 1:10
+        sleep(0.01)
     end
 end
 @testset "\e[34mProgress ProgressLogging custom io" begin
