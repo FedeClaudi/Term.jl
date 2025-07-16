@@ -412,21 +412,20 @@ end
 """
     replace_line(internals::AppInternals)
 
-Erase a line and move cursor
+Erase a line.
 """
 function replace_line(internals::AppInternals)
     erase_line(internals.ioc)
-    down(internals.ioc)
 end
 
 """
     replace_line(internals::AppInternals, newline)
 
-Erase a line, write new content and move cursor. 
+Erase a line and write new content. 
 """
 function replace_line(internals::AppInternals, newline)
     erase_line(internals.ioc)
-    println(internals.ioc, newline)
+    print(internals.ioc, newline)
 end
 
 """
@@ -464,23 +463,16 @@ function refresh!(app::App)
     nlines_prev == 0 && print(internals.ioc, "\n")
 
     # render new content
-    up(internals.ioc, nlines_prev)
+    Consoles.prev_line(internals.ioc, nlines_prev)
     for i in 1:nlines
         line = content_lines[i]
 
-        # avoid re-writing unchanged lines
-        !isnothing(internals.prevcontent) &&
-            nlines_prev > i &&
-            begin
-                old_line = old_lines[i]
-                line == old_line && begin
-                    down(internals.ioc)
-                    continue
-                end
-            end
-
-        # re-write line
-        replace_line(internals, line)
+        # only re-write changed lines
+        if isnothing(internals.prevcontent) || nlines_prev < i || line != old_lines[i]
+            replace_line(internals, line)
+        end
+        
+        Consoles.next_line(internals.ioc)
     end
 
     # output
