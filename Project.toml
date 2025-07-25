@@ -24,7 +24,7 @@ UnicodeFun = "1cfade01-22cf-5700-b092-accc4b62d6e1"
 
 [compat]
 AbstractTrees = "0.4"
-CodeTracking = "1"
+CodeTracking = "1, 2"
 Dates = "1"
 Highlights = "0.5"
 InteractiveUtils = "1"
