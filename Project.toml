@@ -1,7 +1,7 @@
 name = "Term"
 uuid = "22787eb5-b846-44ae-b979-8e399b8463ab"
-authors = ["FedeClaudi <federicoclaudi@protonmail.com> and contributors"]
 version = "2.0.7"
+authors = ["FedeClaudi <federicoclaudi@protonmail.com> and contributors"]
 
 [deps]
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
@@ -24,7 +24,7 @@ UnicodeFun = "1cfade01-22cf-5700-b092-accc4b62d6e1"
 
 [compat]
 AbstractTrees = "0.4"
-CodeTracking = "1"
+CodeTracking = "1, 3"
 Dates = "1"
 Highlights = "0.5"
 InteractiveUtils = "1"
