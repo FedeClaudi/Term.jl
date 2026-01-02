@@ -1,93 +1,95 @@
+using Pkg
+if !Base.get_bool_env("CI", false)
+    Pkg.resolve(); Pkg.instantiate()
+end
 using Term, Documenter
 
-(@main)(args) = begin
-    DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
+DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
 
-    format = Documenter.HTML(;
-        prettyurls = Base.get_bool_env("CI", false),
-        canonical = "https://FedeClaudi.github.io/Term.jl",
-        assets = String[],
-        collapselevel = 1,
-    )
+format = Documenter.HTML(;
+    prettyurls = Base.get_bool_env("CI", false),
+    canonical = "https://FedeClaudi.github.io/Term.jl",
+    assets = String[],
+    collapselevel = 1,
+)
 
-    pages = [
-        "Home" => "index.md",
-        "Basics" => Any[
-            "basics/basics.md",
-            "basics/styled_text.md",
-            "basics/colors_and_theme.md",
-            "basics/renderables.md",
-            "basics/tprint.md",
-            "basics/console.md",
-            "basics/prompt.md",
-            "basics/markdown.md",
-        ],
-        "Renderables" => Any[
-            "ren/intro.md",
-            "ren/text.md",
-            "ren/panel.md",
-            "ren/table.md",
-            "ren/layout_rens.md",
-            "ren/annotation.md",
-            "ren/dendogram.md",
-            "ren/tree.md",
-        ],
-        "Layout" => Any[
-            "layout/layout.md",
-            "layout/nesting.md",
-            "layout/stacking.md",
-            "layout/justify.md",
-            "layout/grid.md",
-            "layout/compositor.md",
-        ],
-        "Advanced" => Any[
-            "adv/adv.md",
-            "adv/repr.md",
-            "adv/progressbars.md",
-            "adv/logging.md",
-            "adv/errors_tracebacks.md",
-            "adv/introspection.md",
-        ],
-        "Live" => [
-            "live/intro.md",
-            "live/app_intro.md",
-            "live/widgets.md",
-            "live/keyboard_input.md",
-        ],
-        "API" => Any[
-            "api/api_term.md",
-            "api/api_boxes.md",
-            "api/api_colors.md",
-            "api/api_console.md",
-            "api/api_compositors.md",
-            "api/api_dendograms.md",
-            "api/api_errors.md",
-            "api/api_grid.md",
-            "api/api_introspection.md",
-            "api/api_layout.md",
-            "api/api_logs.md",
-            "api/api_markdown.md",
-            "api/api_measures.md",
-            "api/api_panels.md",
-            "api/api_renderables.md",
-            "api/api_repr.md",
-            "api/api_segments.md",
-            "api/api_style.md",
-            "api/api_tables.md",
-            "api/api_tprint.md",
-            "api/api_trees.md",
-        ],
-    ]
+pages = [
+    "Home" => "index.md",
+    "Basics" => Any[
+        "basics/basics.md",
+        "basics/styled_text.md",
+        "basics/colors_and_theme.md",
+        "basics/renderables.md",
+        "basics/tprint.md",
+        "basics/console.md",
+        "basics/prompt.md",
+        "basics/markdown.md",
+    ],
+    "Renderables" => Any[
+        "ren/intro.md",
+        "ren/text.md",
+        "ren/panel.md",
+        "ren/table.md",
+        "ren/layout_rens.md",
+        "ren/annotation.md",
+        "ren/dendogram.md",
+        "ren/tree.md",
+    ],
+    "Layout" => Any[
+        "layout/layout.md",
+        "layout/nesting.md",
+        "layout/stacking.md",
+        "layout/justify.md",
+        "layout/grid.md",
+        "layout/compositor.md",
+    ],
+    "Advanced" => Any[
+        "adv/adv.md",
+        "adv/repr.md",
+        "adv/progressbars.md",
+        "adv/logging.md",
+        "adv/errors_tracebacks.md",
+        "adv/introspection.md",
+    ],
+    "Live" => [
+        "live/intro.md",
+        "live/app_intro.md",
+        "live/widgets.md",
+        "live/keyboard_input.md",
+    ],
+    "API" => Any[
+        "api/api_term.md",
+        "api/api_boxes.md",
+        "api/api_colors.md",
+        "api/api_console.md",
+        "api/api_compositors.md",
+        "api/api_dendograms.md",
+        "api/api_errors.md",
+        "api/api_grid.md",
+        "api/api_introspection.md",
+        "api/api_layout.md",
+        "api/api_logs.md",
+        "api/api_markdown.md",
+        "api/api_measures.md",
+        "api/api_panels.md",
+        "api/api_renderables.md",
+        "api/api_repr.md",
+        "api/api_segments.md",
+        "api/api_style.md",
+        "api/api_tables.md",
+        "api/api_tprint.md",
+        "api/api_trees.md",
+    ],
+]
 
-    makedocs(;
-        modules = [Term],
-        authors = "FedeClaudi <federicoclaudi@protonmail.com> and contributors",
-        repo = "https://github.com/FedeClaudi/Term.jl/blob/{commit}{path}#{line}",
-        sitename = "Term.jl",
-        warnonly = true,
-        format,
-        pages
-    )
+makedocs(;
+    modules = [Term],
+    authors = "FedeClaudi <federicoclaudi@protonmail.com> and contributors",
+    repo = "https://github.com/FedeClaudi/Term.jl/blob/{commit}{path}#{line}",
+    sitename = "Term.jl",
+    warnonly = true,
+    format,
+    pages
+)
 
-    deploydocs(; repo = "github.com/FedeClaudi/Term.jl.git")
-end
+deploydocs(; repo = "github.com/FedeClaudi/Term.jl.git")
