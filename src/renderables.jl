@@ -35,8 +35,9 @@ abstract type AbstractRenderable end
 
 Measure(renderable::AbstractRenderable) = renderable.measure
 
-info(r::AbstractRenderable)::String =
-    "\e[38;5;117m$(typeof(r)) <: AbstractRenderable\e[0m \e[2m(h:$(r.measure.h), w:$(r.measure.w))\e[0m"
+info(
+    r::AbstractRenderable,
+)::String = "\e[38;5;117m$(typeof(r)) <: AbstractRenderable\e[0m \e[2m(h:$(r.measure.h), w:$(r.measure.w))\e[0m"
 
 """
     Base.string(r::AbstractRenderable)::String
