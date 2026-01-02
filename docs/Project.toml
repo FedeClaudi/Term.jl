@@ -1,8 +1,9 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
-Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
 
 [compat]
-Documenter = "0.27"
+Documenter = "1"
+
+[sources]
+Term = {path = ".."}
