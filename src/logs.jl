@@ -1,6 +1,6 @@
 module Logs
 
-using ProgressLogging: asprogress
+using ProgressLogging: asprogress, ProgressLevel
 using InteractiveUtils
 using Dates: Dates
 using Logging
@@ -78,7 +78,7 @@ function TermLogger(io::IO, theme::Theme = TERM_THEME[])
 end
 
 # set logger beavior
-Logging.min_enabled_level(logger::TermLogger) = Logging.Info
+Logging.min_enabled_level(logger::TermLogger) = ProgressLevel
 
 Logging.shouldlog(logger::TermLogger, level, _module, group, id) = true
 Logging.catch_exceptions(logger::TermLogger) = true
@@ -146,10 +146,12 @@ function handle_progress(logger::TermLogger, prog)
 
     # render
     if all(map(j -> j.finished, pbar.jobs))
-        map(j -> removejob!(pbar, j), pbar.jobs)
+        while length(pbar.jobs) > 0
+            removejob!(pbar, first(pbar.jobs))
+        end
         stop!(pbar)
     else
-        render(pbar)
+        render(pbar, logger.io)
     end
 end
 
@@ -322,8 +324,10 @@ function Logging.handle_message(
     _progress = asprogress(lvl, msg, _mod, group, id, file, line; kwargs...)
     isnothing(_progress) || return handle_progress(logger, _progress)
 
-    # generate log 
+    # generate log
     logged = sprint(print_log_message, logger, lvl, msg, _mod, file, line, kwargs)
+    write(logger.io, logged)
+    flush(logger.io)
 
     # restore stdout
     NOCOLOR[] && (logged = cleantext(logged))
