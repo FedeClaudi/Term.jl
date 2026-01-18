@@ -67,6 +67,17 @@ end
     end
 
     @test_nothrow begin
+        pbar3 = ProgressBar(; title = "Test")
+        with(pbar3) do
+            job = addjob!(pbar3; N = 10)
+            for i in 1:10
+                update!(job)
+                sleep(0.001)
+            end
+        end
+    end
+
+    @test_nothrow begin
         @track for i in 1:10
             sleep(0.001)
         end
