@@ -149,7 +149,6 @@ end
     IS_WIN || @compare_to_string render(pbar) "pbar_customization"
 end
 
-<<<<<<< HEAD
 @testset "\e[34mProgress per-job columns" begin
     @test_nowarn redirect_stdout(Base.DevNull()) do
         p = ProgressBar(; columns=:default)
@@ -176,7 +175,6 @@ end
     end
 end
 
-=======
 @testset "\e[34mProgress swapjob!()" begin
 
     # one bar.
