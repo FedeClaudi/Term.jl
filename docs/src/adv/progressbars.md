@@ -305,7 +305,7 @@ j3 = addjob!(p; description="[3]: No N bound...")
 
 # when we switch on limits, we will add these columns to each ProgressJob.
 cols = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-        SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+        SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn]
 
 with(p) do
     for i in 1:300
