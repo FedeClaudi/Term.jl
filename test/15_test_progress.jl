@@ -227,8 +227,8 @@ end
     let p = ProgressBar(; title = "swapjob!(): lookup by ID")
         with(p) do
             j1 = addjob!(p; description="[1]: No N bound...")
-            j2 = addjob!(p; description="[2]: No N bound...", id = uuid1())
-            j3 = addjob!(p; description="[3]: No N bound...", id = uuid1())
+            j2 = addjob!(p; description="[2]: No N bound...", id = uuid4())
+            j3 = addjob!(p; description="[3]: No N bound...", id = uuid4())
             for i in 1:300
                 if i == 50
                     j1 = swapjob!(p, j1.id; N=300, description = "[1]: N bounded", inherit = true,
@@ -271,8 +271,8 @@ end
     @test_nothrow let p = ProgressBar(; title = "swapjob!(): Test early-finishing bar with inherited transience")
         with(p) do
             j1 = addjob!(p; description="[1]: No N bound...")
-            j2 = addjob!(p; description="[2]: No N bound...", id = uuid1(), transient = true)
-            j3 = addjob!(p; description="[3]: No N bound...", id = uuid7())
+            j2 = addjob!(p; description="[2]: No N bound...", id = uuid4(), transient = true)
+            j3 = addjob!(p; description="[3]: No N bound...", id = uuid4())
             for i in 1:300
                 if i == 50
                     j1 = swapjob!(p, j1.id; N=300, description = "[1]: N bounded", inherit = true,
@@ -294,7 +294,7 @@ end
                     j1 = swapjob!(p, j1.id, description = "[1]: Lost bound!", N=nothing, inherit = true)
                 end
                 update!.([j1, j2, j3])
-                sleep(0.002)
+                sleep(0.001)
             end
         end
     end
