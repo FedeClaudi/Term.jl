@@ -286,6 +286,71 @@ end
 stop!(pbar)
 ```
 
+## Swapping jobs on-the-fly
+
+Information about task state may arrive after the task has started; in other cases, tasks may change between states which we would like to represent differently. We may otherwise wish to change an in-flight `ProgressJob`. This facility is provided by `swapjob!()`. In terms of invocation, `swapjob!()` is similar to `addjob!()`, and shares most of its arguments and defaults.
+
+`swapjob!()` is invoked with `ProgressBar` and job-identifying parameters. The latter may be a `ProgressJob` structure directly, or it may be the `ProgressJob` ID. If the job is not associated with the bar, an `ArgumentError` is raised.
+
+As an example, we will generate three tasks with no bound. At different points in the iteration, we will introduce these bounds, and change the columns of each job to reflect its new state. The second job is marked transient, and will complete and be removed from the display when it completes; it is also marked to complete earlier than the other two bars. We will additionally remove the bound for the first job late in the iteration.
+
+```Julia
+import Term.Progress: DescriptionColumn, SeparatorColumn, CompletedColumn, ProgressColumn, SpinnerColumn
+
+# make a progress bar, and add three jobs.
+p  = ProgressBar(; title = "swapjob!() Demo")
+j1 = addjob!(p; description="[1]: No N bound...")
+j2 = addjob!(p; description="[2]: No N bound...", transient = true)
+j3 = addjob!(p; description="[3]: No N bound...")
+
+# when we switch on limits, we will add these columns to each ProgressJob.
+cols = [DescriptionColumn, SeparatorColumn, CompletedColumn,
+        SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+
+with(p) do
+    for i in 1:300
+
+        # invoke swapjob!() to change displays on-the-fly.
+        if i == 50
+            j1 = swapjob!(p, j1; N=300, description = "[1]: N bounded", columns = cols)
+        end
+        if i == 150
+            j2 = swapjob!(p, j2; N=200, description = "[2]: N bounded", columns = cols)
+        end
+        if i == 200
+            j3 = swapjob!(p, j3; N=300, description = "[3]: N bounded", columns = cols)
+        end
+        if i == 250
+            j1 = swapjob!(p, j1, description = "[1]: Lost bound!", N=nothing, inherit = true)
+        end
+
+        update!.([j1, j2, j3])
+        sleep(0.02)
+    end
+end
+```
+
+### Inheritance in `swapjob!()`
+
+When `swapjob!()` is called, internally, a new `ProgressJob` object is created and swapped in. There are three sources of data used to build the new `ProgressJob` object. From highest to lowest precedence, they are:
+
+1. Arguments passed directly to `swapjob!()`.
+2. Values carried over from the previous `ProgressJob` object, if the keyword argument `inherit` is set to `true`;
+3. Default arguments as in `addjob!()`, if `inherit` is false.
+
+`inherit` is set to `true` by default; this simplifies code operating on `ProgressJob` objects in state-machine contexts. Arguments to `swapjob!()` unspecified by the caller are represented as `missing`.
+
+The list of inheritable `ProgressJob` attributes is as follows, where the default column is for `inherit = false`:
+
+| Parameter        | Type                   | Default                         | Description                                                    |
+| ---------------- | --------------------   | ------------------------------- | -------------------------------------------------------------- |
+| `description`    | `String`               | `"Running..."`                  | Contents of `DescriptionColumn`                                |
+| `N`              | `Union{Int,Nothing}`   | `nothing`                       | Iteration maximum                                              |
+| `i`              | `Int`                  | `0`                             | Number of iterations                                           |
+| `columns`        | `Vector{DataType}`     | Columns of parent `ProgressBar` | Column structure of `ProgressJob`                              |
+| `columns_kwargs` | `Dict`                 | `Dict()`                        | Column keyword arguments                                       |
+| `transient`      | `Bool`                 | `false`                         | Clean-up bar display after `ProgressJob` enters finished state |
+
 ## For each progress
 Want to just wrap an iterable in a progress bar rendering? Check this out.
 
