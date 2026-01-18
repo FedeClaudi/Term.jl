@@ -195,10 +195,10 @@ end
 
     # three bars, with state inheritance.
     @test_nowarn let p = ProgressBar(; title = "swapjob!(): multiple bars")
+        with(p) do
         j1 = addjob!(p; description="[1]: No N bound...")
         j2 = addjob!(p; description="[2]: No N bound...")
         j3 = addjob!(p; description="[3]: No N bound...")
-        with(p) do
             for i in 1:300
                 if i == 50
                     j1 = swapjob!(p, j1; N=300, description = "[1]: N bounded", inherit = true,
@@ -225,10 +225,10 @@ end
     # three bars, with state inheritance, mixed ID types, lookup by ID,
     # addition and removal of ProgressColumn when N is set or unset
     let p = ProgressBar(; title = "swapjob!(): lookup by ID")
-        j1 = addjob!(p; description="[1]: No N bound...")
-        j2 = addjob!(p; description="[2]: No N bound...", id = uuid1())
-        j3 = addjob!(p; description="[3]: No N bound...", id = uuid1())
         with(p) do
+            j1 = addjob!(p; description="[1]: No N bound...")
+            j2 = addjob!(p; description="[2]: No N bound...", id = uuid1())
+            j3 = addjob!(p; description="[3]: No N bound...", id = uuid1())
             for i in 1:300
                 if i == 50
                     j1 = swapjob!(p, j1.id; N=300, description = "[1]: N bounded", inherit = true,
@@ -269,10 +269,10 @@ end
 
     # three bars, second is transient and finishes early.
     @test_nothrow let p = ProgressBar(; title = "swapjob!(): Test early-finishing bar with inherited transience")
-        j1 = addjob!(p; description="[1]: No N bound...")
-        j2 = addjob!(p; description="[2]: No N bound...", id = uuid1(), transient = true)
-        j3 = addjob!(p; description="[3]: No N bound...", id = uuid7())
         with(p) do
+            j1 = addjob!(p; description="[1]: No N bound...")
+            j2 = addjob!(p; description="[2]: No N bound...", id = uuid1(), transient = true)
+            j3 = addjob!(p; description="[3]: No N bound...", id = uuid7())
             for i in 1:300
                 if i == 50
                     j1 = swapjob!(p, j1.id; N=300, description = "[1]: N bounded", inherit = true,
@@ -319,8 +319,6 @@ end
     end
 end
 
-
->>>>>>> swapjob
 @testset "\e[34mProgress foreachprogress" begin
     @test_nowarn redirect_stdout(Base.DevNull()) do
         Term.Progress.foreachprogress(1:10) do i
