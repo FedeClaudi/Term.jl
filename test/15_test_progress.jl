@@ -136,6 +136,32 @@ end
     IS_WIN || @compare_to_string render(pbar) "pbar_customization"
 end
 
+@testset "\e[34mProgress per-job columns" begin
+    @test_nowarn redirect_stdout(Base.DevNull()) do
+        p = ProgressBar(; columns=:default)
+        c0 = [DescriptionColumn, CompletedColumn, ProgressColumn, SpinnerColumn]
+        c1 = [DescriptionColumn, CompletedColumn, ProgressColumn, SpinnerColumn]
+        c2 = [CompletedColumn,   ProgressColumn, SeparatorColumn, SpinnerColumn]
+        j0 = addjob!(p; columns=c0, N=100)
+        j1 = addjob!(p; columns=c1, N=100)
+        j2 = addjob!(p; columns=c2, N=100)
+        @test all(typeof.(j0.columns) .== c0)
+        @test all(typeof.(j1.columns) .== c1)
+        @test all(typeof.(j2.columns) .== c2)
+        @test !all(typeof.(j2.columns) .== c0)
+        @test !all(typeof.(j0.columns) .== c2)
+        
+        with(p) do
+            for _ in 1:100
+                update!(j0)
+                update!(j1)
+                update!(j2)
+                sleep(0.01)
+            end
+        end
+    end
+end
+
 @testset "\e[34mProgress foreachprogress" begin
     @test_nowarn redirect_stdout(Base.DevNull()) do
         Term.Progress.foreachprogress(1:10) do i
