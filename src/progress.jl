@@ -252,6 +252,7 @@ Arguments:
     - `paused`: false when the bar is running but briefly paused (e.g. to update `jobs`)
     - `task`: references a `Task` for updating the progress bar in parallel
     - `renderstatus`: a `RenderStatus` instance
+    - `title`: progress bar title
     - `extra_info`: a `Dict{String,<:Any}` to show extra information.
 """
 mutable struct ProgressBar
@@ -271,6 +272,7 @@ mutable struct ProgressBar
     task::Union{Task,Nothing}
     renderstatus::Any
     extra_info::Dict{String,<:Any}
+    title::String
 end
 
 """
@@ -300,6 +302,7 @@ function ProgressBar(;
     colors::Union{String,Vector{RGBColor}}  = [RGBColor("(1, .05, .05)"), RGBColor("(.05, .05, 1)"), RGBColor("(.05, 1, .05)")],
     refresh_rate::Int                       = 60,  # FPS of rendering
     extra_info::Dict{String,<:Any}          = Dict{String,Any}(),
+    title                                   = "progress",
 )
     columns = columns isa Symbol ? get_columns(columns) : columns
 
@@ -320,6 +323,7 @@ function ProgressBar(;
         nothing,
         RenderStatus(),
         extra_info,
+        title,
     )
 end
 
@@ -503,7 +507,7 @@ function render(pbar::ProgressBar, io = stdout)
 
         pbar.renderstatus.rendered = true
         pbar.renderstatus.hline =
-            string(hLine(pbar.width, "progress"; style = "blue dim")) * "\n"
+            string(hLine(pbar.width, pbar.title; style = "blue dim")) * "\n"
         pbar.renderstatus.nlines = njobs
         pbar.renderstatus.maxnlines = njobs
 
