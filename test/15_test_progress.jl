@@ -138,12 +138,6 @@ end
     IS_WIN || @compare_to_string render(pbar) "pbar_customization"
 end
 
-using Test
-using Term
-using Term.Progress
-import Term.Progress:
-    CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn, TextColumn, SpinnerColumn, ETAColumn
-
 @testset "\e[34mProgress swapjob!()" begin
 
     # one bar.
