@@ -298,34 +298,35 @@ As an example, we will generate three tasks with no bound. At different points i
 import Term.Progress: DescriptionColumn, SeparatorColumn, CompletedColumn, ProgressColumn, SpinnerColumn
 
 # make a progress bar, and add three jobs.
-p  = ProgressBar(; title = "swapjob!() Demo")
-j1 = addjob!(p; description="[1]: No N bound...")
-j2 = addjob!(p; description="[2]: No N bound...", transient = true)
-j3 = addjob!(p; description="[3]: No N bound...")
+let p  = ProgressBar(; title = "swapjob!() Demo")
+    j1 = addjob!(p; description="[1]: No N bound...")
+    j2 = addjob!(p; description="[2]: No N bound...", transient = true)
+    j3 = addjob!(p; description="[3]: No N bound...")
 
-# when we switch on limits, we will add these columns to each ProgressJob.
-cols = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-        SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn]
+    # when we switch on limits, we will add these columns to each ProgressJob.
+    cols = [DescriptionColumn, SeparatorColumn, CompletedColumn,
+            SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn]
 
-with(p) do
-    for i in 1:300
+    with(p) do
+        for i in 1:300
 
-        # invoke swapjob!() to change displays on-the-fly.
-        if i == 50
-            j1 = swapjob!(p, j1; N=300, description = "[1]: N bounded", columns = cols)
-        end
-        if i == 150
-            j2 = swapjob!(p, j2; N=200, description = "[2]: N bounded", columns = cols)
-        end
-        if i == 200
-            j3 = swapjob!(p, j3; N=300, description = "[3]: N bounded", columns = cols)
-        end
-        if i == 250
-            j1 = swapjob!(p, j1, description = "[1]: Lost bound!", N=nothing, inherit = true)
-        end
+            # invoke swapjob!() to change displays on-the-fly.
+            if i == 50
+                j1 = swapjob!(p, j1; N=300, description = "[1]: N bounded", columns = cols)
+            end
+            if i == 150
+                j2 = swapjob!(p, j2; N=200, description = "[2]: N bounded", columns = cols)
+            end
+            if i == 200
+                j3 = swapjob!(p, j3; N=300, description = "[3]: N bounded", columns = cols)
+            end
+            if i == 250
+                j1 = swapjob!(p, j1, description = "[1]: Lost bound!", N=nothing, inherit = true)
+            end
 
-        update!.([j1, j2, j3])
-        sleep(0.02)
+            update!.([j1, j2, j3])
+            sleep(0.02)
+        end
     end
 end
 ```
