@@ -22,7 +22,7 @@ jobs:
       matrix:
         version:
           - '1.6'  # oldest LTS supported
-          - '1.10'
+          - 'lts'
           - '1' # latest stable release
         experimental:
           - false
@@ -33,10 +33,7 @@ jobs:
             experimental: true
             version: 'pre'
             arch: x64
-          - os: ubuntu-latest
-            experimental: true
-            version: 'nightly'
-            arch: x64
+
     steps:
       - uses: actions/checkout@v6
       - uses: julia-actions/setup-julia@latest
