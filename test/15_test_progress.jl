@@ -2,7 +2,12 @@ using Term.Progress
 import Term.Progress: AbstractColumn, getjob, get_columns, jobcolor
 import Term: install_term_logger, uninstall_term_logger, str_trunc
 import Term.Progress:
-    CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn, TextColumn, SpinnerColumn
+    CompletedColumn,
+    SeparatorColumn,
+    ProgressColumn,
+    DescriptionColumn,
+    TextColumn,
+    SpinnerColumn
 
 using ProgressLogging
 import ProgressLogging.Logging.global_logger
@@ -138,19 +143,19 @@ end
 
 @testset "\e[34mProgress per-job columns" begin
     @test_nowarn redirect_stdout(Base.DevNull()) do
-        p = ProgressBar(; columns=:default)
+        p = ProgressBar(; columns = :default)
         c0 = [DescriptionColumn, CompletedColumn, ProgressColumn, SpinnerColumn]
         c1 = [DescriptionColumn, CompletedColumn, ProgressColumn, SpinnerColumn]
-        c2 = [CompletedColumn,   ProgressColumn, SeparatorColumn, SpinnerColumn]
-        j0 = addjob!(p; columns=c0, N=100)
-        j1 = addjob!(p; columns=c1, N=100)
-        j2 = addjob!(p; columns=c2, N=100)
+        c2 = [CompletedColumn, ProgressColumn, SeparatorColumn, SpinnerColumn]
+        j0 = addjob!(p; columns = c0, N = 100)
+        j1 = addjob!(p; columns = c1, N = 100)
+        j2 = addjob!(p; columns = c2, N = 100)
         @test all(typeof.(j0.columns) .== c0)
         @test all(typeof.(j1.columns) .== c1)
         @test all(typeof.(j2.columns) .== c2)
         @test !all(typeof.(j2.columns) .== c0)
         @test !all(typeof.(j0.columns) .== c2)
-        
+
         with(p) do
             for _ in 1:100
                 update!(j0)
