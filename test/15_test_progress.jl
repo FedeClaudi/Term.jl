@@ -2,7 +2,7 @@ using Term.Progress
 import Term.Progress: AbstractColumn, getjob, get_columns, jobcolor
 import Term: install_term_logger, uninstall_term_logger, str_trunc
 import Term.Progress:
-    CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn, TextColumn
+    CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn, TextColumn, SpinnerColumn
 
 using ProgressLogging
 import ProgressLogging.Logging.global_logger
