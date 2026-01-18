@@ -34,6 +34,7 @@ export ProgressBar,
     start!,
     stop!,
     update!,
+    swapjob!,
     removejob!,
     with,
     @track,
@@ -373,6 +374,86 @@ function addjob!(
     pbar.paused = false
     render(job, pbar)
     return job
+end
+
+"""
+    @__swapjob_inherit!(param, old, default)
+inherit from the old job with the priority scheme as given in the description
+of swapjob!() below. the macro allows us to assign to the parameter, which an
+ordinary closure can't do. unfortunately macros are not allowed outside of
+toplevel scope, so it has to live here at toplevel.
+"""
+macro __swapjob_inherit!(param, old, default)
+    esc(:($param = !ismissing($param) ? $param : (inherit ? $old : $default)))
+end
+
+"""
+    swapjob!(pbar           :: ProgressBar,                               
+             jobid          :: Union{ProgressJob, Int, UUID};             
+             description    :: Union{String,Missing}            = missing,
+             N              :: Union{Int,Nothing,Missing}       = missing,
+             i              :: Union{Int,Missing}               = missing,
+             columns        :: Union{Vector{DataType}, Missing} = missing,
+             columns_kwargs :: Union{Dict, Missing}             = missing,
+             transient      :: Union{Bool,Missing}              = missing,
+             start          :: Bool                             = true,   
+             inherit        :: Bool                             = true,   
+             )::ProgressJob                                                                          
+
+Change progress jobs on-the-fly; returns the newly-constructed `ProgressJob`.
+
+The new progress job inherits the job ID of the old process. This allows
+for a progress job which represents an ongoing task to change form appropriate
+to the current task state. The job to replace can be specified either by a
+`ProgressJob` structure or a job ID. An ArgumentError will be thrown if the
+job ID is not found.
+
+Fields of the new job are populated with the following priority:
+    1. Arguments passed to `swapjob!()`,
+    2. Fields of the prior job (if the kwarg `inherit` is true),
+    3. Default settings as in `addjob!()`.
+"""
+function swapjob!(
+    pbar           :: ProgressBar,
+    jobid          :: Union{ProgressJob, Int, UUID};
+    description    :: Union{String,Missing}            = missing,
+    N              :: Union{Int,Nothing,Missing}       = missing,
+    i              :: Union{Int,Missing}               = missing,
+    columns        :: Union{Vector{DataType}, Missing} = missing,
+    columns_kwargs :: Union{Dict, Missing}             = missing,
+    transient      :: Union{Bool,Missing}              = missing,
+    start          :: Bool                             = true,
+    inherit        :: Bool                             = true,
+)::ProgressJob
+
+    # get the job ID and ensure that it is present in the list of progress bar jobs
+    jobid = jobid isa ProgressJob ? jobid.id : jobid
+    index = findfirst(j -> j.id == jobid, pbar.jobs)
+    isnothing(index) &&
+        throw(ArgumentError("ID $jobid is not a valid job ID. Registered jobs: $([j.id for j in pbar.jobs])"))
+
+    # set parameters from function arguments, old job, and defaults.
+    @__swapjob_inherit! description     pbar.jobs[index].description       "Running..."
+    @__swapjob_inherit! N               pbar.jobs[index].N                 nothing
+    @__swapjob_inherit! i               pbar.jobs[index].i                 0
+    @__swapjob_inherit! columns         typeof.(pbar.jobs[index].columns)  pbar.columns
+    @__swapjob_inherit! columns_kwargs  pbar.jobs[index].columns_kwargs    Dict()
+    @__swapjob_inherit! transient       pbar.jobs[index].transient         false
+
+    # stop the bar and mix in any new column keyword arguments
+    pbar.paused = true
+    kwargs      = merge(pbar.columns_kwargs, columns_kwargs)
+
+    # build the job and start it
+    job = ProgressJob(jobid, N, description, columns, pbar.width, kwargs, transient)
+    job.i = i
+    start && start!(job)
+    pbar.jobs[index] = job
+    
+    # render and return
+    pbar.paused = false
+    render(pbar.jobs[index], pbar)
+    return pbar.jobs[index]
 end
 
 """
