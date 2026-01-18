@@ -414,31 +414,34 @@ Fields of the new job are populated with the following priority:
     3. Default settings as in `addjob!()`.
 """
 function swapjob!(
-    pbar           :: ProgressBar,
-    jobid          :: Union{ProgressJob, Int, UUID};
-    description    :: Union{String,Missing}            = missing,
-    N              :: Union{Int,Nothing,Missing}       = missing,
-    i              :: Union{Int,Missing}               = missing,
-    columns        :: Union{Vector{DataType}, Missing} = missing,
-    columns_kwargs :: Union{Dict, Missing}             = missing,
-    transient      :: Union{Bool,Missing}              = missing,
-    start          :: Bool                             = true,
-    inherit        :: Bool                             = true,
+    pbar::ProgressBar,
+    jobid::Union{ProgressJob,Int,UUID};
+    description::Union{String,Missing}       = missing,
+    N::Union{Int,Nothing,Missing}            = missing,
+    i::Union{Int,Missing}                    = missing,
+    columns::Union{Vector{DataType},Missing} = missing,
+    columns_kwargs::Union{Dict,Missing}      = missing,
+    transient::Union{Bool,Missing}           = missing,
+    start::Bool                              = true,
+    inherit::Bool                            = true,
 )::ProgressJob
 
     # get the job ID and ensure that it is present in the list of progress bar jobs
     jobid = jobid isa ProgressJob ? jobid.id : jobid
     index = findfirst(j -> j.id == jobid, pbar.jobs)
-    isnothing(index) &&
-        throw(ArgumentError("ID $jobid is not a valid job ID. Registered jobs: $([j.id for j in pbar.jobs])"))
+    isnothing(index) && throw(
+        ArgumentError(
+            "ID $jobid is not a valid job ID. Registered jobs: $([j.id for j in pbar.jobs])",
+        ),
+    )
 
     # set parameters from function arguments, old job, and defaults.
-    @__swapjob_inherit! description     pbar.jobs[index].description       "Running..."
-    @__swapjob_inherit! N               pbar.jobs[index].N                 nothing
-    @__swapjob_inherit! i               pbar.jobs[index].i                 0
-    @__swapjob_inherit! columns         typeof.(pbar.jobs[index].columns)  pbar.columns
-    @__swapjob_inherit! columns_kwargs  pbar.jobs[index].columns_kwargs    Dict()
-    @__swapjob_inherit! transient       pbar.jobs[index].transient         false
+    @__swapjob_inherit! description pbar.jobs[index].description "Running..."
+    @__swapjob_inherit! N pbar.jobs[index].N nothing
+    @__swapjob_inherit! i pbar.jobs[index].i 0
+    @__swapjob_inherit! columns typeof.(pbar.jobs[index].columns) pbar.columns
+    @__swapjob_inherit! columns_kwargs pbar.jobs[index].columns_kwargs Dict()
+    @__swapjob_inherit! transient pbar.jobs[index].transient false
 
     # stop the bar and mix in any new column keyword arguments
     pbar.paused = true
@@ -449,7 +452,7 @@ function swapjob!(
     job.i = i
     start && start!(job)
     pbar.jobs[index] = job
-    
+
     # render and return
     pbar.paused = false
     render(pbar.jobs[index], pbar)
