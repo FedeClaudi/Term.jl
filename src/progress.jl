@@ -382,14 +382,16 @@ macro __swapjob_inherit!(param, old, default)
 end
 
 """
-    swapjob!(pbar::ProgressBar,                                                                      
-             jobid::Union{ProgressJob, Int, UUID};                                                   
-             description::String       = jobid isa ProgressJob ? jobid.description    : "Running...",
-             N::Union{Int,Nothing}     = jobid isa ProgressJob ? jobid.N              : nothing,     
-             columns::Vector{DataType} = jobid isa ProgressJob ? jobid.columns        : pbar.columns,
-             columns_kwargs::Dict      = jobid isa ProgressJob ? jobid.columns_kwargs : Dict(),      
-             transient::Bool           = jobid isa ProgressJob ? jobid.transient      : false,       
-             start::Bool = true,                                                                     
+    swapjob!(pbar           :: ProgressBar,                               
+             jobid          :: Union{ProgressJob, Int, UUID};             
+             description    :: Union{String,Missing}            = missing,
+             N              :: Union{Int,Nothing,Missing}       = missing,
+             i              :: Union{Int,Missing}               = missing,
+             columns        :: Union{Vector{DataType}, Missing} = missing,
+             columns_kwargs :: Union{Dict, Missing}             = missing,
+             transient      :: Union{Bool,Missing}              = missing,
+             start          :: Bool                             = true,   
+             inherit        :: Bool                             = true,   
              )::ProgressJob                                                                          
 
 Change progress jobs on-the-fly; returns the newly-constructed `ProgressJob`.
