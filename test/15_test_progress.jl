@@ -151,7 +151,7 @@ end
                                             SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
                 end
                 update!(j; i=i)
-                sleep(0.05)
+                sleep(0.005)
             end
         end
     end
@@ -180,7 +180,7 @@ end
                                              SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
                 end
                 update!.([j1, j2, j3])
-                sleep(0.02)
+                sleep(0.002)
             end
         end
     end
@@ -225,7 +225,7 @@ end
                     @test ProgressColumn in typeof.(j3.columns)
                 end
                 update!.([j1, j2, j3])
-                sleep(0.02)
+                sleep(0.002)
             end
         end
     end
@@ -257,7 +257,7 @@ end
                     j1 = swapjob!(p, j1.id, description = "[1]: Lost bound!", N=nothing, inherit = true)
                 end
                 update!.([j1, j2, j3])
-                sleep(0.02)
+                sleep(0.002)
             end
         end
     end
