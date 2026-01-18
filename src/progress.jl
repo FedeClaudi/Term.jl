@@ -341,7 +341,8 @@ Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar) =
             N::Union{Int, Nothing}=nothing,
             start::Bool=true,
             transient::Bool=false,
-            id=nothing
+            id=nothing,
+            columns::Vector{DataType} = pbar.columns
         )::ProgressJob
 
 Add a new `ProgressJob` to a running `ProgressBar`
@@ -356,6 +357,7 @@ function addjob!(
     transient::Bool = false,
     id = nothing,
     columns_kwargs::Dict = Dict(),
+    columns::Vector{DataType} = pbar.columns,
 )::ProgressJob
     pbar.running && print("\n")
 
@@ -363,7 +365,7 @@ function addjob!(
     pbar.paused = true
     id = isnothing(id) ? length(pbar.jobs) + 1 : id
     kwargs = merge(pbar.columns_kwargs, columns_kwargs)
-    job = ProgressJob(id, N, description, pbar.columns, pbar.width, kwargs, transient)
+    job = ProgressJob(id, N, description, columns, pbar.width, kwargs, transient)
 
     # start job
     start && start!(job)
