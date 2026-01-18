@@ -201,7 +201,7 @@ end
     let p = ProgressBar(; title = "swapjob!(): lookup by ID")
         j1 = addjob!(p; description="[1]: No N bound...")
         j2 = addjob!(p; description="[2]: No N bound...", id = uuid1())
-        j3 = addjob!(p; description="[3]: No N bound...", id = uuid7())
+        j3 = addjob!(p; description="[3]: No N bound...", id = uuid1())
         with(p) do
             for i in 1:300
                 if i == 50
