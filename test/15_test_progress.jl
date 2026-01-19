@@ -2,10 +2,18 @@ using Term.Progress
 import Term.Progress: AbstractColumn, getjob, get_columns, jobcolor
 import Term: install_term_logger, uninstall_term_logger, str_trunc
 import Term.Progress:
-    CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn, TextColumn
+    CompletedColumn,
+    SeparatorColumn,
+    ProgressColumn,
+    DescriptionColumn,
+    TextColumn,
+    SpinnerColumn,
+    ETAColumn
 
 using ProgressLogging
 import ProgressLogging.Logging.global_logger
+
+using UUIDs
 
 @testset "\e[34mProgress - jobs" begin
     pbar = ProgressBar()
@@ -145,6 +153,324 @@ end
 
     start!(pbar)  # re-activate
     IS_WIN || @compare_to_string render(pbar) "pbar_customization"
+end
+
+@testset "\e[34mProgress per-job columns" begin
+    @test_nowarn redirect_stdout(Base.DevNull()) do
+        p = ProgressBar(; columns = :default)
+        c0 = [DescriptionColumn, CompletedColumn, ProgressColumn, SpinnerColumn]
+        c1 = [DescriptionColumn, CompletedColumn, ProgressColumn, SpinnerColumn]
+        c2 = [CompletedColumn, ProgressColumn, SeparatorColumn, SpinnerColumn]
+        j0 = addjob!(p; columns = c0, N = 100)
+        j1 = addjob!(p; columns = c1, N = 100)
+        j2 = addjob!(p; columns = c2, N = 100)
+        @test all(typeof.(j0.columns) .== c0)
+        @test all(typeof.(j1.columns) .== c1)
+        @test all(typeof.(j2.columns) .== c2)
+        @test !all(typeof.(j2.columns) .== c0)
+        @test !all(typeof.(j0.columns) .== c2)
+
+        with(p) do
+            for _ in 1:100
+                update!(j0)
+                update!(j1)
+                update!(j2)
+                sleep(0.01)
+            end
+        end
+    end
+end
+
+@testset "\e[34mProgress swapjob!()" begin
+
+    # one bar.
+    @test_nowarn let p = ProgressBar(; title = "swapjob!(): basic")
+        j = addjob!(p; description = "No N bound...")
+        with(p) do
+            for i in 1:100
+                if i == 50
+                    j = swapjob!(
+                        p,
+                        j;
+                        N = 100,
+                        description = "N bounded",
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                end
+                update!(j; i = i)
+                sleep(0.005)
+            end
+        end
+    end
+
+    # three bars, with state inheritance.
+    @test_nowarn let p = ProgressBar(; title = "swapjob!(): multiple bars")
+        with(p) do
+            j1 = addjob!(p; description = "[1]: No N bound...")
+            j2 = addjob!(p; description = "[2]: No N bound...")
+            j3 = addjob!(p; description = "[3]: No N bound...")
+            for i in 1:300
+                if i == 50
+                    j1 = swapjob!(
+                        p,
+                        j1;
+                        N = 300,
+                        description = "[1]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                end
+                if i == 150
+                    j2 = swapjob!(
+                        p,
+                        j2;
+                        N = 300,
+                        description = "[2]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            ETAColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                end
+                if i == 200
+                    j3 = swapjob!(
+                        p,
+                        j3;
+                        N = 300,
+                        description = "[3]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                end
+                update!.([j1, j2, j3])
+                sleep(0.002)
+            end
+        end
+    end
+
+    # three bars, with state inheritance, mixed ID types, lookup by ID,
+    # addition and removal of ProgressColumn when N is set or unset
+    let p = ProgressBar(; title = "swapjob!(): lookup by ID")
+        with(p) do
+            j1 = addjob!(p; description = "[1]: No N bound...")
+            j2 = addjob!(p; description = "[2]: No N bound...", id = uuid4())
+            j3 = addjob!(p; description = "[3]: No N bound...", id = uuid4())
+            for i in 1:300
+                if i == 50
+                    j1 = swapjob!(
+                        p,
+                        j1.id;
+                        N = 300,
+                        description = "[1]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                    @test ProgressColumn in typeof.(j1.columns)
+                    @test !(ProgressColumn in typeof.(j2.columns))
+                    @test !(ProgressColumn in typeof.(j3.columns))
+                end
+                if i == 150
+                    j2 = swapjob!(
+                        p,
+                        j2.id;
+                        N = 300,
+                        description = "[2]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            ETAColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                    @test ProgressColumn in typeof.(j1.columns)
+                    @test ProgressColumn in typeof.(j2.columns)
+                    @test !(ProgressColumn in typeof.(j3.columns))
+                end
+                if i == 200
+                    j3 = swapjob!(
+                        p,
+                        j3.id;
+                        N = 300,
+                        description = "[3]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                    @test ProgressColumn in typeof.(j1.columns)
+                    @test ProgressColumn in typeof.(j2.columns)
+                    @test ProgressColumn in typeof.(j3.columns)
+                end
+                if i == 250
+                    j1 = swapjob!(
+                        p,
+                        j1.id,
+                        description = "[1]: Lost bound!",
+                        N = nothing,
+                        inherit = true,
+                    )
+                    @test !(ProgressColumn in typeof.(j1.columns))
+                    @test ProgressColumn in typeof.(j2.columns)
+                    @test ProgressColumn in typeof.(j3.columns)
+                end
+                update!.([j1, j2, j3])
+                sleep(0.002)
+            end
+        end
+    end
+
+    # three bars, second is transient and finishes early.
+    @test_nothrow let p = ProgressBar(;
+            title = "swapjob!(): Test early-finishing bar with inherited transience",
+        )
+        with(p) do
+            j1 = addjob!(p; description = "[1]: No N bound...")
+            j2 = addjob!(
+                p;
+                description = "[2]: No N bound...",
+                id = uuid4(),
+                transient = true,
+            )
+            j3 = addjob!(p; description = "[3]: No N bound...", id = uuid4())
+            for i in 1:300
+                if i == 50
+                    j1 = swapjob!(
+                        p,
+                        j1.id;
+                        N = 300,
+                        description = "[1]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                end
+                if i == 150
+                    j2 = swapjob!(
+                        p,
+                        j2.id;
+                        N = 200,
+                        description = "[2]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            ETAColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                end
+                if i == 200
+                    j3 = swapjob!(
+                        p,
+                        j3.id;
+                        N = 300,
+                        description = "[3]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
+                end
+                if i == 250
+                    j1 = swapjob!(
+                        p,
+                        j1.id,
+                        description = "[1]: Lost bound!",
+                        N = nothing,
+                        inherit = true,
+                    )
+                end
+                update!.([j1, j2, j3])
+                sleep(0.001)
+            end
+        end
+    end
+
+    # see if we can get an argument error out
+    let p = ProgressBar(; title = "swapjob!(): throw error on bad ID")
+        u = uuid1()
+        v = uuid1()
+        j = addjob!(p; id = u)
+        u == v && error("ffs hahahahahahahahahaha")
+        with(p) do
+            update!(j)
+            @test_nowarn begin
+                j = swapjob!(p, u; N = 1000)
+            end
+            update!(j)
+            @test_throws ArgumentError begin
+                j = swapjob!(p, v; N = 2000)
+            end
+            update!(j)
+        end
+    end
 end
 
 @testset "\e[34mProgress foreachprogress" begin
