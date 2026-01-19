@@ -116,8 +116,8 @@ mutable struct ProgressJob
             0,
             N,
             description,
-            columns,
-            columns_kwargs,
+            copy(columns),
+            copy(columns_kwargs),
             width,
             false,
             false,
@@ -377,17 +377,6 @@ function addjob!(
 end
 
 """
-    @__swapjob_inherit!(param, old, default)
-inherit from the old job with the priority scheme as given in the description
-of swapjob!() below. the macro allows us to assign to the parameter, which an
-ordinary closure can't do. unfortunately macros are not allowed outside of
-toplevel scope, so it has to live here at toplevel.
-"""
-macro __swapjob_inherit!(param, old, default)
-    esc(:($param = !ismissing($param) ? $param : (inherit ? $old : $default)))
-end
-
-"""
     swapjob!(pbar           :: ProgressBar,                               
              jobid          :: Union{ProgressJob, Int, UUID};             
              description    :: Union{String,Missing}            = missing,
@@ -435,21 +424,24 @@ function swapjob!(
         ),
     )
 
-    # set parameters from function arguments, old job, and defaults.
-    @__swapjob_inherit! description pbar.jobs[index].description "Running..."
-    @__swapjob_inherit! N pbar.jobs[index].N nothing
-    @__swapjob_inherit! i pbar.jobs[index].i 0
-    @__swapjob_inherit! columns typeof.(pbar.jobs[index].columns) pbar.columns
-    @__swapjob_inherit! columns_kwargs pbar.jobs[index].columns_kwargs Dict()
-    @__swapjob_inherit! transient pbar.jobs[index].transient false
-
     # stop the bar and mix in any new column keyword arguments
+    inh(p, o, d) = !ismissing(p) ? p : (inherit ? o : d)
     pbar.paused = true
-    kwargs      = merge(pbar.columns_kwargs, columns_kwargs)
 
     # build the job and start it
-    job = ProgressJob(jobid, N, description, columns, pbar.width, kwargs, transient)
-    job.i = i
+    job = ProgressJob(
+        jobid,
+        inh(N, pbar.jobs[index].N, nothing),
+        inh(description, pbar.jobs[index].description, "Running..."),
+        inh(columns, typeof.(pbar.jobs[index].columns), pbar.columns),
+        pbar.width,
+        merge(
+            pbar.columns_kwargs,
+            inh(columns_kwargs, pbar.jobs[index].columns_kwargs, Dict()),
+        ),
+        inh(transient, pbar.jobs[index].transient, false),
+    )
+    job.i = inh(i, pbar.jobs[index].i, 0)
     start && start!(job)
     pbar.jobs[index] = job
 
