@@ -2,7 +2,13 @@ using Term.Progress
 import Term.Progress: AbstractColumn, getjob, get_columns, jobcolor
 import Term: install_term_logger, uninstall_term_logger, str_trunc
 import Term.Progress:
-    CompletedColumn, SeparatorColumn, ProgressColumn, DescriptionColumn, TextColumn, SpinnerColumn, ETAColumn
+    CompletedColumn,
+    SeparatorColumn,
+    ProgressColumn,
+    DescriptionColumn,
+    TextColumn,
+    SpinnerColumn,
+    ETAColumn
 
 using ProgressLogging
 import ProgressLogging.Logging.global_logger
@@ -151,19 +157,19 @@ end
 
 @testset "\e[34mProgress per-job columns" begin
     @test_nowarn redirect_stdout(Base.DevNull()) do
-        p = ProgressBar(; columns=:default)
+        p = ProgressBar(; columns = :default)
         c0 = [DescriptionColumn, CompletedColumn, ProgressColumn, SpinnerColumn]
         c1 = [DescriptionColumn, CompletedColumn, ProgressColumn, SpinnerColumn]
-        c2 = [CompletedColumn,   ProgressColumn, SeparatorColumn, SpinnerColumn]
-        j0 = addjob!(p; columns=c0, N=100)
-        j1 = addjob!(p; columns=c1, N=100)
-        j2 = addjob!(p; columns=c2, N=100)
+        c2 = [CompletedColumn, ProgressColumn, SeparatorColumn, SpinnerColumn]
+        j0 = addjob!(p; columns = c0, N = 100)
+        j1 = addjob!(p; columns = c1, N = 100)
+        j2 = addjob!(p; columns = c2, N = 100)
         @test all(typeof.(j0.columns) .== c0)
         @test all(typeof.(j1.columns) .== c1)
         @test all(typeof.(j2.columns) .== c2)
         @test !all(typeof.(j2.columns) .== c0)
         @test !all(typeof.(j0.columns) .== c2)
-        
+
         with(p) do
             for _ in 1:100
                 update!(j0)
@@ -179,15 +185,27 @@ end
 
     # one bar.
     @test_nowarn let p = ProgressBar(; title = "swapjob!(): basic")
-        j = addjob!(p; description="No N bound...")
+        j = addjob!(p; description = "No N bound...")
         with(p) do
             for i in 1:100
                 if i == 50
-                    j = swapjob!(p, j; N=100, description = "N bounded",
-                                 columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                            SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+                    j = swapjob!(
+                        p,
+                        j;
+                        N = 100,
+                        description = "N bounded",
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                 end
-                update!(j; i=i)
+                update!(j; i = i)
                 sleep(0.005)
             end
         end
@@ -196,25 +214,64 @@ end
     # three bars, with state inheritance.
     @test_nowarn let p = ProgressBar(; title = "swapjob!(): multiple bars")
         with(p) do
-        j1 = addjob!(p; description="[1]: No N bound...")
-        j2 = addjob!(p; description="[2]: No N bound...")
-        j3 = addjob!(p; description="[3]: No N bound...")
+            j1 = addjob!(p; description = "[1]: No N bound...")
+            j2 = addjob!(p; description = "[2]: No N bound...")
+            j3 = addjob!(p; description = "[3]: No N bound...")
             for i in 1:300
                 if i == 50
-                    j1 = swapjob!(p, j1; N=300, description = "[1]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+                    j1 = swapjob!(
+                        p,
+                        j1;
+                        N = 300,
+                        description = "[1]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                 end
                 if i == 150
-                    j2 = swapjob!(p, j2; N=300, description = "[2]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn,
-                                             ETAColumn, SpinnerColumn])
+                    j2 = swapjob!(
+                        p,
+                        j2;
+                        N = 300,
+                        description = "[2]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            ETAColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                 end
                 if i == 200
-                    j3 = swapjob!(p, j3; N=300, description = "[3]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+                    j3 = swapjob!(
+                        p,
+                        j3;
+                        N = 300,
+                        description = "[3]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                 end
                 update!.([j1, j2, j3])
                 sleep(0.002)
@@ -226,37 +283,82 @@ end
     # addition and removal of ProgressColumn when N is set or unset
     let p = ProgressBar(; title = "swapjob!(): lookup by ID")
         with(p) do
-            j1 = addjob!(p; description="[1]: No N bound...")
-            j2 = addjob!(p; description="[2]: No N bound...", id = uuid4())
-            j3 = addjob!(p; description="[3]: No N bound...", id = uuid4())
+            j1 = addjob!(p; description = "[1]: No N bound...")
+            j2 = addjob!(p; description = "[2]: No N bound...", id = uuid4())
+            j3 = addjob!(p; description = "[3]: No N bound...", id = uuid4())
             for i in 1:300
                 if i == 50
-                    j1 = swapjob!(p, j1.id; N=300, description = "[1]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+                    j1 = swapjob!(
+                        p,
+                        j1.id;
+                        N = 300,
+                        description = "[1]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                     @test ProgressColumn in typeof.(j1.columns)
                     @test !(ProgressColumn in typeof.(j2.columns))
                     @test !(ProgressColumn in typeof.(j3.columns))
                 end
                 if i == 150
-                    j2 = swapjob!(p, j2.id; N=300, description = "[2]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn,
-                                             ETAColumn, SpinnerColumn])
+                    j2 = swapjob!(
+                        p,
+                        j2.id;
+                        N = 300,
+                        description = "[2]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            ETAColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                     @test ProgressColumn in typeof.(j1.columns)
                     @test ProgressColumn in typeof.(j2.columns)
                     @test !(ProgressColumn in typeof.(j3.columns))
                 end
                 if i == 200
-                    j3 = swapjob!(p, j3.id; N=300, description = "[3]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+                    j3 = swapjob!(
+                        p,
+                        j3.id;
+                        N = 300,
+                        description = "[3]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                     @test ProgressColumn in typeof.(j1.columns)
                     @test ProgressColumn in typeof.(j2.columns)
                     @test ProgressColumn in typeof.(j3.columns)
                 end
                 if i == 250
-                    j1 = swapjob!(p, j1.id, description = "[1]: Lost bound!", N=nothing, inherit = true)
+                    j1 = swapjob!(
+                        p,
+                        j1.id,
+                        description = "[1]: Lost bound!",
+                        N = nothing,
+                        inherit = true,
+                    )
                     @test !(ProgressColumn in typeof.(j1.columns))
                     @test ProgressColumn in typeof.(j2.columns)
                     @test ProgressColumn in typeof.(j3.columns)
@@ -268,30 +370,82 @@ end
     end
 
     # three bars, second is transient and finishes early.
-    @test_nothrow let p = ProgressBar(; title = "swapjob!(): Test early-finishing bar with inherited transience")
+    @test_nothrow let p = ProgressBar(;
+            title = "swapjob!(): Test early-finishing bar with inherited transience",
+        )
         with(p) do
-            j1 = addjob!(p; description="[1]: No N bound...")
-            j2 = addjob!(p; description="[2]: No N bound...", id = uuid4(), transient = true)
-            j3 = addjob!(p; description="[3]: No N bound...", id = uuid4())
+            j1 = addjob!(p; description = "[1]: No N bound...")
+            j2 = addjob!(
+                p;
+                description = "[2]: No N bound...",
+                id = uuid4(),
+                transient = true,
+            )
+            j3 = addjob!(p; description = "[3]: No N bound...", id = uuid4())
             for i in 1:300
                 if i == 50
-                    j1 = swapjob!(p, j1.id; N=300, description = "[1]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+                    j1 = swapjob!(
+                        p,
+                        j1.id;
+                        N = 300,
+                        description = "[1]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                 end
                 if i == 150
-                    j2 = swapjob!(p, j2.id; N=200, description = "[2]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn,
-                                             ETAColumn, SpinnerColumn])
+                    j2 = swapjob!(
+                        p,
+                        j2.id;
+                        N = 200,
+                        description = "[2]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            ETAColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                 end
                 if i == 200
-                    j3 = swapjob!(p, j3.id; N=300, description = "[3]: N bounded", inherit = true,
-                                  columns = [DescriptionColumn, SeparatorColumn, CompletedColumn,
-                                             SeparatorColumn, ProgressColumn, SeparatorColumn, SpinnerColumn])
+                    j3 = swapjob!(
+                        p,
+                        j3.id;
+                        N = 300,
+                        description = "[3]: N bounded",
+                        inherit = true,
+                        columns = [
+                            DescriptionColumn,
+                            SeparatorColumn,
+                            CompletedColumn,
+                            SeparatorColumn,
+                            ProgressColumn,
+                            SeparatorColumn,
+                            SpinnerColumn,
+                        ],
+                    )
                 end
                 if i == 250
-                    j1 = swapjob!(p, j1.id, description = "[1]: Lost bound!", N=nothing, inherit = true)
+                    j1 = swapjob!(
+                        p,
+                        j1.id,
+                        description = "[1]: Lost bound!",
+                        N = nothing,
+                        inherit = true,
+                    )
                 end
                 update!.([j1, j2, j3])
                 sleep(0.001)
