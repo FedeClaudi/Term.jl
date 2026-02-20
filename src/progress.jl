@@ -186,7 +186,7 @@ function update!(job::ProgressJob; i = nothing)
     if !isnothing(job.N) && job.i ≥ job.N
         stop!(job)
     else
-        job.i += something(i, 1)
+        job.i = something(i, 1 + job.i)
     end
     return nothing
 end
@@ -252,6 +252,7 @@ Arguments:
     - `paused`: false when the bar is running but briefly paused (e.g. to update `jobs`)
     - `task`: references a `Task` for updating the progress bar in parallel
     - `renderstatus`: a `RenderStatus` instance
+    - `title`: progress bar title
     - `extra_info`: a `Dict{String,<:Any}` to show extra information.
 """
 mutable struct ProgressBar
@@ -271,6 +272,7 @@ mutable struct ProgressBar
     task::Union{Task,Nothing}
     renderstatus::Any
     extra_info::Dict{String,<:Any}
+    title::String
 end
 
 """
@@ -300,6 +302,7 @@ function ProgressBar(;
     colors::Union{String,Vector{RGBColor}}  = [RGBColor("(1, .05, .05)"), RGBColor("(.05, .05, 1)"), RGBColor("(.05, 1, .05)")],
     refresh_rate::Int                       = 60,  # FPS of rendering
     extra_info::Dict{String,<:Any}          = Dict{String,Any}(),
+    title                                   = "progress",
 )
     columns = columns isa Symbol ? get_columns(columns) : columns
 
@@ -320,6 +323,7 @@ function ProgressBar(;
         nothing,
         RenderStatus(),
         extra_info,
+        title,
     )
 end
 
@@ -465,22 +469,22 @@ function render(job::ProgressJob)::String
 end
 
 """
-    render(job::ProgressJob, pbar::ProgressBar)::String
+    render(pbar::ProgressBar, [io=stdout])::String
 
 Render a `ProgressBar`.
 
 When a progress bar is first rendered, this function uses
 ANSI codes to change the scrolling region of the terminal
 window to create a space at the bottom where the bar's visuals
-can be displayed. This allows for thext printed to `stdout` to
+can be displayed. This allows for text printed to `stdout` to
 still be visualized. On subsequent calls, this function
 ensures that the height of the reserved space matches the
 number of running jobs.
 
-All fo this requires a bit of careful work in moving the
+All of this requires a bit of careful work in moving the
 cursor around and doing ANSI magic.
 """
-function render(pbar::ProgressBar)
+function render(pbar::ProgressBar, io = stdout)
     # check if running
     pbar.running || return nothing
 
@@ -503,7 +507,7 @@ function render(pbar::ProgressBar)
 
         pbar.renderstatus.rendered = true
         pbar.renderstatus.hline =
-            string(hLine(pbar.width, "progress"; style = "blue dim")) * "\n"
+            string(hLine(pbar.width, pbar.title; style = "blue dim")) * "\n"
         pbar.renderstatus.nlines = njobs
         pbar.renderstatus.maxnlines = njobs
 
@@ -539,7 +543,8 @@ function render(pbar::ProgressBar)
 
     # restore position and write
     move_to_line(iob, pbar.renderstatus.scrollline)
-    return print(String(take!(iob)))
+    write(io, String(take!(iob)))
+    return flush(io)
 end
 
 # ---------------------------------------------------------------------------- #

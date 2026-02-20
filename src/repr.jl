@@ -113,17 +113,15 @@ function termshow(io::IO, obj::AbstractDict; kwargs...)
 
     # prepare text renderables
     _keys = RenderableText.(short_string.(keys(obj)); style = theme.repr_accent * " bold")
-    ktypes =
-        RenderableText.(
-            map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
-            style = theme.repr_type * " dim",
-        )
+    ktypes = RenderableText.(
+        map(k -> "{{" * short_string(typeof(k)) * "}}", collect(keys(obj)));
+        style = theme.repr_type * " dim",
+    )
     vals = RenderableText.(short_string.(values(obj)); style = theme.repr_values * " bold")
-    vtypes =
-        RenderableText.(
-            map(k -> "{{" * short_string(typeof(k)) * "}}", collect(values(obj)));
-            style = theme.repr_type * " dim",
-        )
+    vtypes = RenderableText.(
+        map(k -> "{{" * short_string(typeof(k)) * "}}", collect(values(obj)));
+        style = theme.repr_type * " dim",
+    )
 
     content = OrderedDict(
         :type => ktypes,

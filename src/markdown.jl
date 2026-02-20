@@ -330,8 +330,10 @@ function parse_md(tb::Markdown.Table; width = console_width())::String
     )
 end
 
-parse_md(link::Markdown.Link; kwargs...)::String =
-    "{white bold}$(parse_md(link.text; inline=true)){/white bold} {dim}($(link.url)){/dim}"
+parse_md(
+    link::Markdown.Link;
+    kwargs...,
+)::String = "{white bold}$(parse_md(link.text; inline=true)){/white bold} {dim}($(link.url)){/dim}"
 
 """
     function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::String
