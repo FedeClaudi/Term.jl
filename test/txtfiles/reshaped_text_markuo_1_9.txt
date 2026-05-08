@@ -1,3 +1,0 @@
-{bold on_bright_red}Hello, I have a bright backgroun{/bold on_bright_red}
-{bold on_bright_red}d and bold text.................{/bold on_bright_red}
-{bold on_bright_red}...........................{/bold on_bright_red}

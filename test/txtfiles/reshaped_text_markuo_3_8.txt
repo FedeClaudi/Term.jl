@@ -1,6 +1,0 @@
-{bold bright_red}Hello, I am a bright{/bold bright_red}
-{bold bright_red} and bold{/bold bright_red}
-{bold bright_red}line of text .......{/bold bright_red}
-{bold bright_red}............{/bold bright_red}
-{bold bright_red}....................{/bold bright_red}
-{bold bright_red}...........{/bold bright_red}

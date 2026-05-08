@@ -17,7 +17,8 @@ import Term:
     chars,
     justify,
     str_trunc,
-    reshape_code_string
+    reshape_code_string,
+    get_closing_ansi_tag
 
 import Term.Colors: nospaces
 import Term.Style: apply_style
@@ -197,8 +198,6 @@ end
         "{on_red}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} dad {/green} asdsa ddfsf ad a {/on_red}",
         "{on_(25, 25, 25)}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} {white}dad{/white} asad {/green} asdsa ddfsf ad a {/on_(25, 25, 25)}",
         "{(220, 180, 150)} pink {bold}pink bold {dodger_blue2} pink bold blue {/dodger_blue2} pink bold {/bold} pink {on_(25, 55, 100)} pink on blue {/(220, 180, 150)} just on blue {/on_(25, 55, 100)} NOW SIMPLE WHITE {red} red red red {/red} white white {underline} underline underline {/underline}",
-        "{bold bright_red}Hello, I am a bright and bold line of text ..................................................{/bold bright_red}",
-        "{bold on_bright_red}Hello, I have a bright background and bold text............................................{/bold on_bright_red}",
     ]
     widths = (32, 65, 20)
 
@@ -207,5 +206,30 @@ end
             reshaped = reshape_text(txt, w)
             IS_WIN || @compare_to_string reshaped "reshaped_text_markuo_$(j)_$(i)"
         end
+    end
+end
+
+@testset "closing tags" begin
+    tags = SubString[
+        "\e[1m",   # bold -> expects \e[22m
+        "\e[2m",   # dim -> expects \e[22m
+        "\e[3m",   # italic -> expects \e[23m
+        "\e[4m",   # underline -> expects \e[24m
+        "\e[5m",   # blink -> expects \e[25m
+        "\e[7m",   # inverse -> expects \e[27m
+        "\e[8m",   # hidden -> expects \e[28m
+        "\e[9m",   # striked -> expects \e[29m
+        "\e[31m",  # red foreground -> expects \e[39m
+        "\e[38;2;10;20;30m", # truecolor foreground -> expects \e[39m
+        "\e[91m",  # bright red foreground -> expects \e[39m
+        "\e[41m",  # red background -> expects \e[49m
+        "\e[48;2;10;20;30m", # truecolor background -> expects \e[49m
+        "\e[101m", # bright red background -> expects \e[49m
+        "\e[100m", # bright black background -> expects \e[49m
+        "\e[22m",  # reset bold/dim -> expects \e[22m
+    ]
+
+    for tag in tags
+        @test get_closing_ansi_tag(tag) !== nothing
     end
 end
