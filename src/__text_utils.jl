@@ -178,9 +178,16 @@ function get_closing_ansi_tag(tag::SubString)
     occursin(r"\e\[3\dm", tag) && return "\e[39m"
     occursin(r"\e\[38[0-9;]*m", tag) && return "\e[39m"
 
+    # deal with bright foreground colors
+    occursin(r"\e\[9[0-9;]*m", tag) && return "\e[39m"
+
     # deal with background colors
     occursin(r"\e\[4\dm", tag) && return "\e[49m"
     occursin(r"\e\[48[0-9;]*m", tag) && return "\e[49m"
+
+    # deal with bright background colors
+    occursin(r"\e\[10[0-9;]*m", tag) && return "\e[49m"
+
     return nothing
 end
 
