@@ -34,6 +34,7 @@ export ProgressBar,
     start!,
     stop!,
     update!,
+    swapjob!,
     removejob!,
     with,
     @track,
@@ -115,8 +116,8 @@ mutable struct ProgressJob
             0,
             N,
             description,
-            columns,
-            columns_kwargs,
+            copy(columns),
+            copy(columns_kwargs),
             width,
             false,
             false,
@@ -341,7 +342,8 @@ Base.show(io::IO, ::MIME"text/plain", pbar::ProgressBar) =
             N::Union{Int, Nothing}=nothing,
             start::Bool=true,
             transient::Bool=false,
-            id=nothing
+            id=nothing,
+            columns::Vector{DataType} = pbar.columns
         )::ProgressJob
 
 Add a new `ProgressJob` to a running `ProgressBar`
@@ -356,6 +358,7 @@ function addjob!(
     transient::Bool = false,
     id = nothing,
     columns_kwargs::Dict = Dict(),
+    columns::Vector{DataType} = pbar.columns,
 )::ProgressJob
     pbar.running && print("\n")
 
@@ -363,7 +366,7 @@ function addjob!(
     pbar.paused = true
     id = isnothing(id) ? length(pbar.jobs) + 1 : id
     kwargs = merge(pbar.columns_kwargs, columns_kwargs)
-    job = ProgressJob(id, N, description, pbar.columns, pbar.width, kwargs, transient)
+    job = ProgressJob(id, N, description, columns, pbar.width, kwargs, transient)
 
     # start job
     start && start!(job)
@@ -371,6 +374,81 @@ function addjob!(
     pbar.paused = false
     render(job, pbar)
     return job
+end
+
+"""
+    swapjob!(pbar           :: ProgressBar,                               
+             jobid          :: Union{ProgressJob, Int, UUID};             
+             description    :: Union{String,Missing}            = missing,
+             N              :: Union{Int,Nothing,Missing}       = missing,
+             i              :: Union{Int,Missing}               = missing,
+             columns        :: Union{Vector{DataType}, Missing} = missing,
+             columns_kwargs :: Union{Dict, Missing}             = missing,
+             transient      :: Union{Bool,Missing}              = missing,
+             start          :: Bool                             = true,   
+             inherit        :: Bool                             = true,   
+             )::ProgressJob                                                                          
+
+Change progress jobs on-the-fly; returns the newly-constructed `ProgressJob`.
+
+The new progress job inherits the job ID of the old process. This allows
+for a progress job which represents an ongoing task to change form appropriate
+to the current task state. The job to replace can be specified either by a
+`ProgressJob` structure or a job ID. An ArgumentError will be thrown if the
+job ID is not found.
+
+Fields of the new job are populated with the following priority:
+    1. Arguments passed to `swapjob!()`,
+    2. Fields of the prior job (if the kwarg `inherit` is true),
+    3. Default settings as in `addjob!()`.
+"""
+function swapjob!(
+    pbar::ProgressBar,
+    jobid::Union{ProgressJob,Int,UUID};
+    description::Union{String,Missing}       = missing,
+    N::Union{Int,Nothing,Missing}            = missing,
+    i::Union{Int,Missing}                    = missing,
+    columns::Union{Vector{DataType},Missing} = missing,
+    columns_kwargs::Union{Dict,Missing}      = missing,
+    transient::Union{Bool,Missing}           = missing,
+    start::Bool                              = true,
+    inherit::Bool                            = true,
+)::ProgressJob
+
+    # get the job ID and ensure that it is present in the list of progress bar jobs
+    jobid = jobid isa ProgressJob ? jobid.id : jobid
+    index = findfirst(j -> j.id == jobid, pbar.jobs)
+    isnothing(index) && throw(
+        ArgumentError(
+            "ID $jobid is not a valid job ID. Registered jobs: $([j.id for j in pbar.jobs])",
+        ),
+    )
+
+    # stop the bar and mix in any new column keyword arguments
+    inh(p, o, d) = !ismissing(p) ? p : (inherit ? o : d)
+    pbar.paused = true
+
+    # build the job and start it
+    job = ProgressJob(
+        jobid,
+        inh(N, pbar.jobs[index].N, nothing),
+        inh(description, pbar.jobs[index].description, "Running..."),
+        inh(columns, typeof.(pbar.jobs[index].columns), pbar.columns),
+        pbar.width,
+        merge(
+            pbar.columns_kwargs,
+            inh(columns_kwargs, pbar.jobs[index].columns_kwargs, Dict()),
+        ),
+        inh(transient, pbar.jobs[index].transient, false),
+    )
+    job.i = inh(i, pbar.jobs[index].i, 0)
+    start && start!(job)
+    pbar.jobs[index] = job
+
+    # render and return
+    pbar.paused = false
+    render(pbar.jobs[index], pbar)
+    return pbar.jobs[index]
 end
 
 """
