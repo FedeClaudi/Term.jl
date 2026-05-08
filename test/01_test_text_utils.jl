@@ -202,7 +202,7 @@ end
     for (i, txt) in enumerate(txts)
         for (j, w) in enumerate(widths)
             reshaped = reshape_text(txt, w)
-            IS_WIN || @compare_to_string reshaped "reshaped_text_markuo_$(j)_$(i)"
+            IS_WIN || @compare_to_string reshaped "reshaped_text_markup_$(j)_$(i)"
         end
     end
 end
