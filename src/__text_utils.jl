@@ -140,29 +140,24 @@ function fix_markup_across_lines(lines::Vector)::Vector
 end
 
 """ Check if an ANSI tag is a closer """
-function is_closing_ansi_tag(tag::SubString)
-    tag ∈ (
-        "\e[0m",
-        "\e[39m",
-        "\e[49m",
-        "\e[22m",
-        "\e[23m",
-        "\e[24m",
-        "\e[25m",
-        "\e[27m",
-        "\e[28m",
-        "\e[29m",
-    )
-end
+is_closing_ansi_tag(tag::SubString) = tag ∈ (
+    "\e[0m",
+    "\e[39m",
+    "\e[49m",
+    "\e[22m",
+    "\e[23m",
+    "\e[24m",
+    "\e[25m",
+    "\e[27m",
+    "\e[28m",
+    "\e[29m",
+)
 
-ansi_pairs = Dict(
+const ansi_pairs = Dict(
     "\e[22m" => "\e[22m",
-    "\e[1m" => "\e[22m",
     "\e[1m" => "\e[22m",
     "\e[2m" => "\e[22m",
     "\e[3m" => "\e[23m",
-    "\e[3m" => "\e[23m",
-    "\e[4m" => "\e[24m",
     "\e[4m" => "\e[24m",
     "\e[5m" => "\e[25m",
     "\e[7m" => "\e[27m",
@@ -170,24 +165,28 @@ ansi_pairs = Dict(
     "\e[9m" => "\e[29m",
 )
 
+const ansi_pairs_keys = keys(ansi_pairs)
+
 """ Given an ANSI tag, get the correct closer tag """
 function get_closing_ansi_tag(tag::SubString)
-    tag ∈ keys(ansi_pairs) && return ansi_pairs[tag]
+    tag ∈ ansi_pairs_keys && return ansi_pairs[tag]
 
-    # deal with foreground colors
-    occursin(r"\e\[3\dm", tag) && return "\e[39m"
-    occursin(r"\e\[38[0-9;]*m", tag) && return "\e[39m"
+    # see en.wikipedia.org/wiki/ANSI_escape_code#Colors
 
-    # deal with background colors
-    occursin(r"\e\[4\dm", tag) && return "\e[49m"
-    occursin(r"\e\[48[0-9;]*m", tag) && return "\e[49m"
+    # deal with 3 and 4bit colors (en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit)
+    occursin(r"\e\[(3|9)[0-7];(4|10)[0-7][m;]", tag) && return "\e[39;49m"  # mix
+    occursin(r"\e\[(3|9)[0-7][m;]", tag) && return "\e[39m"  # foreground
+    occursin(r"\e\[(4|10)[0-7][m;]", tag) && return "\e[49m"  # background
+
+    # deal with 8bit (en.wikipedia.org/wiki/ANSI_escape_code#8-bit),
+    # or 24bit (en.wikipedia.org/wiki/ANSI_escape_code#24-bit) colors
+    occursin(r"\e\[38;(2|5)[m;]", tag) && return "\e[39m"  # foreground
+    occursin(r"\e\[48;(2|5)[m;]", tag) && return "\e[49m"  # background
+
     return nothing
 end
 
-"""
-
-Same as `fix_markup_across_lines` but for ANSI style tags.
-"""
+""" Same as `fix_markup_across_lines` but for ANSI style tags. """
 function fix_ansi_across_lines(lines::Vector)::Vector
     for (i, ln) in enumerate(lines)
         for match in reverse(collect(eachmatch(ANSI_REGEX, ln)))

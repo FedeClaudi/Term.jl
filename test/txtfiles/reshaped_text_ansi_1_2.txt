@@ -1,0 +1,13 @@
+[1m[48;5;9mhello, I am a bright and bold[49m[22m
+[1m[48;5;9mlong line of text with a lot[49m[22m
+[1m[48;5;9mof words in it, and extra paddin[49m[22m
+[1m[48;5;9mg characters, I hope it suits[49m[22m
+[1m[48;5;9mTerm's test suite well .........[49m[22m
+[1m[48;5;9m................................[49m[22m
+[1m[48;5;9m................................[49m[22m
+[1m[48;5;9m...........................[49m[22m
+[1m[48;5;9mhello, I am a bright and bold[49m[22m
+[1m[48;5;9mlong line of text with a lot[49m[22m
+[1m[48;5;9mof words in it, and extra paddin[49m[22m
+[1m[48;5;9mg characters, I hope it suits[49m[22m
+[1m[48;5;9mTerm's test suite well[22m[49m
