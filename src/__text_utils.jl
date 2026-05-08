@@ -140,7 +140,7 @@ function fix_markup_across_lines(lines::Vector)::Vector
 end
 
 """ Check if an ANSI tag is a closer """
-is_closing_ansi_tag(tag::SubString) = tag ∈ (
+is_closing_ansi_tag(tag::AbstractString) = tag ∈ (
     "\e[0m",
     "\e[39m",
     "\e[49m",
@@ -168,7 +168,7 @@ const ansi_pairs = Dict(
 const ansi_pairs_keys = keys(ansi_pairs)
 
 """ Given an ANSI tag, get the correct closer tag """
-function get_closing_ansi_tag(tag::SubString)
+function get_closing_ansi_tag(tag::AbstractString)
     tag ∈ ansi_pairs_keys && return ansi_pairs[tag]
 
     # see en.wikipedia.org/wiki/ANSI_escape_code#Colors

@@ -92,3 +92,28 @@ end
         @test get_color(hex; bg = true) isa RGBColor
     end
 end
+
+@testset "closing tags" begin
+    tags = (
+        "\e[1m",   # bold -> expects \e[22m
+        "\e[2m",   # dim -> expects \e[22m
+        "\e[3m",   # italic -> expects \e[23m
+        "\e[4m",   # underline -> expects \e[24m
+        "\e[5m",   # blink -> expects \e[25m
+        "\e[7m",   # inverse -> expects \e[27m
+        "\e[8m",   # hidden -> expects \e[28m
+        "\e[9m",   # striked -> expects \e[29m
+        "\e[31m",  # red foreground -> expects \e[39m
+        "\e[38;2;10;20;30m", # truecolor foreground -> expects \e[39m
+        "\e[91m",  # bright red foreground -> expects \e[39m
+        "\e[41m",  # red background -> expects \e[49m
+        "\e[48;2;10;20;30m", # truecolor background -> expects \e[49m
+        "\e[101m", # bright red background -> expects \e[49m
+        "\e[100m", # bright black background -> expects \e[49m
+        "\e[22m",  # reset bold/dim -> expects \e[22m
+    )
+
+    for tag in tags
+        @test Term.get_closing_ansi_tag(tag) isa String
+    end
+end
