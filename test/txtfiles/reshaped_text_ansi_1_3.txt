@@ -1,0 +1,13 @@
+[1m[38;5;9m[48;5;10mhello, I am a bright and bold[49m[39m[22m
+[1m[38;5;9m[48;5;10mlong line of text with a lot[49m[39m[22m
+[1m[38;5;9m[48;5;10mof words in it, and extra paddin[49m[39m[22m
+[1m[38;5;9m[48;5;10mg characters, I hope it suits[49m[39m[22m
+[1m[38;5;9m[48;5;10mTerm's test suite well .........[49m[39m[22m
+[1m[38;5;9m[48;5;10m................................[49m[39m[22m
+[1m[38;5;9m[48;5;10m................................[49m[39m[22m
+[1m[38;5;9m[48;5;10m...........................[49m[39m[22m
+[1m[38;5;9m[48;5;10mhello, I am a bright and bold[49m[39m[22m
+[1m[38;5;9m[48;5;10mlong line of text with a lot[49m[39m[22m
+[1m[38;5;9m[48;5;10mof words in it, and extra paddin[49m[39m[22m
+[1m[38;5;9m[48;5;10mg characters, I hope it suits[49m[39m[22m
+[1m[38;5;9m[48;5;10mTerm's test suite well[22m[39m[49m

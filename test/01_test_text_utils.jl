@@ -188,7 +188,7 @@ end
 end
 
 @testset "markup reshaping" begin
-    txts = [
+    txts = (
         "{red}dasda asda dadasda{green}aadasdad{/green}dad asd ad ad ad asdad{bold}adada ad as sad ad ada{/red}ad adas sd ads {/bold}",
         "{red}adasd ad sa dsa{green} ad {blue} sd d ads ad {/blue}da dad {/green} asdsa dad a {/red}",
         "{red}adasd ad sa dsa{bold} ad {blue} sd d ads ad {/blue}da dad {/bold} asdsa dad a {/red}",
@@ -196,13 +196,31 @@ end
         "{on_red}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} dad {/green} asdsa ddfsf ad a {/on_red}",
         "{on_(25, 25, 25)}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} {white}dad{/white} asad {/green} asdsa ddfsf ad a {/on_(25, 25, 25)}",
         "{(220, 180, 150)} pink {bold}pink bold {dodger_blue2} pink bold blue {/dodger_blue2} pink bold {/bold} pink {on_(25, 55, 100)} pink on blue {/(220, 180, 150)} just on blue {/on_(25, 55, 100)} NOW SIMPLE WHITE {red} red red red {/red} white white {underline} underline underline {/underline}",
-    ]
+    )
     widths = (32, 65, 20)
 
     for (i, txt) in enumerate(txts)
         for (j, w) in enumerate(widths)
             reshaped = reshape_text(txt, w)
             IS_WIN || @compare_to_string reshaped "reshaped_text_markup_$(j)_$(i)"
+        end
+    end
+end
+
+
+@testset "ansi reshaping" begin
+    dummy = "hello, I am a bright and bold long line of text with a lot of words in it, and extra padding characters, I hope it suits Term's test suite well"
+    txts = (
+        "{bold bright_red}$dummy $("."^100) $dummy{/bold bright_red}",
+        "{bold on_bright_red}$dummy $("."^100) $dummy{/bold on_bright_red}",
+        "{bold bright_red on_bright_green}$dummy $("."^100) $dummy{/bold bright_red on_bright_green}",
+    )
+    widths = (32, 65, 20)
+
+    for (i, txt) in enumerate(txts)
+        for (j, w) in enumerate(widths)
+            reshaped = reshape_text(apply_style(txt), w)
+            IS_WIN || @compare_to_string reshaped "reshaped_text_ansi_$(j)_$(i)"
         end
     end
 end

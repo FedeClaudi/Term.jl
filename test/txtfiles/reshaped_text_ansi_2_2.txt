@@ -1,0 +1,7 @@
+[1m[48;5;9mhello, I am a bright and bold long line of text with a lot of[49m[22m
+[1m[48;5;9mwords in it, and extra padding characters, I hope it suits Term's[49m[22m
+[1m[48;5;9m test suite well ................................................[49m[22m
+[1m[48;5;9m.................................................... hello,[49m[22m
+[1m[48;5;9mI am a bright and bold long line of text with a lot of words[49m[22m
+[1m[48;5;9min it, and extra padding characters, I hope it suits Term's[49m[22m
+[1m[48;5;9mtest suite well[22m[49m
