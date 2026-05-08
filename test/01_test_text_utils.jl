@@ -197,8 +197,8 @@ end
         "{on_red}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} dad {/green} asdsa ddfsf ad a {/on_red}",
         "{on_(25, 25, 25)}adasd ad sa dsa{green} ad {on_black} sd d ads ad da{/on_black} {white}dad{/white} asad {/green} asdsa ddfsf ad a {/on_(25, 25, 25)}",
         "{(220, 180, 150)} pink {bold}pink bold {dodger_blue2} pink bold blue {/dodger_blue2} pink bold {/bold} pink {on_(25, 55, 100)} pink on blue {/(220, 180, 150)} just on blue {/on_(25, 55, 100)} NOW SIMPLE WHITE {red} red red red {/red} white white {underline} underline underline {/underline}",
-        "Hello, I am a {bright_red}bright and {bold}bold line of text{/bold}{/bright_red}............................................",
-        "Hello, I am a {on_bright_yellow}bright background and {bold}bold line of text{/bold}{/on_bright_yellow}............................................",
+        "{bold bright_red}Hello, I am a bright and bold line of text ..................................................{/bold bright_red}",
+        "{bold on_bright_red}Hello, I have a bright background and bold text............................................{/bold on_bright_red}",
     ]
     widths = (32, 65, 20)
 

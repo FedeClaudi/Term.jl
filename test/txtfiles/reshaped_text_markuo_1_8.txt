@@ -1,3 +1,3 @@
-Hello, I am a {bright_red}bright and {bold}bold{/bold}{/bright_red}
-{bright_red}{bold}line of text{/bold}{/bright_red}....................
-........................
+{bold bright_red}Hello, I am a bright and bold{/bold bright_red}
+{bold bright_red}line of text ...................{/bold bright_red}
+{bold bright_red}...............................{/bold bright_red}

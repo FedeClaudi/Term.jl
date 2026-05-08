@@ -1,4 +1,3 @@
-Hello, I am a {on_bright_yellow}bright background{/on_bright_yellow}
-{on_bright_yellow}and {bold}bold line of text{/bold}{/on_bright_yellow}...........
-................................
-.
+{bold on_bright_red}Hello, I have a bright backgroun{/bold on_bright_red}
+{bold on_bright_red}d and bold text.................{/bold on_bright_red}
+{bold on_bright_red}...........................{/bold on_bright_red}
