@@ -1,11 +1,9 @@
 {(220, 180, 150)} pink {bold}pink bold{/bold}{/(220, 180, 150)}
-{(220, 180, 150)}{bold}{dodger_blue2} pink bold{/dodger_blue2}{/bold}{/(220, 180, 150)}
-{(220, 180, 150)}{bold}{dodger_blue2}blue {/dodger_blue2} pink bold{/bold}{/(220, 180, 150)}
-{(220, 180, 150)}{bold}{/bold} pink {on_(25, 55, 100)} pink{/on_(25, 55, 100)}{/(220, 180, 150)}
-{(220, 180, 150)}{on_(25, 55, 100)}on blue {/(220, 180, 150)} just on{/on_(25, 55, 100)}
-{on_(25, 55, 100)}blue {/on_(25, 55, 100)} NOW
+{(220, 180, 150)}{bold}{dodger_blue2} pink bold blue{/dodger_blue2}{/bold}{/(220, 180, 150)}
+{(220, 180, 150)}{bold}{dodger_blue2}{/dodger_blue2} pink bold {/bold} pink{/(220, 180, 150)}
+{(220, 180, 150)}{on_(25, 55, 100)} pink on blue {/(220, 180, 150)}{/on_(25, 55, 100)}
+{on_(25, 55, 100)}just on blue {/on_(25, 55, 100)} NOW
 SIMPLE WHITE {red} red{/red}
-{red}red red {/red}
-white white {underline} underli{/underline}
-{underline}ne underline{/underline}
-{underline} {/underline}
+{red}red red {/red} white
+white {underline} underline{/underline}
+{underline}underline {/underline}

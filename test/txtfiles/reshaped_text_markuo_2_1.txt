@@ -1,4 +1,2 @@
-{red}dasda asda dadasda{green}aadasdad{/green}dad{/red}
-{red}asd ad ad ad asdad{bold}adada ad{/bold}{/red}
-{red}{bold}as sad ad ada{/red}ad adas sd ads{/bold}
-{bold}{/bold}
+{red}dasda asda dadasda{green}aadasdad{/green}dad asd ad ad ad asdad{bold}adada ad as{/bold}{/red}
+{red}{bold}sad ad ada{/red}ad adas sd ads {/bold}

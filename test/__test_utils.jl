@@ -76,8 +76,7 @@ end
 Load "correct' string from .txt file and correct new lines
 for windows.
 """
-function load_from_txt(filename)
-    filepath = "./txtfiles/$(filename).txt"
+function load_from_txt(filepath)
     correct = fromfile(filepath)
     IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
     correct
@@ -94,30 +93,28 @@ If `TEST_DEBUG_MODE=true`, instead of comparing to a file, save the
 obj's string to the file for future comparison. Also print out
 the output for visual inspection.
 """
-macro compare_to_string(obj, filename, fn = x -> x, skip = nothing)
+macro compare_to_string(obj, filename, func = identity, skip = nothing)
     __f = string(__source__.file)
     __l = string(__source__.line)
+    _expr = obj isa Expr
     quote
-        txt = if $obj isa Expr
-            @capture_out eval($obj)
-        else
-            $obj
-        end |> string
-        txt = $fn(txt)
+        let _txt = string($_expr ? eval($obj) : $obj) |> $func,
+            _fn = "./txtfiles/" * $filename * ".txt"
 
-        !isnothing($skip) && (txt = join(split(txt, '\n')[1:(end - $skip)], '\n'))
+            if !isnothing($skip)
+                _txt = join(split(_txt, '\n')[1:(end - $skip)], '\n')
+            end
 
-        filepath = "./txtfiles/$($filename).txt"
-
-        if TEST_DEBUG_MODE || !isfile(filepath)  # if it doesn't exist, create it.
-            print("\n"^3)
-            tprintln(txt, highlight = false)
-            tofile(txt, filepath)
-        else
-            correct = load_from_txt($filename)
-            txt != correct && (@warn "Failed to match to text" $filename $__f $__l)
-            highlight_diff(txt, correct)
-            @test txt == correct # <-- TEST
+            if TEST_DEBUG_MODE || !isfile(_fn)  # if it doesn't exist, create it.
+                print("\n"^3)
+                tprintln(_txt, highlight = false)
+                tofile(_txt, _fn)
+            else
+                correct = load_from_txt(_fn)
+                _txt == correct || @warn "Failed to match to text" fn=_fn file=$__f line=$__l
+                highlight_diff(_txt, correct)
+                @test _txt == correct # <-- TEST
+            end
         end
     end |> esc
 end

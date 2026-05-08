@@ -153,7 +153,6 @@ end
 
 @testset "Text justify" begin
     str = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-    _str = reshape_text(str, 50)
 
     IS_WIN || @compare_to_string(justify(str, 150), "justify")
 
