@@ -214,21 +214,19 @@ function Table(
         )
 
         # prep row params based on line number, header etc...
-        if l == 1
-            if show_header
-                bottom = if nrows < 2
-                    :bottom
-                elseif nrows > 2
-                    :row
-                else
-                    :foot_row
-                end
-                top = show_header ? nothing : :top
-                mid = :mid
-                _compact = (show_header && (box != BOXES[:NONE])) ? false : compact
+        if l == 1 && show_header
+            bottom = if nrows < 2
+                :bottom
+            elseif nrows > 2
+                :row
             else
-                top, mid, bottom, _compact = :top, :mid, :row, compact
+                :foot_row
             end
+            top = show_header ? nothing : :top
+            mid = :mid
+            _compact = (show_header && (box != BOXES[:NONE])) ? false : compact
+
+            # add additional rows
         elseif l == nrows
             top, mid, bottom, _compact =
                 nothing, :mid, isnothing(footer) ? :bottom : :foot_row, false
@@ -307,23 +305,6 @@ Table(data::AbstractDict; header = nothing, kwargs...) = Table(
     header = isnothing(header) ? string.(collect(keys(data))) : header,
     kwargs...,
 )
-
-""" 
-Table(data::T; kwargs...) where T
-
-Construct `Table` from an object of type T if the type supports the `Tables` interface.
-Specifically, a `Table` is constructed if `istable(T)` returns true, otherwise an `ArgumentError` is thrown.
-The column names of the object make up the table header if none is assigned.
-"""
-function Table(data::T; header = nothing, kwargs...) where T
-    if TablesPkg.istable(T)
-        columns = TablesPkg.Columns(data)
-        header = isnothing(header) ? string.(TablesPkg.columnnames(columns)) : header
-        Table(columns; header, kwargs...)
-    else 
-        throw(ArgumentError("type $T does not support Tables interface"))
-    end
-end
 
 """
     function table_row(
