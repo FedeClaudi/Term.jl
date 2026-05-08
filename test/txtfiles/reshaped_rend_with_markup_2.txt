@@ -1,7 +1,4 @@
-[0m[22m╭────────────────────────────╮[22m[0m
-[22m│[22m  [31mdasda asda dadasda[32maadas[39m[31m[39m   [22m│[22m
-[22m│[22m  [31m[32mdad[39m[31mdad asd ad ad ad[39m       [22m│[22m
-[22m│[22m  [31masdad[1madada ad as sad[22m[31m[39m      [22m│[22m
-[22m│[22m  [31m[1mad ada[39mad adas sd ads[22m      [22m│[22m
-[22m│[22m  [1m[22m                          [22m│[22m
-[0m[22m╰────────────────────────────╯[22m[0m[0m
+[31mdasda asda dadasda[32maadasdad[39m[31mdad[39m 
+[31m asd ad ad ad asdad[1madada[22m[31m[39m      
+[31m[1mad as sad ad ada[39mad adas[22m       
+[1msd ads [22m                       

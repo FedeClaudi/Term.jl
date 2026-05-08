@@ -339,14 +339,15 @@ function fillin(text; bg = nothing)::String
     lines = split_lines(text)
     length(lines) == 1 && return text
 
-    w = max(map(textlen, lines)...)
-    padline(ln) =
-        if isnothing(bg)
-            ln * " "^(w - textlen(ln))
+    w = map(textlen, lines) |> maximum
+    return map(lines) do ln
+        pad = " "^(w - textlen(ln))
+        return ln * if isnothing(bg)
+            pad
         else
-            ln * "{$bg}" * " "^(w - textlen(ln)) * "{/$bg}"
+            '{' * bg * '}' * pad * "{/" * bg * '}'
         end
-    return join_lines(map(padline, lines))
+    end |> join_lines
 end
 
 """

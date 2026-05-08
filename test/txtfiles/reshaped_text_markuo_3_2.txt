@@ -1,4 +1,4 @@
 {red}adasd ad sa dsa{green}{/green}{/red}
-{red}{green}ad {blue} sd d ads{/blue}{/green}{/red}
-{red}{green}{blue}ad {/blue}da dad {/green} asdsa{/red}
-{red}dad a {/red}
+{red}{green}ad {blue} sd d ads ad{/blue}{/green}{/red}
+{red}{green}{blue}{/blue}da dad {/green} asdsa dad{/red}
+{red}a {/red}
