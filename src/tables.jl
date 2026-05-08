@@ -214,19 +214,21 @@ function Table(
         )
 
         # prep row params based on line number, header etc...
-        if l == 1 && show_header
-            bottom = if nrows < 2
-                :bottom
-            elseif nrows > 2
-                :row
+        if l == 1
+            if show_header
+                bottom = if nrows < 2
+                    :bottom
+                elseif nrows > 2
+                    :row
+                else
+                    :foot_row
+                end
+                top = show_header ? nothing : :top
+                mid = :mid
+                _compact = (show_header && (box != BOXES[:NONE])) ? false : compact
             else
-                :foot_row
+                top, mid, bottom, _compact = :top, :mid, :row, compact
             end
-            top = show_header ? nothing : :top
-            mid = :mid
-            _compact = (show_header && (box != BOXES[:NONE])) ? false : compact
-
-            # add additional rows
         elseif l == nrows
             top, mid, bottom, _compact =
                 nothing, :mid, isnothing(footer) ? :bottom : :foot_row, false
