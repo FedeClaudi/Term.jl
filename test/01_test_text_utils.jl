@@ -207,7 +207,6 @@ end
     end
 end
 
-
 @testset "ansi reshaping" begin
     dummy = "hello, I am a bright and bold long line of text with a lot of words in it, and extra padding characters, I hope it suits Term's test suite well"
     txts = (

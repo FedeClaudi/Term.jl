@@ -140,18 +140,19 @@ function fix_markup_across_lines(lines::Vector)::Vector
 end
 
 """ Check if an ANSI tag is a closer """
-is_closing_ansi_tag(tag::AbstractString) = tag ∈ (
-    "\e[0m",
-    "\e[39m",
-    "\e[49m",
-    "\e[22m",
-    "\e[23m",
-    "\e[24m",
-    "\e[25m",
-    "\e[27m",
-    "\e[28m",
-    "\e[29m",
-)
+is_closing_ansi_tag(tag::AbstractString) =
+    tag ∈ (
+        "\e[0m",
+        "\e[39m",
+        "\e[49m",
+        "\e[22m",
+        "\e[23m",
+        "\e[24m",
+        "\e[25m",
+        "\e[27m",
+        "\e[28m",
+        "\e[29m",
+    )
 
 const ansi_pairs = Dict(
     "\e[22m" => "\e[22m",

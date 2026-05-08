@@ -111,7 +111,8 @@ macro compare_to_string(obj, filename, func = identity, skip = nothing)
                 tofile(_txt, _fn)
             else
                 correct = load_from_txt(_fn)
-                _txt == correct || @warn "Failed to match to text" fn=_fn file=$__f line=$__l
+                _txt == correct ||
+                    @warn "Failed to match to text" fn=_fn file=$__f line=$__l
                 highlight_diff(_txt, correct)
                 @test _txt == correct # <-- TEST
             end
