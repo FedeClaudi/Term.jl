@@ -31,7 +31,7 @@ treeguides = Dict(
 const _TREE_PRINTING_TITLE = Ref{Union{Nothing, String}}(nothing)
 
 """
-    print_node(io, node) 
+    print_node(io, node)
 
 Core function to enable fancy tree printing. Styles the leaf/key of each node.
 """
@@ -68,7 +68,7 @@ end
     style_guides(tree::String, guides::TreeCharSet, theme::Theme)
 
 Apply style to a tree's guides by inserting it into its string representation.
-Not ideal as it will affect the style of other elements with the same characters 
+Not ideal as it will affect the style of other elements with the same characters
 like Panels, but ok for no.
 """
 function style_guides(tree::String, guides::TreeCharSet, theme::Theme)
@@ -109,7 +109,7 @@ end
 Constructor for `Tree`
 
 It uses `AbstractTrees.print_tree` to get a string representation of `tree` (any object
-compatible with the `AbstractTrees` packge). Applies style to the string and creates a 
+compatible with the `AbstractTrees` packge). Applies style to the string and creates a
 renderable `Tree`.
 
 Arguments:
@@ -117,7 +117,7 @@ Arguments:
 - `guides`: if a symbol, the name of preset tree guides types. Otherwise an instance of
     `AbstractTrees.TreeCharSet`
 - `theme`: `Theme` used to set tree style.
-- `printkeys`: If `true` print keys. If `false` don't print keys. 
+- `printkeys`: If `true` print keys. If `false` don't print keys.
 - `print_node_function`: Function used to print nodes.
 - `print_key_function`: Function used to print keys.
 - `title`: Title of the tree.
@@ -150,8 +150,8 @@ function Tree(
             io,
             tree;
             charset = guides,
-            printkeys = printkeys,
-            prefix = prefix,
+            printkeys,
+            prefix,
             kwargs...,
         ),
     )
@@ -164,7 +164,6 @@ function Tree(
             "{$(theme.tree_keys)}" * s"\g<0>" * "{/$(theme.tree_keys)}",
         ),
     )
-
     # style guides
     tree = style_guides(tree, guides, theme)
 
@@ -224,24 +223,27 @@ end
     Tree(T::DataType)::Tree
 
 Construct a `Tree` visualization of `T`'s types hierarchy
-The key is in costructing the actual hierarchy tree recursively. 
+The key is in costructing the actual hierarchy tree recursively.
 """
-function Tree(T::DataType)::Tree
+function Tree(T::DataType; kwargs...)::Tree
     # create a dictionary of types hierarchy
     subs = Dict(string(s) => nothing for s in subtypes(T))
     data = make_hierarchy_dict(supertypes(T), T, subs)
 
     # define a fn to avoid printing nodes
     s = TERM_THEME[].tree_mid
-    fn(io::IO, x) =
-        length(children(x)) > 0 ? print(io, apply_style("{$s}┬{/$s}")) : print(io, "")
+    fn(io::IO, x) = if length(children(x)) > 0
+        print(io, apply_style("{$s}┬{/$s}"))
+    else
+        print(io, "")
+    end
 
     # change style of pair
     _style = TERM_THEME[].tree_pair
     TERM_THEME[].tree_pair = "hidden"
 
     # print tree
-    _tree = Tree(data; printkeys = true, print_node_function = fn)
+    _tree = Tree(data; printkeys = true, print_node_function = fn, kwargs...)
     TERM_THEME[].tree_pair = _style
 
     return _tree

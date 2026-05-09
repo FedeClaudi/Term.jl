@@ -11,7 +11,7 @@ data = Dict(
     "c" => (1, 2, 3),
 )
 
-print(Tree(data))
+Tree(data) |> print
 ```
 
 As you can see, the starting point is a `Dict` with `key -> value` entries which get rendered as leaves in the tree. Also, the `Type` of `value` is shown by colors in the tree.
@@ -28,7 +28,7 @@ data = Dict(
     ),
 )
 
-print(Tree(data))
+Tree(data) |> print
 ```
 
 Under the hood, `Tree` just leverages [AbstractTrees.jl](https://github.com/JuliaCollections/AbstractTrees.jl) to handle tree-like data structures, so anything that is compatible with that framework will printed as a `Tree`.
@@ -62,7 +62,8 @@ data = Dict(
 )
 
 _tree = Tree(data)
-_info = Panel("This is a panel\nYou can use it to explain\nwhat the contents of the\ntree are!"; width=30, height=_tree.measure.h, subtitle="description")
+msg = "This is a panel\nYou can use it to explain\nwhat the contents of the\ntree are!"
+_info = Panel(msg; width=30, height=_tree.measure.h, subtitle="description")
 
 print(_tree * "  " *_info)
 
@@ -89,7 +90,6 @@ theme = Theme(
 )
 
 Tree(data; theme) |> print
-)
 ```
 `tree_max_leaf_width` sets the max width of the display of each leaf while the other values set the color of different elements of the `Tree`. In particular `mid`, `terminator`, `dash` refer to the lines (or guides) of the tree.
 

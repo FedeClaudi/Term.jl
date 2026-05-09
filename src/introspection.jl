@@ -57,7 +57,7 @@ use the `Term.typestree` syntax, or import it manually by
 # Example
 Below is an example showing the type tree for `Integer`. Note
 that the colors of the output are not included in this docstring.
-```jldoctest
+```
 julia> Term.typestree(Integer)
 ╭──────────────────────────────────────────────────── Types hierarchy ───╮
 │                                                                        │
@@ -77,24 +77,26 @@ julia> Term.typestree(Integer)
 ╰────────────────────────────────────────────────────────────────────────╯
 ```
 """
-typestree(io::IO, T::DataType) = print(
-    io,
-    Panel(
-        Tree(T);
-        title = "Types hierarchy",
-        style = "$(TERM_THEME[].emphasis) dim",
-        title_style = orange * " default",
-        title_justify = :right,
-        fit = true,
-        padding = (1, 4, 1, 1),
-    ),
-)
+function typestree(io::IO, T::DataType; kwargs...)
+    return print(
+        io,
+        Panel(
+            Tree(T; kwargs...);
+            title = "Types hierarchy",
+            style = "$(TERM_THEME[].emphasis) dim",
+            title_style = orange * " default",
+            title_justify = :right,
+            fit = true,
+            padding = (1, 4, 1, 1),
+        ),
+    )
+end
 
-typestree(T::DataType) = typestree(stdout, T)
+typestree(T::DataType; kwargs...) = typestree(stdout, T; kwargs...)
 
-function expressiontree(io::IO, e::Expr)
+function expressiontree(io::IO, e::Expr; kwargs...)
     _expr = expr2string(e)
-    tree = Tree(e)
+    tree = Tree(e; kwargs...)
 
     return print(
         io,
