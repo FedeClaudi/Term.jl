@@ -20,12 +20,8 @@ Note that the styling macros return a string, so you can combine the resulting s
 
 ```@example
 using Term # hide
-println(
-    @green("This is green") * " and " * @red("this is red")
-)
-println(
-    "Make your text $(@underline("stand out"))!"
-)
+@green("This is green") * " and " * @red("this is red") |> println
+"Make your text $(@underline("stand out"))!" |> println
 ```
 
 With these style macros you can do some simple styling, but it gets clunky when you want to go beyond adding some color. Let's say you want you text to be blue, bold and underlined; do you really need to use three macros?
@@ -38,10 +34,10 @@ mytext = @style "this is my text" blue bold underline
 println(mytext)
 ```
 
-Like the macros you already know, `@style` returns a string with the desired style, except that now you can specify multiple styles at once! 
+Like the macros you already know, `@style` returns a string with the desired style, except that now you can specify multiple styles at once!
 
 ## Markup text
-The basic styling macros are great for handling simple cases where you just want to add a bit of style to a piece of text. More realistically, you might want more control about exactly which parts of your text have what style. 
+The basic styling macros are great for handling simple cases where you just want to add a bit of style to a piece of text. More realistically, you might want more control about exactly which parts of your text have what style.
 
 As a way of example, let's say you want every other word of yours string:
 
@@ -73,7 +69,7 @@ tprint(
 ```
 
 Woah! What just happened!!
-Two things happened: 1) `Term` styling machinery detects strings segments like `"{red}Every{/red}"` as meaning that the text between `"{...}"` and `"{/...}"` should be colored red and 2) `tprint` (short for term print) detects this style information and applies it to your text before printing. 
+Two things happened: 1) `Term` styling machinery detects strings segments like `"{red}Every{/red}"` as meaning that the text between `"{...}"` and `"{/...}"` should be colored red and 2) `tprint` (short for term print) detects this style information and applies it to your text before printing.
 
 Not bad huh? Even better, the style information inside a parentheses can be more than just color:
 ```@example
@@ -86,7 +82,7 @@ that's right, `Term.jl` can also color the background of your text (by adding `o
 
 !!! info "Where did my brackets go!?!?"
     Perhaps you've tried something like `tprint("This is {my} text")` and got surprised when the output was `"This is text"`. If so, read on. What happened there is that `Term.jl` interprets anything with single squared parentheses (`{...}`) as style information
-    and removes that from your text output. So in the example it treated `{my}` as a markup style tag and removed it from the text, but `my` is not a valid style so it was ultimately ignored. If you want to use `{}` in your text, you simply need to use double brackets: `tprint("This is {{my}} text")` will print `"This is {my} text"` as expected. 
+    and removes that from your text output. So in the example it treated `{my}` as a markup style tag and removed it from the text, but `my` is not a valid style so it was ultimately ignored. If you want to use `{}` in your text, you simply need to use double brackets: `tprint("This is {{my}} text")` will print `"This is {my} text"` as expected.
 
 
 If you just want to **use** `Term.jl`'s style functionality, just make sure to read the admonition below. If you're curious about what's happening under the hood, read on below!
@@ -102,11 +98,12 @@ If you just want to **use** `Term.jl`'s style functionality, just make sure to r
 
 !!! tip
     Occasionally you can do without the closing tag:
-    
+
     ```@example
+    import Term: tprint  # hide
     tprint("{red}text")
     ```
-    `Term.jl` will add the closing tag to the end of the string for you. Generally though, when multiple styles are 
+    `Term.jl` will add the closing tag to the end of the string for you. Generally though, when multiple styles are
     applied to the same string, it's better to be explicit in exactly where each style starts and ends.
 
 
@@ -129,17 +126,15 @@ You can also specify how you want some text to be highlighted:
 tprint(highlight("This is just some text", :number))  # it will be colored as number!
 ```
 
-The colors used for the highlights are specified by the [Theme](@ref ThemeDocs) being used as seen a previous section. 
+The colors used for the highlights are specified by the [Theme](@ref ThemeDocs) being used as seen a previous section.
 
 You can also highlight syntax from code snippets (only Julia code for now):
 ```@example h
-
-tprint(highlight_syntax("""
+highlight_syntax("""
 function foo(x::Int)
     x^2
 end
-
-"""))
+""") |> tprint
 ```
 
 or just load and highlight a file (showing lines in a specific range):
@@ -153,28 +148,26 @@ load_code_and_highlight(".../src/highlight.jl", 125; δ=5) |> tprint
 
 If you're reading here you're curious about what exactly is happening under the hood. So let's get started.
 `Term.jl`, like `rich` in python, defines a simple markup language to specify the style of bits of strings.
-As we saw, the syntax is very simple with an opening and closing tag specifying the style and marking the start and end of the styled text. 
+As we saw, the syntax is very simple with an opening and closing tag specifying the style and marking the start and end of the styled text.
 
 So the first thing that needs to happen is the **detection** of these markup tags. This is surprisingly hard because there are so many possible combinations. You can have markup tags whose style information varies considerably, you can have nested tags, you can have tags spread across lines and you can have nested tags spread across lines:
 
 ```@example
 using Term # hide
-tprint(
-    """
+"""
 And {blue} somehow
 it {bold red} all {/bold red}
 has to {green underline} always
 work {/green underline} correctly {/blue}
 somehow.
-    """
-)
+""" |> tprint
 ```
 
 ```@meta
 CurrentModule = Term.Style
 ```
 
-All of this is taken care of by `Term.Style.apply_style` which extracts markup style information from your strings and replaces them with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text between `{...}`) into a `Term.Style.MarkupStyle` object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style. 
+All of this is taken care of by `Term.Style.apply_style` which extracts markup style information from your strings and replaces them with the appropriate [ANSI escape codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797). This is done by parsing the markup information (the text between `{...}`) into a `Term.Style.MarkupStyle` object which stores the style information. Finally, `get_style_codes` get the ANSI codes corresponding to the required style.
 So in summary:
 
 ```julia
@@ -192,4 +185,3 @@ which printed to the console looks like:
 import Term.Style: apply_style  # hide
 print(apply_style("{red}text{/red}")) # hide
 ```
-

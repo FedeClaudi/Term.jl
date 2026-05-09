@@ -68,12 +68,12 @@ end
 Base.size(p::Panel) = size(p.measure)
 
 """
-    Panel(; 
+    Panel(;
         fit::Bool = false,
         height::Int = 2,
         width::Int = $(default_width()),
         padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
-        kwargs...,  
+        kwargs...,
     )
 
 Construct a `Panel` with no content.
@@ -115,14 +115,14 @@ function Panel(;
     # make panel
     return Panel(
         content;
-        fit = fit,
-        panel_measure = panel_measure,
-        content_measure = content_measure,
+        fit,
+        panel_measure,
+        content_measure,
         Δw = padding.left + padding.right + 2,
         Δh = padding.top + padding.bottom,
-        height = height,
-        width = width,
         padding = Padding(padding),
+        height,
+        width,
         kwargs...,
     )
 end
@@ -261,8 +261,8 @@ end
 Construct a `Panel` fitting content to it.
 
 !!! tip
-    Content that is **too large** to fit in the given width will be trimmed. 
-    To avoid trimming, set ```fit=true``` when calling panel. 
+    Content that is **too large** to fit in the given width will be trimmed.
+    To avoid trimming, set ```fit=true``` when calling panel.
 
 """
 function Panel(
@@ -481,8 +481,8 @@ end
 """
     function parse_layout_args end
 
-Parse the arguments of a `Expr(:call, :Panel, ...)` to 
-add a keyword argument to fix the panel's width. 
+Parse the arguments of a `Expr(:call, :Panel, ...)` to
+add a keyword argument to fix the panel's width.
 A few diferent menthods are defined to handle different combinations
 of args/kwargs for the Panel call.
 """

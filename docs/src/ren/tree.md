@@ -44,13 +44,13 @@ Tree([1, [1, 2, [:a, :b, :c]]]) |> print
 # and more!
 ```
 
-Essentially `Tree` work's with `AbstractTrees` to just produce stylized output. 
+Essentially `Tree` work's with `AbstractTrees` to just produce stylized output.
 
 !!! tip `Tree` is not a *tree*
     `Tree` is an `AbstractRenderable`, it is **not** a datastructure for handling tree-like data. It's only meant to be used to *display* trees in your terminal. As such you can't do operations like finding children of nodes or getting a subtree etc. All of that should be done with `AbstractTrees` and `Tree` is only there to display the output
 
 
-As per the note above, `Tree` is a `AbstractRenderable` type so it plays well with other renderables in term. 
+As per the note above, `Tree` is a `AbstractRenderable` type so it plays well with other renderables in term.
 
 ```@example tree
 import Term: Panel
@@ -70,7 +70,7 @@ print(_tree * "  " *_info)
 
 ### Styling
 Easy! [`Tree`](@ref) has lots of options to allow you to style it as you like.
-The style is set by the [`Theme`](@ref ThemeDocs). 
+The style is set by the [`Theme`](@ref ThemeDocs).
 
 ```@example tree
 import Term: Theme
@@ -88,13 +88,10 @@ theme = Theme(
     tree_max_leaf_width = 22,
 )
 
-print(
-    Tree(data,
-        theme=theme
-    )
+Tree(data; theme) |> print
 )
 ```
-`tree_max_leaf_width` sets the max width of the display of each leaf while the other values set the color of different elements of the `Tree`. In particular `mid`, `terminator`, `dash` refer to the lines (or guides) of the tree. 
+`tree_max_leaf_width` sets the max width of the display of each leaf while the other values set the color of different elements of the `Tree`. In particular `mid`, `terminator`, `dash` refer to the lines (or guides) of the tree.
 
 And since we're talking about `guides` you can also use different ones
 ```@example tree

@@ -106,6 +106,9 @@ end
     IS_WIN || @compare_to_string as_frame "widget_placeholder"
 end
 
+@testset "Button" begin
+    @test Button("Click me please!") |> frame isa Panel
+end
 # ---------------------------------------------------------------------------- #
 #                                     MENU                                     #
 # ---------------------------------------------------------------------------- #

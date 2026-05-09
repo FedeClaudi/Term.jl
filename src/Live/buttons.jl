@@ -7,7 +7,7 @@ abstract type AbstractButton <: AbstractWidget end
 set the buttoon's state to :presed.
 """
 function press_button(b::AbstractButton, ::Union{SpaceBar, Enter})
-    if b.status == :not_pressed
+    if b.status ≡ :not_pressed
         b.lastpressed = Dates.value(now())
         b.status = :pressed
         isnothing(b.callback) || return b.callback(b)
@@ -30,7 +30,7 @@ end
 Create a panel to display a button.
 """
 function make_button_panel(message, color, text_color, pressed, active, w, h; kwargs...)
-    if pressed == :active
+    if pressed ≡ :active
         style = "$(text_color) on_$(color)"
         background = color
     else
@@ -44,7 +44,7 @@ function make_button_panel(message, color, text_color, pressed, active, w, h; kw
         width = w,
         height = h,
         justify = get(kwargs, :justify, :center),
-        background = background,
+        background,
         kwargs...,
     )
 end
@@ -84,7 +84,7 @@ function Button(
         kwargs...,
     )
     return Button(
-        WidgetInternals(Measure(), nothing, on_draw, on_activated, on_deactivated, false),
+        WidgetInternals(Measure(1, length(message)), nothing, on_draw, on_activated, on_deactivated, false),
         controls,
         message,
         :not_pressed,
@@ -100,7 +100,7 @@ end
 function frame(b::Button; kwargs...)
     isnothing(b.internals.on_draw) || b.internals.on_draw(b)
 
-    status = if b.status == :pressed
+    status = if b.status ≡ :pressed
         currtime = Dates.value(now())
 
         if currtime - b.lastpressed > 100
@@ -130,7 +130,7 @@ end
 # ---------------------------------------------------------------------------- #
 # ------------------------------- constructors ------------------------------- #
 """
-A button. Pressing it toggles its status between 
+A button. Pressing it toggles its status between
 activated and not.
 """
 @with_repr mutable struct ToggleButton <: AbstractButton
@@ -156,7 +156,7 @@ function ToggleButton(
         kwargs...,
     )
     return ToggleButton(
-        WidgetInternals(Measure(), nothing, on_draw, on_activated, on_deactivated, false),
+        WidgetInternals(Measure(1, length(message)), nothing, on_draw, on_activated, on_deactivated, false),
         controls,
         message,
         :not_pressed,
@@ -172,7 +172,7 @@ end
 function frame(b::ToggleButton; kwargs...)
     isnothing(b.internals.on_draw) || b.internals.on_draw(b)
 
-    status = if b.status == :pressed
+    status = if b.status ≡ :pressed
         :active
     else
         :inactive
