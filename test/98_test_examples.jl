@@ -10,3 +10,7 @@
         include("../examples/text_style.jl")
     end
 end
+
+@testset "\e[34mREADME" begin
+    IS_WIN || @compare_to_string(include("../README.jl"), "README")
+end

@@ -283,7 +283,7 @@ main() = begin
     readme = foldl(/, zip(all, lines) |> Iterators.flatten |> collect)
 
     # print(Spacer(height(readme), 10) * readme)
-    write(joinpath(@__DIR__, "README.txt"), string(readme))
+    write(joinpath(@__DIR__, "test", "txtfiles", "README.txt"), string(readme))
     print(readme)
     return nothing
 end
