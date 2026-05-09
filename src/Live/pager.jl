@@ -1,6 +1,6 @@
 # ------------------------------- constructors ------------------------------- #
 """
-A `Pager` is a widget for visualizing long texts a few lines at the time. 
+A `Pager` is a widget for visualizing long texts a few lines at the time.
 It shows a few lines of a longer text and allows users to move up and down the text
 using keys such as arrow up and arrow down.
 """
@@ -100,8 +100,10 @@ function Pager(
         on_draw::Union{Nothing, Function} = nothing,
         on_activated::Function = on_activated,
         on_deactivated::Function = on_deactivated,
+        page_lines::Integer = 0
     )
     content = reshape_pager_content(text, line_numbers, width)
+    page_lines = page_lines == 0 ? max(height - 5, 1) : page_lines
     return Pager(
         WidgetInternals(
             Measure(height, width),
@@ -118,7 +120,7 @@ function Pager(
         line_numbers,
         length(content),
         1,
-        max(height - 5, 1),
+        page_lines,
     )
 end
 

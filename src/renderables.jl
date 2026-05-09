@@ -13,14 +13,13 @@ import Term:
     get_bg_color,
     textlen,
     NOCOLOR,
-    cleantext
+    cleantext,
+    highlight as highlighter
 
 import Term
 
-import Term: highlight as highlighter
 import ..Consoles: console_width
-import ..Measures: Measure
-import ..Measures: width as get_width
+import ..Measures: Measure, Measure_clean, width as get_width
 import ..Segments: Segment, get_string_types
 import ..Style: apply_style, MarkupStyle, get_style_codes
 
@@ -98,14 +97,11 @@ mutable struct Renderable <: AbstractRenderable
 end
 
 """
-    Renderable(
-        str::String; width::Union{Nothing,Int} = nothing
-    )
+    Renderable(str::String; width::Union{Nothing,Int} = nothing)
 
 Convenience method to construct a RenderableText
 """
 Renderable(str::AbstractString) = RenderableText(str)
-
 Renderable(ren::AbstractRenderable) = ren
 Renderable() = Renderable(Vector{Segment}[], Measure(0, 0))
 
@@ -138,7 +134,7 @@ Optionally `justify`  can be used to set the text justification style ∈ (:left
 function RenderableText(
         text::AbstractString;
         style::Union{Nothing, String} = nothing,
-        width::Int = min(Measure(text).w, console_width(stdout)),
+        width::Int = min(get_width(text), console_width(stdout)),
         background::Union{Nothing, String} = nothing,
         justify::Symbol = :left,
     )
@@ -165,30 +161,30 @@ Construct a RenderableText by possibly re-shaping a RenderableText
 function RenderableText(
         rt::RenderableText;
         style::Union{Nothing, String} = nothing,
-        width::Int = console_width(),
+        width::Int = min(get_width(rt), console_width(stdout)),
         kwargs...,
     )
     return if rt.style == style && rt.measure.w == width
         rt
     else
         text = join_lines([seg.text for seg in rt.segments])
-        RenderableText(text; style = style, width = width, kwargs...)
+        RenderableText(text; style, width, kwargs...)
     end
 end
 
 function RenderableText(
         ren::AbstractRenderable,
         args...;
-        width = console_width(),
+        width = min(get_width(ren), console_width(stdout)),
         kwargs...,
     )
-    if ren.measure.w <= width
+    if ren.measure.w ≤ width
         return RenderableText(ren.segments, ren.measure, nothing)
     else
         lines = getfield.(ren.segments, :text)
         # texts = map(l -> RenderableText(l, args...; width=width, kwargs...), lines)
         # return foldl(/, texts)
-        return RenderableText(join(lines, "\n"), args...; width = width, kwargs...)
+        return RenderableText(join(lines, "\n"), args...; width, kwargs...)
     end
 end
 
@@ -209,7 +205,7 @@ end
 
 function trim_renderable(ren::RenderableText, width::Int)::RenderableText
     text = join(getfield.(ren.segments, :text))
-    return RenderableText(text, width = width)
+    return RenderableText(text; width)
 end
 
 end

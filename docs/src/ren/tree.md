@@ -65,7 +65,7 @@ _tree = Tree(data)
 msg = "This is a panel\nYou can use it to explain\nwhat the contents of the\ntree are!"
 _info = Panel(msg; width=30, height=_tree.measure.h, subtitle="description")
 
-print(_tree * "  " *_info)
+print(_tree * "  " * _info)
 
 ```
 
@@ -95,23 +95,19 @@ Tree(data; theme) |> print
 
 And since we're talking about `guides` you can also use different ones
 ```@example tree
-print(
-    Tree(data,
-        guides=:asciitree
-    )
-)
+Tree(data; guides=:asciitree) |> print
 ```
 
 there's a couple named guides style, but you can customize things even further using an `AbstractTree.TreeCharSet` if you wish.
 
 
-## TypeTree
+## TypesTree
 As you know, Julia allows for hierarchical types structures. Trees are for visualizing hierarchical data structures. So...
 
 ```@example
 import Term: typestree
 
-typestree(AbstractFloat)
+typestree(AbstractFloat) |> print
 ```
 
 Enjoy!

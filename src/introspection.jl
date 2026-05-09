@@ -1,7 +1,6 @@
 module Introspection
 
 using InteractiveUtils
-import InteractiveUtils: supertypes as getsupertypes
 import OrderedCollections: OrderedDict
 import MyterialColors: pink, pink_light, orange, grey_dark, light_green
 
@@ -46,7 +45,7 @@ export inspect, typestree, expressiontree
     typestree(T)
     typestree(io::IO, T)
 
-Print the type hierarchy for `T` in a pretty format. This is
+Returns the type hierarchy for `T` in a pretty format. This is
 done using colors, indentation and unicode for maximal readability.
 The output included all supertypes, and one level of subtypes.
 
@@ -75,71 +74,54 @@ julia> Term.typestree(Integer)
 ╰───────────────────────────────────────────────────────────╯
 ```
 """
-function typestree(io::IO, T::DataType; tree_kwargs = (;), kwargs...)
-    return print(
-        io,
-        Panel(
-            Tree(T; tree_kwargs...);
-            title = "Types hierarchy",
-            style = "$(TERM_THEME[].emphasis) dim",
-            title_style = orange * " default",
-            title_justify = :right,
-            fit = true,
-            kwargs...
-        ),
-    )
-end
+typestree(T::DataType; tree_kwargs = (;), kwargs...) = Panel(
+    Tree(T; tree_kwargs...);
+    title = "Types hierarchy",
+    style = "$(TERM_THEME[].emphasis) dim",
+    title_style = orange * " default",
+    title_justify = :right,
+    fit = true,
+    kwargs...
+)
 
-typestree(T::DataType; kwargs...) = typestree(stdout, T; kwargs...)
-
-function expressiontree(io::IO, e::Expr; tree_kwargs = (;), kwargs...)
+function expressiontree(e::Expr; tree_kwargs = (;), kwargs...)
     _expr = expr2string(e)
     tree = Tree(e; tree_kwargs...)
-
-    return print(
-        io,
-        Panel(
-            tree;
-            title = _expr,
-            title_style = "$(TERM_THEME[].emphasis_light) default bold",
-            title_justify = :center,
-            style = grey_dark,
-            fit = tree.measure.w > default_width(),
-            width = max(tree.measure.w, default_width()),
-            subtitle = "inspect",
-            subtitle_justify = :right,
-            justify = :center,
-            kwargs...
-        ),
+    return Panel(
+        tree;
+        title = _expr,
+        title_style = "$(TERM_THEME[].emphasis_light) default bold",
+        title_justify = :center,
+        style = grey_dark,
+        fit = tree.measure.w > default_width(),
+        width = max(tree.measure.w, default_width()),
+        subtitle = "inspect",
+        subtitle_justify = :right,
+        justify = :center,
+        kwargs...
     )
 end
-expressiontree(e::Expr) = expressiontree(stdout, e)
-
 # ---------------------------------------------------------------------------- #
 #                                EXPR. DENDOGRAM                               #
 # ---------------------------------------------------------------------------- #
 
-function inspect(io::IO, expr::Expr; kwargs...)
+function inspect(expr::Expr; kwargs...)
     _expr = expr2string(expr)
     dendo = Dendogram(expr)
 
-    return print(
-        io,
-        Panel(
-            dendo;
-            title = _expr,
-            title_style = "$(TERM_THEME[].emphasis_light) default bold",
-            title_justify = :center,
-            style = TERM_THEME[].emphasis,
-            fit = true,
-            subtitle = "inspect",
-            subtitle_justify = :right,
-            justify = :center,
-            kwargs...
-        ),
+    return Panel(
+        dendo;
+        title = _expr,
+        title_style = "$(TERM_THEME[].emphasis_light) default bold",
+        title_justify = :center,
+        style = TERM_THEME[].emphasis,
+        fit = true,
+        subtitle = "inspect",
+        subtitle_justify = :right,
+        justify = :center,
+        kwargs...
     )
 end
-
 # ---------------------------------------------------------------------------- #
 #                             INTROSPECT DATATYPES                             #
 # ---------------------------------------------------------------------------- #
@@ -161,9 +143,9 @@ function style_methods(
 
         # get docstring
         docs = if !isnothing(docs)
-            docs = parse_md(something(docs, ""); width = width)
+            parse_md(something(docs, ""); width = width)
         else
-            docs = "{green}No docstring found{/green}"
+            "{green}No docstring found{/green}"
         end
         docs = hLine(width, "DocString"; style = "green") / docs / ""
 
@@ -178,14 +160,9 @@ function style_methods(
 end
 
 """
-    inspect(T::DataType; documentation::Bool=false, constructors::Bool=true, methods::Bool=true, supertypes::Bool=true)
+    inspect(T::Union{Union, DataType})
 
 Inspect a `DataType` to show info such as docstring, constructors and methods.
-Flags can be used to choose the level of detail in the information presented:
- - documentation: show docstring with `termshow`
- - constructors: show `T` constructors
- - methods: show methods using `T` in their signature
- - supertypes: show methods using `T`'s supertypes in their signature
 """
 function inspect(T::Union{Union, DataType})
     # get app size
@@ -205,8 +182,7 @@ function inspect(T::Union{Union, DataType})
 
     # get each method as a Pager
     type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width - 12)
-    methods_pagers =
-        map(
+    methods_pagers = map(
         m -> Pager(
             string(m[2]);
             title = "Method $(m[1]) of $(length(type_methods))",
@@ -225,28 +201,23 @@ function inspect(T::Union{Union, DataType})
     )
 
     # define widgets that go inside the top level Gallery
+    text = string(
+        Panel(
+            type_name / ("  " * line * fields);
+            fit = false,
+            width = widget_width - 10,
+            justify = :center,
+            title = "Fields",
+            title_style = "bright_blue bold",
+            style = "bright_blue dim",
+        ) / hLine(widget_width - 10; style = "dim") / "" / Tree(T),
+    )
+    w, h = comp.elements[:B].w, comp.elements[:B].h
     gallery_widgets = [
-        Pager( # first widget is a pager with struct info
-            string(
-                Panel(
-                    type_name / ("  " * line * fields);
-                    fit = false,
-                    width = widget_width - 10,
-                    justify = :center,
-                    title = "Fields",
-                    title_style = "bright_blue bold",
-                    style = "bright_blue dim",
-                ) / hLine(widget_width - 10; style = "dim") / "" / Tree(T),
-            );
-            width = comp.elements[:B].w - 1,
-            page_lines = comp.elements[:B].h - 7,
-        ),
-        Gallery(  # inner gallery shows each method
-            methods_pagers;
-            width = comp.elements[:B].w - 1,
-            height = comp.elements[:B].h - 2,
-            show_panel = false,
-        ),
+        # first widget is a pager with struct info
+        Pager(text; width = w - 1, page_lines = comp.elements[:B].h - 7),
+        # inner gallery shows each method
+        Gallery(methods_pagers; width = w - 1, height = comp.elements[:B].h - 2, show_panel = false),
     ]
 
     # make the app out of a menu and the top level gallery
@@ -255,19 +226,17 @@ function inspect(T::Union{Union, DataType})
         :B => Gallery(
             gallery_widgets;
             controls = Dict(),
-            width = comp.elements[:B].w,
-            height = comp.elements[:B].h - 1,
+            width = w,
+            height = h - 1,
             show_panel = false,
         ),
     )
 
     transition_rules = Dict(ArrowDown() => Dict(:A => :B), ArrowUp() => Dict(:B => :A))
 
-    function cb(app)
-        return app.widgets[:B].active = app.widgets[:A].active
-    end
+    cb(app) = app.widgets[:B].active = app.widgets[:A].active
 
-    app = App(layout, widgets, transition_rules; on_draw = cb)
+    app = App(layout; widgets, transition_rules, on_draw = cb)
     play(app; transient = false)
     return nothing
 end

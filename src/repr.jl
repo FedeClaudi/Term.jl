@@ -355,16 +355,9 @@ function install_term_repr()
 
         Base.show(io::IO, num::Number) = tprint(io, string(num); highlight = true)
 
-        Base.show(io::IO, ::MIME"text/plain", obj::AbstractDict) = termshow(io, obj)
-
-        Base.show(io::IO, ::MIME"text/plain", obj::Union{AbstractArray, AbstractMatrix}) =
-            termshow(io, obj)
-
-        Base.show(io::IO, ::MIME"text/plain", fun::Function) = termshow(io, fun)
-
-        Base.show(io::IO, ::MIME"text/plain", obj::DataType) = termshow(io, obj)
-
-        Base.show(io::IO, ::MIME"text/plain", expr::Expr) = termshow(io, expr)
+        Base.show(
+            io::IO, ::MIME"text/plain", obj::Union{Expr, Function, DataType, AbstractDict, AbstractArray, AbstractMatrix}
+        ) = termshow(io, obj)
     end
 end
 
@@ -377,7 +370,7 @@ end
 
 Function for the macro @with_repr which creates a `Base.show` method for a type.
 
-The `show` method shows the field names/types for the 
+The `show` method shows the field names/types for the
 type and the values of the fields.
 
 # Example
@@ -403,7 +396,7 @@ with_repr(typedef::Expr)
 
 Function for the macro @with_repr which creates a `Base.show` method for a type.
 
-The `show` method shows the field names/types for the 
+The `show` method shows the field names/types for the
 type and the values of the fields.
 
 # Example
@@ -432,8 +425,8 @@ macro showme(expr, show_all_methods = false)
         """
         !!! note "@showme"
             Showing definition for *method* called by: \n
-                $(expr)       
-                
+                $(expr)
+
         ###### Arguments
 
         """,

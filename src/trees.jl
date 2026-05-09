@@ -1,6 +1,6 @@
 module Trees
 
-import AbstractTrees: repr_tree, TreeCharSet, children
+import AbstractTrees: TreeCharSet, children
 using InteractiveUtils
 
 import Term: replace_multi, highlight, reshape_text, cleantext, TERM_THEME, Theme
@@ -16,7 +16,7 @@ export Tree
 # ---------------------------------------------------------------------------- #
 # copied from AbstractTrees.jl
 
-function print_tree(
+function term_print_tree(
         printnode::Function, print_child_key::Function, io::IO, node;
         maxdepth::Integer = 5,
         indicate_truncation::Bool = true,
@@ -31,7 +31,7 @@ function print_tree(
     printnode(IOContext(buf, io), node; printnode_kw...)
     str = String(take!(buf))
 
-    depth == 0 && print(io, prefix)  # [Term.jl change] added prefix
+    # depth == 0 && print(io, prefix)  # [Term.jl change] added prefix
 
     # Copy buffer to output, prepending prefix to each line
     for (i, line) in enumerate(split(str, '\n'))
@@ -95,19 +95,16 @@ function print_tree(
             child_prefix *= " "^(textwidth(cleantext(key_str)) + textwidth(charset.pair))
         end
 
-        print_tree(
+        term_print_tree(
             printnode, print_child_key, io, child;
-            maxdepth, indicate_truncation, charset = charset,
+            maxdepth, indicate_truncation, charset,
             printkeys, depth = depth + 1, prefix = child_prefix,
             printnode_kw
         )
     end
-    return
+    return nothing
 end
 
-print_tree(printnode::Function, io::IO, node; kw...) = print_tree(printnode, print_child_key, io, node; kw...)
-print_tree(io::IO, node; kw...) = print_tree(printnode, print_child_key, io, node; kw...)
-print_tree(node; kw...) = print_tree(stdout, node; kw...)
 # ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
@@ -128,13 +125,14 @@ treeguides = Dict(
 const _TREE_PRINTING_TITLE = Ref{Union{Nothing, String}}(nothing)
 
 """
-    print_node(io, node; kw...)
+    term_print_node(io, node; kw...)
 
 Core function to enable fancy tree printing. Styles the leaf/key of each node.
 """
-function print_node(io, node; kw...)
+function term_print_node(io, node; kw...)
     theme::Theme = TERM_THEME[]
-    if isnothing(_TREE_PRINTING_TITLE[])  # print node
+    title = _TREE_PRINTING_TITLE[]
+    if isnothing(title)  # print node
         styled = if node isa AbstractString
             highlight(node, :string; theme)
         else
@@ -142,7 +140,6 @@ function print_node(io, node; kw...)
         end
         print(io, reshape_text(styled, theme.tree_max_leaf_width))
     else  # print title
-        title = _TREE_PRINTING_TITLE[]
         print(io, apply_style(title, theme.tree_title))
     end
 
@@ -150,12 +147,13 @@ function print_node(io, node; kw...)
 end
 
 """
-    print_key(io, k; kw...)
+    term_print_key(io, k; kw...)
 
 Print a tree's node's key with some style.
 """
-function print_key(io, k; kw...)
+function term_print_key(io, k; kw...)
     s = TERM_THEME[].tree_keys
+    # return print(io, k)
     return print(io, apply_style("{s}" * string(k) * "{/s}"))
 end
 
@@ -194,8 +192,8 @@ end
         guides::Union{TreeCharSet,Symbol} = :standardtree,
         theme::Theme = TERM_THEME[],
         printkeys::Union{Nothing,Bool} = true,
-        print_node_function::Function = print_node,
-        print_key_function::Function = print_key,
+        print_node_function::Function = term_print_node,
+        print_key_function::Function = term_print_key,
         title::Union{String, Nothing}=nothing,
         prefix::String = "  ",
         kwargs...,
@@ -203,7 +201,7 @@ end
 
 Constructor for `Tree`
 
-It uses `AbstractTrees.repr_tree` to get a string representation of `tree` (any object
+It uses `term_print_tree` to get a string representation of `tree` (any object
 compatible with the `AbstractTrees` packge). Applies style to the string and creates a
 renderable `Tree`.
 
@@ -214,20 +212,20 @@ Arguments:
 - `theme`: `Theme` used to set tree style.
 - `printkeys`: If `true` print keys. If `false` don't print keys.
 - `print_node_function`: Function used to print nodes.
-- `print_key_function`: Function used to print keys.
+- `term_print_key`: Function used to print keys.
 - `title`: Title of the tree.
-- `prefix`: Prefix to be used in `AbstractTrees.repr_tree`
+- `prefix`: Prefix to be used in `term_print_tree`
 
 
-For other kwargs look at `AbstractTrees.repr_tree`
+For other kwargs look at `term_print_tree`
 """
 function Tree(
         tree;
         guides::Union{TreeCharSet, Symbol} = :standardtree,
         theme::Theme = TERM_THEME[],
         printkeys::Union{Nothing, Bool} = true,
-        print_node_function::Function = print_node,
-        print_key_function::Function = print_key,
+        print_node_function::Function = term_print_node,
+        print_key_function::Function = term_print_key,
         title::Union{String, Nothing} = nothing,
         prefix::String = "  ",
         context = nothing,
@@ -239,31 +237,30 @@ function Tree(
 
     # print tree
     guides = guides isa Symbol ? treeguides[guides] : guides
-    tree = repr_tree(
-        print_node_function,
-        print_key_function,
-        tree;
+
+    buf = IOBuffer()
+    io = context ≡ nothing ? buf : IOContext(buf, context)
+    term_print_tree(
+        print_node_function, print_key_function, io, tree;
         charset = guides,
         printkeys,
         prefix,
-        context,
         kwargs...,
     )
+    tree_str = String(take!(buf))
 
     # style keys
     rx = Regex("(?<=$(guides.dash)) [\\w.,\":\\[\\]\\d]+ (?=$(strip(guides.pair)))")
-    tree = replace(
-        tree,
+    tree_str = replace(
+        tree_str,
         rx => SubstitutionString(
             "{$(theme.tree_keys)}" * s"\g<0>" * "{/$(theme.tree_keys)}",
         ),
     )
 
-    # style guides
-    tree = style_guides(tree, guides, theme)
+    tree_str = style_guides(tree_str, guides, theme)  # style guides
 
-    # turn into a renderable
-    rt = RenderableText(tree)
+    rt = RenderableText(tree_str)  # turn into a renderable
 
     # restore theme
     TERM_THEME[] = _theme
@@ -327,7 +324,7 @@ function Tree(T::DataType; prefix = "", kwargs...)::Tree
 
     # define a fn to avoid printing nodes
     s = TERM_THEME[].tree_mid
-    print_node_datatype(io::IO, x) = begin
+    term_print_node_datatype(io::IO, x) = begin
         if length(children(x)) > 0
             print(io, apply_style("{$s}┬{/$s}"))
         else
@@ -343,8 +340,8 @@ function Tree(T::DataType; prefix = "", kwargs...)::Tree
     _tree = Tree(
         data;
         printkeys = true,
-        print_node_function = print_node_datatype,
-        print_key_function = print_key,
+        print_node_function = term_print_node_datatype,
+        print_key_function = term_print_key,
         prefix,
         kwargs...
     )

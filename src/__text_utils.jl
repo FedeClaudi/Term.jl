@@ -1,4 +1,4 @@
-""" 
+"""
 multiple strings replacement.
 """
 function replace_multi(text::AbstractString, pairs::Pair...)::String
@@ -46,7 +46,7 @@ function remove_markup(input_text; remove_orphan_tags = true)::String
     end
 end
 
-""" 
+"""
     has_markup(text::String)
 
 Returns `true` if `text` includes a `MarkupTag`
@@ -63,7 +63,7 @@ Remove all ANSI tags from a string of text
 """
 remove_ansi(input_text)::String = replace(input_text, ANSI_REGEX => "")
 
-""" 
+"""
     has_ansi(text::String)
 
 Returns `true` if `text` includes a `MarkupTag`
@@ -84,7 +84,7 @@ cleantext(str)::String = (remove_ansi ∘ remove_markup)(str)
 Get length of text after all style information is removed.
 """
 textlen(x; remove_orphan_tags = false)::Int =
-    remove_markup(remove_ansi(x); remove_orphan_tags = remove_orphan_tags) |> textwidth
+    remove_markup(remove_ansi(x); remove_orphan_tags) |> textwidth
 
 # --------------------------------- brackets --------------------------------- #
 const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
@@ -111,11 +111,11 @@ unescape_brackets_with_space(text)::String = replace_multi(text, "{{" => " {", "
     fix_markup_across_lines(lines::Vector{AbstractString})::Vector{AbstractString}
 
 When splitting text with markup tags across multiple lines, tags can get separated
-across lines. This is a problem when the text gets printed side by side with other 
+across lines. This is a problem when the text gets printed side by side with other
 text with style information. This fixes that by copying/closing markup tags
 across lines as requested.
-Essentially, if a tag is opened but not closed in a line, close it at the end of 
-the line and add the same open tag at the start of the next, taking care of 
+Essentially, if a tag is opened but not closed in a line, close it at the end of
+the line and add the same open tag at the start of the next, taking care of
 doing things in the correct order when multiple tags are in the same line.
 """
 function fix_markup_across_lines(lines::Vector)::Vector
