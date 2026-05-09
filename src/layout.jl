@@ -176,7 +176,7 @@ Pad a renderable to achieve a target width.
 #### Example
 ```
 julia> pad(RenderableText("ciao"); width=10)
-    ciao   
+    ciao
 ```
 """
 function pad(ren::AbstractRenderable; width::Int, method = :center)
@@ -330,8 +330,8 @@ p1, p2 = leftalign(p1, p2)
 print(p1/p2)
 
 
-╭───────────────────────╮                         
-╰───────────────────────╯                         
+╭───────────────────────╮
+╰───────────────────────╯
 ╭────────────────────────────────────────────────╮
 ╰────────────────────────────────────────────────╯
 ```
@@ -346,7 +346,7 @@ end
 """
     leftalign!(renderables::RenderablesUnion...)
 
-In place version of leftalign. 
+In place version of leftalign.
 
 # Examples
 ```julia
@@ -356,8 +356,8 @@ leftalign!(p1, p2)
 print(p1/p2)
 
 
-╭───────────────────────╮                         
-╰───────────────────────╯                         
+╭───────────────────────╮
+╰───────────────────────╯
 ╭────────────────────────────────────────────────╮
 ╰────────────────────────────────────────────────╯
 """
@@ -387,8 +387,8 @@ p2 = Panel(; width=50)
 p1, p2 = center(p1, p2)
 print(p1/p2)
 
-             ╭───────────────────────╮             
-             ╰───────────────────────╯             
+             ╭───────────────────────╮
+             ╰───────────────────────╯
 ╭────────────────────────────────────────────────╮
 ╰────────────────────────────────────────────────╯
 ```
@@ -414,8 +414,8 @@ p2 = Panel(; width=50)
 center!(p1, p2)
 print(p1/p2)
 
-             ╭───────────────────────╮             
-             ╰───────────────────────╯             
+             ╭───────────────────────╮
+             ╰───────────────────────╯
 ╭────────────────────────────────────────────────╮
 ╰────────────────────────────────────────────────╯
 ```
@@ -494,22 +494,23 @@ end
 
 vstack(s1::String, s2::String; pad::Int = 0) = s1 * '\n'^(pad + 1) * s2
 
-""" 
+"""
     vstack(renderables...)
 
 Vertically stack a variable number of renderables to give a new renderable
 """
 function vstack(renderables::RenderablesUnion...; pad::Int = 0)
+    # @show renderables
     renderables = leftalign(renderables...)
+    # @show renderables
     segments = if pad > 0
         foldl((a, b) -> a / ('\n'^pad) / b, renderables).segments
     else
-        vcat(
-            map(
-                r -> r isa AbstractRenderable ? getfield(r, :segments) : Segment(r),
-                renderables,
-            )...,
+        seq = map(
+            r -> r isa AbstractRenderable ? getfield(r, :segments) : Segment(r),
+            renderables,
         )
+        vcat(seq...)
     end
     return Renderable(segments, Measure(segments))
 end
@@ -553,7 +554,7 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     return Renderable(segments, Measure(segments))
 end
 
-""" 
+"""
     hstack(renderables...)
 
 Horizonatlly stack a variable number of renderables.
@@ -775,15 +776,15 @@ A `renderable` used as a place holder when creating layouts (e.g. with `grid`).
 println(PlaceHolder(25, 10))
 
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
-╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
-╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
 ╲ ╲ ╲ (25 × 10) ╲ ╲ ╲ ╲
-╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
-╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
 ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
-╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ 
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
+╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲ ╲
 ```
 """
 mutable struct PlaceHolder <: AbstractLayoutElement
