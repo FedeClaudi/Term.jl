@@ -169,7 +169,7 @@ end
                     # end
 
                     IS_WIN ||
-                        @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_($l)"
+                        @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_$(l)"
 
                     menu_activate_next(mn, 1)
                     IS_WIN ||

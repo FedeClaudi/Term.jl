@@ -68,9 +68,12 @@ function toggle_help(app, args...)
         internals.help_shown = false
 
         # go to the top of the error message and delete everything
-        h =
-            console_height() - length(internals.prevcontentlines) - help_message.measure.h -
-            1
+        h = (
+            console_height() -
+                length(internals.prevcontentlines) -
+                help_message.measure.h -
+                1
+        )
         move_to_line(stdout, h)
         cleartoend(stdout)
 

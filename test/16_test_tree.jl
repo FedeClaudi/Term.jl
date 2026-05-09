@@ -55,14 +55,14 @@ trees = [
     thm2 = LightTheme
 
     for (i, theme) in enumerate((thm1, thm2))
-        for (j, guides_type) in enumerate((:standardtree, :boldtree, :asciitree))
+        for (j, guides) in enumerate((:standardtree, :boldtree, :asciitree))
             for (k, tree) in enumerate(trees)
                 if VERSION ≥ v"1.7"  # ! not sure why but this fails in older versions: segmentation fault
                     IS_WIN || @compare_to_string string(
                         Tree(
                             tree;
-                            theme = theme,
-                            guides = guides_type,
+                            theme,
+                            guides,
                             printkeys = true,
                             title = "tree_$(i)_$(j)_$(k)",
                         ),
