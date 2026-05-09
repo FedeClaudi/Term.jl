@@ -59,44 +59,42 @@ Below is an example showing the type tree for `Integer`. Note
 that the colors of the output are not included in this docstring.
 ```
 julia> Term.typestree(Integer)
-╭──────────────────────────────────────────────────── Types hierarchy ───╮
-│                                                                        │
-│ ┬                                                                      │
-│   ├─ Base.MultiplicativeInverses.MultiplicativeInverse ⇒               │
-│   ├─ Complex ⇒                                                         │
-│   └─ Real ⇒ ┬                                                          │
-│             ├─ Rational ⇒                                              │
-│             ├─ AbstractIrrational ⇒                                    │
-│             ├─ Integer ⇒ ┬                                             │
-│             │                                        ├─ Signed ⇒       │
-│             │                                        ├─ Unsigned ⇒     │
-│             │                                        └─ Bool ⇒         │
-│             └─ AbstractFloat ⇒                                         │
-│                                                                        │
-│                                                                        │
-╰────────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────────────── Types hierarchy ───╮
+│  ┬                                                        │
+│  ├─ Base.MultiplicativeInverses.MultiplicativeInverse ⇒   │
+│  ├─ Complex ⇒                                             │
+│  └─ Real ⇒ ┬                                              │
+│            ├─ Rational ⇒                                  │
+│            ├─ AbstractIrrational ⇒                        │
+│            ├─ Integer ⇒ ┬                                 │
+│            │            ├─ Signed ⇒                       │
+│            │            ├─ Unsigned ⇒                     │
+│            │            └─ Bool ⇒                         │
+│            └─ AbstractFloat ⇒                             │
+│                                                           │
+╰───────────────────────────────────────────────────────────╯
 ```
 """
-function typestree(io::IO, T::DataType; kwargs...)
+function typestree(io::IO, T::DataType; tree_kwargs = (;), kwargs...)
     return print(
         io,
         Panel(
-            Tree(T; kwargs...);
+            Tree(T; tree_kwargs...);
             title = "Types hierarchy",
             style = "$(TERM_THEME[].emphasis) dim",
             title_style = orange * " default",
             title_justify = :right,
             fit = true,
-            padding = (1, 4, 1, 1),
+            kwargs...
         ),
     )
 end
 
 typestree(T::DataType; kwargs...) = typestree(stdout, T; kwargs...)
 
-function expressiontree(io::IO, e::Expr; kwargs...)
+function expressiontree(io::IO, e::Expr; tree_kwargs = (;), kwargs...)
     _expr = expr2string(e)
-    tree = Tree(e; kwargs...)
+    tree = Tree(e; tree_kwargs...)
 
     return print(
         io,
@@ -111,7 +109,7 @@ function expressiontree(io::IO, e::Expr; kwargs...)
             subtitle = "inspect",
             subtitle_justify = :right,
             justify = :center,
-            padding = (1, 1, 1, 1),
+            kwargs...
         ),
     )
 end
@@ -121,7 +119,7 @@ expressiontree(e::Expr) = expressiontree(stdout, e)
 #                                EXPR. DENDOGRAM                               #
 # ---------------------------------------------------------------------------- #
 
-function inspect(io::IO, expr::Expr)
+function inspect(io::IO, expr::Expr; kwargs...)
     _expr = expr2string(expr)
     dendo = Dendogram(expr)
 
@@ -137,7 +135,7 @@ function inspect(io::IO, expr::Expr)
             subtitle = "inspect",
             subtitle_justify = :right,
             justify = :center,
-            padding = (1, 1, 1, 1),
+            kwargs...
         ),
     )
 end

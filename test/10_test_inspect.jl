@@ -47,6 +47,11 @@ end
             typestree(Float64)
             expressiontree(:(1 + 2.0))
         end
+
+        typestree(Float64)
+
+        IS_WIN || @compare_to_string typestree(Integer, prefix = "xxxx") "typestree_integer"
+        IS_WIN || @compare_to_string typestree(Integer, prefix = "xxxx") "typestree_integer_prefix"
     end
 end
 

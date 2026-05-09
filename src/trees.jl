@@ -1,9 +1,9 @@
 module Trees
 
-import AbstractTrees: print_tree, TreeCharSet, children
+import AbstractTrees: repr_tree, TreeCharSet, children
 using InteractiveUtils
 
-import Term: replace_multi, highlight, reshape_text, TERM_THEME, Theme
+import Term: replace_multi, highlight, reshape_text, cleantext, TERM_THEME, Theme
 
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Style: apply_style
@@ -12,6 +12,103 @@ import ..Measures: Measure
 import ..Panels: Panel
 
 export Tree
+
+# ---------------------------------------------------------------------------- #
+# copied from AbstractTrees.jl
+
+function print_tree(
+        printnode::Function, print_child_key::Function, io::IO, node;
+        maxdepth::Integer = 5,
+        indicate_truncation::Bool = true,
+        charset::TreeCharSet = TreeCharSet(),
+        printkeys::Union{Bool, Nothing} = nothing,
+        depth::Integer = 0,
+        prefix::AbstractString = "",
+        printnode_kw = (;)
+    )
+    # Get node representation as string
+    buf = IOBuffer()
+    printnode(IOContext(buf, io), node; printnode_kw...)
+    str = String(take!(buf))
+
+    depth == 0 && print(io, prefix)  # [Term.jl change] added prefix
+
+    # Copy buffer to output, prepending prefix to each line
+    for (i, line) in enumerate(split(str, '\n'))
+        i ≠ 1 && print(io, prefix)
+        println(io, line)
+    end
+
+    # Node children
+    c = children(node)
+
+    # No children?
+    isempty(c) && return
+
+    # Reached max depth?
+    if depth ≥ maxdepth
+        # Print truncation char(s)
+        if indicate_truncation
+            println(io, prefix, charset.trunc)
+            println(io, prefix)
+        end
+        return
+    end
+
+    # Print keys?
+    this_printkeys = applicable(keys, c) && (isnothing(printkeys) ? shouldprintkeys(c) : printkeys)
+
+    # Print children
+    s = Iterators.Stateful(this_printkeys ? pairs(c) : c)
+
+    while !isempty(s)
+        child_prefix = prefix
+
+        if this_printkeys
+            child_key, child = popfirst!(s)
+        else
+            child = popfirst!(s)
+            child_key = nothing
+        end
+
+        print(io, prefix)
+
+        # Last child?
+        if isempty(s)
+            print(io, charset.terminator)
+            child_prefix *= " "^(textwidth(charset.skip) + textwidth(charset.dash) + 1)
+        else
+            print(io, charset.mid)
+            child_prefix *= charset.skip * " "^(textwidth(charset.dash) + 1)
+        end
+
+        print(io, charset.dash, ' ')
+
+        # Print key
+        if this_printkeys
+            print_child_key(IOContext(buf, io), child_key)
+            key_str = String(take!(buf))
+
+            print(io, key_str, charset.pair)
+
+            # [Term.jl change] added `cleantext`
+            child_prefix *= " "^(textwidth(cleantext(key_str)) + textwidth(charset.pair))
+        end
+
+        print_tree(
+            printnode, print_child_key, io, child;
+            maxdepth, indicate_truncation, charset = charset,
+            printkeys, depth = depth + 1, prefix = child_prefix,
+            printnode_kw
+        )
+    end
+    return
+end
+
+print_tree(printnode::Function, io::IO, node; kw...) = print_tree(printnode, print_child_key, io, node; kw...)
+print_tree(io::IO, node; kw...) = print_tree(printnode, print_child_key, io, node; kw...)
+print_tree(node; kw...) = print_tree(stdout, node; kw...)
+# ---------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------- #
 #                                    GUIDES                                    #
@@ -31,22 +128,20 @@ treeguides = Dict(
 const _TREE_PRINTING_TITLE = Ref{Union{Nothing, String}}(nothing)
 
 """
-    print_node(io, node)
+    print_node(io, node; kw...)
 
 Core function to enable fancy tree printing. Styles the leaf/key of each node.
 """
 function print_node(io, node; kw...)
     theme::Theme = TERM_THEME[]
-
-    if isnothing(_TREE_PRINTING_TITLE[]) # print node
+    if isnothing(_TREE_PRINTING_TITLE[])  # print node
         styled = if node isa AbstractString
-            highlight(node, :string; theme = theme)
+            highlight(node, :string; theme)
         else
-            styled = highlight(string(node); theme = theme)
+            highlight(string(node); theme)
         end
-        reshaped = reshape_text(styled, theme.tree_max_leaf_width)
-        print(io, reshaped)
-    else # print title
+        print(io, reshape_text(styled, theme.tree_max_leaf_width))
+    else  # print title
         title = _TREE_PRINTING_TITLE[]
         print(io, apply_style(title, theme.tree_title))
     end
@@ -79,7 +174,7 @@ function style_guides(tree::String, guides::TreeCharSet, theme::Theme)
         guides.skip => apply_style(guides.skip, theme.tree_skip),
         guides.dash => apply_style(guides.dash, theme.tree_dash),
         guides.trunc => apply_style(guides.trunc, theme.tree_trunc),
-        strip(guides.pair) => apply_style(string(strip(guides.pair)), theme.tree_pair),
+        strip(guides.pair) => apply_style(string(strip(guides.pair)), theme.tree_pair)
     )
 end
 
@@ -108,7 +203,7 @@ end
 
 Constructor for `Tree`
 
-It uses `AbstractTrees.print_tree` to get a string representation of `tree` (any object
+It uses `AbstractTrees.repr_tree` to get a string representation of `tree` (any object
 compatible with the `AbstractTrees` packge). Applies style to the string and creates a
 renderable `Tree`.
 
@@ -121,10 +216,10 @@ Arguments:
 - `print_node_function`: Function used to print nodes.
 - `print_key_function`: Function used to print keys.
 - `title`: Title of the tree.
-- `prefix`: Prefix to be used in `AbstractTrees.print_tree`
+- `prefix`: Prefix to be used in `AbstractTrees.repr_tree`
 
 
-For other kwargs look at `AbstractTrees.print_tree`
+For other kwargs look at `AbstractTrees.repr_tree`
 """
 function Tree(
         tree;
@@ -135,6 +230,7 @@ function Tree(
         print_key_function::Function = print_key,
         title::Union{String, Nothing} = nothing,
         prefix::String = "  ",
+        context = nothing,
         kwargs...,
     )
     _TREE_PRINTING_TITLE[] = title
@@ -143,17 +239,15 @@ function Tree(
 
     # print tree
     guides = guides isa Symbol ? treeguides[guides] : guides
-    tree = sprint(
-        io -> print_tree(
-            print_node_function,
-            print_key_function,
-            io,
-            tree;
-            charset = guides,
-            printkeys,
-            prefix,
-            kwargs...,
-        ),
+    tree = repr_tree(
+        print_node_function,
+        print_key_function,
+        tree;
+        charset = guides,
+        printkeys,
+        prefix,
+        context,
+        kwargs...,
     )
 
     # style keys
@@ -164,6 +258,7 @@ function Tree(
             "{$(theme.tree_keys)}" * s"\g<0>" * "{/$(theme.tree_keys)}",
         ),
     )
+
     # style guides
     tree = style_guides(tree, guides, theme)
 
@@ -220,31 +315,40 @@ function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::AbstractDict)::Abstr
 end
 
 """
-    Tree(T::DataType)::Tree
+    Tree(T::DataType; prefix = "", kwargs...)::Tree
 
 Construct a `Tree` visualization of `T`'s types hierarchy
 The key is in costructing the actual hierarchy tree recursively.
 """
-function Tree(T::DataType; kwargs...)::Tree
+function Tree(T::DataType; prefix = "", kwargs...)::Tree
     # create a dictionary of types hierarchy
     subs = Dict(string(s) => nothing for s in subtypes(T))
     data = make_hierarchy_dict(supertypes(T), T, subs)
 
     # define a fn to avoid printing nodes
     s = TERM_THEME[].tree_mid
-    fn(io::IO, x) = if length(children(x)) > 0
-        print(io, apply_style("{$s}┬{/$s}"))
-    else
-        print(io, "")
+    print_node_datatype(io::IO, x) = begin
+        if length(children(x)) > 0
+            print(io, apply_style("{$s}┬{/$s}"))
+        else
+            print(io, "")
+        end
     end
 
     # change style of pair
-    _style = TERM_THEME[].tree_pair
+    _old_style = TERM_THEME[].tree_pair
     TERM_THEME[].tree_pair = "hidden"
 
     # print tree
-    _tree = Tree(data; printkeys = true, print_node_function = fn, kwargs...)
-    TERM_THEME[].tree_pair = _style
+    _tree = Tree(
+        data;
+        printkeys = true,
+        print_node_function = print_node_datatype,
+        print_key_function = print_key,
+        prefix,
+        kwargs...
+    )
+    TERM_THEME[].tree_pair = _old_style
 
     return _tree
 end
