@@ -38,7 +38,7 @@ end
             @test fromfile("./txtfiles/tree_expr_$i.txt") == cleanstring(tree)
 
             @test fromfile("./txtfiles/exptree_expr_$i.txt") ==
-                  cleansprint(expressiontree, e)
+                cleansprint(expressiontree, e)
 
             inspect(devnull, e)
         end
@@ -47,6 +47,11 @@ end
             typestree(Float64)
             expressiontree(:(1 + 2.0))
         end
+
+        typestree(Float64)
+
+        IS_WIN || @compare_to_string typestree(Integer, prefix = "xxxx") "typestree_integer"
+        IS_WIN || @compare_to_string typestree(Integer, prefix = "xxxx") "typestree_integer_prefix"
     end
 end
 

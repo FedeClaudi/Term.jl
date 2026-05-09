@@ -106,6 +106,9 @@ end
     IS_WIN || @compare_to_string as_frame "widget_placeholder"
 end
 
+@testset "Button" begin
+    @test Button("Click me please!") |> frame isa Panel
+end
 # ---------------------------------------------------------------------------- #
 #                                     MENU                                     #
 # ---------------------------------------------------------------------------- #
@@ -166,7 +169,7 @@ end
                     # end
 
                     IS_WIN ||
-                        @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_($l)"
+                        @compare_to_string frame(mn) "widget_buttonsmenu_$(i)_$(j)_$(k)_$(l)"
 
                     menu_activate_next(mn, 1)
                     IS_WIN ||
@@ -359,7 +362,7 @@ end
 
     button = Button("random"; color = "light_slate_grey", text_color = "white")
 
-    widgets = OrderedDict{Symbol,AbstractWidget}(
+    widgets = OrderedDict{Symbol, AbstractWidget}(
         :A => rgb_visualizer,
         :R => R,
         :G => G,

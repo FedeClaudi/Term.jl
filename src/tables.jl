@@ -74,24 +74,24 @@ Generic constructor for a Table renderable.
     a vector of values, which will be applied to each column.
 """
 function Table(
-    tb::TablesPkg.AbstractColumns;
-    box::Symbol = TERM_THEME[].tb_box,
-    style::String = TERM_THEME[].tb_style,
-    hpad::Union{Vector,Int} = 2,
-    vpad::Union{Vector,Int} = 0,
-    vertical_justify::Symbol = :center,
-    show_header::Bool = true,
-    header::Union{Nothing,Vector,Tuple} = nothing,
-    header_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_header,
-    header_justify::Union{Nothing,Symbol,Vector,Tuple} = nothing,
-    columns_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_columns,
-    columns_justify::Union{Symbol,Vector,Tuple} = :center,
-    columns_widths::Union{Nothing,Int,Vector} = nothing,
-    footer::Union{Function,Nothing,Vector,Tuple} = nothing,
-    footer_style::Union{String,Vector,Tuple} = TERM_THEME[].tb_footer,
-    footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
-    compact::Bool = false,
-)
+        tb::TablesPkg.AbstractColumns;
+        box::Symbol = TERM_THEME[].tb_box,
+        style::String = TERM_THEME[].tb_style,
+        hpad::Union{Vector, Int} = 2,
+        vpad::Union{Vector, Int} = 0,
+        vertical_justify::Symbol = :center,
+        show_header::Bool = true,
+        header::Union{Nothing, Vector, Tuple} = nothing,
+        header_style::Union{String, Vector, Tuple} = TERM_THEME[].tb_header,
+        header_justify::Union{Nothing, Symbol, Vector, Tuple} = nothing,
+        columns_style::Union{String, Vector, Tuple} = TERM_THEME[].tb_columns,
+        columns_justify::Union{Symbol, Vector, Tuple} = :center,
+        columns_widths::Union{Nothing, Int, Vector} = nothing,
+        footer::Union{Function, Nothing, Vector, Tuple} = nothing,
+        footer_style::Union{String, Vector, Tuple} = TERM_THEME[].tb_footer,
+        footer_justify::Union{Nothing, Symbol, Vector, Tuple} = :center,
+        compact::Bool = false,
+    )
 
     # prepare some variables
     header_justify = something(header_justify, columns_justify)
@@ -194,7 +194,7 @@ function Table(
             :head,
             :head_row,
             style,
-            heights[1];
+            heights[1]
             # compact = true
         ),
     )
@@ -291,7 +291,7 @@ end
 
 Construct `Table` from `Vector` and `Matrix`
 """
-Table(data::Union{AbstractVector,AbstractMatrix}; kwargs...) =
+Table(data::Union{AbstractVector, AbstractMatrix}; kwargs...) =
     Table(TablesPkg.table(data); kwargs...)
 
 """ 
@@ -335,16 +335,16 @@ The mid section is made up of the row's cells and dividing lines.
 - compact: if true avoids adding a top layer to the row
 """
 function table_row(
-    cells::Vector,
-    widths::Vector,
-    box,
-    top_level::Union{Nothing,Symbol},
-    mid_level::Symbol,
-    bottom_level::Symbol,
-    box_style,
-    row_height::Int;
-    compact::Bool = false,
-)
+        cells::Vector,
+        widths::Vector,
+        box,
+        top_level::Union{Nothing, Symbol},
+        mid_level::Symbol,
+        bottom_level::Symbol,
+        box_style,
+        row_height::Int;
+        compact::Bool = false,
+    )
     # get box characters
     mid_level = getfield(box, mid_level)
 
@@ -378,14 +378,14 @@ end
 Create a Table's row's cell from a string - apply styling and vertical/horizontal justification.
 """
 function cell(
-    x::AbstractString,
-    hor_pad::Int,
-    h::Int,
-    w::Int,
-    justify::Symbol,
-    style::String,
-    vertical_justify::Symbol,
-)
+        x::AbstractString,
+        hor_pad::Int,
+        h::Int,
+        w::Int,
+        justify::Symbol,
+        style::String,
+        vertical_justify::Symbol,
+    )
     content = do_by_line(
         y -> apply_style(" " * pad(y, w - 2, justify) * " ", style),
         str_trunc(x, w - hor_pad),
@@ -421,7 +421,7 @@ cell(
 Create a row's cell from a vector of 'entries' (renderables or strings).
 """
 make_row_cells(
-    entries::Union{Tuple,Vector},
+    entries::Union{Tuple, Vector},
     style::Vector{String},
     justify::Vector{Symbol},
     widths::Vector{Int},

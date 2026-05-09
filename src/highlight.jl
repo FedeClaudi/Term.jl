@@ -26,13 +26,13 @@ Highlighs a text introducing markup to style semantically
 relevant segments, colors specified by a theme object.
 """
 function highlight(
-    text::AbstractString;
-    theme::Theme = TERM_THEME[],
-    ignore_ansi::Bool = false,
-)
+        text::AbstractString;
+        theme::Theme = TERM_THEME[],
+        ignore_ansi::Bool = false,
+    )
     (has_ansi(text) && !ignore_ansi) && return text
 
-    # highlight with regexes 
+    # highlight with regexes
     for (symb, rxs) in pairs(highlight_regexes)
         markup = getfield(theme, symb)
         open, close = "{$markup}", "{/$markup}"
@@ -79,6 +79,7 @@ function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
             print(io, str)
         end
     end
+    return
 end
 
 """

@@ -9,7 +9,7 @@ will print `my text` as bold, green and underlined
 """
 macro style(text, styles...)
     markup = join(styles, " ")
-    quote
+    return quote
         local txt = $(esc(text))
         with_markup = "{$($markup)}$txt{/$($markup)}"
         apply_style(with_markup)
@@ -21,10 +21,10 @@ end
 Macro to create macros such as `@green` which colors text accordingly
 """
 macro make_color_macro(color)
-    quote
+    return quote
         macro $(esc(color))(text)
             color_str = $(string(color))
-            quote
+            return quote
                 local txt = $(esc(text))
                 code = ANSICode(get_color($color_str); bg = false)
                 styled = apply_style(txt)
@@ -38,10 +38,10 @@ end
 Macro to create macros such as `@underline` which styles text accordingly.
 """
 macro make_mode_macro(mode)
-    quote
+    return quote
         macro $(esc(mode))(text)
             mode_str = $(string(mode))
-            quote
+            return quote
                 local txt = $(esc(text))
                 code = CODES[Symbol($mode_str)]
                 styled = apply_style(txt)

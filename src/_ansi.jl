@@ -1,5 +1,4 @@
-
-struct ANSICode{T<:AbstractString}
+struct ANSICode{T <: AbstractString}
     open::T
     close::T
 end

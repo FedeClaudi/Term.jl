@@ -1,4 +1,3 @@
-
 """
     keyboard_input(widget::AbstractWidget)
 

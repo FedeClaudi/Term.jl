@@ -46,55 +46,55 @@ export inspect, typestree, expressiontree
     typestree(T)
     typestree(io::IO, T)
 
-Print the type hierarchy for `T` in a pretty format. This is 
+Print the type hierarchy for `T` in a pretty format. This is
 done using colors, indentation and unicode for maximal readability.
 The output included all supertypes, and one level of subtypes.
 
-This function is not exported, so to use it you need to 
+This function is not exported, so to use it you need to
 use the `Term.typestree` syntax, or import it manually by
 `import Term: typestree`
 
 # Example
-Below is an example showing the type tree for `Integer`. Note 
+Below is an example showing the type tree for `Integer`. Note
 that the colors of the output are not included in this docstring.
-```jldoctest
+```
 julia> Term.typestree(Integer)
-╭────────────── Types hierarchy ───╮
-│                                  │
-│  Number                          │
-│ ━━━━━━━━                         │
-│    │                             │
-│    ├── Complex                   │
-│    └── Real                      │
-│        ├── Rational              │
-│        ├── AbstractIrrational    │
-│        ├── Integer               │
-│        │   ├── Signed            │
-│        │   ├── Unsigned          │
-│        │   └── Bool              │
-│        └── AbstractFloat         │
-│                                  │
-╰──────────────────────────────────╯
+╭─────────────────────────────────────── Types hierarchy ───╮
+│  ┬                                                        │
+│  ├─ Base.MultiplicativeInverses.MultiplicativeInverse ⇒   │
+│  ├─ Complex ⇒                                             │
+│  └─ Real ⇒ ┬                                              │
+│            ├─ Rational ⇒                                  │
+│            ├─ AbstractIrrational ⇒                        │
+│            ├─ Integer ⇒ ┬                                 │
+│            │            ├─ Signed ⇒                       │
+│            │            ├─ Unsigned ⇒                     │
+│            │            └─ Bool ⇒                         │
+│            └─ AbstractFloat ⇒                             │
+│                                                           │
+╰───────────────────────────────────────────────────────────╯
 ```
 """
-typestree(io::IO, T::DataType) = print(
-    io,
-    Panel(
-        Tree(T);
-        title = "Types hierarchy",
-        style = "$(TERM_THEME[].emphasis) dim",
-        title_style = orange * " default",
-        title_justify = :right,
-        fit = true,
-        padding = (1, 4, 1, 1),
-    ),
-)
+function typestree(io::IO, T::DataType; tree_kwargs = (;), kwargs...)
+    return print(
+        io,
+        Panel(
+            Tree(T; tree_kwargs...);
+            title = "Types hierarchy",
+            style = "$(TERM_THEME[].emphasis) dim",
+            title_style = orange * " default",
+            title_justify = :right,
+            fit = true,
+            kwargs...
+        ),
+    )
+end
 
-typestree(T::DataType) = typestree(stdout, T)
+typestree(T::DataType; kwargs...) = typestree(stdout, T; kwargs...)
 
-function expressiontree(io::IO, e::Expr)
+function expressiontree(io::IO, e::Expr; tree_kwargs = (;), kwargs...)
     _expr = expr2string(e)
-    tree = Tree(e)
+    tree = Tree(e; tree_kwargs...)
 
     return print(
         io,
@@ -109,7 +109,7 @@ function expressiontree(io::IO, e::Expr)
             subtitle = "inspect",
             subtitle_justify = :right,
             justify = :center,
-            padding = (1, 1, 1, 1),
+            kwargs...
         ),
     )
 end
@@ -119,7 +119,7 @@ expressiontree(e::Expr) = expressiontree(stdout, e)
 #                                EXPR. DENDOGRAM                               #
 # ---------------------------------------------------------------------------- #
 
-function inspect(io::IO, expr::Expr)
+function inspect(io::IO, expr::Expr; kwargs...)
     _expr = expr2string(expr)
     dendo = Dendogram(expr)
 
@@ -135,7 +135,7 @@ function inspect(io::IO, expr::Expr)
             subtitle = "inspect",
             subtitle_justify = :right,
             justify = :center,
-            padding = (1, 1, 1, 1),
+            kwargs...
         ),
     )
 end
@@ -145,10 +145,10 @@ end
 # ---------------------------------------------------------------------------- #
 
 function style_methods(
-    methods::Union{Vector{Base.Method},Base.MethodList},
-    docstrings::Vector,
-    width::Int,
-)
+        methods::Union{Vector{Base.Method}, Base.MethodList},
+        docstrings::Vector,
+        width::Int,
+    )
     mets = []
     fn_col = TERM_THEME[].func
     panel_col = TERM_THEME[].text_accent
@@ -187,7 +187,7 @@ Flags can be used to choose the level of detail in the information presented:
  - methods: show methods using `T` in their signature
  - supertypes: show methods using `T`'s supertypes in their signature
 """
-function inspect(T::Union{Union,DataType};)
+function inspect(T::Union{Union, DataType})
     # get app size
     layout = :(A(4, 1.0) / B(30, 1.0))
     comp = Compositor(layout)
@@ -207,14 +207,14 @@ function inspect(T::Union{Union,DataType};)
     type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width - 12)
     methods_pagers =
         map(
-            m -> Pager(
-                string(m[2]);
-                title = "Method $(m[1]) of $(length(type_methods))",
-                width = widget_width,
-                page_lines = comp.elements[:B].h - 8,
-            ),
-            enumerate(type_methods),
-        ) |> collect
+        m -> Pager(
+            string(m[2]);
+            title = "Method $(m[1]) of $(length(type_methods))",
+            width = widget_width,
+            page_lines = comp.elements[:B].h - 8,
+        ),
+        enumerate(type_methods),
+    ) |> collect
 
     # create app
     menu = ButtonsMenu(
@@ -264,7 +264,7 @@ function inspect(T::Union{Union,DataType};)
     transition_rules = Dict(ArrowDown() => Dict(:A => :B), ArrowUp() => Dict(:B => :A))
 
     function cb(app)
-        app.widgets[:B].active = app.widgets[:A].active
+        return app.widgets[:B].active = app.widgets[:A].active
     end
 
     app = App(layout, widgets, transition_rules; on_draw = cb)
@@ -279,7 +279,7 @@ function inspect(F::Function; documentation::Bool = true)
         termshow(F)
         print("\n"^3)
     end
-    nothing
+    return nothing
 end
 
 end

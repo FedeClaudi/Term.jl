@@ -44,7 +44,7 @@ function tprint(io::IO, x::AbstractString; highlight = true)
     x =
         Measure(x).w <= console_width(io) ? x :
         string(RenderableText(string(x), width = console_width(io)))
-    print(io, sprint_no_color(x))
+    return print(io, sprint_no_color(x))
 end
 
 """
@@ -58,7 +58,7 @@ Equivalent to `print(x)`
 function tprint(io::IO, x::AbstractRenderable; highlight = true)
     w = console_width()
     x = x.measure.w > console_width() ? trim_renderable(x, w) : x
-    print(io, sprint_no_color(x))
+    return print(io, sprint_no_color(x))
 end
 
 function tprint(io::IO, args...; highlight = true)

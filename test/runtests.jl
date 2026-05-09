@@ -23,7 +23,7 @@ con = Console(TEST_CONSOLE_WIDTH)
 enable(con)
 
 macro runner(fn)
-    quote
+    return quote
         tprintln(
             $(
                 "\n{bold green}Running:{/bold green} {underline bold white}'$fn'{/underline bold white}"

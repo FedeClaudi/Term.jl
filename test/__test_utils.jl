@@ -10,15 +10,15 @@ later be used for testing.
 """
 tofile(content::Vector, filepath) =
     open(filepath, "w") do io
-        map(ln -> println(io, ln), content)
-        close(io)
-    end
+    map(ln -> println(io, ln), content)
+    close(io)
+end
 
 tofile(content::String, filepath) =
     open(filepath, "w") do io
-        print(io, content)
-        close(io)
-    end
+    print(io, content)
+    close(io)
+end
 
 """
 Load a string representation of a renderable from file
@@ -55,7 +55,7 @@ function highlight_diff(s1::String, s2::String; stop = 500)
 
     i = 1
     while i < (min(length(c1), length(c2)) - 50)
-        "{dim}Characters $i-$(i+50){/dim}" |> tprintln
+        "{dim}Characters $i-$(i + 50){/dim}" |> tprintln
         tprintln(
             "{bold blue}(current){/bold blue}  - " * join(c1[i:(i + 50)]),
             highlight = false,
@@ -69,7 +69,7 @@ function highlight_diff(s1::String, s2::String; stop = 500)
         i += 50
         i > stop && break
     end
-    hLine(style = "red") |> tprint
+    return hLine(style = "red") |> tprint
 end
 
 """
@@ -79,7 +79,7 @@ for windows.
 function load_from_txt(filepath)
     correct = fromfile(filepath)
     IS_WIN && (correct = replace(correct, "\n" => "\r\n"))
-    correct
+    return correct
 end
 
 """
@@ -97,9 +97,9 @@ macro compare_to_string(obj, filename, func = identity, skip = nothing)
     __f = string(__source__.file)
     __l = string(__source__.line)
     _expr = obj isa Expr
-    quote
+    return quote
         let _txt = string($_expr ? eval($obj) : $obj) |> $func,
-            _fn = "./txtfiles/" * $filename * ".txt"
+                _fn = "./txtfiles/" * $filename * ".txt"
 
             if !isnothing($skip)
                 _txt = join(split(_txt, '\n')[1:(end - $skip)], '\n')
@@ -112,7 +112,7 @@ macro compare_to_string(obj, filename, func = identity, skip = nothing)
             else
                 correct = load_from_txt(_fn)
                 _txt == correct ||
-                    @warn "Failed to match to text" fn=_fn file=$__f line=$__l
+                    @warn "Failed to match to text" fn = _fn file = $__f line = $__l
                 highlight_diff(_txt, correct)
                 @test _txt == correct # <-- TEST
             end
@@ -128,6 +128,7 @@ function check_widths(text, width)
     for line in split_lines(text)
         @test textlen(line) <= width
     end
+    return
 end
 
 """
@@ -135,7 +136,7 @@ Extensively test a panel making sure it has
 the right size and Measure
 """
 macro testpanel(p, h, w)
-    quote
+    return quote
         # isnothing($h) || println(vLine(h) * $p)
         # check all lines have the same length
         _p = string($p)
@@ -166,7 +167,7 @@ macro testpanel(p, h, w)
 end
 
 macro testtree(p, h, w)
-    quote
+    return quote
         # check all lines have the same length
         _p = string($p)
 

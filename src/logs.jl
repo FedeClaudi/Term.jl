@@ -94,8 +94,8 @@ function print_closing_line(io::IO, color::String, width::Int = 48)
     tprintln(
         io,
         "  {$color bold dim}$(BOXES[:ROUNDED].bottom.left)" *
-        "$(BOXES[:ROUNDED].row.mid)"^(width) *
-        "{/$color bold dim}",
+            "$(BOXES[:ROUNDED].row.mid)"^(width) *
+            "{/$color bold dim}",
     )
     _date = Dates.format(Dates.now(), "e, dd u yyyy")
     _time = Dates.format(Dates.now(), "HH:MM:SS")
@@ -145,7 +145,7 @@ function handle_progress(logger::TermLogger, prog)
     end
 
     # render
-    if all(map(j -> j.finished, pbar.jobs))
+    return if all(map(j -> j.finished, pbar.jobs))
         while length(pbar.jobs) > 0
             removejob!(pbar, first(pbar.jobs))
         end
@@ -171,10 +171,10 @@ function style_log_msg_kw_value(logger, v::AbstractVector)
     v *= "\n {$(logger.theme.text)}$(_size) {/$(logger.theme.text)}{dim}items{/dim}"
     return (v, _style)
 end
-function style_log_msg_kw_value(logger, v::Union{AbstractArray,AbstractMatrix})
+function style_log_msg_kw_value(logger, v::Union{AbstractArray, AbstractMatrix})
     _style = logger.theme.number
     _size = size(v)
-    v = str_trunc("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end-1]){/dim}", 60)
+    v = str_trunc("$(typeof(v)) {dim}<: $(supertypes(typeof(v))[end - 1]){/dim}", 60)
     v *=
         "\n {dim}shape: {default $(logger.theme.text)}" *
         join(string.(_size), " × ") *
@@ -197,7 +197,7 @@ end
 
 log_value_display(x::AbstractDict) =
     highlight(str_trunc(string(x), 1000); ignore_ansi = true)
-log_value_display(x) = highlight(str_trunc(string(x), 1000);)
+log_value_display(x) = highlight(str_trunc(string(x), 1000))
 
 function print_log_message(io, logger, lvl, msg, _mod, file, line, kwargs)
 
@@ -298,7 +298,7 @@ function print_log_message(io, logger, lvl, msg, _mod, file, line, kwargs)
         ll = hstack(line, t, k, equal, v; pad = 1)
         tprint(io, ll)
     end
-    print_closing_line(io, color)
+    return print_closing_line(io, color)
 end
 
 """
@@ -310,16 +310,16 @@ In addition to the log message and info such as file/line and time of log,
 it prints kwargs styled by their type.
 """
 function Logging.handle_message(
-    logger::TermLogger,
-    lvl,
-    msg,
-    _mod,
-    group,
-    id,
-    file,
-    line;
-    kwargs...,
-)
+        logger::TermLogger,
+        lvl,
+        msg,
+        _mod,
+        group,
+        id,
+        file,
+        line;
+        kwargs...,
+    )
     # handle log progress
     _progress = asprogress(lvl, msg, _mod, group, id, file, line; kwargs...)
     isnothing(_progress) || return handle_progress(logger, _progress)
@@ -331,7 +331,7 @@ function Logging.handle_message(
 
     # restore stdout
     NOCOLOR[] && (logged = cleantext(logged))
-    print(logged)
+    return print(logged)
 end
 
 # ---------------------------- install term logger --------------------------- #

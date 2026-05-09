@@ -112,7 +112,7 @@ Pad a string by a fixed ammount to the left and to the right.
 """
 function pad(text::AbstractString, left::Int = 0, right::Int = 0; bg = nothing)
     stype = string_type(text)
-    if isnothing(bg)
+    return if isnothing(bg)
         (' '^max(0, left) * text * ' '^max(0, right)) |> stype
     else
         l = "{$bg}" * ' '^max(0, left) * "{/$bg}"
@@ -200,7 +200,7 @@ In place version for padding a renderable.
 function pad!(ren::AbstractRenderable, left::Int, right::Int)
     ren.segments = pad(ren.segments, left, right)
     ren.measure = Measure(ren.segments)
-    nothing
+    return nothing
 end
 
 """
@@ -368,6 +368,7 @@ function leftalign!(renderables::RenderablesUnion...)
     for ren in renderables
         pad!(ren, 0, width - ren.measure.w)
     end
+    return
 end
 
 """
@@ -426,6 +427,7 @@ function center!(renderables::RenderablesUnion...)
     for ren in renderables
         pad!(ren; width = width)
     end
+    return
 end
 
 """
@@ -483,6 +485,7 @@ function rightalign!(renderables::RenderablesUnion...)
     for ren in renderables
         pad!(ren, width - ren.measure.w, 0)
     end
+    return
 end
 
 # ---------------------------------------------------------------------------- #
@@ -511,7 +514,7 @@ function vstack(renderables::RenderablesUnion...; pad::Int = 0)
     return Renderable(segments, Measure(segments))
 end
 
-vstack(renderables::Union{AbstractVector,Tuple}; kwargs...) =
+vstack(renderables::Union{AbstractVector, Tuple}; kwargs...) =
     vstack(renderables...; kwargs...)
 
 """
@@ -543,9 +546,9 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     stype = get_string_types(s1, s2)
     segments = [
         Segment(
-            stype(ss1.text * ' '^pad * ss2.text),
-            Measure(1, ss1.measure.w + pad + ss2.measure.w),
-        ) for (ss1, ss2) in zip(s1, s2)
+                stype(ss1.text * ' '^pad * ss2.text),
+                Measure(1, ss1.measure.w + pad + ss2.measure.w),
+            ) for (ss1, ss2) in zip(s1, s2)
     ]
     return Renderable(segments, Measure(segments))
 end
@@ -601,11 +604,11 @@ Right align renderables and then vertically stack.
 rvstack(renderables::RenderablesUnion...; kwargs...)::Renderable =
     vstack(rightalign(renderables...)...; kwargs...)
 
-rvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) =
+rvstack(renderables::Union{Tuple, AbstractVector}; kwargs...) =
     rvstack(renderables...; kwargs...)
-cvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) =
+cvstack(renderables::Union{Tuple, AbstractVector}; kwargs...) =
     cvstack(renderables...; kwargs...)
-lvstack(renderables::Union{Tuple,AbstractVector}; kwargs...) =
+lvstack(renderables::Union{Tuple, AbstractVector}; kwargs...) =
     lvstack(renderables...; kwargs...)
 
 # ---------------------------------------------------------------------------- #
@@ -654,11 +657,11 @@ end
 Create a `vLine` given a height and, optionally, style information.
 """
 function vLine(
-    height::Int;
-    style::String = TERM_THEME[].line,
-    box::Symbol = TERM_THEME[].box,
-    char::Union{Char,Nothing} = nothing,
-)
+        height::Int;
+        style::String = TERM_THEME[].line,
+        box::Symbol = TERM_THEME[].box,
+        char::Union{Char, Nothing} = nothing,
+    )
     char = isnothing(char) ? BOXES[box].head.left : char
     line = apply_style("{" * style * "}" * char * "{/" * style * "}\e[0m")
     return vLine(fill(Segment(line), height), Measure(height, 1))
@@ -705,12 +708,12 @@ hLine(width::Int; style::String = TERM_THEME[].line, box::Symbol = TERM_THEME[].
 Creates an hLine object with texte centered horizontally.
 """
 function hLine(
-    width::Number,
-    text::String;
-    style::String = TERM_THEME[].line,
-    box::Symbol = TERM_THEME[].box,
-    pad_txt::Bool = true,
-)
+        width::Number,
+        text::String;
+        style::String = TERM_THEME[].line,
+        box::Symbol = TERM_THEME[].box,
+        pad_txt::Bool = true,
+    )
     box = BOXES[box]
     text = apply_style(text) * "{$style}"
     tl, tr = get_lr_widths(textlen(text))
@@ -816,11 +819,11 @@ end
 Create a `PlaceHolder` with additional style information.
 """
 function PlaceHolder(
-    h::Int,
-    w::Int;
-    style::String = "dim",
-    text::Union{Nothing,String} = nothing,
-)
+        h::Int,
+        w::Int;
+        style::String = "dim",
+        text::Union{Nothing, String} = nothing,
+    )
     # create lines of renderable
     b1 = place_holder_line(w, 0)
     b2 = place_holder_line(w, 1)
@@ -840,10 +843,10 @@ function PlaceHolder(
         original = lines[cint(h / 2)].text
         lines[cint(h / 2)] = Segment(
             ltrim_str(original, _w - _l) *
-            "{default bold white}" *
-            text *
-            "{/default bold white}{$style}" *
-            rtrim_str(original, _w + _l),
+                "{default bold white}" *
+                text *
+                "{/default bold white}{$style}" *
+                rtrim_str(original, _w + _l),
         )
     end
 

@@ -38,12 +38,12 @@ end
 
 function make_julia_circles()
     circle = """
-    oooo    
- oooooooooo 
-oooooooooooo
-oooooooooooo
- oooooooooo 
-    oooo    """
+        oooo    
+     oooooooooo 
+    oooooooooooo
+    oooooooooooo
+     oooooooooo 
+        oooo    """
 
     # create circles
     green = Panel(
@@ -120,19 +120,19 @@ _code_style = "yellow italic bold"
 bfc = rainbow_maker(10)
 basic_features = Panel(
     """
-    {bright_red bold underline}Features{/bright_red bold underline}
+        {bright_red bold underline}Features{/bright_red bold underline}
 
-{bold $(bfc[1])}✔{/bold $(bfc[1])}{white} {blue}Colored text{/blue}{/white}
-{bold $(bfc[2])}✔{/bold $(bfc[2])}{white} {italic}italic{/italic}, {bold}bold{/bold}, {underline}underline{/underline}, {striked}striked{/striked}, {inverse}inverse{/inverse}{/white}
-{bold $(bfc[3])}✔{/bold $(bfc[3])}{white} styling {$_code_style}@macros{/$_code_style}{/white}
-{bold $(bfc[4])}✔{/bold $(bfc[4])}{white} {italic white}markup{/italic white} style syntax{/white}
-{bold $(bfc[5])}✔{/bold $(bfc[5])}{white} progress bars{/white}
-{bold $(bfc[6])}✔{/bold $(bfc[6])}{white} Code introspection and REPR
-{bold $(bfc[7])}✔{/bold $(bfc[7])}{white} logging{/white}
-{bold $(bfc[8])}✔{/bold $(bfc[8])}{white} stacktraces{/white}
-{bold $(bfc[9])}✔{/bold $(bfc[9])}{white} syntax highlighting{/white}
-{bold $(bfc[10])}✔{/bold $(bfc[10])}{white} Markdown parsing{/white}
-""";
+    {bold $(bfc[1])}✔{/bold $(bfc[1])}{white} {blue}Colored text{/blue}{/white}
+    {bold $(bfc[2])}✔{/bold $(bfc[2])}{white} {italic}italic{/italic}, {bold}bold{/bold}, {underline}underline{/underline}, {striked}striked{/striked}, {inverse}inverse{/inverse}{/white}
+    {bold $(bfc[3])}✔{/bold $(bfc[3])}{white} styling {$_code_style}@macros{/$_code_style}{/white}
+    {bold $(bfc[4])}✔{/bold $(bfc[4])}{white} {italic white}markup{/italic white} style syntax{/white}
+    {bold $(bfc[5])}✔{/bold $(bfc[5])}{white} progress bars{/white}
+    {bold $(bfc[6])}✔{/bold $(bfc[6])}{white} Code introspection and REPR
+    {bold $(bfc[7])}✔{/bold $(bfc[7])}{white} logging{/white}
+    {bold $(bfc[8])}✔{/bold $(bfc[8])}{white} stacktraces{/white}
+    {bold $(bfc[9])}✔{/bold $(bfc[9])}{white} syntax highlighting{/white}
+    {bold $(bfc[10])}✔{/bold $(bfc[10])}{white} Markdown parsing{/white}
+    """;
     width = 70,
     padding = (2, 2, 1, 2),
     justify = :center,
@@ -229,43 +229,43 @@ styles =
     (pink_light, teal_light, indigo_light, amber_light, deep_purple_light, salmon_light)
 rens =
     map(
-        s -> Panel(; width = 20, height = 8, box = :SQUARE, background = "on_$s"),
-        styles,
-    ) |> collect
+    s -> Panel(; width = 20, height = 8, box = :SQUARE, background = "on_$s"),
+    styles,
+) |> collect
 g = grid(rens)
 
 t = parse_md(
     md"""
-# Markdown parsing
+    # Markdown parsing
 
-Term parses `MD` types - markdown content - with style!
+    Term parses `MD` types - markdown content - with style!
 
-!!! tip "Docs"
-    Have a look at the docs for more info!
-    [docs](https://fedeclaudi.github.io/Term.jl/stable/)
+    !!! tip "Docs"
+        Have a look at the docs for more info!
+        [docs](https://fedeclaudi.github.io/Term.jl/stable/)
 
-Julia's docstring are parsed as Markdown, and Term turns markdown into styled terminal output. 
-So you can use term to print styled docstrings and other info to the REPL. 
+    Julia's docstring are parsed as Markdown, and Term turns markdown into styled terminal output. 
+    So you can use term to print styled docstrings and other info to the REPL. 
 
-```julia
-import Term: termshow
+    ```julia
+    import Term: termshow
 
-termshow(print)  # prints styled docstring to console
-```
+    termshow(print)  # prints styled docstring to console
+    ```
 
----
-| Col1 | Col2 | Col3 | Col4 |
-|:---------- | :----------: |:------------:|:------------:|
-| ONE    | TWO |   THREE           |      FOUR        |
-| ONE    | TWO  | THREE | FOUR|
-
-
-!!! tip "Tables"
-        The table above was parsed from a markdown to a `Table` renderable
-        Term has a really awesome `Table` renderable, you should check it out!
+    ---
+    | Col1 | Col2 | Col3 | Col4 |
+    |:---------- | :----------: |:------------:|:------------:|
+    | ONE    | TWO |   THREE           |      FOUR        |
+    | ONE    | TWO  | THREE | FOUR|
 
 
-""";
+    !!! tip "Tables"
+            The table above was parsed from a markdown to a `Table` renderable
+            Term has a really awesome `Table` renderable, you should check it out!
+
+
+    """;
     width = 100,
 )
 
@@ -275,30 +275,30 @@ print("\n"^10)
 
 readme =
     (
-        Spacer(circles.measure.h, 10) *
+    Spacer(circles.measure.h, 10) *
         circles *
         Spacer(circles.measure.h, 8) *
         basic_features
-    ) / (Spacer(2, 140) / line) / (
-        Spacer(colors_info.measure.h, 3) *
+) / (Spacer(2, 140) / line) / (
+    Spacer(colors_info.measure.h, 3) *
         colors_info *
         Spacer(colors_info.measure.h, 3) *
         (Spacer(1, 100) / colors)
-    ) / line /
+) / line /
     (Spacer(lorem_description.measure.h, 3) * lorem_description * lorem1 * lorem2) / line /
     (
-        Spacer(tree.measure.h, 3) *
+    Spacer(tree.measure.h, 3) *
         renderables_info *
         tree *
         Spacer(tree.measure.h, 5) *
         dendo
-    ) / line / (Spacer(layout_text.measure.h, 3) * layout_text * layout_example) / line / (
-        Spacer(height(t), 20) *
+) / line / (Spacer(layout_text.measure.h, 3) * layout_text * layout_example) / line / (
+    Spacer(height(t), 20) *
         vLine(height(t); style = "dim") *
         "  " *
         t *
         "  " *
         vLine(height(t); style = "dim")
-    )
+)
 
 print(Spacer(readme.measure.h, 10) * readme)

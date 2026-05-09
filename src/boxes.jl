@@ -74,7 +74,7 @@ function Box(box_name::String, box::String)
 end
 
 function Base.show(io::IO, box::Box)
-    if io ≡ stdout
+    return if io ≡ stdout
         print(io, "Box ($(box.name))\n$(fit(box, [1, 3, 1]))")
     else
         print(io, "Box\e[2m($(box.name))\e[0m")
@@ -159,14 +159,14 @@ Can create both titles in the top and bottom row to produce subtitles.
 See also [`get_row`](@ref).
 """
 function get_title_row(
-    row::Symbol,
-    box,  # ::Box,
-    title::Union{Nothing,String};
-    width::Int = default_width(),
-    style::String = "default",
-    title_style::Union{Nothing,String} = nothing,
-    justify::Symbol = :left,
-)::Segment
+        row::Symbol,
+        box,  # ::Box,
+        title::Union{Nothing, String};
+        width::Int = default_width(),
+        style::String = "default",
+        title_style::Union{Nothing, String} = nothing,
+        justify::Symbol = :left,
+    )::Segment
 
     # if no title or no space, just return a row
     if isnothing(title) || width < 12
@@ -178,7 +178,7 @@ function get_title_row(
             str_trunc(title, max(1, width - 15))
     end
 
-    # compose title line 
+    # compose title line
     boxline = getfield(box, row)
 
     open, close, space = "{" * style * "}", "{/" * style * "}\e[0m", " "
@@ -236,16 +236,18 @@ Creates a box.
 The box has one of each level type with columns
 widths specified by a vector of widhts.
 """
-fit(box::Box, widths::Vector{Int}) = join_lines([
-    get_row(box, widths, :top),
-    get_row(box, widths, :head),
-    get_row(box, widths, :head_row),
-    get_row(box, widths, :mid),
-    get_row(box, widths, :row),
-    get_row(box, widths, :foot_row),
-    get_row(box, widths, :foot),
-    get_row(box, widths, :bottom),
-])
+fit(box::Box, widths::Vector{Int}) = join_lines(
+    [
+        get_row(box, widths, :top),
+        get_row(box, widths, :head),
+        get_row(box, widths, :head_row),
+        get_row(box, widths, :mid),
+        get_row(box, widths, :row),
+        get_row(box, widths, :foot_row),
+        get_row(box, widths, :foot),
+        get_row(box, widths, :bottom),
+    ]
+)
 
 # ---------------------------------------------------------------------------- #
 #                                   Box types                                  #

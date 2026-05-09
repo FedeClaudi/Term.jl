@@ -78,11 +78,11 @@ Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
     println(io, string(renderable))
-    DEBUG_ON[] && println(io, info(renderable))
+    return DEBUG_ON[] && println(io, info(renderable))
 end
 
 # -------------------------------- union type -------------------------------- #
-RenderablesUnion = Union{AbstractString,AbstractRenderable}
+RenderablesUnion = Union{AbstractString, AbstractRenderable}
 
 # ------------------------- generic renderable object ------------------------ #
 
@@ -124,7 +124,7 @@ See also [`Renderable`](@ref), [`TextBox`](@ref)
 mutable struct RenderableText <: AbstractRenderable
     segments::Vector{Segment}
     measure::Measure
-    style::Union{Nothing,String}
+    style::Union{Nothing, String}
 end
 
 """
@@ -136,12 +136,12 @@ The text is resized to fit the given width.
 Optionally `justify`  can be used to set the text justification style ∈ (:left, :center, :right, :justify).
 """
 function RenderableText(
-    text::AbstractString;
-    style::Union{Nothing,String} = nothing,
-    width::Int = min(Measure(text).w, console_width(stdout)),
-    background::Union{Nothing,String} = nothing,
-    justify::Symbol = :left,
-)
+        text::AbstractString;
+        style::Union{Nothing, String} = nothing,
+        width::Int = min(Measure(text).w, console_width(stdout)),
+        background::Union{Nothing, String} = nothing,
+        justify::Symbol = :left,
+    )
     stype::DataType = typeof(text)
     text = text_to_width(text, width, justify; background = background) |> chomp
     text = apply_style(text)
@@ -163,11 +163,11 @@ end
 Construct a RenderableText by possibly re-shaping a RenderableText
 """
 function RenderableText(
-    rt::RenderableText;
-    style::Union{Nothing,String} = nothing,
-    width::Int = console_width(),
-    kwargs...,
-)
+        rt::RenderableText;
+        style::Union{Nothing, String} = nothing,
+        width::Int = console_width(),
+        kwargs...,
+    )
     return if rt.style == style && rt.measure.w == width
         rt
     else
@@ -177,11 +177,11 @@ function RenderableText(
 end
 
 function RenderableText(
-    ren::AbstractRenderable,
-    args...;
-    width = console_width(),
-    kwargs...,
-)
+        ren::AbstractRenderable,
+        args...;
+        width = console_width(),
+        kwargs...,
+    )
     if ren.measure.w <= width
         return RenderableText(ren.segments, ren.measure, nothing)
     else

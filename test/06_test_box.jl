@@ -24,7 +24,7 @@ import Term: Segment
 
     _bstring = Term.Boxes.fit(Term.Boxes.BOXES[:ASCII], [1, 1, 1, 1, 1, 1, 1, 1])
     @test _bstring ==
-          "+---------------+\n| | | | | | | | |\n|-+-+-+-+-+-+-+-|\n| | | | | | | | |\n|-+-+-+-+-+-+-+-|\n|-+-+-+-+-+-+-+-|\n| | | | | | | | |\n+---------------+"
+        "+---------------+\n| | | | | | | | |\n|-+-+-+-+-+-+-+-|\n| | | | | | | | |\n|-+-+-+-+-+-+-+-|\n|-+-+-+-+-+-+-+-|\n| | | | | | | | |\n+---------------+"
 
     # test get row
     @test get_row(Term.Boxes.BOXES[:ROUNDED], [3], :top) == "╭───╮"
@@ -48,7 +48,7 @@ import Term: Segment
     )
     @test left.measure.w == 22
     @test left.text ==
-          "\e[31m╭──── \e[34mtest\e[39m\e[31m\e[31m ──────────╮\e[39m\e[0m\e[39m"
+        "\e[31m╭──── \e[34mtest\e[39m\e[31m\e[31m ──────────╮\e[39m\e[0m\e[39m"
 
     right = get_title_row(
         :top,
@@ -61,7 +61,7 @@ import Term: Segment
     )
     @test right.measure.w == 22
     @test right.text ==
-          "\e[31m╭─────────── \e[34mtest\e[39m\e[31m\e[31m ───╮\e[39m\e[0m\e[39m"
+        "\e[31m╭─────────── \e[34mtest\e[39m\e[31m\e[31m ───╮\e[39m\e[0m\e[39m"
 
     center = get_title_row(
         :top,
@@ -74,7 +74,7 @@ import Term: Segment
     )
     @test center.measure.w == 22
     @test center.text ==
-          "\e[31m╭─────── \e[34mtest\e[39m\e[31m\e[31m ───────╮\e[39m\e[0m\e[39m"
+        "\e[31m╭─────── \e[34mtest\e[39m\e[31m\e[31m ───────╮\e[39m\e[0m\e[39m"
 
     for width in (15, 21, 33, 58), justify in (:left, :center, :right)
         line = get_title_row(

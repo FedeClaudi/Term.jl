@@ -1,23 +1,23 @@
 """
 display/hide help tooltip
 """
-function toggle_help(app, args...;)
+function toggle_help(app, args...)
     internals = app.internals
     width = app.measure.w
     msg =
         if !isnothing(internals.help_message) == true
-            parse_md(Markdown.parse(app.internals.help_message); width = width - 6)
-        else
-            "{dim} no help message shown{/dim}"
-        end |> RenderableText
+        parse_md(Markdown.parse(app.internals.help_message); width = width - 6)
+    else
+        "{dim} no help message shown{/dim}"
+    end |> RenderableText
 
     # get the docstring of the currently active widget
     active_widget = app.widgets[app.active]
     widget_msg =
         something(
-            parse_md(getdocs(active_widget); width = max(20, width - 6)),
-            "{dim} no help message shown{/dim}",
-        ) |> RenderableText
+        parse_md(getdocs(active_widget); width = max(20, width - 6)),
+        "{dim} no help message shown{/dim}",
+    ) |> RenderableText
 
     # get the docstring of each control method
     col = TERM_THEME[].text_accent
@@ -32,7 +32,7 @@ function toggle_help(app, args...;)
             controls,
             RenderableText(
                 "{bold $col} - $(k){/bold $col}: " *
-                parse_md(getdocs(c); width = max(20, width - 20)),
+                    parse_md(getdocs(c); width = max(20, width - 20)),
             ),
         )
         push!(already_added, k)
@@ -68,9 +68,12 @@ function toggle_help(app, args...;)
         internals.help_shown = false
 
         # go to the top of the error message and delete everything
-        h =
-            console_height() - length(internals.prevcontentlines) - help_message.measure.h -
-            1
+        h = (
+            console_height() -
+                length(internals.prevcontentlines) -
+                help_message.measure.h -
+                1
+        )
         move_to_line(stdout, h)
         cleartoend(stdout)
 
@@ -84,5 +87,5 @@ function toggle_help(app, args...;)
     end
 
     internals.prevcontent = nothing
-    internals.prevcontentlines = String[]
+    return internals.prevcontentlines = String[]
 end

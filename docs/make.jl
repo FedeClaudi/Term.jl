@@ -9,6 +9,7 @@ DocMeta.setdocmeta!(Term, :DocTestSetup, :(using Term); recursive = true)
 format = Documenter.HTML(;
     prettyurls = Base.get_bool_env("CI", false),
     canonical = "https://FedeClaudi.github.io/Term.jl",
+    size_threshold = nothing,
     assets = String[],
     collapselevel = 1,
 )

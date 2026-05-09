@@ -137,11 +137,11 @@ Base.displaysize(c::Console) = (c.height, c.width)
 
 function enable(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = console.width
-    console
+    return console
 end
 
 function disable(console::Console)
     ACTIVE_CONSOLE_WIDTH[] = nothing
-    console
+    return console
 end
 end

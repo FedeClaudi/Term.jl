@@ -70,10 +70,10 @@ Arguments:
 - `transient`: if truee the job's visual display disappears when `stopped=true`
 """
 mutable struct ProgressJob
-    id::Union{Int,UUID}
+    id::Union{Int, UUID}
 
     i::Int   # keep track of progress
-    N::Union{Nothing,Int}
+    N::Union{Nothing, Int}
 
     description::String
     columns::Any
@@ -82,8 +82,8 @@ mutable struct ProgressJob
 
     started::Bool
     finished::Bool
-    startime::Union{Nothing,DateTime}
-    stoptime::Union{Nothing,DateTime}
+    startime::Union{Nothing, DateTime}
+    stoptime::Union{Nothing, DateTime}
     transient::Bool
 
     """
@@ -102,14 +102,14 @@ mutable struct ProgressJob
     See also [`addjob!`](@ref), [`start!`](@ref), [`stop!`](@ref), [`update!`](@ref), [`redender`](@ref)
     """
     function ProgressJob(
-        id::Union{Int,UUID},
-        N::Union{Int,Nothing},
-        description::String,
-        columns::Vector{DataType},
-        width::Int,
-        columns_kwargs::Dict,
-        transient::Bool,
-    )
+            id::Union{Int, UUID},
+            N::Union{Int, Nothing},
+            description::String,
+            columns::Vector{DataType},
+            width::Int,
+            columns_kwargs::Dict,
+            transient::Bool,
+        )
         return new(
             id,
             0,
@@ -263,15 +263,15 @@ mutable struct ProgressBar
     columns_kwargs::Dict
 
     transient::Bool
-    colors::Union{String,Vector{RGBColor}}
+    colors::Union{String, Vector{RGBColor}}
     Δt::Float64
 
     buff::IOBuffer  # will be used to store temporarily re-directed stdout
     running::Bool
     paused::Bool
-    task::Union{Task,Nothing}
+    task::Union{Task, Nothing}
     renderstatus::Any
-    extra_info::Dict{String,<:Any}
+    extra_info::Dict{String, <:Any}
     title::String
 end
 
@@ -294,16 +294,16 @@ end
 Create a ProgressBar instance.
 """
 function ProgressBar(;
-    width::Int                              = default_width(),
-    columns::Union{Vector{DataType},Symbol} = :default,
-    columns_kwargs::Dict                    = Dict(),
-    expand::Bool                            = false,
-    transient::Bool                         = false,
-    colors::Union{String,Vector{RGBColor}}  = [RGBColor("(1, .05, .05)"), RGBColor("(.05, .05, 1)"), RGBColor("(.05, 1, .05)")],
-    refresh_rate::Int                       = 60,  # FPS of rendering
-    extra_info::Dict{String,<:Any}          = Dict{String,Any}(),
-    title                                   = "progress",
-)
+        width::Int = default_width(),
+        columns::Union{Vector{DataType}, Symbol} = :default,
+        columns_kwargs::Dict = Dict(),
+        expand::Bool = false,
+        transient::Bool = false,
+        colors::Union{String, Vector{RGBColor}} = [RGBColor("(1, .05, .05)"), RGBColor("(.05, .05, 1)"), RGBColor("(.05, 1, .05)")],
+        refresh_rate::Int = 60,  # FPS of rendering
+        extra_info::Dict{String, <:Any} = Dict{String, Any}(),
+        title = "progress",
+    )
     columns = columns isa Symbol ? get_columns(columns) : columns
 
     # check that width is large enough
@@ -349,14 +349,14 @@ Add a new `ProgressJob` to a running `ProgressBar`
 See also: [`removejob!`](@ref), [`getjob`](@ref)
 """
 function addjob!(
-    pbar::ProgressBar;
-    description::String = "Running...",
-    N::Union{Int,Nothing} = nothing,
-    start::Bool = true,
-    transient::Bool = false,
-    id = nothing,
-    columns_kwargs::Dict = Dict(),
-)::ProgressJob
+        pbar::ProgressBar;
+        description::String = "Running...",
+        N::Union{Int, Nothing} = nothing,
+        start::Bool = true,
+        transient::Bool = false,
+        id = nothing,
+        columns_kwargs::Dict = Dict(),
+    )::ProgressJob
     pbar.running && print("\n")
 
     # create Job
@@ -619,7 +619,7 @@ macro track(ex)
     iter = esc(ex.args[1].args[2])
     i = esc(ex.args[1].args[1])
     body = esc(ex.args[2])
-    quote
+    return quote
         __pbar = ProgressBar()
         __pbarjob = addjob!(__pbar; N = length($iter))
         with(__pbar) do
@@ -689,17 +689,17 @@ end
 ```
 """
 function foreachprogress(
-    f,
-    iter,
-    pbar = FOREACH_PROGRESS;
-    n = _getn(iter),
-    transient = true,
-    parallel = false,
-    columns_kwargs = Dict(),
-    kwargs...,
-)
+        f,
+        iter,
+        pbar = FOREACH_PROGRESS;
+        n = _getn(iter),
+        transient = true,
+        parallel = false,
+        columns_kwargs = Dict(),
+        kwargs...,
+    )
     task = nothing
-    try
+    return try
         # Only handle rendering of progress bar if it is not already running.
         # This allows nesting of `foreachprogress`
         if !pbar.running
@@ -739,7 +739,7 @@ function foreachprogress(
 end
 
 _getn(iter) = _getn(iter, Base.IteratorSize(iter))
-_getn(iter, ::Union{Base.HasLength,<:Base.HasShape}) = length(iter)
+_getn(iter, ::Union{Base.HasLength, <:Base.HasShape}) = length(iter)
 _getn(_, _) = nothing
 
 function _startrenderloop(pbar)
@@ -747,6 +747,7 @@ function _startrenderloop(pbar)
         pbar.paused || render(pbar)
         sleep(pbar.Δt)
     end
+    return
 end
 
 # ------------------------------- general utils ------------------------------ #

@@ -11,7 +11,7 @@ data = Dict(
     "c" => (1, 2, 3),
 )
 
-print(Tree(data))
+Tree(data) |> print
 ```
 
 As you can see, the starting point is a `Dict` with `key -> value` entries which get rendered as leaves in the tree. Also, the `Type` of `value` is shown by colors in the tree.
@@ -28,7 +28,7 @@ data = Dict(
     ),
 )
 
-print(Tree(data))
+Tree(data) |> print
 ```
 
 Under the hood, `Tree` just leverages [AbstractTrees.jl](https://github.com/JuliaCollections/AbstractTrees.jl) to handle tree-like data structures, so anything that is compatible with that framework will printed as a `Tree`.
@@ -44,13 +44,13 @@ Tree([1, [1, 2, [:a, :b, :c]]]) |> print
 # and more!
 ```
 
-Essentially `Tree` work's with `AbstractTrees` to just produce stylized output. 
+Essentially `Tree` work's with `AbstractTrees` to just produce stylized output.
 
 !!! tip `Tree` is not a *tree*
     `Tree` is an `AbstractRenderable`, it is **not** a datastructure for handling tree-like data. It's only meant to be used to *display* trees in your terminal. As such you can't do operations like finding children of nodes or getting a subtree etc. All of that should be done with `AbstractTrees` and `Tree` is only there to display the output
 
 
-As per the note above, `Tree` is a `AbstractRenderable` type so it plays well with other renderables in term. 
+As per the note above, `Tree` is a `AbstractRenderable` type so it plays well with other renderables in term.
 
 ```@example tree
 import Term: Panel
@@ -62,7 +62,8 @@ data = Dict(
 )
 
 _tree = Tree(data)
-_info = Panel("This is a panel\nYou can use it to explain\nwhat the contents of the\ntree are!"; width=30, height=_tree.measure.h, subtitle="description")
+msg = "This is a panel\nYou can use it to explain\nwhat the contents of the\ntree are!"
+_info = Panel(msg; width=30, height=_tree.measure.h, subtitle="description")
 
 print(_tree * "  " *_info)
 
@@ -70,7 +71,7 @@ print(_tree * "  " *_info)
 
 ### Styling
 Easy! [`Tree`](@ref) has lots of options to allow you to style it as you like.
-The style is set by the [`Theme`](@ref ThemeDocs). 
+The style is set by the [`Theme`](@ref ThemeDocs).
 
 ```@example tree
 import Term: Theme
@@ -88,13 +89,9 @@ theme = Theme(
     tree_max_leaf_width = 22,
 )
 
-print(
-    Tree(data,
-        theme=theme
-    )
-)
+Tree(data; theme) |> print
 ```
-`tree_max_leaf_width` sets the max width of the display of each leaf while the other values set the color of different elements of the `Tree`. In particular `mid`, `terminator`, `dash` refer to the lines (or guides) of the tree. 
+`tree_max_leaf_width` sets the max width of the display of each leaf while the other values set the color of different elements of the `Tree`. In particular `mid`, `terminator`, `dash` refer to the lines (or guides) of the tree.
 
 And since we're talking about `guides` you can also use different ones
 ```@example tree

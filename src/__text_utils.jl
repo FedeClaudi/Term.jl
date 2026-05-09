@@ -142,17 +142,17 @@ end
 """ Check if an ANSI tag is a closer """
 is_closing_ansi_tag(tag::AbstractString) =
     tag ∈ (
-        "\e[0m",
-        "\e[39m",
-        "\e[49m",
-        "\e[22m",
-        "\e[23m",
-        "\e[24m",
-        "\e[25m",
-        "\e[27m",
-        "\e[28m",
-        "\e[29m",
-    )
+    "\e[0m",
+    "\e[39m",
+    "\e[49m",
+    "\e[22m",
+    "\e[23m",
+    "\e[24m",
+    "\e[25m",
+    "\e[27m",
+    "\e[28m",
+    "\e[29m",
+)
 
 const ansi_pairs = Dict(
     "\e[22m" => "\e[22m",
@@ -356,11 +356,11 @@ end
 Shorten a string of text to a target width
 """
 function str_trunc(
-    text::AbstractString,
-    width::Int;
-    trailing_dots = "...",
-    ignore_markup = false,
-)::String
+        text::AbstractString,
+        width::Int;
+        trailing_dots = "...",
+        ignore_markup = false,
+    )::String
     width < 0 && return text
     textlen(text) ≤ width && return text
     if contains(text, '\n')

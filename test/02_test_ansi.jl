@@ -75,12 +75,12 @@ end
     end
 
     for rgb in [
-        "on_(1, .8, .0)",
-        "on_(.2,.1,.33)",
-        "on_(.5,0.1, .99)",
-        "on_(255, 128,128)",
-        "on_(128,58,200)",
-    ]
+            "on_(1, .8, .0)",
+            "on_(.2,.1,.33)",
+            "on_(.5,0.1, .99)",
+            "on_(255, 128,128)",
+            "on_(128,58,200)",
+        ]
         @test is_background(rgb)
         @test !is_color(rgb)
         @test get_color(rgb; bg = true) isa RGBColor

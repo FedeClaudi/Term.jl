@@ -58,12 +58,12 @@ gets resized if its too large (based on `position` and `console_width`).
 - `style`: color/style information
 """
 function Decoration(
-    num::Int,
-    position::Int,
-    message::String,
-    underscore_width::Int,
-    style::String,
-)
+        num::Int,
+        position::Int,
+        message::String,
+        underscore_width::Int,
+        style::String,
+    )
     # create hLine underscore
     underscore = hLine(underscore_width, "┬"; pad_txt = false, style = "$style dim")
 
@@ -139,7 +139,7 @@ function overlay_decorations(decorations::Vector{Decoration})
     lines = []
     lpads = map(
         i ->
-            i == 1 ? positions[1] :
+        i == 1 ? positions[1] :
             positions[i] - positions[i - 1] - underscores_widths[i - 1] + 2,
         1:n,
     )
@@ -150,7 +150,7 @@ function overlay_decorations(decorations::Vector{Decoration})
     # make a second line with just verticals
     lpads = map(
         i ->
-            i == 1 ? positions[1] + underscores_centers[1] - 1 :
+        i == 1 ? positions[1] + underscores_centers[1] - 1 :
             positions[i] - positions[i - 1] - underscores_centers[i - 1] +
             underscores_centers[i] - 1,
         1:n,
@@ -195,7 +195,7 @@ function overlay_decorations(decorations::Vector{Decoration})
             push!(
                 lines,
                 line *
-                join_interleaved(spaces[(rendering + 1):end], verts[(rendering + 1):end]),
+                    join_interleaved(spaces[(rendering + 1):end], verts[(rendering + 1):end]),
             )
         end
 

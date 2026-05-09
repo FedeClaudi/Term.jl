@@ -14,7 +14,7 @@ function repr_get_obj_fields_display(obj)
     fields = map(
         ft -> RenderableText(
             apply_style(string(ft[1]), theme.repr_accent) *
-            apply_style(string(ft[2]), theme.repr_type),
+                apply_style(string(ft[2]), theme.repr_type),
         ),
         zip(field_names, field_types),
     )
@@ -40,15 +40,15 @@ end
 Get the name of a type as an expression
 """
 typename(typedef::Expr) =
-    if typedef.args[2] isa Symbol
-        typedef.args[2]
-    elseif typedef.args[2].args[1] isa Symbol
-        typedef.args[2].args[1]
-    elseif typedef.args[2].args[1].args[1] isa Symbol
-        typedef.args[2].args[1].args[1]
-    else
-        error("Could not parse type-head from: $typedef")
-    end
+if typedef.args[2] isa Symbol
+    typedef.args[2]
+elseif typedef.args[2].args[1] isa Symbol
+    typedef.args[2].args[1]
+elseif typedef.args[2].args[1].args[1] isa Symbol
+    typedef.args[2].args[1].args[1]
+else
+    error("Could not parse type-head from: $typedef")
+end
 
 """
 Create a Panel showing repr content using the current theme's style info.
@@ -75,13 +75,13 @@ repr_panel(
     kwargs...,
 )
 
-function vec_elems2renderables(v::Union{Tuple,AbstractVector}, N, max_w; ellipsis = false)
+function vec_elems2renderables(v::Union{Tuple, AbstractVector}, N, max_w; ellipsis = false)
     v = Vector(v)  # necessary to handle sparse vectors
     shortsting(x) =
         x isa AbstractRenderable ? info(x) : remove_markup(str_trunc(string(x), max_w))
     out = highlight.(shortsting.(v[1:N]))
 
-    ellipsis && length(v) > N && push!(out, " ⋮";)
+    ellipsis && length(v) > N && push!(out, " ⋮")
     return out
 end
 
@@ -135,7 +135,7 @@ function matrix2content(mtx::AbstractMatrix; max_w = 12, max_items = 50, max_D =
     return content
 end
 
-function vec2content(vec::Union{Tuple,AbstractVector})
+function vec2content(vec::Union{Tuple, AbstractVector})
     max_w = default_width()
     max_items = 50
     N = min(max_items, length(vec))
@@ -146,8 +146,8 @@ function vec2content(vec::Union{Tuple,AbstractVector})
     counts = "(" .* string.(1:length(vec_items)) .* ")"
 
     length(vec) > N && begin
-        push!(vec_items, " ⋮";)
-        push!(counts, "";)
+        push!(vec_items, " ⋮")
+        push!(counts, "")
     end
 
     content = Table(

@@ -67,11 +67,11 @@ end
 
 @time pprint(Panel(Panel("."^250); fit = true))
 
-@time pprint(Panel(Panel("test");))
+@time pprint(Panel(Panel("test")))
 
-@time pprint(Panel(Panel(Panel("."););))
+@time pprint(Panel(Panel(Panel("."))))
 
-@time pprint(Panel(Panel("."^250);))
+@time pprint(Panel(Panel("."^250)))
 
 @time pprint(Panel(Panel("t1"), Panel("t2")))
 

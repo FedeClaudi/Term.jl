@@ -41,7 +41,7 @@ hor_menu_controls = Dict(
 )
 
 function on_layout_change(mn::AbstractMenu, m::Measure)
-    mn.internals.measure = m
+    return mn.internals.measure = m
 end
 
 # ---------------------------------------------------------------------------- #
@@ -63,16 +63,16 @@ The currently selected option is highlighted with a different style.
     layout::Symbol
 
     function SimpleMenu(
-        titles::Vector;
-        controls::Union{Nothing,AbstractDict} = nothing,
-        width = default_width(),
-        active_style::String = "white bold",
-        inactive_style::String = "dim",
-        layout::Symbol = :vertical,
-        on_draw::Union{Nothing,Function} = nothing,
-        on_activated::Function = on_activated,
-        on_deactivated::Function = on_deactivated,
-    )
+            titles::Vector;
+            controls::Union{Nothing, AbstractDict} = nothing,
+            width = default_width(),
+            active_style::String = "white bold",
+            inactive_style::String = "dim",
+            layout::Symbol = :vertical,
+            on_draw::Union{Nothing, Function} = nothing,
+            on_activated::Function = on_activated,
+            on_deactivated::Function = on_deactivated,
+        )
         controls = something(
             controls,
             layout == :vertical ? vert_menu_controls : hor_menu_controls,
@@ -129,7 +129,7 @@ function frame(mn::SimpleMenu; kwargs...)
     # make and stack title
     titles = map(
         i ->
-            i == mn.active ? active_title(mn, i, max_titles_width) :
+        i == mn.active ? active_title(mn, i, max_titles_width) :
             inactive_title(mn, i, max_titles_width),
         1:length(titles),
     )
@@ -159,20 +159,20 @@ Styling reflects which option is currently selected
     panel_kwargs
 
     function ButtonsMenu(
-        titles::Vector;
-        controls::Union{Nothing,AbstractDict} = nothing,
-        width::Int = console_width(),
-        active_color::Union{Vector,String} = "black",
-        active_background::Union{Vector,String} = "white",
-        inactive_color::Union{Vector,String} = "dim",
-        inactive_background::Union{Vector,String} = "default",
-        layout::Symbol = :vertical,
-        height::Union{Nothing,Int} = length(titles),
-        on_draw::Union{Nothing,Function} = nothing,
-        on_activated::Function = on_activated,
-        on_deactivated::Function = on_deactivated,
-        panel_kwargs...,
-    )
+            titles::Vector;
+            controls::Union{Nothing, AbstractDict} = nothing,
+            width::Int = console_width(),
+            active_color::Union{Vector, String} = "black",
+            active_background::Union{Vector, String} = "white",
+            inactive_color::Union{Vector, String} = "dim",
+            inactive_background::Union{Vector, String} = "default",
+            layout::Symbol = :vertical,
+            height::Union{Nothing, Int} = length(titles),
+            on_draw::Union{Nothing, Function} = nothing,
+            on_activated::Function = on_activated,
+            on_deactivated::Function = on_deactivated,
+            panel_kwargs...,
+        )
         controls = something(
             controls,
             layout == :vertical ? vert_menu_controls : hor_menu_controls,
@@ -226,8 +226,8 @@ function active_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_kw
     active_color, active_background = mn.active_style[i], mn.active_background[i]
     return Panel(
         "{$(active_color) on_$(active_background)}" *
-        mn.titles[i] *
-        "{/$(active_color) on_$(active_background)}";
+            mn.titles[i] *
+            "{/$(active_color) on_$(active_background)}";
         background = active_background,
         style = "$(active_color) on_$(active_background)",
         width = width,
@@ -247,8 +247,8 @@ function inactive_title(mn::ButtonsMenu, i::Int, width::Int, height::Int; panel_
     inactive_color, inactive_background = mn.inactive_style[i], mn.inactive_background[i]
     return Panel(
         "{$(inactive_color) on_$(inactive_background)}" *
-        mn.titles[i] *
-        "{/$(inactive_color) on_$(inactive_background)}";
+            mn.titles[i] *
+            "{/$(inactive_color) on_$(inactive_background)}";
         background = inactive_background,
         style = inactive_color,
         width = width,
@@ -267,7 +267,7 @@ function frame(mn::ButtonsMenu; kwargs...)
     # make and stack title
     titles = map(
         i ->
-            i == mn.active ?
+        i == mn.active ?
             active_title(mn, i, button_width, button_height; mn.panel_kwargs...) :
             inactive_title(mn, i, button_width, button_height; mn.panel_kwargs...),
         1:(mn.n_titles),
@@ -314,7 +314,7 @@ Toggle selection status of current active option
 """
 function multi_select_toggle(mn::MultiSelectMenu, ::SpaceBar)
     active = mn.active
-    if active ∈ mn.selected
+    return if active ∈ mn.selected
         deleteat!(mn.selected, mn.selected .== active)
     else
         push!(mn.selected, active)
@@ -331,21 +331,21 @@ multi_select_controls = Dict(
 )
 
 function MultiSelectMenu(
-    options::Vector;
-    controls::AbstractDict = multi_select_controls,
-    active_style::String = "white bold",
-    inactive_style::String = "dim",
-    width::Int = console_width(),
-    on_draw::Union{Nothing,Function} = nothing,
-    on_activated::Function = on_activated,
-    on_deactivated::Function = on_deactivated,
-)
+        options::Vector;
+        controls::AbstractDict = multi_select_controls,
+        active_style::String = "white bold",
+        inactive_style::String = "dim",
+        width::Int = console_width(),
+        on_draw::Union{Nothing, Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
+    )
     selected_sym = apply_style("✔ ", active_style)
     notselected_sym = apply_style("□ ", inactive_style)
 
     max_titles_width = min(width, maximum(get_width.(options)) + 2)
 
-    MultiSelectMenu(
+    return MultiSelectMenu(
         WidgetInternals(
             Measure(length(options), width),
             nothing,

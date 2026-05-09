@@ -27,14 +27,14 @@ strings = [
     ".|||...."^10,
     replace(
         """
-Lorem ipsum {bold}dolor sit{/bold} amet, consectetur adipiscing elit,
-ed do e{red}iusmod tempor incididunt{/red} ut {bold}labore et {underline}dolore{/underline} magna aliqua.{/bold} Ut enim ad minim
-veniam, quis{green} nostrud exercitation {on_black}ullamco laboris nisi ut aliquip ex {/on_black}
-ea commodo consequat.{blue} Duis aute irure dolor in{/blue} reprehenderit 
-in voluptate velit{/green} esse {italic}cillum dolore{/italic}{red} eu{/red}{italic green} fugiat {/italic green}nulla 
-pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident, 
-sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
-id est laborum.""",
+        Lorem ipsum {bold}dolor sit{/bold} amet, consectetur adipiscing elit,
+        ed do e{red}iusmod tempor incididunt{/red} ut {bold}labore et {underline}dolore{/underline} magna aliqua.{/bold} Ut enim ad minim
+        veniam, quis{green} nostrud exercitation {on_black}ullamco laboris nisi ut aliquip ex {/on_black}
+        ea commodo consequat.{blue} Duis aute irure dolor in{/blue} reprehenderit 
+        in voluptate velit{/green} esse {italic}cillum dolore{/italic}{red} eu{/red}{italic green} fugiat {/italic green}nulla 
+        pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident, 
+        sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
+        id est laborum.""",
         "\n" => "",
     ),
 ]

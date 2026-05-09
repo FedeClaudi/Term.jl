@@ -1,10 +1,12 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+MyterialColors = "1c23619d-4212-4747-83aa-717207fae70f"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Term = "22787eb5-b846-44ae-b979-8e399b8463ab"
 
 [compat]
 Documenter = "1"
+MyterialColors = "0.3"
 Pkg = "1"
 
 [sources]

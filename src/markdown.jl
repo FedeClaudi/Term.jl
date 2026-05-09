@@ -126,11 +126,11 @@ Try to convert it to unicode characters when possible,
 otherwise output the latex string.
 """
 function parse_md(
-    ltx::Markdown.LaTeX;
-    inline = false,
-    width = console_width(),
-    kwargs...,
-)::String
+        ltx::Markdown.LaTeX;
+        inline = false,
+        width = console_width(),
+        kwargs...,
+    )::String
     formula = ""
     try
         formula = escape_brackets(to_latex(escape_string(string(ltx.formula))))
@@ -162,18 +162,18 @@ For non-inline code snippets the code is put in a panel
 with different background coloring to make it stand out.
 """
 function parse_md(
-    code::Markdown.Code;
-    width = console_width(),
-    inline = false,
-    lpad = true,
-    kwargs...,
-)::String
+        code::Markdown.Code;
+        width = console_width(),
+        inline = false,
+        lpad = true,
+        kwargs...,
+    )::String
     syntax = reshape_code_string(highlight_syntax(code.code), width - 20)
     theme = TERM_THEME[]
     if inline
         return "{$(theme.md_code)}`$(code.language){/$(theme.md_code)}" *
-               syntax *
-               "{$(theme.md_code)}`{/$(theme.md_code)}"
+            syntax *
+            "{$(theme.md_code)}`{/$(theme.md_code)}"
     else
         panel = Panel(
             RenderableText(syntax; style = "on_$(theme.md_codeblock_bg)");
@@ -220,7 +220,7 @@ function parse_md(qt::Markdown.BlockQuote; width = default_width() - 1, kwargs..
             "{$(theme.md_quote)}>{/$(theme.md_quote)}" /
             vLine(content.measure.h - 1; style = "$(theme.md_quote) dim", box = :HEAVY)
         ) : "{$(theme.md_quote)}>{/$(theme.md_quote)}"
-    string("  " * line * " " * content)
+    return string("  " * line * " " * content)
 end
 
 parse_md(hl::Markdown.HorizontalRule; width = default_width(), kwargs...)::String =
@@ -237,11 +237,11 @@ parse_md(hl::Markdown.HorizontalRule; width = default_width(), kwargs...)::Strin
 Parse a list and all its elements, for both numbered and unnumbered lists.
 """
 function parse_md(
-    list::Markdown.List;
-    width = console_width(),
-    inline = false,
-    space = "",
-)::String
+        list::Markdown.List;
+        width = console_width(),
+        inline = false,
+        space = "",
+    )::String
     theme = TERM_THEME[]
     list_elements = []
     for item in list.items
@@ -258,7 +258,7 @@ function parse_md(
 
         item_content = map(
             elem ->
-                elem isa Markdown.List ? "\n" * parse_md(elem; space = "   ") :
+            elem isa Markdown.List ? "\n" * parse_md(elem; space = "   ") :
                 parse_md(elem; inline = true),
             item,
         )
@@ -269,7 +269,7 @@ function parse_md(
 end
 
 function parse_md(img::Markdown.Image; kwargs...)::String
-    "{dim} 🌄 image: {/dim}" * img.alt * " {dim}| at: " * img.url * "{/dim}"
+    return "{dim} 🌄 image: {/dim}" * img.alt * " {dim}| at: " * img.url * "{/dim}"
 end
 
 """
@@ -313,7 +313,7 @@ function parse_md(tb::Markdown.Table; width = console_width())::String
     header = parse_md.(tb.rows[1])
     table_content = OrderedDict(
         header[i] => [parse_md(r[i]; inline = true) for r in tb.rows[2:end]] for
-        i in 1:length(header)
+            i in 1:length(header)
     )
 
     return string(
@@ -333,7 +333,7 @@ end
 parse_md(
     link::Markdown.Link;
     kwargs...,
-)::String = "{white bold}$(parse_md(link.text; inline=true)){/white bold} {dim}($(link.url)){/dim}"
+)::String = "{white bold}$(parse_md(link.text; inline = true)){/white bold} {dim}($(link.url)){/dim}"
 
 """
     function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::String

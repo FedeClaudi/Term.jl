@@ -1,4 +1,3 @@
-
 """
 Showing how to use Term.jl to create styled console representation for your types.
 """

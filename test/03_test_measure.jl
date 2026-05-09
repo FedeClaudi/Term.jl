@@ -5,22 +5,22 @@ import Term: remove_markup, Panel
     @test size(Measure("a"^10)) == (1, 10)
 
     for string in (
-        "asadasda"^2,
-        "~~±±||__ASdaSDvxcvxc\nasdfsiaudfhsdiufhndskjv",
-        "dasdadsa\nsdfsd"^7,
-        "asdasdsa|dfvcxvashfusdn\nfidsuhfsdf",
-    )
+            "asadasda"^2,
+            "~~±±||__ASdaSDvxcvxc\nasdfsiaudfhsdiufhndskjv",
+            "dasdadsa\nsdfsd"^7,
+            "asdasdsa|dfvcxvashfusdn\nfidsuhfsdf",
+        )
         m = Measure(string)
         @test m.h == nlines(string)
         @test m.w == lw(string)
     end
 
     for string in (
-        "[red]is my color"^2,
-        "~~±±||__{red on_green}aasdas{bold}asdsad{/bold}asdas{/red on_green}xc\nasdfsiaudfhsdiufhndskjv",
-        "dasda{#ffffff}dsa{#ffffff}\nsdfsd"^7,
-        "asdasdsa|dfvcxvashf{bold}usdn\nfid[/bold]suhfsdf",
-    )
+            "[red]is my color"^2,
+            "~~±±||__{red on_green}aasdas{bold}asdsad{/bold}asdas{/red on_green}xc\nasdfsiaudfhsdiufhndskjv",
+            "dasda{#ffffff}dsa{#ffffff}\nsdfsd"^7,
+            "asdasdsa|dfvcxvashf{bold}usdn\nfid[/bold]suhfsdf",
+        )
         m = Measure(string)
         @test m.h == nlines(remove_markup(string))
         @test m.w == lw(remove_markup(string))

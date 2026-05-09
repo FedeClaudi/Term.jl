@@ -73,7 +73,7 @@ other renderables.
 
 print(
     (Table(data; box = :ROUNDED, style = "red") * " " * Table(data; box = :HEAVY)) /
-    Table(data; box = :SIMPLE_HEAVY, style = "dim blue"),
+        Table(data; box = :SIMPLE_HEAVY, style = "dim blue"),
 )
 
 """

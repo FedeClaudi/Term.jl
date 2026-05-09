@@ -68,12 +68,12 @@ end
 Base.size(p::Panel) = size(p.measure)
 
 """
-    Panel(; 
+    Panel(;
         fit::Bool = false,
         height::Int = 2,
         width::Int = $(default_width()),
         padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
-        kwargs...,  
+        kwargs...,
     )
 
 Construct a `Panel` with no content.
@@ -94,12 +94,12 @@ julia> Panel(height=3, width=5)
 ```
 """
 function Panel(;
-    fit::Bool = false,
-    height::Int = 2,
-    width::Int = default_width(),
-    padding::Union{Vector,Padding,NTuple} = Padding(0, 0, 0, 0),
-    kwargs...,
-)
+        fit::Bool = false,
+        height::Int = 2,
+        width::Int = default_width(),
+        padding::Union{Vector, Padding, NTuple} = Padding(0, 0, 0, 0),
+        kwargs...,
+    )
     # get panel measure
     panel_measure = if fit
         # hardcoded size of empty 'fitted' panel
@@ -115,14 +115,14 @@ function Panel(;
     # make panel
     return Panel(
         content;
-        fit = fit,
-        panel_measure = panel_measure,
-        content_measure = content_measure,
+        fit,
+        panel_measure,
+        content_measure,
         Δw = padding.left + padding.right + 2,
         Δh = padding.top + padding.bottom,
-        height = height,
-        width = width,
         padding = Padding(padding),
+        height,
+        width,
         kwargs...,
     )
 end
@@ -144,12 +144,12 @@ on the value of `fit` to either fith the `Panel` to its content or vice versa.
 the presence and style of titles, box type etc... see [render](@ref) below.
 """
 function Panel(
-    content::Union{AbstractString,AbstractRenderable};
-    fit::Bool = false,
-    padding::Union{Nothing,Padding,NTuple} = nothing,
-    width::Int = default_width(),
-    kwargs...,
-)
+        content::Union{AbstractString, AbstractRenderable};
+        fit::Bool = false,
+        padding::Union{Nothing, Padding, NTuple} = nothing,
+        width::Int = default_width(),
+        kwargs...,
+    )
     padding = if isnothing(padding)
         if get(kwargs, :style, "default") == "hidden"
             Padding(0, 0, 0, 0)
@@ -160,7 +160,7 @@ function Panel(
         Padding(padding)
     end
 
-    # estimate content and panel size 
+    # estimate content and panel size
     content_width = content isa AbstractString ? Measure(content).w : content.measure.w
     panel_width = if fit
         content_width + padding.left + padding.right + 2
@@ -190,7 +190,7 @@ content_as_renderable(
     width::Int,
     Δw::Int,
     justify::Symbol,
-    background::Union{String,Nothing},
+    background::Union{String, Nothing},
 )::RenderableText =
     RenderableText(content; width = width - Δw, background = background, justify = justify)
 
@@ -212,15 +212,15 @@ Construct a `Panel` fitting the content's width.
     If the content is larger than the console terminal's width, it will get trimmed to avoid overflow, unless `trim=false` is given.
 """
 function Panel(
-    content::Union{AbstractString,AbstractRenderable},
-    ::Val{true},
-    padding::Padding;
-    height::Union{Nothing,Int} = nothing,
-    width::Int,
-    background::Union{Nothing,String} = nothing,
-    justify::Symbol = :left,
-    kwargs...,
-)
+        content::Union{AbstractString, AbstractRenderable},
+        ::Val{true},
+        padding::Padding;
+        height::Union{Nothing, Int} = nothing,
+        width::Int,
+        background::Union{Nothing, String} = nothing,
+        justify::Symbol = :left,
+        kwargs...,
+    )
     Δw = padding.left + padding.right + 2
     Δh = padding.top + padding.bottom
 
@@ -261,20 +261,20 @@ end
 Construct a `Panel` fitting content to it.
 
 !!! tip
-    Content that is **too large** to fit in the given width will be trimmed. 
-    To avoid trimming, set ```fit=true``` when calling panel. 
+    Content that is **too large** to fit in the given width will be trimmed.
+    To avoid trimming, set ```fit=true``` when calling panel.
 
 """
 function Panel(
-    content::Union{AbstractString,AbstractRenderable},
-    ::Val{false},
-    padding::Padding;
-    height::Union{Nothing,Int} = nothing,
-    width::Int = default_width(),
-    background::Union{Nothing,String} = nothing,
-    justify::Symbol = :left,
-    kwargs...,
-)
+        content::Union{AbstractString, AbstractRenderable},
+        ::Val{false},
+        padding::Padding;
+        height::Union{Nothing, Int} = nothing,
+        width::Int = default_width(),
+        background::Union{Nothing, String} = nothing,
+        justify::Symbol = :left,
+        kwargs...,
+    )
     Δw = padding.left + padding.right + 2
     Δh = padding.top + padding.bottom
 
@@ -307,7 +307,7 @@ function Panel(
         content = Renderable(segments, Measure(segments))
     end
 
-    # @debug "creating not fitted panel" content.measure panel_measure width Δw 
+    # @debug "creating not fitted panel" content.measure panel_measure width Δw
     return render(
         content;
         panel_measure = panel_measure,
@@ -341,15 +341,15 @@ Panel(ren, renderables...; kwargs...) = Panel(vstack(ren, renderables...); kwarg
 Create a Panel's content line.
 """
 function makecontent_line(
-    cline::Segment,
-    panel_measure::Measure,
-    justify::Symbol,
-    background::Union{Nothing,String},
-    padding::Padding,
-    left::String,
-    right::String,
-    Δw::Int,
-)::Segment
+        cline::Segment,
+        panel_measure::Measure,
+        justify::Symbol,
+        background::Union{Nothing, String},
+        padding::Padding,
+        left::String,
+        right::String,
+        Δw::Int,
+    )::Segment
     line = pad(cline, panel_measure.w - Δw, justify, ; bg = background).text
     line = pad(line, padding.left, padding.right; bg = background)
     return Segment(typeof(cline.text)(left * line * right))
@@ -378,24 +378,24 @@ end
 Construct a `Panel`'s content.
 """
 function render(
-    content::Union{Renderable,RenderableText};
-    box::Symbol = TERM_THEME[].box,
-    style::String = TERM_THEME[].line,
-    title::Union{String,Nothing} = nothing,
-    title_style::Union{Nothing,String} = nothing,
-    title_justify::Symbol = :left,
-    subtitle::Union{String,Nothing} = nothing,
-    subtitle_style::Union{Nothing,String} = nothing,
-    subtitle_justify::Symbol = :left,
-    justify::Symbol = :left,
-    panel_measure::Measure,
-    content_measure::Measure,
-    Δw::Int,
-    Δh::Int,
-    padding::Padding,
-    background::Union{Nothing,String} = nothing,
-    kwargs...,
-)::Panel
+        content::Union{Renderable, RenderableText};
+        box::Symbol = TERM_THEME[].box,
+        style::String = TERM_THEME[].line,
+        title::Union{String, Nothing} = nothing,
+        title_style::Union{Nothing, String} = nothing,
+        title_justify::Symbol = :left,
+        subtitle::Union{String, Nothing} = nothing,
+        subtitle_style::Union{Nothing, String} = nothing,
+        subtitle_justify::Symbol = :left,
+        justify::Symbol = :left,
+        panel_measure::Measure,
+        content_measure::Measure,
+        Δw::Int,
+        Δh::Int,
+        padding::Padding,
+        background::Union{Nothing, String} = nothing,
+        kwargs...,
+    )::Panel
     background = get_bg_color(background)
     # @info "calling render" content content_measure background
 
@@ -481,8 +481,8 @@ end
 """
     function parse_layout_args end
 
-Parse the arguments of a `Expr(:call, :Panel, ...)` to 
-add a keyword argument to fix the panel's width. 
+Parse the arguments of a `Expr(:call, :Panel, ...)` to
+add a keyword argument to fix the panel's width.
 A few diferent menthods are defined to handle different combinations
 of args/kwargs for the Panel call.
 """
@@ -561,7 +561,7 @@ macro nested_panels(layout_call)
     end
 
     layout_call = fix_layout_width(layout_call, 0)
-    quote
+    return quote
         $layout_call
     end |> esc
 end

@@ -24,8 +24,8 @@ end
 Get the docstring for each method for an object (function/datatype).
 """
 function get_methods_with_docstrings(
-    obj::Union{Union,DataType,Function},
-)::Tuple{Vector,Vector}
+        obj::Union{Union, DataType, Function},
+    )::Tuple{Vector, Vector}
     # get the parent module and the methods list for the object
     mod = parentmodule(obj)
     mm = methods(obj)

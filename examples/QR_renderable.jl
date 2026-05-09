@@ -44,7 +44,7 @@ function QR(qr::BitMatrix)
     end
 
     segments = Segment.(out)
-    QR(segments, Measure(segments))
+    return QR(segments, Measure(segments))
 end
 
 # hand made QR code bitmatrix :)
@@ -54,17 +54,19 @@ qr[16:20, 1:5] .= 1
 qr[1:5, 16:20] .= 1
 qr[16:20, 16:20] .= 1
 
-description = RenderableText("""
-    {bright_blue}Scan this QR to discover the secret behind beautiful {/bright_blue}
-    {bright_blue}terminal output in your REPL.{/bright_blue}
+description = RenderableText(
+    """
+        {bright_blue}Scan this QR to discover the secret behind beautiful {/bright_blue}
+        {bright_blue}terminal output in your REPL.{/bright_blue}
 
-    Just kidding, the QR code is fake, just use Term.jl
+        Just kidding, the QR code is fake, just use Term.jl
 
-    But seriously, this should work with proper QR codes
+        But seriously, this should work with proper QR codes
 
-    
-    {bold white}What will you use this for?{/bold white}
-""")
+        
+        {bold white}What will you use this for?{/bold white}
+    """
+)
 
 # embed the QR renderable in a panel
 Panel(

@@ -8,16 +8,16 @@ compute the width of each column based on the size of its contents
 including the header and footer.
 """
 function calc_columns_widths(
-    N_cols::Int,
-    N_rows::Int,
-    columns_widths::Union{Nothing,Vector,Int},
-    show_header::Bool,
-    header::Union{Tuple,AbstractVector,String,Nothing},
-    tb::TablesPkg.AbstractColumns,
-    sch,  # table schema
-    footer::Union{Tuple,AbstractVector,String,Nothing},
-    hpad::Union{Nothing,Int,AbstractVector},
-)
+        N_cols::Int,
+        N_rows::Int,
+        columns_widths::Union{Nothing, Vector, Int},
+        show_header::Bool,
+        header::Union{Tuple, AbstractVector, String, Nothing},
+        tb::TablesPkg.AbstractColumns,
+        sch,  # table schema
+        footer::Union{Tuple, AbstractVector, String, Nothing},
+        hpad::Union{Nothing, Int, AbstractVector},
+    )
     if !isnothing(columns_widths)
         columns_widths = expand(columns_widths, N_cols)
         return columns_widths
@@ -53,7 +53,7 @@ end
 Expand single `Table` arguments into a vector if necessary.
 """
 expand(v::Vector, N::Int) = v
-expand(v::Union{Symbol,String,Int}, N::Int) = fill(v, N)
+expand(v::Union{Symbol, String, Int}, N::Int) = fill(v, N)
 
 """
     assert_table_arguments
@@ -62,21 +62,21 @@ Check that arguments passed to `Table` match the Table's shape.
 Single arguments are fine, but when a vector is passed it should have the appropriate size.
 """
 function assert_table_arguments(
-    N_cols,
-    N_rows,
-    show_header,
-    header,
-    header_style,
-    header_justify,
-    columns_style,
-    columns_justify,
-    columns_widths,
-    footer,
-    footer_style,
-    footer_justify,
-    hpad,
-    vpad,
-)
+        N_cols,
+        N_rows,
+        show_header,
+        header,
+        header_style,
+        header_justify,
+        columns_style,
+        columns_justify,
+        columns_widths,
+        footer,
+        footer_style,
+        footer_justify,
+        hpad,
+        vpad,
+    )
     # check header
     problems = []
     if !isnothing(header) && show_header
@@ -104,9 +104,9 @@ function assert_table_arguments(
     columns_widths isa Vector &&
         length(columns_widths) != N_cols &&
         push!(
-            problems,
-            "Got columns_widths with length $(length(columns_widths)), expected $N_cols",
-        )
+        problems,
+        "Got columns_widths with length $(length(columns_widths)), expected $N_cols",
+    )
 
     # check footer
     if !isnothing(footer)

@@ -38,8 +38,8 @@ const STACKTRACE_HIDE_FRAMES = Ref(true)
 
 const DEBUG_ON = Ref(false)
 
-const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing,Int}}(nothing)
-const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing,Int}}(nothing)
+const ACTIVE_CONSOLE_WIDTH = Ref{Union{Nothing, Int}}(nothing)
+const ACTIVE_CONSOLE_HEIGHT = Ref{Union{Nothing, Int}}(nothing)
 const DEFAULT_CONSOLE_WIDTH = Ref{Int}(88)
 const DEFAULT_STACKTRACE_WIDTH = Ref{Int}(140)
 const NOCOLOR = Ref{Bool}(false)
@@ -160,11 +160,11 @@ Measures.Measure(seg::Segment) = seg.measure
 gives the measure of a vector of segments
 """
 Measures.Measure(segments::AbstractVector) =
-    if length(segments) == 0
-        Measure(0, 0)  # nothing we can do here
-    else
-        Measure(sum(Measures.height.(segments)), maximum(Measures.width.(segments)))
-    end
+if length(segments) == 0
+    Measure(0, 0)  # nothing we can do here
+else
+    Measure(sum(Measures.height.(segments)), maximum(Measures.width.(segments)))
+end
 
 # ---------------------------------- others ---------------------------------- #
 using .Errors: install_term_stacktrace, render_backtrace, StacktraceContext

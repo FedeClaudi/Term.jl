@@ -18,16 +18,16 @@ gallery_controls = Dict(
 )
 
 function Gallery(
-    widgets::Vector;
-    controls = gallery_controls,
-    height::Int = console_height() - 5,
-    width::Int = console_width(),
-    show_panel::Bool = true,
-    title::String = "Widget",
-    on_draw::Union{Nothing,Function} = nothing,
-    on_activated::Function = on_activated,
-    on_deactivated::Function = on_deactivated,
-)
+        widgets::Vector;
+        controls = gallery_controls,
+        height::Int = console_height() - 5,
+        width::Int = console_width(),
+        show_panel::Bool = true,
+        title::String = "Widget",
+        on_draw::Union{Nothing, Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
+    )
     # set widgets size
     Δ = show_panel ? 4 : 0
     measure = Measure(height, width)
@@ -53,6 +53,7 @@ function on_layout_change(gal::Gallery, m::Measure)
     for wdg in gal.widgets
         on_layout_change(wdg, Measure(m.h - Δ, m.w - Δ))
     end
+    return
 end
 
 # ----------------------------------- frame ---------------------------------- #
@@ -64,10 +65,10 @@ function frame(gal::Gallery; kwargs...)
 
     style = gal.show_panel && isactive(gal) ? "dim" : "hidden"
 
-    Panel(
+    return Panel(
         content;
         title = gal.show_panel ? "$(gal.title) $(gal.active)/$(length(gal.widgets))" :
-                nothing,
+            nothing,
         justify = :center,
         style = style,
         title_style = "default",
