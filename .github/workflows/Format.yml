@@ -1,4 +1,4 @@
-name: runic
+name: Runic
 
 on:
   push:
@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  runic:
+  format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
