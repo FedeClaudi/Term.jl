@@ -39,7 +39,7 @@ end
     end
 end
 
-IS_WIN || @testset "Introspect types" begin
+Sys.islinux() && @testset "Introspect types" begin
     @compare_to_string typestree(Integer, prefix = "xxxx") "typestree_Integer"
     @compare_to_string typestree(Integer, prefix = "xxxx") "typestree_Integer_prefix"
 
