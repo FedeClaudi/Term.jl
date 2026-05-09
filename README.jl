@@ -113,7 +113,7 @@ function rainbow_maker(N)
     return colors
 end
 
-main() = begin
+main(output = false) = begin
     circles = make_julia_circles()  # 42 x 17
     code_style = "yellow italic bold"
 
@@ -283,9 +283,6 @@ main() = begin
     readme = foldl(/, zip(all, lines) |> Iterators.flatten |> collect)
 
     # print(Spacer(height(readme), 10) * readme)
-    write(joinpath(@__DIR__, "test", "txtfiles", "README.txt"), string(readme))
-    print(readme)
-    return nothing
+    output && write(joinpath(@__DIR__, "test", "txtfiles", "README.txt"), string(readme))
+    readme
 end
-
-@entry main()
