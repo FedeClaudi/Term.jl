@@ -33,7 +33,7 @@ B = InputBox(title = "B value", style = "blue", title_justify = :center)
 
 button = Button("random"; color = "light_slate_grey", text_color = "white")
 
-widgets = OrderedDict{Symbol,AbstractWidget}(
+widgets = OrderedDict{Symbol, AbstractWidget}(
     :A => rgb_visualizer,
     :R => R,
     :G => G,
@@ -62,20 +62,20 @@ function update_visualizer(app::App)
 
     viz = app.widgets[:A]
 
-    viz.text =
+    return viz.text =
         "(r:$r, g:$g, b:$b)" / apply_style(
-            join(
-                repeat([" "^(viz.internals.measure.w - 4)], viz.internals.measure.h),
-                "\n",
-            ),
-            "on_($r, $g, $b)",
-        )
+        join(
+            repeat([" "^(viz.internals.measure.w - 4)], viz.internals.measure.h),
+            "\n",
+        ),
+        "on_($r, $g, $b)",
+    )
 end
 
 function set_random_color(::Button)
     app.widgets[:R].input_text = string(rand(0:255))
     app.widgets[:G].input_text = string(rand(0:255))
-    app.widgets[:B].input_text = string(rand(0:255))
+    return app.widgets[:B].input_text = string(rand(0:255))
 end
 
 # ------------------------------------ run ----------------------------------- #

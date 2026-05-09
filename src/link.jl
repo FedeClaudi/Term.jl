@@ -44,18 +44,18 @@ function LinkString(s::String)
         length(additional_text) > 1 &&
             (additional_text_w = max(additional_text_w, width(additional_text[2])))
     end
-    LinkString(s, link_width + additional_text_w + 3)
+    return LinkString(s, link_width + additional_text_w + 3)
 end
 
 LinkString(l::LinkString) = l
 
-Base.:*(s::Union{SubString,String}, l::LinkString) =
+Base.:*(s::Union{SubString, String}, l::LinkString) =
     LinkString(s * l.link, textlen(s) + l.width)
-Base.:*(l::LinkString, s::Union{SubString,String}) =
+Base.:*(l::LinkString, s::Union{SubString, String}) =
     LinkString(l.link * s, textlen(s) + l.width)
-Base.:/(s::Union{SubString,String}, l::LinkString) =
+Base.:/(s::Union{SubString, String}, l::LinkString) =
     LinkString(s / l.link, max(textlen(s), l.width))
-Base.:/(l::LinkString, s::Union{SubString,String}) =
+Base.:/(l::LinkString, s::Union{SubString, String}) =
     LinkString(l.link / s, max(textlen(s), l.width))
 
 Segments.Segment(l::LinkString) = Segment(l, Measure(1, l.width))
@@ -101,11 +101,11 @@ Base.show(io::IO, ::MIME"text/plain", l::LinkString) = print(io, l.link)
 Build a link given a file path and line number.
 """
 function Link(
-    file_path::AbstractString,
-    line_number::Union{Nothing,Integer} = nothing,
-    display_text::Union{Nothing,String} = nothing;
-    style = TERM_THEME[].link,
-)
+        file_path::AbstractString,
+        line_number::Union{Nothing, Integer} = nothing,
+        display_text::Union{Nothing, String} = nothing;
+        style = TERM_THEME[].link,
+    )
     link_dest =
         isnothing(line_number) ? "file://" * file_path : "file://$file_path#$line_number"
     isnothing(display_text) &&
@@ -148,13 +148,13 @@ specialized to take into account `Link`'s different sizes
 between displayed and actual text.
 """
 function Renderables.RenderableText(
-    link::Link,
-    args...;
-    style::Union{Nothing,String} = link.style,
-    width::Int = link.measure.w,
-    background::Union{Nothing,String} = nothing,
-    justify::Symbol = :left,
-)
+        link::Link,
+        args...;
+        style::Union{Nothing, String} = link.style,
+        width::Int = link.measure.w,
+        background::Union{Nothing, String} = nothing,
+        justify::Symbol = :left,
+    )
     display_text =
         pad(cleantext(link.display_text), width - link.measure.w, justify; bg = background)
     link_text =

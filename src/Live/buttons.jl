@@ -6,7 +6,7 @@ abstract type AbstractButton <: AbstractWidget end
 """
 set the buttoon's state to :presed.
 """
-function press_button(b::AbstractButton, ::Union{SpaceBar,Enter})
+function press_button(b::AbstractButton, ::Union{SpaceBar, Enter})
     if b.status == :not_pressed
         b.lastpressed = Dates.value(now())
         b.status = :pressed
@@ -21,7 +21,7 @@ button_controls =
     Dict('q' => quit, Esc() => quit, Enter() => press_button, SpaceBar() => press_button)
 
 function on_layout_change(b::AbstractButton, m::Measure)
-    b.internals.measure = m
+    return b.internals.measure = m
 end
 
 """
@@ -66,7 +66,7 @@ A callback can be set to be called when the button is pressed.
     controls::AbstractDict
     message::String
     status::Symbol
-    callback::Union{Nothing,Function}
+    callback::Union{Nothing, Function}
     lastpressed::Int
     color::String
     text_color::String
@@ -74,15 +74,15 @@ A callback can be set to be called when the button is pressed.
 end
 
 function Button(
-    message::String;
-    controls::AbstractDict = button_controls,
-    text_color = "bold white",
-    color = "red",
-    on_draw::Union{Nothing,Function} = nothing,
-    on_activated::Function = on_activated,
-    on_deactivated::Function = on_deactivated,
-    kwargs...,
-)
+        message::String;
+        controls::AbstractDict = button_controls,
+        text_color = "bold white",
+        color = "red",
+        on_draw::Union{Nothing, Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
+        kwargs...,
+    )
     return Button(
         WidgetInternals(Measure(), nothing, on_draw, on_activated, on_deactivated, false),
         controls,
@@ -138,7 +138,7 @@ activated and not.
     controls::AbstractDict
     message::String
     status::Symbol
-    callback::Union{Nothing,Function}
+    callback::Union{Nothing, Function}
     lastpressed::Int
     color::String
     text_color::String
@@ -146,15 +146,15 @@ activated and not.
 end
 
 function ToggleButton(
-    message::String;
-    controls::AbstractDict = button_controls,
-    text_color = "bold white",
-    color = "red",
-    on_draw::Union{Nothing,Function} = nothing,
-    on_activated::Function = on_activated,
-    on_deactivated::Function = on_deactivated,
-    kwargs...,
-)
+        message::String;
+        controls::AbstractDict = button_controls,
+        text_color = "bold white",
+        color = "red",
+        on_draw::Union{Nothing, Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
+        kwargs...,
+    )
     return ToggleButton(
         WidgetInternals(Measure(), nothing, on_draw, on_activated, on_deactivated, false),
         controls,

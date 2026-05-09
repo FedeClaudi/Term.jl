@@ -192,11 +192,11 @@ Options prompts additionally print the available options.
 """
 function Base.print(io::IO, prompt::AbstractOptionsPrompt)
     _print_prompt_text(io, prompt)
-    tprint(
+    return tprint(
         io,
         " {$(prompt.answers_style)}" *
-        join(prompt.options, " {$(prompt.style)}/{/$(prompt.style)} ") *
-        "{/$(prompt.answers_style)}";
+            join(prompt.options, " {$(prompt.style)}/{/$(prompt.style)} ") *
+            "{/$(prompt.answers_style)}";
         highlight = false,
     )
 end
@@ -258,7 +258,7 @@ abstract type AbstractDefaultPrompt <: AbstractOptionsPrompt end
 end
 
 function DefaultPrompt(options::Vector, default::Int, prompt::String)
-    DefaultPrompt(
+    return DefaultPrompt(
         options,
         default,
         prompt,
@@ -281,13 +281,15 @@ function Base.print(io::IO, prompt::AbstractDefaultPrompt)
         1:n_options,
     )
     options = join(
-        (map(
-            i -> "{$(answer_styles[i])}$(prompt.options[i]){/$(answer_styles[i])}",
-            1:n_options,
-        )),
+        (
+            map(
+                i -> "{$(answer_styles[i])}$(prompt.options[i]){/$(answer_styles[i])}",
+                1:n_options,
+            )
+        ),
         ", ",
     )
-    tprint(io, " " * options)
+    return tprint(io, " " * options)
 end
 
 confirm() = ask(DefaultPrompt(["yes", "no"], 1, "Confirm?"))

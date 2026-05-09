@@ -172,7 +172,7 @@ termshow(io::IO, mtx::AbstractMatrix; kwargs...) = print(
 
 Show a vector's content as a 1D table visualization.
 """
-termshow(io::IO, vec::Union{Tuple,AbstractVector}; kwargs...) = print(
+termshow(io::IO, vec::Union{Tuple, AbstractVector}; kwargs...) = print(
     io,
     repr_panel(
         vec,
@@ -197,7 +197,7 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
     panel_style = TERM_THEME[].repr_array_panel
     panel_title_style = TERM_THEME[].repr_array_title
 
-    panels::Vector{Union{Panel,Spacer}} = []
+    panels::Vector{Union{Panel, Spacer}} = []
     for (n, i) in enumerate(I)
         i_string = join(string.(Tuple(i)), ", ")
         push!(
@@ -232,8 +232,8 @@ function termshow(io::IO, arr::AbstractArray; kwargs...)
             arr,
             vstack(panels...),
             "{$(TERM_THEME[].text_accent)}" *
-            join(string.(size(arr)), " × ") *
-            "{/$(TERM_THEME[].text_accent)}",
+                join(string.(size(arr)), " × ") *
+                "{/$(TERM_THEME[].text_accent)}",
             fit = true,
         ),
     )
@@ -269,17 +269,17 @@ function termshow(io::IO, obj::DataType; showdocs = true, kwargs...)
     end
     content =
         "    " * repr_panel(
-            nothing,
-            string(type_name / ("  " * line * fields)),
-            nothing;
-            fit = false,
-            width = min(console_width() - 5, default_width(io)),
-            justify = :center,
-        )
+        nothing,
+        string(type_name / ("  " * line * fields)),
+        nothing;
+        fit = false,
+        width = min(console_width() - 5, default_width(io)),
+        justify = :center,
+    )
 
     print(io, content)
 
-    showdocs && begin
+    return showdocs && begin
         # get docstring
         doc, _ = get_docstring(obj)
         doc = parse_md(doc; width = min(100, console_width()))
@@ -310,19 +310,19 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
     m = N - 1
     panel =
         "   " * repr_panel(
-            nothing,
-            methods_contents,
-            "{$(theme.text_accent)}$m{/$(theme.text_accent)} $(plural("method", m))",
-            title = "Function: {bold $(theme.repr_array_text)}$(string(fun)){/bold $(theme.repr_array_text)}",
-            width = width - 8,
-            fit = false,
-            justify = :left,
-        )
+        nothing,
+        methods_contents,
+        "{$(theme.text_accent)}$m{/$(theme.text_accent)} $(plural("method", m))",
+        title = "Function: {bold $(theme.repr_array_text)}$(string(fun)){/bold $(theme.repr_array_text)}",
+        width = width - 8,
+        fit = false,
+        justify = :left,
+    )
     # @info "made panel" panel.measure  width console_width(io)
 
-    # get docstring 
+    # get docstring
     doc, _ = get_docstring(fun)
-    panel.measure.w < 45 && begin   # handle narrow console 
+    panel.measure.w < 45 && begin   # handle narrow console
         doc = replace(string(doc), "```" => " ") |> Markdown.MD
     end
     doc = parse_md(doc; width = panel.measure.w - 4)
@@ -335,7 +335,7 @@ function termshow(io::IO, fun::Function; width = min(console_width(io), default_
     end
     print(io, panel)
     print(io, hLine(panel.measure.w, "Docstring"; style = "green dim", box = :HEAVY))
-    print(io, "   " * RenderableText(join(doc, "\n"), width = width - 4))
+    return print(io, "   " * RenderableText(join(doc, "\n"), width = width - 4))
 end
 
 # ---------------------------------------------------------------------------- #
@@ -347,7 +347,7 @@ end
 Make `term_show` be called every times something is shown in the REPL
 """
 function install_term_repr()
-    @eval begin
+    return @eval begin
         import Term: termshow
 
         Base.show(io::IO, ::MIME"text/plain", num::Number) =
@@ -357,7 +357,7 @@ function install_term_repr()
 
         Base.show(io::IO, ::MIME"text/plain", obj::AbstractDict) = termshow(io, obj)
 
-        Base.show(io::IO, ::MIME"text/plain", obj::Union{AbstractArray,AbstractMatrix}) =
+        Base.show(io::IO, ::MIME"text/plain", obj::Union{AbstractArray, AbstractMatrix}) =
             termshow(io, obj)
 
         Base.show(io::IO, ::MIME"text/plain", fun::Function) = termshow(io, fun)
@@ -392,7 +392,7 @@ end
 function with_repr(typedef::Expr)
     tn = typename(typedef) # the name of the type
     showfn = :(Base.show(io::IO, ::MIME"text/plain", obj::$tn) = termshow(io, obj))
-    quote
+    return quote
         Core.@__doc__ $typedef
         $showfn
     end
@@ -428,14 +428,16 @@ macro showme(expr, show_all_methods = false)
     hLine(width, style = "dim") |> tprint
 
     # print info msg
-    info_msg = String["""
-    !!! note "@showme"
-        Showing definition for *method* called by: \n
-            $(expr)       
-            
-    ###### Arguments
+    info_msg = String[
+        """
+        !!! note "@showme"
+            Showing definition for *method* called by: \n
+                $(expr)       
+                
+        ###### Arguments
 
-    """]
+        """,
+    ]
 
     parse_md(info_msg) |> tprintln
 
@@ -447,19 +449,21 @@ macro showme(expr, show_all_methods = false)
         arg = expr.args[i]
         arg = arg isa AbstractString ? "\"$arg\"" : arg
         "     {$(theme.emphasis)}⨀{/$(theme.emphasis)} {$(theme.text_accent) italic}$arg{/$(theme.text_accent) italic}{$_type_color}::$(typeof(arg)){/$_type_color}" |>
-        tprintln
+            tprintln
     end
 
     print("\n")
 
-    quote
+    return quote
         code_source = @code_string $expr
         Markdown.parse("###### Method definition") |> tprintln
-        code_source = Markdown.parse("""
-        ```
-        $code_source
-        ```
-        """)
+        code_source = Markdown.parse(
+            """
+            ```
+            $code_source
+            ```
+            """
+        )
         code = parse_md(code_source; width = $width + 2, lpad = false) |> string
 
         method = @which $expr

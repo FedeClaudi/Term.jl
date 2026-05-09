@@ -23,7 +23,7 @@ of the left/right widths.
 When width is even that's easy, when it's odd we need to
 be careful.
 """
-function get_lr_widths(width::Int)::Tuple{Int,Int}
+function get_lr_widths(width::Int)::Tuple{Int, Int}
     iseven(width) && return (rint(width / 2), rint(width / 2))
     return (fint(width / 2), cint(width / 2))
 end
@@ -50,6 +50,7 @@ function get_file_format(nbytes; suffix = "B")
         nbytes < 1024 && return string(round(nbytes; digits = 2), ' ', unit, suffix)
         nbytes = nbytes / 1024
     end
+    return
 end
 
 """
@@ -60,7 +61,7 @@ If `aspect` is `nothing`, chooses the best fir between a default and a unit aspe
 
 Adapted from: stackoverflow.com/a/43366784
 """
-function calc_nrows_ncols(n, aspect::Union{Nothing,Number,NTuple} = nothing)
+function calc_nrows_ncols(n, aspect::Union{Nothing, Number, NTuple} = nothing)
     h, w = if isnothing(aspect)
         r1, c1 = calc_nrows_ncols(n, DEFAULT_ASPECT_RATIO[])
         r2, c2 = calc_nrows_ncols(n, 1)  # unit aspect - square

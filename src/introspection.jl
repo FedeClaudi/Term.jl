@@ -145,10 +145,10 @@ end
 # ---------------------------------------------------------------------------- #
 
 function style_methods(
-    methods::Union{Vector{Base.Method},Base.MethodList},
-    docstrings::Vector,
-    width::Int,
-)
+        methods::Union{Vector{Base.Method}, Base.MethodList},
+        docstrings::Vector,
+        width::Int,
+    )
     mets = []
     fn_col = TERM_THEME[].func
     panel_col = TERM_THEME[].text_accent
@@ -187,7 +187,7 @@ Flags can be used to choose the level of detail in the information presented:
  - methods: show methods using `T` in their signature
  - supertypes: show methods using `T`'s supertypes in their signature
 """
-function inspect(T::Union{Union,DataType};)
+function inspect(T::Union{Union, DataType})
     # get app size
     layout = :(A(4, 1.0) / B(30, 1.0))
     comp = Compositor(layout)
@@ -207,14 +207,14 @@ function inspect(T::Union{Union,DataType};)
     type_methods = style_methods(get_methods_with_docstrings(T)..., widget_width - 12)
     methods_pagers =
         map(
-            m -> Pager(
-                string(m[2]);
-                title = "Method $(m[1]) of $(length(type_methods))",
-                width = widget_width,
-                page_lines = comp.elements[:B].h - 8,
-            ),
-            enumerate(type_methods),
-        ) |> collect
+        m -> Pager(
+            string(m[2]);
+            title = "Method $(m[1]) of $(length(type_methods))",
+            width = widget_width,
+            page_lines = comp.elements[:B].h - 8,
+        ),
+        enumerate(type_methods),
+    ) |> collect
 
     # create app
     menu = ButtonsMenu(
@@ -264,7 +264,7 @@ function inspect(T::Union{Union,DataType};)
     transition_rules = Dict(ArrowDown() => Dict(:A => :B), ArrowUp() => Dict(:B => :A))
 
     function cb(app)
-        app.widgets[:B].active = app.widgets[:A].active
+        return app.widgets[:B].active = app.widgets[:A].active
     end
 
     app = App(layout, widgets, transition_rules; on_draw = cb)
@@ -279,7 +279,7 @@ function inspect(F::Function; documentation::Bool = true)
         termshow(F)
         print("\n"^3)
     end
-    nothing
+    return nothing
 end
 
 end

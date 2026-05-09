@@ -1,4 +1,3 @@
-
 @testset "\e[34mEXAMPLES" begin
     println("\nTesting examples, stdout temporarily disabled")
     @suppress_out begin

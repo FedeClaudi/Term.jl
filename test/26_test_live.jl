@@ -359,7 +359,7 @@ end
 
     button = Button("random"; color = "light_slate_grey", text_color = "white")
 
-    widgets = OrderedDict{Symbol,AbstractWidget}(
+    widgets = OrderedDict{Symbol, AbstractWidget}(
         :A => rgb_visualizer,
         :R => R,
         :G => G,

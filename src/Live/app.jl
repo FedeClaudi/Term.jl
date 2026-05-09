@@ -26,25 +26,25 @@ other widgets to access their internal variables.
     iob::IOBuffer
     ioc::IOContext
     term::AbstractTerminal
-    prevcontent::Union{Nothing,AbstractRenderable}
+    prevcontent::Union{Nothing, AbstractRenderable}
     prevcontentlines::Vector{String}
     raw_mode_enabled::Bool
-    last_update::Union{Nothing,Int}
+    last_update::Union{Nothing, Int}
     refresh_Δt::Int
     help_shown::Bool
-    help_message::Union{Nothing,String}
+    help_message::Union{Nothing, String}
     should_stop::Bool
 
     function AppInternals(;
-        refresh_rate::Int = 60,
-        help_message = nothing,
-        suppress_output = false,
-    )
+            refresh_rate::Int = 60,
+            help_message = nothing,
+            suppress_output = false,
+        )
         # get output buffers
         iob = IOBuffer()
         ioc = IOContext(iob, :displaysize => displaysize(stdout))
 
-        # prepare terminal 
+        # prepare terminal
         raw_mode_enabled = try
             raw!(get_terminal(), true)
             true
@@ -88,7 +88,7 @@ An `App` is a collection of widgets.
     internals::AppInternals
     measure::Measure
     controls::AbstractDict
-    parent::Union{Nothing,AbstractWidget}
+    parent::Union{Nothing, AbstractWidget}
     compositor::Compositor
     layout::Expr
     width::Int
@@ -97,8 +97,8 @@ An `App` is a collection of widgets.
     widgets::AbstractDict
     transition_rules::AbstractDict
     active::Symbol
-    on_draw::Union{Nothing,Function}
-    on_stop::Union{Nothing,Function}
+    on_draw::Union{Nothing, Function}
+    on_stop::Union{Nothing, Function}
 end
 
 isactive(::App) = true
@@ -138,16 +138,16 @@ app_controls = Dict(
 Convenience constructor for an `App` with a single widget.
 """
 function App(
-    widget::AbstractWidget;
-    controls::AbstractDict = app_controls,
-    width = 1.0,
-    height = min(40, console_height()),
-    kwargs...,
-)
+        widget::AbstractWidget;
+        controls::AbstractDict = app_controls,
+        width = 1.0,
+        height = min(40, console_height()),
+        kwargs...,
+    )
     layout = :(A($height, $width))
     return App(
         layout;
-        widgets = Dict{Symbol,AbstractWidget}(:A => widget),
+        widgets = Dict{Symbol, AbstractWidget}(:A => widget),
         controls = controls,
         height = height,
         width = fint(width * console_width()),
@@ -156,17 +156,17 @@ function App(
 end
 
 function App(
-    layout::Expr;
-    widgets::Union{Nothing,AbstractDict} = nothing,
-    transition_rules::Union{Nothing,AbstractDict} = nothing,
-    width = console_width(),
-    height = min(40, console_height()),
-    controls::AbstractDict = app_controls,
-    on_draw::Union{Nothing,Function} = nothing,
-    on_stop::Union{Nothing,Function} = nothing,
-    expand::Bool = true,
-    help_message::Union{Nothing,String} = nothing,
-)
+        layout::Expr;
+        widgets::Union{Nothing, AbstractDict} = nothing,
+        transition_rules::Union{Nothing, AbstractDict} = nothing,
+        width = console_width(),
+        height = min(40, console_height()),
+        controls::AbstractDict = app_controls,
+        on_draw::Union{Nothing, Function} = nothing,
+        on_stop::Union{Nothing, Function} = nothing,
+        expand::Bool = true,
+        help_message::Union{Nothing, String} = nothing,
+    )
 
     # parse the layout expression and get the compositor
     compositor = Compositor(
@@ -314,7 +314,7 @@ function enforce_app_size(app::App, measure::Measure)
         on_layout_change(wdg, wdg.internals.measure)
     end
 
-    app.compositor = compositor
+    return app.compositor = compositor
 end
 
 # ----------------------------------- frame ---------------------------------- #
@@ -333,7 +333,7 @@ function on_layout_change(app::App)
 
     # the console is too small, re-design
     app.measure = Measure(app.measure.h, new_width)
-    enforce_app_size(app, app.measure)
+    return enforce_app_size(app, app.measure)
 end
 
 """
@@ -351,7 +351,7 @@ function frame(app::App; kwargs...)
         # toggle active
         if length(app.widgets) > 1
             app.active == name ? widget.internals.on_activated(widget) :
-            widget.internals.on_deactivated(widget)
+                widget.internals.on_deactivated(widget)
         end
 
         content = frame(widget)
@@ -416,7 +416,7 @@ Erase a line and move cursor
 """
 function replace_line(internals::AppInternals)
     erase_line(internals.ioc)
-    down(internals.ioc)
+    return down(internals.ioc)
 end
 
 """
@@ -426,7 +426,7 @@ Erase a line, write new content and move cursor.
 """
 function replace_line(internals::AppInternals, newline)
     erase_line(internals.ioc)
-    println(internals.ioc, newline)
+    return println(internals.ioc, newline)
 end
 
 """
@@ -472,12 +472,12 @@ function refresh!(app::App)
         !isnothing(internals.prevcontent) &&
             nlines_prev > i &&
             begin
-                old_line = old_lines[i]
-                line == old_line && begin
-                    down(internals.ioc)
-                    continue
-                end
+            old_line = old_lines[i]
+            line == old_line && begin
+                down(internals.ioc)
+                continue
             end
+        end
 
         # re-write line
         replace_line(internals, line)
@@ -502,7 +502,7 @@ function erase!(app::App)
     up(app.internals.ioc, nlines)
     cleartoend(app.internals.ioc)
     write(stdout, take!(app.internals.iob))
-    nothing
+    return nothing
 end
 
 """
@@ -517,7 +517,7 @@ function stop!(app::App)
     print(internals.term.out_stream, "\x1b[?25h") # unhide cursor
     print(stdout, "\x1b[?25h")
     raw!(internals.term, false)
-    nothing
+    return nothing
 end
 
 """

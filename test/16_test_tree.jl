@@ -78,7 +78,7 @@ trees = [
 
     # test printing
     @test sprint(io -> show(io, Tree(trees[1]))) ==
-          "\e[38;5;117mTree <: AbstractRenderable\e[0m \e[2m(h:10, w:80)\e[0m"
+        "\e[38;5;117mTree <: AbstractRenderable\e[0m \e[2m(h:10, w:80)\e[0m"
     @test sprint(io -> show(io, MIME("text/plain"), Tree(trees[1]).segments[1])) ==
-          "Segment{String} \e[2m(size: Measure (h: 1, w: 80))\e[0m"
+        "Segment{String} \e[2m(size: Measure (h: 1, w: 80))\e[0m"
 end

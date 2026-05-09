@@ -45,15 +45,15 @@ Complex layout is supported using compositor expressions.
 `order`: `:row` for row major input iteration (default) or `:col` for column major.
 """
 function grid(
-    rens::Union{AbstractVector,Tuple,NamedTuple};
-    placeholder::Union{Nothing,AbstractRenderable} = nothing,
-    placeholder_size::Union{Nothing,Tuple} = nothing,
-    aspect::Union{Nothing,Number,NTuple} = nothing,
-    layout::Union{Nothing,Tuple,Expr} = nothing,
-    show_placeholder::Bool = false,
-    pad::Union{Tuple,Integer} = 0,
-    order::Symbol = :row,
-)
+        rens::Union{AbstractVector, Tuple, NamedTuple};
+        placeholder::Union{Nothing, AbstractRenderable} = nothing,
+        placeholder_size::Union{Nothing, Tuple} = nothing,
+        aspect::Union{Nothing, Number, NTuple} = nothing,
+        layout::Union{Nothing, Tuple, Expr} = nothing,
+        show_placeholder::Bool = false,
+        pad::Union{Tuple, Integer} = 0,
+        order::Symbol = :row,
+    )
     rens_seq = if rens isa NamedTuple
         collect(values(rens))
     elseif rens isa Tuple
@@ -70,7 +70,7 @@ function grid(
         ph_size =
             something(placeholder_size, (minimum(first.(sizes)), minimum(last.(sizes))))
 
-        kw = Dict{Symbol,Any}()
+        kw = Dict{Symbol, Any}()
         n = 0
         for (i, e) in enumerate(get_elements_and_sizes(layout; placeholder_size = ph_size))
             kw[nm] = if (nm = e.args[1]) ≡ :_
@@ -122,11 +122,11 @@ end
 Construct a grid of `PlaceHolder`s, for a given layout.
 """
 function grid(
-    rens::Nothing = nothing;
-    placeholder_size::Union{Nothing,Tuple} = nothing,
-    layout::Union{Nothing,Tuple,Expr} = nothing,
-    kw...,
-)
+        rens::Nothing = nothing;
+        placeholder_size::Union{Nothing, Tuple} = nothing,
+        layout::Union{Nothing, Tuple, Expr} = nothing,
+        kw...,
+    )
     isnothing(layout) &&
         throw(ArgumentError("`layout` must be given as `Tuple` of `Integer`s or `Expr`"))
     return grid(
@@ -141,7 +141,7 @@ end
 
 Construct a grid from an `AbstractMatrix`.
 """
-function grid(rens::AbstractMatrix; pad::Union{Tuple,Integer} = 0)
+function grid(rens::AbstractMatrix; pad::Union{Tuple, Integer} = 0)
     hpad, vpad = if pad isa Integer
         (pad, pad)
     else
@@ -149,7 +149,7 @@ function grid(rens::AbstractMatrix; pad::Union{Tuple,Integer} = 0)
     end
     rows = collect(
         foldl((a, b) -> a * ' '^hpad * b, col[2:end]; init = first(col)) for
-        col in eachrow(rens)
+            col in eachrow(rens)
     )
     if vpad > 0
         vspace = vpad > 1 ? vstack(fill(" ", vpad)...) : " "

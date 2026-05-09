@@ -38,7 +38,7 @@ end
             @test fromfile("./txtfiles/tree_expr_$i.txt") == cleanstring(tree)
 
             @test fromfile("./txtfiles/exptree_expr_$i.txt") ==
-                  cleansprint(expressiontree, e)
+                cleansprint(expressiontree, e)
 
             inspect(devnull, e)
         end

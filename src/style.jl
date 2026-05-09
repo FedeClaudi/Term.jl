@@ -20,11 +20,11 @@ import ..Colors:
 export apply_style
 
 apply_style(text::String, style::String) =
-    if occursin('\n', text)
-        do_by_line(ln -> apply_style(ln, style), text)
-    else
-        apply_style("{" * style * "}" * text * "{/" * style * "}")
-    end
+if occursin('\n', text)
+    do_by_line(ln -> apply_style(ln, style), text)
+else
+    apply_style("{" * style * "}" * text * "{/" * style * "}")
+end
 
 """
 Check if a string is a mode name
@@ -49,8 +49,8 @@ Holds information about the style specification set out by a `MarkupTag`.
     inverse::Bool = false
     hidden::Bool = false
     striked::Bool = false
-    color::Union{Nothing,AbstractColor} = nothing
-    background::Union{Nothing,AbstractColor} = nothing
+    color::Union{Nothing, AbstractColor} = nothing
+    background::Union{Nothing, AbstractColor} = nothing
 end
 
 """
@@ -182,16 +182,16 @@ function apply_style(text; leave_orphan_tags = false)::String
 
         # if previous style had color and we're nested, use color info
         if open_match.offset > previous_color[1] &&
-           close_match.offset < previous_color[2] &&
-           !isnothing(previous_color[3].color)
+                close_match.offset < previous_color[2] &&
+                !isnothing(previous_color[3].color)
             col_prev_ansi_open, _ = get_style_codes(previous_color[3])
             ansi_close = ansi_close * col_prev_ansi_open
         end
 
         # and for background
         if open_match.offset > previous_background[1] &&
-           close_match.offset < previous_background[2] &&
-           !isnothing(previous_background[3].background)
+                close_match.offset < previous_background[2] &&
+                !isnothing(previous_background[3].background)
             bg_prev_ansi_open, _ = get_style_codes(previous_background[3])
             ansi_close = ansi_close * bg_prev_ansi_open
         end

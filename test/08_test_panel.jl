@@ -26,8 +26,8 @@ end
 @testset "\e[34mPanel - fit overflow" begin
     inside = Panel("MYTEXT"^50; height = 10)
     @testpanel(inside, 10, 80)
-    @testpanel(Panel(inside / inside, fit = true), 42, TEST_CONSOLE_WIDTH,)
-    @testpanel(Panel(inside / inside, fit = false), 42, TEST_CONSOLE_WIDTH,)
+    @testpanel(Panel(inside / inside, fit = true), 42, TEST_CONSOLE_WIDTH)
+    @testpanel(Panel(inside / inside, fit = false), 42, TEST_CONSOLE_WIDTH)
 end
 
 @testset "\e[34mPANEL - fit - measure" begin
@@ -151,9 +151,9 @@ end
 
         @testpanel(Panel(Panel("test"; _kw...); fit = true), 5, 16)
 
-        @testpanel(Panel(Panel(Panel("°"; _kw...); _kw...); fit = true), 7, 19,)
+        @testpanel(Panel(Panel(Panel("°"; _kw...); _kw...); fit = true), 7, 19)
 
-        @testpanel(Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = true), 8, 14,)
+        @testpanel(Panel(Panel("t1"; _kw...), Panel("t2"; _kw...); fit = true), 8, 14)
 
         _kw = (fit = true, width = 30, height = 8)
         @testpanel(Panel(Panel("test"; width = 22); _kw...), 8, 28)
@@ -176,7 +176,7 @@ end
         IS_WIN || @compare_to_string(p, "centered_title_panel_$(i)")
 
         p = Panel(title = "test", width = 50, title_justify = just)
-        IS_WIN || @compare_to_string(p, "centered_title_panel_$(i+3)")
+        IS_WIN || @compare_to_string(p, "centered_title_panel_$(i + 3)")
         @testpanel(p, nothing, 50)
     end
 
@@ -208,27 +208,27 @@ end
 
 @testset "PANEL - compare to string" begin
     pts = """
-Lorem{red} ipsum dolor s{/red}it amet, consectetur adipiscing elit,
-ed do eiusmod tempor {bold blue}incididu{underline}nt ut labore et dolore magna aliqua. Ut enim ad minim
-veniam, quis nos{/underline}trud exercitation ullamco laboris nisi ut aliquip ex 
-ea commodo consequat. Duis aute {/bold blue}{red on_black}irure dolor in reprehenderit 
-in voluptate velit esse cillum dolore eu fugiat nulla 
-pariatur. Excepteur sint occaecat{/red on_black} cupidatat non proident, 
-sunt in {green}culpa qui officia{/green} deserunt mollit anim 
-id est laborum."""
+    Lorem{red} ipsum dolor s{/red}it amet, consectetur adipiscing elit,
+    ed do eiusmod tempor {bold blue}incididu{underline}nt ut labore et dolore magna aliqua. Ut enim ad minim
+    veniam, quis nos{/underline}trud exercitation ullamco laboris nisi ut aliquip ex 
+    ea commodo consequat. Duis aute {/bold blue}{red on_black}irure dolor in reprehenderit 
+    in voluptate velit esse cillum dolore eu fugiat nulla 
+    pariatur. Excepteur sint occaecat{/red on_black} cupidatat non proident, 
+    sunt in {green}culpa qui officia{/green} deserunt mollit anim 
+    id est laborum."""
 
     pts = replace(pts, "\n" => "")
 
     pts2 = replace(
         """
-Lorem ipsum {bold}dolor sit{/bold} amet, consectetur adipiscing elit,
-ed do e{red}iusmod tempor incididunt{/red} ut {bold}labore et {underline}dolore{/underline} magna aliqua.{/bold} Ut enim ad minim
-veniam, quis{green} nostrud exercitation {on_black}ullamco laboris nisi ut aliquip ex {/on_black}
-ea commodo consequat.{blue} Duis aute irure dolor in{/blue} reprehenderit 
-in voluptate velit{/green} esse {italic}cillum dolore{/italic}{red} eu{/red}{italic green} fugiat {/italic green}nulla 
-pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident, 
-sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
-id est laborum.""",
+        Lorem ipsum {bold}dolor sit{/bold} amet, consectetur adipiscing elit,
+        ed do e{red}iusmod tempor incididunt{/red} ut {bold}labore et {underline}dolore{/underline} magna aliqua.{/bold} Ut enim ad minim
+        veniam, quis{green} nostrud exercitation {on_black}ullamco laboris nisi ut aliquip ex {/on_black}
+        ea commodo consequat.{blue} Duis aute irure dolor in{/blue} reprehenderit 
+        in voluptate velit{/green} esse {italic}cillum dolore{/italic}{red} eu{/red}{italic green} fugiat {/italic green}nulla 
+        pariatur. Excepteur{red} sint{/red}{blue} occaecat cupidatat {/blue}non proident, 
+        sunt in culpa qui {italic}officia{/italic} deserunt mollit anim 
+        id est laborum.""",
         "\n" => "",
     )
 
@@ -237,15 +237,15 @@ id est laborum.""",
     @testpanel(Panel(pts2; fit = false, width = 67), nothing, 67)
 
     circle = """
-          oooo    
-       oooooooooo 
-      oooooooooooo
-      oooooooooooo
-       oooooooooo 
-          oooo    """
+        oooo    
+     oooooooooo 
+    oooooooooooo
+    oooooooooooo
+     oooooooooo 
+        oooo    """
     p = Panel(circle; fit = true, padding = (2, 2, 0, 0))
     @test string(p) ==
-          "\e[0m\e[22m╭────────────────╮\e[22m\e[0m\n\e[22m│\e[22m      oooo      \e[22m│\e[22m\n\e[22m│\e[22m   oooooooooo   \e[22m│\e[22m\n\e[22m│\e[22m  oooooooooooo  \e[22m│\e[22m\n\e[22m│\e[22m  oooooooooooo  \e[22m│\e[22m\n\e[22m│\e[22m   oooooooooo   \e[22m│\e[22m\n\e[22m│\e[22m      oooo      \e[22m│\e[22m\n\e[0m\e[22m╰────────────────╯\e[22m\e[0m\e[0m"
+        "\e[0m\e[22m╭────────────────╮\e[22m\e[0m\n\e[22m│\e[22m      oooo      \e[22m│\e[22m\n\e[22m│\e[22m   oooooooooo   \e[22m│\e[22m\n\e[22m│\e[22m  oooooooooooo  \e[22m│\e[22m\n\e[22m│\e[22m  oooooooooooo  \e[22m│\e[22m\n\e[22m│\e[22m   oooooooooo   \e[22m│\e[22m\n\e[22m│\e[22m      oooo      \e[22m│\e[22m\n\e[0m\e[22m╰────────────────╯\e[22m\e[0m\e[0m"
 
     p = Panel(
         "test"^25;
@@ -332,15 +332,17 @@ end
     )
     IS_WIN || @compare_to_string p "panel_background_1"
 
-    p = Panel(apply_style(
-        """
-    asasd
-asdasadas
-asdsasdasdsadasdsa
-ads
-    """,
-        "on_blue",
-    ); background = "on_red", fit = true)
+    p = Panel(
+        apply_style(
+            """
+                asasd
+            asdasadas
+            asdsasdasdsadasdsa
+            ads
+                """,
+            "on_blue",
+        ); background = "on_red", fit = true
+    )
 
     IS_WIN || @compare_to_string p "panel_background_2"
 end
@@ -368,26 +370,26 @@ end
      ⠀1⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀2⠀"""
     p = Panel(str; fit = true, style = "hidden")
     @test Term.remove_ansi(string(p)) == """
-    ╭───────────────────────────────────────────╮
-    │ ┌────────────────────────────────────────┐│
-    │2│⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ │⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │1│⣀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
-    │ └────────────────────────────────────────┘│
-    │ ⠀1⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀2⠀│
-    ╰───────────────────────────────────────────╯"""
+        ╭───────────────────────────────────────────╮
+        │ ┌────────────────────────────────────────┐│
+        │2│⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⠀⠀⢀⡠⠊⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ │⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │1│⣀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀││
+        │ └────────────────────────────────────────┘│
+        │ ⠀1⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀2⠀│
+        ╰───────────────────────────────────────────╯"""
 end
 
 @testset "\e[34mPANEL - nested panels macro" begin

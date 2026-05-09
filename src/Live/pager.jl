@@ -9,7 +9,7 @@ using keys such as arrow up and arrow down.
     controls::AbstractDict
     text::AbstractString
     content::Vector{String}
-    title::Union{Nothing,String}
+    title::Union{Nothing, String}
     line_numbers::Bool
     tot_lines::Int
     curr_line::Int
@@ -20,24 +20,24 @@ end
 """
 move to the next line
 """
-next_line(p::Pager, ::Union{Char,ArrowDown}) =
+next_line(p::Pager, ::Union{Char, ArrowDown}) =
     p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + 1)
 
 """
 move to the previous line
 """
-prev_line(p::Pager, ::Union{Char,ArrowUp}) = p.curr_line = max(1, p.curr_line - 1)
+prev_line(p::Pager, ::Union{Char, ArrowUp}) = p.curr_line = max(1, p.curr_line - 1)
 
 """
 move to the next page
 """
-next_page(p::Pager, ::Union{PageDownKey,ArrowRight,Char}) =
+next_page(p::Pager, ::Union{PageDownKey, ArrowRight, Char}) =
     p.curr_line = min(p.tot_lines - p.page_lines, p.curr_line + p.page_lines)
 
 """
 move to the previous page
 """
-prev_page(p::Pager, ::Union{PageUpKey,ArrowLeft,Char}) =
+prev_page(p::Pager, ::Union{PageUpKey, ArrowLeft, Char}) =
     p.curr_line = max(1, p.curr_line - p.page_lines)
 
 """
@@ -71,10 +71,10 @@ pager_controls = Dict(
 Turns a text into a vector of lines with the right size (and optionally line numbers)
 """
 function reshape_pager_content(
-    content::AbstractString,
-    line_numbers::Bool,
-    width::Int,
-)::Vector{String}
+        content::AbstractString,
+        line_numbers::Bool,
+        width::Int,
+    )::Vector{String}
     reshaped_content = if line_numbers == true
         join(
             map(iln -> "{dim}$(iln[1])  {/dim}" * iln[2], enumerate(split(content, "\n"))),
@@ -91,16 +91,16 @@ function reshape_pager_content(
 end
 
 function Pager(
-    text::String;
-    controls::AbstractDict = pager_controls,
-    height = 30,
-    width = console_width(),
-    title::Union{Nothing,String} = nothing,
-    line_numbers::Bool = false,
-    on_draw::Union{Nothing,Function} = nothing,
-    on_activated::Function = on_activated,
-    on_deactivated::Function = on_deactivated,
-)
+        text::String;
+        controls::AbstractDict = pager_controls,
+        height = 30,
+        width = console_width(),
+        title::Union{Nothing, String} = nothing,
+        line_numbers::Bool = false,
+        on_draw::Union{Nothing, Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
+    )
     content = reshape_pager_content(text, line_numbers, width)
     return Pager(
         WidgetInternals(
@@ -127,7 +127,7 @@ function on_layout_change(p::Pager, m::Measure)
     p.content = reshape_pager_content(p.text, p.line_numbers, m.w)
     p.tot_lines = length(p.content)
     p.curr_line = min(p.curr_line, p.tot_lines - p.page_lines)
-    p.internals.measure = m
+    return p.internals.measure = m
 end
 
 # ---------------------------------- frame  ---------------------------------- #
@@ -203,7 +203,7 @@ function frame(pager::Pager; omit_panel = false)::AbstractRenderable
         width = pager.internals.measure.w,
         height = pager.internals.measure.h,
         padding = (2, 0, 1, 0),
-        subtitle = "Lines: $(max(1, i)):$(min(i+Δi, pager.tot_lines)) of $(pager.tot_lines)",
+        subtitle = "Lines: $(max(1, i)):$(min(i + Δi, pager.tot_lines)) of $(pager.tot_lines)",
         subtitle_style = "bold dim",
         subtitle_justify = :right,
         style = style,

@@ -8,7 +8,7 @@ sprint_termshow(io::IO, x) = termshow(io, x; width = 60)
     p = string(Panel())
     w = TEST_CONSOLE_WIDTH
     @test sprint(show, Panel()) ==
-          "\e[38;5;117mPanel <: AbstractRenderable\e[0m \e[2m(h:3, w:80)\e[0m"
+        "\e[38;5;117mPanel <: AbstractRenderable\e[0m \e[2m(h:3, w:80)\e[0m"
 end
 
 @testset "REPR @with_repr" begin

@@ -1,4 +1,3 @@
-
 # ---------------------------------------------------------------------------- #
 #                                PRECOMPILATION                                #
 # ---------------------------------------------------------------------------- #
@@ -99,47 +98,47 @@ PrecompileTools.verbose[] = false
     """
 
     code = """
-function render(
-content::Union{Renderable,RenderableText};
-box::Symbol = TERM_THEME[].box,
-style::String = TERM_THEME[].line,
-title::Union{String,Nothing} = nothing,
-title_style::Union{Nothing,String} = nothing,
-Δh::Int,
-padding::Padding,
-background::Union{Nothing,String} = nothing,
-kwargs...,
-)::Panel
-background = get_bg_color(background)
-# @info "calling render" content content_measure background
+    function render(
+    content::Union{Renderable,RenderableText};
+    box::Symbol = TERM_THEME[].box,
+    style::String = TERM_THEME[].line,
+    title::Union{String,Nothing} = nothing,
+    title_style::Union{Nothing,String} = nothing,
+    Δh::Int,
+    padding::Padding,
+    background::Union{Nothing,String} = nothing,
+    kwargs...,
+    )::Panel
+    background = get_bg_color(background)
+    # @info "calling render" content content_measure background
 
-# create top/bottom rows with titles
-box = BOXES[box]  # get box object from symbol
-top = get_title_row(
-    :top,
-    box;
-    title_style = title_style,
-    justify = title_justify,
-)
+    # create top/bottom rows with titles
+    box = BOXES[box]  # get box object from symbol
+    top = get_title_row(
+        :top,
+        box;
+        title_style = title_style,
+        justify = title_justify,
+    )
 
-bottom = get_title_row(
-    :bottom,
-    box,
-    subtitle;
-    width = panel_measure.w,
-)
+    bottom = get_title_row(
+        :bottom,
+        box,
+        subtitle;
+        width = panel_measure.w,
+    )
 
-# get left/right vertical lines
-σ(s) = apply_style("\e[0m{" * style * "}" * s * "{/" * style * "}")
-left, right = σ(box.mid.left), σ(box.mid.right)
+    # get left/right vertical lines
+    σ(s) = apply_style("\e[0m{" * style * "}" * s * "{/" * style * "}")
+    left, right = σ(box.mid.left), σ(box.mid.right)
 
-# get an empty padding line
-empty = if isnothing(background)
-    [Segment(left * " "^(panel_measure.w - 2) * right)]
-else
-    [Segment(left * "{background}" * " "^(panel_measure.w - 2) * "{/background}" * right)]
-end
-"""
+    # get an empty padding line
+    empty = if isnothing(background)
+        [Segment(left * " "^(panel_measure.w - 2) * right)]
+    else
+        [Segment(left * "{background}" * " "^(panel_measure.w - 2) * "{/background}" * right)]
+    end
+    """
 
     junkio = IOBuffer()  # from https://github.com/timholy/SnoopCompile.jl/issues/308
 

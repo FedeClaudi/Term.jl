@@ -24,7 +24,7 @@ end
 
 Get the Module a function is defined in, as a string
 """
-function frame_module(frame::StackFrame)::Union{Nothing,String}
+function frame_module(frame::StackFrame)::Union{Nothing, String}
     m = Base.parentmodule(frame)
 
     if m !== nothing
@@ -67,10 +67,10 @@ function should_skip(frame::StackFrame, modul)
 
     return bad || (
         contains(f, r"[/\\].julia[/\\]") ||
-        contains(f, r"julia[/\\]stdlib") ||
-        contains(f, r"julia[/\\]lib") ||
-        contains(f, "julialang.language") ||
-        contains(f, "libjulia")
+            contains(f, r"julia[/\\]stdlib") ||
+            contains(f, r"julia[/\\]lib") ||
+            contains(f, "julialang.language") ||
+            contains(f, "libjulia")
     )
 end
 should_skip(frame::StackFrame, hide::Bool, args...) =
@@ -193,18 +193,18 @@ Renders a panel with:
  - source code at error line
 """
 function add_stack_frame!(
-    content,
-    frame::StackFrame,
-    ctx::StacktraceContext,
-    as_panel::Bool,
-    num::Int;
-    δ = 3,
-    kwargs...,
-)
+        content,
+        frame::StackFrame,
+        ctx::StacktraceContext,
+        as_panel::Bool,
+        num::Int;
+        δ = 3,
+        kwargs...,
+    )
     # get the name of the error function
     func = get_frame_function_name(frame, ctx)
 
-    # get other information about the function 
+    # get other information about the function
     inline =
         frame.inlined ? RenderableText("inlined"; style = "bold dim $(ctx.theme.text)") : ""
     c = frame.from_c ? RenderableText("from C"; style = "bold dim $(ctx.theme.text)") : ""
@@ -247,7 +247,7 @@ function add_stack_frame!(
     end
 
     numren = vertical_pad("{dim}($num){/dim} ", height(panel), :center)
-    push!(content, numren * panel)
+    return push!(content, numren * panel)
 end
 
 add_stack_frame!(content, pointer::Ptr{Nothing}, args...; δ = 3, kwargs...) =
@@ -263,7 +263,7 @@ When a frame belonging to a module different from the previous one is shown,
 print the new module's name.
 """
 function add_new_module_name!(content, ctx::StacktraceContext, curr_module)
-    push!(
+    return push!(
         content,
         hLine(
             ctx.module_line_w,
@@ -280,15 +280,15 @@ Add some text explaining how many frames were skipped from the stacktrace visual
 and to which modules they belonged. 
 """
 function add_number_frames_skipped!(
-    content,
-    ctx::StacktraceContext,
-    to_skip,
-    num,
-    bt,
-    n_skipped,
-    skipped_frames_modules,
-)
-    if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
+        content,
+        ctx::StacktraceContext,
+        to_skip,
+        num,
+        bt,
+        n_skipped,
+        skipped_frames_modules,
+    )
+    return if (to_skip == false || num == length(bt) - 1) && n_skipped > 0
         color = ctx.theme.err_btframe_panel
         accent = ctx.theme.err_accent
 
@@ -324,12 +324,12 @@ It renders each frame in a stacktrace after some filtering (e.g. to hide frames 
 It takes care of hiding frames when there's a large number of them. 
 """
 function render_backtrace(
-    ctx::StacktraceContext,
-    bt::Vector;
-    reverse_backtrace = true,
-    max_n_frames = 30,
-    hide_frames = true,
-)
+        ctx::StacktraceContext,
+        bt::Vector;
+        reverse_backtrace = true,
+        max_n_frames = 30,
+        hide_frames = true,
+    )
     length(bt) == 0 && return RenderableText("")
     if reverse_backtrace
         bt = reverse(bt)
@@ -395,8 +395,8 @@ function render_backtrace(
         if num ∉ [1, length(bt)]
             # skip extra panels for long stack traces
             if tot_frames_added > max_n_frames &&
-               num < length(bt) - 5 &&
-               added_skipped_message == false
+                    num < length(bt) - 5 &&
+                    added_skipped_message == false
                 skipped_line = hLine(
                     ctx.module_line_w,
                     "{bold dim}$(N - max_n_frames - 2){/bold dim}{$(ctx.theme.err_btframe_panel) dim} frames skipped{/$(ctx.theme.err_btframe_panel) dim}";

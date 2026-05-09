@@ -54,19 +54,19 @@ Create ANSI tags for colors.
 function ANSICode(color::NamedColor; bg::Bool = false)
     Δ = bg ? 40 : 30
     v = CODES[color.color]
-    return ANSICode("\e[$(Δ + v)m", "\e[$(Δ+9)m")
+    return ANSICode("\e[$(Δ + v)m", "\e[$(Δ + 9)m")
 end
 
 function ANSICode(color::BitColor; bg::Bool = false)
     Δ = bg ? 48 : 38
     v = CODES_16BIT_COLORS[color.color]
-    return ANSICode("\e[$Δ;5;$(v)m", "\e[$(Δ+1)m")
+    return ANSICode("\e[$Δ;5;$(v)m", "\e[$(Δ + 1)m")
 end
 
 function ANSICode(color::RGBColor; bg::Bool = false)
     Δ = bg ? 48 : 38
     rgb = "$(color.r);$(color.g);$(color.b)"
-    return ANSICode("\e[$Δ;2;$(rgb)m", "\e[$(Δ+1)m")
+    return ANSICode("\e[$Δ;2;$(rgb)m", "\e[$(Δ + 1)m")
 end
 
 # --------------------------------- is color? -------------------------------- #

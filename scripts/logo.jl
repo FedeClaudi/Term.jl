@@ -77,19 +77,19 @@ function make_logo()
 
     # add a final message
     msg = """{#75b6e0}Term.jl is based on the {underline}Python{/underline} library {orange1 italic}Rich{/orange1 italic} by {/#75b6e0}Will McGugan. 
-                        {dim}https://github.com/Textualize/rich{/dim}"""
+    {dim}https://github.com/Textualize/rich{/dim}"""
 
     logo =
         Panel(
-            content;
-            title = "Term.jl",
-            title_style = "bold $indigo",
-            style = "dim $indigo",
-            subtitle = "https://github.com/FedeClaudi/Term.jl",
-            subtitle_justify = :right,
-            subtitle_style = "dim",
-            fit = false,
-        ) / "" / (Spacer(2, 12) * msg)
+        content;
+        title = "Term.jl",
+        title_style = "bold $indigo",
+        style = "dim $indigo",
+        subtitle = "https://github.com/FedeClaudi/Term.jl",
+        subtitle_justify = :right,
+        subtitle_style = "dim",
+        fit = false,
+    ) / "" / (Spacer(2, 12) * msg)
 
     return logo
 end

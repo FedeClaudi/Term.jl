@@ -23,7 +23,7 @@ text_widget_controls = Dict('q' => quit, Esc() => quit)
 TextWidget(
     text::String;
     as_panel = false,
-    on_draw::Union{Nothing,Function} = nothing,
+    on_draw::Union{Nothing, Function} = nothing,
     on_activated::Function = on_activated,
     on_deactivated::Function = on_deactivated,
     controls = text_widget_controls,
@@ -40,7 +40,7 @@ TextWidget(
     controls,
     text,
     as_panel,
-    Dict{Symbol,Any}(kwargs),
+    Dict{Symbol, Any}(kwargs),
 )
 
 on_layout_change(t::TextWidget, m::Measure) = t.internals.measure = m
@@ -89,10 +89,10 @@ InputBox collects and displays user input as text.
 @with_repr mutable struct InputBox <: AbstractWidget
     internals::WidgetInternals
     controls::AbstractDict
-    input_text::Union{Nothing,String}
+    input_text::Union{Nothing, String}
     blinker_update::Int
     blinker_status::Symbol
-    panel_kwargs::Dict{Symbol,Any}
+    panel_kwargs::Dict{Symbol, Any}
 end
 
 """
@@ -106,16 +106,16 @@ addspace(ib::InputBox, ::SpaceBar) = isnothing(ib.input_text) || (ib.input_text 
 """ delete last character """
 del(ib::InputBox, ::Del) =
     isnothing(ib.input_text) || begin
-        textwidth(ib.input_text) > 0 && (ib.input_text = ib.input_text[1:(end - 1)])
-    end
+    textwidth(ib.input_text) > 0 && (ib.input_text = ib.input_text[1:(end - 1)])
+end
 
 """ add character to input """
 addchar(ib::InputBox, c::Char) =
-    if isnothing(ib.input_text)
-        ib.input_text = string(c)
-    else
-        ib.input_text *= c
-    end
+if isnothing(ib.input_text)
+    ib.input_text = string(c)
+else
+    ib.input_text *= c
+end
 
 input_box_controls = Dict(
     Enter() => newline,
@@ -126,13 +126,13 @@ input_box_controls = Dict(
 )
 
 function InputBox(;
-    controls::AbstractDict = input_box_controls,
-    on_draw::Union{Nothing,Function} = nothing,
-    on_activated::Function = on_activated,
-    on_deactivated::Function = on_deactivated,
-    kwargs...,
-)
-    InputBox(
+        controls::AbstractDict = input_box_controls,
+        on_draw::Union{Nothing, Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
+        kwargs...,
+    )
+    return InputBox(
         WidgetInternals(
             Measure(5, console_width()),
             nothing,
@@ -195,22 +195,22 @@ on_layout_change(ph::PlaceHolderWidget, m::Measure) = ph.internals.measure = m
 
 function on_activated(ph::PlaceHolderWidget)
     ph.internals.active = true
-    ph.style = "bold"
+    return ph.style = "bold"
 end
 function on_deactivated(ph::PlaceHolderWidget)
     ph.internals.active = false
-    ph.style = "dim"
+    return ph.style = "dim"
 end
 
 function PlaceHolderWidget(
-    h::Int,
-    w::Int,
-    name::String,
-    color::String;
-    on_draw::Union{Nothing,Function} = nothing,
-    on_activated::Function = on_activated,
-    on_deactivated::Function = on_deactivated,
-)
+        h::Int,
+        w::Int,
+        name::String,
+        color::String;
+        on_draw::Union{Nothing, Function} = nothing,
+        on_activated::Function = on_activated,
+        on_deactivated::Function = on_deactivated,
+    )
     internals = WidgetInternals(
         Measure(h, w),
         nothing,
@@ -220,7 +220,7 @@ function PlaceHolderWidget(
         false,
     )
 
-    PlaceHolderWidget(internals, text_widget_controls, color, "dim", name)
+    return PlaceHolderWidget(internals, text_widget_controls, color, "dim", name)
 end
 
 function frame(ph::PlaceHolderWidget; kwargs...)

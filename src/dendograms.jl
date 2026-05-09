@@ -260,8 +260,8 @@ function link(dendos...; title = "", shifttitle = false, pretitle = nothing)::De
                 Segment(" "^l("⋀") * "⋀" * " "^r("⋀"), "$LINES_STYLE bold"),
                 Segment(
                     " "^l(BOXES[:SQUARE].bottom.vertical) *
-                    BOXES[:SQUARE].bottom.vertical *
-                    " "^r(BOXES[:SQUARE].bottom.vertical),
+                        BOXES[:SQUARE].bottom.vertical *
+                        " "^r(BOXES[:SQUARE].bottom.vertical),
                     "$LINES_STYLE dim",
                 ),
             ],

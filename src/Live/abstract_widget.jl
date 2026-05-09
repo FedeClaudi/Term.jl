@@ -23,8 +23,8 @@ callbacks assigned to it.
 """
 mutable struct WidgetInternals
     measure::Measure
-    parent::Union{Nothing,AbstractWidget}
-    on_draw::Union{Nothing,Function}
+    parent::Union{Nothing, AbstractWidget}
+    on_draw::Union{Nothing, Function}
     on_activated::Function
     on_deactivated::Function
     active::Bool
@@ -110,8 +110,8 @@ function print_node(io, x)
     w_color = wx >= wc ? style : "red"
 
     msg = """{$color}$(typeof(x)){/$color} {dim} ($hx, $wx){/dim}
-           {$style}content: ({$h_color}$hc{/$h_color}, {$w_color}$wc{/$w_color}){/$style}"""
-    print(io, apply_style(msg))
+    {$style}content: ({$h_color}$hc{/$h_color}, {$w_color}$wc{/$w_color}){/$style}"""
+    return print(io, apply_style(msg))
 end
 
 Base.print(io::IO, widget::AbstractWidget) = print_tree(print_node, print, io, widget)

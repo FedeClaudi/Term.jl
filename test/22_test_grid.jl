@@ -57,15 +57,15 @@ end
     h, w = 10, 20
     panels = collect(
         Panel("{on_$c} {/on_$c}", height = h, width = w) for c in (
-            :bright_red,
-            :bright_green,
-            :bright_blue,
-            :bright_yellow,
-            :bright_magenta,
-            :bright_cyan,
-            :bright_black,
-            :bright_white,
-        )
+                :bright_red,
+                :bright_green,
+                :bright_blue,
+                :bright_yellow,
+                :bright_magenta,
+                :bright_cyan,
+                :bright_black,
+                :bright_white,
+            )
     )
 
     # auto layout (default placeholder)

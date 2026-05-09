@@ -78,7 +78,7 @@ include("_errors.jl")
 # ---------------------------------------------------------------------------- #
 
 function print_term_error(io::IO, er, bt, reverse_backtrace, max_n_frames, hide_frames)
-    try
+    return try
         # create a StacktraceContext
         ctx = StacktraceContext()
 
@@ -156,11 +156,11 @@ Julia's default ordering), hide extra frames when a large number is in the trace
 and hide Base and standard libraries error information (i.e. when a frame is in a module belonging to those.)
 """
 function install_term_stacktrace(;
-    reverse_backtrace::Bool = true,
-    max_n_frames::Int = 30,
-    hide_frames = true,
-)
-    @eval begin
+        reverse_backtrace::Bool = true,
+        max_n_frames::Int = 30,
+        hide_frames = true,
+    )
+    return @eval begin
         function Base.showerror(io::IO, er, bt; backtrace = true)
             print(io, "\n")
             # @info "Showing" er bt
@@ -188,7 +188,7 @@ function install_term_stacktrace(;
                 $(hide_frames),
             )
             NOCOLOR[] && (err = cleantext(err))
-            print(io, err)
+            return print(io, err)
         end
     end
 end

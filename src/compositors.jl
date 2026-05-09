@@ -32,18 +32,18 @@ each `LayoutElement` if there is one, the placeholder otherwise.
     id::Symbol
     h::Int
     w::Int
-    renderable::Union{Nothing,String,AbstractRenderable}
+    renderable::Union{Nothing, String, AbstractRenderable}
     placeholder::PlaceHolder
 
     function LayoutElement(
-        id::Symbol,
-        h::Number,
-        w::Number,
-        renderable::Union{Nothing,String,AbstractRenderable},
-        placeholder::PlaceHolder;
-        max_w::Int = console_width(),
-        max_h::Int = console_height(),
-    )
+            id::Symbol,
+            h::Number,
+            w::Number,
+            renderable::Union{Nothing, String, AbstractRenderable},
+            placeholder::PlaceHolder;
+            max_w::Int = console_width(),
+            max_h::Int = console_height(),
+        )
         h = h isa Int ? h : fint(max_h * h)
         w = w isa Int ? w : fint(max_w * w)
         return new(id, h, w, renderable, placeholder)
@@ -62,7 +62,7 @@ A layout compositor, creates an updatable layout from an expression.
 """
 mutable struct Compositor
     layout::Expr
-    elements::Dict{Symbol,Union{Nothing,LayoutElement}}
+    elements::Dict{Symbol, Union{Nothing, LayoutElement}}
 end
 
 """
@@ -72,15 +72,15 @@ Constructor. Parses a layout expression and creates LayoutElements for
 each element in the expression.
 """
 function Compositor(
-    layout::Expr;
-    hpad::Int = 0,
-    vpad::Int = 0,
-    placeholder_size = nothing,
-    check::Bool = true,
-    max_w::Int = console_width(),
-    max_h::Int = console_height(),
-    kwargs...,
-)
+        layout::Expr;
+        hpad::Int = 0,
+        vpad::Int = 0,
+        placeholder_size = nothing,
+        check::Bool = true,
+        max_w::Int = console_width(),
+        max_h::Int = console_height(),
+        kwargs...,
+    )
     elements = get_elements_and_sizes(layout; placeholder_size = placeholder_size)
     names = map(e -> first(e.args), elements)
 
@@ -93,25 +93,25 @@ function Compositor(
 
     renderables = Dict(
         n => extract_renderable_from_kwargs(e.args...; check = check, kwargs...) for
-        (n, e) in zip(names, elements)
+            (n, e) in zip(names, elements)
     )
 
     placeholders = Dict(
         n => compositor_placeholder(e.args..., n ≡ :_ ? "hidden" : c) for
-        (n, c, e) in zip(names, colors, elements)
+            (n, c, e) in zip(names, colors, elements)
     )
 
     # create layout elements
     layout_elements = Dict(
         n => LayoutElement(
-            n,          # symbol
-            e.args[2],  # height
-            e.args[3],  # width
-            renderables[n],
-            placeholders[n];
-            max_w = max_w,
-            max_h = max_h,
-        ) for (n, e) in zip(names, elements)
+                n,          # symbol
+                e.args[2],  # height
+                e.args[3],  # width
+                renderables[n],
+                placeholders[n];
+                max_w = max_w,
+                max_h = max_h,
+            ) for (n, e) in zip(names, elements)
     )
 
     # edit layout expression to add padding and remove size info
@@ -143,10 +143,10 @@ If the content's measure doesn't match the pre-defined size of
 the `LayoutElement`, it prints a warning message.
 """
 function update!(
-    compositor::Compositor,
-    id::Symbol,
-    content::Union{String,AbstractRenderable},
-)
+        compositor::Compositor,
+        id::Symbol,
+        content::Union{String, AbstractRenderable},
+    )
     # check that the id is valid
     haskey(compositor.elements, id) || begin
         @warn highlight("Could not update compositor - id: `$id` is not in the layout")
@@ -167,14 +167,14 @@ function update!(
     end
 
     # update content
-    compositor.elements[id].renderable = content
+    return compositor.elements[id].renderable = content
 end
 
 function update!(compositor::Compositor; kwargs...)
     for (id, content) in kwargs
         update!(compositor, id, content)
     end
-    compositor
+    return compositor
 end
 
 # ---------------------------------------------------------------------------- #

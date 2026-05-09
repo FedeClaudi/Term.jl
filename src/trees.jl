@@ -28,7 +28,7 @@ treeguides = Dict(
 #                                     TREE                                     #
 # ---------------------------------------------------------------------------- #
 
-const _TREE_PRINTING_TITLE = Ref{Union{Nothing,String}}(nothing)
+const _TREE_PRINTING_TITLE = Ref{Union{Nothing, String}}(nothing)
 
 """
     print_node(io, node) 
@@ -51,7 +51,7 @@ function print_node(io, node; kw...)
         print(io, apply_style(title, theme.tree_title))
     end
 
-    _TREE_PRINTING_TITLE[] = nothing
+    return _TREE_PRINTING_TITLE[] = nothing
 end
 
 """
@@ -61,7 +61,7 @@ Print a tree's node's key with some style.
 """
 function print_key(io, k; kw...)
     s = TERM_THEME[].tree_keys
-    print(io, apply_style("{s}" * string(k) * "{/s}"))
+    return print(io, apply_style("{s}" * string(k) * "{/s}"))
 end
 
 """
@@ -127,16 +127,16 @@ Arguments:
 For other kwargs look at `AbstractTrees.print_tree`
 """
 function Tree(
-    tree;
-    guides::Union{TreeCharSet,Symbol} = :standardtree,
-    theme::Theme = TERM_THEME[],
-    printkeys::Union{Nothing,Bool} = true,
-    print_node_function::Function = print_node,
-    print_key_function::Function = print_key,
-    title::Union{String,Nothing} = nothing,
-    prefix::String = "  ",
-    kwargs...,
-)
+        tree;
+        guides::Union{TreeCharSet, Symbol} = :standardtree,
+        theme::Theme = TERM_THEME[],
+        printkeys::Union{Nothing, Bool} = true,
+        print_node_function::Function = print_node,
+        print_key_function::Function = print_key,
+        title::Union{String, Nothing} = nothing,
+        prefix::String = "  ",
+        kwargs...,
+    )
     _TREE_PRINTING_TITLE[] = title
     _theme = TERM_THEME[]
     TERM_THEME[] = theme
@@ -231,7 +231,7 @@ function Tree(T::DataType)::Tree
     subs = Dict(string(s) => nothing for s in subtypes(T))
     data = make_hierarchy_dict(supertypes(T), T, subs)
 
-    # define a fn to avoid printing nodes 
+    # define a fn to avoid printing nodes
     s = TERM_THEME[].tree_mid
     fn(io::IO, x) =
         length(children(x)) > 0 ? print(io, apply_style("{$s}┬{/$s}")) : print(io, "")

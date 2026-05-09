@@ -100,9 +100,9 @@ end
     strings = [
         "aaa\nadasda\nasdasda",
         """
-        asdasd
-adsada
-asddsa""",
+                asdasd
+        adsada
+        asddsa""",
     ]
     for str in strings
         @test join_lines(split_lines(str)) == str

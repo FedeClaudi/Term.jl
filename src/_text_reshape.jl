@@ -55,7 +55,7 @@ function reshape_text(text::AbstractString, width::Int; ignore_markup::Bool = fa
     push!(lines, rstrip(line))
 
     out = join((fix_ansi_across_lines ∘ fix_markup_across_lines)(lines), "\n")
-    chomp(out)
+    return chomp(out)
 end
 
 """
@@ -100,11 +100,11 @@ Cast a text to have a given width by reshaping, it and padding.
 It includes an option to justify the text (:left, :right, :center, :justify).
 """
 function text_to_width(
-    text::AbstractString,
-    width::Int,
-    justify::Symbol;
-    background::Union{String,Nothing} = nothing,
-)::String
+        text::AbstractString,
+        width::Int,
+        justify::Symbol;
+        background::Union{String, Nothing} = nothing,
+    )::String
     # reshape text
     if Measure(text).w > width
         text = reshape_text(text, width - 1)

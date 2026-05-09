@@ -72,7 +72,7 @@ struct SpaceBar <: KeyInput end
 struct Esc <: KeyInput end
 struct Del <: KeyInput end
 
-KEYs = Dict{Int,KeyInput}(
+KEYs = Dict{Int, KeyInput}(
     13 => Enter(),
     27 => Esc(),
     32 => SpaceBar(),
