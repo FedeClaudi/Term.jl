@@ -67,5 +67,7 @@ dosmth(m::MyStr) = print(m.x)
     # IS_WIN || @compare_to_string intro "introspection_Panel"
 
     intro = @capture_out inspect(print)
-    IS_WIN || @compare_to_string remove_ansi(intro) "introspection_print"
+    if VERSION ≥ v"1.12"
+        IS_WIN || @compare_to_string remove_ansi(intro) "introspection_print"
+    end
 end
