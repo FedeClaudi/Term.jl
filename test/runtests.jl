@@ -46,7 +46,7 @@ end
 @runner "07_test_renderables.jl"
 @runner "08_test_panel.jl"
 @runner "09_test_layout.jl"
-@runner "10_test_inspect.jl"
+@runner "10_test_introspection.jl"
 @runner "11_test_theme.jl"
 @runner "12_test_console.jl"
 @runner "13_test_logs.jl"

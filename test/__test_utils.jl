@@ -5,7 +5,7 @@ cleanstring(x) = replace(string(x), "\r\n" => "\n")
 cleansprint(fn, x) = replace(sprint(fn, x), "\r\n" => "\n")
 
 """
-Write one or multiple strings to a text file so that they can 
+Write one or multiple strings to a text file so that they can
 later be used for testing.
 """
 tofile(content::Vector, filepath) =
@@ -89,7 +89,7 @@ Check that the string representation of an object is identical to
 what's saved in a .txt file at `filename`. If `obj` is an expression or
 a renderable first turn it into a string.
 
-If `TEST_DEBUG_MODE=true`, instead of comparing to a file, save the 
+If `TEST_DEBUG_MODE=true`, instead of comparing to a file, save the
 obj's string to the file for future comparison. Also print out
 the output for visual inspection.
 """
@@ -107,7 +107,7 @@ macro compare_to_string(obj, filename, func = identity, skip = nothing)
 
             if TEST_DEBUG_MODE || !isfile(_fn)  # if it doesn't exist, create it.
                 print("\n"^3)
-                tprintln(_txt, highlight = false)
+                tprintln(_txt; highlight = false)
                 tofile(_txt, _fn)
             else
                 correct = load_from_txt(_fn)

@@ -1,0 +1,79 @@
+─────────────────────────────── inspecting: print ──────────────────────────────
+   ╭──── Function: print ─────────────────────────────────────────────────╮
+   │                                                                      │
+   │ (1)  print(compositor::Compositor; kwargs...)                        │
+   │ (2)                                                                  │
+   │ (3)  print(io::Base.AnnotatedIOBuffer, c::Base.Annotat               │
+   │     edChar)                                                          │
+   │ (4)                                                                  │
+   │ (5)  print(io::Base.AnnotatedIOBuffer, s::Union{Base.A               │
+   │     nnotatedString, SubString{<:Base.AnnotatedString}                │
+   │     )                                                                │
+   │ (6)                                                                  │
+   │ (7)  print(io::IO, llp::Base.Libc.Libdl.LazyLibraryPat               │
+   │     h)                                                               │
+   │ (8)                                                                  │
+   │ (9)  print(io::IO, s::Symbol)                                        │
+   │ (10)                                                                 │
+   │                                                                      │
+   ╰─────────────────────────────────────────────────────── 90 methods ───╯
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ Docstring ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       ┌─────────────────────────────────────────────────────────┐             
+       │  print([io::IO], xs...)                                 │             
+       └─────────────────────────────────────────────── julia ───┘             
+                                                                               
+   Write to `io` (or to the default output stream `stdout` (@ref) if           
+   `io` is not given) a canonical (un-decorated) text representation.          
+   The representation used by `print` includes minimal formatting and          
+   tries to avoid Julia-specific details.                                      
+                                                                               
+   `print` falls back to calling the 2-argument `show(io, x)` for each         
+   argument `x` in `xs`, so most types should just define `show`. Define       
+   `print` if your type has a separate "plain" representation.  For exampl     
+   e, `show` displays strings with quotes, and `print` displays strings        
+   without quotes.                                                             
+                                                                               
+   See also `println` (@ref), `string` (@ref), `printstyled` (@ref).           
+                                                                               
+   ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓             
+   ┃                          Examples                           ┃             
+   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛             
+                                                                               
+       ┌─────────────────────────────────────────────────────────┐             
+       │  julia> print("Hello World!")                           │             
+       │  Hello World!                                           │             
+       │  julia> io = IOBuffer();                                │             
+       │                                                         │             
+       │  julia> print(io, "Hello", ' ', :World!)                │             
+       │                                                         │             
+       │  julia> String(take!(io))                               │             
+       │  "Hello World!"                                         │             
+       └─────────────────────────────────────────── jldoctest ───┘             
+                                                                               
+       ┌─────────────────────────────────────────────────────────┐             
+       │  print(io::IO, renderable::AbstractRenderable)          │             
+       └─────────────────────────────────────────────── julia ───┘             
+                                                                               
+   Print a renderable to an IO                                                 
+                                                                               
+       ┌─────────────────────────────────────────────────────────┐             
+       │  Base.print(io::IO, prompt::AbstractPrompt)             │             
+       └─────────────────────────────────────────────── julia ───┘             
+                                                                               
+   Default prompt printing, just prints the message `prompt` with a bit        
+   of style.                                                                   
+                                                                               
+       ┌─────────────────────────────────────────────────────────┐             
+       │  Base.print(io::IO, prompt::AbstractOptionsPrompt)      │             
+       └─────────────────────────────────────────────── julia ───┘             
+                                                                               
+   Options prompts additionally print the available options.                   
+                                                                               
+       ┌─────────────────────────────────────────────────────────┐             
+       │  Base.print(io::IO, prompt::AbstractDefaultPrompt)      │             
+       └─────────────────────────────────────────────── julia ───┘             
+                                                                               
+   Print a prompt with style applied to the default option.                    
+
+
+
