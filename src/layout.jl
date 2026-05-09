@@ -70,12 +70,12 @@ julia> pad("ciao", 10, :right)
 function pad(text::AbstractString, target_width::Int, method::Symbol; bg = nothing)
     bg = get_bg_color(bg)
     occursin('\n', text) &&
-        return do_by_line(ln -> pad(ln, target_width, method; bg = bg), text)
+        return do_by_line(ln -> pad(ln, target_width, method; bg), text)
 
     # get total padding size
     lw = width(text)
     lw ≥ target_width && return text
-    return pad(text, target_width, method, lw; bg = bg)
+    return pad(text, target_width, method, lw; bg)
 end
 
 """
@@ -500,9 +500,7 @@ vstack(s1::String, s2::String; pad::Int = 0) = s1 * '\n'^(pad + 1) * s2
 Vertically stack a variable number of renderables to give a new renderable
 """
 function vstack(renderables::RenderablesUnion...; pad::Int = 0)
-    # @show renderables
     renderables = leftalign(renderables...)
-    # @show renderables
     segments = if pad > 0
         foldl((a, b) -> a / ('\n'^pad) / b, renderables).segments
     else

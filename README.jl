@@ -98,7 +98,7 @@ function make_rgb_colors(; max_width = 88)
         colors *= "\n"
     end
 
-    return colors
+    return chomp(colors)
 end
 
 function rainbow_maker(N)
@@ -258,54 +258,9 @@ main() = begin
         """; width = 80,
     )
 
-    function remove_markup2(input_text; remove_orphan_tags = true)::String
-        if remove_orphan_tags
-            return Term.replace_multi(
-                input_text,
-                Term.OPEN_TAG_REGEX => "",
-                Term.GENERIC_CLOSER_REGEX => "",
-                Term.CLOSE_TAG_REGEX => "",
-            )
-        else
-            # turn non-orphaned closing tags in opening tags before removing them
-            for match in eachmatch(Term.OPEN_TAG_REGEX, input_text)
-                markup = match.match[2:(end - 1)]
-                close = r"\{\/" * Regex(markup) * r"\}"
-                input_text = replace(input_text, close => "{$markup}", count = 1)
-            end
-            return Term.replace_multi(input_text, Term.OPEN_TAG_REGEX => "", Term.GENERIC_CLOSER_REGEX => "")
-        end
-    end
-
-    function Measure2(str::AbstractString)
-        txt = Term.remove_markup(Term.remove_ansi(str); remove_orphan_tags = false)
-        lines = split(txt, '\n')
-        tl = textlen.(lines; remove_orphan_tags = false)
-        @show str txt tl
-        return Measure(length(lines), maximum(tl))
-    end
-
     off = 2
     colors = Spacer(1, 10) / colors
-    if false
-        @show Term.console_width()
-        @show typeof(colors)
-        # foreach(println, colors.segments)
-        @show Measure.(colors.segments)
-        ll = colors.segments[2]
-        @show ll Renderable(ll.text)
-        return
-        no_ansi = Term.remove_ansi(ll.text)
-        @show ll.text no_ansi
-        @show remove_markup2(no_ansi; remove_orphan_tags = true)
-        @show remove_markup2(no_ansi; remove_orphan_tags = false)
-        @show typeof(ll)
-        println(repr(ll.text))
-        print(ll.text)
-        print(ll)
-        @show Measure2(ll.text) cleantext(ll.text) length(cleantext(ll.text))
-        return
-    end
+
     a = Spacer(height(circles), 4off) * circles * Spacer(height(circles), 4off) * basic_features
     b = Spacer(height(colors_info), off) * colors_info * Spacer(height(colors_info), off) * colors
     c = Spacer(height(lorem_description), off) * lorem_description * lorem1 * lorem2
@@ -314,15 +269,10 @@ main() = begin
     f = Spacer(height(txt), 30) * vLine(height(txt); style = "dim") * txt * vLine(height(txt); style = "dim")
     g = Spacer(height(grid_rens), 50) * grid_rens
 
-    # @show width(colors) height(colors)
-    # @show Measure(colors_info) Measure(colors)
-
-    # FIXME : something is too wide here, whereas each individual item renders ok
-    # colors in b is too wide
     all = a, b, c, d, e, f
 
     max_width = maximum(width.(all))
-    @show width.(all) max_width
+    # @show width.(all) max_width
     line = hLine(max_width; style = "bold dim grey35", box = :HEAVY)
 
     if false
@@ -330,7 +280,7 @@ main() = begin
         return
     end
     lines = fill(line, length(all) - 1)
-    readme = reduce(/, zip(all, lines) |> Iterators.flatten |> collect)
+    readme = foldl(/, zip(all, lines) |> Iterators.flatten |> collect)
 
     # print(Spacer(height(readme), 10) * readme)
     write(joinpath(@__DIR__, "README.txt"), string(readme))

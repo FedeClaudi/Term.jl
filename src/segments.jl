@@ -3,7 +3,7 @@ module Segments
 import Term: remove_markup, remove_ansi, unescape_brackets
 
 import ..Style: apply_style, MarkupStyle
-import ..Measures: Measure, width
+import ..Measures: Measure
 
 using Term: Term
 
@@ -29,9 +29,9 @@ end
 
 Construct a Segment out of a string with markup.
 """
-Segment(text) = begin
+function Segment(text)
     text = apply_style(text)
-    Segment(text, Measure(text))
+    return Segment(text, Measure(text))
 end
 
 """
@@ -67,7 +67,7 @@ Base.:*(seg1::Segment, seg2::Segment) = Segment(seg1.text * seg2.text)
 
 Given a number of `Segment[]` vectors, get the `AbstractString` like
 type they're using. If they are all using normal `String` or `Substring`
-go with that, but if one of them is using a different string type, use it. 
+go with that, but if one of them is using a different string type, use it.
 """
 function get_string_types(segments_vectors...)::DataType
     stypes::Vector{DataType} =

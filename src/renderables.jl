@@ -19,7 +19,7 @@ import Term:
 import Term
 
 import ..Consoles: console_width
-import ..Measures: Measure, width as get_width
+import ..Measures: Measure, Measure_clean, width as get_width
 import ..Segments: Segment, get_string_types
 import ..Style: apply_style, MarkupStyle, get_style_codes
 
@@ -97,14 +97,11 @@ mutable struct Renderable <: AbstractRenderable
 end
 
 """
-    Renderable(
-        str::String; width::Union{Nothing,Int} = nothing
-    )
+    Renderable(str::String; width::Union{Nothing,Int} = nothing)
 
 Convenience method to construct a RenderableText
 """
 Renderable(str::AbstractString) = RenderableText(str)
-
 Renderable(ren::AbstractRenderable) = ren
 Renderable() = Renderable(Vector{Segment}[], Measure(0, 0))
 

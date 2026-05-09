@@ -2,7 +2,7 @@ module Measures
 
 import Term: rint, remove_ansi, remove_markup, default_width, cleantext, DEFAULT_ASPECT_RATIO, textlen
 import Base: ==
-export Measure
+export Measure, Measure_clean
 
 """
     Measure
@@ -34,10 +34,10 @@ function Measure(str::AbstractString)
     lines = split(str, '\n')
     return Measure(length(lines), maximum(textlen.(lines; remove_orphan_tags = false)))
 end
-# function Measure(str::AbstractString)
-#     lines = cleantext.(split(str, '\n'))
-#     return Measure(length(lines), maximum(length.(lines)))
-# end
+function Measure_clean(str::AbstractString)
+    lines = cleantext.(split(str, '\n'))
+    return Measure(length(lines), maximum(length.(lines)))
+end
 
 Measure(::Nothing) = Measure(0, 0)
 Measure() = Measure(0, 0)
