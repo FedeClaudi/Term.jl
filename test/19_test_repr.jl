@@ -24,12 +24,10 @@ end
     obj = Rocket(10, 50, 5000, "NASA")
     @with_repr struct T end
 
-    if VERSION ≥ v"1.7"
-        IS_WIN || @compare_to_string sprint(termshow, obj) "repr_rocket"
-        IS_WIN || @compare_to_string sprint(termshow, T()) "repr_T_struct"
-        if VERSION ≤ v"1.10"
-            IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
-        end
+    IS_WIN || @compare_to_string sprint(termshow, obj) "repr_rocket"
+    IS_WIN || @compare_to_string sprint(termshow, T()) "repr_T_struct"
+    if VERSION ≤ v"1.10"
+        IS_WIN || @compare_to_string sprint(termshow, Rocket) "repr_rocket_struct"
     end
     @with_repr struct MyTestStruct3
         x::String
@@ -41,9 +39,7 @@ end
 
     mts = MyTestStruct3("aa aa"^100, zeros(100, 100), 3, Panel(), "b b b"^100)
 
-    if VERSION ≥ v"1.7"
-        IS_WIN || @compare_to_string sprint(termshow, mts) "mts_repr"
-    end
+    IS_WIN || @compare_to_string sprint(termshow, mts) "mts_repr"
 end
 
 @testset "REPR @with_repr with doc" begin
@@ -67,28 +63,19 @@ end
 fn(x::Int) = x
 fn(s::String) = s
 
-objs = if VERSION >= v"1.7.1"
-    (
-        (1, [1, 2, 3]),
-        (2, Dict(:x => [1, 2, 3], "a" => Dict(:z => "a"))),
-        (3, Dict(i => i for i in 1:100)),
-        (4, zeros(120, 300)),
-        (5, zeros(200)),
-        (6, zeros(3, 3, 3)),
-        (7, fn),
-        (8, :(x / y + √9)),
-        (9, zeros(10)),
-        (10, zeros(5, 5)),
-        (11, zeros(100, 100, 100)),
-    )
-else
-    (
-        (1, [1, 2, 3]),
-        (2, Dict(:x => [1, 2, 3], "a" => Dict(:z => "a"))),
-        (3, Dict(i => i for i in 1:100)),
-        (7, fn),
-    )
-end
+objs = (
+    (1, [1, 2, 3]),
+    (2, Dict(:x => [1, 2, 3], "a" => Dict(:z => "a"))),
+    (3, Dict(i => i for i in 1:100)),
+    (4, zeros(120, 300)),
+    (5, zeros(200)),
+    (6, zeros(3, 3, 3)),
+    (7, fn),
+    (8, :(x / y + √9)),
+    (9, zeros(10)),
+    (10, zeros(5, 5)),
+    (11, zeros(100, 100, 100)),
+)
 
 v"1.7" ≤ VERSION ≤ v"1.10" && @testset "TERMSHOW for types" begin
     for (i, t) in objs
