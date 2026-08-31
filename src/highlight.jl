@@ -1,8 +1,7 @@
 import OrderedCollections: OrderedDict
-import Highlights: Lexers
+import tree_sitter_julia_jll
 
 using Highlights: Highlights
-using Highlights.Format
 
 # ------------------------------- highlighting ------------------------------- #
 highlight_regexes = OrderedDict(
@@ -59,26 +58,41 @@ highlight(x; theme = TERM_THEME[]) = apply_style(string(x), theme(x)) # capture 
 # ------------------------------ Highlighters.jl ----------------------------- #
 
 """
-    Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
+    code_style(capture::AbstractString)
 
-custom ANSI lexer for Highlighters.jl
+Style for a tree sitter capture name, from the `CodeTheme` entry of the
+capture itself or, failing that, of its closest ancestor.
 """
-function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
-    for (str, id, style) in tokens
-        fg = style.fg.active ? map(Int, (style.fg.r, style.fg.g, style.fg.b)) : ""
-        bg = style.bg.active ? map(Int, (style.bg.r, style.bg.g, style.bg.b)) : nothing
-
-        bold = style.bold ? "bold" : ""
-        italic = style.italic ? "italic" : ""
-        underline = style.underline ? "underline" : ""
-        bg = isnothing(bg) ? "" : "on_$(bg)"
-        markup = "$fg $(bg) $(bold) $(italic) $(underline)"
-        if length(strip(markup)) > 0
-            print(io, "{$markup}$str{/$markup}")
-        else
-            print(io, str)
-        end
+function code_style(capture::AbstractString)
+    parts = split(capture, '.')
+    while !isempty(parts)
+        style = get(CodeTheme, join(parts, '.'), nothing)
+        isnothing(style) || return style
+        pop!(parts)
     end
+    return CodeTheme["text"]
+end
+
+print_code_segment(io::IO, code::AbstractString, style::AbstractString) =
+    print(io, "{$style}", escape_brackets(code), "{/$style}")
+
+"""
+    render_code(io::IO, code::AbstractString)
+
+custom markup renderer for Highlighters.jl tokens
+"""
+function render_code(io::IO, code::AbstractString)
+    pos = 1
+    for token in Highlights.highlight_tokens(tree_sitter_julia_jll, code)
+        first_byte, last_byte = token.byte_range
+        pos < first_byte && print_code_segment(
+            io, SubString(code, pos, thisind(code, first_byte - 1)), CodeTheme["text"]
+        )
+        print_code_segment(io, token.text, code_style(token.capture))
+        pos = last_byte + 1
+    end
+    pos ≤ ncodeunits(code) &&
+        print_code_segment(io, SubString(code, pos), CodeTheme["text"])
     return
 end
 
@@ -88,14 +102,7 @@ end
 Highlight Julia code syntax in a string.
 """
 function highlight_syntax(code::AbstractString; style::Bool = true)
-    txt = sprint(
-        Highlights.highlight,
-        MIME("text/ansi"),
-        escape_brackets(code),
-        Lexers.JuliaLexer,
-        CodeTheme;
-        context = stdout,
-    )
+    txt = sprint(render_code, code; context = stdout)
     style && (txt = apply_style(txt))
     return remove_markup(txt)
 end
