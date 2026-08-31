@@ -60,8 +60,7 @@ highlight(x; theme = TERM_THEME[]) = apply_style(string(x), theme(x)) # capture 
 """
     code_style(capture::AbstractString)
 
-Style for a tree sitter capture name, from the `CodeTheme` entry of the
-capture itself or, failing that, of its closest ancestor.
+Look up `capture` in `CodeTheme`, falling back to its closest ancestor capture.
 """
 function code_style(capture::AbstractString)
     parts = split(capture, '.')
@@ -81,11 +80,6 @@ function print_code_segment(io::IO, code::AbstractString, style::AbstractString)
     return
 end
 
-"""
-    render_code(io::IO, code::AbstractString)
-
-custom markup renderer for Highlighters.jl tokens
-"""
 function render_code(io::IO, code::AbstractString)
     pos = 1
     for token in Highlights.highlight_tokens(tree_sitter_julia_jll, code)
@@ -112,16 +106,15 @@ function highlight_syntax(code::AbstractString; style::Bool = true)
     return remove_markup(txt)
 end
 
-# a stack trace highlights many frames of the same few files, and highlighting
-# a file is dominated by the cost of parsing it, so hold on to the last few
+# Stack traces revisit the same few files across frames, and parsing dominates the cost.
 const HIGHLIGHTED_FILES = Dict{Tuple{String, Float64}, Vector{String}}()
 const HIGHLIGHTED_FILES_CACHE_SIZE = 32
 
 """
     highlight_file_lines(path::AbstractString)::Vector{String}
 
-Highlight the syntax of an entire file and return its styled lines, so that
-every line is highlighted in the context of the whole file rather than on its own.
+Highlight `path`, returning its styled lines. Parsing the whole file keeps each
+line's enclosing block intact, which a line-at-a-time parse would cut apart.
 """
 function highlight_file_lines(path::AbstractString)::Vector{String}
     length(HIGHLIGHTED_FILES) ≥ HIGHLIGHTED_FILES_CACHE_SIZE && empty!(HIGHLIGHTED_FILES)

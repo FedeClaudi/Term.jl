@@ -370,12 +370,11 @@ end
 # ------------------------------ Highlighters.jl ----------------------------- #
 
 """
-Custom hilighting theme for Highlighters.jl
-https://juliadocs.github.io/Highlights.jl/stable/
+Custom highlighting theme for Highlights.jl.
 
-Keys are tree sitter capture names, looked up by `code_style` along the capture
-hierarchy, so `keyword` also covers `keyword.return`. Captures with no entry
-of their own fall back to `text`.
+Keys are tree sitter capture names; `code_style` looks them up along the
+capture hierarchy (`keyword` also covers `keyword.return`), falling back to
+`text` when unmatched.
 """
 const CodeTheme = Dict(
     "text" => "#dedede",
