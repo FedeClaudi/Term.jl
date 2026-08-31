@@ -70,6 +70,14 @@ Returns `true` if `text` includes a `MarkupTag`
 """
 has_ansi(text)::Bool = occursin(ANSI_REGEX, text)
 
+"""
+    lstrip_ansi(text)
+
+Remove leading whitespace from a string of text, keeping the ANSI tags among it.
+"""
+lstrip_ansi(text)::String =
+    replace(text, r"^(?:\e\[[0-9;]*m|\s)*" => m -> replace(m, r"\s" => ""))
+
 # --------------------------- clean text / text len -------------------------- #
 """
     cleantext(str::AbstractString)

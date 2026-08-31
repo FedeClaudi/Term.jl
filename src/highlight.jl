@@ -73,8 +73,13 @@ function code_style(capture::AbstractString)
     return CodeTheme["text"]
 end
 
-print_code_segment(io::IO, code::AbstractString, style::AbstractString) =
-    print(io, "{$style}", escape_brackets(code), "{/$style}")
+function print_code_segment(io::IO, code::AbstractString, style::AbstractString)
+    for (i, line) in enumerate(split(code, '\n'))
+        i > 1 && print(io, '\n')
+        isempty(line) || print(io, "{$style}", escape_brackets(line), "{/$style}")
+    end
+    return
+end
 
 """
     render_code(io::IO, code::AbstractString)
@@ -103,8 +108,26 @@ Highlight Julia code syntax in a string.
 """
 function highlight_syntax(code::AbstractString; style::Bool = true)
     txt = sprint(render_code, code; context = stdout)
-    style && (txt = apply_style(txt))
+    style && (txt = do_by_line(apply_style, txt))
     return remove_markup(txt)
+end
+
+# a stack trace highlights many frames of the same few files, and highlighting
+# a file is dominated by the cost of parsing it, so hold on to the last few
+const HIGHLIGHTED_FILES = Dict{Tuple{String, Float64}, Vector{String}}()
+const HIGHLIGHTED_FILES_CACHE_SIZE = 32
+
+"""
+    highlight_file_lines(path::AbstractString)::Vector{String}
+
+Highlight the syntax of an entire file and return its styled lines, so that
+every line is highlighted in the context of the whole file rather than on its own.
+"""
+function highlight_file_lines(path::AbstractString)::Vector{String}
+    length(HIGHLIGHTED_FILES) ≥ HIGHLIGHTED_FILES_CACHE_SIZE && empty!(HIGHLIGHTED_FILES)
+    return get!(HIGHLIGHTED_FILES, (String(path), mtime(path))) do
+        split_lines(highlight_syntax(join_lines(readlines(path)); style = true))
+    end
 end
 
 """
@@ -117,16 +140,9 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     @assert lineno > 0 "lineno must be ≥1"
     @assert lineno ≤ η "lineno $lineno too high for file with $(η) lines"
 
-    lines = read_file_lines(path, lineno - δ, lineno + δ)
-    linenos = first.(lines)
-    code =
-        [highlight_syntax((δ == 0 ? lstrip(ln[2]) : ln[2]); style = true) for ln in lines]
-    code = split(join(code), "\n")
-
-    # clean
-    clean(line) = replace(replace(line, "    {/    }" => ""), '\r' => "")  # NOTE: julia `1.6` compat
-    codelines = clean.(code)  # [10-δ:10+δ]
-    linenos = linenos  # [10-δ:10+δ]
+    linenos = max(lineno - δ, 1):min(lineno + δ, η)
+    codelines = highlight_file_lines(path)[linenos]
+    δ == 0 && (codelines = lstrip_ansi.(codelines))
 
     # format
     _len = textlen ∘ lstrip
@@ -159,12 +175,5 @@ end
 
 Load and highlight the syntax of an entire file
 """
-function load_code_and_highlight(path::AbstractString)::String
-    lines = readlines(path)
-    code = [highlight_syntax(ln; style = true) for ln in lines]
-
-    # clean
-    clean(line) = replace(line, "    {/    }" => "")
-    codelines = clean.(code)
-    return join(codelines, "\n")
-end
+load_code_and_highlight(path::AbstractString)::String =
+    join_lines(highlight_file_lines(path))
