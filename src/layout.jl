@@ -545,9 +545,9 @@ function hstack(r1::RenderablesUnion, r2::RenderablesUnion; pad::Int = 0)
     stype = get_string_types(s1, s2)
     segments = [
         Segment(
-                stype(ss1.text * ' '^pad * ss2.text),
-                Measure(1, ss1.measure.w + pad + ss2.measure.w),
-            ) for (ss1, ss2) in zip(s1, s2)
+            stype(ss1.text * ' '^pad * ss2.text),
+            Measure(1, ss1.measure.w + pad + ss2.measure.w),
+        ) for (ss1, ss2) in zip(s1, s2)
     ]
     return Renderable(segments, Measure(segments))
 end
