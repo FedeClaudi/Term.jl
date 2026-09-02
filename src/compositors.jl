@@ -104,14 +104,14 @@ function Compositor(
     # create layout elements
     layout_elements = Dict(
         n => LayoutElement(
-                n,          # symbol
-                e.args[2],  # height
-                e.args[3],  # width
-                renderables[n],
-                placeholders[n];
-                max_w = max_w,
-                max_h = max_h,
-            ) for (n, e) in zip(names, elements)
+            n,          # symbol
+            e.args[2],  # height
+            e.args[3],  # width
+            renderables[n],
+            placeholders[n];
+            max_w = max_w,
+            max_h = max_h,
+        ) for (n, e) in zip(names, elements)
     )
 
     # edit layout expression to add padding and remove size info

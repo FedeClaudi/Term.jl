@@ -1,8 +1,7 @@
 import OrderedCollections: OrderedDict
-import Highlights: Lexers
+import tree_sitter_julia_jll
 
 using Highlights: Highlights
-using Highlights.Format
 
 # ------------------------------- highlighting ------------------------------- #
 highlight_regexes = OrderedDict(
@@ -59,26 +58,40 @@ highlight(x; theme = TERM_THEME[]) = apply_style(string(x), theme(x)) # capture 
 # ------------------------------ Highlighters.jl ----------------------------- #
 
 """
-    Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
+    code_style(capture::AbstractString)
 
-custom ANSI lexer for Highlighters.jl
+Look up `capture` in `CodeTheme`, falling back to its closest ancestor capture.
 """
-function Format.render(io::IO, ::MIME"text/ansi", tokens::Format.TokenIterator)
-    for (str, id, style) in tokens
-        fg = style.fg.active ? map(Int, (style.fg.r, style.fg.g, style.fg.b)) : ""
-        bg = style.bg.active ? map(Int, (style.bg.r, style.bg.g, style.bg.b)) : nothing
-
-        bold = style.bold ? "bold" : ""
-        italic = style.italic ? "italic" : ""
-        underline = style.underline ? "underline" : ""
-        bg = isnothing(bg) ? "" : "on_$(bg)"
-        markup = "$fg $(bg) $(bold) $(italic) $(underline)"
-        if length(strip(markup)) > 0
-            print(io, "{$markup}$str{/$markup}")
-        else
-            print(io, str)
-        end
+function code_style(capture::AbstractString)
+    parts = split(capture, '.')
+    while !isempty(parts)
+        style = get(CodeTheme, join(parts, '.'), nothing)
+        isnothing(style) || return style
+        pop!(parts)
     end
+    return CodeTheme["text"]
+end
+
+function print_code_segment(io::IO, code::AbstractString, style::AbstractString)
+    for (i, line) in enumerate(split(code, '\n'))
+        i > 1 && print(io, '\n')
+        isempty(line) || print(io, "{$style}", escape_brackets(line), "{/$style}")
+    end
+    return
+end
+
+function render_code(io::IO, code::AbstractString)
+    pos = 1
+    for token in Highlights.highlight_tokens(tree_sitter_julia_jll, code)
+        first_byte, last_byte = token.byte_range
+        pos < first_byte && print_code_segment(
+            io, SubString(code, pos, thisind(code, first_byte - 1)), CodeTheme["text"]
+        )
+        print_code_segment(io, token.text, code_style(token.capture))
+        pos = last_byte + 1
+    end
+    pos ≤ ncodeunits(code) &&
+        print_code_segment(io, SubString(code, pos), CodeTheme["text"])
     return
 end
 
@@ -88,16 +101,26 @@ end
 Highlight Julia code syntax in a string.
 """
 function highlight_syntax(code::AbstractString; style::Bool = true)
-    txt = sprint(
-        Highlights.highlight,
-        MIME("text/ansi"),
-        escape_brackets(code),
-        Lexers.JuliaLexer,
-        CodeTheme;
-        context = stdout,
-    )
-    style && (txt = apply_style(txt))
+    txt = sprint(render_code, code; context = stdout)
+    style && (txt = do_by_line(apply_style, txt))
     return remove_markup(txt)
+end
+
+# Stack traces revisit the same few files across frames, and parsing dominates the cost.
+const HIGHLIGHTED_FILES = Dict{Tuple{String, Float64}, Vector{String}}()
+const HIGHLIGHTED_FILES_CACHE_SIZE = 32
+
+"""
+    highlight_file_lines(path::AbstractString)::Vector{String}
+
+Highlight `path`, returning its styled lines. Parsing the whole file keeps each
+line's enclosing block intact, which a line-at-a-time parse would cut apart.
+"""
+function highlight_file_lines(path::AbstractString)::Vector{String}
+    length(HIGHLIGHTED_FILES) ≥ HIGHLIGHTED_FILES_CACHE_SIZE && empty!(HIGHLIGHTED_FILES)
+    return get!(HIGHLIGHTED_FILES, (String(path), mtime(path))) do
+        split_lines(highlight_syntax(join_lines(readlines(path)); style = true))
+    end
 end
 
 """
@@ -110,16 +133,9 @@ function load_code_and_highlight(path::AbstractString, lineno::Int; δ::Int = 3)
     @assert lineno > 0 "lineno must be ≥1"
     @assert lineno ≤ η "lineno $lineno too high for file with $(η) lines"
 
-    lines = read_file_lines(path, lineno - δ, lineno + δ)
-    linenos = first.(lines)
-    code =
-        [highlight_syntax((δ == 0 ? lstrip(ln[2]) : ln[2]); style = true) for ln in lines]
-    code = split(join(code), "\n")
-
-    # clean
-    clean(line) = replace(replace(line, "    {/    }" => ""), '\r' => "")  # NOTE: julia `1.6` compat
-    codelines = clean.(code)  # [10-δ:10+δ]
-    linenos = linenos  # [10-δ:10+δ]
+    linenos = max(lineno - δ, 1):min(lineno + δ, η)
+    codelines = highlight_file_lines(path)[linenos]
+    δ == 0 && (codelines = lstrip_ansi.(codelines))
 
     # format
     _len = textlen ∘ lstrip
@@ -152,12 +168,5 @@ end
 
 Load and highlight the syntax of an entire file
 """
-function load_code_and_highlight(path::AbstractString)::String
-    lines = readlines(path)
-    code = [highlight_syntax(ln; style = true) for ln in lines]
-
-    # clean
-    clean(line) = replace(line, "    {/    }" => "")
-    codelines = clean.(code)
-    return join(codelines, "\n")
-end
+load_code_and_highlight(path::AbstractString)::String =
+    join_lines(highlight_file_lines(path))

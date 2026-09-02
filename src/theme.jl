@@ -1,4 +1,3 @@
-using Highlights.Tokens, Highlights.Themes
 import Markdown: @md_str
 using MyterialColors
 
@@ -371,31 +370,31 @@ end
 # ------------------------------ Highlighters.jl ----------------------------- #
 
 """
-Custom hilighting theme for Highlighters.jl
-https://juliadocs.github.io/Highlights.jl/stable/man/theme/
+Custom highlighting theme for Highlights.jl.
+
+Keys are tree sitter capture names; `code_style` looks them up along the
+capture hierarchy (`keyword` also covers `keyword.return`), falling back to
+`text` when unmatched.
 """
-abstract type CodeTheme <: AbstractTheme end
+const CodeTheme = Dict(
+    "text" => "#dedede",
 
-@theme CodeTheme Dict(
-    :style => S"",
-    :tokens => Dict(
-        TEXT => S"fg: dedede;",
+    # yellow
+    "function" => "#e8d472",
+    "macro" => "#e8d472",
 
-        # yellow
-        NAME_FUNCTION => S"fg: e8d472;",
-        NAME_OTHER => S"fg: e8d472;",
+    # red
+    "keyword" => "#7a93f5",
+    "boolean" => "#7a93f5",
+    "constant" => "#7a93f5",
+    "operator" => "#de6d59",
+    "punctuation" => "#e38864",
 
-        # red
-        KEYWORD => S"fg: 7a93f5;",
-        OPERATOR => S"fg: de6d59;",
-        PUNCTUATION => S"fg: e38864",
+    # green
+    "string" => "#50ad5f",
+    "character" => "#50ad5f",
+    "comment" => "#287a36 italic",
 
-        # green
-        STRING => S"fg: 50ad5f",
-        COMMENT => S"fg: 287a36; italic",
-        STRING_DOC => S"fg: 50ad5f",
-
-        # blue
-        NUMBER => S"fg: 90CAF9",
-    ),
+    # blue
+    "number" => "#90CAF9",
 )
