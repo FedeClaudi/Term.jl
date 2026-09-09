@@ -105,3 +105,23 @@ This is where you print the content of your foot notes:
         IS_WIN || @compare_to_string(t, "markdown_$i")
     end
 end
+
+@testset "Test Markdown nested tables" begin
+    # the recursion passes `inline = true` down to whatever it finds nested
+    rows = ["| a | b |", "|---|---|", "| 1 | 2 |"]
+    tb = join(rows, '\n') * "\n"
+    in_list = "- item\n\n" * join("  " .* rows, '\n') * "\n"
+    in_quote = "> quote\n>\n" * join("> " .* rows, '\n') * "\n"
+
+    @test_nothrow parse_md(Markdown.parse(tb); width = 60)        # top level
+    @test_nothrow parse_md(Markdown.parse(in_list); width = 60)   # in a list item
+    @test_nothrow parse_md(Markdown.parse(in_quote); width = 60)  # in a block quote
+
+    for src in (in_list, in_quote)
+        out = cleantext(parse_md(Markdown.parse(src); width = 60))
+        @test occursin("a", out) && occursin("1", out)
+    end
+
+    # every method tolerates the keywords the recursion passes
+    @test_nothrow parse_md(Markdown.parse("[^1]: a note\n"); width = 60, space = "  ")
+end
