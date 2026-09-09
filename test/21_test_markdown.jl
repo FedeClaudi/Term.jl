@@ -155,3 +155,21 @@ end
         Term.NOCOLOR[] = false
     end
 end
+
+@testset "Test Markdown empty list items" begin
+    # an item with no content renders as an empty bullet
+    unordered = cleantext(parse_md(Markdown.parse("- a\n-\n- b\n"); width = 60))
+    @test count("•", unordered) == 3
+    @test occursin("• a", unordered)
+    @test occursin("• b", unordered)
+
+    # the empty item keeps its place, so numbering does not shift
+    ordered = cleantext(parse_md(Markdown.parse("1. a\n2.\n3. b\n"); width = 60))
+    @test occursin("1. a", ordered)
+    @test occursin("2. ", ordered)
+    @test occursin("3. b", ordered)
+
+    # a lone bullet, and an empty item nested in another list
+    @test_nothrow parse_md(Markdown.parse("-\n"); width = 60)
+    @test_nothrow parse_md(Markdown.parse("- a\n    + b\n    +\n"); width = 60)
+end

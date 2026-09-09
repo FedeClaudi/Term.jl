@@ -278,7 +278,7 @@ function parse_md(
                 parse_md(elem; inline = true),
             item,
         )
-        item_content = length(item_content) > 1 ? join(item_content) : item_content[1]
+        item_content = join(item_content)
         rendered *= bullet * item_content * "\n"
     end
     return reshape_text(rendered, width)
