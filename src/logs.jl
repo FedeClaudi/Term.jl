@@ -166,8 +166,8 @@ style_log_msg_kw_value(logger, v) = (v, nothing)
 function style_log_msg_kw_value(logger, v::AbstractVector)
     _style = logger.theme.number
     _size = length(v)
-    v = escape_brackets(string(v))
-    v = textlen(v) > 60 ? v[1:57] * "..." : v
+    v = string(v)
+    v = escape_brackets(length(v) > 60 ? v[1:57] * "..." : v)
     v *= "\n {$(logger.theme.text)}$(_size) {/$(logger.theme.text)}{dim}items{/dim}"
     return (v, _style)
 end
