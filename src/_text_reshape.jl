@@ -20,20 +20,30 @@ function reshape_text(text::AbstractString, width::Int; ignore_markup::Bool = fa
     line, line_length = "", 0
     bracketed = false
     in_escape_code = false
-    for c in text
+    chars = collect(text)
+    i = 1
+    while i ≤ length(chars)
+        c = chars[i]
+
+        # `{{`/`}}` is one literal bracket, one column wide, not a tag
+        escaped =
+            !ignore_markup && (c == '{' || c == '}') &&
+            i < length(chars) && chars[i + 1] == c
+
         # check if we are entering a special context
         if c == '\e'
             in_escape_code = true
         end
-        if c == '{' && !ignore_markup
+        if c == '{' && !ignore_markup && !escaped
             bracketed = true
         end
 
         line *= c
+        escaped && (line *= chars[i + 1])
 
         # see if we need to go to a new line
         if !bracketed && !in_escape_code
-            line_length += textwidth(c)
+            line_length += escaped ? 1 : textwidth(c)
 
             if line_length + 1 > width
                 push!(lines, rstrip(line))
@@ -48,9 +58,11 @@ function reshape_text(text::AbstractString, width::Int; ignore_markup::Bool = fa
         if c == 'm' && in_escape_code
             in_escape_code = false
         end
-        if c == '}'
+        if c == '}' && !escaped
             bracketed = false
         end
+
+        i += escaped ? 2 : 1
     end
     push!(lines, rstrip(line))
 
