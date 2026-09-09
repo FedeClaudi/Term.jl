@@ -259,11 +259,6 @@ function parse_md(
         space = "",
     )::String
     theme = TERM_THEME[]
-    list_elements = []
-    for item in list.items
-        push!(list_elements, join(parse_md.(item)))
-    end
-
     rendered = ""
     for (i, item) in enumerate(list.items)
         bullet = if Markdown.isordered(list)
