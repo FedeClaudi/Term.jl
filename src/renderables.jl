@@ -5,7 +5,7 @@ import Term:
     reshape_text,
     ltrim_str,
     join_lines,
-    unescape_brackets_with_space,
+    unescape_brackets,
     DEBUG_ON,
     textwidth,
     str_trunc,
@@ -58,8 +58,8 @@ Base.String(r::AbstractRenderable) = Base.string(r)
 Print a renderable to an IO
 """
 function Base.print(io::IO, renderable::AbstractRenderable; highlight = true)
-    ren = unescape_brackets_with_space(string(renderable)) |> apply_style
-    NOCOLOR[] && (ren = cleantext(ren))
+    ren = apply_style(string(renderable))
+    ren = NOCOLOR[] ? cleantext(ren) : unescape_brackets(ren)
     return println(io, ren)
 end
 
@@ -76,7 +76,7 @@ Base.show(io::IO, renderable::AbstractRenderable) = print(io, info(renderable))
 Show a renderable and some information about its shape.
 """
 function Base.show(io::IO, ::MIME"text/plain", renderable::AbstractRenderable)
-    println(io, string(renderable))
+    println(io, unescape_brackets(string(renderable)))
     return DEBUG_ON[] && println(io, info(renderable))
 end
 

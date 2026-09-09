@@ -42,7 +42,9 @@ when an element (e.g. a code snippet) is in-line within a larger element
 function parse_md end
 
 parse_md(text::String) = parse_md(Markdown.parse(text))
-parse_md(x; kwargs...)::String = string(x)
+# Every plain-text leaf reaches this fallback. Escaping keeps `apply_style`
+# from reading a brace in the text as a style tag.
+parse_md(x; kwargs...)::String = escape_brackets(string(x))
 
 """
     parse_md(text::Markdown.MD; kwargs...)::String
@@ -75,7 +77,10 @@ function parse_md(header::Markdown.Header{l}; width = default_width(), kwargs...
         Dict(1 => :center, 2 => :center, 3 => :center, 4 => :left, 5 => :left, 6 => :left)
 
     style = header_styles[l]
-    header_text = chomp(join(map(ln -> "{$style}$ln{/$style}\n", header.text))) |> rstrip
+    styled = map(header.text) do ln
+        "{$style}$(parse_md(ln; inline = true, kwargs...)){/$style}\n"
+    end
+    header_text = rstrip(chomp(join(styled)))
     if l > 1
         header_text = reshape_text(header_text, width)
         return pad(header_text, width - 1, header_justify[l])
@@ -105,10 +110,10 @@ function parse_md(paragraph::Markdown.Paragraph; width = console_width(), kwargs
 end
 
 parse_md(italic::Markdown.Italic; kwargs...)::String =
-    join(map(ln -> "{italic}$(ln){/italic}", italic.text))
+    join(map(ln -> "{italic}$(parse_md(ln; inline = true, kwargs...)){/italic}", italic.text))
 
 parse_md(bold::Markdown.Bold; kwargs...)::String =
-    join(map(ln -> "{bold}$(ln){/bold}", bold.text))
+    join(map(ln -> "{bold}$(parse_md(ln; inline = true, kwargs...)){/bold}", bold.text))
 
 parse_md(lb::Markdown.LineBreak; kwargs...)::String = "\n"
 
@@ -171,7 +176,7 @@ function parse_md(
     syntax = reshape_code_string(highlight_syntax(code.code), width - 20)
     theme = TERM_THEME[]
     if inline
-        return "{$(theme.md_code)}`$(code.language){/$(theme.md_code)}" *
+        return "{$(theme.md_code)}`$(escape_brackets(code.language)){/$(theme.md_code)}" *
             syntax *
             "{$(theme.md_code)}`{/$(theme.md_code)}"
     else
@@ -179,7 +184,8 @@ function parse_md(
             RenderableText(syntax; style = "on_$(theme.md_codeblock_bg)");
             style = "white on_$(theme.md_codeblock_bg)",
             box = :SQUARE,
-            subtitle = length(code.language) > 0 ? code.language : nothing,
+            subtitle = length(code.language) > 0 ? escape_brackets(code.language) :
+                nothing,
             width = width - 12,
             background = "on_$(theme.md_codeblock_bg)",
             subtitle_justify = :right,
@@ -269,7 +275,11 @@ function parse_md(
 end
 
 function parse_md(img::Markdown.Image; kwargs...)::String
-    return "{dim} 🌄 image: {/dim}" * img.alt * " {dim}| at: " * img.url * "{/dim}"
+    return "{dim} 🌄 image: {/dim}" *
+        escape_brackets(img.alt) *
+        " {dim}| at: " *
+        escape_brackets(img.url) *
+        "{/dim}"
 end
 
 """
@@ -280,11 +290,11 @@ Style a footnote differently based on if they are a renference to it or its cont
 function parse_md(note::Markdown.Footnote; width = console_width(), inline = false)
     theme = TERM_THEME[]
     if isnothing(note.text)
-        return id = "{$(theme.md_footnote)}[$(note.id)]{/$(theme.md_footnote)}"
+        return id = "{$(theme.md_footnote)}[$(escape_brackets(note.id))]{/$(theme.md_footnote)}"
     else
         id =
             (inline ? "\n" : "") *
-            "{$(theme.md_footnote)}[$(note.id)]{/$(theme.md_footnote)}"
+            "{$(theme.md_footnote)}[$(escape_brackets(note.id))]{/$(theme.md_footnote)}"
         content = parse_md.(note.text)
         return if length(content) == 1
             string(RenderableText("$id: " * content[1]; width = width))
@@ -333,7 +343,7 @@ end
 parse_md(
     link::Markdown.Link;
     kwargs...,
-)::String = "{white bold}$(parse_md(link.text; inline = true)){/white bold} {dim}($(link.url)){/dim}"
+)::String = "{white bold}$(parse_md(link.text; inline = true)){/white bold} {dim}($(escape_brackets(link.url))){/dim}"
 
 """
     function parse_md(ad::Markdown.Admonition; width = console_width(), kwargs...)::String

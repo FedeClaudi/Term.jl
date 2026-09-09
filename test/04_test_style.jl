@@ -1,5 +1,5 @@
 import Term.Style: apply_style
-import Term: tprint, tprintln, get_file_format, reshape_text
+import Term: tprint, tprintln, get_file_format, reshape_text, escape_brackets, remove_ansi
 
 @testset "\e[34mStyle\e[0m" begin
     @test apply_style("test") == "test"
@@ -100,7 +100,10 @@ end
     ) ==
         "test \e[31m sdfsdf\nfdsf\e[39m \e[1m sfsdfp\e[32m sdfsdp\e[39msdsdfs\npdfsdp\e[22m"
 
-    @test stprint("This and that {{something}} for") == "This and that {{something}} for"
+    # `{{`/`}}` escapes a literal brace and collapses on output
+    @test stprint("This and that {{something}} for") == "This and that {something} for"
+    # tprint highlights by default, so compare without ANSI
+    @test remove_ansi(stprint(escape_brackets("f(x::Tuple{Int})"))) == "f(x::Tuple{Int})"
 end
 
 @testset "\e[34mTmisc\e[0m" begin
