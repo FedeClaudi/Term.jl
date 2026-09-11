@@ -2,6 +2,7 @@ module Trees
 
 import AbstractTrees: TreeCharSet, children
 using InteractiveUtils
+using OrderedCollections: OrderedDict
 
 import Term: replace_multi, highlight, reshape_text, cleantext, TERM_THEME, Theme
 
@@ -276,6 +277,12 @@ Apply style for the type whose hierarchy Tree we are making
 style_T(T) = "{orange1 italic underline}$T{/orange1 italic underline}"
 
 """
+`subtypes` sorted by name so that the hierarchy tree is deterministic
+across julia versions (`Dict` iteration order is not).
+"""
+sorted_subtypes(T) = sort(subtypes(T); by = string)
+
+"""
     make_hierarchy_dict(x::Vector{DataType}, T::DataType, Tsubs::AbstractDict)::AbstractDict
 
 Recursively create a dictionary with the types hierarchy for `T`.
@@ -283,14 +290,14 @@ Recursively create a dictionary with the types hierarchy for `T`.
 The AbstractDict is made backwards. From  the deepest levels up.
 """
 function make_hierarchy_dict(x::NTuple, T::DataType, Tsubs::AbstractDict)::AbstractDict
-    data = Dict()
+    data = OrderedDict()
     prev = ""
     for (n, y) in enumerate(x)
         if n == 1
             continue
         elseif n < length(x)
-            subs = Dict()
-            for s in subtypes(y)
+            subs = OrderedDict()
+            for s in sorted_subtypes(y)
                 if s == T
                     subs[style_T(s)] = Tsubs
                 else
@@ -319,7 +326,7 @@ The key is in costructing the actual hierarchy tree recursively.
 """
 function Tree(T::DataType; prefix = "", kwargs...)::Tree
     # create a dictionary of types hierarchy
-    subs = Dict(string(s) => nothing for s in subtypes(T))
+    subs = OrderedDict(string(s) => nothing for s in sorted_subtypes(T))
     data = make_hierarchy_dict(supertypes(T), T, subs)
 
     # define a fn to avoid printing nodes

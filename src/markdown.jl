@@ -95,20 +95,30 @@ function parse_md(header::Markdown.Header{l}; width = default_width(), kwargs...
 end
 
 """
+    soft_breaks(x)
+
+Render soft line breaks in inline markdown text as spaces.
+Since Julia 1.14 `Markdown` keeps the newlines of the source in the
+parsed text, older versions already replaced them with spaces.
+"""
+soft_breaks(text::AbstractString) = replace(text, '\n' => ' ')
+soft_breaks(x) = x
+
+"""
     parse_md(paragraph::Markdown.Paragraph; width = console_width(), kwargs...)::String
 
 Parse each element in a paragraph
 """
 function parse_md(paragraph::Markdown.Paragraph; width = console_width(), kwargs...)::String
-    out = join(parse_md.(paragraph.content; inline = true, width = width))
+    out = join(parse_md.(soft_breaks.(paragraph.content); inline = true, width = width))
     return reshape_text(out, width) * "\e[0m"
 end
 
 parse_md(italic::Markdown.Italic; kwargs...)::String =
-    join(map(ln -> "{italic}$(ln){/italic}", italic.text))
+    join(map(ln -> "{italic}$(soft_breaks(ln)){/italic}", italic.text))
 
 parse_md(bold::Markdown.Bold; kwargs...)::String =
-    join(map(ln -> "{bold}$(ln){/bold}", bold.text))
+    join(map(ln -> "{bold}$(soft_breaks(ln)){/bold}", bold.text))
 
 parse_md(lb::Markdown.LineBreak; kwargs...)::String = "\n"
 
