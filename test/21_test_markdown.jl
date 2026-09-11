@@ -105,3 +105,15 @@ This is where you print the content of your foot notes:
         IS_WIN || @compare_to_string(t, "markdown_$i")
     end
 end
+
+@testset "Test Markdown table header cells are inline" begin
+    # A header cell is inline content, exactly as a body cell is: a code span in
+    # one comes out a span, so the header stays one line tall and the table
+    # keeps the width it was asked for.
+    tb = "| a | `f(::T)` | c |\n|---|---|---|\n| 1 | 2 | 3 |\n"
+    lines = split(rstrip(cleantext(parse_md(Markdown.parse(tb); width = 60))), '\n')
+
+    @test length(lines) == 5              # border, header, rule, row, border
+    @test all(l -> length(l) <= 60, lines)
+    @test occursin("f(::T)", lines[2])    # and the header kept its text
+end
