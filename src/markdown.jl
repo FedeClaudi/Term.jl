@@ -253,11 +253,6 @@ function parse_md(
         space = "",
     )::String
     theme = TERM_THEME[]
-    list_elements = []
-    for item in list.items
-        push!(list_elements, join(parse_md.(item)))
-    end
-
     rendered = ""
     for (i, item) in enumerate(list.items)
         bullet = if Markdown.isordered(list)
@@ -272,7 +267,7 @@ function parse_md(
                 parse_md(elem; inline = true),
             item,
         )
-        item_content = length(item_content) > 1 ? join(item_content) : item_content[1]
+        item_content = join(item_content)
         rendered *= bullet * item_content * "\n"
     end
     return reshape_text(rendered, width)
