@@ -1,5 +1,6 @@
 import Term.Tables: Table
 import Term.Layout: PlaceHolder
+import OrderedCollections: OrderedDict
 
 t = 1:5
 data = hcat(t, ones(length(t)), string.(ones(length(t)) .* 100000))
@@ -30,7 +31,7 @@ ph1 = PlaceHolder(25, 5)
 ph2 = PlaceHolder(23, 9)
 ph3 = PlaceHolder(22, 11)
 
-data = Dict(
+data = OrderedDict(  # keep the columns order stable across julia versions
     "first\ncol." => [ph1, ph2, ph3],
     "second\ncol." => [ph3, ph2, ph3],
     "third\ncol." => [ph2, ph2, ph1],

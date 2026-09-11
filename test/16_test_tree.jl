@@ -2,39 +2,42 @@ import Term: Tree, TERM_THEME, LightTheme
 import OrderedCollections: OrderedDict
 
 trees = [
-    Dict(
+    OrderedDict(
         "nestedasdasdsadasdasdsadsadasdasdasdsadasasdasdassfsdfdsfdsfdsfsdfsdfdsfsdfd" =>
-            Dict("n1" => 1, "n2" => 2),
+            OrderedDict("n1" => 1, "n2" => 2),
     ),
-    Dict("nested" => Dict("n1" => 1, "n2" => 2), "nested2" => Dict("n1" => "a", "n2" => 2)),
-    Dict(
-        "nested" => Dict("n1" => 1, "n2" => 2),
+    OrderedDict(
+        "nested" => OrderedDict("n1" => 1, "n2" => 2),
+        "nested2" => OrderedDict("n1" => "a", "n2" => 2),
+    ),
+    OrderedDict(
+        "nested" => OrderedDict("n1" => 1, "n2" => 2),
         "leaf2" => 2,
         "leaf" => 2,
         "leafme" => "v",
         "canopy" => "test",
         ["a"] => :test,
     ),
-    Dict(
-        "nested" => Dict(
-            "deeper" => Dict("aleaf" => "unbeliefable", "leaflet" => "level 3"^20),
+    OrderedDict(
+        "nested" => OrderedDict(
+            "deeper" => OrderedDict("aleaf" => "unbeliefable", "leaflet" => "level 3"^20),
             "n2" => Int,
             "n3" => 1 + 2,
         ),
-        "nested2" => Dict("n1" => "a", "n2" => 2),
+        "nested2" => OrderedDict("n1" => "a", "n2" => 2),
     ),
-    Dict(
-        "nested" => Dict(
-            "deeper" => Dict(
+    OrderedDict(
+        "nested" => OrderedDict(
+            "deeper" => OrderedDict(
                 "aleaf" => "unbeliefable",
                 "leaflet" => "level 3",
-                "sodeep" => Dict("a" => 4),
+                "sodeep" => OrderedDict("a" => 4),
             ),
             "n2" => Int,
             "n3" => 1 + 2,
-            "adict" => Dict("x" => 2),
+            "adict" => OrderedDict("x" => 2),
         ),
-        "nested2" => Dict("n1" => "a", "n2" => 2),
+        "nested2" => OrderedDict("n1" => "a", "n2" => 2),
     ),
     OrderedDict(3 => OrderedDict(3 => 8, 1 => "a"), 2 => OrderedDict(3 => 8, 1 => "a")),
     OrderedDict(2 => 1, 3 => OrderedDict(4 => 2, "a" => 2, "b" => 1)),
@@ -46,7 +49,7 @@ trees = [
         OrderedDict(2 => "a", 1 => :ok, "a" => 2, :test => [1, 2]),
     ],
     Int,
-    String,
+    Bool,  # not `String`: its subtypes depend on the julia version and loaded packages
     :(print, :(x, y)),
 ]
 
