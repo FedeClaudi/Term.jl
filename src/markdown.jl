@@ -310,7 +310,7 @@ Convert a markdown Table to a `Table` renderable.
 """
 function parse_md(tb::Markdown.Table; width = console_width())::String
     just = Dict(:l => :left, :r => :right, :c => :center)
-    header = parse_md.(tb.rows[1])
+    header = parse_md.(tb.rows[1]; inline = true)
     table_content = OrderedDict(
         header[i] => [parse_md(r[i]; inline = true) for r in tb.rows[2:end]] for
             i in 1:length(header)
