@@ -283,11 +283,16 @@ function parse_md(img::Markdown.Image; kwargs...)::String
 end
 
 """
-    parse_md(note::Markdown.Footnote; width = console_width(), inline = false)
+    parse_md(note::Markdown.Footnote; width = console_width(), inline = false, kwargs...)
 
 Style a footnote differently based on if they are a renference to it or its content.
 """
-function parse_md(note::Markdown.Footnote; width = console_width(), inline = false)
+function parse_md(
+        note::Markdown.Footnote;
+        width = console_width(),
+        inline = false,
+        kwargs...,
+    )
     theme = TERM_THEME[]
     if isnothing(note.text)
         return id = "{$(theme.md_footnote)}[$(note.id)]{/$(theme.md_footnote)}"
@@ -314,11 +319,11 @@ function parse_md(content::Vector; kwargs...)::String
 end
 
 """
-    function parse_md(tb::Markdown.Table; width = console_width())::String
+    function parse_md(tb::Markdown.Table; width = console_width(), kwargs...)::String
 
 Convert a markdown Table to a `Table` renderable.
 """
-function parse_md(tb::Markdown.Table; width = console_width())::String
+function parse_md(tb::Markdown.Table; width = console_width(), kwargs...)::String
     just = Dict(:l => :left, :r => :right, :c => :center)
     header = parse_md.(tb.rows[1])
     table_content = OrderedDict(
