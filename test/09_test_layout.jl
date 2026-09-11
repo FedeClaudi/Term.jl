@@ -265,3 +265,18 @@ end
     @test string(vstack(p1, p2, p3; pad = 3)) ==
         "\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n\e[2m ╲ ╲ \e[22m\n\e[2m╲ ╲ ╲\e[22m\n     \n     \n     \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  \n\e[2m╲ ╲\e[22m  \n\e[2m ╲ \e[22m  "
 end
+
+@testset "Layout - aligning does not rewrap" begin
+    # Aligning pads and nothing else, so a string wider than the console keeps
+    # its width and stays on one line.
+    wide = "-"^(console_width() + 20)
+
+    for aligned in (leftalign(wide, "x"), center(wide, "x"), rightalign(wide, "x"))
+        @test aligned[1].measure.h == 1
+        @test aligned[1].measure.w == length(wide)
+        @test cleantext(string(aligned[1])) == wide
+    end
+
+    # `vstack` aligns its arguments first, so it keeps them whole too.
+    @test vstack(wide, "x", "y").measure.h == 3
+end

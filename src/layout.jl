@@ -314,6 +314,22 @@ end
 #                                    JUSTIFY                                   #
 # ---------------------------------------------------------------------------- #
 """
+    as_renderable(x)
+
+Convert `x` to a renderable at the width it already has.
+
+This is the conversion a layout wants. Aligning and stacking pad rather than
+re-wrap, so a string keeps its own width however wide the terminal is: a `Table`
+row is as wide as the table's columns make it, and the console has no say in it.
+
+`Renderable(::AbstractString)` is the other conversion. It fits the string to
+`console_width()`, which suits a paragraph about to be printed rather than
+something already laid out.
+"""
+as_renderable(ren::AbstractRenderable) = ren
+as_renderable(str::AbstractString) = RenderableText(str; width = width(str))
+
+"""
     leftalign(renderables::RenderablesUnion...)
 
 Pad two (or more) renderables so that they have the same width and they
@@ -338,7 +354,7 @@ print(p1/p2)
 """
 function leftalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
-    renderables = Renderable.(renderables)
+    renderables = as_renderable.(renderables)
     width = maximum(map(r -> r.measure.w, renderables))
     return map(r -> pad(r, 0, width - r.measure.w), renderables)
 end
@@ -363,7 +379,7 @@ print(p1/p2)
 """
 function leftalign!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
-    renderables = Renderable.(renderables)
+    renderables = as_renderable.(renderables)
     width = maximum(map(r -> r.measure.w, renderables))
     for ren in renderables
         pad!(ren, 0, width - ren.measure.w)
@@ -395,7 +411,7 @@ print(p1/p2)
 """
 function center(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
-    renderables = Renderable.(renderables)
+    renderables = as_renderable.(renderables)
     width = maximum(map(r -> r.measure.w, renderables))
     renderables = map(r -> pad(r; width = width), renderables)
     return renderables
@@ -422,7 +438,7 @@ print(p1/p2)
 """
 function center!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
-    renderables = Renderable.(renderables)
+    renderables = as_renderable.(renderables)
     width = maximum(map(r -> r.measure.w, renderables))
     for ren in renderables
         pad!(ren; width = width)
@@ -454,7 +470,7 @@ print(p1/p2)
 """
 function rightalign(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
-    renderables = Renderable.(renderables)
+    renderables = as_renderable.(renderables)
     width = maximum(map(r -> r.measure.w, renderables))
     renderables = map(r -> pad(r, width - r.measure.w, 0), renderables)
     return renderables
@@ -479,7 +495,7 @@ print(p1/p2)
 """
 function rightalign!(renderables::RenderablesUnion...)
     length(renderables) < 2 && return renderables
-    renderables = Renderable.(renderables)
+    renderables = as_renderable.(renderables)
     width = maximum(map(r -> r.measure.w, renderables))
 
     for ren in renderables

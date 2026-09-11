@@ -61,3 +61,14 @@ tbls = [t1, t2, t3, t4, t5, t6, t7, t8]
     VERSION >= v"1.7.1" &&
         Table(data; columns_widths = [25, 7, 7, 12, 41, 52], footer = sum, box = :SIMPLE)
 end
+
+@testset "Table - the console width does not chop a row" begin
+    # A table's columns are sized from its content, so it has the same shape
+    # whether or not it fits the terminal.
+    narrow = Table(hcat(1:2, fill("x"^10, 2)); header = ["n", "w"])
+    wide = Table(hcat(1:2, fill("x"^console_width(), 2)); header = ["n", "w"])
+
+    @test wide.measure.w > console_width()
+    @test wide.measure.h == narrow.measure.h
+    @test length(wide.segments) == length(narrow.segments)
+end
