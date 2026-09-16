@@ -45,6 +45,17 @@ import Term.Measures: width as get_width
     @test remove_markup("text with {{double}} squares") == "text with {{double}} squares"
     @test !has_markup("text with {{double}} squares")
 
+    # an escaped bracket prints as one character, so it measures as one
+    @test cleantext("text with {{double}} squares") == "text with {double} squares"
+    @test textlen("text with {{double}} squares") == textwidth("text with {double} squares")
+    @test textlen("{red}Tuple{{Int}}{/red}") == textwidth("Tuple{Int}")
+
+    # a bracket already next to another is doubled too, or it is lost
+    for s in ("Tuple{Int}", "Vector{Vector{Int}}", "Dict{Symbol, Vector{Int}}", "{}", "}{")
+        @test unescape_brackets(escape_brackets(s)) == s
+        @test textlen(escape_brackets(s)) == textwidth(s)
+    end
+
     text = "{red}asdasda{/green}a{blue}sda{/blue}sda{/red}"
 
     @test remove_markup(text) == "asdasdaasdasda"

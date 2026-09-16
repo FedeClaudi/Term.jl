@@ -2,8 +2,8 @@ This is an example of markdown content rendered in Term.jl.
 You can use markdown syntax to make words {bold}bold{/bold} and {italic}italic{/italic}
 or insert {#FFF59D italic}`{/#FFF59D italic}[38;2;222;222;222mliterals[39m{#FFF59D italic}`{/#FFF59D italic}.[0m
 
-You markdown can include in-line latex {#FFF59D italic}ŁaTeX  frac{{1}}{{2}}{/#FFF59D italic} and
-maths in a new line too:[0m
+You markdown can include in-line latex {#FFF59D italic}ŁaTeX  frac{{1}}{{2}}{/#FFF59D italic}
+and maths in a new line too:[0m
 
 
      {#FFF59D italic}f(a) = \frac{1}{2\pi}\int_{0}^{2\pi} (\alpha+R\cos(\theta))d\theta{/#FFF59D italic}{/0}{/1}

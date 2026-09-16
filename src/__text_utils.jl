@@ -83,27 +83,31 @@ lstrip_ansi(text)::String =
     cleantext(str::AbstractString)
 
 Remove all style information from a string.
+
+Escaped brackets are unescaped: the result is the text as it will print.
 """
-cleantext(str)::String = (remove_ansi ∘ remove_markup)(str)
+cleantext(str)::String = (unescape_brackets ∘ remove_ansi ∘ remove_markup)(str)
 
 """
     textlen(x::AbstractString)
 
 Get length of text after all style information is removed.
+
+A `{{` counts as the single `{` it prints as.
 """
 textlen(x; remove_orphan_tags = false)::Int =
-    remove_markup(remove_ansi(x); remove_orphan_tags) |> textwidth
+    unescape_brackets(remove_markup(remove_ansi(x); remove_orphan_tags)) |> textwidth
 
 # --------------------------------- brackets --------------------------------- #
-const brackets_regexes = [r"(?<!\{)\{(?!\{)", r"(?<!\})\}(?!\})"]
-
 """
-    escape_brackets(text)::Stringremove_ansi(str)::String
+    escape_brackets(text)::String
 
-Replace each curly bracket with a double copy of itself
+Replace each curly bracket with a double copy of itself.
+
+Every bracket is doubled, including one already next to another, so that
+`unescape_brackets` halves them back pairwise.
 """
-escape_brackets(text)::String =
-    replace_multi(text, brackets_regexes[1] => "{{", brackets_regexes[2] => "}}")
+escape_brackets(text)::String = replace_multi(text, "{" => "{{", "}" => "}}")
 
 """
     unescape_brackets(text)::String
@@ -111,8 +115,6 @@ escape_brackets(text)::String =
 Replece every double squared parenthesis with a single copy of itself
 """
 unescape_brackets(text)::String = replace_multi(text, "{{" => "{", "}}" => "}")
-
-unescape_brackets_with_space(text)::String = replace_multi(text, "{{" => " {", "}}" => "} ")
 
 # ------------------------------ multiline-style ----------------------------- #
 """

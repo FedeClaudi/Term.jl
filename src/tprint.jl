@@ -11,12 +11,6 @@ import ..Consoles: console_width
 
 export tprint, tprintln
 
-function sprint_no_color(x)
-    o = sprint(print, x)
-    NOCOLOR[] && (o = cleantext(o))
-    return o
-end
-
 """
     tprint
 
@@ -44,7 +38,11 @@ function tprint(io::IO, x::AbstractString; highlight = true)
     x =
         Measure(x).w <= console_width(io) ? x :
         string(RenderableText(string(x), width = console_width(io)))
-    return print(io, sprint_no_color(x))
+
+    # collapse the escape now that markup is consumed; `cleantext` already
+    # does this, so the two are alternatives rather than steps
+    x = string(x)
+    return print(io, NOCOLOR[] ? cleantext(x) : unescape_brackets(x))
 end
 
 """
@@ -58,7 +56,7 @@ Equivalent to `print(x)`
 function tprint(io::IO, x::AbstractRenderable; highlight = true)
     w = console_width()
     x = x.measure.w > console_width() ? trim_renderable(x, w) : x
-    return print(io, sprint_no_color(x))
+    return print(io, x)
 end
 
 function tprint(io::IO, args...; highlight = true)
