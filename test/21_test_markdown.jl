@@ -24,7 +24,7 @@ This is an example of markdown content rendered in Term.jl.
 You can use markdown syntax to make words **bold** and *italic* or insert `literals`.
 
 
-You markdown can include in-line latex ``\LaTeX  \frac{{1}}{{2}}`` and maths in a new line too:
+You markdown can include in-line latex ``\LaTeX  \frac{1}{2}`` and maths in a new line too:
 
 ```math
 f(a) = \frac{1}{2\pi}\int_{0}^{2\pi} (\alpha+R\cos(\theta))d\theta
