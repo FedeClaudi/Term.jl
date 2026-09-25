@@ -86,3 +86,24 @@ end
     @test all(l -> textwidth(l) == t.measure.w, lines)
     @test count(l -> occursin('x', l), lines) == 1
 end
+
+@testset "Table - wrap" begin
+    data = hcat([1, 2], ["a long cell with several words in it", "short"])
+    kw = (header = ["n", "text"], columns_widths = [6, 16])
+
+    # by default a cell wider than its column is truncated
+    truncated = cleantext(string(Table(data; kw...)))
+    @test occursin("...", truncated)
+    @test !occursin("words", truncated)
+
+    # with `wrap` it takes more lines instead, and loses no text
+    t = Table(data; wrap = true, kw...)
+    lines = split(cleantext(string(t)), '\n')
+    @test t.measure.w == Table(data; kw...).measure.w
+    @test all(l -> textwidth(l) == t.measure.w, lines)
+    @test count(l -> occursin(r"long|several|words", l), lines) == 3
+    @test !occursin("...", join(lines))
+    for word in split("a long cell with several words in it")
+        @test occursin(word, join(lines))
+    end
+end

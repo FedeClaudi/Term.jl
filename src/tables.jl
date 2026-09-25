@@ -2,7 +2,7 @@ module Tables
 
 import Tables as TablesPkg
 
-import Term: do_by_line, fillin, str_trunc, TERM_THEME
+import Term: do_by_line, fillin, str_trunc, wrap_text, TERM_THEME
 
 import ..Renderables: AbstractRenderable, RenderableText
 import ..Layout: cvstack, hstack, vstack, pad, vLine, vertical_pad, as_renderable
@@ -64,6 +64,7 @@ end
         footer_style::Union{String,Vector,Tuple} = "default",
         footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
         compact::Bool = false,
+        wrap::Bool = false,
     )
 
 Generic constructor for a Table renderable.
@@ -72,6 +73,11 @@ Generic constructor for a Table renderable.
     Arguments such as `header_style`, `columns_style` and `footer_style` can 
     either be passed a single value, which will be applied to all columns, or
     a vector of values, which will be applied to each column.
+
+A string cell wider than its column is truncated, unless `wrap = true`: then it
+is word-wrapped to the column's width over as many lines as it needs, and its
+row grows to fit. This is mostly useful with `columns_widths`, since columns
+are otherwise as wide as their widest cell.
 """
 function Table(
         tb::TablesPkg.AbstractColumns;
@@ -91,6 +97,7 @@ function Table(
         footer_style::Union{String, Vector, Tuple} = TERM_THEME[].tb_footer,
         footer_justify::Union{Nothing, Symbol, Vector, Tuple} = :center,
         compact::Bool = false,
+        wrap::Bool = false,
     )
 
     # prepare some variables
@@ -164,6 +171,16 @@ function Table(
             push!(_row, val isa AbstractRenderable ? val : string(val))
         end
         push!(rows_values, _row)
+    end
+
+    # wrap string cells to their column's width
+    if wrap
+        wrap_cells = entries -> map(enumerate(entries)) do (i, x)
+            x isa AbstractString ? wrap_text(x, widths[i] - 2hpad[i]) : x
+        end
+        show_header && (header = wrap_cells(header))
+        rows_values = map(wrap_cells, rows_values)
+        isnothing(footer) || (footer = wrap_cells(footer))
     end
 
     # get the height of each row
