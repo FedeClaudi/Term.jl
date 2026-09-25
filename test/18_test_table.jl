@@ -107,3 +107,16 @@ end
         @test occursin(word, join(lines))
     end
 end
+
+@testset "Table - compact" begin
+    data = hcat(1:3, 4:6)
+    rules(t) = count(l -> occursin(r"[─━]", l), split(cleantext(string(t)), '\n'))
+
+    # a rule under the header and one around the table: none between the rows
+    @test rules(Table(data; box = :SQUARE, compact = true)) == 3
+    @test rules(Table(data; box = :SQUARE)) == 5
+    @test rules(Table(data; box = :MINIMAL_HEAVY_HEAD, compact = true)) == 1
+
+    # a table of one row still has its bottom border
+    @test rules(Table(hcat(1, 2); box = :SQUARE, compact = true)) == 3
+end

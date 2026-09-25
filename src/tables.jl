@@ -241,7 +241,8 @@ function Table(
             end
             top = show_header ? nothing : :top
             mid = :mid
-            _compact = (show_header && (box != BOXES[:NONE])) ? false : compact
+            # the rule under the first row is kept only when it closes the table
+            _compact = (show_header && (box != BOXES[:NONE])) ? (nrows > 1 && compact) : compact
 
             # add additional rows
         elseif l == nrows
