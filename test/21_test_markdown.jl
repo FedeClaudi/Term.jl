@@ -225,3 +225,19 @@ end
     @test all(l -> length(l) <= 60, lines)
     @test occursin("f(::T)", lines[2])    # and the header kept its text
 end
+
+@testset "Test Markdown header inline elements" begin
+    # A header's elements are inline content, one line of them: a code span or
+    # a link in a header continues the line rather than starting a new one.
+    for md in ("## head `z` tail", "# head `z` tail", "#### head [l](http://a) tail")
+        lines = filter(!isempty, strip.(split(cleantext(parse_md(Markdown.parse(md); width = 60)), '\n')))
+        text = only(filter(l -> occursin("head", l), lines))
+        @test occursin("tail", text)
+        @test !any(l -> occursin("Markdown.", l), lines)
+    end
+
+    # the same holds for emphasis, which recurses into what it contains
+    out = cleantext(parse_md(Markdown.parse("**Why `JL_GC_PUSHARGS` frames** and *em `x` y*"); width = 80))
+    @test !occursin("Markdown.", out)
+    @test occursin("JL_GC_PUSHARGS", out)
+end

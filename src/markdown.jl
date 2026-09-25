@@ -78,9 +78,9 @@ function parse_md(header::Markdown.Header{l}; width = default_width(), kwargs...
 
     style = header_styles[l]
     styled = map(header.text) do ln
-        "{$style}$(parse_md(ln; inline = true, kwargs...)){/$style}\n"
+        "{$style}$(parse_md(soft_breaks(ln); inline = true, kwargs...)){/$style}"
     end
-    header_text = rstrip(chomp(join(styled)))
+    header_text = rstrip(join(styled))
     if l > 1
         header_text = reshape_text(header_text, width)
         return pad(header_text, width - 1, header_justify[l])
