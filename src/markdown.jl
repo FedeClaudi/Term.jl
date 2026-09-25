@@ -11,7 +11,9 @@ import Term:
     escape_brackets,
     default_width,
     TERM_THEME,
-    reshape_code_string
+    reshape_code_string,
+    cleantext,
+    textlen
 import ..Tables: Table
 import ..Style: apply_style
 import ..Layout: pad, hLine, vLine
@@ -22,6 +24,7 @@ import ..Tprint: tprint, tprintln
 import ..Tprint
 import ..Panels: Panel
 import ..Segments: Segment
+import ..Measures: Measure
 
 export parse_md
 
@@ -267,10 +270,11 @@ function parse_md(
             "$space{$(theme.text_accent)}" * "  • " * "{/$(theme.text_accent)}"
         end
 
+        item_width = width - textlen(bullet)
         item_content = map(
             elem ->
-            elem isa Markdown.List ? "\n" * parse_md(elem; space = "   ") :
-                parse_md(elem; inline = true),
+            elem isa Markdown.List ? "\n" * parse_md(elem; space = "   ", width = width) :
+                parse_md(elem; inline = true, width = item_width),
             item,
         )
         item_content = join(item_content)
@@ -324,30 +328,72 @@ function parse_md(content::Vector; kwargs...)::String
 end
 
 """
-    function parse_md(tb::Markdown.Table; width = console_width(), kwargs...)::String
+    function parse_md(tb::Markdown.Table; width = console_width(), inline = false, kwargs...)::String
 
 Convert a markdown Table to a `Table` renderable.
+
+Columns are as wide as their widest cell when the table fits in `width`.
+Otherwise the widest columns are narrowed first, and their cells wrapped,
+down to about their longest word; a table that does not fit even then is
+drawn at its natural widths. At the top level the table is centered.
 """
-function parse_md(tb::Markdown.Table; width = console_width(), kwargs...)::String
+function parse_md(tb::Markdown.Table; width = console_width(), inline = false, kwargs...)::String
     just = Dict(:l => :left, :r => :right, :c => :center)
-    header = parse_md.(tb.rows[1]; inline = true)
+    rows = [parse_md.(row; inline = true) for row in tb.rows]
+    header = rows[1]
     table_content = OrderedDict(
-        header[i] => [parse_md(r[i]; inline = true) for r in tb.rows[2:end]] for
-            i in 1:length(header)
+        header[i] => [r[i] for r in rows[2:end]] for i in 1:length(header)
     )
 
-    return string(
-        pad(
-            Table(
-                table_content;
-                columns_justify = [just[j] for j in tb.align],
-                box = :ROUNDED,
-                header_style = TERM_THEME[].md_table_header,
-                style = "dim",
-            );
-            width = width - 8,
-        ),
+    columns_widths = table_columns_widths(rows, width)
+    table = Table(
+        table_content;
+        columns_justify = [just[j] for j in tb.align],
+        box = :ROUNDED,
+        header_style = TERM_THEME[].md_table_header,
+        style = "dim",
+        columns_widths = columns_widths,
+        wrap = !isnothing(columns_widths),
     )
+    # nested in a list or a quote, the table starts a line of its own
+    return inline ? "\n" * string(table) : string(pad(table; width = width - 8))
+end
+
+"""
+    table_columns_widths(rows, width; hpad = 2, max_floor = 20)
+
+Choose the columns' widths for a markdown table whose cells (the header's
+included) are `rows`, so that the table fits in `width`. No column is made
+narrower than its longest word, or `max_floor` if that is shorter.
+
+Return `nothing` when the columns can be as wide as their widest cell, or
+when the table cannot fit even at those narrowest widths.
+"""
+function table_columns_widths(rows, width; hpad = 2, max_floor = 20)
+    ncols = length(first(rows))
+    column(i) = [r[i] for r in rows]
+    natural = [maximum(c -> Measure(c).w, column(i)) for i in 1:ncols]
+    floors = map(1:ncols) do i
+        words = [w for c in column(i) for w in split(cleantext(c))]
+        longest = isempty(words) ? 1 : maximum(textwidth, words)
+        min(natural[i], max(1, min(longest, max_floor)))
+    end
+
+    # the room left for the cells' text, after borders and padding
+    available = width - (ncols + 1) - 2hpad * ncols
+    sum(natural) ≤ available && return nothing
+    sum(floors) > available && return nothing
+
+    # narrow the widest column still above its floor, one column at a time
+    widths = copy(natural)
+    while sum(widths) > available
+        i = argmax(i -> widths[i] > floors[i] ? widths[i] : typemin(Int), 1:ncols)
+        excess = sum(widths) - available
+        others = (widths[j] for j in 1:ncols if j != i && widths[j] > floors[j])
+        second = maximum(others; init = floors[i])
+        widths[i] = max(floors[i], widths[i] - excess, min(second, widths[i] - 1))
+    end
+    return widths .+ 2hpad
 end
 
 parse_md(

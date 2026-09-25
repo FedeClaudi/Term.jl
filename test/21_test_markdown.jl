@@ -241,3 +241,34 @@ end
     @test !occursin("Markdown.", out)
     @test occursin("JL_GC_PUSHARGS", out)
 end
+
+@testset "Test Markdown table fits the width" begin
+    long = "reverted `base/binaryplatforms.jl` and a `LibUnwind_jll` bump, both of which " *
+        "auto-merged but are out of scope here; dropped the `LazyLibrary` hunk"
+    src = "| PR | Changed afterward |\n|---|---|\n| #58731 | $long |\n| #60369 | nothing |\n"
+
+    for width in (40, 60, 80, 100)
+        lines = split(cleantext(parse_md(Markdown.parse(src); width = width)), '\n')
+        @test all(l -> textwidth(l) ≤ width, lines)
+
+        # every cell's text is there, in order, however it was wrapped
+        cells = [strip.(split(l, '│')) for l in lines if count('│', l) == 3]
+        expected = [("PR", "#58731", "#60369"), ("Changed afterward", long, "nothing")]
+        for (col, texts) in zip((2, 3), expected)
+            text = replace(join(getindex.(cells, col)), ' ' => "")
+            @test all(t -> occursin(replace(t, ' ' => ""), text), texts)
+        end
+    end
+
+    # a table that fits keeps its columns as wide as their widest cell
+    @test isnothing(TermMarkdown.table_columns_widths([["a", "bb"], ["ccc", "d"]], 60))
+    # and one that cannot fit even at its longest words is not squeezed further
+    @test isnothing(TermMarkdown.table_columns_widths([["a"^15, "b"^15]], 30))
+
+    # nested, a table starts a line of its own
+    rows = ["| a | b |", "|---|---|", "| 1 | 2 |"]
+    in_list = "- item\n\n" * join("  " .* rows, '\n') * "\n"
+    lines = split(cleantext(parse_md(Markdown.parse(in_list); width = 60)), '\n')
+    @test any(l -> occursin("item", l) && !occursin('╭', l), lines)
+    @test any(l -> startswith(l, '╭'), lines)
+end
