@@ -5,7 +5,7 @@ import Tables as TablesPkg
 import Term: do_by_line, fillin, str_trunc, TERM_THEME
 
 import ..Renderables: AbstractRenderable, RenderableText
-import ..Layout: cvstack, hstack, vstack, pad, vLine, vertical_pad
+import ..Layout: cvstack, hstack, vstack, pad, vLine, vertical_pad, as_renderable
 import ..Measures: Measure, width, height
 import ..Style: apply_style
 import ..Segments: Segment
@@ -354,6 +354,9 @@ function table_row(
 
     if row_height == 1
         l, m, r = string.((l, m, r))
+    else
+        # joined with `*` to the borders, a cell keeps the width it has
+        cells = as_renderable.(cells)
     end
 
     # create row

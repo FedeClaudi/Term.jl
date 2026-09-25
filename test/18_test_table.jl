@@ -73,3 +73,16 @@ end
     @test wide.measure.h == narrow.measure.h
     @test length(wide.segments) == length(narrow.segments)
 end
+
+@testset "Table - a row of several lines keeps its width" begin
+    # A cell of several lines is joined to the borders as a renderable, and
+    # that conversion must not fit it to the console.
+    cell = "x"^(console_width() + 10) * "\n" * "y"^10
+    t = Table(hcat([1], [cell]); header = ["n", "w"])
+    lines = split(cleantext(string(t)), '\n')
+
+    @test t.measure.w > console_width()
+    @test length(lines) == 6              # border, header, rule, 2 lines, border
+    @test all(l -> textwidth(l) == t.measure.w, lines)
+    @test count(l -> occursin('x', l), lines) == 1
+end
