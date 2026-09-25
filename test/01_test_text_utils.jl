@@ -259,3 +259,28 @@ end
         @test Term.get_closing_ansi_tag(tag) isa String
     end
 end
+
+@testset "TU - wrap_text" begin
+    wrap_text = Term.wrap_text
+
+    # lines break at spaces, and are as full as the width lets them be
+    @test wrap_text("aa bb cc dd", 5) == "aa bb\ncc dd"
+    @test wrap_text("aa bb cc dd", 7) == "aa bb\ncc dd"
+    @test wrap_text("aa bb", 10) == "aa bb"
+
+    # a word is split only when it cannot fit on a line of its own
+    @test wrap_text("a bbbbbbb c", 4) == "a\nbbbb\nbbb\nc"
+
+    # markup takes no width and is carried over to the next line
+    wrapped = wrap_text("{bold}aa bb cc{/bold}", 5)
+    @test cleantext(wrapped) == "aa bb\ncc"
+    @test all(l -> occursin("{bold}", l) || occursin("{/bold}", l), split(wrapped, '\n'))
+
+    for width in 1:12
+        txt = "{red}a word{/red} or \e[1mtwo\e[22m and a verylongword too"
+        lines = split(wrap_text(txt, width), '\n')
+        @test all(l -> textlen(l) ≤ width, lines)
+        @test replace(join(cleantext.(lines)), ' ' => "") ==
+            replace(cleantext(txt), ' ' => "")
+    end
+end

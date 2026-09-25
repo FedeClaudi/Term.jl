@@ -96,9 +96,14 @@ style outputs to terminal.
     md_latex::String = "$yellow_light italic"
     md_code::String = "$yellow_light italic"
     md_codeblock_bg::String = "#202020"
+    md_codeblock_box::Symbol = :SQUARE
+    md_codeblock_indent::Int = 4
     md_quote::String = "#5a74f2"
     md_footnote::String = "#9aacdb"
     md_table_header::String = "bold yellow"
+    md_table_box::Symbol = :ROUNDED
+    md_table_style::String = "dim"
+    md_table_compact::Bool = false  # no rule between the body's rows
     md_admonition_note::String = "blue"
     md_admonition_info::String = "blue"
     md_admonition_warning::String = yellow_light

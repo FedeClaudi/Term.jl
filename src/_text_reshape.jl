@@ -71,6 +71,77 @@ function reshape_text(text::AbstractString, width::Int; ignore_markup::Bool = fa
 end
 
 """
+    wrap_text(text::AbstractString, width::Int)
+
+Word-wrap a text so that each line is within the given width.
+
+Unlike `reshape_text`, lines are broken only at spaces, and a word is split
+only when it is wider than `width` by itself. Runs of spaces between words
+are collapsed to one. Markup tags and ANSI codes take no width, and tags left
+open at the end of a line are carried over to the next.
+"""
+function wrap_text(text::AbstractString, width::Int)
+    width = max(width, 1)
+    occursin('\n', text) && return do_by_line(ln -> wrap_text(ln, width), text)
+    textlen(text) ≤ width && return text
+
+    # split into words, each as a list of (chars, visible width) pieces so that
+    # a markup tag or an escape code is never broken apart
+    words = Vector{Tuple{String, Int}}[]
+    word = Tuple{String, Int}[]
+    chars = collect(text)
+    i = 1
+    while i ≤ length(chars)
+        c = chars[i]
+        if c == '\e'
+            j = something(findnext(==('m'), chars, i), length(chars))
+            push!(word, (String(chars[i:j]), 0))
+            i = j + 1
+        elseif (c == '{' || c == '}') && i < length(chars) && chars[i + 1] == c
+            # `{{`/`}}` is one literal bracket, one column wide
+            push!(word, (String(chars[i:(i + 1)]), 1))
+            i += 2
+        elseif c == '{' && !isnothing(findnext(==('}'), chars, i))
+            j = findnext(==('}'), chars, i)
+            push!(word, (String(chars[i:j]), 0))
+            i = j + 1
+        elseif c == ' '
+            isempty(word) || push!(words, word)
+            word = Tuple{String, Int}[]
+            i += 1
+        else
+            push!(word, (string(c), textwidth(c)))
+            i += 1
+        end
+    end
+    isempty(word) || push!(words, word)
+
+    lines = String[]
+    line, line_width = "", 0
+    for word in words
+        word_width = sum(last, word)
+        if line_width > 0 && line_width + 1 + word_width ≤ width
+            line *= " "
+            line_width += 1
+        elseif line_width > 0
+            push!(lines, line)
+            line, line_width = "", 0
+        end
+        for (piece, w) in word
+            if line_width + w > width && line_width > 0
+                push!(lines, line)
+                line, line_width = "", 0
+            end
+            line *= piece
+            line_width += w
+        end
+    end
+    push!(lines, line)
+
+    return join((fix_ansi_across_lines ∘ fix_markup_across_lines)(lines), "\n")
+end
+
+"""
     justify(text::AbstractString, width::Int)::String
 
 Justify a piece of text spreading out text to fill in a given width.

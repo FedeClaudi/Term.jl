@@ -2,10 +2,10 @@ module Tables
 
 import Tables as TablesPkg
 
-import Term: do_by_line, fillin, str_trunc, TERM_THEME
+import Term: do_by_line, fillin, str_trunc, wrap_text, TERM_THEME
 
 import ..Renderables: AbstractRenderable, RenderableText
-import ..Layout: cvstack, hstack, vstack, pad, vLine, vertical_pad
+import ..Layout: cvstack, hstack, vstack, pad, vLine, vertical_pad, as_renderable
 import ..Measures: Measure, width, height
 import ..Style: apply_style
 import ..Segments: Segment
@@ -64,6 +64,7 @@ end
         footer_style::Union{String,Vector,Tuple} = "default",
         footer_justify::Union{Nothing,Symbol,Vector,Tuple} = :center,
         compact::Bool = false,
+        wrap::Bool = false,
     )
 
 Generic constructor for a Table renderable.
@@ -72,6 +73,11 @@ Generic constructor for a Table renderable.
     Arguments such as `header_style`, `columns_style` and `footer_style` can 
     either be passed a single value, which will be applied to all columns, or
     a vector of values, which will be applied to each column.
+
+A string cell wider than its column is truncated, unless `wrap = true`: then it
+is word-wrapped to the column's width over as many lines as it needs, and its
+row grows to fit. This is mostly useful with `columns_widths`, since columns
+are otherwise as wide as their widest cell.
 """
 function Table(
         tb::TablesPkg.AbstractColumns;
@@ -91,6 +97,7 @@ function Table(
         footer_style::Union{String, Vector, Tuple} = TERM_THEME[].tb_footer,
         footer_justify::Union{Nothing, Symbol, Vector, Tuple} = :center,
         compact::Bool = false,
+        wrap::Bool = false,
     )
 
     # prepare some variables
@@ -166,6 +173,16 @@ function Table(
         push!(rows_values, _row)
     end
 
+    # wrap string cells to their column's width
+    if wrap
+        wrap_cells = entries -> map(enumerate(entries)) do (i, x)
+            x isa AbstractString ? wrap_text(x, widths[i] - 2hpad[i]) : x
+        end
+        show_header && (header = wrap_cells(header))
+        rows_values = map(wrap_cells, rows_values)
+        isnothing(footer) || (footer = wrap_cells(footer))
+    end
+
     # get the height of each row
     heights = rows_heights(N_rows, show_header, header, rows_values, footer, vpad)
     # @info "sizes" widths heights  tb sch
@@ -224,7 +241,8 @@ function Table(
             end
             top = show_header ? nothing : :top
             mid = :mid
-            _compact = (show_header && (box != BOXES[:NONE])) ? false : compact
+            # the rule under the first row is kept only when it closes the table
+            _compact = (show_header && (box != BOXES[:NONE])) ? (nrows > 1 && compact) : compact
 
             # add additional rows
         elseif l == nrows
@@ -354,6 +372,9 @@ function table_row(
 
     if row_height == 1
         l, m, r = string.((l, m, r))
+    else
+        # joined with `*` to the borders, a cell keeps the width it has
+        cells = as_renderable.(cells)
     end
 
     # create row

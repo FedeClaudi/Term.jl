@@ -73,3 +73,50 @@ end
     @test wide.measure.h == narrow.measure.h
     @test length(wide.segments) == length(narrow.segments)
 end
+
+@testset "Table - a row of several lines keeps its width" begin
+    # A cell of several lines is joined to the borders as a renderable, and
+    # that conversion must not fit it to the console.
+    cell = "x"^(console_width() + 10) * "\n" * "y"^10
+    t = Table(hcat([1], [cell]); header = ["n", "w"])
+    lines = split(cleantext(string(t)), '\n')
+
+    @test t.measure.w > console_width()
+    @test length(lines) == 6              # border, header, rule, 2 lines, border
+    @test all(l -> textwidth(l) == t.measure.w, lines)
+    @test count(l -> occursin('x', l), lines) == 1
+end
+
+@testset "Table - wrap" begin
+    data = hcat([1, 2], ["a long cell with several words in it", "short"])
+    kw = (header = ["n", "text"], columns_widths = [6, 16])
+
+    # by default a cell wider than its column is truncated
+    truncated = cleantext(string(Table(data; kw...)))
+    @test occursin("...", truncated)
+    @test !occursin("words", truncated)
+
+    # with `wrap` it takes more lines instead, and loses no text
+    t = Table(data; wrap = true, kw...)
+    lines = split(cleantext(string(t)), '\n')
+    @test t.measure.w == Table(data; kw...).measure.w
+    @test all(l -> textwidth(l) == t.measure.w, lines)
+    @test count(l -> occursin(r"long|several|words", l), lines) == 3
+    @test !occursin("...", join(lines))
+    for word in split("a long cell with several words in it")
+        @test occursin(word, join(lines))
+    end
+end
+
+@testset "Table - compact" begin
+    data = hcat(1:3, 4:6)
+    rules(t) = count(l -> occursin(r"[─━]", l), split(cleantext(string(t)), '\n'))
+
+    # a rule under the header and one around the table: none between the rows
+    @test rules(Table(data; box = :SQUARE, compact = true)) == 3
+    @test rules(Table(data; box = :SQUARE)) == 5
+    @test rules(Table(data; box = :MINIMAL_HEAVY_HEAD, compact = true)) == 1
+
+    # a table of one row still has its bottom border
+    @test rules(Table(hcat(1, 2); box = :SQUARE, compact = true)) == 3
+end
