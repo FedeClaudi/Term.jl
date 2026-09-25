@@ -272,3 +272,25 @@ end
     @test any(l -> occursin("item", l) && !occursin('╭', l), lines)
     @test any(l -> startswith(l, '╭'), lines)
 end
+
+@testset "Test Markdown table look from the theme" begin
+    src = "| a | b |\n|---|---|\n| 1 | 2 |\n| 3 | 4 |\n| 5 | 6 |\n"
+    render() = filter(!isempty, strip.(split(cleantext(parse_md(Markdown.parse(src); width = 40)), '\n')))
+
+    # by default: a rounded frame, and a rule under the header and every row
+    lines = render()
+    @test startswith(first(lines), '╭')
+    @test count(l -> occursin('─', l), lines) == 5
+
+    # much as GitHub draws it: only the header rule, and no frame
+    theme = Term.TERM_THEME[]
+    try
+        Term.TERM_THEME[] = Term.Theme(md_table_box = :MINIMAL_HEAVY_HEAD, md_table_compact = true)
+        lines = render()
+        @test !any(l -> occursin(r"[╭╰─]", l), lines)
+        @test count(l -> occursin('━', l), lines) == 1
+        @test count(l -> occursin('│', l), lines) == 4
+    finally
+        Term.TERM_THEME[] = theme
+    end
+end

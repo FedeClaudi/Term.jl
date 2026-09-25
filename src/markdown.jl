@@ -332,6 +332,12 @@ end
 
 Convert a markdown Table to a `Table` renderable.
 
+Its look is set by the theme: `md_table_box`, `md_table_style`,
+`md_table_header` and `md_table_compact`. For instance
+`md_table_box = :MINIMAL_HEAVY_HEAD, md_table_compact = true` draws it
+much as GitHub does, with a rule under the header, lines between the
+columns, and no outer frame or rules between the rows.
+
 Columns are as wide as their widest cell when the table fits in `width`.
 Otherwise the widest columns are narrowed first, and their cells wrapped,
 down to about their longest word; a table that does not fit even then is
@@ -345,13 +351,15 @@ function parse_md(tb::Markdown.Table; width = console_width(), inline = false, k
         header[i] => [r[i] for r in rows[2:end]] for i in 1:length(header)
     )
 
+    theme = TERM_THEME[]
     columns_widths = table_columns_widths(rows, width)
     table = Table(
         table_content;
         columns_justify = [just[j] for j in tb.align],
-        box = :ROUNDED,
-        header_style = TERM_THEME[].md_table_header,
-        style = "dim",
+        box = theme.md_table_box,
+        header_style = theme.md_table_header,
+        style = theme.md_table_style,
+        compact = theme.md_table_compact,
         columns_widths = columns_widths,
         wrap = !isnothing(columns_widths),
     )
