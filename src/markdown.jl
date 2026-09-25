@@ -178,6 +178,8 @@ Parse a code snippet with syntax highlighting (for Julia code).
 
 For non-inline code snippets the code is put in a panel
 with different background coloring to make it stand out.
+The theme's `md_codeblock_box` sets the panel's box (`:NONE` for none)
+and `md_codeblock_indent` how far it is indented, unless `lpad = false`.
 """
 function parse_md(
         code::Markdown.Code;
@@ -196,7 +198,7 @@ function parse_md(
         panel = Panel(
             RenderableText(syntax; style = "on_$(theme.md_codeblock_bg)");
             style = "white on_$(theme.md_codeblock_bg)",
-            box = :SQUARE,
+            box = theme.md_codeblock_box,
             subtitle = length(code.language) > 0 ? escape_brackets(code.language) :
                 nothing,
             width = width - 12,
@@ -205,11 +207,8 @@ function parse_md(
             fit = false,
         )
 
-        return if lpad
-            string("    " * panel)
-        else
-            string(panel)
-        end
+        indent = lpad ? theme.md_codeblock_indent : 0
+        return indent > 0 ? string(' '^indent * panel) : string(panel)
     end
 end
 

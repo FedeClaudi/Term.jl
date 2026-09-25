@@ -294,3 +294,25 @@ end
         Term.TERM_THEME[] = theme
     end
 end
+
+@testset "Test Markdown code block look from the theme" begin
+    src = "```julia\nf(x) = x + 1\n```\n"
+    render() = split(cleantext(parse_md(Markdown.parse(src); width = 40)), '\n')
+
+    # by default: a square panel, indented by four columns
+    lines = render()
+    @test startswith(first(lines), "    ┌")
+    @test any(l -> occursin("f(x) = x + 1", l), lines)
+
+    theme = Term.TERM_THEME[]
+    try
+        Term.TERM_THEME[] = Term.Theme(md_codeblock_box = :NONE, md_codeblock_indent = 0)
+        lines = render()
+        @test !any(l -> occursin(r"[┌┐└┘│─]", l), lines)
+        @test any(l -> occursin("f(x) = x + 1", l), lines)
+        @test all(l -> textwidth(l) == textwidth(first(lines)), lines)
+        @test textwidth(first(lines)) == 28  # the panel alone, `width - 12`
+    finally
+        Term.TERM_THEME[] = theme
+    end
+end
